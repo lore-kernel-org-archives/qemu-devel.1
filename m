@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C85C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E3FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:51:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD28B20758
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF40020759
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:51:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EiLvKn9T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD28B20758
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OPML/uex"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF40020759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZn7-0001yU-0r
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:50:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45438)
+	id 1jZZoL-0004Fe-17
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:51:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZic-000295-Ir
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58551
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZih-0002JU-2n
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47692
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZib-000260-7d
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:38 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZif-000278-4x
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546735;
+ s=mimecast20190719; t=1589546740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UDyGmwNluSmj3AKzcdp88iWWWctet5DfvVCBxbzUFQk=;
- b=EiLvKn9TdVIf/J0y3ehkYnbYcjGb9v0QbdXKxp0VpP0Isvf92+6nF0xQVKIWUfnVzMC3uR
- K48GY3bBMb27M/ECTVgTdGR9Er1e3CMxj7lLyWZ79TRjer8jiQki2yk+RIoxaF4qGRepSb
- hEkO0spW0LRuzWGB58GCENOjJ1e+9wI=
+ bh=tCfxbEtQqZs5JrNHeQ27Uq5tlNIM45o4v+oWJ8/63g0=;
+ b=OPML/uexAboaINJMdoTReN+3eVTwV4lT2HSmQvIOltGbMaY7vnelht7n1VsdTK65pAtMag
+ 1IoaWdOJT6IAiT+48fhxGWSiH3/wSV55t+ASTOc8vraU2xynEDfuu4K01A+rnAQEsnV6Gl
+ zgymgXYsN+pzSEdqztiJPIJOULzax6g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-Uec38bWgOMOH3dTzbeKLlg-1; Fri, 15 May 2020 08:45:33 -0400
-X-MC-Unique: Uec38bWgOMOH3dTzbeKLlg-1
+ us-mta-279-GSGZH1FbNkWyx4jDjJqMfw-1; Fri, 15 May 2020 08:45:36 -0400
+X-MC-Unique: GSGZH1FbNkWyx4jDjJqMfw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8068B8014D7;
- Fri, 15 May 2020 12:45:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1186819200C1;
+ Fri, 15 May 2020 12:45:35 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
  [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 860F82E024;
- Fri, 15 May 2020 12:45:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18A3C2E024;
+ Fri, 15 May 2020 12:45:33 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 02/51] iotests/229: Use blkdebug to inject an error
-Date: Fri, 15 May 2020 14:44:32 +0200
-Message-Id: <20200515124521.335403-3-kwolf@redhat.com>
+Subject: [PULL 04/51] iotests: Mirror with different source/target size
+Date: Fri, 15 May 2020 14:44:34 +0200
+Message-Id: <20200515124521.335403-5-kwolf@redhat.com>
 In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
 References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -98,96 +98,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-229 relies on the mirror running into an I/O error when the target is
-smaller than the source. After changing mirror to catch this condition
-while starting the job, this test case won't get a job that is paused
-for an I/O error any more. Use blkdebug instead to inject an error.
+This tests that the mirror job catches situations where the target node
+has a different size than the source node. It must also forbid resize
+operations when the job is already running.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200511135825.219437-3-kwolf@redhat.com>
+Message-Id: <20200511135825.219437-5-kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/229     | 15 +++++++++++----
- tests/qemu-iotests/229.out |  6 +++---
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/041     | 45 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/041.out |  4 ++--
+ 2 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-index 866168b236..a5d4e5d4f2 100755
---- a/tests/qemu-iotests/229
-+++ b/tests/qemu-iotests/229
-@@ -33,6 +33,7 @@ _cleanup()
-     _cleanup_test_img
-     _rm_test_img "$TEST_IMG"
-     _rm_test_img "$DEST_IMG"
-+    rm -f "$TEST_DIR/blkdebug.conf"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 1812dd8479..601c756117 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -240,6 +240,49 @@ class TestSingleBlockdev(TestSingleDrive):
+                              target=self.qmp_target)
+         self.assert_qmp(result, 'error/class', 'GenericError')
  
-@@ -49,11 +50,10 @@ _supported_os Linux
- 
- DEST_IMG="$TEST_DIR/d.$IMGFMT"
- TEST_IMG="$TEST_DIR/b.$IMGFMT"
-+BLKDEBUG_CONF="$TEST_DIR/blkdebug.conf"
- 
- _make_test_img 2M
--
--# destination for mirror will be too small, causing error
--TEST_IMG=$DEST_IMG _make_test_img 1M
-+TEST_IMG=$DEST_IMG _make_test_img 2M
- 
- $QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
- 
-@@ -67,11 +67,18 @@ echo
- echo '=== Starting drive-mirror, causing error & stop  ==='
- echo
- 
-+cat > "$BLKDEBUG_CONF" <<EOF
-+[inject-error]
-+event = "write_aio"
-+errno = "5"
-+once = "on"
-+EOF
++    def do_test_resize(self, device, node):
++        def pre_finalize():
++            if device:
++                result = self.vm.qmp('block_resize', device=device, size=65536)
++                self.assert_qmp(result, 'error/class', 'GenericError')
 +
- _send_qemu_cmd $QEMU_HANDLE \
-     "{'execute': 'drive-mirror',
-                  'arguments': {'device': 'testdisk',
-                                'format': '$IMGFMT',
--                               'target': '$DEST_IMG',
-+                               'target': 'blkdebug:$BLKDEBUG_CONF:$DEST_IMG',
-                                'sync':   'full',
-                                'mode':   'existing',
-                                'on-source-error': 'stop',
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-index 22350d75d7..fdcd249642 100644
---- a/tests/qemu-iotests/229.out
-+++ b/tests/qemu-iotests/229.out
-@@ -1,6 +1,6 @@
- QA output created by 229
- Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
--Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
-+Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=2097152
- wrote 2097152/2097152 bytes at offset 0
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {'execute': 'qmp_capabilities'}
-@@ -8,7 +8,7 @@ wrote 2097152/2097152 bytes at offset 0
++            result = self.vm.qmp('block_resize', node_name=node, size=65536)
++            self.assert_qmp(result, 'error/class', 'GenericError')
++
++        result = self.vm.qmp(self.qmp_cmd, job_id='job0', device='drive0',
++                             sync='full', target=self.qmp_target,
++                             auto_finalize=False, auto_dismiss=False)
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.run_job('job0', auto_finalize=False,
++                                 pre_finalize=pre_finalize)
++        self.assertEqual(result, None)
++
++    def test_source_resize(self):
++        self.do_test_resize('drive0', 'top')
++
++    def test_target_resize(self):
++        self.do_test_resize(None, self.qmp_target)
++
++    def do_test_target_size(self, size):
++        result = self.vm.qmp('block_resize', node_name=self.qmp_target,
++                             size=size)
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.qmp(self.qmp_cmd, job_id='job0',
++                             device='drive0', sync='full', auto_dismiss=False,
++                             target=self.qmp_target)
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.run_job('job0')
++        self.assertEqual(result, 'Source and target image have different sizes')
++
++    def test_small_target(self):
++        self.do_test_target_size(self.image_len // 2)
++
++    def test_large_target(self):
++        self.do_test_target_size(self.image_len * 2)
++
+     test_large_cluster = None
+     test_image_not_found = None
+     test_small_buffer2 = None
+@@ -251,6 +294,8 @@ class TestSingleDriveZeroLength(TestSingleDrive):
  
- === Starting drive-mirror, causing error & stop  ===
+ class TestSingleBlockdevZeroLength(TestSingleBlockdev):
+     image_len = 0
++    test_small_target = None
++    test_large_target = None
  
--{'execute': 'drive-mirror', 'arguments': {'device': 'testdisk', 'format': 'IMGFMT', 'target': 'TEST_DIR/d.IMGFMT', 'sync': 'full', 'mode': 'existing', 'on-source-error': 'stop', 'on-target-error': 'stop' }}
-+{'execute': 'drive-mirror', 'arguments': {'device': 'testdisk', 'format': 'IMGFMT', 'target': 'blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/d.IMGFMT', 'sync': 'full', 'mode': 'existing', 'on-source-error': 'stop', 'on-target-error': 'stop' }}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
- {"return": {}}
-@@ -21,5 +21,5 @@ wrote 2097152/2097152 bytes at offset 0
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
- *** done
+ class TestSingleDriveUnalignedLength(TestSingleDrive):
+     image_len = 1025 * 1024
+diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
+index 877b76fd31..53abe11d73 100644
+--- a/tests/qemu-iotests/041.out
++++ b/tests/qemu-iotests/041.out
+@@ -1,5 +1,5 @@
+-..............................................................................................
++........................................................................................................
+ ----------------------------------------------------------------------
+-Ran 94 tests
++Ran 104 tests
+ 
+ OK
 -- 
 2.25.4
 
