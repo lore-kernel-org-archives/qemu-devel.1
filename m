@@ -2,92 +2,100 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E6EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22FFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:49:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7589E205CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84AA820709
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:49:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Etu79MZd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7589E205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EO/Od1tP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84AA820709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZYbf-0006ho-KW
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:34:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57792)
+	id 1jZYqZ-00068O-Kz
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:49:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jZYNx-0001s2-EC
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:20:17 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37271)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jZYNw-0001lo-Gq
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:20:13 -0400
-Received: by mail-wm1-x341.google.com with SMTP id z72so2246502wmc.2
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 04:20:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=LakqsnOw1fCA9MrXwbf916YXPopabvmyCB0CB3Siu28=;
- b=Etu79MZdvTAjYzDSPOA/oDntJoYzM0lRgrXqE0Q4KmrYf8VDiI/Qssp3ZlVPgYMTfU
- yQnnw1qdmkr9f/6vF6lO2JM6OT1rWZgoPeHm7eTpZmFsIDriWlegddzHUjhD2ZW4Hgb+
- gdYIXx9GJTqAxFl4ZxzOjT6huV/wrOpyovVgDhxKOKymGZFnQT3wX9Z2liCKw+bMiLF6
- S2RLFejE63GCGiAdFh0FYsv/J99wcWaCHizOgZ7xn4WmOaHCmV+6zsjPXQu3Lh1WRGR4
- jdZMqLfvAsq7fySk8mJuj4809dd1hUYGlUkMIDzYKen0Pbfc/PxdmC//DSfn4PM2+PoY
- KAog==
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1jZYpk-0004zu-2G
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 07:48:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23111
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1jZYpi-0002Eb-Ig
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 07:48:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589543332;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=4sZCVbBZwAwxMCNzqSwUWyPYyZ+QolaNeecOJbi68l4=;
+ b=EO/Od1tP18xzMHPQBbLTqI4rZ4FhKQFjkaI8I0K8lejSTO9sk3CbYH4umRdtGwJKgYIelH
+ bRzSI2N1/Hxb1xvy5Tu1bdv8MVbqgOQTtuZRynat/q7veGkY9lUVHsH18LKJ0VliRToDD5
+ /fbhWaOcSTR+9o+KTZRcTDw01Hi9LIM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-h6C7gFflOZq6bEtHf6NBeA-1; Fri, 15 May 2020 07:48:51 -0400
+X-MC-Unique: h6C7gFflOZq6bEtHf6NBeA-1
+Received: by mail-wr1-f72.google.com with SMTP id l12so1073635wrw.9
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 04:48:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=LakqsnOw1fCA9MrXwbf916YXPopabvmyCB0CB3Siu28=;
- b=b8/4zM6IVnep2kpgd4DN6PcepAeb484wu0zNV4KQk27Mer9IA/zMsUwehwwncPPfic
- JFm9drqJlZ2KYgck2VxYX+ZnXq0eDTO5Wz1sEsO8rJEdmWh61mJGu1QXs2Jy7/WY1WU/
- xIzXKABPJHMEb0oaSlgFtleUPN1XREcZtYap3OtQ3+07WTRruge5rceRhAkyWUTeL9kz
- C0dB3loLkDZDStJrZYI2FUGOSo5SxfVwJzFHGr99VAiIXD0oTqAevq3eX3S5sDbmvjOl
- 58mplq/BBfvH2pJdFdCV0WkbLFR6u7/sqVAfmrVVEBEsDNd/yWChdJmRusV0xMJ3LdCu
- aziw==
-X-Gm-Message-State: AOAM533nrTzFMqylqkpoDLLQQa1kkF9owN0YehDjy/pzF6EtJ/FY/jeM
- k5tEEugMT/dCJw3rReYGWBu/aPghyqzomXXcrmk=
-X-Google-Smtp-Source: ABdhPJyRCrXTAbciMD6ETgZWeJL0CmSscvuEbHaf1tPoXgiupPWjucJN5yPfIpiMMpwHw/qK0y19N3EWhbrg+wm1Ob4=
-X-Received: by 2002:a1c:9a09:: with SMTP id c9mr3395888wme.159.1589541610767; 
- Fri, 15 May 2020 04:20:10 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4sZCVbBZwAwxMCNzqSwUWyPYyZ+QolaNeecOJbi68l4=;
+ b=TIV3NhXvSg8KGJ4al11uoo3T44ZbhXS+xAIcE1+S8abN+XBDjldadcGAZJyMOrMPdr
+ sUpnBIxJmA9olQRC5q6ub5v0SNP1l0qW3/wBFIEJKI9kq8klAUjV86LEN4Fg/Y3h7Ym9
+ NFiOaWVUmvMoz/IYvSqDo5QjhCU78mB1WOUI/tO17TamuPVynkzzhIB0ulZHT29BsS4r
+ Pd8rXMbEasX9G8HyP8Ss0/c7GrO+mNcPF79d1wtjHAXZ7hu2fUDwJt+lrc9BQhFWMUk7
+ aQDhUWCbO8qKQhMm5u3I6TV7091HVcn0Nlq9yA6hlfbokbGK6ysRk+Q+M9nig7YTj82V
+ 38pQ==
+X-Gm-Message-State: AOAM533JAyiyPeH68m5gxpqV1tFKP0R6qnJY43R4TWHRUNMq4ELVwCzg
+ oIz0xlc6olXVIE7n8X6XxDGE+CpIfEfmlqu94lYEoydK0TGLhVk6s4J6OfkjKWjBWuLuy7LhRUr
+ GWfRlNyOyWOO7tu0=
+X-Received: by 2002:adf:a118:: with SMTP id o24mr3752868wro.330.1589543329673; 
+ Fri, 15 May 2020 04:48:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbmFDEYaZT3RntLZgMsaG71g7veMFXIA2FRvbUJIlXm/8vfl0ILyJrOqbxvS521RZd1z1Drg==
+X-Received: by 2002:adf:a118:: with SMTP id o24mr3752848wro.330.1589543329453; 
+ Fri, 15 May 2020 04:48:49 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+ by smtp.gmail.com with ESMTPSA id n6sm3243394wrt.58.2020.05.15.04.48.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 15 May 2020 04:48:48 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] i386/kvm: correct the meaning of '0xffffffff' value for
+ hv-spinlocks
+Date: Fri, 15 May 2020 13:48:47 +0200
+Message-Id: <20200515114847.74523-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-References: <20200514192047.5297-1-aleksandar.qemu.devel@gmail.com>
- <20200514192047.5297-18-aleksandar.qemu.devel@gmail.com>
- <87lfltr5vk.fsf@dusky.pond.sub.org>
- <CAHiYmc6qZQz8c3mmuvdDWP0uPtBi5K5ie06JOTEo-sy7tbJojg@mail.gmail.com>
- <CAFEAcA9J6-qoyqJyH9mxhfX6oNhq+DkeFmGbsPbVgi0jX+qMMw@mail.gmail.com>
-In-Reply-To: <CAFEAcA9J6-qoyqJyH9mxhfX6oNhq+DkeFmGbsPbVgi0jX+qMMw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Fri, 15 May 2020 13:19:55 +0200
-Message-ID: <CAHiYmc6mpd2bRS9FuA0xmARNPC_9W0rZeixkDqKAdx_fiB_QNw@mail.gmail.com>
-Subject: Re: [PATCH v2 17/17] hw/mips: Convert Malta "ifdef 0"-ed code to
- comments
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=vkuznets@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,42 +108,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BF=D0=B5=D1=82, 15. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:12 Peter Maydell=
- <peter.maydell@linaro.org> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Fri, 15 May 2020 at 12:07, Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> > I understood your points. They make sense to me. In hindsight, in
-> > general, we shouldn't try just to silence checkpatch warnings (or, for
-> > that matter, compiler warnings as well), but try to resolve the root
-> > cause, the underlying issue, of the warning. In this case, creating
-> > tracepoints seems to be the right thing to do.
->
-> For this sort of "default case, guest accessed a bad register offset"
-> case, what I usually do is something like
->    qemu_log_mask(LOG_GUEST_ERROR, "malta_fpga_write: Bad register offset =
-0x"
->                  TARGET_FMT_lx "\n", addr);
->
-> That's a simpler change than adding tracepoints and matches how
-> we report this kind of guest-did-the-wrong-thing behaviour elsewhere.
->
+Hyper-V TLFS prior to version 6.0 had a mistake in it: special value
+'0xffffffff' for CPUID 0x40000004.EBX was called 'never to retry', this
+looked weird (like why it's not '0' which supposedly have the same effect?)
+but nobody raised the question. In TLFS version 6.0 the mistake was
+corrected to 'never notify' which sounds logical. Fix QEMU accordingly.
 
-Oh, great! I appreciate your remark and guidance very much!
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ docs/hyperv.txt   | 2 +-
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 4 ++--
+ target/i386/kvm.c | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-I am going to correct this patch in v3.
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+index 6518b716a958..5df00da54fc4 100644
+--- a/docs/hyperv.txt
++++ b/docs/hyperv.txt
+@@ -49,7 +49,7 @@ more efficiently. In particular, this enlightenment allows paravirtualized
+ ======================
+ Enables paravirtualized spinlocks. The parameter indicates how many times
+ spinlock acquisition should be attempted before indicating the situation to the
+-hypervisor. A special value 0xffffffff indicates "never to retry".
++hypervisor. A special value 0xffffffff indicates "never notify".
+ 
+ 3.4. hv-vpindex
+ ================
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 7a4a8e3847f0..5bb9a8017523 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -7133,7 +7133,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+ 
+     DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
+-                       HYPERV_SPINLOCK_NEVER_RETRY),
++                       HYPERV_SPINLOCK_NEVER_NOTIFY),
+     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
+                       HYPERV_FEAT_RELAXED, 0),
+     DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 408392dbf6f4..80253d1c373b 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -980,8 +980,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define HYPERV_FEAT_IPI                 13
+ #define HYPERV_FEAT_STIMER_DIRECT       14
+ 
+-#ifndef HYPERV_SPINLOCK_NEVER_RETRY
+-#define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
++#ifndef HYPERV_SPINLOCK_NEVER_NOTIFY
++#define HYPERV_SPINLOCK_NEVER_NOTIFY             0xFFFFFFFF
+ #endif
+ 
+ #define EXCP00_DIVZ	0
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 34f838728dd6..28e9c73cc2a5 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -731,7 +731,7 @@ static bool hyperv_enabled(X86CPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+     return kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV) > 0 &&
+-        ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_RETRY) ||
++        ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) ||
+          cpu->hyperv_features || cpu->hyperv_passthrough);
+ }
+ 
+@@ -1201,7 +1201,7 @@ static int hyperv_handle_properties(CPUState *cs,
+             env->features[FEAT_HV_RECOMM_EAX] = c->eax;
+ 
+             /* hv-spinlocks may have been overriden */
+-            if (cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_RETRY) {
++            if (cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) {
+                 c->ebx = cpu->hyperv_spinlock_attempts;
+             }
+         }
+-- 
+2.25.4
 
-Sincerely,
-Aleksandar
-
-> thanks
-> -- PMM
 
