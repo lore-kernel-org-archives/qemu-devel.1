@@ -2,84 +2,72 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64862C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CCFC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E2202076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:32:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o77+yC/a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2202076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 96FEB20671
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96FEB20671
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbNi-0001aE-CN
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:32:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38180)
+	id 1jZbRa-0004Zo-Ic
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:36:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbJw-0004wO-QG
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:28:16 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46057)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbJv-0005il-JC
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:28:16 -0400
-Received: by mail-ot1-x332.google.com with SMTP id c3so1994241otr.12
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=reQyUrW9mva1Op8l/EMrOreOktGwhFUrlHplVgfpIbc=;
- b=o77+yC/akFvBIL3fCREBfxEP46bDkXXoccQ3s0vlSSYQyAX3UI5Biu/wJQ6puhtHYO
- 3BkHRc3uwhgKNlwkJYWFgjLesliA0cYydUDRZp9F4CLVwe6uPO2RXOjAKhZ4zHXFHIqn
- RTkVkptKxgF8aZVEQyIJImlCgvGUnuEsLWFhnn9JDl85cvyOJd9+Lh6/aD+6//NB1140
- hv2DXojictHiTWziJm35smAl3kDh9OHg+1AqSgyEegubuEvO9lVXRLPXWqo0q06Guby9
- dM6wW2pbBOHvmib6GBmjIO3etVHYEvo59mQUwskkWGaHeBkakyBM257mFzLgt11MUyEJ
- aEmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=reQyUrW9mva1Op8l/EMrOreOktGwhFUrlHplVgfpIbc=;
- b=KPNJI+QurLguzF4gN40a2k6SBIJxfL1O9X9qOGI/ybRNdzkhYEqVT4mWnRxY6lTYwf
- 0NM5eBUfPXrxp3kp8j/koGlXzWRNmTnNOAW1XsAAM/+1kipyfskpLQYFzgq8/ci758+k
- jT71rHgCbYr80feTp21IL39gN5AFcPrsN42QZ7Kwn98JgZGG3NM37eMTv1zcnTdl1t2C
- rhqlVXS/HPQXMQRi/A+QmJITyWegpANdj2v4ceDiTSiL0aBZuIpr9oXqlR0eu/er1SCR
- 1er9+cP6GqgOeDTcwK27S/hhwp2iWFmrxxysgMAifRcwbqSzFiokS02cn28kD5HIMIN2
- fMLA==
-X-Gm-Message-State: AOAM533liAG/MaXBgpix7hWtcIzUrKD9b4ZPlKbfDgxJnQq1+jA+KHH7
- mWtI71tdWpJbjXm5pV+3vmBBHSD73l7oGeYtVMnV3w==
-X-Google-Smtp-Source: ABdhPJx8HQ3nSRmJIViug/Xxsj7fN8V2OYbJyKYF6XhzhbPbdVPZhWVBfoIWYpr4TXJSZMxLKZh/ncrK6yDm9KqN4Nk=
-X-Received: by 2002:a9d:3623:: with SMTP id w32mr681400otb.91.1589552894202;
- Fri, 15 May 2020 07:28:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jZbQj-0003r5-6F
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:17 -0400
+Resent-Date: Fri, 15 May 2020 10:35:17 -0400
+Resent-Message-Id: <E1jZbQj-0003r5-6F@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21356)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jZbQh-0007hJ-5g
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589553300; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=GCY7o0h2bFK9LFVIdaKVVQlJbz0Yse3VZ5KWjUSMO51WRRrH2TAMFXlG1wgcY9BhDlwMgZW5dHCW0HDvk1kAtYyliJJvi56MMlAOoY7tWDy5DVcdZqkWBbN3VKh+2hDbhBEIzBVJrCdFDrlfbigW6XS25KEYpSJ48Lpc7nWyEhw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589553300;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ZezM6BpkDrmbG0X8cu3Aynz0h8fh3mfhaz2Kipz8v+A=; 
+ b=VmXTvFIBcEj/QFM5aS2r+0Pgey1W+PT2eM5xkIAY+crpc7MSyRj8nKeDcpOgBIEvWlayYA8R+xoQsKpsRFnI336PqxFfMH9C62u1KF0nJ6LE8G6RzoidZ7+0r2WvpqgOQPEIXMfJ0TJvSAtW2+968gWc344j3IHO+0B+uzQKfxg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589553298889407.5702973357555;
+ Fri, 15 May 2020 07:34:58 -0700 (PDT)
+Message-ID: <158955329783.4564.10993194901347019272@45ef0f9c86ae>
+In-Reply-To: <20200515060424.18993-1-armbru@redhat.com>
+Subject: Re: [PULL 00/21] QOM patches for 2020-05-15
 MIME-Version: 1.0
-References: <20200515124521.335403-1-kwolf@redhat.com>
-In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 May 2020 15:28:03 +0100
-Message-ID: <CAFEAcA9Wh7DKs38aMJ+35Sji8cFaViBXsphWZyZ_qW6n1qn30g@mail.gmail.com>
-Subject: Re: [PULL 00/51] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Fri, 15 May 2020 07:34:58 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 10:35:12
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,161 +81,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 at 13:45, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 013a18edbbc59cdad019100c7d03c0494642b74c:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200514' into staging (2020-05-14 16:17:55 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 7d8f21a650e562270f5ed5341134c9c2c39dc5e8:
->
->   iotests/030: Reduce run time by unthrottling job earlier (2020-05-15 14:12:34 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Introduce real BdrvChildRole
-> - blk/bdrv_make_empty() functions instead of calling callbacks directly
-> - mirror: Make sure that source and target size match
-> - block-copy: Fix uninitialized variable
-> - block/replication: Avoid cancelling the job twice
-> - ahci: Log lost IRQs
-> - iotests: Run pylint and mypy in a testcase
-> - iotests: log messages from notrun()
-
-Hi; I'm afraid aarch64, ppc64 and aarch32 all failed on iotest 229:
-
-
-PPC64:
-  TEST    iotest-qcow2: 229 [fail]
-QEMU          --
-"/home/pm215/qemu/build/all/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
--nodefaults -display none -accel qtest
-QEMU_IMG      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
-writeback --aio threads -f qcow2
-QEMU_NBD      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/ppc64 gcc1-power7 3.10.0-862.14.4.el7.ppc64
-TEST_DIR      -- /home/pm215/qemu/build/all/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.6nPwQm0Y01
-SOCKET_SCM_HELPER --
-/home/pm215/qemu/build/all/tests/qemu-iotests/socket_scm_helper
-
---- /home/pm215/qemu/tests/qemu-iotests/229.out 2020-05-15
-12:46:57.991595216 +0000
-+++ /home/pm215/qemu/build/all/tests/qemu-iotests/229.out.bad
-2020-05-15 12:55:31.022877791 +0000
-@@ -21,5 +21,5 @@
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id":
-"testdisk"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id":
-"testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len":
-2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len":
-2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
- *** done
-
-AArch64:
-  TEST    iotest-qcow2: 229 [fail]
-QEMU          --
-"/home/pm/qemu/build/all/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
--nodefaults -dis
-play none -machine virt -accel qtest
-QEMU_IMG      -- "/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
-writeback --aio threads -f qcow2
-QEMU_NBD      -- "/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/aarch64 qemu-test 5.4.19
-TEST_DIR      -- /home/pm/qemu/build/all/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.xiNXu5VDz9
-SOCKET_SCM_HELPER --
-/home/pm/qemu/build/all/tests/qemu-iotests/socket_scm_helper
-
---- /home/pm/qemu/tests/qemu-iotests/229.out    2020-05-15
-12:46:56.086403523 +0000
-+++ /home/pm/qemu/build/all/tests/qemu-iotests/229.out.bad
-2020-05-15 12:58:25.074083672 +0000
-@@ -21,5 +21,5 @@
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "ru
-nning", "id": "testdisk"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "ab
-orting", "id": "testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
-testdisk", "len": 2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
-testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
- *** done
-
-AArch32:
-
-  TEST    iotest-qcow2: 229 [fail]
-QEMU          --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
--
-nodefaults -display none -machine virt -accel qtest
-QEMU_IMG      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-io"
- --cache writeback --aio thre
-ads -f qcow2
-QEMU_NBD      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/aarch64 mustang-maydell 4.15.0-51-generic
-TEST_DIR      --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.tbyzUS8J3l
-SOCKET_SCM_HELPER --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/socket_scm_helper
-
---- /home/peter.maydell/qemu/tests/qemu-iotests/229.out 2020-05-15
-12:46:56.206202633 +0000
-+++ /home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/229.out.bad
-      2020-05-15 13:06:42.331534509 +0000
-@@ -21,5 +21,5 @@
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "ru
-nning", "id": "testdisk"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "ab
-orting", "id": "testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
-testdisk", "len": 2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
-testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
- *** done
-
-thanks
--- PMM
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxNTA2MDQyNC4xODk5
+My0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUxNTA2MDQyNC4xODk5My0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzIxXSBRT00gcGF0Y2hlcyBmb3IgMjAyMC0wNS0xNQpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
+di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE1N2I5YTAgaHc6IFJlbW92ZSB1bm5lY2Vzc2FyeSBE
+RVZJQ0UoKSBjYXN0CjlmMDcyN2EgdmFyaW91czogUmVtb3ZlIHVubmVjZXNzYXJ5IE9CSkVDVCgp
+IGNhc3QKMjg1ODkzYyB0YXJnZXQ6IFJlbW92ZSB1bm5lY2Vzc2FyeSBDUFUoKSBjYXN0CjRmM2I2
+ZWEgcW9tOiBEcm9wIEBlcnJwIHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVydHlfZGVsKCkKNmIz
+M2EwNSBzcGFwcl9wY2k6IERyb3Agc29tZSBkZWFkIGVycm9yIGhhbmRsaW5nCjQ1MzRiODEgcWRl
+djogVW5yZWFsaXplIG11c3Qgbm90IGZhaWwKNGZmNWQ4MCBEcm9wIG1vcmUgQGVycnAgcGFyYW1l
+dGVycyBhZnRlciBwcmV2aW91cyBjb21taXQKNWQ1NzM0MiBxb206IERyb3AgcGFyYW1ldGVyIEBl
+cnJwIG9mIG9iamVjdF9wcm9wZXJ0eV9hZGQoKSAmIGZyaWVuZHMKOGYxNWJmOSBxZGV2OiBDbGVh
+biB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKQo2MmVjMmFkIGh3L2FybS9iY20yODM1
+OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRvcHRpbmcgbWVtb3J5CmQxZDYxMWQgZTEw
+MDA6IERvbid0IHJ1biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UKMjk1MzE0NyBody9pc2Ev
+c3VwZXJpbzogTWFrZSB0aGUgY29tcG9uZW50cyBRT00gY2hpbGRyZW4KYjc1MWM5OSBzMzkweC9j
+cHVtb2RlbDogRml4IFVJIHRvIENQVSBmZWF0dXJlcyBwY2MtY21hYy17YWVzLCBlYWVzfS0yNTYK
+MDJkMjJlNSB0ZXN0cy9jaGVjay1xb20tcHJvcGxpc3Q6IEltcHJvdmUgaXRlcmF0b3IgY292ZXJh
+Z2UKMGRkMDFjNzAgcW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24oKSBw
+YXJhbWV0ZXIgQGVycnAKYTY3YTI2ZSBxb206IE1ha2UgYWxsIHRoZSBvYmplY3RfcHJvcGVydHlf
+YWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkKMTgwOGM4YyBxb206IERyb3AgY29udmVuaWVu
+Y2UgbWV0aG9kIG9iamVjdF9wcm9wZXJ0eV9nZXRfdWludDE2TGlzdCgpCjJhOTRkYmUgcW9tOiBT
+aW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0X2VudW0oKQo3YmI1MTlkIHFvbTogRHJvcCBvYmpl
+Y3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVzZWQgcGFyYW1ldGVyIEBlcnJwCjQ3YjExMmEg
+cW9tOiBDbGVhbiB1cCBpbmNvbnNpc3RlbnQgdXNlIG9mIGdjaGFyICogdnMuIGNoYXIgKgowNzEz
+ZWE4IHFvbTogQ2xlYXJlciByZWZlcmVuY2UgY291bnRpbmcgaW4gb2JqZWN0X2luaXRpYWxpemVf
+Y2hpbGR2KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjEgQ2hlY2tpbmcgY29tbWl0IDA3MTNl
+YThlYTIyMyAocW9tOiBDbGVhcmVyIHJlZmVyZW5jZSBjb3VudGluZyBpbiBvYmplY3RfaW5pdGlh
+bGl6ZV9jaGlsZHYoKSkKMi8yMSBDaGVja2luZyBjb21taXQgNDdiMTEyYWYzZDYwIChxb206IENs
+ZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2NoYXIgKiB2cy4gY2hhciAqKQozLzIxIENoZWNr
+aW5nIGNvbW1pdCA3YmI1MTlkNGIzYmYgKHFvbTogRHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2No
+aWxkKCkncyB1bnVzZWQgcGFyYW1ldGVyIEBlcnJwKQo0LzIxIENoZWNraW5nIGNvbW1pdCAyYTk0
+ZGJlMTJhY2UgKHFvbTogU2ltcGxpZnkgb2JqZWN0X3Byb3BlcnR5X2dldF9lbnVtKCkpCjUvMjEg
+Q2hlY2tpbmcgY29tbWl0IDE4MDhjOGNhOGIzYyAocW9tOiBEcm9wIGNvbnZlbmllbmNlIG1ldGhv
+ZCBvYmplY3RfcHJvcGVydHlfZ2V0X3VpbnQxNkxpc3QoKSkKNi8yMSBDaGVja2luZyBjb21taXQg
+YTY3YTI2ZWYwM2NiIChxb206IE1ha2UgYWxsIHRoZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygp
+IHJldHVybiB0aGUgcHJvcGVydHkpCjcvMjEgQ2hlY2tpbmcgY29tbWl0IDBkZDAxYzcwMzI4NCAo
+cW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVy
+cnApCjgvMjEgQ2hlY2tpbmcgY29tbWl0IDAyZDIyZTUxYTgzOSAodGVzdHMvY2hlY2stcW9tLXBy
+b3BsaXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVyYWdlKQo5LzIxIENoZWNraW5nIGNvbW1pdCBi
+NzUxYzk5ZDM3OTkgKHMzOTB4L2NwdW1vZGVsOiBGaXggVUkgdG8gQ1BVIGZlYXR1cmVzIHBjYy1j
+bWFjLXthZXMsIGVhZXN9LTI1NikKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1OTog
+RklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlc19kZWYuaW5jLmg6MzE0OgorREVGX0ZFQVQo
+UENDX0NNQUNfQUVTXzI1NiwgInBjYy1jbWFjLWFlcy0yNTYiLCBQQ0MsIDIwLCAiUENDIENvbXB1
+dGUtTGFzdC1CbG9jay1DTUFDLVVzaW5nLUFFUy0yNTYiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCjEwLzIxIENoZWNraW5nIGNvbW1pdCAyOTUzMTQ3MGI4MzYgKGh3L2lzYS9zdXBlcmlv
+OiBNYWtlIHRoZSBjb21wb25lbnRzIFFPTSBjaGlsZHJlbikKMTEvMjEgQ2hlY2tpbmcgY29tbWl0
+IGQxZDYxMWQxMTJiYyAoZTEwMDA6IERvbid0IHJ1biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdp
+Y2UpCjEyLzIxIENoZWNraW5nIGNvbW1pdCA2MmVjMmFkZGUwMWEgKGh3L2FybS9iY20yODM1OiBE
+cm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRvcHRpbmcgbWVtb3J5KQoxMy8yMSBDaGVja2lu
+ZyBjb21taXQgOGYxNWJmOThiN2I0IChxZGV2OiBDbGVhbiB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19v
+dXRfbmFtZWQoKSkKMTQvMjEgQ2hlY2tpbmcgY29tbWl0IDVkNTczNDJlMTY1MiAocW9tOiBEcm9w
+IHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJvcGVydHlfYWRkKCkgJiBmcmllbmRzKQpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjExOiBGSUxFOiBiYWNrZW5kcy9ob3N0bWVt
+LWZpbGUuYzoxODc6CisgICAgICAgIGZpbGVfbWVtb3J5X2JhY2tlbmRfZ2V0X2Rpc2NhcmRfZGF0
+YSwgZmlsZV9tZW1vcnlfYmFja2VuZF9zZXRfZGlzY2FyZF9kYXRhKTsKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDgyOiBGSUxFOiBody9hcm0vcmFzcGkuYzoyODc6CisgICAg
+b2JqZWN0X3Byb3BlcnR5X2FkZF9jb25zdF9saW5rKE9CSkVDVCgmcy0+c29jKSwgInJhbSIsIE9C
+SkVDVChtYWNoaW5lLT5yYW0pKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMz
+MTE2OiBGSUxFOiBody9wcGMvc3BhcHIuYzozMzM2OgorICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAmc3BhcHItPmtlcm5lbF9hZGRyLCBPQkpfUFJPUF9GTEFHX1JFQURXUklURSk7
+Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDQ0ODggbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MTQvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTUvMjEgQ2hlY2tpbmcgY29tbWl0IDRm
+ZjVkODAwZmM2NSAoRHJvcCBtb3JlIEBlcnJwIHBhcmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29t
+bWl0KQoxNi8yMSBDaGVja2luZyBjb21taXQgNDUzNGI4MTQ4Yzg0IChxZGV2OiBVbnJlYWxpemUg
+bXVzdCBub3QgZmFpbCkKMTcvMjEgQ2hlY2tpbmcgY29tbWl0IDZiMzNhMDU0M2NhMCAoc3BhcHJf
+cGNpOiBEcm9wIHNvbWUgZGVhZCBlcnJvciBoYW5kbGluZykKMTgvMjEgQ2hlY2tpbmcgY29tbWl0
+IDRmM2I2ZWFlYjcxZSAocW9tOiBEcm9wIEBlcnJwIHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVy
+dHlfZGVsKCkpCjE5LzIxIENoZWNraW5nIGNvbW1pdCAyODU4OTNjNGIyMGQgKHRhcmdldDogUmVt
+b3ZlIHVubmVjZXNzYXJ5IENQVSgpIGNhc3QpCjIwLzIxIENoZWNraW5nIGNvbW1pdCA5ZjA3Mjdh
+NDliNTkgKHZhcmlvdXM6IFJlbW92ZSB1bm5lY2Vzc2FyeSBPQkpFQ1QoKSBjYXN0KQoyMS8yMSBD
+aGVja2luZyBjb21taXQgMTU3YjlhMGVmZGNmIChodzogUmVtb3ZlIHVubmVjZXNzYXJ5IERFVklD
+RSgpIGNhc3QpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMjAwNTE1MDYwNDI0LjE4OTkzLTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
