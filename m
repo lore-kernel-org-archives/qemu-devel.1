@@ -2,99 +2,121 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A425C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:48:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D7452076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 415A520759
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ESRomGei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D7452076A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nMSCjOk5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 415A520759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZkV-0004sG-Gr
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:47:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44968)
+	id 1jZZku-0005Cb-Ck
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:48:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZZee-0003Xa-An
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:41:32 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45361)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZZed-0000G3-BI
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:41:32 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v12so3326480wrp.12
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 05:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=IQ0eFlSkR7zpXpj+3Jtq2ybHouefTyQIC/gafnIl3xo=;
- b=ESRomGeiqJRaAs6n9qnTW03sDrXgnT1QfCu4Jere/9OBt1ixa4K8zTBDX4giBD96Qs
- LIY9sUdo6lNE4CJ76fOxwQu5WRDF3pymlcYHLOTkJ+uzYR8sE+JYCSLOnteaQXw0BHIa
- JFAC5Ugkz5//SOQ4vW/JcYTWm66KjaW+h0HWozfiZk8HMPdFYS2pEmyUJYF5lcf/uMtv
- CdHOsOqkEREnCB6rgi8og2hFxsVBEyGt/EDaqtoC1LTaj4qMOLSmP7jPmb2HsRaUoTW5
- tFhcnU2+6TO6CTZhwSOF5vQUE4Pt2fXZxNmxOBb8PH52at/vW4pmgKHDY9tr40+yTolf
- RrqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IQ0eFlSkR7zpXpj+3Jtq2ybHouefTyQIC/gafnIl3xo=;
- b=BhzZDgxkyYg0Us2UrUiDB4tScWOc5UvOQh2Cn4cK/Q23HGQE6eq8kD/5eO2mf7phoi
- s0Djs+BDMTCS/7BiffP350+x+PObKRCZv83ya9xm1PfEfqkZe1xRLxQQzvms8tnv+D6g
- FqHqms3U1gXtYN2lewew1PBGsEFSWs2uuJROHmh2SGyjUWbioN3MpBnBMDPfQ5ItIqMV
- SGio/sW48eZSznzHatbkxFfgezT60Z1m6RKJKuTAqX1rOPKFU8bB/3wMSEcbjAjuA2rh
- UIwkVtZp0P/qsfv8Bkz/ifIMt92V+ILMFkxvKxJPN+BysX1Kr23upCTNGtRrqqqQeiJE
- pBVA==
-X-Gm-Message-State: AOAM533b3Rmx/aJY0DnmUM/3crWm+d6lXtSwtSrfErkpWC7BW83HskYM
- VNLxUhidk2w/NYZXRJWvucw=
-X-Google-Smtp-Source: ABdhPJyguttZLTiyLrdgZbyoee/ObyT1w6IFSSUzHQnpO74GfsYedfTpCQAN+hYiaKF/JBMB5e8zLQ==
-X-Received: by 2002:adf:8169:: with SMTP id 96mr4057902wrm.283.1589546489381; 
- Fri, 15 May 2020 05:41:29 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id t6sm3473858wma.4.2020.05.15.05.41.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 15 May 2020 05:41:28 -0700 (PDT)
-Subject: Re: [PATCH] tests/docker: Kludge <linux/swab.h> breakage by pinning
- linux-libc-dev
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200513120147.21443-1-f4bug@amsat.org>
- <87a72beuhn.fsf@linaro.org> <2839ba1a-f4c4-3a4d-cabe-d6e0e1b6accc@amsat.org>
- <87blmpcshm.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <832577c9-7a7d-43d9-796b-e22e71b8baed@amsat.org>
-Date: Fri, 15 May 2020 14:41:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <87blmpcshm.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZZeE-0002UN-Sy; Fri, 15 May 2020 08:41:06 -0400
+Received: from mail-eopbgr150102.outbound.protection.outlook.com
+ ([40.107.15.102]:11310 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZZeD-0008VJ-VS; Fri, 15 May 2020 08:41:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uo+Y7/dLEtZAbHZoFOoi72qFFzJJ/lZLqOxTOjiZ+3uMVV21n2vH6mN7mGqUWcICz4S/lrSHNgGAViWq9cg2xKythx5Poxi+clQ07oBas17YYAT06BtU2UmlMWIK7BURgsz5G7OjyTPXciQvbC2cvewy+9cKMux9dU4OYHB3NtXLE+IOc/z5OGHOMRSjhxNBNChanPhkLL4V0/gF8D+Byv4ikZMKYOZU/4vQ5OgTZyyrvugGROQcgx3WOSFCBr+AEiKfW8/2ttJgy/vmiorRPRnyxFBb90O12uidpcR4ncOyazRKp69mGBP/wp6VR9H9B+NZJtj6lSMizoQ+ycGa3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZSB2hKNLczbYc9ZqKMwDegweqQ1vr9FoUCy1i1/yrhY=;
+ b=Y8MTdplWyJ9E58i+nqTR4yLhHE57Rd6c3jsnYevnBm3mgzAAInjdwx393F8vpbF/fUYVfPQNdaw5GpOCstTCIYcAKuf4FxxN9FdlLPSuh3arzrRGvYtfsnCGu1KpoLc8RCkvbXRBalQwq3XZ+BzkkC6+ikXfEhcU3Jazg4LvjuNesNFG+O1EohPfTeQsuv3IZziPCgQSlYKlhDfSJqA+5/eDT1HT6+ILVXXz99IDyDRZah6rTx60YHrZlJZOfYSn4Yu0wcMfYRBeDEoBu5BbGTb+5C38tpXz/S1Im+yK1/a19zI7L8dG+0z38KU+Mt/E0YAvN/oos1qAMZLgh97skA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZSB2hKNLczbYc9ZqKMwDegweqQ1vr9FoUCy1i1/yrhY=;
+ b=nMSCjOk5Tg+RI2Mf9cH+6u0Jn5+1xDl1t1hbbQNB8aWTnU09e8pDyVQ8RxEqwwlsKFZsppmilKR7Xfpo8tCjyrJURX9cJlPoX9SYo7f7okfNw0lM1mhbw6Z0nOXpWF4CkiOK9oJKcL0X76l37t65tNBuqFxiiGJoYkk/NH38W6U=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5381.eurprd08.prod.outlook.com (2603:10a6:20b:105::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
+ 2020 12:40:59 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Fri, 15 May 2020
+ 12:40:59 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 7/7] migration/block-dirty-bitmap: forbid migration by
+ generated node-name
+Date: Fri, 15 May 2020 15:40:24 +0300
+Message-Id: <20200515124024.3491-8-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200515124024.3491-1-vsementsov@virtuozzo.com>
+References: <20200515124024.3491-1-vsementsov@virtuozzo.com>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR03CA0039.eurprd03.prod.outlook.com (2603:10a6:208::16)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.184) by
+ AM0PR03CA0039.eurprd03.prod.outlook.com (2603:10a6:208::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.20 via Frontend Transport; Fri, 15 May 2020 12:40:58 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.184]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 40384dc3-e3ee-432d-8281-08d7f8cd3828
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5381C5F2798949C78EB5A123C1BD0@AM7PR08MB5381.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:15;
+X-Forefront-PRVS: 04041A2886
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AUAgAEGaz9voBAd7c+WiVBi59q/g9HKmxhZaFka8AxrGtnodN4USYXXKKbCutG/z8tE3d+xGRchbehr4GX1tcsA1AJpVFYpeb6CXMd+EDeBUxOXi4WWw6m6MmRABriYpB3GtHvjVoxsjC32Mv1vLdyloPc7twbZu2FRAM1jb71ubrHc9+E6wsYJJZF5aueJlG1/6TQCcnLrc+byXn9sQ+H1+y3SpUCpWAJV9ZDhf8wh2RLWcySspATquvORVAZM+HPpPa76iVtVTDdKb6/c1Pk514JvJEmBxwndUrXGAp7BSUIOorMRlIZ+dLOR/LLUbGvo8Pe72l1T2cIB8CsORborx96bWktfz9I+6ZXvebP14iyWs7vbpfV7CuUCfPfapSbziwi3TNnCcCWy4tQkJmtiJ2SoH794vMWOeKRgyKZ1YU266xluU5PC9LCmXj9nj+1TcV1Qu3ak/+watjhuwDWCx5+J5Kl9J3FlRQCi00W0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(136003)(346002)(396003)(39840400004)(52116002)(6486002)(36756003)(8676002)(7416002)(8936002)(6916009)(478600001)(6666004)(86362001)(6512007)(4326008)(316002)(107886003)(26005)(5660300002)(16526019)(186003)(6506007)(4744005)(2616005)(2906002)(1076003)(956004)(66556008)(66946007)(66476007)(14143004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: j4dCfSXhzIXKSGG5CbbQ8KFUbnCF9q3aseQdDhkHiRx7qaAbzwCttfrqN79gN3yaWOSdubUxad2MP8MRSt6rFOGUvK09dknXFkNz8KP5uOghHvBYrkCuV4+E1VwEBZtCHZI40D30v95M+sUywiU0+qNLKi2/ZShyuGpRDNDojGmi3novMjLLGVotR8FOFiYPHeC0xybR4ZdPOiCRd22ZFWENuS6aNfXKmC5A9Sdg2g8HjzHRz+bTN43uIBU4JT4LqAxoSgSQ6Gonwhl3xhdCsDo8Lc7jeG0ihMd3Ug4vCdhYIUENvhjHnel4ngo11JH9TSNsSzi6NIpuWaLOgIKpkHxjxHLdzICYslJwlnd4ur4i9j7/jfRk5kYmr+oARHRErFSM5qPTolVFnlf7WHcYptBJn4BNRgPCGRO02AV8h5CpjnazNJisgJOqx4k897yKgbGd7seap+U4D4z5eDdRJdVO2Qz+KtsdfI+++SC0LFc=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40384dc3-e3ee-432d-8281-08d7f8cd3828
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 12:40:59.1930 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ghieIhwabVWeVtyJKO0IrIVC7Z7a7qiTAWL2k3e9S1j42ypkMOgfMr1d1+d7CBPCB6S4KprbQGE0Tdbg0FKaasHMT8X8cNsKA4rdXvcILBs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
+Received-SPF: pass client-ip=40.107.15.102;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 08:40:51
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,140 +130,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Salvatore Bonaccorso <carnil@debian.org>
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ stefanha@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, mreitz@redhat.com,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, pavel.dovgaluk@ispras.ru,
+ den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/20 2:06 PM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> On 5/13/20 5:15 PM, Alex Bennée wrote:
->>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>>
->>>> Linux kernel commit d5767057c9a [1] aimed to fix an issue with the
->>>> swab() declaration, but doing so it introduced the BITS_PER_LONG
->>>> definition, without using the kernel __ prefix, leading to odd
->>>> failures in userland code using kernel uapi headers, such:
->>>>
->>>>         CC      block/file-posix.o
->>>>       In file included from include/qemu/timer.h:4,
->>>>                        from include/qemu/timed-average.h:29,
->>>>                        from include/block/accounting.h:28,
->>>>                        from include/block/block_int.h:27,
->>>>                        from block/file-posix.c:30:
->>>>       /usr/include/linux/swab.h: In function `__swab':
->>>>       include/qemu/bitops.h:20:34: error: "sizeof" is not defined, evaluates to 0 [-Werror=undef]
->>>>          20 | #define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
->>>>             |                                  ^~~~~~
->>>>       include/qemu/bitops.h:20:41: error: missing binary operator before token "("
->>>>          20 | #define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
->>>>             |                                         ^
->>>>       cc1: all warnings being treated as errors
->>>>       make: *** [rules.mak:69: block/file-posix.o] Error 1
->>>>
->>>> The issue has been fixed in Linux kernel commit 467d12f5c78 [2].
->>>> Some distributions already backported the first commit, but still
->>>> lack the second one.
->>>>
->>>> This is the case for Debian Buster.
->>>> The linux-libc-dev package contains the Linux kernel headers.
->>>> Kernel commit d5767057c9a has been backported in package
->>>> commit 1fb0eb7956 "Update to 4.19.116" [3], see debian/changelog:
->>>>
->>>>     +linux (4.19.116-1) UNRELEASED; urgency=medium
->>>>     ...
->>>>     +    - uapi: rename ext2_swab() to swab() and share globally in swab.h
->>>>
->>>> The previous released update before it is debian/4.19.98-1,
->>>> released as debian/4.19.98-1+deb10u1.
->>>>
->>>> We can find this package in the Debian snapshot archives,
->>>> luckily archived on 2020-04-28 21:20:54 (see [4]).
->>>>
->>>> QEMU use Debian based Docker images for most of its cross-builds,
->>>> which are tested by our Shippable CI jobs. The current broken
->>>> package makes most of our CI red. We can kludge this by using the
->>>> latest package released before the breakage. Do so by pinning
->>>> the package version (apt hold), and using the snapshot archives,
->>>> similar to commit b4048a7cd1.
->>>> We'll revert once the fix is backported on Debian.
->>> May as well mention:
->>>     https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=960271
->>
->> Sure (I remembered you talked about it on IRC, but was lazy to dig).
->>
->>>
->>>>
->>>> Reference to commits:
->>>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d5767057c9a
->>>> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=467d12f5c78
->>>> [3] https://salsa.debian.org/kernel-team/linux/-/commit/1fb0eb7956
->>>> [4] http://snapshot.debian.org/package/linux/4.19.98-1%2Bdeb10u1/#linux-libc-dev_4.19.98-1:2b:deb10u1
->>>>
->>>> Cc: Salvatore Bonaccorso <carnil@debian.org>
->>>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>> Shippable green again:
->>>> https://app.shippable.com/github/philmd/qemu/runs/759/summary/console
->>>> ---
->>>>    tests/docker/dockerfiles/debian10.docker | 16 ++++++++++++++++
->>>>    1 file changed, 16 insertions(+)
->>>>
->>>> diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
->>>> index 0769700a41..d7084ac283 100644
->>>> --- a/tests/docker/dockerfiles/debian10.docker
->>>> +++ b/tests/docker/dockerfiles/debian10.docker
->>>> @@ -9,6 +9,15 @@
->>>>    #
->>>>    FROM debian:buster-slim
->>>>    + # Use a snapshot known to work (see
->>>> http://snapshot.debian.org/#Usage)
->>>> +ENV DEBIAN_SNAPSHOT_DATE "20200428T212054Z"
->>>> +RUN sed -i \
->>>> +    "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" \
->>>> +    /etc/apt/sources.list
->>>> +RUN sed -i \
->>>> +    "s%^deb \(https\?://\)security.debian.org/debian-security/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian-security/${DEBIAN_SNAPSHOT_DATE} \2%" \
->>>> +    /etc/apt/sources.list
->>>> +
->>>>    # Duplicate deb line as deb-src
->>>>    RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
->>>>    @@ -35,4 +44,11 @@ RUN apt update && \
->>>>            texinfo \
->>>>            $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
->>>>    +# Install common build utilities
->>>> +RUN apt update && \
->>>> +    DEBIAN_FRONTEND=noninteractive eatmydata \
->>>> +    apt install -y --allow-downgrades \
->>>> +        linux-libc-dev=4.19.98-1+deb10u1 && \
->>>> +    apt-mark hold linux-libc-dev
->>>> +
->>> Do we need this bit? Surely if we have a snapshot URL we don't need
->>> to
->>> hold the package as it will never get updated?
->>
->> You are right, it is a remnant from the first approach (pin it without
->> using snapshot) which didn't work. I'll remove this line and the
->> comment in description.
-> 
-> Hmm it seems this is needed - without it I see other failures:
-> 
->    https://app.shippable.com/github/stsquad/qemu/runs/1377/8/console
-> 
+It actually never worked with libvirt, as auto-generated names are
+different on source and destination.
 
-Sorry I haven't updated this thread.
+It's unsafe and useless to migrate by auto-generated node-names, so
+let's forbid it.
 
-I did the requested change, but then the snapshot server went down, so I 
-couldn't finish testing.
-My impression is that when 2 different versions are available (which 
-happens in this snapshot date) apt will install the more recent. I 
-couldn't find other snapshot dates with at least 4.19.98-1+deb10u1 and 
-at most 4.19.98-1+deb10u1. Only this date but with 2 versions, so 
-pinning is unfortunately required.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ migration/block-dirty-bitmap.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index e0e081ce60..f5744c35e6 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -285,6 +285,13 @@ static int add_bitmaps_to_list(BlockDriverState *bs, const char *bs_name)
+         return -1;
+     }
+ 
++    if (bs_name[0] == '#') {
++        error_report("Found bitmap '%s' in a node with auto-generated "
++                     "name: %s. It can't be migrated",
++                     bdrv_dirty_bitmap_name(bitmap), bs_name);
++        return -1;
++    }
++
+     FOR_EACH_DIRTY_BITMAP(bs, bitmap) {
+         if (!bdrv_dirty_bitmap_name(bitmap)) {
+             continue;
+-- 
+2.21.0
 
 
