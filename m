@@ -3,138 +3,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95227C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15453C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:36:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20595206D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBE122074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="rYWsO+Kp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20595206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="01BzQG+U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE122074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZFN-00071e-2y
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:15:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38876)
+	id 1jZZZz-0007Sz-Uy
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:36:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jZZED-00068N-EZ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:14:13 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:47898)
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jZZZ8-0006wN-Rn
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:35:50 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:35324)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jZZEB-0007TC-Eu
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:14:12 -0400
-Received: from pps.filterd (m0127840.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04FCBxSk025937; Fri, 15 May 2020 05:13:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=nkxhmCrd/iyHtKmoxeyMpKvF4yeDU1w3kIgLteXU100=;
- b=rYWsO+Kpt7a6RhWC6z0RVvfWaBmVn1bsOgHCu2mVhu0r52qz0TGhHCN2hJeXp1YfAC6F
- sgdc2wyxLsmlnNfpdk4xpNPJUbGiX7/++CD9YtTHjqk5R2fJq+HrgaiGzhdLwAv1M4VE
- yiZc2CGbUUuYK3oJAEvyW5iNk9jZc1Pd3gPbsqTX5BngkJqTDiy05SH/PaX1vGI5f2mU
- EjBAKHmae8mA3qVsDIwMekOXTR2UWeljuq/5cnZFLVPVmvDliBrTAj8fxJ0zDqSBKP5M
- 2DXIpy0/1gsT3l6vbxhn7iVOR7da6pxYWDX+FiJf4Mkr9gocf1zSdAdjg2n9hJUStbK/ pg== 
-Received: from nam12-bn8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
- by mx0a-002c1b01.pphosted.com with ESMTP id 3100ybf4sb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 15 May 2020 05:13:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nEgUg1his4Ej0CtstJDTdhBaZo41g7PTL/ngLTF3fvO77ZDMOyfXx2OTu9FpqHYOI472boD60vs5O67DUzFl/y51uYkfjeKuvQb46TpvdOd2hq6lxPBVVYHVpWG8ct+Y7JdkTWYvaLRfshxO3vh/MPw6Ym1WxnkM4iIYqNjT2DJu7bOe7nUcnJnXaISerSgK8zNkG4pMktQom25ClE7B6jN3Z5q5IYSuG5rrIUTrLeq9MgYbEvdlAtZlQl8jLXn+1fmWQFP9LxB0R/5LKGYeBfkJ6/OuWxSgtxv+8uzk19EQ6v5bAfExZxfDu71Ie64SCwi6qGcQPVb2Z2kOg7hp8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nkxhmCrd/iyHtKmoxeyMpKvF4yeDU1w3kIgLteXU100=;
- b=DBkw1KApvakDkIvB3FL+V3ppOPRa4wvTi2Yz2LCY49bwC/QVAC5IidrLHMcXsUUBcu7bBnxFftVAE+TkHiowaelirEHqHBdVHuLk6WSee1USK0K5/9DNJyes5O4ko2weTDPdEOFGdJ20JjQUjcpA0JbPlmGiWEreYl12GNUBeH6Ih+M0RGnfdXYCHMHQXA/kDUctK18W8/BQqafTVFo9/gkkYhWvPLQYAG9CNRe2yDlD0dAObe5JkGmuFSRF7hEGV/FENhSXFED1lNEgmoXbs6dTTI3ul/WZwGzMDYJG829JRZPiYE1M2/O6Txnz7xfj68ynsWKuFI/utEclFIn/1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
- by MN2PR02MB6256.namprd02.prod.outlook.com (2603:10b6:208:180::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
- 2020 12:13:53 +0000
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01]) by MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01%7]) with mapi id 15.20.2979.033; Fri, 15 May 2020
- 12:13:53 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-Thread-Topic: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
- of devices on non-root buses
-Thread-Index: AQHWHUYvMyDNYIpa20C9378Nh0w8t6ijUHoAgACw0gCAAoGgAIACpx8A
-Date: Fri, 15 May 2020 12:13:53 +0000
-Message-ID: <7FF83CE8-F25A-4458-80A7-EAA6296EF175@nutanix.com>
-References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
- <20200511205352.05ff541a@redhat.com>
- <9941B800-BBEF-4DF8-BEE0-EC39D2A20D98@nutanix.com>
- <20200513214312.0dfa4752@redhat.com>
-In-Reply-To: <20200513214312.0dfa4752@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [192.146.154.3]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b070531b-b6b5-4670-b14e-08d7f8c96f3e
-x-ms-traffictypediagnostic: MN2PR02MB6256:
-x-microsoft-antispam-prvs: <MN2PR02MB625688D540ED54B75AEB1272F1BD0@MN2PR02MB6256.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 04041A2886
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fkaw97PKz1K3YHytSg/+nHW021d79+yOZLN4gduRyxDW89+uFFfanoNOT+BzIWDkczYygYFcRXZ8bjcDB3SlC6YlWgYOgn3HqprPnBhxJtQ7nLtOCTW7uDPgZpBDX1Cq8f5edJCBwV3Sfyr7ofw0jPkD8v14eUuYfLzwuGyKvT7y1ukWTDKJvxlFZE21o3fQEu+QHc4YfRfkJK1oQKkIv5T1zjieDxotqT1gdIWd/B7er61kKTM8ILZdFnOJkvptyYWtvKQRp9dVrsXQh50zRnEH+e9cGMMp/664YcEVYorPWk3T+DhEasX3d+bvG558pi6dxjavNFvXrYdWCsQ1tPwTRTdqjeFTa1llHgjpQtpLgfEq1YYPiZdJo92LX6FilTi5wLcunvw2sS2fks+9vl271nYGBUU9L+GohUWrGC9lAMHjUhs0s2EvRf6iWpIt
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(346002)(396003)(376002)(39860400002)(136003)(366004)(44832011)(8676002)(6486002)(91956017)(26005)(66476007)(2616005)(66556008)(66446008)(66946007)(64756008)(6512007)(76116006)(316002)(4326008)(6916009)(2906002)(54906003)(478600001)(8936002)(7416002)(5660300002)(33656002)(86362001)(186003)(71200400001)(36756003)(53546011)(6506007);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: bHpBa9xw+uPx9+SZKMD9YbwTeb8DWcKyI/DLK7tsjIOmwkEx5Q3nsCczbjJg0COcblOAViuLgfJnhXBf6xT5drEPU+wqEpz073/lwKy4LyjuXPPn8Dn7jJFYA5VJH6nLBGvyOWKh00RkmxLIbRq6pk6WL2YheDElHuGRT9Urne5xRbeXMEb1Mb5jDZHjRTGXAf88Z984NfawoZ6pQwtzXu/PpsJ+1sSRnYoS4ZaqaZW/fet+3RanI62SZgCNueEPKUH9KblVlcOuxdoKlZy8zlSY/ckDKGEnhgxySPadmhi8A6bE/1TFUMdlOT6bOWleolaA6ZQ9CcT2HVySLeO6VLqUmXXNM0uT6sixs37PCoWuvXHlyGOVGhtiPfISooTIKPF6tJ2/dPI2jX/rFFOIH36RlAjci+UfVXIlgDMKHPOtb/3vv/hujfcAdPlfMB3oITdLGwAvPeE/4xiRrMEAYZSWc+D60H5uS4Z7KWVetN8=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FCAA235C30E72C419014F6ED03AB4961@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jZZZ5-0006Xl-A4
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:35:49 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 00EBD2E15EC;
+ Fri, 15 May 2020 15:35:40 +0300 (MSK)
+Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
+ (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
+ by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ OGWjJb71yy-ZcrmLdE5; Fri, 15 May 2020 15:35:39 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1589546139; bh=Q9jFzaev3lq9TkuTq/i00/QKNOl8R0xszKIuZTqHRt0=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=01BzQG+UDh+pe/m/sdrYkm75Y0a4eE65VJo/GmFtiOhkCu26aEHN+0BSsTrJBcqCd
+ nZQMYJmwzMwvbmdb7RVcylP/fsnoLjjMtWtlfplOHnRatfsFVBz/2gUTmwUXEnqJGS
+ E96We3l3irKZ9RK49ONiq6MzEgre7c4rKYho66eo=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:220::1:7])
+ by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ mADdXfnKz8-ZbWSseSF; Fri, 15 May 2020 15:35:37 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Fri, 15 May 2020 15:35:35 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: Jon Doron <arilou@gmail.com>
+Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
+Message-ID: <20200515123535.GF85336@rvkaganb.lan>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ Jon Doron <arilou@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+ eyakovlev@virtuozzo.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ liran.alon@oracle.com, Roman Kagan <rkagan@virtuozzo.com>,
+ pbonzini@redhat.com, vkuznets@redhat.com
+References: <20200424123444.3481728-1-arilou@gmail.com>
+ <20200424123444.3481728-6-arilou@gmail.com>
+ <20200505150637.7131e79b@redhat.com>
+ <20200505153838.GC2862@jondnuc>
+ <30fea22b-ef36-04d9-17ef-d13e3f93a3c5@maciej.szmigiero.name>
+ <20200507031425.GG2862@jondnuc>
+ <20200511201106.GB1307176@rvkaganb.lan>
+ <20200513173725.277b0e16@redhat.com>
+ <20200515085636.GN2862@jondnuc>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b070531b-b6b5-4670-b14e-08d7f8c96f3e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2020 12:13:53.3409 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: REy6W0akDN6rGZhhKkSVAaCBkUPQCCYckJu0kcFsf8Z1w1LK7HnxeRxu+hw+GCuBfmAs/nbBRN2vgOM7w/sRVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6256
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-15_04:2020-05-15,
- 2020-05-15 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.151.68;
- envelope-from=ani.sinha@nutanix.com; helo=mx0a-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 08:14:09
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200515085636.GN2862@jondnuc>
+Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- KHOP_DYNAMIC=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -148,70 +103,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, eyakovlev@virtuozzo.com,
+ ehabkost@redhat.com, qemu-devel@nongnu.org, liran.alon@oracle.com,
+ Roman Kagan <rkagan@virtuozzo.com>, pbonzini@redhat.com,
+ Igor Mammedov <imammedo@redhat.com>, vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gTWF5IDE0LCAyMDIwLCBhdCAxOjEzIEFNLCBJZ29yIE1hbW1lZG92IDxpbWFtbWVk
-b0ByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+PiANCj4+IA0KPj4+IFdpbGwgZm9sbG93aW5nIGhh
-Y2sgd29yayBmb3IgeW91Pw0KPj4+IHBvc3NpYmxlIHBlcm11dGF0aW9ucw0KPj4+IDEpIEFDUEkg
-aG90cGx1ZyBldmVyeXdoZXJlDQo+Pj4gLWdsb2JhbCBQSUlYNF9QTS5hY3BpLXBjaS1ob3RwbHVn
-PW9uIC1nbG9iYWwgUElJWDRfUE0uYWNwaS1wY2ktaG90cGx1Zy13aXRoLWJyaWRnZS1zdXBwb3J0
-PW9uIC1kZXZpY2UgcGNpLWJyaWRnZSxjaGFzc2lzX25yPTEsc2hwYz1kb2VzbnRfbWF0dGVyIC1k
-ZXZpY2UgZTEwMDAsYnVzPXBjaS4xLGFkZHI9MDEsaWQ9bmV0ZGV2MSANCj4+PiANCj4+PiAyKSBO
-byBob3RwbHVnIGF0IGFsbA0KPj4+IC1nbG9iYWwgUElJWDRfUE0uYWNwaS1wY2ktaG90cGx1Zz1v
-ZmYgLWdsb2JhbCBQSUlYNF9QTS5hY3BpLXBjaS1ob3RwbHVnLXdpdGgtYnJpZGdlLXN1cHBvcnQ9
-b24gLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9MSxzaHBjPW9mZiAtZGV2aWNlIGUxMDAw
-LGJ1cz1wY2kuMSxhZGRyPTAxLGlkPW5ldGRldjENCj4+PiANCj4+PiAtZ2xvYmFsIFBJSVg0X1BN
-LmFjcGktcGNpLWhvdHBsdWc9b2ZmIC1nbG9iYWwgUElJWDRfUE0uYWNwaS1wY2ktaG90cGx1Zy13
-aXRoLWJyaWRnZS1zdXBwb3J0PW9mZiAtZGV2aWNlIHBjaS1icmlkZ2UsY2hhc3Npc19ucj0xLHNo
-cGM9ZG9lc250X21hdHRlciAgLWRldmljZSBlMTAwMCxidXM9cGNpLjEsYWRkcj0wMSxpZD1uZXRk
-ZXYxICANCj4+IA0KPj4gR2l2ZW4gdGhhdCBteSBwYXRjaCBpcyBub3QgYWNjZXB0YWJsZSwgSeKA
-mWQgcHJlZmVyIHRoZSBmb2xsb3dpbmcgaW4gdGhlIG9yZGVyIG9mIHByZWZlcmVuY2U6DQo+PiAN
-Cj4+IChhKSBIYXZlIGFuIG9wdGlvbiB0byBkaXNhYmxlIGhvdCBlamVjdGlvbiBvZiBQQ0ktUENJ
-IGJyaWRnZSBzbyB0aGF0IFdpbmRvd3MgZG9lcyBub3QgZXZlbiBzaG93IHRoaXMgSFcgaW4gdGhl
-IOKAnHNhZmVseSByZW1vdmUgSFfigJ0gb3B0aW9uLiBJZiB3ZSBjYW4gZG8gdGhpcyB0aGVuIGZy
-b20gT1MgcGVyc3BlY3RpdmUgdGhlIEdVSSBvcHRpb25zIHdpbGwgYmUgc2FtZSBhcyB3aGF0IGlz
-IGF2YWlsYWJsZSB3aXRoIFBDSUUvcTM1IC0gbm9uZSBvZiB0aGUgZGV2aWNlcyB3aWxsIGJlIGhv
-dCBlamVjdGFibGUgaWYgdGhlIGhvdCBwbHVnIG9wdGlvbiBpcyB0dXJuZWQgb2ZmIGZyb20gdGhl
-IFBDSUUgc2xvdHMgd2hlcmUgZGV2aWNlcyBhcmUgcGx1Z2dlZCBpbnRvLg0KPj4gSSBsb29rZWQg
-YXQgdGhlIGNvZGUuIEl0IHNlZW1zIHRvIG1hbmlwdWxhdGUgQUNQSSB0YWJsZXMgb2YgdGhlIGVt
-cHR5IHNsb3RzIG9mIHRoZSByb290IGJ1cyB3aGVyZSBubyBkZXZpY2VzIGFyZSBhdHRhY2hlZCAo
-c2VlIGNvbW1lbnQgIi8qIGFkZCBob3RwbHVnIHNsb3RzIGZvciBub24gcHJlc2VudCBkZXZpY2Vz
-ICovIOKAnCkuIEZvciBjb2xkIHBsdWdnZWQgYnJpZGdlcywgaXQgcmVjdXJzZXMgZG93biB0byBz
-Y2FuIHRoZSBzbG90cyBvZiB0aGUgYnJpZGdlLiBJcyBpdCBwb3NzaWJsZSB0byBkaXNhYmxlIGhv
-dCBwbHVnIGZvciB0aGUgc2xvdCB0byB3aGljaCB0aGUgYnJpZGdlIGlzIGF0dGFjaGVkPw0KPiAN
-Cj4gSSBkb24ndCB0aGluayBpdCdzIHBvc3NpYmxlIHRvIGhhdmUgcGVyIHNsb3QgaG90cGx1ZyBv
-biBjb252ZW50aW9uYWwgUENJIGhhcmR3YXJlLg0KPiBpdCdzIHBlciBicmlkZ2UgcHJvcGVydHku
-DQoNCldlIGFkZCB0aGUgQU1McyBwZXIgZW1wdHkgc2xvdCB0aG91Z2guIFdoZW4gdGhlIHBpYyBi
-cmlkZ2UgaXMgYXR0YWNoZWQsIHdlIGRvIG5vdGhpbmcsIGp1c3QgcmVjdXJzZSBpbnRvIHRoZSBi
-cmlkZ2Ugc2xvdHMuIFRoYXQgaXMgd2hhdCBJIHdhcyBhc2tpbmcsIGlmIGl0IHdhcyBwb3NzaWJs
-ZSB0byBqdXN0IGRpc2FibGUgdGhlIEFNTHMgb3IgdXNlIHNvbWUgdHJpY2tzIHRvIHNheSB0aGF0
-IHRoaXMgcGFydGljdWxhciBzbG90IGlzIG5vdCBob3RwbHVnZ2FibGUuIEkgYW0gbm90IHN1cmUg
-d2h5IFdpbmRvd3MgaXMgdHJ5aW5nIHRvIGVqZWN0IHRoZSBQQ0kgYnJpZGdlIGFuZCBmYWlsaW5n
-LiBNYXliZSBzb21ldGhpbmcgcmVsYXRlZCB0byB0aGlzIGNvbW1lbnQ/DQoNCg0KLyogV2hlbiBo
-b3RwbHVnIGZvciBicmlkZ2VzIGlzIGVuYWJsZWQsIGJyaWRnZXMgYXJlICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgKiBkZXNjcmliZWQg
-aW4gQUNQSSBzZXBhcmF0ZWx5IChzZWUgYnVpbGRfcGNpX2J1c19lbmQpLiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQogICAgICAgICAqIEluIHRoaXMgY2FzZSB0
-aGV5IGFyZW4ndCB0aGVtc2VsdmVzIGhvdC1wbHVnZ2FibGUuICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICANCiAgICAgICAgICogSG90cGx1Z2dlZCBicmlkZ2Vz
-ICphcmUqIGhvdC1wbHVnZ2FibGUuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgKi8NCg0KDQoNCj4gDQo+IA0KPj4gKGIp
-IEZhaWxpbmcgYWJvdmUsIGhhdmluZyBhIGdsb2JhbCBvcHRpb24gdG8gZGlzYWJsZSBhbGwgaG90
-IHBsdWcsIGluY2x1ZGluZyB0aGUgMzIgc2xvdHMgb2YgdGhlIHJvb3QgYnVzIHdvdWxkIGJlIGdv
-b2QuIEhvd2V2ZXIsIHRoaXMgZG9lcyBub3QgZ2l2ZSB1cyB0aGUgZmxleGliaWxpdHkgd2UgaGF2
-ZSB3aXRoIFBDSUUgKHRoYXQgaXMsIHRvIGhvdCBwbHVnIGEgIGRldmljZSwgd2UgY2FuIGFsd2F5
-cyBwbHVnIGl0IHRvIGEgc2xvdCB3aXRoIGhvdCBwbHVnIGVuYWJsZWQpLg0KPiANCj4gc291bmRz
-IGZpbmUgdG8gbWUsIGF0IGxlYXN0IGl0IHdpbGwgYWRkcmVzcyBwcm9ibGVtLg0KPiBDYW4geW91
-IHBvc3QgYSBwYXRjaCB0byB0aGF0IGVmZmVjdCBwbGVhc2U/DQo+IC9JdCBzaG91bGQgZGlzYWJs
-ZSBhbGwgQU1MIHJlbGF0ZWQgdG8gaG90cGx1ZyBhbmQgcmVsYXRlZCBoYWR3YXJlIGNvZGUvDQoN
-CkkgaGF2ZSB0cmllZCBhIHBhdGNoIGFuZCBzZW50IGl0Lg0KDQo=
+On Fri, May 15, 2020 at 11:56:36AM +0300, Jon Doron wrote:
+> On 13/05/2020, Igor Mammedov wrote:
+> 
+> Do you guys know perhaps which module is reading the ACPI configuration for
+> VMBus? vmbus.sys / vmbkmcl.sys / winhv.sys? is it the kernel or HAL?
+
+No idea...
+
+> I dont have any real HyperV Windows to play with...
+> 
+> Roman, do you remember when is this information being used? Do we need a
+> full emulation setup (aka your hv-scsi / hv-net) patches in order to see
+> Windows working this ACPI entry?
+
+I think the series you've posted should be enough to see VMBus in the
+DeviceManager.  hv-scsi and hv-net should not further depend on ACPI.
+hv-pci does: it (at least in its Linux driver implementation) wants the
+VMBus entry or any of its ancestors to define range(s) where mmio
+windows can be placed.  This may be worth considering when deciding
+where to stick the VMBus entry to.
+
+Thanks,
+Roman.
+
+> Thanks,
+> -- Jon.
+> 
+> > On Mon, 11 May 2020 23:11:23 +0300
+> > Roman Kagan <rvkagan@yandex-team.ru> wrote:
+> > 
+> > > On Thu, May 07, 2020 at 06:14:25AM +0300, Jon Doron wrote:
+> > > > Igor it seems like the IRQ being used is 5 and not 7 & 13 like in the
+> > > > current patch.
+> > > 
+> > > HyperV using irq 5 doesn't mean QEMU has to too.  Especially so as no
+> > > guest was noticed to use the irqs in ACPI.  I'd rather try and test if
+> > > the guest requires any those at all.
+> > > 
+> > > > Seems like it needs to reside in the _CRS like you said.
+> > > 
+> > > They already are there.
+> > > 
+> > > > Seems like it has all those _STA/_DIS/_PS0 just like the way it's currently
+> > > > in the patch (unless I'm missing something).
+> > > 
+> > > Right, but, as you can see, they are pretty dumb, so the question is
+> > > whether they are necessary or the guests can do without (Linux
+> > > apparently can).
+> > 
+> > Agreed with all of above,
+> > Instead of blind copying dubious AML, we should try to figure out what's
+> > really necessary of it and throw away the rest.
+> > 
+> > > 
+> > > Thanks,
+> > > Roman.
+> > > 
+> > > > Notice _PS3 is not a Method.
+> > > >
+> > > > So just to summarize the changes i need to do:
+> > > > 1. Change from 2 IRQs to single one (and use 5 as the default)
+> > > > 2. IRQs needs to be under _CRS.
+> > > > 3. You mentioned you want under a different location than the ISA bug where
+> > > > would you want it to be?
+> > > >
+> > > > Please let me know if there is anything else.
+> > > >
+> > > > Thanks,
+> > > > -- Jon.
+> > > >
+> > > > On 06/05/2020, Maciej S. Szmigiero wrote:
+> > > > > On 05.05.2020 17:38, Jon Doron wrote:
+> > > > > > On 05/05/2020, Igor Mammedov wrote:
+> > > > > >
+> > > > > > I dont know what were the original intentions of the original patch authors (at this point I simply rebased it, and to be honest I did not need this patch to get where I was going to, but it was part of the original patchset).
+> > > > > >
+> > > > > > But I'm willing to do any changes so we can keep going forward with this.
+> > > > > >
+> > > > > > > On Fri, 24 Apr 2020 15:34:43 +0300
+> > > > > > > Jon Doron <arilou@gmail.com> wrote:
+> > > > > > >
+> > > > > > > > Guest OS uses ACPI to discover VMBus presence.  Add a corresponding
+> > > > > > > > entry to DSDT in case VMBus has been enabled.
+> > > > > > > >
+> > > > > > > > Experimentally Windows guests were found to require this entry to
+> > > > > > > > include two IRQ resources. They seem to never be used but they still
+> > > > > > > > have to be there.
+> > > > > > > >
+> > > > > > > > Make IRQ numbers user-configurable via corresponding properties; use 7
+> > > > > > > > and 13 by default.
+> > > > > > > well, it seems that at least linux guest driver uses one IRQ,
+> > > > > > > abeit not from ACPI descriptior
+> > > > > > >
+> > > > > > > perhaps it's what hyperv host puts into _CRS.
+> > > > > > > Could you dump ACPI tables and check how hyperv describes vmbus in acpi?
+> > > > > > >
+> > > > > > >
+> > > > > >
+> > > > > > I can no longer get to the HyperV computer I had (in the office so hopefully if someone else has access to HyperV machine and willing to reply here with the dumped ACPI tables that would be great).
+> > > > > >
+> > > > >
+> > > > > Here is a VMBus ACPI device description from Hyper-V in Windows Server 2019:
+> > > > >
+> > > > > Device (\_SB.VMOD.VMBS)
+> > > > > {
+> > > > >    Name (STA, 0x0F)
+> > > > >    Name (_ADR, Zero)  // _ADR: Address
+> > > > >    Name (_DDN, "VMBUS")  // _DDN: DOS Device Name
+> > > > >    Name (_HID, "VMBus")  // _HID: Hardware ID
+> > > > >    Name (_UID, Zero)  // _UID: Unique ID
+> > > > >    Method (_DIS, 0, NotSerialized)  // _DIS: Disable Device
+> > > > >    {
+> > > > > 	STA &= 0x0D
+> > > > >    }
+> > > > >
+> > > > >    Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
+> > > > >    {
+> > > > > 	STA |= 0x0F
+> > > > >    }
+> > > > >
+> > > > >    Method (_STA, 0, NotSerialized)  // _STA: Status
+> > > > >    {
+> > > > > 	Return (STA) /* \_SB_.VMOD.VMBS.STA_ */
+> > > > >    }
+> > > > >
+> > > > >    Name (_PS3, Zero)  // _PS3: Power State 3
+> > > > >    Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+> > > > >    {
+> > > > > 	IRQ (Edge, ActiveHigh, Exclusive, )
+> > > > > 	    {5}
+> > > > >    })
+> > > > > }
+> > > > >
+> > > > > It seems to use just IRQ 5.
+> > > > >
+> > > > > Maciej
+> > > >
+> > > 
+> > 
 
