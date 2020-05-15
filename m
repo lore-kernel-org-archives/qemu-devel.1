@@ -2,92 +2,129 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC994C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D57EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62CE520727
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:11:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B87B20727
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:51:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O5lH1nBk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CE520727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uMsWEnd2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B87B20727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZfjh-0006u4-BX
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:11:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55904)
+	id 1jZgMS-0004vd-8r
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfb2-0001t7-F3
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:12 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45492)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfb0-0001qb-EN
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:12 -0400
-Received: by mail-pf1-x443.google.com with SMTP id z26so1278030pfk.12
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 12:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=2mkOApOfyovlkCqZcQYL+u8RzltlLvSt3FtUuezPUhI=;
- b=O5lH1nBkVtOJYEIyNRjztqyF3fWvtE1dWrHocclWOAJgF12s5fQb3+33mhtX8lbMwY
- /WtEuj8TnQ5tT5oZ3dIb3bNL5pVWoSvavi80FwzfDNOm65Gf7hK/aaBJfVKdfGL1adFI
- DahGUQKRVO3hPhISUK0PlPjSxQ7iuJWuHCq6dA06tE3EN6q7Dq6elwYMOR5mGDr8xeMs
- YpouBLsmPrUuTf5CvA+N8B7JRj64C60GIIzjkRV1EisecMRUzINk2IqWpHvJ3pB0SO+V
- 6KxUkkxMNrj2otVP7sMVqcNy2S2oNy4aj06ZmqLbE2Mnxl4fDgb+9dZSXPSPH4vEpI2b
- VoLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=2mkOApOfyovlkCqZcQYL+u8RzltlLvSt3FtUuezPUhI=;
- b=MCorgNRERtOewIGrc8/LvqYHZrizFLbe4pebMITK0i/6PpM4JpEW+GcSBoXb/xALap
- 1SNp1TrEA2aNIkOGzrRZ8azFneiX4oMN9bUsUJ0FO8q/cdGYeIJOD6ZRUmuvTU2Ynrta
- 9W/EHfpNk/cBECE/TIYiFuDz4SZGu8UH2gfJC04kmRFwvx3ExeCxXFo71WXAJHkS2Kff
- j0SZY4X9CKFGCydapkslIUx5Ii8DcLJKc2fSFeXdgQ+EM5WJvF5zEC2fo6kJ6US94QUj
- 1o7iW+KNgUEG0f4RYBIali6gz5poeeO0vhf27Lp9B8xPiqTRj/roQoBTsJDODFFgP8ys
- zVxA==
-X-Gm-Message-State: AOAM530r2kP0g8GpJhbMcPK1IGd+dhI+Yj4VbK24/tEg3/jzJQPe5jSy
- jbq4IRc5/5HbIhRIMlj3fyXoy7UO16s=
-X-Google-Smtp-Source: ABdhPJyqvY8sLyijzRDQW2mVem7l5Z2U6wgE4BDMYl9ZTR+MhNGpteyn4Xpj5lFAyWfQzeDquwzMuw==
-X-Received: by 2002:a62:68c1:: with SMTP id d184mr5307519pfc.138.1589569328261; 
- Fri, 15 May 2020 12:02:08 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id q21sm2485719pfg.131.2020.05.15.12.02.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 12:02:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 10/10] softfloat: Return bool from all classification
- predicates
-Date: Fri, 15 May 2020 12:01:53 -0700
-Message-Id: <20200515190153.6017-11-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200515190153.6017-1-richard.henderson@linaro.org>
-References: <20200515190153.6017-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZgLP-0003ww-Ir; Fri, 15 May 2020 15:50:07 -0400
+Received: from mail-eopbgr140108.outbound.protection.outlook.com
+ ([40.107.14.108]:8576 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZgLN-0006Fr-2L; Fri, 15 May 2020 15:50:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TmRQoRnl8mFo301GP5yV+XR1/c9a2JAYhQHom48wXSPX1xH384t8oRzst6Qtzb9B/dL17z3tFn9fX26mPCgvqVUCUrmtb2GIRY4aLYTa7nSvX5YiuEu34L2JwMRrQlvy7h2Rj+GAKKBUd7/FzzB8XyeTupDmw+ZrYVCO3ki4IzFJ5av4i5LnYgUEhqW7tR/dg8UAIYRShWb1XfGzvItCSs74VX04U4jnDnAFkZzAMkfwmU9CuAHTxYOyQfMQUXLGErzil3IRt9D1wSrzOyf16cmS30uIRrMQlMRz0oe9nmFdLLkzOqsFTm4jTALI/L44jfwy39asVk/U8+aDUPIpSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1MT1Pimhg7veBif70ojbh25E91WI/MBQ/rThbfZs6vo=;
+ b=ABLMXfwlo+j+YXvz3oO0xw159ejcFEprtPup8kiqZLdrFhAnaoNZc2/dFJZ41t679wNeuxjOttpwf2XtKzLg7QbroSUz6dTyso/rWQN7uv3t3vUUAw8Z+Cwfd++N4N/bYxjWZYqENxQkiSKXHdGekuhBsCwNS5oXFCyEc85wBy8xkq1ftnfD0eqHQ26VcSj2fgUZ5rhM3wHN61A/R3yC7lAW28nL9W/7vy4oB2e60WxN44flTrdj09mVlAJTXTiI3bJlPwdGZkECGZuyZX5RFnEPVsuAVGC5ckinqAG4zdfmmlmCOtnBdP6Aty3KKfHZhFzA6yfIl+D5ij8Op/CtiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1MT1Pimhg7veBif70ojbh25E91WI/MBQ/rThbfZs6vo=;
+ b=uMsWEnd2CPLyUamHfW4orQ6tihYIPFEZRIFafiEVeqlq8OogOFbsFpoLZii4Z2uen7OSvx09M9FDorS05Zpdxg1ucS41RppjX/5eDx0rjqyP77kcWxlSIjdq6QLcrF+GEXp66mEx7zfwTBDRkzbUnp+jduy/3wbkatNMr6hT6d0=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5445.eurprd08.prod.outlook.com (2603:10a6:20b:10d::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
+ 2020 19:49:59 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Fri, 15 May 2020
+ 19:49:59 +0000
+Subject: Re: [PATCH v2 0/5] fix migration with bitmaps and mirror
+To: Eric Blake <eblake@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+References: <20191219085106.22309-1-vsementsov@virtuozzo.com>
+ <20191219103638.GJ4914@andariel.pipo.sk>
+ <a5015250-46f4-c6ed-92b9-779f885e8a4a@virtuozzo.com>
+ <20200403112358.GV578401@andariel.pipo.sk>
+ <c25fb60b-9072-294f-847b-9b650292171b@redhat.com>
+ <738cbfd7-9ec8-7043-923a-0510929e73e2@virtuozzo.com>
+ <acecd801-9486-6dea-d06c-19b7ce6d77b3@virtuozzo.com>
+ <5dfecf7a-0da8-d9da-dc7f-cd684710353b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2d212e49-5610-a5fb-257c-db779e3da5b8@virtuozzo.com>
+Date: Fri, 15 May 2020 22:49:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <5dfecf7a-0da8-d9da-dc7f-cd684710353b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM4PR0701CA0017.eurprd07.prod.outlook.com
+ (2603:10a6:200:42::27) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.184) by
+ AM4PR0701CA0017.eurprd07.prod.outlook.com (2603:10a6:200:42::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.11 via Frontend
+ Transport; Fri, 15 May 2020 19:49:58 +0000
+X-Originating-IP: [185.215.60.184]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 48dc5126-a2d0-41b8-cb3d-08d7f909269b
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5445:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5445773ACD5FD765F423D5CEC1BD0@AM7PR08MB5445.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 04041A2886
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Uir6yOIv/XlM0hkr5sSFRnhJeRKaMF14LEtn76oyROsF+UX4sLqftEJh+C/2lFta3A1zcAomh+AnYEcRibtkSp+XDZRv7L3oCqC4f8NwtHSsUEodRsN8TWgL/h8yvg6hNGbSpsydYRnWA8Wh8kx+HXbOIkTs3VquN1Dixli0SYr8HZ2/7yCCA7gfitHatz7ss5671Uobx64jsw0o6Tx1nx6tEHl4B0XlooOBA6qdx7UhxT08H2GnKuwHZ79lqjwRCtv9MjMjd1sP6bMZS3WCgGz/KZ0pwqliWV+L+Fvvxn+x6dSC9KWOgRSLX5RH3JTUKCFr9vdAw4kYh5r2UsF2RK3I+aTTc2gwSp6wOibWRpsw/d1K0iStEVl6dD31p9nkC6DPq4ttOfIwcsYeucWqW/qLIAErVTH2ViZQB1in+IzVk7cv5IMh7gTWuH3ejVGcN5j8E190avoUE4MRAYzPqrO8pf6WXNZtlRLmknUiFPk91gOPywjito1LJuatT3BgQf6UgZb5DrXs7TPptIqD4+9N38p6S9N5fkkj0glgpZYjaOCKOSyYvw5wHet0Nl9caZtapE7dFHiD5LeASnI6Qw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39840400004)(136003)(376002)(366004)(346002)(186003)(66556008)(53546011)(316002)(5660300002)(26005)(16576012)(66476007)(2616005)(956004)(2906002)(66946007)(7416002)(8676002)(8936002)(52116002)(31686004)(16526019)(36756003)(6486002)(110136005)(86362001)(966005)(478600001)(31696002)(4326008)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: hK3yM46uhz6jaEAxm2Jl8zieDFChHY6v2vLq+cFvHbdwM7fML4P7pT0tixCvK9fpcjFPzFUb9GYBs0P5d8M+v8yBaJ5zQASj53am4GLcv2KxK4LDysr7FMt/09u+P6LVl9tiWml7xx/LRNvKEGyzuBikmM4OMCnQdH3LnwchlzfxHyY4pC6nmEP/3Yk2ep6bJpE/x0mQft1InVcP28ecOkpdCAM+X7PuFa7JUfRkzcXjqTRnPaquwRKB0Aqsjw+dl/mN9PGGK7LJO4AMp3qu0xPAz0KnnYG+YqhAgwYbzB3CYHcWcxSbt8qxKN5ZKwOGqBZZ4bkRuT8I7UBRXS6Od3O31kJgAMXEYkJIyECtEQ2rDeVbwT//mbulafbNxYl/EX99D1mWEvtV07HjZ7nFyjtll3pKmKKIlEVuBADcWeid0Jgxd81mH+JqoZoxLkpsxAoDbPCZyHJvj5RIZSge4nGqJFAeDGfQhXFbpReqiL6tFV3Aq3hr+AEqcTL/2YKo
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48dc5126-a2d0-41b8-cb3d-08d7f909269b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 19:49:59.5364 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: p27FAMca5h0I1WVB35sN2xylqEDOr9K4f6SmM7wtOm76mamMbfO/3UtbJRJs2qbfZjKu20S5Waecwse/LiTDBdn8wgp13vqeHZINSWVQAhQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5445
+Received-SPF: pass client-ip=40.107.14.108;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 15:50:01
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,310 +138,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org,
+ quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ stefanha@redhat.com, den@openvz.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes *_is_any_nan, *_is_neg, *_is_inf, etc.
+15.05.2020 20:51, Eric Blake wrote:
+> On 5/15/20 6:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 
+>>>> Max is trying to tackle the node-name issue:
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03358.html
+>>>>
+>>>> And trying to apply that patch after staging this series hits a conflict in mnigration/block-dirty-bitmap.c.  Which one should go in first?
+>>>>
+>>>
+>>> My patches are needed to fix migration for the pre-blockdev configuration with mirror-top filter.
+>>>
+>>> We ofcrouse need them in Virtuozzo, but it's not hard to keep the in downstream-only.. And it will be not simple to use new command from Max in pre-blockdev libvirt configuration, with auto-generated node-names.
+> 
+> Carrying a downstream fork forever is more work on you.  If the patch is easy enough to maintain, incorporating it upstream is best all around, even if libvirt has moved on to the point of no longer caring since it no longer uses pre-blockdev.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/fpu/softfloat.h        | 66 +++++++++++++++++-----------------
- fpu/softfloat-specialize.inc.c | 16 ++++-----
- 2 files changed, 41 insertions(+), 41 deletions(-)
+I hope not forever, when Rhel moves to node-names, we will do it too (hmm, I don't know, may be future already came, and Rhel8 libvirt is node-name oriented?) Still, yes it's always better to reduce the downstream overhead
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 37217d9b9b..16ca697a73 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -235,31 +235,31 @@ float16 float16_sqrt(float16, float_status *status);
- FloatRelation float16_compare(float16, float16, float_status *status);
- FloatRelation float16_compare_quiet(float16, float16, float_status *status);
- 
--int float16_is_quiet_nan(float16, float_status *status);
--int float16_is_signaling_nan(float16, float_status *status);
-+bool float16_is_quiet_nan(float16, float_status *status);
-+bool float16_is_signaling_nan(float16, float_status *status);
- float16 float16_silence_nan(float16, float_status *status);
- 
--static inline int float16_is_any_nan(float16 a)
-+static inline bool float16_is_any_nan(float16 a)
- {
-     return ((float16_val(a) & ~0x8000) > 0x7c00);
- }
- 
--static inline int float16_is_neg(float16 a)
-+static inline bool float16_is_neg(float16 a)
- {
-     return float16_val(a) >> 15;
- }
- 
--static inline int float16_is_infinity(float16 a)
-+static inline bool float16_is_infinity(float16 a)
- {
-     return (float16_val(a) & 0x7fff) == 0x7c00;
- }
- 
--static inline int float16_is_zero(float16 a)
-+static inline bool float16_is_zero(float16 a)
- {
-     return (float16_val(a) & 0x7fff) == 0;
- }
- 
--static inline int float16_is_zero_or_denormal(float16 a)
-+static inline bool float16_is_zero_or_denormal(float16 a)
- {
-     return (float16_val(a) & 0x7c00) == 0;
- }
-@@ -351,8 +351,8 @@ float32 float32_minnum(float32, float32, float_status *status);
- float32 float32_maxnum(float32, float32, float_status *status);
- float32 float32_minnummag(float32, float32, float_status *status);
- float32 float32_maxnummag(float32, float32, float_status *status);
--int float32_is_quiet_nan(float32, float_status *status);
--int float32_is_signaling_nan(float32, float_status *status);
-+bool float32_is_quiet_nan(float32, float_status *status);
-+bool float32_is_signaling_nan(float32, float_status *status);
- float32 float32_silence_nan(float32, float_status *status);
- float32 float32_scalbn(float32, int, float_status *status);
- 
-@@ -372,27 +372,27 @@ static inline float32 float32_chs(float32 a)
-     return make_float32(float32_val(a) ^ 0x80000000);
- }
- 
--static inline int float32_is_infinity(float32 a)
-+static inline bool float32_is_infinity(float32 a)
- {
-     return (float32_val(a) & 0x7fffffff) == 0x7f800000;
- }
- 
--static inline int float32_is_neg(float32 a)
-+static inline bool float32_is_neg(float32 a)
- {
-     return float32_val(a) >> 31;
- }
- 
--static inline int float32_is_zero(float32 a)
-+static inline bool float32_is_zero(float32 a)
- {
-     return (float32_val(a) & 0x7fffffff) == 0;
- }
- 
--static inline int float32_is_any_nan(float32 a)
-+static inline bool float32_is_any_nan(float32 a)
- {
-     return ((float32_val(a) & ~(1 << 31)) > 0x7f800000UL);
- }
- 
--static inline int float32_is_zero_or_denormal(float32 a)
-+static inline bool float32_is_zero_or_denormal(float32 a)
- {
-     return (float32_val(a) & 0x7f800000) == 0;
- }
-@@ -540,8 +540,8 @@ float64 float64_minnum(float64, float64, float_status *status);
- float64 float64_maxnum(float64, float64, float_status *status);
- float64 float64_minnummag(float64, float64, float_status *status);
- float64 float64_maxnummag(float64, float64, float_status *status);
--int float64_is_quiet_nan(float64 a, float_status *status);
--int float64_is_signaling_nan(float64, float_status *status);
-+bool float64_is_quiet_nan(float64 a, float_status *status);
-+bool float64_is_signaling_nan(float64, float_status *status);
- float64 float64_silence_nan(float64, float_status *status);
- float64 float64_scalbn(float64, int, float_status *status);
- 
-@@ -561,27 +561,27 @@ static inline float64 float64_chs(float64 a)
-     return make_float64(float64_val(a) ^ 0x8000000000000000LL);
- }
- 
--static inline int float64_is_infinity(float64 a)
-+static inline bool float64_is_infinity(float64 a)
- {
-     return (float64_val(a) & 0x7fffffffffffffffLL ) == 0x7ff0000000000000LL;
- }
- 
--static inline int float64_is_neg(float64 a)
-+static inline bool float64_is_neg(float64 a)
- {
-     return float64_val(a) >> 63;
- }
- 
--static inline int float64_is_zero(float64 a)
-+static inline bool float64_is_zero(float64 a)
- {
-     return (float64_val(a) & 0x7fffffffffffffffLL) == 0;
- }
- 
--static inline int float64_is_any_nan(float64 a)
-+static inline bool float64_is_any_nan(float64 a)
- {
-     return ((float64_val(a) & ~(1ULL << 63)) > 0x7ff0000000000000ULL);
- }
- 
--static inline int float64_is_zero_or_denormal(float64 a)
-+static inline bool float64_is_zero_or_denormal(float64 a)
- {
-     return (float64_val(a) & 0x7ff0000000000000LL) == 0;
- }
-@@ -708,7 +708,7 @@ static inline floatx80 floatx80_chs(floatx80 a)
-     return a;
- }
- 
--static inline int floatx80_is_infinity(floatx80 a)
-+static inline bool floatx80_is_infinity(floatx80 a)
- {
- #if defined(TARGET_M68K)
-     return (a.high & 0x7fff) == floatx80_infinity.high && !(a.low << 1);
-@@ -718,22 +718,22 @@ static inline int floatx80_is_infinity(floatx80 a)
- #endif
- }
- 
--static inline int floatx80_is_neg(floatx80 a)
-+static inline bool floatx80_is_neg(floatx80 a)
- {
-     return a.high >> 15;
- }
- 
--static inline int floatx80_is_zero(floatx80 a)
-+static inline bool floatx80_is_zero(floatx80 a)
- {
-     return (a.high & 0x7fff) == 0 && a.low == 0;
- }
- 
--static inline int floatx80_is_zero_or_denormal(floatx80 a)
-+static inline bool floatx80_is_zero_or_denormal(floatx80 a)
- {
-     return (a.high & 0x7fff) == 0;
- }
- 
--static inline int floatx80_is_any_nan(floatx80 a)
-+static inline bool floatx80_is_any_nan(floatx80 a)
- {
-     return ((a.high & 0x7fff) == 0x7fff) && (a.low<<1);
- }
-@@ -936,8 +936,8 @@ float128 float128_rem(float128, float128, float_status *status);
- float128 float128_sqrt(float128, float_status *status);
- FloatRelation float128_compare(float128, float128, float_status *status);
- FloatRelation float128_compare_quiet(float128, float128, float_status *status);
--int float128_is_quiet_nan(float128, float_status *status);
--int float128_is_signaling_nan(float128, float_status *status);
-+bool float128_is_quiet_nan(float128, float_status *status);
-+bool float128_is_signaling_nan(float128, float_status *status);
- float128 float128_silence_nan(float128, float_status *status);
- float128 float128_scalbn(float128, int, float_status *status);
- 
-@@ -953,22 +953,22 @@ static inline float128 float128_chs(float128 a)
-     return a;
- }
- 
--static inline int float128_is_infinity(float128 a)
-+static inline bool float128_is_infinity(float128 a)
- {
-     return (a.high & 0x7fffffffffffffffLL) == 0x7fff000000000000LL && a.low == 0;
- }
- 
--static inline int float128_is_neg(float128 a)
-+static inline bool float128_is_neg(float128 a)
- {
-     return a.high >> 63;
- }
- 
--static inline int float128_is_zero(float128 a)
-+static inline bool float128_is_zero(float128 a)
- {
-     return (a.high & 0x7fffffffffffffffLL) == 0 && a.low == 0;
- }
- 
--static inline int float128_is_zero_or_denormal(float128 a)
-+static inline bool float128_is_zero_or_denormal(float128 a)
- {
-     return (a.high & 0x7fff000000000000LL) == 0;
- }
-@@ -983,7 +983,7 @@ static inline bool float128_is_denormal(float128 a)
-     return float128_is_zero_or_denormal(a) && !float128_is_zero(a);
- }
- 
--static inline int float128_is_any_nan(float128 a)
-+static inline bool float128_is_any_nan(float128 a)
- {
-     return ((a.high >> 48) & 0x7fff) == 0x7fff &&
-         ((a.low != 0) || ((a.high & 0xffffffffffffLL) != 0));
-diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc.c
-index 025ee4f991..44f5b661f8 100644
---- a/fpu/softfloat-specialize.inc.c
-+++ b/fpu/softfloat-specialize.inc.c
-@@ -245,7 +245,7 @@ typedef struct {
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float16_is_quiet_nan(float16 a_, float_status *status)
-+bool float16_is_quiet_nan(float16 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return float16_is_any_nan(a_);
-@@ -264,7 +264,7 @@ int float16_is_quiet_nan(float16 a_, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float16_is_signaling_nan(float16 a_, float_status *status)
-+bool float16_is_signaling_nan(float16 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return 0;
-@@ -283,7 +283,7 @@ int float16_is_signaling_nan(float16 a_, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float32_is_quiet_nan(float32 a_, float_status *status)
-+bool float32_is_quiet_nan(float32 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return float32_is_any_nan(a_);
-@@ -302,7 +302,7 @@ int float32_is_quiet_nan(float32 a_, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float32_is_signaling_nan(float32 a_, float_status *status)
-+bool float32_is_signaling_nan(float32 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return 0;
-@@ -637,7 +637,7 @@ static float32 propagateFloat32NaN(float32 a, float32 b, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float64_is_quiet_nan(float64 a_, float_status *status)
-+bool float64_is_quiet_nan(float64 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return float64_is_any_nan(a_);
-@@ -657,7 +657,7 @@ int float64_is_quiet_nan(float64 a_, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float64_is_signaling_nan(float64 a_, float_status *status)
-+bool float64_is_signaling_nan(float64 a_, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return 0;
-@@ -939,7 +939,7 @@ floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
- | NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float128_is_quiet_nan(float128 a, float_status *status)
-+bool float128_is_quiet_nan(float128 a, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return float128_is_any_nan(a);
-@@ -959,7 +959,7 @@ int float128_is_quiet_nan(float128 a, float_status *status)
- | signaling NaN; otherwise returns 0.
- *----------------------------------------------------------------------------*/
- 
--int float128_is_signaling_nan(float128 a, float_status *status)
-+bool float128_is_signaling_nan(float128 a, float_status *status)
- {
- #ifdef NO_SIGNALING_NANS
-     return 0;
+> 
+>>>
+>>> How much we care about pre-blockdev libvirt now in upstream Qemu?
+>>>
+>>> If we don't care, than these series are only for downstreams, and we don't need to apply them upstream..
+> 
+> Eventually, we may want to deprecate pre-blockdev, but I don't think we are there yet, and even when it does happen, it will be two more releases with it being deprecated before it is gone, so we might as well make it work correctly in the meantime.
+
+Agree. Better to fix old behavior first, and then do proper deprecation if needed.
+
+> 
+>>>
+>>> On the other hand, Max have to resend anyway, to handle old code, which uses device name instead of node-name. And if we don't want to drop now the code which can use device name (needed for old libvirt), why not to apply the series, which just make old code better?
+>>>
+>>> ====
+>>>
+>>> In other words: do we still support pre-blockdev libvirt (and any other pre-blockdev users)?
+>>>
+>>> If we support, than, as I said somewhere, I need to resend these series as I have updated version in our downstream. And I think, I can rebase Max's patch by myself and send together with this all, if no objections.
+>>>
+>>
+>> I'm going to resend the series today, let's look at it.
+>>
+> 
+> Sounds reasonable.
+> 
+
 -- 
-2.20.1
-
+Best regards,
+Vladimir
 
