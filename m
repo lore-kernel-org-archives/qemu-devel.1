@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90714C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFABC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:55:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B20A2076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 513602076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:55:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iVrCgyth"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B20A2076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="icIXrHxr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 513602076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbj0-0008Le-H3
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:54:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44584)
+	id 1jZbkG-0002Xc-HC
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:55:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZZ-0002TX-1o
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:25 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:36942)
+ id 1jZbfe-0003m3-Pf
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:50:42 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40678)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZY-00010f-0P
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:24 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id z72so2963894wmc.2
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:44:23 -0700 (PDT)
+ id 1jZbfd-0002NS-Fh
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:50:42 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id u16so2967940wmc.5
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:50:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KIiMOFkFR1RmW/iOKb+Q1Re9AaDQXvi4+44fXAW725w=;
- b=iVrCgythiyjZNR1VRaz5Jvueln1XQIX7WFkM9j7/WxnYDCzIyjsSHZOSEXcQ2jsqyZ
- cIgYsyd+MZpDLWSVPj7SZWu1LHh7X6HaqzS3kF5NGg9zuXEcIqk/GX9Xrj/dk5h4CwlH
- BvWSKaoCgz/uG5Ep+lIMkddx2Ki8r23C3voClnzujhD7K7voo3uWH78EiJYpj8kQPNlM
- tV16RdiLSpbbY+IzVxk6UppQmJyl/8F7sb+Ksk8rUQ+Z0yEVHKlUyz2DKJuWEPYzqGEg
- 3ASke35YK6ferGGN2OW/yelPayqeixI4vTk9kSfWnjm4J4E5pJwMsbxf2OFg7D/mpTHO
- /QWw==
+ bh=kKMoxXAM7m/jF9QY7qqcaTZMK0m+l3vXAyXZXTtWXsI=;
+ b=icIXrHxronYe/OpJ1UDOT+R3rBTwR7CYroDGueLRQMp7wTN+XJDVsYRG5vLRUQ9X1t
+ wB3QK3ZjFN3ONBHMruFWpGXyEPQoT8gnWTPDujzTu4+Rb/zA3E6aq5/pWrPHfXdhZEZC
+ 2tc58yNDJhCL+WeSGE2zs51uyLjboFADHHsh4ddO6R2ZPzD1+q1TbR/aYU/1MKQDCFAA
+ HpnJB5kg4L0/JNPbBeyFIsznkBuONdAKC92XeLe/YYZSbFtiUaF7ZZMbmptZRNS43vCc
+ B9LglIOqiNSutl1wHRIK4wF9L+5bMP/WuRVmdACAF2vzM4jHjFFuX7QXTByBmVkTUVqa
+ bnxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KIiMOFkFR1RmW/iOKb+Q1Re9AaDQXvi4+44fXAW725w=;
- b=moZCMAUfZP1DUflWw61VYUmZAmKDvt7hbLU/K3DFpGmkEF6CKK0+/7YaIEyNpo76Cj
- wvHMJhWjiCiMW9XeISF49mIrhtGTvJerEl3VLgd2TmhYtmMz7tgSMA/a7Kf/SSGMbBof
- 1mjEsMLsztZF1Vf0MUu0vHS4s4S2npLEGz7NW3tmOZk5gOVpje39H/75ZB0NrdsimV4w
- 0UyOfVKygeg32kFmGFnq9Ti+Mys1nNWiRnu1llwxspwzg3qpbb435tNOl5Ybod+gHO84
- SWEgTUqSAjiDBKEYnlzzLApejUTvfoWaB2hcyHy76/+ZclAdtLIHAnckvlNqMB3QnHBH
- OZXQ==
-X-Gm-Message-State: AOAM530o262C+cp8hWkXNs5vFovWC5a07ZqcLNWPJ9hxgnp1FUGKi8MC
- LbVMviRzmMM1k36owVaO8xbm7A==
-X-Google-Smtp-Source: ABdhPJxZt5skKDlrsjaqV2hI4hK6LbgwPfryq+fKkNZqKD/wCCi9LfA8oSiS2V7Z6F0vavQFqrQHdw==
-X-Received: by 2002:a1c:1b44:: with SMTP id b65mr4550513wmb.181.1589553862523; 
- Fri, 15 May 2020 07:44:22 -0700 (PDT)
+ bh=kKMoxXAM7m/jF9QY7qqcaTZMK0m+l3vXAyXZXTtWXsI=;
+ b=c9D+V5YFTuUaDqeaLoGI5pcupQ/V9XFkozkTgI9CZmmdWBB29Cf/utJHeXY5w46gd/
+ LIP325LfPuCYK7xQlgYjX61o1LB2moKbWXVNkbE1gBKuvrQkdChgU6GcB2C8Fyy/9A/Y
+ KnPtCTxJpVMw4zxY36WfZGFqMjbGSPvVc6VcsZuJoBVs4tK2rtHGNHkHgbhcDji+Es39
+ Vbdzzl+jSI46a0FDPwib0hp8ssLF79txSjdVYlDTRxRivOsKN1WcFDayBH49Pnsw6MMv
+ 9qK/rUrMEKabbwPagtQp0r0458iGlRIXtYhlESO7Wec5wRwmkDhklbOsrBu6N+TIvzX8
+ cwPg==
+X-Gm-Message-State: AOAM532P6YptU4UvGryWiGusIQ//vDtmUTcFOkB+GbeqaU1idZifatPP
+ CmDKgX+jmnC7+PV83O8wxVrvZQ==
+X-Google-Smtp-Source: ABdhPJwI9p3OqA9tRSlOJUGFZeFNgc7BAfdY8AAvNU7owbqsVgQH0MUWFP9oFAk5O+Iccu6vyWbwCA==
+X-Received: by 2002:a7b:c2a9:: with SMTP id c9mr4409414wmk.8.1589554239941;
+ Fri, 15 May 2020 07:50:39 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z124sm2598547wmg.20.2020.05.15.07.44.12
+ by smtp.gmail.com with ESMTPSA id h74sm4122337wrh.76.2020.05.15.07.50.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 07:44:20 -0700 (PDT)
+ Fri, 15 May 2020 07:50:38 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5C1E81FF9C;
+ by zen.linaroharston (Postfix) with ESMTP id 47DBB1FF9B;
  Fri, 15 May 2020 15:44:06 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 13/13] MAINTAINERS: update the orphaned cpus-common.c file
-Date: Fri, 15 May 2020 15:44:05 +0100
-Message-Id: <20200515144405.20580-14-alex.bennee@linaro.org>
+Subject: [PULL v2 12/13] qemu/qemu-plugin: Make qemu_plugin_hwaddr_is_io()
+ hwaddr argument const
+Date: Fri, 15 May 2020 15:44:04 +0100
+Message-Id: <20200515144405.20580-13-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200515144405.20580-1-alex.bennee@linaro.org>
 References: <20200515144405.20580-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,31 +104,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: "Emilio G . Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We forgot to update MAINTAINERS when this code was re-factored.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Fixes: 267f685b8b
+Rename qemu_plugin_hwaddr_is_io() address argument 'haddr'
+similarly to qemu_plugin_hwaddr_device_offset(), and make
+it const.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200513173200.11830-5-alex.bennee@linaro.org>
+Message-Id: <20200510171119.20827-4-f4bug@amsat.org>
+Message-Id: <20200513173200.11830-4-alex.bennee@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f02e2907023..47ef3139e6d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -115,6 +115,7 @@ M: Richard Henderson <rth@twiddle.net>
- R: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
- F: cpus.c
-+F: cpus-common.c
- F: exec.c
- F: accel/tcg/
- F: accel/stubs/tcg-stub.c
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index 5502e112c81..89ed579f559 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -331,7 +331,7 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+  * to return information about it. For non-IO accesses the device
+  * offset will be into the appropriate block of RAM.
+  */
+-bool qemu_plugin_hwaddr_is_io(struct qemu_plugin_hwaddr *hwaddr);
++bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
+ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
+ 
+ typedef void
+diff --git a/plugins/api.c b/plugins/api.c
+index 53c8a735823..bbdc5a4eb46 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -275,10 +275,10 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+ }
+ #endif
+ 
+-bool qemu_plugin_hwaddr_is_io(struct qemu_plugin_hwaddr *hwaddr)
++bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr)
+ {
+ #ifdef CONFIG_SOFTMMU
+-    return hwaddr->is_io;
++    return haddr->is_io;
+ #else
+     return false;
+ #endif
 -- 
 2.20.1
 
