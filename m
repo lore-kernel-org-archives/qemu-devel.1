@@ -2,81 +2,77 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51825C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3898DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A7B3206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01922206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:47:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CvlkQzG9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7B3206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NgZ6cfhi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01922206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZWuj-0001Mw-1O
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38398)
+	id 1jZWwG-0003GW-5l
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:47:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWu7-0000gJ-Ey
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:45:19 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43123
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZWvN-0002OS-AE
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:46:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32658
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWu6-0003FK-SJ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:45:19 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZWvM-0003Vl-Ly
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:46:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589535917;
+ s=mimecast20190719; t=1589535995;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IAOnmNbS2TDggtIU3jhjKnoR8UAw+nO/k2V4YA1yunY=;
- b=CvlkQzG9exYcfvjAauyD8NDhNAuhRZHhggUyVKU/ieu1FlmZlIP57A3BsOjAuAPg6ZtWHD
- V57Sahip+H0zTx2fZ6OduDSNf32wenHFpbGrlOY0F6nEcz5vea8k4G0slEUY80vy0d0lDh
- vBa6pIZm13FsMqNxWt49O1c6I5e+rz8=
+ bh=N6ya2zmJcUDiyFZxHC/XxRocPqoFjxrlb9HicaZi0C0=;
+ b=NgZ6cfhirC6wFsD+36vEp+oNC6g7f8lAJ8izBPb3mII89LpuRA7XJJYG6zXsfZvEdAGkNn
+ NauEK+kmma2tC+gqtrbHKETKnKVBohVAn7JuoIpV52F6qpCKNVdaen8d1/J5a85USxX21Y
+ HXZ4k8K4rvxOBLGzntdOWdvTxl05k4s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-XDpn_Y6bMu22MEuxHLjVRQ-1; Fri, 15 May 2020 05:45:15 -0400
-X-MC-Unique: XDpn_Y6bMu22MEuxHLjVRQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-442-7S-JjKtzPTO4lZ__NIAZUg-1; Fri, 15 May 2020 05:46:32 -0400
+X-MC-Unique: 7S-JjKtzPTO4lZ__NIAZUg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C710A1005510;
- Fri, 15 May 2020 09:45:14 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E1EDF39E;
- Fri, 15 May 2020 09:45:13 +0000 (UTC)
-Date: Fri, 15 May 2020 11:45:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 2/3] docs/s390x: document 3270
-Message-ID: <20200515114511.2ac852f3.cohuck@redhat.com>
-In-Reply-To: <b6acb966-16f2-605d-6d01-70f6085bfa79@redhat.com>
-References: <20200505135025.14614-1-cohuck@redhat.com>
- <20200505135025.14614-3-cohuck@redhat.com>
- <4ea47ea1-04d5-3073-fef6-5af07f06a4d6@redhat.com>
- <20200515110007.1676b17d.cohuck@redhat.com>
- <b6acb966-16f2-605d-6d01-70f6085bfa79@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59905835B41;
+ Fri, 15 May 2020 09:46:31 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-110.ams2.redhat.com [10.36.113.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 131F86E9E7;
+ Fri, 15 May 2020 09:46:29 +0000 (UTC)
+Date: Fri, 15 May 2020 11:46:28 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v4 3/3] iotests: modify test 040 to use JobRunner
+Message-ID: <20200515094628.GD93011@linux.fritz.box>
+References: <20200514022536.2568-1-jsnow@redhat.com>
+ <20200514022536.2568-4-jsnow@redhat.com>
+ <20200514155319.GL5518@linux.fritz.box>
+ <6f88db54-b311-2952-9bba-0f99df049f44@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <6f88db54-b311-2952-9bba-0f99df049f44@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,62 +93,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 11:14:40 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 15/05/2020 11.00, Cornelia Huck wrote:
-> > On Fri, 15 May 2020 09:29:42 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 05/05/2020 15.50, Cornelia Huck wrote:  
-> >>> Add some basic info how to use 3270 devices.
-> >>>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>  docs/system/s390x/3270.rst   | 32 ++++++++++++++++++++++++++++++++
-> >>>  docs/system/target-s390x.rst |  1 +
-> >>>  2 files changed, 33 insertions(+)
-> >>>  create mode 100644 docs/system/s390x/3270.rst
-> >>>
-> >>> diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
-> >>> new file mode 100644
-> >>> index 000000000000..e367a457e001
-> >>> --- /dev/null
-> >>> +++ b/docs/system/s390x/3270.rst
-> >>> @@ -0,0 +1,32 @@
-> >>> +3270 devices
-> >>> +============
-> >>> +
-> >>> +With the aid of the ``x3270`` emulator, QEMU provides limited support
-> >>> +for making a single 3270 device available to a guest. Note that this
-> >>> +supports basic features only.    
+Am 14.05.2020 um 21:37 hat John Snow geschrieben:
+> 
+> 
+> On 5/14/20 11:53 AM, Kevin Wolf wrote:
+> > Am 14.05.2020 um 04:25 hat John Snow geschrieben:
+> >> Instead of having somewhat reproduced it for itself.
 > >>
-> >> The first sentence sounds somewhat confusing. Maybe rather something like:
-> >>
-> >> QEMU can emulate a 3270 device attached to a guest, which then can be
-> >> used with a program like ``x3270`` to get a traditional 3270 terminal
-> >> for your guest.  
+> >> Signed-off-by: John Snow <jsnow@redhat.com>
 > > 
-> > But QEMU actually relies on x3270 (or a comparable program). It only
-> > emulates the basic ccw plumbing; for the actual protocol (beyond
-> > negotiating tn3270), it relies on the emulation done by x3270.  
+> > I think you should pass auto_dismiss=True to the JobRunner, or (probably
+> > preferable) change prepare_and_start_job() to start the job with
+> > auto_dismiss=False.
+> > 
+> > Kevin
+> > 
 > 
-> Ok, makes sense now. Maybe something like:
+> okay, I'll try that out and see if I like it.
 > 
-> QEMU provides the possibility to connect an external 3270 terminal
-> emulator (like ``x3270``) to a guest?
+> 
+> Wild tangents, as is my normal:
+> 
+> I also think it would be neat, in some sense, to provide a job creation
+> abstraction where creating the QMP command in python also creates the
+> runner with the right parameters based on how you initialized it.
+> 
+> I've not given these even a proper three minutes think, but some
+> generalized interface for managing the creation of jobs to use in
+> concert with the job runner would be slick.
 
-Hm...
+JobRunner could have a static method that starts a job (it would take
+the same options as qmp() and forward everything to qmp(), except that
+it parses auto_* first) and returns a JobRunner object that you can run
+later.
 
-"QEMU supports connecting an external 3270 terminal emulator (such as
-``x3270``) to make a single 3270 device available to a guest. Note that
-this supports basic features only."
+> (What reminds me of this is needing to remember and understand if I
+> started something with auto_dismiss or not, which jobs it defaults to
+> which for, etc. Streamlining the creation and runner could be slick for
+> faster test-writing in normative cases.)
 
-?
+Yes.
+
+In general, I think we should keep tests simple (even if that means some
+duplication) and avoid overengineering testing infrastructure because we
+could well sink more time there than we'll ever get back, but I guess
+small and simple wrappers like in this case can't hurt.
+
+Kevin
 
 
