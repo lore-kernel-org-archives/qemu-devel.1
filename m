@@ -2,94 +2,89 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09BEC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F07CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:32:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EBF820727
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:31:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B768B20727
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:32:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KNaJlWa9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EBF820727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7FvgNjo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B768B20727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZeAo-00082z-TN
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:31:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45148)
+	id 1jZeCP-0001WE-Vn
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:32:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZe8T-0003da-Hb
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:28:37 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51421)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZe8S-00016h-JM
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:28:37 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f134so3105251wmf.1
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 10:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oAW6sgDCW3rYyrQQOtrgET+T55ELTqidNtOcxJc+4ts=;
- b=KNaJlWa9a6GnBklC4PpfVmmUjSoXkRASJWRMaupy20+GdkDDtDnC8ybwV9Pn1BsizB
- APR22yy4FshshFCpV6Tctl/vt1UfA7iDM2Wv0n7m9IvBm0SIvIVdov9gOacb5UKbKEfK
- jS+Jq5+8HoqPGSjUsvsUaA1cjCj6HTolEgoWBeqjiLkGkEVsCs4VJoq/IJNRT8q25Dzp
- kn/YD2UF3TEDbsGX34pnrLAw6RBf61oD+3M8jzLqNEYx50pVjFNgl9Mdn+4BtLsEI4qW
- 5musrPLiu2TXnBcXnXek7LV/SS9Ww/i/wSo+iUO6m+YivLj/OWNfyjxcEJDciUt724K5
- Fz5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oAW6sgDCW3rYyrQQOtrgET+T55ELTqidNtOcxJc+4ts=;
- b=sUJrZz8xOoURhs2dtaO/aEon6NHeLL1rVIBD9s7+/M73UPPk35Zdve9zn9RJwb4PFr
- L0atcbZ8W7Orkn8d8mg2zTTyuqTo/TvmIwMm4wDe052eQa/gLK71XAss/AH2Qb2A1I8F
- LkezTBuhkz/E11TIwZiffVVBDRn7NpXyDCUQF6Lzb/MVFzx3xM/mZcDGgseDHxHsIlTj
- R4VwD6DljcQxD4Wwi3IML4WxJl2HYyyMT5m33t86ZWBlqPaT25d38gssv1xLUzLmdJqk
- KKXm0UNLtGunWXLVtvIUBi2+LCnPgUhIJPQrvuP8EyWZE4/AbD+eax3T0VwmCCPPRG77
- A6mg==
-X-Gm-Message-State: AOAM532vJbCrmWEc+NwyUQfAALW4n26/zvpAWAA9LJtKlpkI5XXm4EUF
- UcL3X18hG1hKGtnkuFBuj7oZjQ==
-X-Google-Smtp-Source: ABdhPJwlwl+yaIIPe6mzsSmv8As/CCF/BtKiwYx/SmQ/9zAwDCjz8vxt2Mdyqy50mwi/k1jQDLHW0g==
-X-Received: by 2002:a1c:6142:: with SMTP id v63mr4858146wmb.61.1589563715184; 
- Fri, 15 May 2020 10:28:35 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w9sm5372491wrc.27.2020.05.15.10.28.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 10:28:31 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 613731FF8C;
- Fri, 15 May 2020 18:28:31 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 2/2] tests/vm: pass --genisoimage to basevm script
-Date: Fri, 15 May 2020 18:28:31 +0100
-Message-Id: <20200515172831.8439-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200515172831.8439-1-alex.bennee@linaro.org>
-References: <20200515172831.8439-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZeBJ-0000O6-2D
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:31:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28219
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZeBI-0001vX-91
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:31:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589563890;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iPcEtRrxrVfJocKoflV6kb8Wr1wsfvdPIIaiDWwj8ws=;
+ b=e7FvgNjoQB4LN1K1M6iuFSo/BK7O182sUAOx3dLewtBKzqUOXfWW9vWOJr4I3NyBolAe6d
+ wFULJskb3vtFOmAT0Ht3zq47YAPzjMGJYlP/PsqQmZiupwmEZns/bYsjhErnUcqJKv9fIm
+ mp6ByMRqOBwVKFTNlhxybjd3j6medFg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405--jL3b5WhOi6IGVWzXqCGLQ-1; Fri, 15 May 2020 13:31:26 -0400
+X-MC-Unique: -jL3b5WhOi6IGVWzXqCGLQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 374778014D7;
+ Fri, 15 May 2020 17:31:25 +0000 (UTC)
+Received: from [10.3.114.84] (ovpn-114-84.phx2.redhat.com [10.3.114.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AC09F600F5;
+ Fri, 15 May 2020 17:31:24 +0000 (UTC)
+Subject: Re: [PATCH v2 0/1] qemu-nbd: Close inherited stderr
+To: Raphael Pour <raphael.pour@hetzner.com>, qemu-devel@nongnu.org
+References: <158946069407.13639.5714365663552293557@45ef0f9c86ae>
+ <ece77427-d918-d766-b2bc-08cf7d4660bc@redhat.com>
+ <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8e552e6c-a291-f309-c684-e6ceafe47eaa@redhat.com>
+Date: Fri, 15 May 2020 12:31:24 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,88 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- robert.foley@linaro.org
+Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we have an alternative to genisoimage we really need to tell the
-script about it as well so it can use it. It will still default to
-genisoimage in case it is run outside our build machinery.
+On 5/15/20 1:36 AM, Raphael Pour wrote:
+>>From e5749541494abcdcaa37d752172741e1bc38e984 Mon Sep 17 00:00:00 2001
+> From: Raphael Pour <raphael.pour@hetzner.com>
+> Date: Fri, 15 May 2020 08:30:50 +0200
+> Subject: [PATCH] qemu-nbd: Close inherited stderr
+> 
+> Close inherited stderr of the parent if fork_process is false.
+> Otherwise no one will close it. (introduced by e6df58a5)
+> 
+> Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
+> ---
+>   qemu-nbd.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/vm/Makefile.include |  1 +
- tests/vm/basevm.py        | 16 ++++++++++------
- 2 files changed, 11 insertions(+), 6 deletions(-)
+Thanks. It might have been easier posting this as a standalone v3 rather 
+than buried in reply to v2, but I have now queued it to go in through my 
+NBD tree (I plan on doing a pull request Monday).
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 1bf9693d195..74ab522c55d 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -56,6 +56,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
- 	$(call quiet-command, \
- 		$(PYTHON) $< \
- 		$(if $(V)$(DEBUG), --debug) \
-+		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
- 		--image "$@" \
- 		--force \
- 		--build-image $@, \
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 756ccf7acae..a2d4054d72b 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -61,8 +61,9 @@ class BaseVM(object):
-     # 4 is arbitrary, but greater than 2,
-     # since we found we need to wait more than twice as long.
-     tcg_ssh_timeout_multiplier = 4
--    def __init__(self, debug=False, vcpus=None):
-+    def __init__(self, debug=False, vcpus=None, genisoimage=None):
-         self._guest = None
-+        self._genisoimage = genisoimage
-         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
-                                                          suffix=".tmp",
-                                                          dir="."))
-@@ -381,12 +382,12 @@ class BaseVM(object):
-             udata.writelines(["apt:\n",
-                               "  proxy: %s" % proxy])
-         udata.close()
--        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
-+        subprocess.check_call([self._genisoimage, "-output", "cloud-init.iso",
-                                "-volid", "cidata", "-joliet", "-rock",
-                                "user-data", "meta-data"],
--                               cwd=cidir,
--                               stdin=self._devnull, stdout=self._stdout,
--                               stderr=self._stdout)
-+                              cwd=cidir,
-+                              stdin=self._devnull, stdout=self._stdout,
-+                              stderr=self._stdout)
- 
-         return os.path.join(cidir, "cloud-init.iso")
- 
-@@ -424,6 +425,8 @@ def parse_args(vmcls):
-                       help="Interactively run command")
-     parser.add_option("--snapshot", "-s", action="store_true",
-                       help="run tests with a snapshot")
-+    parser.add_option("--genisoimage", default="genisoimage",
-+                      help="iso imaging tool")
-     parser.disable_interspersed_args()
-     return parser.parse_args()
- 
-@@ -435,7 +438,8 @@ def main(vmcls):
-             return 1
-         logging.basicConfig(level=(logging.DEBUG if args.debug
-                                    else logging.WARN))
--        vm = vmcls(debug=args.debug, vcpus=args.jobs)
-+        vm = vmcls(debug=args.debug, vcpus=args.jobs,
-+                   genisoimage=args.genisoimage)
-         if args.build_image:
-             if os.path.exists(args.image) and not args.force:
-                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+I've also taken the liberty to amend the commit message as follows, to 
+give more context into why the fix is needed:
+
+     qemu-nbd: Close inherited stderr
+
+     Close inherited stderr of the parent if fork_process is false.
+     Otherwise no one will close it. (introduced by e6df58a5)
+
+     This only affected 'qemu-nbd -c /dev/nbd0'.
+
+     Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
+     Message-Id: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
+     Reviewed-by: Eric Blake <eblake@redhat.com>
+     [eblake: Enhance commit message]
+     Signed-off-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
