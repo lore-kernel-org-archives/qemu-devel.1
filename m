@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083F4C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08160C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:41:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7524206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:40:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C67FA206C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:41:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UUC7BqQU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7524206C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hButAgq8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67FA206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZdNt-00025j-Vo
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:40:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36388)
+	id 1jZdP2-0003Wb-Ap
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:41:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZdEb-0007zY-W0
- for qemu-devel@nongnu.org; Fri, 15 May 2020 12:30:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23651
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZdEf-000803-AG
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 12:30:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53323
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZdEb-0001gv-99
- for qemu-devel@nongnu.org; Fri, 15 May 2020 12:30:53 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZdEe-0001k6-Kv
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 12:30:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589560252;
+ s=mimecast20190719; t=1589560256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OktuFlpyEDCogWQETFKDEsXyn69UzB2tvuqAaVa6mdg=;
- b=UUC7BqQUnWuUIkCjvwg9yMM2jvS5FY2wVaqRdfB7j03vK7WrfBJLXkv8jjetHQ1e8R+iNG
- CKkR7hf7Yl4+MW54eWJ3SnR16GZqzFaUy+S+CGugRgC4NWvrp369Ua2ZRplrxRfWm1nZOe
- dWN3qmuxcWSr7GGsHlO9E/JiupozzVY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-ZhQxhYeHOE2XJj1VhaK3UQ-1; Fri, 15 May 2020 12:30:49 -0400
-X-MC-Unique: ZhQxhYeHOE2XJj1VhaK3UQ-1
-Received: by mail-wm1-f71.google.com with SMTP id a67so1420500wme.6
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 09:30:49 -0700 (PDT)
+ bh=MlwAsFx7qZJhpUw9yV0U2104dkmNaPniQZ/O8ObnvZY=;
+ b=hButAgq8OosvfIzmhX1tN+wlJu0IwiDsk3uJZWRmaTR7k1lnVIHVCfjyHAv5bBHurfwxC6
+ 1DKW85vZS7/QG6lAaMIK/UaG4cpW3ySWXqTuoWZwChk/37T3lkMET1ZzItJzWqICxR9dfw
+ uZvbaZvkdC4wrTkQI9PslBa9683hWNU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-4IfYEPh_NsCiuNWKk5T8LQ-1; Fri, 15 May 2020 12:30:54 -0400
+X-MC-Unique: 4IfYEPh_NsCiuNWKk5T8LQ-1
+Received: by mail-wm1-f69.google.com with SMTP id t82so1128960wmf.4
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 09:30:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=OktuFlpyEDCogWQETFKDEsXyn69UzB2tvuqAaVa6mdg=;
- b=XON4w/ruqqg4Zb4b+eI6Wa6AY2dE1eFkeCFqt5np9B+dqwTMgggSlagM5HXR2Ij9QB
- +bZXBNZ+VizT19nxi+4tifiw261E0t5lPt41ARA4fCMzNDTL4OkSNniuD/bmZlo7gYDS
- w7k9ttLOz9sjAWPaY0qMVz808MzHGv6F/PtYQVBN33d26Keyx12ext9UL2AGerRqUQvQ
- gttuHuPPEAi2btzuRA4SQhQgtbCekalJL1qA2RI8QcP7zMAS/3JKaCv05730jhttviIp
- NcaDIxqIkW9pV/g8NyQ1m2ZMa7s7mAVikGl6xDwmh/WPmr0fylefTNwWnLkxYU5XM0VQ
- POfg==
-X-Gm-Message-State: AOAM531ENy6Z+p8O/bIxjzjkmOYmD5U1LSsUVK3W76MeZunOikrWKn6D
- k1aTuFhl1VLAfcTDcJNBMHrNinNjzvsRu+J5kw5dOR68M6XX13IqXkv5YgxnDzHLvFzVEwRJphj
- vDqijXRsNLlTtNg4=
-X-Received: by 2002:a05:600c:21c2:: with SMTP id
- x2mr4880119wmj.148.1589560247914; 
- Fri, 15 May 2020 09:30:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy0kWYqIavdmRwwF41X+xixuw/Fo9G4vDFMRGQHnfV73iCzCUyPk5INn4I3I2kG3hh/P2Pm+Q==
-X-Received: by 2002:a05:600c:21c2:: with SMTP id
- x2mr4880097wmj.148.1589560247761; 
- Fri, 15 May 2020 09:30:47 -0700 (PDT)
+ bh=MlwAsFx7qZJhpUw9yV0U2104dkmNaPniQZ/O8ObnvZY=;
+ b=lC2rkFLpPLYMKYN9X4pzP03XSiBs9t66yLTpf31O2prcq7jMd2Gxaoe/9bH6wO8Hfg
+ NtallFNhpZV5r/x0HgNVs1qxKLe9L7lA9N0WOa6qA3Jj6xPstD0BBslMallSOHvjeAjH
+ 9s5voPJkD1KsgFNuMz8kjXui5nlFsQmXrVz13/pERS7XmbvEHkKZ6VhLPxVr5KPUceSQ
+ lNoWy8KQ3sDBVw/vStljQL8hwI7HTFXi4QPa8U6qkev+HOrmSiM5D3HfB051/W6FMD0l
+ 3rCpkUG+ai9qVSCNY83D0dAg8KJdLFLp1kAsHUC0kv7s2XkVUk01nS0DaVRJyVM5BSye
+ yMHA==
+X-Gm-Message-State: AOAM533I87Wy4E1sGmG6lO5UQ7Oo3njwrslU0xpo0JWOIAH4Ouu/7j4i
+ ZLcSIz65kp3hefJt4iC0wf2OtGymeoe0K0OT/o6PlC+AzTeWLqkfvO4HO/UJ7iR/Sa3JioDTkbz
+ YRkITouSJcTSXn9Y=
+X-Received: by 2002:a5d:604b:: with SMTP id j11mr5008234wrt.193.1589560252855; 
+ Fri, 15 May 2020 09:30:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyYN3QMXAM+RElvusEhgJ3ndtHjnofJqsedjH96rWZ8jlGt1feyThWdofPDVTtgstn8J1ZBHA==
+X-Received: by 2002:a5d:604b:: with SMTP id j11mr5008217wrt.193.1589560252691; 
+ Fri, 15 May 2020 09:30:52 -0700 (PDT)
 Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id s8sm3836173wrt.69.2020.05.15.09.30.46
+ by smtp.gmail.com with ESMTPSA id j2sm4373178wrp.47.2020.05.15.09.30.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 09:30:47 -0700 (PDT)
+ Fri, 15 May 2020 09:30:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/5] gitlab-ci: Remove flex/bison packages
-Date: Fri, 15 May 2020 18:30:27 +0200
-Message-Id: <20200515163029.12917-4-philmd@redhat.com>
+Subject: [PATCH v2 4/5] cirrus-ci: Remove flex/bison packages
+Date: Fri, 15 May 2020 18:30:28 +0200
+Message-Id: <20200515163029.12917-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200515163029.12917-1-philmd@redhat.com>
 References: <20200515163029.12917-1-philmd@redhat.com>
@@ -126,22 +124,22 @@ QEMU does not use flex/bison packages.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- .gitlab-ci.yml | 2 +-
+ .cirrus.yml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index b889fb96b6..994774250f 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -4,7 +4,7 @@ include:
- 
- before_script:
-  - apt-get update -qq
-- - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev genisoimage
-+ - apt-get install -y -qq libglib2.0-dev libpixman-1-dev genisoimage
- 
- build-system1:
-  script:
+diff --git a/.cirrus.yml b/.cirrus.yml
+index de0727cb09..ce7850a320 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -7,7 +7,7 @@ freebsd_12_task:
+     cpu: 8
+     memory: 8G
+   install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
+-    bash bison curl cyrus-sasl git glib gmake gnutls gsed
++    bash curl cyrus-sasl git glib gmake gnutls gsed
+     nettle perl5 pixman pkgconf png usbredir
+   script:
+     - mkdir build
 -- 
 2.21.3
 
