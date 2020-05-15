@@ -2,63 +2,66 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F81C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD652C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A0B420671
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:34:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A71BA20671
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:34:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="je1IHzVX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A0B420671
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="WgW/yQ53"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A71BA20671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZS3g-0003VW-KB
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39582)
+	id 1jZS3h-0003Wb-Ph
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
- id 1jZS2l-0002fS-Br
+ id 1jZS2l-0002fU-Ea
  for qemu-devel@nongnu.org; Fri, 15 May 2020 00:33:57 -0400
-Received: from mail-m975.mail.163.com ([123.126.97.5]:40224)
+Received: from mail-m975.mail.163.com ([123.126.97.5]:40222)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
- id 1jZS2h-0005Rr-G7
+ id 1jZS2j-0005Rs-1T
  for qemu-devel@nongnu.org; Fri, 15 May 2020 00:33:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=IpkHR
- lommvQGoOw2O12kL2bBK0HXKG5ruLkU5YVCxtE=; b=je1IHzVXX54s9/grp7ezN
- LqgZcIWuRFBZg78lkFSjyKsMBV8KUo6TxAFpFKvKW5r1GyVkTkBt4jzVd5THHpAg
- ly2tUmKtvlDws0YymEplWxJobx32XhG63Ch1+MkxklkRsRAJmUi4oSj6eOLXI12C
- FnIaP+V5O5l8eRNo2DxB3I=
+ s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=/NcvS
+ o1vK7M28qvvpL0Qua7NUSmc+hQjegBGuU0seYQ=; b=WgW/yQ53kY3DDf8ph0ZSp
+ UIy277xq33CPjq72XofsWSLqiYdBfy1n/9NcCNZ2cIDyLeMv/PO/4cnvHxGM17r6
+ wrp/6sQl2H/ZW1UkwMf/Ju5W4kjzIyxuAoIZ5MYNTcacx3kidnHa9tJA0wKCDb6C
+ AXQSiQOAYA+q48Zyu9/I84=
 Received: from localhost.localdomain (unknown [114.240.93.195])
- by smtp5 (Coremail) with SMTP id HdxpCgA3zWVtG75ezKxrBQ--.333S2;
- Fri, 15 May 2020 12:33:35 +0800 (CST)
+ by smtp5 (Coremail) with SMTP id HdxpCgA3zWVtG75ezKxrBQ--.333S5;
+ Fri, 15 May 2020 12:33:36 +0800 (CST)
 From: xiaoqiang zhao <zxq_yx_007@163.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/3] qemu-sockets: add abstract UNIX domain socket support
-Date: Fri, 15 May 2020 12:32:32 +0800
-Message-Id: <20200515043235.32189-1-zxq_yx_007@163.com>
+Subject: [PATCH v4 3/3] qemu-options: updates for abstract unix sockets
+Date: Fri, 15 May 2020 12:32:35 +0800
+Message-Id: <20200515043235.32189-4-zxq_yx_007@163.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200515043235.32189-1-zxq_yx_007@163.com>
+References: <20200515043235.32189-1-zxq_yx_007@163.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: HdxpCgA3zWVtG75ezKxrBQ--.333S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7GFyxJFWxGry3Cw13Ary3twb_yoW3JFb_Xr
- y0k3s5trW2ga1rCa45CrnxJrW7Ar40gF1vqF1UtrWkGw18Zr98trs8Ar17Kw1UXF9xWF17
- X3s7GrZ3A342gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
- 9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8SdgJUUUUU==
+X-CM-TRANSID: HdxpCgA3zWVtG75ezKxrBQ--.333S5
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tw45Ary5Zr4rZF4ftrWUArb_yoW8Cr48pr
+ 90gas8t348J3WFvrsrG3W8tryFkw4kXrs7G3y3Ww1kta9rW398ta4UKw15X34UArs7XFya
+ vF90yryjvF4Yy3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jEVbkUUUUU=
 X-Originating-IP: [114.240.93.195]
-X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/xtbB0golxlUMWIB78wAAsy
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/1tbiqAAlxlc7PMjargAAsn
 Received-SPF: pass client-ip=123.126.97.5; envelope-from=zxq_yx_007@163.com;
  helo=mail-m975.mail.163.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:33:39
@@ -90,28 +93,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu does not support abstract UNIX domain
-socket address. Add this ability to make qemu handy
-when abstract address is needed.
+add options documents changes for -chardev
 
-Changes since v3: 
-* rebase on master
-* refine qapi document statement
-* use random names to avoid name clash in unit test
+Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ qemu-options.hx | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Xiaoqiang Zhao (3):
-  qemu-sockets: add abstract UNIX domain socket support
-  tests/util-sockets: add abstract unix socket cases
-  qemu-options: updates for abstract unix sockets
-
- chardev/char-socket.c     |  4 ++
- chardev/char.c            |  7 +++
- qapi/sockets.json         |  8 +++-
- qemu-options.hx           |  9 +++-
- tests/test-util-sockets.c | 91 +++++++++++++++++++++++++++++++++++++++
- util/qemu-sockets.c       | 39 ++++++++++++++---
- 6 files changed, 148 insertions(+), 10 deletions(-)
-
+diff --git a/qemu-options.hx b/qemu-options.hx
+index e2dca8a4e9..e63cc1b4b4 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2938,7 +2938,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+     "         [,server][,nowait][,telnet][,websocket][,reconnect=seconds][,mux=on|off]\n"
+     "         [,logfile=PATH][,logappend=on|off][,tls-creds=ID][,tls-authz=ID] (tcp)\n"
+     "-chardev socket,id=id,path=path[,server][,nowait][,telnet][,websocket][,reconnect=seconds]\n"
+-    "         [,mux=on|off][,logfile=PATH][,logappend=on|off] (unix)\n"
++    "         [,mux=on|off][,logfile=PATH][,logappend=on|off][,tight=on|off][,abstract=on|off] (unix)\n"
+     "-chardev udp,id=id[,host=host],port=port[,localaddr=localaddr]\n"
+     "         [,localport=localport][,ipv4][,ipv6][,mux=on|off]\n"
+     "         [,logfile=PATH][,logappend=on|off]\n"
+@@ -3105,9 +3105,14 @@ The available backends are:
+ 
+         ``nodelay`` disables the Nagle algorithm.
+ 
+-    ``unix options: path=path``
++    ``unix options: path=path[,tight=on|off][,abstract=on|off]``
+         ``path`` specifies the local path of the unix socket. ``path``
+         is required.
++	``tight`` whether to set @addrlen to the minimal string length,
++        or the maximum sun_path length. defaults to true. ``tight`` is
++        optional.
++	``abstract`` whether use abstract address. defaults to false.
++	``abstract`` is optional.
+ 
+ ``-chardev udp,id=id[,host=host],port=port[,localaddr=localaddr][,localport=localport][,ipv4][,ipv6]``
+     Sends all traffic from the guest to a remote host over UDP.
 -- 
 2.17.1
 
