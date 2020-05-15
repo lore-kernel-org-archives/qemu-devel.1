@@ -2,87 +2,87 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11DEC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47063C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88471206F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88471206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 055962065C
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUAAzpAG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055962065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZWSE-0002ic-Nf
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:16:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34336)
+	id 1jZWSI-0002ol-5R
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jZWQz-0001Mh-84
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWQz-0001Mn-SK
  for qemu-devel@nongnu.org; Fri, 15 May 2020 05:15:14 -0400
-Received: from mga03.intel.com ([134.134.136.65]:44988)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jZWQw-0004Ma-S3
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:15:12 -0400
-IronPort-SDR: cToHzsnJPk28zOy+1Ah5D7/aN6uU0okhCbukzTACcdgD7VvBgtpS2JIXMf8LIVq0UisFTVq6EW
- bsSVMAMrQCdw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 May 2020 02:15:07 -0700
-IronPort-SDR: wcblKPSN0cewgOfNRBtNBi8P/773cxZ10Y82gC04FpGNLfSC4B+P8mDNU7uj8JStReIyO47w0e
- NPT9eWwfcwkg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,394,1583222400"; d="scan'208";a="298990819"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by orsmga008.jf.intel.com with ESMTP; 15 May 2020 02:15:07 -0700
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 15 May 2020 02:15:06 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 15 May 2020 17:15:04 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Fri, 15 May 2020 17:15:04 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Subject: RE: [PATCH v4 0/6] colo-compare bugfixes
-Thread-Topic: [PATCH v4 0/6] colo-compare bugfixes
-Thread-Index: AQHWIf625UvnXtHnKk++jUa3390H/6io7l1g
-Date: Fri, 15 May 2020 09:15:04 +0000
-Message-ID: <567ae50795cf46cebb96526e9f252895@intel.com>
-References: <cover.1588587700.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1588587700.git.lukasstraub2@web.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49502
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWQy-0004OE-L6
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:15:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589534111;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k7igWknBSuzQCUC39j5k5ojzyzBP37dzEvLf2r/InQA=;
+ b=LUAAzpAGze8hs5Ri2r9JWXj0oVCBhe4Kkw4xEBM9iXgJKg7SOvYbHSuCzHqF+cPcoPEHO4
+ 8SOsEpxZezboRv92CwlOZQr4Ln3l4ueQCxOAP5v9S1yA3eUzRg8k6Wg/Ggwp0904QC6UQQ
+ OKbwNzNWoCyQNFAvaqyHoE/4mqzCzpY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-ehThMSl4NPCx6WtUYGI9Zw-1; Fri, 15 May 2020 05:15:09 -0400
+X-MC-Unique: ehThMSl4NPCx6WtUYGI9Zw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 035448005AD;
+ Fri, 15 May 2020 09:15:09 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 22C1D579A0;
+ Fri, 15 May 2020 09:15:07 +0000 (UTC)
+Date: Fri, 15 May 2020 11:15:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 3/3] docs/s390x: document vfio-ccw
+Message-ID: <20200515111505.06699d91.cohuck@redhat.com>
+In-Reply-To: <3326e2c5-d569-57f4-0bd0-615a4fa289f8@redhat.com>
+References: <20200505135025.14614-1-cohuck@redhat.com>
+ <20200505135025.14614-4-cohuck@redhat.com>
+ <3326e2c5-d569-57f4-0bd0-615a4fa289f8@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.65; envelope-from=chen.zhang@intel.com;
- helo=mga03.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 05:15:07
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,75 +95,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo
- Bonzini <pbonzini@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please update this series, I will queue it to COLO branch.
+On Fri, 15 May 2020 09:54:44 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Thanks
-Zhang Chen
+> On 05/05/2020 15.50, Cornelia Huck wrote:
+> > Add a basic example for passing a dasd via vfio-ccw.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  docs/system/s390x/vfio-ccw.rst | 58 ++++++++++++++++++++++++++++++++++
+> >  docs/system/target-s390x.rst   |  1 +
+> >  2 files changed, 59 insertions(+)
+> >  create mode 100644 docs/system/s390x/vfio-ccw.rst
+> > 
+> > diff --git a/docs/system/s390x/vfio-ccw.rst b/docs/system/s390x/vfio-ccw.rst
+> > new file mode 100644
+> > index 000000000000..3b465578971f
+> > --- /dev/null
+> > +++ b/docs/system/s390x/vfio-ccw.rst
+> > @@ -0,0 +1,58 @@
+> > +Subchannel passthrough via vfio-ccw
+> > +===================================
+> > +
+> > +vfio-ccw (based upon the mediated vfio device infrastructure) allows to
+> > +make certain I/O subchannels and their devices available to a guest. The
+> > +host will not interact with those subchannels/devices any more.
+> > +
+> > +Note that while vfio-ccw should work with most non-QDIO devices, only ECKD
+> > +DASD have really been tested.  
+> 
+> s/DASD/DASDs/ ?
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Monday, May 4, 2020 6:28 PM
-> To: qemu-devel <qemu-devel@nongnu.org>
-> Cc: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian
-> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
-> Andr=E9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
-> <pbonzini@redhat.com>
-> Subject: [PATCH v4 0/6] colo-compare bugfixes
->=20
-> Hello Everyone,
-> Here are fixes for bugs that I found in my tests.
->=20
-> Benchmark results:
-> Client-to-server tcp:
-> without patch: ~63 Mbit/s
-> with patch: ~66 Mbit/s
-> Server-to-client tcp:
-> without patch: ~771 Kbit/s
-> with patch: ~702 Kbit/s
->=20
-> Regards,
-> Lukas Straub
->=20
-> Version changes:
-> v4:
->  -fix potential deadlock with notify_remote_frame  -avoid malloc and
-> memcpy in many cases
->=20
-> v3:
->  -fix checkpatch.pl error
->=20
-> v2:
->  -better wording
->  -fix performance-regression in patch 3 "net/colo-compare.c: Fix deadlock=
- in
-> compare_chr_send"
->  -add more bugfixes
->=20
->=20
-> Lukas Straub (6):
->   net/colo-compare.c: Create event_bh with the right AioContext
->   chardev/char.c: Use qemu_co_sleep_ns if in coroutine
->   net/colo-compare.c: Fix deadlock in compare_chr_send
->   net/colo-compare.c: Only hexdump packets if tracing is enabled
->   net/colo-compare.c, softmmu/vl.c: Check that colo-compare is active
->   net/colo-compare.c: Correct ordering in complete and finalize
->=20
->  chardev/char.c     |   7 +-
->  net/colo-compare.c | 250 +++++++++++++++++++++++++++++++++---------
-> ---
->  net/colo-compare.h |   1 +
->  net/colo.c         |   7 ++
->  net/colo.h         |   1 +
->  softmmu/vl.c       |   2 +
->  6 files changed, 204 insertions(+), 64 deletions(-)
->=20
-> --
-> 2.20.1
+I've seen 'DASD' used both as singular and as plural. Can use 'DASDs'
+if that is less confusing.
+
+> 
+> > +Example configuration
+> > +---------------------
+> > +
+> > +Step 1: configure the host device
+> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > +
+> > +Note: it is recommended to use the ``mdevctl`` tool for this step.  
+> 
+> Can you also give an example on how to use it?
+
+Maybe
+
+"To define the same device as configured below to be started
+automatically, use
+
+::
+
+   [root@host ~]+ driverctl -b css set-override 0.0.0313 vfio_ccw
+   [root@host ~]# mdevctl define -u 7e270a25-e163-4922-af60-757fc8ed48c6 \
+                  -p 0.0.0313 -t vfio-ccw_io -a
+"
+
+> 
+> > If this
+> > +is not possible or wanted, follow the manual procedure below.
+> > +
+> > +* Locate the subchannel for the device (in this example, ``0.0.2b09``)::
+> > +
+> > +    [root@host ~]# lscss | grep 0.0.2b09 | awk '{print $2}'
+> > +    0.0.0313  
+> 
+> I'd remove the "[root@host ~]" part from all examples.
+
+I'd rather keep them, just to make it clear where each command is
+issued (there are commands issued in the guest in step 2.)
+
+> 
+> > +* Unbind the subchannel (in this example, ``0.0.0313``) from the standard
+> > +  I/O subchannel driver and bind it to the vfio-ccw driver::
+> > +
+> > +    [root@host ~]# echo 0.0.0313 > /sys/bus/css/devices/0.0.0313/driver/unbind
+> > +    [root@host ~]# echo 0.0.0313 > /sys/bus/css/drivers/vfio_ccw/bind
+> > +
+> > +* Create the mediated device (identified by a uuid)::
+> > +
+> > +    [root@host ~]# uuidgen
+> > +    7e270a25-e163-4922-af60-757fc8ed48c6
+> > +    [root@host ~]# echo "7e270a25-e163-4922-af60-757fc8ed48c6" > /sys/bus/css/devices/0.0.0313/mdev_supported_types/vfio_ccw-io/create  
+> 
+> Maybe break the long line with a backslash?
+
+Makes sense.
+
+> 
+> > +Step 2: configure QEMU
+> > +~~~~~~~~~~~~~~~~~~~~~~
+> > +
+> > +* Reference the created mediated device and (optionally) pick a device id to
+> > +  be presented in the guest (here, ``fe.0.1234``, which will end up visible
+> > +  in the guest as ``0.0.1234``::
+> > +
+> > +    -device vfio-ccw,devno=fe.0.1234,sysfsdev=/sys/bus/mdev/devices/7e270a25-e163-4922-af60-757fc8ed48c6
+> > +
+> > +* Start the guest. The device (here, ``0.0.1234``) should now be usable::
+> > +
+> > +    [root@guest ~]# lscss -d 0.0.1234
+> > +    Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs           
+> > +    ----------------------------------------------------------------------
+> > +    0.0.1234 0.0.0007  3390/0e 3990/e9      f0  f0  ff   1a2a3a0a 00000000
+> > +    [root@guest ~]# chccwdev -e 0.0.1234
+> > +    Setting device 0.0.1234 online  
+> Here I'd add a sentence saying that you could run "dmesg -t" now to
+> check the kernel log. Then omit the timestamp in the example output
+> below, that will shorten the lines quite a bit.
+
+Makes sense as well.
+
+> 
+> > +    [  197.011652] dasd-eckd 0.0.1234: A channel path to the device has become operational
+> > +    [  197.014468] dasd-eckd 0.0.1234: New DASD 3390/0E (CU 3990/01) with 10017 cylinders, 15 heads, 224 sectors
+> > +    [  197.045606] dasd-eckd 0.0.1234: DASD with 4 KB/block, 7212240 KB total size, 48 KB/track, compatible disk layout
+> > +    [  197.049034]  dasda:VOL1/  0X2B09: dasda1  
+> 
+>  Thomas
+
 
