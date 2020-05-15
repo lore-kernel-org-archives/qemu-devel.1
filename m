@@ -2,101 +2,83 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4246C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F215FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D1AF206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:01:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nkYEXSgz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1AF206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C4EC4206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:02:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4EC4206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZWDS-0001Jk-Ij
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:01:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59970)
+	id 1jZWEt-0003Lz-Ul
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:02:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZWCR-0008Hg-ER
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:00:11 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40292)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZWDi-0002CW-L9
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:01:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33402)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZWCQ-000887-BQ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:00:11 -0400
-Received: by mail-wr1-x444.google.com with SMTP id e16so2582920wra.7
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 02:00:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ODafr75E3Um8Jo0xIkAoea3FgPNJAjDKQEOH9D+QlKk=;
- b=nkYEXSgz3BwRAUFCA/poQMGs3WQBQ07p4Ci+HPbbyMqfT8mUWNmLKrbZE8Sl40zcx5
- TNDND3bJG5MUVp4BmmjvsoCP6LtzxRzMc+E9NiHndVDeiqoG3scAd9uCTiOCUUdwv893
- +Ujze6mfGt/3zsrO7yf7bWOKnT9x9OOnkpUKTveaduyY7nBXyva/nD3Z/S9VPhYoHM+7
- J9zKOsbW0lMRYYdVEv2yhxHg8rboK05BGnZJANK4ofCkUhi38uFVZT1yzJ75ASJH3rdf
- hLPXxPg5kE1qyO+3kpeztBYasgd4RDu6P+6l0ArTtyOmRRSiI1saihvKBYVL85c8pw8B
- DHNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ODafr75E3Um8Jo0xIkAoea3FgPNJAjDKQEOH9D+QlKk=;
- b=Av+29FEH7kaeUv1GE3UgCFX6uGEpEMTWzSDlyCWhIzo0+HnUveWkT1Kc3K5TyKGJ+x
- t3vdno20FT/XsiUs6PQKYAD0j7p4+RXPTqNOM5GN33c/AUThsol6oCmFQldpJLT27iLy
- /VkDL2TsUb0aB6/qgT0qCg5My18XkRl5lCAtLpQ5Rn1dfv30wRIMVw9P1FTXV7mNZZkX
- 6bJU0tveXtzZoZ+uVKd7CKy9ahhuf8gcxyNaFGVnt4jB9NXk/XOSCiYbDGm207I7i++u
- +SHnNSGTJnV1U3sK0qi8qEOurSr0EvGALufjbltOGBRJWNRz5oF8IP1bbRdF+43tK/9P
- e/dA==
-X-Gm-Message-State: AOAM530MZ+E3VAxAxXP94L67vBiCfUlgb77Wr6Zvd7glbuwflyXO8P9J
- jDfkcAhi6JVUYEovUhi9dsGVpA==
-X-Google-Smtp-Source: ABdhPJwu3m4SN+7vz+8nvZi2LmpWMMXEWu3knBCSX4kkKAaIXgBi0o4a4vSk/nhXdMeYkebnr2Mqpw==
-X-Received: by 2002:a05:6000:1241:: with SMTP id
- j1mr3126872wrx.42.1589533208730; 
- Fri, 15 May 2020 02:00:08 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n9sm2600291wrv.43.2020.05.15.02.00.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 02:00:07 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9E4EC1FF7E;
- Fri, 15 May 2020 10:00:06 +0100 (BST)
-References: <20200507151819.28444-1-peter.maydell@linaro.org>
- <20200507151819.28444-2-peter.maydell@linaro.org>
-User-agent: mu4e 1.4.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 1/5] docs/system: Add 'Arm' to the Integrator/CP
- document title
-In-reply-to: <20200507151819.28444-2-peter.maydell@linaro.org>
-Date: Fri, 15 May 2020 10:00:06 +0100
-Message-ID: <87pnb5d149.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZWDh-0000In-De
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:01:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jZWDe-0002Ne-5k
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 09:01:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7E9262E810A
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 09:01:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Date: Fri, 15 May 2020 08:48:53 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878348@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange christophe-lyon laurent-vivier philmd
+ pmaydell
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158935359452.19393.4863679569975227091.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158953253307.31625.13760027279797418905.malone@chaenomeles.canonical.com>
+Subject: [Bug 1878348] Re: --static build fails in v5.0 (since
+ 5010cec2bc87dafab39b3913c8ca91f88df9c540)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 42ac6ee138775e277561a08ba3ce2dd21a274f76
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 04:30:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,42 +87,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1878348 <1878348@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For the record, previous attempt to fix:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg624142.html
+and identical conclusion:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg624164.html
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+-- =
 
-> Add 'Arm' to the Integrator/CP document title, for consistency with
-> the titling of the other documentation of Arm devboard models
-> (versatile, realview).
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1878348
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Title:
+  --static build fails in v5.0 (since
+  5010cec2bc87dafab39b3913c8ca91f88df9c540)
 
-> ---
->  docs/system/arm/integratorcp.rst | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/docs/system/arm/integratorcp.rst b/docs/system/arm/integrato=
-rcp.rst
-> index e6f050f602b..594438008e4 100644
-> --- a/docs/system/arm/integratorcp.rst
-> +++ b/docs/system/arm/integratorcp.rst
-> @@ -1,5 +1,5 @@
-> -Integrator/CP (``integratorcp``)
-> -=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> +Arm Integrator/CP (``integratorcp``)
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20=20
->  The Arm Integrator/CP board is emulated with the following devices:
+Status in QEMU:
+  New
 
+Bug description:
+  Hi,
 
---=20
-Alex Benn=C3=A9e
+  Since commit 5010cec2bc87dafab39b3913c8ca91f88df9c540, building qemu
+  fails when configured with --static (eg ../configure --target-
+  list=3Dx86_64-softmmu,x86_64-linux-user --enable-debug --static).
+
+  On ubuntu 16.04, it fails to find -lffi and -lselinux.
+
+  After I apt-get install libffi-dev libselinux1-dev, the build still fails:
+  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_pre=
+_save':
+  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:29: undefine=
+d reference to `_TRACE_DBUS_VMSTATE_PRE_SAVE_DSTATE'
+  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_pos=
+t_load':
+  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:52: undefine=
+d reference to `_TRACE_DBUS_VMSTATE_POST_LOAD_DSTATE'
+  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_loa=
+ding':
+  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:75: undefine=
+d reference to `_TRACE_DBUS_VMSTATE_LOADING_DSTATE'
+  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_sav=
+ing':
+  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:98: undefine=
+d reference to `_TRACE_DBUS_VMSTATE_SAVING_DSTATE'
+  collect2: error: ld returned 1 exit status
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1878348/+subscriptions
 
