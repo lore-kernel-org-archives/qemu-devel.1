@@ -2,85 +2,76 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20168C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64862C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD3D52076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:29:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E2202076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:32:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mum9kL3B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3D52076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o77+yC/a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2202076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbKm-0006Mv-0x
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:29:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34876)
+	id 1jZbNi-0001aE-CN
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbD7-000157-Ca
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:13 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55536)
+ id 1jZbJw-0004wO-QG
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:28:16 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46057)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbD6-0003vL-2R
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:13 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f13so2490755wmc.5
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:21:11 -0700 (PDT)
+ id 1jZbJv-0005il-JC
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:28:16 -0400
+Received: by mail-ot1-x332.google.com with SMTP id c3so1994241otr.12
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=nNsSGVGF8y4So1qak3dO7LfQL9H2lgAJXftV4QL0Yx8=;
- b=mum9kL3ByrWhU8A0oiXiqltR/TJV+/8rb+bTO6xaOd+63TBUwim7fr5ZezQCdAfGrn
- JyyRmas30Dvkpjh7YkTmcyNKIEZeCX0Fa158jd3iOp/SIqJwSM6i/aX2xbe953yKDvGb
- b8R4Ix0DREr2evxvOHFke0Cz82gDo1TTe3BeqVUMi06hEHmqhuaaBFE3HfanvrTKDnIK
- 88/zixazkxeQN84xBEfr9KsRovjzTDtEWZwdSPXZlFKl/PqYVVvfkqTJ2lYogrmDyvJU
- +xzCcfYc1JXr8bYRnnORskGzRlE4t1KKYaGokFSzEG3eFKf6t6r9QleMCUyAgfD9slYQ
- F3qQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=reQyUrW9mva1Op8l/EMrOreOktGwhFUrlHplVgfpIbc=;
+ b=o77+yC/akFvBIL3fCREBfxEP46bDkXXoccQ3s0vlSSYQyAX3UI5Biu/wJQ6puhtHYO
+ 3BkHRc3uwhgKNlwkJYWFgjLesliA0cYydUDRZp9F4CLVwe6uPO2RXOjAKhZ4zHXFHIqn
+ RTkVkptKxgF8aZVEQyIJImlCgvGUnuEsLWFhnn9JDl85cvyOJd9+Lh6/aD+6//NB1140
+ hv2DXojictHiTWziJm35smAl3kDh9OHg+1AqSgyEegubuEvO9lVXRLPXWqo0q06Guby9
+ dM6wW2pbBOHvmib6GBmjIO3etVHYEvo59mQUwskkWGaHeBkakyBM257mFzLgt11MUyEJ
+ aEmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=nNsSGVGF8y4So1qak3dO7LfQL9H2lgAJXftV4QL0Yx8=;
- b=gqYp8VsAXAiXUOkmUodiRhn5qIl5+5vGh71dEVvlQuCmZNFsl/dpFwxvsR1ees484h
- om3w4Zb+a1LWr3v4iaXdEo+Uh7lEOXjRNeNU5heEuKV4DewoDGsUD8gOeYbst/eIBx9N
- n8gT9wZu0yKTpW37a0kpXUMyOVYXp2QXOGuBvEDTQ7om3dBHWS/3BGu0iaLa8sPP85oj
- SlljnqvuTB6Wujf6EfkG+J+fYFUTq4AKLpQ43iUEgJy+zbyCl28Ge/r3uTiQMmjY5HX7
- 1ZTS2XSfoWi0VibeqDP77ZPRicJf7qcYgGARciDVVHho7TEYi5YF5mQvyt8fOIXFQpJx
- 1e2w==
-X-Gm-Message-State: AOAM5337/kln0d7XFpvTAuxyH2/aZ/rddTBIXlitHeaJhTD4CpR73zpF
- gWqOe91KB+P8AFzWhfAoQoo3lA==
-X-Google-Smtp-Source: ABdhPJzMUA5mK/DGYFshKV2Snad8Vl/Jsy0AAPzzEWscgloPDKWqUiCIj1sQ6c59edE/XZC67xWjUg==
-X-Received: by 2002:a05:600c:22c9:: with SMTP id
- 9mr4247016wmg.162.1589552470479; 
- Fri, 15 May 2020 07:21:10 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s14sm3738327wmh.18.2020.05.15.07.21.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 07:21:09 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 10/10] target/arm: Convert Neon one-register-and-immediate
- insns to decodetree
-Date: Fri, 15 May 2020 15:20:56 +0100
-Message-Id: <20200515142056.21346-11-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200515142056.21346-1-peter.maydell@linaro.org>
-References: <20200515142056.21346-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=reQyUrW9mva1Op8l/EMrOreOktGwhFUrlHplVgfpIbc=;
+ b=KPNJI+QurLguzF4gN40a2k6SBIJxfL1O9X9qOGI/ybRNdzkhYEqVT4mWnRxY6lTYwf
+ 0NM5eBUfPXrxp3kp8j/koGlXzWRNmTnNOAW1XsAAM/+1kipyfskpLQYFzgq8/ci758+k
+ jT71rHgCbYr80feTp21IL39gN5AFcPrsN42QZ7Kwn98JgZGG3NM37eMTv1zcnTdl1t2C
+ rhqlVXS/HPQXMQRi/A+QmJITyWegpANdj2v4ceDiTSiL0aBZuIpr9oXqlR0eu/er1SCR
+ 1er9+cP6GqgOeDTcwK27S/hhwp2iWFmrxxysgMAifRcwbqSzFiokS02cn28kD5HIMIN2
+ fMLA==
+X-Gm-Message-State: AOAM533liAG/MaXBgpix7hWtcIzUrKD9b4ZPlKbfDgxJnQq1+jA+KHH7
+ mWtI71tdWpJbjXm5pV+3vmBBHSD73l7oGeYtVMnV3w==
+X-Google-Smtp-Source: ABdhPJx8HQ3nSRmJIViug/Xxsj7fN8V2OYbJyKYF6XhzhbPbdVPZhWVBfoIWYpr4TXJSZMxLKZh/ncrK6yDm9KqN4Nk=
+X-Received: by 2002:a9d:3623:: with SMTP id w32mr681400otb.91.1589552894202;
+ Fri, 15 May 2020 07:28:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
+References: <20200515124521.335403-1-kwolf@redhat.com>
+In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 May 2020 15:28:03 +0100
+Message-ID: <CAFEAcA9Wh7DKs38aMJ+35Sji8cFaViBXsphWZyZ_qW6n1qn30g@mail.gmail.com>
+Subject: Re: [PULL 00/51] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,349 +93,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the insns in the one-register-and-immediate group to decodetree.
+On Fri, 15 May 2020 at 13:45, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit 013a18edbbc59cdad019100c7d03c0494642b74c:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200514' into staging (2020-05-14 16:17:55 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 7d8f21a650e562270f5ed5341134c9c2c39dc5e8:
+>
+>   iotests/030: Reduce run time by unthrottling job earlier (2020-05-15 14:12:34 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - Introduce real BdrvChildRole
+> - blk/bdrv_make_empty() functions instead of calling callbacks directly
+> - mirror: Make sure that source and target size match
+> - block-copy: Fix uninitialized variable
+> - block/replication: Avoid cancelling the job twice
+> - ahci: Log lost IRQs
+> - iotests: Run pylint and mypy in a testcase
+> - iotests: log messages from notrun()
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/neon-dp.decode       |  49 +++++++++++
- target/arm/translate-neon.inc.c | 151 ++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 101 +--------------------
- 3 files changed, 202 insertions(+), 99 deletions(-)
+Hi; I'm afraid aarch64, ppc64 and aarch32 all failed on iotest 229:
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index bce4043746e..39d2217a9c8 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -430,3 +430,52 @@ VCVT_FS_2sh      1111 001 0 1 . 1 shift:5   .... 1111 0 . . 1 .... \
-                  @2reg_shift size=0
- VCVT_FU_2sh      1111 001 1 1 . 1 shift:5   .... 1111 0 . . 1 .... \
-                  @2reg_shift size=0
-+
-+######################################################################
-+# 1-reg-and-modified-immediate grouping:
-+# 1111 001 i 1 D 000 imm:3 Vd:4 cmode:4 0 Q op 1 Vm:4
-+######################################################################
-+
-+&1reg_imm        vd q imm cmode op
-+
-+%asimd_imm_value 24:1 16:3 0:4
-+
-+@1reg_imm        .... ... . . . ... ... .... .... . q:1 . . .... \
-+                 &1reg_imm imm=%asimd_imm_value vd=%vd_dp
-+
-+{
-+  # Logic operations, ie not VMOV or VMVN: (cmode & 1) && cmode < 12
-+  VORR_1r        1111 001 . 1 . 000 ... .... 0001 0 . 0 1 .... \
-+                 @1reg_imm cmode=1 op=0
-+  VORR_1r        1111 001 . 1 . 000 ... .... 0011 0 . 0 1 .... \
-+                 @1reg_imm cmode=3 op=0
-+  VORR_1r        1111 001 . 1 . 000 ... .... 0101 0 . 0 1 .... \
-+                 @1reg_imm cmode=5 op=0
-+  VORR_1r        1111 001 . 1 . 000 ... .... 0111 0 . 0 1 .... \
-+                 @1reg_imm cmode=7 op=0
-+  VORR_1r        1111 001 . 1 . 000 ... .... 1001 0 . 0 1 .... \
-+                 @1reg_imm cmode=9 op=0
-+  VORR_1r        1111 001 . 1 . 000 ... .... 1011 0 . 0 1 .... \
-+                 @1reg_imm cmode=11 op=0
-+
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 0001 0 . 1 1 .... \
-+                 @1reg_imm cmode=1 op=1
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 0011 0 . 1 1 .... \
-+                 @1reg_imm cmode=3 op=1
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 0101 0 . 1 1 .... \
-+                 @1reg_imm cmode=5 op=1
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 0111 0 . 1 1 .... \
-+                 @1reg_imm cmode=7 op=1
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 1001 0 . 1 1 .... \
-+                 @1reg_imm cmode=9 op=1
-+  VBIC_1r        1111 001 . 1 . 000 ... .... 1011 0 . 1 1 .... \
-+                 @1reg_imm cmode=11 op=1
-+
-+  # A VMVN special case: cmode == 14 op == 1
-+  VMVN_14_1r     1111 001 . 1 . 000 ... .... 1110 0 . 1 1 .... \
-+                 @1reg_imm cmode=14 op=1
-+
-+  # VMOV, VMVN: all other cmode/op combinations
-+  VMOV_1r        1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... \
-+                 @1reg_imm
-+}
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index f27fe769f85..f4eeb84541f 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -1821,3 +1821,154 @@ DO_FP_2SH(VCVT_SF, gen_helper_vfp_sltos)
- DO_FP_2SH(VCVT_UF, gen_helper_vfp_ultos)
- DO_FP_2SH(VCVT_FS, gen_helper_vfp_tosls_round_to_zero)
- DO_FP_2SH(VCVT_FU, gen_helper_vfp_touls_round_to_zero)
-+
-+static uint32_t asimd_imm_const(uint32_t imm, int cmode, int op)
-+{
-+    /*
-+     * Expand the encoded constant.
-+     * Note that cmode = 2,3,4,5,6,7,10,11,12,13 imm=0 is UNPREDICTABLE.
-+     * We choose to not special-case this and will behave as if a
-+     * valid constant encoding of 0 had been given.
-+     * cmode = 15 op = 1 must UNDEF; we assume decode has handled that.
-+     */
-+    switch (cmode) {
-+    case 0: case 1:
-+        /* no-op */
-+        break;
-+    case 2: case 3:
-+        imm <<= 8;
-+        break;
-+    case 4: case 5:
-+        imm <<= 16;
-+        break;
-+    case 6: case 7:
-+        imm <<= 24;
-+        break;
-+    case 8: case 9:
-+        imm |= imm << 16;
-+        break;
-+    case 10: case 11:
-+        imm = (imm << 8) | (imm << 24);
-+        break;
-+    case 12:
-+        imm = (imm << 8) | 0xff;
-+        break;
-+    case 13:
-+        imm = (imm << 16) | 0xffff;
-+        break;
-+    case 14:
-+        imm |= (imm << 8) | (imm << 16) | (imm << 24);
-+        if (op) {
-+            imm = ~imm;
-+        }
-+        break;
-+    case 15:
-+        imm = ((imm & 0x80) << 24) | ((imm & 0x3f) << 19)
-+            | ((imm & 0x40) ? (0x1f << 25) : (1 << 30));
-+        break;
-+    }
-+    if (op) {
-+        imm = ~imm;
-+    }
-+    return imm;
-+}
-+
-+static bool do_1reg_imm(DisasContext *s, arg_1reg_imm *a,
-+                        GVecGen2iFn *fn)
-+{
-+    uint32_t imm;
-+    int reg_ofs, vec_size;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vd & 0x10)) {
-+        return false;
-+    }
-+
-+    if (a->vd & a->q) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    reg_ofs = neon_reg_offset(a->vd, 0);
-+    vec_size = a->q ? 16 : 8;
-+    imm = asimd_imm_const(a->imm, a->cmode, a->op);
-+
-+    fn(MO_32, reg_ofs, reg_ofs, imm, vec_size, vec_size);
-+    return true;
-+}
-+
-+static bool trans_VORR_1r(DisasContext *s, arg_1reg_imm *a)
-+{
-+    return do_1reg_imm(s, a, tcg_gen_gvec_ori);
-+}
-+
-+static bool trans_VBIC_1r(DisasContext *s, arg_1reg_imm *a)
-+{
-+    /* The immediate value will be inverted, so BIC becomes AND. */
-+    return do_1reg_imm(s, a, tcg_gen_gvec_andi);
-+}
-+
-+static bool trans_VMVN_14_1r(DisasContext *s, arg_1reg_imm *a)
-+{
-+    /* The cmode==14 op==1 special case isn't vectorized */
-+    uint32_t imm;
-+    TCGv_i64 t64;
-+    int pass;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vd & 0x10)) {
-+        return false;
-+    }
-+
-+    if (a->vd & a->q) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    imm = asimd_imm_const(a->imm, a->cmode, a->op);
-+
-+    t64 = tcg_temp_new_i64();
-+    for (pass = 0; pass <= a->q; ++pass) {
-+        uint64_t val = 0;
-+        int n;
-+
-+        for (n = 0; n < 8; n++) {
-+            if (imm & (1 << (n + pass * 8))) {
-+                val |= 0xffull << (n * 8);
-+            }
-+        }
-+        tcg_gen_movi_i64(t64, val);
-+        neon_store_reg64(t64, a->vd + pass);
-+    }
-+    tcg_temp_free_i64(t64);
-+    return true;
-+}
-+
-+static void gen_VMOV_1r(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                        int64_t c, uint32_t oprsz, uint32_t maxsz)
-+{
-+    tcg_gen_gvec_dup_imm(MO_32, dofs, oprsz, maxsz, c);
-+}
-+
-+static bool trans_VMOV_1r(DisasContext *s, arg_1reg_imm *a)
-+{
-+    /* There is one unallocated cmode/op combination in this space */
-+    if (a->cmode == 15 && a->op == 1) {
-+        return false;
-+    }
-+    return do_1reg_imm(s, a, gen_VMOV_1r);
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9cc44e6258e..20d07e99053 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5232,105 +5232,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         /* Three register same length: handled by decodetree */
-         return 1;
-     } else if (insn & (1 << 4)) {
--        if ((insn & 0x00380080) != 0) {
--            /* Two registers and shift: handled by decodetree */
--            return 1;
--        } else { /* (insn & 0x00380080) == 0 */
--            int invert, reg_ofs, vec_size;
--
--            if (q && (rd & 1)) {
--                return 1;
--            }
--
--            op = (insn >> 8) & 0xf;
--            /* One register and immediate.  */
--            imm = (u << 7) | ((insn >> 12) & 0x70) | (insn & 0xf);
--            invert = (insn & (1 << 5)) != 0;
--            /* Note that op = 2,3,4,5,6,7,10,11,12,13 imm=0 is UNPREDICTABLE.
--             * We choose to not special-case this and will behave as if a
--             * valid constant encoding of 0 had been given.
--             */
--            switch (op) {
--            case 0: case 1:
--                /* no-op */
--                break;
--            case 2: case 3:
--                imm <<= 8;
--                break;
--            case 4: case 5:
--                imm <<= 16;
--                break;
--            case 6: case 7:
--                imm <<= 24;
--                break;
--            case 8: case 9:
--                imm |= imm << 16;
--                break;
--            case 10: case 11:
--                imm = (imm << 8) | (imm << 24);
--                break;
--            case 12:
--                imm = (imm << 8) | 0xff;
--                break;
--            case 13:
--                imm = (imm << 16) | 0xffff;
--                break;
--            case 14:
--                imm |= (imm << 8) | (imm << 16) | (imm << 24);
--                if (invert) {
--                    imm = ~imm;
--                }
--                break;
--            case 15:
--                if (invert) {
--                    return 1;
--                }
--                imm = ((imm & 0x80) << 24) | ((imm & 0x3f) << 19)
--                      | ((imm & 0x40) ? (0x1f << 25) : (1 << 30));
--                break;
--            }
--            if (invert) {
--                imm = ~imm;
--            }
--
--            reg_ofs = neon_reg_offset(rd, 0);
--            vec_size = q ? 16 : 8;
--
--            if (op & 1 && op < 12) {
--                if (invert) {
--                    /* The immediate value has already been inverted,
--                     * so BIC becomes AND.
--                     */
--                    tcg_gen_gvec_andi(MO_32, reg_ofs, reg_ofs, imm,
--                                      vec_size, vec_size);
--                } else {
--                    tcg_gen_gvec_ori(MO_32, reg_ofs, reg_ofs, imm,
--                                     vec_size, vec_size);
--                }
--            } else {
--                /* VMOV, VMVN.  */
--                if (op == 14 && invert) {
--                    TCGv_i64 t64 = tcg_temp_new_i64();
--
--                    for (pass = 0; pass <= q; ++pass) {
--                        uint64_t val = 0;
--                        int n;
--
--                        for (n = 0; n < 8; n++) {
--                            if (imm & (1 << (n + pass * 8))) {
--                                val |= 0xffull << (n * 8);
--                            }
--                        }
--                        tcg_gen_movi_i64(t64, val);
--                        neon_store_reg64(t64, rd + pass);
--                    }
--                    tcg_temp_free_i64(t64);
--                } else {
--                    tcg_gen_gvec_dup_imm(MO_32, reg_ofs, vec_size,
--                                         vec_size, imm);
--                }
--            }
--        }
-+        /* Two registers and shift or reg and imm: handled by decodetree */
-+        return 1;
-     } else { /* (insn & 0x00800010 == 0x00800000) */
-         if (size != 3) {
-             op = (insn >> 8) & 0xf;
--- 
-2.20.1
 
+PPC64:
+  TEST    iotest-qcow2: 229 [fail]
+QEMU          --
+"/home/pm215/qemu/build/all/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
+-nodefaults -display none -accel qtest
+QEMU_IMG      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
+writeback --aio threads -f qcow2
+QEMU_NBD      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/ppc64 gcc1-power7 3.10.0-862.14.4.el7.ppc64
+TEST_DIR      -- /home/pm215/qemu/build/all/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/tmp.6nPwQm0Y01
+SOCKET_SCM_HELPER --
+/home/pm215/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+
+--- /home/pm215/qemu/tests/qemu-iotests/229.out 2020-05-15
+12:46:57.991595216 +0000
++++ /home/pm215/qemu/build/all/tests/qemu-iotests/229.out.bad
+2020-05-15 12:55:31.022877791 +0000
+@@ -21,5 +21,5 @@
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id":
+"testdisk"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id":
+"testdisk"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len":
+2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len":
+2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+ *** done
+
+AArch64:
+  TEST    iotest-qcow2: 229 [fail]
+QEMU          --
+"/home/pm/qemu/build/all/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
+-nodefaults -dis
+play none -machine virt -accel qtest
+QEMU_IMG      -- "/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
+writeback --aio threads -f qcow2
+QEMU_NBD      -- "/home/pm/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/aarch64 qemu-test 5.4.19
+TEST_DIR      -- /home/pm/qemu/build/all/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/tmp.xiNXu5VDz9
+SOCKET_SCM_HELPER --
+/home/pm/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+
+--- /home/pm/qemu/tests/qemu-iotests/229.out    2020-05-15
+12:46:56.086403523 +0000
++++ /home/pm/qemu/build/all/tests/qemu-iotests/229.out.bad
+2020-05-15 12:58:25.074083672 +0000
+@@ -21,5 +21,5 @@
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "ru
+nning", "id": "testdisk"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "ab
+orting", "id": "testdisk"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
+testdisk", "len": 2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
+testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+ *** done
+
+AArch32:
+
+  TEST    iotest-qcow2: 229 [fail]
+QEMU          --
+"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
+-
+nodefaults -display none -machine virt -accel qtest
+QEMU_IMG      --
+"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-io"
+ --cache writeback --aio thre
+ads -f qcow2
+QEMU_NBD      --
+"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/aarch64 mustang-maydell 4.15.0-51-generic
+TEST_DIR      --
+/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/tmp.tbyzUS8J3l
+SOCKET_SCM_HELPER --
+/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/socket_scm_helper
+
+--- /home/peter.maydell/qemu/tests/qemu-iotests/229.out 2020-05-15
+12:46:56.206202633 +0000
++++ /home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/229.out.bad
+      2020-05-15 13:06:42.331534509 +0000
+@@ -21,5 +21,5 @@
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "ru
+nning", "id": "testdisk"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "JOB_STATUS_CHANGE", "data": {"status": "ab
+orting", "id": "testdisk"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
+testdisk", "len": 2097152, "offset": 2097152, "speed": 0, "type": "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_CANCELLED", "data": {"device": "
+testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+ *** done
+
+thanks
+-- PMM
 
