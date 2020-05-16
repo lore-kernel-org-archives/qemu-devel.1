@@ -2,105 +2,97 @@ Return-Path: <SRS0=I9ML=66=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB3BC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 05:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 05:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5ABB206F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 05:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FDB6206F4
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 05:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oq+7anYI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5ABB206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RELAjeq3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDB6206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZpIO-0008MO-0p
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 01:23:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35288)
+	id 1jZpNE-000239-D7
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 01:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZpHh-0007rK-Et
- for qemu-devel@nongnu.org; Sat, 16 May 2020 01:22:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35090
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZpHg-00065e-4n
- for qemu-devel@nongnu.org; Sat, 16 May 2020 01:22:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589606570;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pc4wAVmTMgosydwiJpo/FiIoHx8jQlFXAHTZecLNUSI=;
- b=Oq+7anYIQoopc1sVlhSQwLDPyQ+DT3B/0q+UwBdkvRny/JE9idM32uWAEBRtYT5sEXoNgO
- MW8SfdY9XOYpEp+twlfMHD/WZaJqD9TrTcergicIOqwnsu4Wb45bqLURITE74imEbRwZ2/
- +W4a4d8GtZTKXmA3ItsQ56yDvcRhqc8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-laQJqoWtMd-6Y9GNTCk42Q-1; Sat, 16 May 2020 01:22:48 -0400
-X-MC-Unique: laQJqoWtMd-6Y9GNTCk42Q-1
-Received: by mail-wr1-f72.google.com with SMTP id z5so2190720wrt.17
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 22:22:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jZpMh-0001Y9-Cy
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 01:28:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jZpMg-0000UT-Ku
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 01:28:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l11so5823707wru.0
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 22:28:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TeKbUgDg/e1ToNP4FPnBIdX4bzto6nC8SGmfLuO+VqI=;
+ b=RELAjeq3vczdYJxCEe7WvZ57R9EHzJgfrkKLRzbJRgSiGKc2wg9m67jKwWn+Zp8Y+V
+ aiU0ZlxhClotcC16WAM6g1p2dsBoRhuXapd1F1PgGupIo0qWtdrf46qvxikBowuNUa4Q
+ Jy5e4migMaxv28n31Lfib3QRou/FR14qgUwVuwofYsfd8XgegdLdl7NfkhBhsZZmrSl7
+ xkArzxc68aGZpgiqcSCWZgMD9XSwn2b2k5nL5+vVqPtIns5pUhvUip2MO7uPRnR7nTIR
+ fKD3cqXXXbs8bJxtp41ReBvlFm/MxYpzjieGMSi9KSgAo8Xh2LaWY4IVDhSEs2K3x3Uh
+ Xw3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=pc4wAVmTMgosydwiJpo/FiIoHx8jQlFXAHTZecLNUSI=;
- b=NjjMe8Rv5nZbrsi5bsPh8JAPbYFNXk8pCjBVlW8MgADeg6ln9E99qV/hi6xBc9ufYj
- yVsC8b2J6TAhaH4fOHXwgBMoVHM6qQ/EYmfBQ5sLJH3yBoW6SGQfwG7xQgBzEq7a/Jmz
- 0hgoV8pife0jKj9RFPEaCn/ihsqtmuQiprFT4npocQ5A/NhuY1wkN1Svh+eWoRw2Z+T3
- WyGzVcKFXOWoym10gMuCISjxAy9DayQdcp1uq6AwgaTvc6PN0FObNHLM/YfQGozX1j+w
- EmNKyobAW0buI9sOYbqVWTIciZS9SnUJ/aNBDg24D2IwDrUkkGBaH/NyXkgRGVZ4li0i
- 7z6Q==
-X-Gm-Message-State: AOAM533bK+jsoCRvu08/kM+Abzc14P/Wzoc1AC1CeXtvcSJ/oIg4PqER
- W0e+4It79eGvh0DJ9LXS071ajxa5OYZRgtn+JQgBS1NHF0pzWCRn4tZCedHNS140uqNmfixXbQX
- 271DlHj5FyS+aqxc=
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr7335034wmg.87.1589606566682; 
- Fri, 15 May 2020 22:22:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZ5H3xRFJnTHhOkKQ/Z99G1qGy4pBFAoplOQclw1/P6z5So2NmFed8W7Tr+X+BLuHnJky7ag==
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr7335013wmg.87.1589606566471; 
- Fri, 15 May 2020 22:22:46 -0700 (PDT)
+ bh=TeKbUgDg/e1ToNP4FPnBIdX4bzto6nC8SGmfLuO+VqI=;
+ b=Pqnef7R8Uw0S7SVThO064nVF9Iad3szpcltDwdADEXdSgGxbylgh+4Qbdat/08qSC8
+ Cm0VaiL7XDDlVIjnjtIbsEXzeuE2iRGWDu5YAv6fwmin4jlCyWE8meR83knZTewqzXre
+ zTSVGbG+VvW1MwY/v5P/lm2RR/pBuJ2PB2SE++OmyToJnkVs1PVs9WUb6GrXD0G/fx+R
+ 736moEhTD7p8V7jy3OFIwaiAmuwzN7dlLhnWoBJErqPzw1Af9OPPPSEvgqG5ZSlQoBqq
+ k05p5nvgIycnjvVuj4zxVc5V5EeTyrPlxivwKC3tRM4+TNZuKmJLGUoV4hCDwDuHF4Xq
+ YNWA==
+X-Gm-Message-State: AOAM531Aciox+NvKXmxEHIZURtM6SFKI0eEm/tG6/Iq0qvWs0uG7V/w2
+ dcmXVurytdW5OGBuz5ILHCU=
+X-Google-Smtp-Source: ABdhPJy9iM/gff0Xcf1KBH9Auxc76ef9vkVDzzZT9C9UVSz7J6BAXqepyK7XVpbiOCeA4cueYqTpaw==
+X-Received: by 2002:adf:fa4d:: with SMTP id y13mr8159175wrr.263.1589606881114; 
+ Fri, 15 May 2020 22:28:01 -0700 (PDT)
 Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id p8sm6467501wre.11.2020.05.15.22.22.45
+ by smtp.gmail.com with ESMTPSA id g10sm6257834wrx.4.2020.05.15.22.27.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 15 May 2020 22:22:45 -0700 (PDT)
-Subject: Re: [PATCH 1/1] 9pfs: include linux/limits.h for XATTR_SIZE_MAX
-To: Dan Robertson <dan@dlrobertson.com>, Greg Kurz <groug@kaod.org>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>
-References: <20200515203015.7090-1-dan@dlrobertson.com>
- <20200515203015.7090-2-dan@dlrobertson.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b2a11de1-db41-47b6-e79e-3092866aacea@redhat.com>
-Date: Sat, 16 May 2020 07:22:44 +0200
+ Fri, 15 May 2020 22:27:59 -0700 (PDT)
+Subject: Re: [PATCH 02/10] softfloat: Replace flag with bool
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200515190153.6017-1-richard.henderson@linaro.org>
+ <20200515190153.6017-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e29e3512-efc9-bedc-f68c-1f2978581f37@amsat.org>
+Date: Sat, 16 May 2020 07:27:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200515203015.7090-2-dan@dlrobertson.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200515190153.6017-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 01:22:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,42 +106,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/20 10:30 PM, Dan Robertson wrote:
-> linux/limits.h should be included for the XATTR_SIZE_MAX definition used
-
-Maybe rewrite as <linux/limits.h> in subject & description (maintainer 
-could do it for you).
-
-> by v9fs_xattrcreate.
+On 5/15/20 9:01 PM, Richard Henderson wrote:
+> We have had this on the to-do list for quite some time.
 > 
-
-Fixes: 3b79ef2cf48
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> Signed-off-by: Dan Robertson <dan@dlrobertson.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   hw/9pfs/9p.c | 1 +
->   1 file changed, 1 insertion(+)
+>   include/fpu/softfloat-helpers.h |  14 +--
+>   include/fpu/softfloat-macros.h  |  24 ++--
+>   include/fpu/softfloat-types.h   |  14 +--
+>   include/fpu/softfloat.h         |  10 +-
+>   fpu/softfloat-specialize.inc.c  |  16 +--
+>   fpu/softfloat.c                 | 190 ++++++++++++++++----------------
+>   target/arm/sve_helper.c         |   8 +-
+>   target/arm/vfp_helper.c         |   8 +-
+>   target/m68k/softfloat.c         |  70 ++++++------
+>   target/mips/msa_helper.c        |  10 +-
+>   10 files changed, 174 insertions(+), 190 deletions(-)
 > 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index a2a14b5979..68c2df7333 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -28,6 +28,7 @@
->   #include "sysemu/qtest.h"
->   #include "qemu/xxhash.h"
->   #include <math.h>
-> +#include <linux/limits.h>
+[...]
+> diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+> index 2aae6a89b1..619b875df6 100644
+> --- a/include/fpu/softfloat-types.h
+> +++ b/include/fpu/softfloat-types.h
+> @@ -80,12 +80,6 @@ this code that are retained.
+>   #ifndef SOFTFLOAT_TYPES_H
+>   #define SOFTFLOAT_TYPES_H
 >   
->   int open_fd_hw;
->   int total_open_fd;
-> 
-> 
+> -/* This 'flag' type must be able to hold at least 0 and 1. It should
+> - * probably be replaced with 'bool' but the uses would need to be audited
+> - * to check that they weren't accidentally relying on it being a larger type.
+> - */
+> -typedef uint8_t flag;
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> -
+>   /*
+>    * Software IEC/IEEE floating-point types.
+>    */
+> @@ -169,12 +163,12 @@ typedef struct float_status {
+>       uint8_t     float_exception_flags;
+>       signed char floatx80_rounding_precision;
+>       /* should denormalised results go to zero and set the inexact flag? */
+> -    flag flush_to_zero;
+> +    bool flush_to_zero;
+>       /* should denormalised inputs go to zero and set the input_denormal flag? */
+> -    flag flush_inputs_to_zero;
+> -    flag default_nan_mode;
+> +    bool flush_inputs_to_zero;
+> +    bool default_nan_mode;
+>       /* not always used -- see snan_bit_is_one() in softfloat-specialize.h */
+> -    flag snan_bit_is_one;
+> +    bool snan_bit_is_one;
+>   } float_status;
+>   
+>   #endif /* SOFTFLOAT_TYPES_H */
+[...]
 
