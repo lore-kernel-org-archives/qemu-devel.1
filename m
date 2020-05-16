@@ -2,81 +2,99 @@ Return-Path: <SRS0=I9ML=66=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91344C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A90C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:36:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6322820728
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6322820728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 2FEF820727
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:36:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMsxw1SU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FEF820727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZv49-0001WC-KC
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 07:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42364)
+	id 1jZv7H-00043W-8p
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 07:36:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZv1o-0007vZ-3C
- for qemu-devel@nongnu.org; Sat, 16 May 2020 07:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60730)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZv1m-0007tT-8c
- for qemu-devel@nongnu.org; Sat, 16 May 2020 07:30:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jZv1j-0005zI-Cu
- for <qemu-devel@nongnu.org>; Sat, 16 May 2020 11:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5E9322E80BA
- for <qemu-devel@nongnu.org>; Sat, 16 May 2020 11:30:47 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZv6i-0003co-T3
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 07:35:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52706
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZv6h-0000Ni-4Y
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 07:35:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589628953;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=plmK8ueeCWkXMqQ0pT6IqDFxat4X5UP9C+XAPIkIjoE=;
+ b=hMsxw1SUmzIGbjG8SFrp0JwpGuICkATIqVIW2yr6+HRfB1jh276/4uTXaDqNNjDG94svTm
+ UH/k8pkpdtbZEsrmsOBXIkbHnCjnnRahHCXxl6lgY3Su/mglMVF7OxvcUVbAdnrLRC8A+1
+ 3pJnoHnSjE2Ww3iWYIisB97abNzPShI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-OYLyfj4CNcWCRHcA_AWRpA-1; Sat, 16 May 2020 07:35:47 -0400
+X-MC-Unique: OYLyfj4CNcWCRHcA_AWRpA-1
+Received: by mail-wm1-f72.google.com with SMTP id 23so2554177wma.8
+ for <qemu-devel@nongnu.org>; Sat, 16 May 2020 04:35:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=plmK8ueeCWkXMqQ0pT6IqDFxat4X5UP9C+XAPIkIjoE=;
+ b=YO1bQA7DBLsqIAy0iVeL2dPe7SVM6nUfHkYcnIQS7o8j1kclzeE5aA47Qdj+8cChIS
+ 1WkqIYLxP1lDGZbYSaY4oJIciZj5rDhEcgdxiZwa1U+OY77JXmPAvuqDM7aXrR9PVjbx
+ fq8GdDXkV7vilIeQObQz6uwK2xj6VPvXZ3ZOVpmrqO0rWO1pdNACKLOLT6P4rNvBKTUF
+ rbEyFElpYThwkxpzaknlYfcyklUyPNw3+9t2lL2exLWlT2BQ5TvHu/70WJ/GInp1lGzg
+ X9S90nCUW9HmycbLqVbCUPQv3SFFj52oOchnnCtF7GULvshrSqHZCNZd64fG/yEDtE5K
+ 80+g==
+X-Gm-Message-State: AOAM532t34QO8ckv672vL2Hda+Jc7hP3dECo+QXtbmGuVoOlNTZQsRWs
+ KdwAQiGeLBMEzypQcutD1Eq6bR0k0de7X5De8TeNr7r7yvbzKJs851BL9EDxfUDykFpT7dxAXAh
+ OLx7a2AuiVwCSDdp0SjxyU7Ptl7sCbK4=
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr8605609wmd.125.1589628946197; 
+ Sat, 16 May 2020 04:35:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0Ftvv/FMX7WaNAtrqa19DBv6GNm8FwmIkNw8V4jG2jwKyIb4EUznEMdGIO9AXvBRyPYM6CGbGb6+Vn3e6Bu8=
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr8605579wmd.125.1589628945712; 
+ Sat, 16 May 2020 04:35:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200511044121.eihns2tdimdzgi4i@mozz.bu.edu>
+In-Reply-To: <20200511044121.eihns2tdimdzgi4i@mozz.bu.edu>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Sat, 16 May 2020 13:35:34 +0200
+Message-ID: <CAP+75-WyjYTDcERsxYG3YyN4mWH3aRi-OYyQcPAWEa10htv6Lw@mail.gmail.com>
+Subject: Re: Null-pointer dereference through virtio-balloon
+To: Alexander Bulekov <alxndr@bu.edu>, David Hildenbrand <david@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 16 May 2020 11:25:17 -0000
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr balaton-4 rafaeldtinoco
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: BALATON Zoltan (balaton-4)
-References: <158925637015.6343.182119641060008506.malonedeb@soybean.canonical.com>
-Message-Id: <alpine.BSF.2.22.395.2005161307110.2078@zero.eik.bme.hu>
-Subject: Re: [Bug 1878134] [NEW] Assertion failures in
- ati_reg_read_offs/ati_reg_write_offs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a5d2780aa490806fabee6199b536df8ab392bb80
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 07:30:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 05:35:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,146 +103,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878134 <1878134@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020, Launchpad Bug Tracker wrote:
-> You have been subscribed to a public bug by Philippe Mathieu-Daud=C3=A9 (=
-philmd):
++David (virtio-balloon maintainer)
+
+On Mon, May 11, 2020 at 6:42 AM Alexander Bulekov <alxndr@bu.edu> wrote:
 >
 > Hello,
-> While fuzzing, I found inputs that trigger assertion failures in
-> ati_reg_read_offs/ati_reg_write_offs
+> While fuzzing, I found an input that triggers a null-ptr dereference in
+> aio_bh_enqueue, through virtio-balloon. Based on the stacktrace below,
+> I am not positive that this is specific to virtio-balloon, however
+> I have not encountered the same issue for any of the other virtio
+> devices I am fuzzing.
 >
-> uint32_t extract32(uint32_t, int, int): Assertion `start >=3D 0 && length
->> 0 && length <=3D 32 - start' failed
+> AddressSanitizer: SEGV on unknown address 0x000000000000
 >
-> #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556e760c0 =
-<str> "start >=3D 0 && length > 0 && length <=3D 32 - start", file=3D0x5555=
-56e76120 <str> "/home/alxndr/Development/qemu/include/qemu/bitops.h", line=
-=3D0x12c, function=3D0x555556e76180 <__PRETTY_FUNCTION__.extract32> "uint32=
-_t extract32(uint32_t, int, int)") at assert.c:101
-> #4  0x000055555653d8a7 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x1a, size=3D<optimized out>) at /home/alxndr/Development/qemu/include/qemu/=
-log-for-trace.h:29
-> #5  0x000055555653c825 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x4, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/display/ati=
-.c:289
-> #6  0x000055555601446e in memory_region_read_accessor (mr=3D0x63100004dc2=
-0, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out>,=
- shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/alx=
-ndr/Development/qemu/memory.c:434
-> #7  0x0000555556001a70 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x63100004dc20, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-> #8  0x0000555556001a70 in memory_region_dispatch_read1 (mr=3D0x63100004dc=
-20, addr=3D0x4, pval=3D<optimized out>, size=3D0x4, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:1396
+> #0 0x55ee5b93eb28 in aio_bh_enqueue util/async.c:69:27
+> #1 0x55ee5b93eb28 in qemu_bh_schedule util/async.c:181:5
+> #2 0x55ee5ae71465 in virtio_queue_notify hw/virtio/virtio.c:2364:9
+> #3 0x55ee5b51142d in virtio_mmio_write hw/virtio/virtio-mmio.c:369:13
+> #4 0x55ee5ad0d2d6 in memory_region_write_accessor memory.c:483:5
+> #5 0x55ee5ad0cc7f in access_with_adjusted_size memory.c:544:18
+> #6 0x55ee5ad0cc7f in memory_region_dispatch_write memory.c:1476:16
+> #7 0x55ee5ac221d3 in flatview_write_continue exec.c:3137:23
+> #8 0x55ee5ac1ab97 in flatview_write exec.c:3177:14
+> #9 0x55ee5ac1ab97 in address_space_write exec.c:3268:18
+>
+> I can reproduce it in a qemu 5.0 build using:
+> cat << EOF | qemu-system-i386 -M pc-q35-5.0 -M microvm,x-option-roms=3Dof=
+f,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=3Doff -nographic -device virtio-=
+balloon-device,free-page-hint=3Dtrue,deflate-on-oom=3Dtrue -nographic -moni=
+tor none -display none -serial none -qtest stdio
+> write 0xc0000e30 0x24 0x0300000003000000030000000300000003000000030000000=
+30000000300000003000000
+> EOF
 
-Here's a stack trace with --enable debug which is more useful:
+If you start QEMU this way, you get a warning:
 
-#4  0x0000555555b39464 in extract32 (value=3D0, start=3D16, length=3D32) at=
- /home/balaton/src/qemu/include/qemu/bitops.h:300
-#5  0x0000555555b3a45f in ati_reg_read_offs (reg=3D0, offs=3D2, size=3D4) a=
-t hw/display/ati.c:269
-#6  0x0000555555b3a9f1 in ati_mm_read (opaque=3D0x555556f35610, addr=3D26, =
-size=3D4) at hw/display/ati.c:299
-#7  0x0000555555b3a988 in ati_mm_read (opaque=3D0x555556f35610, addr=3D4, s=
-ize=3D4) at hw/display/ati.c:290
+qemu-system-i386: -device
+virtio-balloon-device,free-page-hint=3Dtrue,deflate-on-oom=3Dtrue:
+iothread is missing
 
-It's trying to do an indexed read via MM_DATA reg of the middle of reg =
+        if (s->iothread) {
+            s->free_page_bh =3D
+aio_bh_new(iothread_get_aio_context(s->iothread), ...
+            ...
+        } else {
+            ...
+           virtio_error(vdev, "iothread is missing");
+        }
 
-0x18 BIOS_2_SCRATCH which ends up calling ati_reg_read_offs with out of =
+Shouldn't we call error_setg(errp, "iothread is missing") and return instea=
+d?
 
-bound values. Maybe we should clamp size somewhere.
+>
+>
+> I also uploaded the above trace, in case the formatting is broken:
+>
+> curl https://paste.debian.net/plain/1146094 | qemu-system-i386 -M pc-q35-=
+5.0 -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=
+=3Doff -nographic -device virtio-balloon-device,free-page-hint=3Dtrue,defla=
+te-on-oom=3Dtrue -nographic -monitor none -display none -serial none -qtest=
+ stdio
+>
+> Please let me know if I can provide any further info.
+> -Alex
+>
 
-Regards,
-BALATON Zoltan
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878134
-
-Title:
-  Assertion failures in ati_reg_read_offs/ati_reg_write_offs
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found inputs that trigger assertion failures in
-  ati_reg_read_offs/ati_reg_write_offs
-
-  uint32_t extract32(uint32_t, int, int): Assertion `start >=3D 0 &&
-  length > 0 && length <=3D 32 - start' failed
-
-  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556e760c0 =
-<str> "start >=3D 0 && length > 0 && length <=3D 32 - start", file=3D0x5555=
-56e76120 <str> "/home/alxndr/Development/qemu/include/qemu/bitops.h", line=
-=3D0x12c, function=3D0x555556e76180 <__PRETTY_FUNCTION__.extract32> "uint32=
-_t extract32(uint32_t, int, int)") at assert.c:101
-  #4  0x000055555653d8a7 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x1a, size=3D<optimized out>) at /home/alxndr/Development/qemu/include/qemu/=
-log-for-trace.h:29
-  #5  0x000055555653c825 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x4, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/display/ati=
-.c:289
-  #6  0x000055555601446e in memory_region_read_accessor (mr=3D0x63100004dc2=
-0, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out>,=
- shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/alx=
-ndr/Development/qemu/memory.c:434
-  #7  0x0000555556001a70 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x63100004dc20, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #8  0x0000555556001a70 in memory_region_dispatch_read1 (mr=3D0x63100004dc=
-20, addr=3D0x4, pval=3D<optimized out>, size=3D0x4, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:1396
-
-  =
-
-  I can reproduce it in qemu 5.0 built with using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
-  outl 0xcf8 0x80001018
-  outl 0xcfc 0xe2000000
-  outl 0xcf8 0x8000101c
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fa20
-  write 0xe2000004 0x1 0x1a
-  readq 0xe2000000
-  EOF
-
-  Similarly for ati_reg_write_offs:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
-  outl 0xcf8 0x80001018
-  outl 0xcfc 0xe2000000
-  outl 0xcf8 0x8000101c
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fa20
-  write 0xe2000000 0x8 0x6a00000000006a00
-  EOF
-
-  I also attached the traces to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -device ati-vga -nographic -qtest stdio
-  -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878134/+subscriptions
 
