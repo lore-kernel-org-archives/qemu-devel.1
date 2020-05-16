@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D86C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D74EC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FB69206D4
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E219206D4
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qhg6Xiby"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FB69206D4
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1LxGlMj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E219206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ja12N-00024z-HB
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 13:55:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52214)
+	id 1ja13f-0004Oa-Iu
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 13:57:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1ja0td-0003WS-92
- for qemu-devel@nongnu.org; Sat, 16 May 2020 13:46:49 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42719)
+ id 1ja0te-0003b4-Ok
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 13:46:50 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:37901)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1ja0tc-0008RO-GC
- for qemu-devel@nongnu.org; Sat, 16 May 2020 13:46:48 -0400
-Received: by mail-lj1-x242.google.com with SMTP id d21so5548914ljg.9
- for <qemu-devel@nongnu.org>; Sat, 16 May 2020 10:46:48 -0700 (PDT)
+ id 1ja0td-0008SF-S4
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 13:46:50 -0400
+Received: by mail-lj1-x243.google.com with SMTP id e25so5570851ljg.5
+ for <qemu-devel@nongnu.org>; Sat, 16 May 2020 10:46:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lJgCSZt5mHFIRGTCzDEMalJcIzhFOtdVx1BtWwULXEk=;
- b=qhg6XibyvMwpVgyiHqkNSYJXLKS7OS9nkh+xzOj1rNqtaiIrEJ4KnWkeXIUaCW83hI
- dbQWn09cYEwAaSRo1GC61V3waxh1kouyfJ1uuo9AFIdLBml5369JjlN2GUxvvJfeF7ou
- mm6Lu7e0a6lLIwiA7Hk54GPtPKd7JFod/o+qq/oCJcphplHKYzHM+4Hiy6pYZn+6yvpb
- 8ww10DW8eWl5OyB8ciVsJauCMGLcL6BZV9/BJZ+hRSjylwJtzV4j1lWfWn+SiaIQFsTF
- ao1HZdRyCC3vGf+yeG9dc+HpNLExmlrbo5xZ/WtcV+eI0djSR+EfclsIGMfXCxbs0Wna
- FEHA==
+ bh=bFeqPWm2QsPGoTt7fEQgUrf7uzCq2N6hwh31edqpp1E=;
+ b=X1LxGlMjyO6sEyhdw6SIS8Zm+yQlYqxpOXPwlQWh5Q4oiELu00S8cKbjTkLI0n7ZdB
+ K3v8XSqBBRsdT/gVGKpJcurqJEDBOWpEqipmR9jXEdg7lh17TiipiEU/ftLcuz18b7x6
+ iDXscfk4BzYhkx1ghOl2R+sxnLjYcAQBvbGDzGUlcYKvT7mwyHl50Y2jYG3Qb49zj4cC
+ f+88CxsEn8Uyh4ZNIlpj+bYXBlPA09ha0hp2XgetjhOmnHKjwPW8dz99vndfiOKoScBw
+ PABKY7Nha2x0L0eF4xTjm9XyoKAXNx4Nwo0M7T5pBgI7HwqCi0ou7PH8yrXnpINw+3BS
+ 05YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lJgCSZt5mHFIRGTCzDEMalJcIzhFOtdVx1BtWwULXEk=;
- b=T1axjRU/d20R+H+Ydwj9hOMOT7seDoA4ChgJldzNQEUC8coJnV6+UAw0CEkAlO8zLB
- Cr3CJAr9WXZSMIxCJA3SNhMdfK2k1CsSGojjGj6LnA+nShZIVG2kSlNiKKULzqj4JQ61
- IOyB6nCkipvU+EWsFmuOs1tvjU7lD9my3YkkZZTsdFL0lwmqAHdRBnEm+ed6Blq4OX9G
- rQgZ80wJoFO2ypAkVW9Hh89P5lpMd4n3F/bB1AyGE9+7CwCCltGsPzN3HxT17k2XQNJE
- 8Re5ZAKfEutjACosCpaWrVxYEb4TdXSRtXpjWQ7rEwvq9Xw5CYCVqd7Em3UMQBgTHg2I
- 65aQ==
-X-Gm-Message-State: AOAM532bZTXnTvVJZ4R+vtxGOje0t3dnYK8FOC06q2+iEKVWdr0fm+pH
- H0Y7HF6JedkzzV6KB7aNW3etYvlsFFs=
-X-Google-Smtp-Source: ABdhPJzx0euEhH+kMlDXusXs3lbib1Z5xa9TFYOvhSThi1CRQNb5v6ubgINjHyELtRQ3Yls9EmF4Hw==
-X-Received: by 2002:a2e:8018:: with SMTP id j24mr5758570ljg.246.1589651206867; 
- Sat, 16 May 2020 10:46:46 -0700 (PDT)
+ bh=bFeqPWm2QsPGoTt7fEQgUrf7uzCq2N6hwh31edqpp1E=;
+ b=H6kv+M8TgR4pNPRQGWWKQVZcaisoVN3h3fYyUIQ51gaAUut+RRZY6gIMBNAUsfInya
+ 2ONZlXU34wDGFXbzi77b7q02PVm6olcz6qf2hOVzg5bOqA/YbxrvKOM1M4cjvIKJoM7/
+ JsOQEPajtBqswviLGzPx0gpf/Bby7WGM7WeRl/QWlm9iUXoa2WcQYbXwfQTYdnxVw18R
+ dY2K7jYgUR/q6kXLrWEhEoXbiEZByJ4aDFC0o6T6S2Chadh62tVC0wUZ0owalmZs6IpI
+ kBCHm3JdoTJGV4owvlgy/idFKOGyx/WOk02vWfezHNLY5RgClzcsViYezm+BzVo1D1fF
+ /tsQ==
+X-Gm-Message-State: AOAM531tfl6WT+eRXfiDdDzhDAuWHEMtlzAKRnjkGYMDS4zmKVIBN+4W
+ 2u2nSJB9vT7pUlIkSfGJsYgsw5BCVhc=
+X-Google-Smtp-Source: ABdhPJxslnjkthASH1+w0PhYVQGnKVrNUy9pDhb1S39TGxdiE04emVBs73mWzuddP9rbS40LnUr3KQ==
+X-Received: by 2002:a2e:8807:: with SMTP id x7mr5711113ljh.173.1589651208280; 
+ Sat, 16 May 2020 10:46:48 -0700 (PDT)
 Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id i1sm3024759lja.3.2020.05.16.10.46.45
+ by smtp.gmail.com with ESMTPSA id i1sm3024759lja.3.2020.05.16.10.46.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 16 May 2020 10:46:46 -0700 (PDT)
+ Sat, 16 May 2020 10:46:47 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/18] target/mips: fpu: Remove now unused FLOAT_RINT macro
-Date: Sat, 16 May 2020 19:45:44 +0200
-Message-Id: <20200516174548.7631-15-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v3 15/18] target/mips: fpu: Name better paired-single variables
+Date: Sat, 16 May 2020 19:45:45 +0200
+Message-Id: <20200516174548.7631-16-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200516174548.7631-1-aleksandar.qemu.devel@gmail.com>
 References: <20200516174548.7631-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,37 +105,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After demacroing RINT.<D|S>, this macro is not needed anymore.
+Use consistently 'l' and 'h' for low and high halves.
 
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- target/mips/fpu_helper.c | 13 -------------
- 1 file changed, 13 deletions(-)
+ target/mips/fpu_helper.c | 62 ++++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
 diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index dae1331f23..56ba49104e 100644
+index 56ba49104e..dbb8ca5692 100644
 --- a/target/mips/fpu_helper.c
 +++ b/target/mips/fpu_helper.c
-@@ -1102,19 +1102,6 @@ uint64_t helper_float_rsqrt1_ps(CPUMIPSState *env, uint64_t fdt0)
-     return ((uint64_t)fsth2 << 32) | fst2;
+@@ -1059,14 +1059,14 @@ uint32_t helper_float_recip1_s(CPUMIPSState *env, uint32_t fst0)
+ 
+ uint64_t helper_float_recip1_ps(CPUMIPSState *env, uint64_t fdt0)
+ {
+-    uint32_t fst2;
++    uint32_t fstl2;
+     uint32_t fsth2;
+ 
+-    fst2 = float32_div(float32_one, fdt0 & 0XFFFFFFFF,
+-                       &env->active_fpu.fp_status);
++    fstl2 = float32_div(float32_one, fdt0 & 0XFFFFFFFF,
++                        &env->active_fpu.fp_status);
+     fsth2 = float32_div(float32_one, fdt0 >> 32, &env->active_fpu.fp_status);
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
  }
  
--#define FLOAT_RINT(name, bits)                                              \
--uint ## bits ## _t helper_float_ ## name(CPUMIPSState *env,                 \
--                                         uint ## bits ## _t fs)             \
--{                                                                           \
--    uint ## bits ## _t fdret;                                               \
--                                                                            \
--    fdret = float ## bits ## _round_to_int(fs, &env->active_fpu.fp_status); \
--    update_fcr31(env, GETPC());                                             \
--    return fdret;                                                           \
--}
--
--#undef FLOAT_RINT
--
- uint64_t helper_float_rint_d(CPUMIPSState *env, uint64_t fs)
+ uint64_t helper_float_rsqrt1_d(CPUMIPSState *env, uint64_t fdt0)
+@@ -1091,15 +1091,15 @@ uint32_t helper_float_rsqrt1_s(CPUMIPSState *env, uint32_t fst0)
+ 
+ uint64_t helper_float_rsqrt1_ps(CPUMIPSState *env, uint64_t fdt0)
  {
-     uint64_t fdret;
+-    uint32_t fst2;
++    uint32_t fstl2;
+     uint32_t fsth2;
+ 
+-    fst2 = float32_sqrt(fdt0 & 0XFFFFFFFF, &env->active_fpu.fp_status);
++    fstl2 = float32_sqrt(fdt0 & 0XFFFFFFFF, &env->active_fpu.fp_status);
+     fsth2 = float32_sqrt(fdt0 >> 32, &env->active_fpu.fp_status);
+-    fst2 = float32_div(float32_one, fst2, &env->active_fpu.fp_status);
++    fstl2 = float32_div(float32_one, fstl2, &env->active_fpu.fp_status);
+     fsth2 = float32_div(float32_one, fsth2, &env->active_fpu.fp_status);
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
+ }
+ 
+ uint64_t helper_float_rint_d(CPUMIPSState *env, uint64_t fs)
+@@ -1367,19 +1367,19 @@ uint32_t helper_float_recip2_s(CPUMIPSState *env, uint32_t fst0, uint32_t fst2)
+ 
+ uint64_t helper_float_recip2_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
+ {
+-    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
+     uint32_t fsth0 = fdt0 >> 32;
+-    uint32_t fst2 = fdt2 & 0XFFFFFFFF;
++    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
+     uint32_t fsth2 = fdt2 >> 32;
+ 
+-    fst2 = float32_mul(fst0, fst2, &env->active_fpu.fp_status);
++    fstl2 = float32_mul(fstl0, fstl2, &env->active_fpu.fp_status);
+     fsth2 = float32_mul(fsth0, fsth2, &env->active_fpu.fp_status);
+-    fst2 = float32_chs(float32_sub(fst2, float32_one,
++    fstl2 = float32_chs(float32_sub(fstl2, float32_one,
+                                        &env->active_fpu.fp_status));
+     fsth2 = float32_chs(float32_sub(fsth2, float32_one,
+                                        &env->active_fpu.fp_status));
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
+ }
+ 
+ uint64_t helper_float_rsqrt2_d(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
+@@ -1404,51 +1404,51 @@ uint32_t helper_float_rsqrt2_s(CPUMIPSState *env, uint32_t fst0, uint32_t fst2)
+ 
+ uint64_t helper_float_rsqrt2_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
+ {
+-    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
+     uint32_t fsth0 = fdt0 >> 32;
+-    uint32_t fst2 = fdt2 & 0XFFFFFFFF;
++    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
+     uint32_t fsth2 = fdt2 >> 32;
+ 
+-    fst2 = float32_mul(fst0, fst2, &env->active_fpu.fp_status);
++    fstl2 = float32_mul(fstl0, fstl2, &env->active_fpu.fp_status);
+     fsth2 = float32_mul(fsth0, fsth2, &env->active_fpu.fp_status);
+-    fst2 = float32_sub(fst2, float32_one, &env->active_fpu.fp_status);
++    fstl2 = float32_sub(fstl2, float32_one, &env->active_fpu.fp_status);
+     fsth2 = float32_sub(fsth2, float32_one, &env->active_fpu.fp_status);
+-    fst2 = float32_chs(float32_div(fst2, FLOAT_TWO32,
++    fstl2 = float32_chs(float32_div(fstl2, FLOAT_TWO32,
+                                        &env->active_fpu.fp_status));
+     fsth2 = float32_chs(float32_div(fsth2, FLOAT_TWO32,
+                                        &env->active_fpu.fp_status));
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
+ }
+ 
+ uint64_t helper_float_addr_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt1)
+ {
+-    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
+     uint32_t fsth0 = fdt0 >> 32;
+-    uint32_t fst1 = fdt1 & 0XFFFFFFFF;
++    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
+     uint32_t fsth1 = fdt1 >> 32;
+-    uint32_t fst2;
++    uint32_t fstl2;
+     uint32_t fsth2;
+ 
+-    fst2 = float32_add(fst0, fsth0, &env->active_fpu.fp_status);
+-    fsth2 = float32_add(fst1, fsth1, &env->active_fpu.fp_status);
++    fstl2 = float32_add(fstl0, fsth0, &env->active_fpu.fp_status);
++    fsth2 = float32_add(fstl1, fsth1, &env->active_fpu.fp_status);
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
+ }
+ 
+ uint64_t helper_float_mulr_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt1)
+ {
+-    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
+     uint32_t fsth0 = fdt0 >> 32;
+-    uint32_t fst1 = fdt1 & 0XFFFFFFFF;
++    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
+     uint32_t fsth1 = fdt1 >> 32;
+-    uint32_t fst2;
++    uint32_t fstl2;
+     uint32_t fsth2;
+ 
+-    fst2 = float32_mul(fst0, fsth0, &env->active_fpu.fp_status);
+-    fsth2 = float32_mul(fst1, fsth1, &env->active_fpu.fp_status);
++    fstl2 = float32_mul(fstl0, fsth0, &env->active_fpu.fp_status);
++    fsth2 = float32_mul(fstl1, fsth1, &env->active_fpu.fp_status);
+     update_fcr31(env, GETPC());
+-    return ((uint64_t)fsth2 << 32) | fst2;
++    return ((uint64_t)fsth2 << 32) | fstl2;
+ }
+ 
+ #define FLOAT_MINMAX(name, bits, minmaxfunc)                            \
 -- 
 2.20.1
 
