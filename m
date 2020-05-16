@@ -2,120 +2,100 @@ Return-Path: <SRS0=I9ML=66=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 744FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF14C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A1E720756
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F24962065C
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 17:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6yYXEdY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A1E720756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hti7TEfK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F24962065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ja0Rz-00084c-AW
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 13:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48318)
+	id 1ja0Zy-0002vq-4J
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 13:26:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rth7680@gmail.com>) id 1ja0R3-0007bc-NI
- for qemu-devel@nongnu.org; Sat, 16 May 2020 13:17:17 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35925)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ja0ZK-0002PT-A9
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 13:25:50 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38464)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <rth7680@gmail.com>) id 1ja0R2-0001BU-EZ
- for qemu-devel@nongnu.org; Sat, 16 May 2020 13:17:17 -0400
-Received: by mail-pl1-x644.google.com with SMTP id f15so2273024plr.3
- for <qemu-devel@nongnu.org>; Sat, 16 May 2020 10:17:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uI2ObEE48DFHp+IS/ZePssIvs3hOF/CSuFQdrxZEGlc=;
- b=c6yYXEdYFXELf+vWuZNnxFsYC63hYYEHGEKUnJ9zp70urJOhhsg0XFyuRXjr4GjgtY
- vu7CEgTpih52SS8QJRosvH0dVH4bKmKYS6cuhlcLqc5Lml6eLFKhBrreUa57J0hxvN7o
- x5KS434dzqrD8wIFhbD5TzFZcRNuvkttglLTq2XEI1q9mtsUJzyAFuH8Lfo819Bkh4OR
- BTEcKu7dMyDMvJUehSsdGfJZlBRrh4/N4J1aAynnfT9omzhXMg/6z9thgf1AY+CrTNPf
- uyVEBqr5DPX0MBgbUuoHRyxvZHouhD8HdRSpc+LiTMaLl+4frh9fYtR4cvhENi7TF2Jd
- 34vA==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ja0ZJ-0002OD-45
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 13:25:49 -0400
+Received: by mail-pf1-x444.google.com with SMTP id q8so792394pfu.5
+ for <qemu-devel@nongnu.org>; Sat, 16 May 2020 10:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MQuZWr48M3ssJYApkyVgMr2ePaUx57+QrviWYvaR2z4=;
+ b=hti7TEfKHAbKJhA13mB+LzVz74bc290lVjtq8IybKQrOUaWg977FKOKlmYT8CKaMAb
+ ptACP10W42tRswWtP/VAgd153MS68BQqIIQeXfloEph20uD1a4xmsz761XtYjDV724/S
+ F4UjE7bRPYeUOCYoO6urDH1NudwWcS7tL4LXwzGPL3+tyGJKREq0+BhMzc5ynvrRfY4m
+ E2B0VLcsFbYm/trqIPjkVXq3KZm4J7FLwB4Cl2BFiXNr0uuJ+bU9v0u5FZuU6pGw/B+/
+ S9kLpjIz1FM4hg6pWxkBK/J++xy8b0QR+ufBZEv8MEd05fodlELVXs6Y4j/5hjhT+Mlg
+ RDvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=uI2ObEE48DFHp+IS/ZePssIvs3hOF/CSuFQdrxZEGlc=;
- b=Vf5IjcMFqJtyxVqMaCB5kgSHaZ7mObfj/rFBO56rmV7U98qF+Jxjm2YFXj2wiPZCae
- xsjV1Rwc9GVeqhEtTq83z3B2Sd4uDyfSFBVBHhvLMWpFIhMrpvvhpJvDNxf9IPdA2yfN
- +qBpqnLh10Tl4w3fDv1hJq7kYVp3/TQHjZxAWaPxxLN+2DcqOj7vV0j64KSfPSQc+RmY
- /T7gxYK7sx45RGWBZ2NjbIGqsUANgLUpAc9Qm8TEwqMNeBGWyKSG/n4NHm8nekVtntIW
- LMYQZbfvO1fjvv5PBYwhZIiAEEVC3Di99gqHH2P9BFLoxbzr93y9EDmAHJLMqgvQz63k
- udlw==
-X-Gm-Message-State: AOAM5315A+PTNbG9cCA372c+pdMgV2BcZs0FOMVhHJdWLAkTR1nlJKYO
- x0D020atutiwgcy9ytAYogg=
-X-Google-Smtp-Source: ABdhPJy+R4t/MH65Jt1A3KLlaOoecTndOs/Z/d787szNaFEz6M8zpoS9POYmcGnHJNOG2WwZJzUa+w==
-X-Received: by 2002:a17:90a:e147:: with SMTP id
- ez7mr10005290pjb.128.1589649434106; 
- Sat, 16 May 2020 10:17:14 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MQuZWr48M3ssJYApkyVgMr2ePaUx57+QrviWYvaR2z4=;
+ b=je01knvDKo6PJg9JlsR1XV3XFkhrY4As9xQX9DiROY7UJx36Q7dadbdaCKwD2NPjEv
+ UEZBKMf1x8BM8ABy4Ay9Lx7AX9EFLuwZQAuvkm3MrpST9fpNxVIQp7scV2/Y0vXEF/pO
+ Gz4s8aC9OWcGhfTY1ckigxLabcr/6/2geQ5zmevJr3kSG5ACSJn+XAHOWKthgi48t0lA
+ jqwpJGBU8Og4sjZ6in67UkCk45j3fSW7l5AbdFO8bvROh1o4uyuSdR2o51EzPnvg+hzm
+ LDkQlCv+EmWtLQiIwicla9lK/bYplihby6TnLTPZQ/qOA4mXbxkue9oHmeo38xqSVI6J
+ DRew==
+X-Gm-Message-State: AOAM533f8Hoih2PSc9qgzQLW6ys9n6hdk+MzFJN6wjBmJg9qSlD5f6/P
+ ELxQt8bkaXChCF+f70UdhRMVNA==
+X-Google-Smtp-Source: ABdhPJwUq9f6VPYMa5A7W2ugIfsQvG4GnTdPb/v7AnEzCFlxhLMBufvx13XpGcdSWbxsymnPrBI9aw==
+X-Received: by 2002:aa7:842b:: with SMTP id q11mr9209942pfn.302.1589649947225; 
+ Sat, 16 May 2020 10:25:47 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.googlemail.com with ESMTPSA id fv12sm4269236pjb.42.2020.05.16.10.17.12
+ by smtp.gmail.com with ESMTPSA id cc8sm4273989pjb.11.2020.05.16.10.25.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 16 May 2020 10:17:13 -0700 (PDT)
-Subject: Re: [PATCH v2] NetBSD/arm build fix
-To: Nick Hudson <skrll@netbsd.org>, qemu-devel@nongnu.org
-References: <20200516154147.24842-1-skrll@netbsd.org>
-From: Richard Henderson <rth@twiddle.net>
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
- mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
- n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
- rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
- Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
- n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
- AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
- BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
- V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
- i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
- nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
- ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
- ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
- NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
- PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
- HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
- Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
- JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
- 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
- VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
- rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
- hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
- erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
- q9OBIdA=
-Message-ID: <511ec9a9-9c96-69cb-796e-15586f463a20@twiddle.net>
-Date: Sat, 16 May 2020 10:17:11 -0700
+ Sat, 16 May 2020 10:25:46 -0700 (PDT)
+Subject: Re: [PATCH] linux-user/arm: Reset CPSR_E when entering a signal
+ handler
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200507202429.1643202-1-amanieu@gmail.com>
+ <CAFEAcA-n8-pOcwovsS1Z3T4AMa1Nueo2yik9zX5H16QAHeE05A@mail.gmail.com>
+ <CA+y5pbSueV8HQKQEZnBS4DvOvMDXUY7HMaODNhY7v-fKkJJPYw@mail.gmail.com>
+ <CAFEAcA8etD+V3KrCFwvqfDuZ0x4_cW-RN423WG13iVpJBRvq4g@mail.gmail.com>
+ <47fd7f16-a7ed-e3ee-9a97-b2b21f43e7b7@linaro.org>
+ <CAFEAcA_5_98BZfTbdLTR75w=qdOVVKra3eCM0YKX_gUEJSfkkw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6f45a4d8-844e-8c94-ebcd-af87d03c28d7@linaro.org>
+Date: Sat, 16 May 2020 10:25:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200516154147.24842-1-skrll@netbsd.org>
+In-Reply-To: <CAFEAcA_5_98BZfTbdLTR75w=qdOVVKra3eCM0YKX_gUEJSfkkw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=rth7680@gmail.com; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,24 +108,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- Riku Voipio <riku.voipio@iki.fi>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-arm <qemu-arm@nongnu.org>,
+ Amanieu d'Antras <amanieu@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/16/20 8:41 AM, Nick Hudson wrote:
-> Fix building on NetBSD/arm by extracting the FSR value from the
-> correct siginfo_t field.
+On 5/16/20 5:58 AM, Peter Maydell wrote:
+> On Sat, 16 May 2020 at 05:12, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> On 5/15/20 2:25 PM, Peter Maydell wrote:
+>>>> You also need to call arm_rebuild_hflags() after modifying CPSR_E
+>>>> otherwise the change doesn't take effect.
+>>>
+>>> Hmm. I was expecting cpsr_write() to take care of that if we
+>>> updated a cpsr flag that was in the hflags, but it looks like
+>>> the rebuild_hflags() is in the HELPER() wrapper but not in
+>>> cpsr_write() itself. Richard, does anything go wrong if
+>>> cpsr_write() proper does the hflags rebuild ?
+>>
+>> We wind up rebuilding hflags multiple times, is all.
+>>
+>> Most of the time we call cpsr_write we also do something else that also
+>> requires a rebuild.  So we do it once after all updates.
 > 
-> Signed-off-by: Nick Hudson <skrll@netbsd.org>
-> ---
->  accel/tcg/user-exec.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
+> The downside is that it leaves a trap which makes it really
+> easy to introduce bugs where hflags aren't rebuilt: as
+> a caller of cpsr_write() I don't really want to have to
+> care which cpsr flags happen to be in the hflags or not,
+> and it's particularly awkward that simply fixing which
+> flags belong in CPSR_USER suddenly means that a call
+> that happened to be OK before is now buggy.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I don't see any way around that.
 
-Queued to tcg-next.
+As I said, if we put the rebuild in cpsr_write, then we should also rearrange
+the code that calls cpsr_write to assume that's where the rebuild gets done.
 
 
 r~
