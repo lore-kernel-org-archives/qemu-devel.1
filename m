@@ -2,99 +2,81 @@ Return-Path: <SRS0=I9ML=66=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A90C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB999C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FEF820727
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:36:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMsxw1SU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FEF820727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9D6AD20657
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 11:56:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6AD20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZv7H-00043W-8p
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 07:36:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42964)
+	id 1jZvQR-0001jc-QU
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 07:56:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZv6i-0003co-T3
- for qemu-devel@nongnu.org; Sat, 16 May 2020 07:35:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52706
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZv6h-0000Ni-4Y
- for qemu-devel@nongnu.org; Sat, 16 May 2020 07:35:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589628953;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=plmK8ueeCWkXMqQ0pT6IqDFxat4X5UP9C+XAPIkIjoE=;
- b=hMsxw1SUmzIGbjG8SFrp0JwpGuICkATIqVIW2yr6+HRfB1jh276/4uTXaDqNNjDG94svTm
- UH/k8pkpdtbZEsrmsOBXIkbHnCjnnRahHCXxl6lgY3Su/mglMVF7OxvcUVbAdnrLRC8A+1
- 3pJnoHnSjE2Ww3iWYIisB97abNzPShI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-OYLyfj4CNcWCRHcA_AWRpA-1; Sat, 16 May 2020 07:35:47 -0400
-X-MC-Unique: OYLyfj4CNcWCRHcA_AWRpA-1
-Received: by mail-wm1-f72.google.com with SMTP id 23so2554177wma.8
- for <qemu-devel@nongnu.org>; Sat, 16 May 2020 04:35:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=plmK8ueeCWkXMqQ0pT6IqDFxat4X5UP9C+XAPIkIjoE=;
- b=YO1bQA7DBLsqIAy0iVeL2dPe7SVM6nUfHkYcnIQS7o8j1kclzeE5aA47Qdj+8cChIS
- 1WkqIYLxP1lDGZbYSaY4oJIciZj5rDhEcgdxiZwa1U+OY77JXmPAvuqDM7aXrR9PVjbx
- fq8GdDXkV7vilIeQObQz6uwK2xj6VPvXZ3ZOVpmrqO0rWO1pdNACKLOLT6P4rNvBKTUF
- rbEyFElpYThwkxpzaknlYfcyklUyPNw3+9t2lL2exLWlT2BQ5TvHu/70WJ/GInp1lGzg
- X9S90nCUW9HmycbLqVbCUPQv3SFFj52oOchnnCtF7GULvshrSqHZCNZd64fG/yEDtE5K
- 80+g==
-X-Gm-Message-State: AOAM532t34QO8ckv672vL2Hda+Jc7hP3dECo+QXtbmGuVoOlNTZQsRWs
- KdwAQiGeLBMEzypQcutD1Eq6bR0k0de7X5De8TeNr7r7yvbzKJs851BL9EDxfUDykFpT7dxAXAh
- OLx7a2AuiVwCSDdp0SjxyU7Ptl7sCbK4=
-X-Received: by 2002:a1c:81d0:: with SMTP id c199mr8605609wmd.125.1589628946197; 
- Sat, 16 May 2020 04:35:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw0Ftvv/FMX7WaNAtrqa19DBv6GNm8FwmIkNw8V4jG2jwKyIb4EUznEMdGIO9AXvBRyPYM6CGbGb6+Vn3e6Bu8=
-X-Received: by 2002:a1c:81d0:: with SMTP id c199mr8605579wmd.125.1589628945712; 
- Sat, 16 May 2020 04:35:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZvPu-0001Kq-4S
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 07:55:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34236)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZvPt-00076J-4P
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 07:55:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jZvPr-0007OV-Hn
+ for <qemu-devel@nongnu.org>; Sat, 16 May 2020 11:55:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 746BB2E80E7
+ for <qemu-devel@nongnu.org>; Sat, 16 May 2020 11:55:43 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200511044121.eihns2tdimdzgi4i@mozz.bu.edu>
-In-Reply-To: <20200511044121.eihns2tdimdzgi4i@mozz.bu.edu>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Sat, 16 May 2020 13:35:34 +0200
-Message-ID: <CAP+75-WyjYTDcERsxYG3YyN4mWH3aRi-OYyQcPAWEa10htv6Lw@mail.gmail.com>
-Subject: Re: Null-pointer dereference through virtio-balloon
-To: Alexander Bulekov <alxndr@bu.edu>, David Hildenbrand <david@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 05:35:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Date: Sat, 16 May 2020 11:49:55 -0000
+From: Christian Schoenebeck <1877384@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: richard-maw schoenebeck
+X-Launchpad-Bug-Reporter: Fishface60 (richard-maw)
+X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+References: <158886102295.5250.16201751310283363946.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158962979567.22424.13386143965250658312.malone@wampee.canonical.com>
+Subject: [Bug 1877384] Re: 9pfs file create with mapped-xattr can fail on
+ overlayfs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 87e933974b03873b316d8174e6bfff2553e08017
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 07:30:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,75 +85,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: Bug 1877384 <1877384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+David (virtio-balloon maintainer)
+Yes, that compile error with QEMU + recent kernel headers is a bit
+annoying, and AFAICS it is not fixed in Debian yet.
 
-On Mon, May 11, 2020 at 6:42 AM Alexander Bulekov <alxndr@bu.edu> wrote:
->
-> Hello,
-> While fuzzing, I found an input that triggers a null-ptr dereference in
-> aio_bh_enqueue, through virtio-balloon. Based on the stacktrace below,
-> I am not positive that this is specific to virtio-balloon, however
-> I have not encountered the same issue for any of the other virtio
-> devices I am fuzzing.
->
-> AddressSanitizer: SEGV on unknown address 0x000000000000
->
-> #0 0x55ee5b93eb28 in aio_bh_enqueue util/async.c:69:27
-> #1 0x55ee5b93eb28 in qemu_bh_schedule util/async.c:181:5
-> #2 0x55ee5ae71465 in virtio_queue_notify hw/virtio/virtio.c:2364:9
-> #3 0x55ee5b51142d in virtio_mmio_write hw/virtio/virtio-mmio.c:369:13
-> #4 0x55ee5ad0d2d6 in memory_region_write_accessor memory.c:483:5
-> #5 0x55ee5ad0cc7f in access_with_adjusted_size memory.c:544:18
-> #6 0x55ee5ad0cc7f in memory_region_dispatch_write memory.c:1476:16
-> #7 0x55ee5ac221d3 in flatview_write_continue exec.c:3137:23
-> #8 0x55ee5ac1ab97 in flatview_write exec.c:3177:14
-> #9 0x55ee5ac1ab97 in address_space_write exec.c:3268:18
->
-> I can reproduce it in a qemu 5.0 build using:
-> cat << EOF | qemu-system-i386 -M pc-q35-5.0 -M microvm,x-option-roms=3Dof=
-f,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=3Doff -nographic -device virtio-=
-balloon-device,free-page-hint=3Dtrue,deflate-on-oom=3Dtrue -nographic -moni=
-tor none -display none -serial none -qtest stdio
-> write 0xc0000e30 0x24 0x0300000003000000030000000300000003000000030000000=
-30000000300000003000000
-> EOF
+Would you mind writing a test case for this bug that you fixed, to
+prevent this accidentally being broken in future again?
 
-If you start QEMU this way, you get a warning:
+Please note that 9pfs is currently only been taken care of by 2 people,
+and both only on a side channel. The 9pfs code base is complex and error
+prone to edge cases like this one, so active assistance would be very
+much appreciated!
 
-qemu-system-i386: -device
-virtio-balloon-device,free-page-hint=3Dtrue,deflate-on-oom=3Dtrue:
-iothread is missing
+If you might consider writing a test case, I would give you quick, easy
+and short instructions how to compile the 9pfs test cases, and which
+source files to touch. There is no guest OS installation required for
+the test cases.
 
-        if (s->iothread) {
-            s->free_page_bh =3D
-aio_bh_new(iothread_get_aio_context(s->iothread), ...
-            ...
-        } else {
-            ...
-           virtio_error(vdev, "iothread is missing");
-        }
+Thanks!
 
-Shouldn't we call error_setg(errp, "iothread is missing") and return instea=
-d?
+-- =
 
->
->
-> I also uploaded the above trace, in case the formatting is broken:
->
-> curl https://paste.debian.net/plain/1146094 | qemu-system-i386 -M pc-q35-=
-5.0 -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=
-=3Doff -nographic -device virtio-balloon-device,free-page-hint=3Dtrue,defla=
-te-on-oom=3Dtrue -nographic -monitor none -display none -serial none -qtest=
- stdio
->
-> Please let me know if I can provide any further info.
-> -Alex
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877384
 
+Title:
+  9pfs file create with mapped-xattr can fail on overlayfs
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU Version: 3.1.0 as packaged in debian buster, but the code appears to=
+ do the same in master.
+  qemu command-line: qemu-system-x86_64 -m 1G -nographic -nic "user,model=
+=3Dvirtio-net-pci,tftp=3D$(pwd),net=3D10.0.2.0/24,host=3D10.0.2.2" -fsdev l=
+ocal,id=3Dfs,path=3D$thisdir/..,security_model=3Dmapped-xattr -device virti=
+o-9p-pci,fsdev=3Dfs,mount_tag=3Dfs -drive "file=3D$rootdisk,if=3Dvirtio,for=
+mat=3Draw" -kernel "$kernel" -initrd "$initrd" -append "$append"
+
+  =
+
+  I'm using CI that runs in a Docker container and runs a qemu VM with code=
+ and results shared via virtio 9p.
+  The 9p fsdev is configured with security_model=3Dmapped-xattr
+  When the test code attempts to create a log file in an existing directory=
+, open with O_CREAT fails with -ENOENT.
+
+  The relevant strace excerpt is:
+
+  28791 openat(11, ".", O_RDONLY|O_NOFOLLOW|O_PATH|O_DIRECTORY) =3D 20
+  28791 openat(20, "src", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW|O_DIRECTO=
+RY) =3D 21
+  28791 fcntl(21, F_SETFL, O_RDONLY|O_DIRECTORY) =3D 0
+  28791 close(20)                         =3D 0
+  28791 openat(21, "client.log", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK|O_NOF=
+OLLOW, 0600) =3D 20
+  28791 fcntl(20, F_SETFL, O_WRONLY|O_CREAT|O_NONBLOCK|O_NOFOLLOW) =3D 0
+  28791 lsetxattr("/proc/self/fd/21/client.log", "user.virtfs.uid", "\0\0\0=
+", 4, 0) =3D -1 ENOENT (No such file or directory)
+
+  My hypothesis for what's going wrong is since the Docker container's
+  overlayfs copies-up on writes, when it opens the file it's created a
+  new version of the `src` directory containing a `client.log`, but this
+  new src directory isn't accessible by file descriptor 20 and the
+  lsetxattr call is instead attempting to set attributes on the path in
+  the old `src` directory.
+
+  Looking at the code, a fix would be to change `hw/9pfs/9p-local.c` and
+  change `local_open2` to instead of calling `local_set_xattrat` to set
+  the xattrs by directory file descriptor and file name, to have a
+  version of local_set_xattrat` which uses `fsetxattr` to set the virtfs
+  attributes instead of the `fsetxattrat_nofollow` helper.
+
+  This reliably happened for me in CI, but I don't have access to the CI
+  host or the time to strip the test down to make a minimal test case,
+  and had difficulty reproducing the error on other machines.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877384/+subscriptions
 
