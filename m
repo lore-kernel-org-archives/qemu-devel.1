@@ -2,69 +2,63 @@ Return-Path: <SRS0=I9ML=66=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27171C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 03:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D22EBC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 03:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DADDB20728
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 03:03:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 930962073E
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 03:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DrjLLB+k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADDB20728
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="hj+0vRgF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930962073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZn6V-0006jb-0i
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 23:03:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46304)
+	id 1jZnIS-00030I-LK
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 23:15:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
- id 1jZn5h-0006Jc-Be
- for qemu-devel@nongnu.org; Fri, 15 May 2020 23:02:21 -0400
-Received: from mail-m975.mail.163.com ([123.126.97.5]:37330)
+ id 1jZnHA-0001mz-9c
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 23:14:13 -0400
+Received: from mail-m975.mail.163.com ([123.126.97.5]:47805)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
- id 1jZn5b-0002A9-S0
- for qemu-devel@nongnu.org; Fri, 15 May 2020 23:02:18 -0400
+ id 1jZnH6-0006YE-5E
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 23:14:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=788y2
- imNs+iCPYuXCvUck7WTQ/qr0M/Sj0G09hdMcVo=; b=DrjLLB+kuCMpH74///vwW
- 7qMC1TLX23H+Fs1X/j/c7SnmJGCa0w5gsiOD8YKKZKW1v7fkbcDcq4G8kx+NYPqQ
- cuI3UmlENN4F6q/a0p7FoGv0MwOHH++8qlY1mcgloNqcMnvXDIjCHsuIb30uj1tH
- 6MlHBMW1pwzfUtEOlzFCio=
-Received: from [192.168.0.123] (unknown [114.240.93.195])
- by smtp5 (Coremail) with SMTP id HdxpCgDXFkmMV79eMOe3AA--.31S2;
- Sat, 16 May 2020 11:01:42 +0800 (CST)
-Subject: Re: [PATCH v4 3/3] qemu-options: updates for abstract unix sockets
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200515043235.32189-1-zxq_yx_007@163.com>
- <20200515043235.32189-4-zxq_yx_007@163.com>
- <df4fe148-90af-771d-641e-0579e2049cc3@redhat.com>
+ s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GFS6O
+ Sv5OXF/PXQYyUTBSYK7hExceohezHeicoNhLW8=; b=hj+0vRgFcqi+nwQWUZ3o0
+ 6aV1qC36HFwOszV026zA/jwBVvatI8a8RYjO4MECKfXqoAosZLMLAUwgDtHCtEZO
+ nrPrPJqXybF1X0iqOCm/Yv1Puv98eKeE3zBos+FZPUFIBkUd2Kn16uDUw8rM/76B
+ rgoT3LvPOAc67mLRbYysWk=
+Received: from localhost.localdomain (unknown [114.240.93.195])
+ by smtp5 (Coremail) with SMTP id HdxpCgC3FwRcWr9eLYq7AA--.563S2;
+ Sat, 16 May 2020 11:13:58 +0800 (CST)
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Message-ID: <d2161f52-f23d-a70c-648c-2d3da9290247@163.com>
-Date: Sat, 16 May 2020 11:01:31 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/3] qemu-sockets: add abstract UNIX domain socket support
+Date: Sat, 16 May 2020 11:13:24 +0800
+Message-Id: <20200516031327.15305-1-zxq_yx_007@163.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <df4fe148-90af-771d-641e-0579e2049cc3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: HdxpCgDXFkmMV79eMOe3AA--.31S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7XF4kJFy8KF4rZF4kXF4Dtwb_yoW8Jr47pr
- y5Kan0yrn7X3y8uF13Xay8JrWrGa1Fqa18K34UJwn0k398Za4Sga47Kw1vqw18ArWfAF4a
- y3WjvryYga1qv3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07b0ManUUUUU=
+X-CM-TRANSID: HdxpCgC3FwRcWr9eLYq7AA--.563S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7GFyxJw1UGry3ur45tFWDJwb_yoW3tFX_Xr
+ y0k34ktrW7Aa1rCa45CrnxJFW7Cr40gF10qF1UtrWkGw1kZrn8Krn8Ary7Kw1UJa43uF17
+ X34kGr93A3y2gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+ 9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU0VOJUUUUUU==
 X-Originating-IP: [114.240.93.195]
-X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/1tbiFhYmxl44Kn1IqwAAsy
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/1tbiqBYmxlc7PN687QAAsB
 Received-SPF: pass client-ip=123.126.97.5; envelope-from=zxq_yx_007@163.com;
  helo=mail-m975.mail.163.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 23:02:07
@@ -96,34 +90,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-在 2020/5/16 上午1:37, Eric Blake 写道:
-> On 5/14/20 11:32 PM, xiaoqiang zhao wrote:
->> add options documents changes for -chardev
->>
->> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
->> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
->> ---
->>   qemu-options.hx | 9 +++++++--
->>   1 file changed, 7 insertions(+), 2 deletions(-)
->
-> I'd suggest listing 'abstract' before 'tight', since 'tight' only 
-> matters for abstract.  I also have grammar suggestions:
->
->> -    ``unix options: path=path``
->> +    ``unix options: path=path[,tight=on|off][,abstract=on|off]``
->>           ``path`` specifies the local path of the unix socket. ``path``
->>           is required.
->> +    ``tight`` whether to set @addrlen to the minimal string length,
->> +        or the maximum sun_path length. defaults to true. ``tight`` is
->> +        optional.
->> +    ``abstract`` whether use abstract address. defaults to false.
->> +    ``abstract`` is optional.
->
-> ``abstract`` specifies the use of the abstract socket namespace, 
-> rather than the filesystem.  Optional, defaults to false.
-> ``tight`` sets the socket length of abstract sockets to their minimum, 
-> rather than the full sun_path length.  Optional, defaults to true.
->
-Reasonable,  will change in v6
+qemu does not support abstract UNIX domain
+socket address. Add this ability to make qemu handy
+when abstract address is needed.
+
+Changes since v5: 
+* rebase on master
+* refine document statement
+
+v4 -> v5: 
+* fix typo and coding style problems
+
+v3 -> v4: 
+* rebase on master
+* refine qapi document statement
+* use random names to avoid name clash in unit test
+
+Xiaoqiang Zhao (3):
+  qemu-sockets: add abstract UNIX domain socket support
+  tests/util-sockets: add abstract unix socket cases
+  qemu-options: updates for abstract unix sockets
+
+ chardev/char-socket.c     |  4 ++
+ chardev/char.c            |  7 +++
+ qapi/sockets.json         |  8 +++-
+ qemu-options.hx           |  8 +++-
+ tests/test-util-sockets.c | 92 +++++++++++++++++++++++++++++++++++++++
+ util/qemu-sockets.c       | 39 ++++++++++++++---
+ 6 files changed, 148 insertions(+), 10 deletions(-)
+
+-- 
+2.17.1
 
 
