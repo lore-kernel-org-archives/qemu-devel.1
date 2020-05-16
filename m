@@ -7,64 +7,65 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16577C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 14:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D153C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 14:25:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D09CA206F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 14:24:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEAB4206F4
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 May 2020 14:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="nde6qM/a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09CA206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="knLHA2Ti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEAB4206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZxjV-00068A-1X
-	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 10:24:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53956)
+	id 1jZxkR-00078T-1D
+	for qemu-devel@archiver.kernel.org; Sat, 16 May 2020 10:25:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <teachk@foxmail.com>)
- id 1jZwvC-00030L-1a
- for qemu-devel@nongnu.org; Sat, 16 May 2020 09:32:10 -0400
-Received: from out203-205-221-245.mail.qq.com ([203.205.221.245]:60107
+ id 1jZxSS-0007lF-Mh
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 10:06:32 -0400
+Received: from out203-205-221-149.mail.qq.com ([203.205.221.149]:49254
  helo=qq.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <teachk@foxmail.com>)
- id 1jZwv6-0007CO-LQ
- for qemu-devel@nongnu.org; Sat, 16 May 2020 09:32:09 -0400
+ id 1jZxSM-00072F-Oh
+ for qemu-devel@nongnu.org; Sat, 16 May 2020 10:06:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1589635904; bh=dqNWq+Cq319NegWg6B2F9qiSIJaev6Gp6VZfGEzFlqE=;
+ t=1589637971; bh=dqNWq+Cq319NegWg6B2F9qiSIJaev6Gp6VZfGEzFlqE=;
  h=From:To:Cc:Subject:Date;
- b=nde6qM/aR9sn0/9nw263nW5dW5uAIlpzkR5O+xNS46ncapxHzg7yN9C2rVgN7JLUU
- ODkTWD0tbhtwyXN+uGkkRSrm9aew4F2teW186f6LMhT4+V6HgZQH8h8xYAA3fAQ+j4
- pI5hFgcE3Etd60xPE+Wp3KL4Zf5LoO8vwHMLbMc0=
+ b=knLHA2TiFl4xb+GGQP7Jc6G0LOOb+ubps3lzznILADGTk6sQ6cP73eDNZkTepv1qo
+ 1WE82dC8NvOTrIoL8nmljOGIiOj4S/LJDYquzejPzeHMdA7/X8/1tJqpRrQeMPivvO
+ BwdGQOqzCCnjaqWtynGYOd1p6iWEIZwnPhlbQ1VE=
 Received: from localhost.localdomain ([120.200.144.22])
- by newxmesmtplogicsvrsza6.qq.com (NewEsmtp) with SMTP
- id 7E78A01D; Sat, 16 May 2020 21:31:39 +0800
-X-QQ-mid: xmsmtpt1589635899tv0urv9rl
-X-QQ-XMAILINFO: N1Suf0tbEPcE/BCjGpluwTRJhI4tESztUm2uUoqLkq6U95xXj01MeDllbI2fhj
- OfiMnlRcDOQC6oEfF46XEqOC7YJ1i5FBE/cLYibOjXg5jESwzU1DU416cWhqz9EAmCzvI8jiXLWv
- 0DHpu6Avpt3Q4JWyr8oj2J5UH8XxsB7qD0/YNFh8hbmDkw2xz5rz00xpT8rT++VpWJq4PD4ibXAf
- WWzrg4kCWeG2vU0IP3E4sFmzaNgwAGOHStaS7liJ/9jXRzdCEkxKvRmEWNGOlPekB6qwPAtE9hwT
- QhU7G1gX1Tt5TKZlkoA1Zz+iINtxSh/X0eQ2TAaxHp57A3XKbiw5HgmQzd2jqyqYyLzd1HI2j53z
- Ql4zt7h4EeT/j1bmtOYgE1OJCssr13Xm/csfhmL23ZKRVQ4bMNfEV0OAJC2djc1sBjGpbRkHhnTV
- ha6hKO49TIWWqsSLWfzqe9FIuPkSxS8jA3s/WmGQ0/A5r0glRBEBqguquoqrMKgFdnhImSf3y2M1
- 7t4qX5XdlwSF4q5RWWsypj5AYQwOcVY9esTsGcsN3FeDsraIB55GH28uRwuhKPpKDX7sWzOoiVIZ
- jUgZHVyoD5f9xfwMPEPpVFVGh+TsTIIephf9vqU/qrNYjyZuN6wVShlepyTIYCiUX8wN8=
+ by newxmesmtplogicsvrszc5.qq.com (NewEsmtp) with SMTP
+ id 1879961C; Sat, 16 May 2020 22:06:07 +0800
+X-QQ-mid: xmsmtpt1589637967tnnuy7lma
+X-QQ-XMAILINFO: Nrw6fLiikHXY6esOCuMUdSmsPcObMYAh4r/8NbhietWtzeYuuaQBseW0SjCQRu
+ nBQHNZ7qmkaST5GyRrW6hJtjO6Pw91E9Zf7+TEhv6KRMt3MR8iJ6we7/Tl9Wo7EJqMNGnN51uu4C
+ AZMYxiOfq1TV4sTSuaiiPSdkdvWThiB9XXcZTxspReKAqm3rFIxMyQUZCYBDUBhYp8XCmkv/NMlr
+ 9csql8+FYu91KzKnBJEEPCoXwasvglHi1LYCvnWP64M0CDm+H9RaGs71w1WAi2tgnbsGo6qxWr40
+ iU8OIq9uY1gpbnlduu03sIFSjw0xcLy95B1itk6N13FM0GG9Hl6pUY6sbYjVKZiLPSQ5w8HyQnro
+ 1/JrUsz82loX6yBIm6tsq0zyiT1o2ds8HCuxLKq8TRyDapQUiR8ua1tmYKQyqUmUpVwr/Asi2wdc
+ +b+ilFqGzLPRrPMQj5pkSuhH9V+mDA6KQgzykkdWQn9+N9K8FhUpLfts1uHjZcju4zHqhkY+0PG2
+ 2hHK7lxM3wUqSLdcCW/igBjEWnmjjDG8omO5Am8fQtuB2CGtoP2pjCpdGrz3UBgI8jKu4MzOszNT
+ vpqfBKb8MxdW79Vdxvo6YEM08AExDun0qwYnj8cjYBrHBYjc1Ngg/QACkwzLPVfrBbNLDvQ/hurJ
+ EY0Q==
 From: teachk <teachk@foxmail.com>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] virtio-crypto: Convert DPRINTF to trace event
-Date: Sat, 16 May 2020 21:31:22 +0800
-Message-Id: <20200516133122.374-1-teachk@foxmail.com>
+Date: Sat, 16 May 2020 22:05:40 +0800
+Message-Id: <20200516140540.51-1-teachk@foxmail.com>
 X-Mailer: git-send-email 2.22.0.windows.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.205.221.245; envelope-from=teachk@foxmail.com;
+Received-SPF: pass client-ip=203.205.221.149; envelope-from=teachk@foxmail.com;
  helo=qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 09:31:46
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/16 10:06:13
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -74,7 +75,7 @@ X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  RDNS_DYNAMIC=0.982, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Sat, 16 May 2020 10:23:12 -0400
+X-Mailman-Approved-At: Sat, 16 May 2020 10:23:14 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
