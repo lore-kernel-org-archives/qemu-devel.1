@@ -2,94 +2,50 @@ Return-Path: <SRS0=EQsI=67=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15377C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 09:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC35C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBFBF2065F
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 09:35:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lp+cpK5W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBFBF2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88C212075F
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:16:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C212075F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaFi5-0005as-3M
-	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 05:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36740)
+	id 1jaGLL-0008B0-Il
+	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 06:16:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaFXD-0004bK-7D
- for qemu-devel@nongnu.org; Sun, 17 May 2020 05:24:39 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41127)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaFXC-0001pJ-Ch
- for qemu-devel@nongnu.org; Sun, 17 May 2020 05:24:38 -0400
-Received: by mail-lj1-x241.google.com with SMTP id v16so2569161ljc.8
- for <qemu-devel@nongnu.org>; Sun, 17 May 2020 02:24:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tW+0eLzQ2UZfvVWbxFduozLUGGyjb7gucIG22bozEe0=;
- b=Lp+cpK5WMRiqblHp6OAv6rZ2mwtg0ZO7zPd1e9RbMnwwkQ2PnqYSYA4v3s/+X2U9/F
- 40wSpwmcJWuZwu/gf9FK0+pLT0TTE3qP4wUqDVIo9iLhmEhmUud2tp3yqCB2h0GCrde7
- O/gYI4zxZ2NzCcpKQnSx4dVZHxKIAicoaOSGuR2k8JK2vWdLmJ8MLdfLEwr2+Uzo+4OE
- zmsO4SnmY39mcD9BbmQEAMxeWF6ofDFdZcsG/X6A9dMITVfAc5dbpbQ/hnKh4GpZewaK
- nDpD+UDkzaEfzejom3VtQHEc23Ng7QrVSQVNyxmckdUtlFZlhGbIfVosDbC1RL90kK5d
- 7RTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=tW+0eLzQ2UZfvVWbxFduozLUGGyjb7gucIG22bozEe0=;
- b=Ty9Q+9tCEGK2vIKMLKLPdBizc6YCAGd33twSYnaPolFbuSirISc3YG6uiJNjQIpQFM
- 4wW22FAuiKUMxWJuXfA0nwHf+E5yt3W1zns8tXMgorrpTYumV8/6UnpwIG8UGk3rvopk
- uNecK3zLsc/08rctbc1rWK3Z3v4l7hsgp2eU7CYYpd/hDjEs1lU/um96h4om8uxfVrFF
- fZKiLd/3uRwKmfWC3TywK/hAReM7QxBMqsdf7dJ+qcPuZOSLV3/7hUMRr4MKzOq7Am0Y
- 13gdFRDjitLPsMFHGPwgGjnFPwcvozZ53WrS10eao0vRMaEf0i181MOAyjcljnhxgkhU
- u6Nw==
-X-Gm-Message-State: AOAM533ONUkzQsb7vO023+bhwmHd4VvNqNZZBRWmq9AHdCvPpk1/D9iX
- q7FSepiolXcuukoJuLOlhUG/voIBC0s=
-X-Google-Smtp-Source: ABdhPJxvtqr42mpUCESmUuLH4SxgsZayN274ovP7cQbRlJ4Sz2qR0lwBFiEJP7xS00I26LZrwt6XdQ==
-X-Received: by 2002:a2e:a58e:: with SMTP id m14mr7127671ljp.95.1589707476379; 
- Sun, 17 May 2020 02:24:36 -0700 (PDT)
-Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id l2sm3872138ljg.89.2020.05.17.02.24.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 17 May 2020 02:24:36 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGJ4-00073T-9V
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 06:14:06 -0400
+Received: from mail.netbsd.org ([199.233.217.200]:61061)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGJ3-0006PP-6q
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 06:14:05 -0400
+Received: by mail.netbsd.org (Postfix, from userid 1220)
+ id 9395E84C8B; Sun, 17 May 2020 10:14:02 +0000 (UTC)
+From: Nick Hudson <skrll@netbsd.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 19/19] hw/mips: Rename malta/mipssim/r4k/jazz files in
- hw/mips
-Date: Sun, 17 May 2020 11:23:57 +0200
-Message-Id: <20200517092357.1469-20-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200517092357.1469-1-aleksandar.qemu.devel@gmail.com>
-References: <20200517092357.1469-1-aleksandar.qemu.devel@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PATCH] Provide a NetBSD specific aarch64 cpu_signal_handler
+Date: Sun, 17 May 2020 11:13:39 +0100
+Message-Id: <20200517101339.5278-1-skrll@netbsd.org>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=199.233.217.200; envelope-from=skrll@netbsd.org;
+ helo=mail.netbsd.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 06:14:03
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,67 +58,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Nick Hudson <skrll@netbsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Machine file names should not have prefix "mips_".
+Fix qemu build on NetBSD/evbarm-aarch64 by providing a NetBSD specific
+cpu_signal_handler.
 
-Folong2 machine source file will be handled in a separate patch,
-to avoid conflicts. That patch is pending integration into the
-main tree.
-
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-CC:  Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Nick Hudson <skrll@netbsd.org>
 ---
- hw/mips/Makefile.objs                 | 8 ++++----
- hw/mips/{mips_jazz.c => jazz.c}       | 0
- hw/mips/{mips_malta.c => malta.c}     | 0
- hw/mips/{mips_mipssim.c => mipssim.c} | 0
- hw/mips/{mips_r4k.c => r4k.c}         | 0
- 5 files changed, 4 insertions(+), 4 deletions(-)
- rename hw/mips/{mips_jazz.c => jazz.c} (100%)
- rename hw/mips/{mips_malta.c => malta.c} (100%)
- rename hw/mips/{mips_mipssim.c => mipssim.c} (100%)
- rename hw/mips/{mips_r4k.c => r4k.c} (100%)
+ accel/tcg/user-exec.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-index 525809af07..1d767ed9a8 100644
---- a/hw/mips/Makefile.objs
-+++ b/hw/mips/Makefile.objs
-@@ -1,8 +1,8 @@
- obj-y += addr.o mips_int.o
--obj-$(CONFIG_R4K) += mips_r4k.o
--obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
--obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
--obj-$(CONFIG_JAZZ) += mips_jazz.o
-+obj-$(CONFIG_R4K) += r4k.o
-+obj-$(CONFIG_MALTA) += gt64xxx_pci.o malta.o
-+obj-$(CONFIG_MIPSSIM) += mipssim.o
-+obj-$(CONFIG_JAZZ) += jazz.o
- obj-$(CONFIG_FULONG) += mips_fulong2e.o
- obj-$(CONFIG_MIPS_CPS) += cps.o
- obj-$(CONFIG_MIPS_BOSTON) += boston.o
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/jazz.c
-similarity index 100%
-rename from hw/mips/mips_jazz.c
-rename to hw/mips/jazz.c
-diff --git a/hw/mips/mips_malta.c b/hw/mips/malta.c
-similarity index 100%
-rename from hw/mips/mips_malta.c
-rename to hw/mips/malta.c
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mipssim.c
-similarity index 100%
-rename from hw/mips/mips_mipssim.c
-rename to hw/mips/mipssim.c
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/r4k.c
-similarity index 100%
-rename from hw/mips/mips_r4k.c
-rename to hw/mips/r4k.c
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 4be78eb9b3..dd128adc00 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -523,6 +523,31 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ 
+ #elif defined(__aarch64__)
+ 
++#if defined(__NetBSD__)
++
++#include <ucontext.h>
++#include <sys/siginfo.h>
++
++int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
++{
++    ucontext_t *uc = puc;
++    siginfo_t *si = pinfo;
++    unsigned long pc;
++    int is_write;
++    uint32_t esr;
++
++    pc = uc->uc_mcontext.__gregs[_REG_PC];
++    esr = si->si_trap;
++
++    /* siginfo_t::si_trap is the ESR value, for data aborts ESR.EC
++     * is 0b10010x: then bit 6 is the WnR bit
++     */
++    is_write = extract32(esr, 27, 5) == 0x12 && extract32(esr, 6, 1) == 1;
++    return handle_cpu_signal(pc, si, is_write, &uc->uc_sigmask);
++}
++
++#else
++
+ #ifndef ESR_MAGIC
+ /* Pre-3.16 kernel headers don't have these, so provide fallback definitions */
+ #define ESR_MAGIC 0x45535201
+@@ -585,6 +610,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+     }
+     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
++#endif
+ 
+ #elif defined(__s390__)
+ 
 -- 
-2.20.1
+2.17.1
 
 
