@@ -2,101 +2,91 @@ Return-Path: <SRS0=EQsI=67=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4338C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 17:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55DD4C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 17:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CBCF20758
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 17:55:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20B5520758
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 17:58:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsgzJDGR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CBCF20758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RIVLOMz0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B5520758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaNVa-0002dc-Pi
-	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 13:55:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36350)
+	id 1jaNYv-0004m4-AW
+	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 13:58:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jaNUI-0001kH-4D
- for qemu-devel@nongnu.org; Sun, 17 May 2020 13:54:11 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34079)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jaNUH-0004ih-9q
- for qemu-devel@nongnu.org; Sun, 17 May 2020 13:54:09 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y3so9199318wrt.1
- for <qemu-devel@nongnu.org>; Sun, 17 May 2020 10:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6T/qb4rnrH5RfKSGyJ1i0NaxjPfIQSW88gXzcJmCVEw=;
- b=XsgzJDGRgPoJYm+WjwgMyFrafvymL9Nv/gJWeG6TmSi8A7wljc/CQ2wjkGV+fZuiTB
- WXFxX0ysW1nrLCrY0VDiYtKwcPuBxEoiQQUT+noO5i6nSBNSIgwgBquJ4NltDLtaEeVJ
- gkWIxl5t9F1pEjrdWL3Hw+7UVr/ajnpEvP/WVpEFHekpxzN0eTLPeqK8Fl+QOYaofudv
- +CekuXcDUYc/y07tgsVBXyd8uYqvy1t+5unUQJkJbkmf5hRfctjBK1dFvdMqW34Uo1f9
- g4njyztv1KDazteuTVyC3lXpO86DKLrCVLc0F5nFXOp6LcsqCz+ZXU0PhVVs4SpXmyn3
- CoiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6T/qb4rnrH5RfKSGyJ1i0NaxjPfIQSW88gXzcJmCVEw=;
- b=LgAmpMRJvgsFfHKqENwZ3ukNdDgnvIozwjDwNrbFOzjUh/ONgXLQdfCpIfPMIajf38
- dNMJUitJfOc8uuiks4T0Ygra68f1oiE581IlzgGq+eLxA1UQUnyHASd0V48cpJPn7JwF
- dmvbNSPPWtwE6OTQLadY8YzJDxhD+0w5n5mabXUL8phn+WzY194N8stsXhXdJExp4T/k
- U8Y+Lt5qcshpRtgtahan/ZkDIIlVH7WfrpSD9nVH3Jdhg6if6jNZVH+rKy6MT3jwxii+
- GgBg7Gu7R/cBCbggxt9/QKHmAzrPKMhiSkh+i53SRMNg9hqvjhucyR3+64bPWvzRWwrm
- xDig==
-X-Gm-Message-State: AOAM530HrfWuhNi+m2ok5WW9lW4WJq7tH/SgbOVNk9TRlz7OsoZzNIRt
- fgN/iE3OZDFpWkSjDOGHS1I=
-X-Google-Smtp-Source: ABdhPJzRbhQkSwOKVeY1gqfhYYTRiCOYgjbM/xCkruH3jsM+JpSIgfmh03BZ2pLO902Pqd0Ohhc3og==
-X-Received: by 2002:adf:e9d2:: with SMTP id l18mr15376728wrn.34.1589738047820; 
- Sun, 17 May 2020 10:54:07 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id q5sm13828341wra.36.2020.05.17.10.54.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 17 May 2020 10:54:06 -0700 (PDT)
-Subject: Re: [PATCH] ati-vga: Do not allow unaligned access via index register
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20200516132352.39E9374594E@zero.eik.bme.hu>
- <20200516144706.zz54mgs7k7anq3cj@mozz.bu.edu>
- <alpine.BSF.2.22.395.2005161730460.69993@zero.eik.bme.hu>
- <16020f02-5fe3-a7d9-ca30-759a2ba69307@amsat.org>
- <2aa3e473-4de3-253b-37b6-f61b13969329@amsat.org>
- <alpine.BSF.2.22.395.2005171613510.1650@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <620e0537-6a38-21b8-4ec1-9c12eb010399@amsat.org>
-Date: Sun, 17 May 2020 19:54:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2005171613510.1650@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jaNWz-0003VL-5k
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 13:56:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21369
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jaNWy-0005NM-9j
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 13:56:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589738215;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iFD7eTGqcu+VNM3Dwjcp4el7QYjdDOvqTwl2FtHdA3E=;
+ b=RIVLOMz0GKXb1zm+5GDgPYvHuAaNkkBx3WZuBeeunrJlNNvE6Q73LQrmNMDEBj5kYNOXro
+ EiZLostsRCYJ7snbm7L2v1CCNvL0gcBH0ITHPBmxcGKgxFaNiHzb+9DPkhQ4z73QskClUi
+ 0SqHh4kKTLMG/zCJ7CTBV5qjFDQbQY0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-WnT6VxoTNTmT7Hckgt-chg-1; Sun, 17 May 2020 13:56:53 -0400
+X-MC-Unique: WnT6VxoTNTmT7Hckgt-chg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 972E2835B40;
+ Sun, 17 May 2020 17:56:52 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7662F2DE95;
+ Sun, 17 May 2020 17:56:50 +0000 (UTC)
+Message-ID: <26b95a4e2617435c15d14d5ad09777ce46d3ef28.camel@redhat.com>
+Subject: Re: [PATCH v6 07/14] block/crypto: implement the encryption key
+ management
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "Daniel P." =?ISO-8859-1?Q?Berrang=E9?=
+ <berrange@redhat.com>
+Date: Sun, 17 May 2020 20:56:49 +0300
+In-Reply-To: <b54a5cdc-f649-acba-4821-2c3f357c6d94@redhat.com>
+References: <20200510134037.18487-1-mlevitsk@redhat.com>
+ <20200510134037.18487-8-mlevitsk@redhat.com>
+ <1413abb3-f226-5ecc-3ea9-3dd945a134ed@redhat.com>
+ <20200514141418.GJ1280939@redhat.com>
+ <b54a5cdc-f649-acba-4821-2c3f357c6d94@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 13:47:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,92 +99,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/17/20 4:30 PM, BALATON Zoltan wrote:
-> On Sun, 17 May 2020, Philippe Mathieu-Daudé wrote:
->> On 5/17/20 12:40 PM, Philippe Mathieu-Daudé wrote:
->>> On 5/16/20 5:33 PM, BALATON Zoltan wrote:
->>>> On Sat, 16 May 2020, Alexander Bulekov wrote:
->>>>> On 200516 1513, BALATON Zoltan wrote:
->>> Finally, there is a tag documented for bug fixes:
->>> https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit_message 
->>>
->>> If your patch addresses a bug in a public bug tracker, please add a 
->>> line with "Buglink: <URL-of-the-bug>" there, too.
->>>
->>> Buglink: https://bugs.launchpad.net/qemu/+bug/1878134
+On Thu, 2020-05-14 at 16:32 +0200, Max Reitz wrote:
+> On 14.05.20 16:14, Daniel P. Berrangé wrote:
+> > On Thu, May 14, 2020 at 04:09:59PM +0200, Max Reitz wrote:
+> > > On 10.05.20 15:40, Maxim Levitsky wrote:
+> > > > This implements the encryption key management using the generic code in
+> > > > qcrypto layer and exposes it to the user via qemu-img
+> > > > 
+> > > > This code adds another 'write_func' because the initialization
+> > > > write_func works directly on the underlying file, and amend
+> > > > works on instance of luks device.
+> > > > 
+> > > > This commit also adds a 'hack/workaround' I and Kevin Wolf (thanks)
+> > > > made to make the driver both support write sharing (to avoid breaking the users),
+> > > > and be safe against concurrent  metadata update (the keyslots)
+> > > > 
+> > > > Eventually the write sharing for luks driver will be deprecated
+> > > > and removed together with this hack.
+> > > > 
+> > > > The hack is that we ask (as a format driver) for BLK_PERM_CONSISTENT_READ
+> > > > and then when we want to update the keys, we unshare that permission.
+> > > > So if someone else has the image open, even readonly, encryption
+> > > > key update will fail gracefully.
+> > > > 
+> > > > Also thanks to Daniel Berrange for the idea of
+> > > > unsharing read, rather that write permission which allows
+> > > > to avoid cases when the other user had opened the image read-only.
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> > > > ---
+> > > >  block/crypto.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++--
+> > > >  block/crypto.h |  34 +++++++++++++
+> > > >  2 files changed, 158 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/block/crypto.c b/block/crypto.c
+> > > > index 2e16b62bdc..b14cb0ff06 100644
+> > > > --- a/block/crypto.c
+> > > > +++ b/block/crypto.c
+> > > 
+> > > [...]
+> > > 
+> > > > +static void
+> > > > +block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
+> > > > +                         const BdrvChildRole *role,
+> > > > +                         BlockReopenQueue *reopen_queue,
+> > > > +                         uint64_t perm, uint64_t shared,
+> > > > +                         uint64_t *nperm, uint64_t *nshared)
+> > > > +{
+> > > > +
+> > > > +    BlockCrypto *crypto = bs->opaque;
+> > > > +
+> > > > +    bdrv_filter_default_perms(bs, c, role, reopen_queue,
+> > > > +            perm, shared, nperm, nshared);
+> > > > +    /*
+> > > > +     * Ask for consistent read permission so that if
+> > > > +     * someone else tries to open this image with this permission
+> > > > +     * neither will be able to edit encryption keys, since
+> > > > +     * we will unshare that permission while trying to
+> > > > +     * update the encryption keys
+> > > > +     */
+> > > > +    if (!(bs->open_flags & BDRV_O_NO_IO)) {
+> > > > +        *nperm |= BLK_PERM_CONSISTENT_READ;
+> > > > +    }
+> > > 
+> > > I’m not sure this is important, because this really means we won’t do
+> > > I/O.  Its only relevant use in this case is for qemu-img info.  Do we
+> > > really care if someone edits the key slots while qemu-img info is
+> > > processing?
+> > 
+> > FWIW, OpenStack runs  qemu-img info in a periodic background job, so
+> > it can be concurrent with anything else they are running.
 > 
-> Does this reply add that tag already or do I need to submit a v2 with it 
-> (or the maintainer could add it when merging)?
-
-If he doesn't have time he can reply to your patch :)
-
+> That might actually be a problem then, because this may cause sporadic
+> failure when trying to change (amend) keyslots; while qemu-img info
+> holds the CONSISTENT_READ permission, the amend process can’t unshare
+> it.  That might lead to hard-to-track-down bugs.
 > 
->>> Now, looking at your device implementation, it seems
->>>
->>> 1/ The device isn't supposed to have 64-bit accesses
->>>
->>> So this might be a more generic fix to Alexander issue:
->>>
->>> -- >8 --
->>> @@ -879,6 +879,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
->>>   static const MemoryRegionOps ati_mm_ops = {
->>>       .read = ati_mm_read,
->>>       .write = ati_mm_write,
->>> +    .valid.max_access_size = 4,
->>>       .endianness = DEVICE_LITTLE_ENDIAN,
->>>   };
->>> ---
+> > Having said
+> > that due to previous QEMU bugs, they unconditonally pass the arg to
+> > qemu-img to explicitly disable locking
 > 
-> I've tried that first but it does not work. The reason is that 
-> ati_mm_read is recursively called for indexed access via MM_DATA which 
-> causes the problem that happens when MM_INDEX is set to a non-aligned 
-> value. No 64 bit access, just 32 bit with offset of 2 bytes as can be 
-> seen from the stach trace I've attached to the bug. Fortunately indexed 
-> access is documented to only support aligned access by not allowing 
-> setting low bits of MM_INDEX so unless we find a client needing it my 
-> patch should do it.
-
-OK, so this is another device affected by the memory.c lacking of 
-unaligned access (Gerd saw another one with USB).
-
+> Well, then it doesn’t matter in this case.  But still something to
+> consider, probably.
 > 
->>> 2/ All the registers are 32-bit aligned
->>>
->>> So you can simplify the implementation by letting 
->>> access_with_adjusted_size() handle the 8/16-bit accesses by using:
->>>
->>> @@ -879,6 +879,8 @@ static void ati_mm_write(void *opaque, hwaddr addr,
->>>   static const MemoryRegionOps ati_mm_ops = {
->>>       .read = ati_mm_read,
->>>       .write = ati_mm_write,
->>> +    .min.min_access_size = 4,
->>
->> I meant '.impl.min_access_size'.
+> Max
 > 
-> I think this would not work either because not all registers are the 
-> same, some only can be read all 32 bits, some also 16 or 8 bits and 
-> clients do access these with less than 32 bits and accessing parts of 
-> the reg may trigger actions so the current way is probably better and 
-> necessary to correctly support different valid and invalid unaligned 
-> accessses.
+So I understand correctly that I should leave the patch as is?
 
-.valid.xxx_access_size is what the guest are allowed to use,
-.impl.xxx_access_size is what the developer had in mind when writing the 
-model.
+Thanks for the review!
 
-.impl.min_access_size = 4 doesn't forbid 8/16-bit guest accesses.
+Best regards,
+	Maxim Levitsky
 
-Moreover, it overloads you the burden of handling short accesses.
-
-Anyway this was just a suggested simplification.
-
-> 
-> Regards,
-> BALATON Zoltan
 
