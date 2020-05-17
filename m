@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BE0C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 20:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44066C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 20:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8462207C4
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 20:25:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8462207C4
+	by mail.kernel.org (Postfix) with ESMTPS id 1537C20758
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 20:47:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1537C20758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaPqr-0005ij-5Z
-	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 16:25:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52740)
+	id 1jaQC9-0003nc-66
+	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 16:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jaPpq-00051m-If
- for qemu-devel@nongnu.org; Sun, 17 May 2020 16:24:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45752)
+ id 1jaQAJ-0003BC-DP
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 16:45:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47020)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jaPpn-0008Dn-TP
- for qemu-devel@nongnu.org; Sun, 17 May 2020 16:24:34 -0400
+ id 1jaQAG-0004X6-Uh
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 16:45:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jaPpl-0005RK-Qr
- for <qemu-devel@nongnu.org>; Sun, 17 May 2020 20:24:29 +0000
+ id 1jaQAD-0006QM-Q9
+ for <qemu-devel@nongnu.org>; Sun, 17 May 2020 20:45:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B98012E810A
- for <qemu-devel@nongnu.org>; Sun, 17 May 2020 20:24:29 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id BBBAC2E8048
+ for <qemu-devel@nongnu.org>; Sun, 17 May 2020 20:45:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 17 May 2020 20:10:49 -0000
-From: mizz <1502613@bugs.launchpad.net>
+Date: Sun, 17 May 2020 20:36:46 -0000
+From: Paul Zimmerman <1772165@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Wishlist;
- assignee=snizovtsev@gmail.com; 
-X-Launchpad-Bug-Tags: battery management power virtual
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Wishlist;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm usb
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kranebrain naftaly-avadiaev snizovtsev
- wolfgangandreas
-X-Launchpad-Bug-Reporter: Wolfgang Andreas (wolfgangandreas)
-X-Launchpad-Bug-Modifier: mizz (kranebrain)
-References: <20151004131253.1871.94138.malonedeb@wampee.canonical.com>
-Message-Id: <158974624996.31351.4231767700521859983.malone@chaenomeles.canonical.com>
-Subject: [Bug 1502613] Re: [Feature Request] Battery Status / Virtual Battery
+X-Launchpad-Bug-Commenters: aditya-govardhan andrew-pennebaker clemd davbac
+ dougrabson kraxel-redhat pauldzim pmaydell vortelf weberkai
+X-Launchpad-Bug-Reporter: George (vortelf)
+X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
+References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158974780626.17285.13064005808932797841.malone@soybean.canonical.com>
+Subject: [Bug 1772165] Re: arm raspi2/raspi3 emulation has no USB support
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fe7ade300aeb861b1df2167055a27e9658577716
+X-Launchpad-Hash: b0402e7873a682be74ebe0893f9feda6d174c51e
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 16:24:30
@@ -87,43 +87,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1502613 <1502613@bugs.launchpad.net>
+Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Has there been any progress? I'm using KVM for ubuntu 20.04 and would
-love to have this feature.
+Have you seen the patch series I have posted on the qemu-devel mailing
+list? "[PATCH v5 0/7] dwc-hsotg (aka dwc2) USB host controller emulation."
+If you could test that and give your 'tested-by', it could help get the
+patch series accepted. That would require you to download the latest Qemu
+source code, apply the patches, and build it yourself.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1502613
+https://bugs.launchpad.net/bugs/1772165
 
 Title:
-  [Feature Request] Battery Status / Virtual Battery
+  arm raspi2/raspi3 emulation has no USB support
 
 Status in QEMU:
-  In Progress
+  Confirmed
 
 Bug description:
-  When using virtualization on notebooks heavily then virtual machines
-  do not realize that they're running on a notebook device causing high
-  power consumption because they're not switching into a optimized
-  "laptop mode". This leads to the circumstance that they are trying to
-  do things like defragmentation / virtus scan / etc. while the host is
-  still running on batteries.
+  Using Qemu 2.12.0 on ArchLinux.
 
-  So it would be great if QEMU / KVM would have support for emulating
-  "Virtual Batteries" to guests causing them to enable power-saving
-  options like disabling specific services / devices / file operations
-  automatically by OS.
+  Trying to emulate arm device with `qemu-system-arm` and attach usb
+  device for unput using
 
-  Optionally a great feature would be to set virtual battery's status
-  manually. For example: Current charge rate / charging / discharging /
-  ...
+  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
+
+  # lsusb returns
+
+  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
+
+  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
+
+  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
+
+  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
+ Reader Controller
+  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+  # qemu returns
+  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
+=3D0x0002: Bus '001' not found
+
+  =
+
+  Tried with connecting external usb keyboard but that didn't seem to work =
+either.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1502613/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
 
