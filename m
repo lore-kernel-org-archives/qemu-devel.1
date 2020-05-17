@@ -2,82 +2,81 @@ Return-Path: <SRS0=EQsI=67=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB56C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BDEC433DF
 	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 16:22:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A3CB20809
+	by mail.kernel.org (Postfix) with ESMTPS id 9372E2070A
 	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 16:22:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pRVwVT/U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3CB20809
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oA/Vd15f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9372E2070A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaM3p-0007fu-CW
+	id 1jaM3p-0007hB-FY
 	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 12:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53958)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>) id 1jaM2r-000623-JO
- for qemu-devel@nongnu.org; Sun, 17 May 2020 12:21:45 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40548)
+ (Exim 4.90_1) (envelope-from <groeck7@gmail.com>) id 1jaM2u-00064D-1E
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 12:21:48 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>) id 1jaM2q-0006kI-Hu
- for qemu-devel@nongnu.org; Sun, 17 May 2020 12:21:45 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id ci23so295576pjb.5
- for <qemu-devel@nongnu.org>; Sun, 17 May 2020 09:21:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groeck7@gmail.com>) id 1jaM2t-0006kc-3f
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 12:21:47 -0400
+Received: by mail-pf1-x443.google.com with SMTP id y198so2105179pfb.4
+ for <qemu-devel@nongnu.org>; Sun, 17 May 2020 09:21:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=IKqSsLhQC2QhDVU4F5SnGseXmbR5yG/zUVktutymlAA=;
- b=pRVwVT/UIu66NLNKgJ1Uc8pOmlU3Jva7b6yje6lRz4QraVwOuCbMFzixR1NundotIo
- 1QxdPB1ACr5ANxZdpbx5ilbnJUKsH1rhDokltV+JrxCKuALCgiissD0YZxpG1YhehePc
- tGETJndJHJUjdEKf6iWOosVB3yVF8N8JprgA+rFQraB+Nv4R3A7kI7JMu9QxRjkg//N0
- 8NIJ/EC08bTUBt4vYeawQhWQ9oNovxBcF63gpjd+9T6t7J4Ii/Z5fJQc/sDJ6PieyLjV
- Fv2EtlKAJMrdOTs8KVBtTEuKN85IPvOFRNA3JVsRy8X9+ZO4FwOY/vFC5YaRiVUk6B7F
- DYmA==
+ bh=JRQ52zM2NnpaXcf+LK51XyGqjmB9A212C485J5vFewc=;
+ b=oA/Vd15fbDbj0vCe8mvgAa61jmml2MYP0dy9sR7mm/amEIOk82hQgz5yXaSN8d2V29
+ TutQuv12qS8YH1AncEEc2Lid9MNspQBPP6+EboRGaZJkvdYG6bTdrSA3/qRMG7kRUVoy
+ jRcAbbl4SArcFbibAGngDJiIhyCITJ3a2eUsSb7ONJ9Zav89I/iCPbZ2qxYc13FyOA/D
+ so6j+qag3oxZ2tu4Y4VTqcjenwPB/qbHOmn2UmmpsePhDzD32bNin1/pw0u9qP3jGLZP
+ /6YXiOKwOOlF1u+oQED209MjeJ2ZaS6n3E3w1q2Rg+ZfW+iYC3Vwy+K2CaNYlxTJzknO
+ VM+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=IKqSsLhQC2QhDVU4F5SnGseXmbR5yG/zUVktutymlAA=;
- b=Y6D66jVIJUzvepW37XD0GIlL9fFNqEgTTuWhdUPZEW7hDIOYcf+4wgpgwDghVKpeh6
- KmUIEzlA+l/vjqNqRX6+x9YPUOQQ4LrFPZpR7KzaiiRxgmjQYU8zcsJpgFh/l/y3zKJK
- pTsLXs5w/lJgkZP8DWXH1/2ZJewupR7mrkxxdVFNR88N7JXqqb9iNpbnMj71ajaJ34t2
- Qiarbd9sDUfSHm8Ve+CDRVcRODBw9YFvN7RZeFadBoOmRMppC4AHWOcJZ2J0F8+8cjUE
- Dwm8bsCH+zCeNWWwQDaTaO+ojWXEPUV9MVAdyuYSsTd27N2rmtPdEbvtKlk4eyHmPiws
- Wr4Q==
-X-Gm-Message-State: AOAM5315NUownrbJN+LpHF3R1dlqRQ+5m/jGEZSXVx5PWeCPr88HDObD
- uIQtlhQJ3o7lSJQ02ntTeGA=
-X-Google-Smtp-Source: ABdhPJxpInwON3cuq1M1xsmqbVKCruLFL/9C4Lh759yg1fzt5SjDmBpjEbYODtuQuZX6XtSaVDXCdg==
-X-Received: by 2002:a17:902:930c:: with SMTP id
- bc12mr12637537plb.255.1589732503248; 
- Sun, 17 May 2020 09:21:43 -0700 (PDT)
+ bh=JRQ52zM2NnpaXcf+LK51XyGqjmB9A212C485J5vFewc=;
+ b=fpibV+n8ccyuLelGrUHAfEva1XnoUyJm0/IvGpm9pknOfuSORDqjisAeVamQWO8sq2
+ mQ+ceVz96DP8cdYu0XPVIsQoher7q/O6DHpjodRv+aZr5VBnHJ78C+FnCbHGobqmpqBa
+ /hGNkKYh8Htgmk00xtLfj85kovrf7qG0sSriLUipFuPW6vTqfFZkguVs6WWLTOsVKv0S
+ wRNJ6VXW8kxgZI5rX60Xfy0n5jSdFFVDxCpkB6S8gWidOh+FFT2/dSF3iV5AKOE2J6Ff
+ IxuEETpk2VvS96HOLkFkdIhIjCUf4uI80U47XR28i2wlcGlhfByuBxsS4ZRCJPM7c6ZL
+ 8g3Q==
+X-Gm-Message-State: AOAM531SWEwNEmFlkKjlSJJId9i9FYN3xGqQL8yDdoiYMleDsG8eutmv
+ NI5fEyuexTOqOYZvBsTOpAk=
+X-Google-Smtp-Source: ABdhPJwn8Uf+O78M9ie/qrVv+EGmiCeKzTwm6i0LW/8shaMplRs6jBPbXo/DNLRNwv0scOpnTG7qVA==
+X-Received: by 2002:aa7:8dc1:: with SMTP id j1mr13209200pfr.285.1589732505951; 
+ Sun, 17 May 2020 09:21:45 -0700 (PDT)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id h3sm577799pjk.10.2020.05.17.09.21.42
+ by smtp.gmail.com with ESMTPSA id q25sm6553653pfh.94.2020.05.17.09.21.45
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Sun, 17 May 2020 09:21:42 -0700 (PDT)
+ Sun, 17 May 2020 09:21:45 -0700 (PDT)
 From: Guenter Roeck <linux@roeck-us.net>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v3 1/8] hw: Move i.MX watchdog driver to hw/watchdog
-Date: Sun, 17 May 2020 09:21:28 -0700
-Message-Id: <20200517162135.110364-2-linux@roeck-us.net>
+Subject: [PATCH v3 3/8] hw/arm/fsl-imx25: Wire up watchdog
+Date: Sun, 17 May 2020 09:21:30 -0700
+Message-Id: <20200517162135.110364-4-linux@roeck-us.net>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200517162135.110364-1-linux@roeck-us.net>
 References: <20200517162135.110364-1-linux@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=groeck7@gmail.com; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=groeck7@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -108,167 +107,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In preparation for a full implementation, move i.MX watchdog driver
-from hw/misc to hw/watchdog. While at it, add the watchdog files
-to MAINTAINERS.
+With this commit, the watchdog on imx25-pdk is fully operational,
+including pretimeout support.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
 v3: No change
-v2: Instead of auto-selecting WDT_IMX2 if IMX is enabled, select it 
-    explicitly for each emulation using it.
-    In Makefile, fix CONFIG_WDT_IMX -> CONFIG_WDT_IMX2
+v2: Select WDT_IMX2 explicitly
     Added Philippe's Reviewed-by: tag
 
- MAINTAINERS                                         | 2 ++
- hw/arm/Kconfig                                      | 3 +++
- hw/misc/Makefile.objs                               | 1 -
- hw/watchdog/Kconfig                                 | 3 +++
- hw/watchdog/Makefile.objs                           | 1 +
- hw/{misc/imx2_wdt.c => watchdog/wdt_imx2.c}         | 2 +-
- include/hw/arm/fsl-imx6.h                           | 2 +-
- include/hw/arm/fsl-imx6ul.h                         | 2 +-
- include/hw/arm/fsl-imx7.h                           | 2 +-
- include/hw/{misc/imx2_wdt.h => watchdog/wdt_imx2.h} | 0
- 10 files changed, 13 insertions(+), 5 deletions(-)
- rename hw/{misc/imx2_wdt.c => watchdog/wdt_imx2.c} (98%)
- rename include/hw/{misc/imx2_wdt.h => watchdog/wdt_imx2.h} (100%)
+ hw/arm/Kconfig             |  1 +
+ hw/arm/fsl-imx25.c         | 10 ++++++++++
+ include/hw/arm/fsl-imx25.h |  5 +++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8aa8efaf1d..998eb5053c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -631,8 +631,10 @@ S: Odd Fixes
- F: hw/arm/fsl-imx25.c
- F: hw/arm/imx25_pdk.c
- F: hw/misc/imx25_ccm.c
-+F: hw/watchdog/wdt_imx2.c
- F: include/hw/arm/fsl-imx25.h
- F: include/hw/misc/imx25_ccm.h
-+F: include/hw/watchdog/wdt_imx2.h
- 
- i.MX31 (kzm)
- M: Peter Chubb <peter.chubb@nicta.com.au>
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 188419dc1e..adf401e827 100644
+index adf401e827..54a49aeabd 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -374,6 +374,7 @@ config FSL_IMX6
-     select IMX_FEC
-     select IMX_I2C
-     select IMX_USBPHY
-+    select WDT_IMX2
-     select SDHCI
- 
- config ASPEED_SOC
-@@ -411,6 +412,7 @@ config FSL_IMX7
+@@ -358,6 +358,7 @@ config FSL_IMX25
      select IMX
      select IMX_FEC
      select IMX_I2C
 +    select WDT_IMX2
-     select PCI_EXPRESS_DESIGNWARE
-     select SDHCI
-     select UNIMP
-@@ -424,6 +426,7 @@ config FSL_IMX6UL
-     select IMX
-     select IMX_FEC
-     select IMX_I2C
-+    select WDT_IMX2
-     select SDHCI
-     select UNIMP
+     select DS1338
  
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 68aae2eabb..b25181b711 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -44,7 +44,6 @@ common-obj-$(CONFIG_IMX) += imx6_ccm.o
- common-obj-$(CONFIG_IMX) += imx6ul_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
- common-obj-$(CONFIG_IMX) += imx7_ccm.o
--common-obj-$(CONFIG_IMX) += imx2_wdt.o
- common-obj-$(CONFIG_IMX) += imx7_snvs.o
- common-obj-$(CONFIG_IMX) += imx7_gpr.o
- common-obj-$(CONFIG_IMX) += imx_rngc.o
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index 2118d897c9..293209b291 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -14,3 +14,6 @@ config WDT_IB700
+ config FSL_IMX31
+diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
+index 6f1a82ce3d..cdaa79c26b 100644
+--- a/hw/arm/fsl-imx25.c
++++ b/hw/arm/fsl-imx25.c
+@@ -87,6 +87,7 @@ static void fsl_imx25_init(Object *obj)
+                               TYPE_CHIPIDEA);
+     }
  
- config WDT_DIAG288
-     bool
++    sysbus_init_child_obj(obj, "wdt", &s->wdt, sizeof(s->wdt), TYPE_IMX2_WDT);
+ }
+ 
+ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+@@ -302,6 +303,15 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+                                             usb_table[i].irq));
+     }
+ 
++    /* Watchdog */
++    object_property_set_bool(OBJECT(&s->wdt), true, "pretimeout-support",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&s->wdt), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt), 0, FSL_IMX25_WDT_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->wdt), 0,
++                                      qdev_get_gpio_in(DEVICE(&s->avic),
++                                                       FSL_IMX25_WDT_IRQ));
 +
-+config WDT_IMX2
-+    bool
-diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
-index 3f536d1cad..631b711d86 100644
---- a/hw/watchdog/Makefile.objs
-+++ b/hw/watchdog/Makefile.objs
-@@ -4,3 +4,4 @@ common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
- common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
- common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
- common-obj-$(CONFIG_ASPEED_SOC) += wdt_aspeed.o
-+common-obj-$(CONFIG_WDT_IMX2) += wdt_imx2.o
-diff --git a/hw/misc/imx2_wdt.c b/hw/watchdog/wdt_imx2.c
-similarity index 98%
-rename from hw/misc/imx2_wdt.c
-rename to hw/watchdog/wdt_imx2.c
-index 2aedfe803a..ad1ef02e9e 100644
---- a/hw/misc/imx2_wdt.c
-+++ b/hw/watchdog/wdt_imx2.c
-@@ -14,7 +14,7 @@
- #include "qemu/module.h"
- #include "sysemu/watchdog.h"
- 
--#include "hw/misc/imx2_wdt.h"
-+#include "hw/watchdog/wdt_imx2.h"
- 
- #define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
- #define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index 973bcb72f7..1ebd751324 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -21,7 +21,7 @@
- #include "hw/cpu/a9mpcore.h"
- #include "hw/misc/imx6_ccm.h"
- #include "hw/misc/imx6_src.h"
--#include "hw/misc/imx2_wdt.h"
-+#include "hw/watchdog/wdt_imx2.h"
- #include "hw/char/imx_serial.h"
- #include "hw/timer/imx_gpt.h"
- #include "hw/timer/imx_epit.h"
-diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
-index 1a0bab8daa..37c89cc5f9 100644
---- a/include/hw/arm/fsl-imx6ul.h
-+++ b/include/hw/arm/fsl-imx6ul.h
-@@ -24,7 +24,7 @@
- #include "hw/misc/imx7_snvs.h"
- #include "hw/misc/imx7_gpr.h"
- #include "hw/intc/imx_gpcv2.h"
--#include "hw/misc/imx2_wdt.h"
-+#include "hw/watchdog/wdt_imx2.h"
+     /* initialize 2 x 16 KB ROM */
+     memory_region_init_rom(&s->rom[0], OBJECT(dev), "imx25.rom0",
+                            FSL_IMX25_ROM0_SIZE, &err);
+diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
+index 5e196bbf05..9e228dacea 100644
+--- a/include/hw/arm/fsl-imx25.h
++++ b/include/hw/arm/fsl-imx25.h
+@@ -29,6 +29,7 @@
  #include "hw/gpio/imx_gpio.h"
- #include "hw/char/imx_serial.h"
- #include "hw/timer/imx_gpt.h"
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index 706aef2e7e..3a0041c4c2 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -26,7 +26,7 @@
- #include "hw/misc/imx7_snvs.h"
- #include "hw/misc/imx7_gpr.h"
- #include "hw/misc/imx6_src.h"
--#include "hw/misc/imx2_wdt.h"
+ #include "hw/sd/sdhci.h"
+ #include "hw/usb/chipidea.h"
 +#include "hw/watchdog/wdt_imx2.h"
- #include "hw/gpio/imx_gpio.h"
- #include "hw/char/imx_serial.h"
- #include "hw/timer/imx_gpt.h"
-diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/watchdog/wdt_imx2.h
-similarity index 100%
-rename from include/hw/misc/imx2_wdt.h
-rename to include/hw/watchdog/wdt_imx2.h
+ #include "exec/memory.h"
+ #include "target/arm/cpu.h"
+ 
+@@ -60,6 +61,7 @@ typedef struct FslIMX25State {
+     IMXGPIOState   gpio[FSL_IMX25_NUM_GPIOS];
+     SDHCIState     esdhc[FSL_IMX25_NUM_ESDHCS];
+     ChipideaState  usb[FSL_IMX25_NUM_USBS];
++    IMX2WdtState   wdt;
+     MemoryRegion   rom[2];
+     MemoryRegion   iram;
+     MemoryRegion   iram_alias;
+@@ -229,6 +231,8 @@ typedef struct FslIMX25State {
+ #define FSL_IMX25_GPIO1_SIZE    0x4000
+ #define FSL_IMX25_GPIO2_ADDR    0x53FD0000
+ #define FSL_IMX25_GPIO2_SIZE    0x4000
++#define FSL_IMX25_WDT_ADDR      0x53FDC000
++#define FSL_IMX25_WDT_SIZE      0x4000
+ #define FSL_IMX25_USB1_ADDR     0x53FF4000
+ #define FSL_IMX25_USB1_SIZE     0x0200
+ #define FSL_IMX25_USB2_ADDR     0x53FF4400
+@@ -268,5 +272,6 @@ typedef struct FslIMX25State {
+ #define FSL_IMX25_ESDHC2_IRQ    8
+ #define FSL_IMX25_USB1_IRQ      37
+ #define FSL_IMX25_USB2_IRQ      35
++#define FSL_IMX25_WDT_IRQ       55
+ 
+ #endif /* FSL_IMX25_H */
 -- 
 2.17.1
 
