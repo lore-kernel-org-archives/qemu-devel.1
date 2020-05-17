@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC35C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7B2C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88C212075F
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:16:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C212075F
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA182075F
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 May 2020 10:17:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA182075F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaGLL-0008B0-Il
-	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 06:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41050)
+	id 1jaGMm-0000kt-EN
+	for qemu-devel@archiver.kernel.org; Sun, 17 May 2020 06:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGJ4-00073T-9V
- for qemu-devel@nongnu.org; Sun, 17 May 2020 06:14:06 -0400
-Received: from mail.netbsd.org ([199.233.217.200]:61061)
+ (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGKY-0007xV-03
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 06:15:38 -0400
+Received: from mail.netbsd.org ([2001:470:a085:999::25]:57685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGJ3-0006PP-6q
- for qemu-devel@nongnu.org; Sun, 17 May 2020 06:14:05 -0400
+ (Exim 4.90_1) (envelope-from <skrll@netbsd.org>) id 1jaGKX-0006xF-7H
+ for qemu-devel@nongnu.org; Sun, 17 May 2020 06:15:37 -0400
 Received: by mail.netbsd.org (Postfix, from userid 1220)
- id 9395E84C8B; Sun, 17 May 2020 10:14:02 +0000 (UTC)
+ id D044284C8B; Sun, 17 May 2020 10:15:35 +0000 (UTC)
 From: Nick Hudson <skrll@netbsd.org>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] Provide a NetBSD specific aarch64 cpu_signal_handler
-Date: Sun, 17 May 2020 11:13:39 +0100
-Message-Id: <20200517101339.5278-1-skrll@netbsd.org>
+Date: Sun, 17 May 2020 11:15:29 +0100
+Message-Id: <20200517101529.5367-1-skrll@netbsd.org>
 X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=199.233.217.200; envelope-from=skrll@netbsd.org;
- helo=mail.netbsd.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 06:14:03
-X-ACL-Warn: Detected OS   = ???
+Received-SPF: pass client-ip=2001:470:a085:999::25;
+ envelope-from=skrll@netbsd.org; helo=mail.netbsd.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
@@ -58,7 +58,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nick Hudson <skrll@netbsd.org>
+Cc: Nick Hudson <skrll@netbsd.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
