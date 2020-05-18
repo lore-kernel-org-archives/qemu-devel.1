@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1A6C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C72F2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D09020674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D09020674
+	by mail.kernel.org (Postfix) with ESMTPS id 9613B20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:26:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9613B20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jab2b-0006cV-Aw
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:22:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45164)
+	id 1jab6e-0000n7-SB
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:26:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jab1w-0005ki-Sy
- for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51136)
+ id 1jab66-0000Lv-8t
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 04:26:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51906)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jab1u-000387-G7
- for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:48 -0400
+ id 1jab65-0004PS-Ge
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 04:26:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jab1q-00043s-Qq
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:43 +0000
+ id 1jab63-0005kt-Rf
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:26:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 391572E824D
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C356C2E8106
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:26:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2020 08:14:41 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1837094@bugs.launchpad.net>
+Date: Mon, 18 May 2020 08:06:46 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1502613@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: slirp
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Wishlist;
+ assignee=snizovtsev@gmail.com; 
+X-Launchpad-Bug-Tags: battery management power virtual
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd samuel-thibault
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
+X-Launchpad-Bug-Commenters: kranebrain naftaly-avadiaev philmd snizovtsev
+ wolfgangandreas
+X-Launchpad-Bug-Reporter: Wolfgang Andreas (wolfgangandreas)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-References: <156347205992.30489.16276823737610194084.malonedeb@soybean.canonical.com>
-Message-Id: <158978968163.22954.295445845100130972.malone@gac.canonical.com>
-Subject: [Bug 1837094] Re: UndefinedBehaviorSanitizer crash around
- slirp::ip_reass()
+References: <20151004131253.1871.94138.malonedeb@wampee.canonical.com>
+Message-Id: <158978920674.17853.8337243912424290112.malone@soybean.canonical.com>
+Subject: [Bug 1502613] Re: [Feature Request] Battery Status / Virtual Battery
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 68616629ce8390fa3dcaa37b4063bcffc944c7b9
+X-Launchpad-Hash: 02cc289e278b68142e887d6f132f5ef2e6f4fe26
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 04:21:44
@@ -89,49 +88,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1837094 <1837094@bugs.launchpad.net>
+Reply-To: Bug 1502613 <1502613@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixed in QEMU release v5.0.0
-
-** Changed in: qemu
-       Status: New =3D> Fix Released
+The implementation could be similar to the temperature sensor interface pro=
+posed here:
+https://www.mail-archive.com/qemu-block@nongnu.org/msg65192.html
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1837094
+https://bugs.launchpad.net/bugs/1502613
 
 Title:
-  UndefinedBehaviorSanitizer crash around slirp::ip_reass()
+  [Feature Request] Battery Status / Virtual Battery
 
 Status in QEMU:
-  Fix Released
+  In Progress
 
 Bug description:
-  tag: v4.1.0-rc1
+  When using virtualization on notebooks heavily then virtual machines
+  do not realize that they're running on a notebook device causing high
+  power consumption because they're not switching into a optimized
+  "laptop mode". This leads to the circumstance that they are trying to
+  do things like defragmentation / virtus scan / etc. while the host is
+  still running on batteries.
 
-  ./configure --enable-sanitizers --extra-cflags=3D-O1
+  So it would be great if QEMU / KVM would have support for emulating
+  "Virtual Batteries" to guests causing them to enable power-saving
+  options like disabling specific services / devices / file operations
+  automatically by OS.
 
-  =3D=3D26130=3D=3DERROR: UndefinedBehaviorSanitizer: SEGV on unknown addre=
-ss 0x000000000008 (pc 0x0000561ad346d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e=
-8 T26130)
-  =3D=3D26130=3D=3DThe signal is caused by a WRITE memory access.
-  =3D=3D26130=3D=3DHint: address points to the zero page.
-  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x0000561ad346d587 in ip_deq() at slirp/src/ip=
-_input.c:411:55
-  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x0000561ad346cffb in ip_reass() at slirp/src/=
-ip_input.c:304:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x0000561ad346cb6f in ip_input() at slirp/src/=
-ip_input.c:184:18
-
-  I only had access to the last packet which isn't the culprit, I'm now
-  seeing how to log the network traffic of the guest to provide more
-  useful information.
+  Optionally a great feature would be to set virtual battery's status
+  manually. For example: Current charge rate / charging / discharging /
+  ...
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1837094/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1502613/+subscriptions
 
