@@ -4,63 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145A7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69299C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDBA2206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33F592065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N163LBG0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDBA2206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3EAdXsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33F592065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaeFJ-0005Bm-Vs
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:47:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43724)
+	id 1jaeKP-000067-B8
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:53:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeDw-0004e4-U3
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:46:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20658
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeJj-0007yG-WF
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:52:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32660
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeDw-0006kU-4L
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:46:24 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeJi-00089Q-ET
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:52:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589802382;
+ s=mimecast20190719; t=1589802740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=E4tN3TXSTycD/Mgo2gyP62CScRVuBPGUplOqfxlDmOs=;
- b=N163LBG0Yc66a2CG8lNXqbE8h0J7D+QCNels9cXyE2YQmpmHmFRsIdmqZTKbXiBp7x7Pd1
- 7u/20+zv4N2AMtqYmCPf0rspQoIuhr5S7qcJXckEVCZ0POop2mTB9ZbiOJa/pw+rPU7jtn
- ow7ygTUwxkn6D5eLcUEFg96sPzbHj9o=
+ bh=DKtMHuEZYAeVQNRKKCnrkfFpvsYsSzBr2T1LAGawIqc=;
+ b=a3EAdXsWViW9XRBsz5vdvNvGUNDXJ23LVyjS3i5D6nrTQrBzEVjMP3O7wwgC3p90zsIZ5f
+ NtU3O34QHTTSJ7avbU+klKxPXIlryVCU7adxFNGRjCQJX4BvjnUBXKaE6LhaKy3QzVMBq7
+ zrbDQUV8QLf1c4kLpBRE+ZUEyXrUb08=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-G184Yr4BMcS0tkhNn1GpCg-1; Mon, 18 May 2020 07:46:21 -0400
-X-MC-Unique: G184Yr4BMcS0tkhNn1GpCg-1
+ us-mta-418-jTe1oGNXOcWM1WoZF1JTqg-1; Mon, 18 May 2020 07:52:18 -0400
+X-MC-Unique: jTe1oGNXOcWM1WoZF1JTqg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DD391005510;
- Mon, 18 May 2020 11:46:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0F6B80058A;
+ Mon, 18 May 2020 11:52:17 +0000 (UTC)
 Received: from [10.36.113.224] (ovpn-113-224.ams2.redhat.com [10.36.113.224])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7BC995D9DC;
- Mon, 18 May 2020 11:46:09 +0000 (UTC)
-Subject: Re: [PATCH v2 2/8] s390/sclp: check sccb len before filling in data
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200515222032.18838-1-walling@linux.ibm.com>
- <20200515222032.18838-3-walling@linux.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 41C7C5D9DC;
+ Mon, 18 May 2020 11:52:16 +0000 (UTC)
+Subject: Re: [PATCH v2 1/9] pc-bios: s390x: cio.c cleanup and compile fix
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200514123729.156283-1-frankja@linux.ibm.com>
+ <20200514123729.156283-2-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -106,29 +105,29 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <292a440b-d147-e94a-2c00-49a2fa3659b1@redhat.com>
-Date: Mon, 18 May 2020 13:46:08 +0200
+Message-ID: <48adae20-487d-adb1-de0c-9470e3f6292d@redhat.com>
+Date: Mon, 18 May 2020 13:52:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515222032.18838-3-walling@linux.ibm.com>
+In-Reply-To: <20200514123729.156283-2-frankja@linux.ibm.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,43 +140,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
- pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16.05.20 00:20, Collin Walling wrote:
-> The SCCB must be checked for a sufficient length before it is filled
-> with any data. If the length is insufficient, then the SCLP command
-> is suppressed and the proper response code is set in the SCCB header.
+On 14.05.20 14:37, Janosch Frank wrote:
+> Let's initialize the structs at the beginning to ease reading and also
+> zeroing all other fields. This also makes the compiler stop
+> compalining about sense_id_ccw.flags being ored into when it's not
+
+s/compalining/complaining/
+
+> initialized.
 > 
-> Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  hw/s390x/sclp.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+>  pc-bios/s390-ccw/cio.c | 36 ++++++++++++++++++------------------
+>  1 file changed, 18 insertions(+), 18 deletions(-)
 > 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 61e2e2839c..2bd618515e 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -75,6 +75,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->      int rnsize, rnmax;
->      IplParameterBlock *ipib = s390_ipl_get_iplb();
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> index 339ec5fbe7..63301ebb58 100644
+> --- a/pc-bios/s390-ccw/cio.c
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -49,13 +49,13 @@ void enable_subchannel(SubChannelId schid)
 >  
-> +    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
-> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +        return;
-> +    }
-> +
+>  uint16_t cu_type(SubChannelId schid)
+>  {
+> -    Ccw1 sense_id_ccw;
+>      SenseId sense_data;
+> -
+> -    sense_id_ccw.cmd_code = CCW_CMD_SENSE_ID;
+> -    sense_id_ccw.cda = ptr2u32(&sense_data);
+> -    sense_id_ccw.count = sizeof(sense_data);
+> -    sense_id_ccw.flags |= CCW_FLAG_SLI;
+> +    Ccw1 sense_id_ccw = {
+> +        .cmd_code = CCW_CMD_SENSE_ID,
+> +        .count = sizeof(sense_data),
+> +        .flags = CCW_FLAG_SLI,
+> +        .cda = ptr2u32(&sense_data),
+> +    };
+>  
+>      if (do_cio(schid, CU_TYPE_UNKNOWN, ptr2u32(&sense_id_ccw), CCW_FMT1)) {
+>          panic("Failed to run SenseID CCw\n");
+> @@ -67,13 +67,13 @@ uint16_t cu_type(SubChannelId schid)
+>  int basic_sense(SubChannelId schid, uint16_t cutype, void *sense_data,
+>                   uint16_t data_size)
+>  {
+> -    Ccw1 senseCcw;
+> +    Ccw1 senseCcw = {
+> +        .cmd_code = CCW_CMD_BASIC_SENSE,
+> +        .count = data_size,
+> +        .cda = ptr2u32(sense_data),
+> +    };
+>      Irb irb;
+>  
+> -    senseCcw.cmd_code = CCW_CMD_BASIC_SENSE;
+> -    senseCcw.cda = ptr2u32(sense_data);
+> -    senseCcw.count = data_size;
+> -
+>      return __do_cio(schid, ptr2u32(&senseCcw), CCW_FMT1, &irb);
+>  }
+>  
+> @@ -314,7 +314,13 @@ static void print_irb_err(Irb *irb)
+>   */
+>  static int __do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt, Irb *irb)
+>  {
+> -    CmdOrb orb = {};
+> +    CmdOrb orb = {
+> +        .fmt = fmt,
+> +        .pfch = 1,	/* QEMU's cio implementation requires prefetch */
+> +        .c64 = 1,	/* QEMU's cio implementation requires 64-bit idaws */
 
-(replied to v1 by mistake)
+Maybe just document this on top (all comments combined)
 
-Lines too long.
+/*
+ * QEMU's CIO implementation requires prefetch and 64-bit idaws. We
+ * allow all paths.
+ */
 
-Please run scripts/checkpatch.pl before submitting.
+Or get rid of the tabs ;)
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
