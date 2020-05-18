@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CDAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F3CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:16:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27C9B20756
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2273C20671
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:16:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b8Qmr2U7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27C9B20756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1OpDumv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2273C20671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jahVW-0004h4-A1
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:16:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47646)
+	id 1jahVY-0004i2-Bk
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:16:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jahS6-0008D0-Vx
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jahS7-0008DI-Dn
  for qemu-devel@nongnu.org; Mon, 18 May 2020 11:13:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36145
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23405
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jahS1-0005xH-Vu
- for qemu-devel@nongnu.org; Mon, 18 May 2020 11:13:14 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jahS0-0005wr-U4
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 11:13:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589814789;
+ s=mimecast20190719; t=1589814787;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ldHYNRCCIyCjzZACk5BSdTldkMiO0XhPJ88/SX/DWp8=;
- b=b8Qmr2U7jeKwE3tDdD6JE875ypGSKjbvYny5VP62Wta5qoi6svp2646Rzi5+m/r+Gf8GJY
- w+qPmkNQYC34Q3c7ReDuraZOEu4tVBIPJbjQn3dZaGSVtMq7338tulJgqMIcCyMFi7erbL
- Xdt5X/atSrkQaqFOD3m5lUqHQ2SEp/M=
+ references:references; bh=+iI8FGRKs81adLpcBjB+Oh9YO05lIOQpzFUXVMZs9XA=;
+ b=P1OpDumv24JBrnngvxcOqJVEK0+tzFiIygOuFUF2TqiPr5eQlSRThDQQMOBqgCZU/iNjiT
+ xq9Dylt+a/4o/TnpO4Fp/EtGnhA9e5RxofaFDrL2/5zA/3I2b/n1W0/av4S1FUQ3E+IR6d
+ vRi7qRTk6EKOTLW+rUIAV74X0l1dNoE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-pLmnozaoP9ueV0CW8_RSEQ-1; Mon, 18 May 2020 11:13:05 -0400
-X-MC-Unique: pLmnozaoP9ueV0CW8_RSEQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-251-ZLrXOuxSPE2VLEQSGIjyag-1; Mon, 18 May 2020 11:13:04 -0400
+X-MC-Unique: ZLrXOuxSPE2VLEQSGIjyag-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D707B107ACCD;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99CC1805726;
  Mon, 18 May 2020 15:13:03 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
  [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 37C335C1B2;
- Mon, 18 May 2020 15:12:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B6B8A99ED;
+ Mon, 18 May 2020 15:12:57 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8319817477; Mon, 18 May 2020 17:12:55 +0200 (CEST)
+ id A50F59DAD; Mon, 18 May 2020 17:12:55 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] ati-vga: Do not allow unaligned access via index register
-Date: Mon, 18 May 2020 17:12:48 +0200
-Message-Id: <20200518151255.10785-2-kraxel@redhat.com>
+Subject: [PULL 4/8] Revert "hw/display/ramfb: lock guest resolution after it's
+ set"
+Date: Mon, 18 May 2020 17:12:51 +0200
+Message-Id: <20200518151255.10785-5-kraxel@redhat.com>
 In-Reply-To: <20200518151255.10785-1-kraxel@redhat.com>
 References: <20200518151255.10785-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,40 +92,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>,
  Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+ Gerd Hoffmann <kraxel@redhat.com>, Hou Qiming <hqm03ster@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+This reverts commit a9e0cb67b7f4c485755659f9b764c38b5f970de4.
 
-According to docs bits 1 and 0 of MM_INDEX are hard coded to 0 so
-unaligned access via this register should not be possible.
-This also fixes problems reported in bug #1878134.
+This breaks OVMF.  Reproducer: Just hit 'ESC' at early boot to enter
+firmware setup.  OVMF wants switch from (default) 800x600 to 640x480 for
+that, and this patch blocks it.
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1878134
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Tested-by: Alexander Bulekov <alxndr@bu.edu>
-Acked-by: Alexander Bulekov <alxndr@bu.edu>
-Message-id: 20200516132352.39E9374594E@zero.eik.bme.hu
+Cc: Hou Qiming <hqm03ster@gmail.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-id: 20200429115236.28709-3-kraxel@redhat.com
 ---
- hw/display/ati.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/display/ramfb.c | 26 ++++----------------------
+ 1 file changed, 4 insertions(+), 22 deletions(-)
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 58ec8291d460..065f197678e4 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -511,7 +511,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
-     }
-     switch (addr) {
-     case MM_INDEX:
--        s->regs.mm_index = data;
-+        s->regs.mm_index = data & ~3;
-         break;
-     case MM_DATA ... MM_DATA + 3:
-         /* indexed access to regs or memory */
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+index bd4746dc1768..9d41c2ad2868 100644
+--- a/hw/display/ramfb.c
++++ b/hw/display/ramfb.c
+@@ -31,7 +31,6 @@ struct RAMFBState {
+     DisplaySurface *ds;
+     uint32_t width, height;
+     struct RAMFBCfg cfg;
+-    bool locked;
+ };
+ 
+ static void ramfb_unmap_display_surface(pixman_image_t *image, void *unused)
+@@ -72,25 +71,18 @@ static DisplaySurface *ramfb_create_display_surface(int width, int height,
+ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
+ {
+     RAMFBState *s = dev;
+-    uint32_t fourcc, format, width, height;
++    uint32_t fourcc, format;
+     hwaddr stride, addr;
+ 
+-    width     = be32_to_cpu(s->cfg.width);
+-    height    = be32_to_cpu(s->cfg.height);
++    s->width  = be32_to_cpu(s->cfg.width);
++    s->height = be32_to_cpu(s->cfg.height);
+     stride    = be32_to_cpu(s->cfg.stride);
+     fourcc    = be32_to_cpu(s->cfg.fourcc);
+     addr      = be64_to_cpu(s->cfg.addr);
+     format    = qemu_drm_format_to_pixman(fourcc);
+ 
+     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
+-            width, height, addr);
+-    if (s->locked) {
+-        fprintf(stderr, "%s: resolution locked, change rejected\n", __func__);
+-        return;
+-    }
+-    s->locked = true;
+-    s->width = width;
+-    s->height = height;
++            s->width, s->height, addr);
+     s->ds = ramfb_create_display_surface(s->width, s->height,
+                                          format, stride, addr);
+ }
+@@ -110,13 +102,6 @@ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
+     dpy_gfx_update_full(con);
+ }
+ 
+-static void ramfb_reset(void *opaque)
+-{
+-    RAMFBState *s = (RAMFBState *)opaque;
+-    s->locked = false;
+-    memset(&s->cfg, 0, sizeof(s->cfg));
+-}
+-
+ RAMFBState *ramfb_setup(Error **errp)
+ {
+     FWCfgState *fw_cfg = fw_cfg_find();
+@@ -129,12 +114,9 @@ RAMFBState *ramfb_setup(Error **errp)
+ 
+     s = g_new0(RAMFBState, 1);
+ 
+-    s->locked = false;
+-
+     rom_add_vga("vgabios-ramfb.bin");
+     fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
+                              NULL, ramfb_fw_cfg_write, s,
+                              &s->cfg, sizeof(s->cfg), false);
+-    qemu_register_reset(ramfb_reset, s);
+     return s;
+ }
 -- 
 2.18.4
 
