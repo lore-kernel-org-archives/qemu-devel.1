@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBBEC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1D9C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180152065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 573E92065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAcCf4BK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180152065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+wxljOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573E92065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jafC4-0006eN-95
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:48:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53066)
+	id 1jafCT-0007FB-H7
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:48:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafA5-0004xb-Ty
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:46:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30590
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafBb-0006KH-68
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:48:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38137
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafA4-0005sG-AW
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:46:29 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafBa-00067Z-6u
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:48:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589805987;
+ s=mimecast20190719; t=1589806081;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=2QhQkgRxBCf/lgNuuw/Jib6+kkwv7osg2WCjw97bPFQ=;
- b=AAcCf4BKNyenRNSsJCThinwpPeaAVfv/fieq7EO51L61vcY6VPoC6GI7M896nAb7+lmw9q
- aVvl0g8fBudmK0G/123qaiGTwqpwNmqy7bxtYcSWI8fXmW9ZG7bQa6SqhS7FG7OhIyiLsM
- Eh2Rqwz9q6fXVFgwV+mHKwBvSn1KpSQ=
+ bh=C0+Q9JxIyb0o9T+oXGno9I8d6+UGiR3hsP345RxBtC0=;
+ b=N+wxljObb1QZca0XrPDcaAVZBRgJwYvE0RdLQR7Gtg9cDUQDF4Dxd6gJD62jzCkbZtWjmb
+ fK0p6ikx9vGwYFg90P0PtlKK9goILeP3zXaJW5ri7oNJempJnAbwdW085yFQPpHbkPR5VQ
+ iG0/BypeCgUT4Sd1SSp0X8OnDHLGHyE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-7U4eBGM7MkKVlEVWZ-pYGg-1; Mon, 18 May 2020 08:46:24 -0400
-X-MC-Unique: 7U4eBGM7MkKVlEVWZ-pYGg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-147-GxhuEgTeOgmOimvU0vCCDg-1; Mon, 18 May 2020 08:47:54 -0400
+X-MC-Unique: GxhuEgTeOgmOimvU0vCCDg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD24F8014D7;
- Mon, 18 May 2020 12:46:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CBFDEC1A3;
+ Mon, 18 May 2020 12:47:53 +0000 (UTC)
 Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86AE41001925;
- Mon, 18 May 2020 12:46:21 +0000 (UTC)
-Subject: Re: [PATCH v2 3/9] pc-bios: s390x: Get rid of magic offsets into the
- lowcore
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 100C45D9DC;
+ Mon, 18 May 2020 12:47:51 +0000 (UTC)
+Subject: Re: [PATCH v2 8/9] pc-bios: s390x: Replace 0x00 with 0x0 or 0
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200514123729.156283-1-frankja@linux.ibm.com>
- <20200514123729.156283-4-frankja@linux.ibm.com>
+ <20200514123729.156283-9-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -106,28 +105,29 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <40d0f2bf-7e90-9de9-68a6-5fa36ed946ff@redhat.com>
-Date: Mon, 18 May 2020 14:46:20 +0200
+Message-ID: <1e02198f-73ed-b9cc-1e8a-f120f17a601f@redhat.com>
+Date: Mon, 18 May 2020 14:47:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200514123729.156283-4-frankja@linux.ibm.com>
+In-Reply-To: <20200514123729.156283-9-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -146,65 +146,77 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 14.05.20 14:37, Janosch Frank wrote:
-> If we have a lowcore struct that has members for offsets that we want
-> to touch, why not use it?
+> 0x00 looks odd, time to replace it with 0 or 0x0 (for pointers).
+
+"(for addresses)" maybe?
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  pc-bios/s390-ccw/cio.h  | 17 +++++++++++------
->  pc-bios/s390-ccw/main.c |  8 +++-----
->  2 files changed, 14 insertions(+), 11 deletions(-)
+>  pc-bios/s390-ccw/dasd-ipl.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-> index aaa432dedd..1ce5344b85 100644
-> --- a/pc-bios/s390-ccw/cio.h
-> +++ b/pc-bios/s390-ccw/cio.h
-> @@ -122,12 +122,17 @@ typedef struct schib {
->  } __attribute__ ((packed, aligned(4))) Schib;
+> diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
+> index b932531e6f..764ee89e92 100644
+> --- a/pc-bios/s390-ccw/dasd-ipl.c
+> +++ b/pc-bios/s390-ccw/dasd-ipl.c
+> @@ -98,18 +98,18 @@ static int run_dynamic_ccw_program(SubChannelId schid, uint16_t cutype,
 >  
->  typedef struct subchannel_id {
-> -        __u32 cssid:8;
-> -        __u32:4;
-> -        __u32 m:1;
-> -        __u32 ssid:2;
-> -        __u32 one:1;
-> -        __u32 sch_no:16;
-> +    union {
-> +        struct {
-> +            __u16 cssid:8;
-> +            __u16 reserved:4;
-> +            __u16 m:1;
-> +            __u16 ssid:2;
-> +            __u16 one:1;
-> +        };
-> +        __u16 sch_id;
-> +    };
-> +        __u16 sch_no;
->  } __attribute__ ((packed, aligned(4))) SubChannelId;
->  
->  struct chsc_header {
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 4e65b411e1..8b912454c9 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -36,11 +36,9 @@ LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
->   */
->  void write_subsystem_identification(void)
+>  static void make_readipl(void)
 >  {
-> -    SubChannelId *schid = (SubChannelId *) 184;
-> -    uint32_t *zeroes = (uint32_t *) 188;
-> -
-> -    *schid = blk_schid;
-> -    *zeroes = 0;
-> +    lowcore->subchannel_id = blk_schid.sch_id;
-> +    lowcore->subchannel_nr = blk_schid.sch_no;
-> +    lowcore->io_int_parm = 0;
+> -    Ccw0 *ccwIplRead = (Ccw0 *)0x00;
+> +    Ccw0 *ccwIplRead = (Ccw0 *)0x0;
+>  
+>      /* Create Read IPL ccw at address 0 */
+>      ccwIplRead->cmd_code = CCW_CMD_READ_IPL;
+> -    ccwIplRead->cda = 0x00; /* Read into address 0x00 in main memory */
+> +    ccwIplRead->cda = 0x0; /* Read into address 0x00 in main memory */
+>      ccwIplRead->chain = 0; /* Chain flag */
+>      ccwIplRead->count = 0x18; /* Read 0x18 bytes of data */
 >  }
 >  
->  void write_iplb_location(void)
+>  static void run_readipl(SubChannelId schid, uint16_t cutype)
+>  {
+> -    if (do_cio(schid, cutype, 0x00, CCW_FMT0)) {
+> +    if (do_cio(schid, cutype, 0x0, CCW_FMT0)) {
+>          panic("dasd-ipl: Failed to run Read IPL channel program\n");
+>      }
+>  }
+> @@ -133,10 +133,10 @@ static void check_ipl2(uint32_t ipl2_addr)
+>  {
+>      Ccw0 *ccw = u32toptr(ipl2_addr);
+>  
+> -    if (ipl2_addr == 0x00) {
+> +    if (ipl2_addr == 0) {
+>          panic("IPL2 address invalid. Is this disk really bootable?\n");
+>      }
+> -    if (ccw->cmd_code == 0x00) {
+> +    if (ccw->cmd_code == 0) {
+>          panic("IPL2 ccw data invalid. Is this disk really bootable?\n");
+>      }
+>  }
+> @@ -161,7 +161,7 @@ static void ipl1_fixup(void)
+>      memcpy(ccwRead, (void *)0x08, 16);
+>  
+>      /* Disable chaining so we don't TIC to IPL2 channel program */
+> -    ccwRead->chain = 0x00;
+> +    ccwRead->chain = 0;
+>  
+>      ccwSeek->cmd_code = CCW_CMD_DASD_SEEK;
+>      ccwSeek->cda = ptr2u32(seekData);
+> @@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
+>   */
+>  void dasd_ipl(SubChannelId schid, uint16_t cutype)
+>  {
+> -    PSWLegacy *pswl = (PSWLegacy *) 0x00;
+> +    PSWLegacy *pswl = (PSWLegacy *) 0x0;
+>      uint32_t ipl2_addr;
+>  
+>      /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
