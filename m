@@ -7,59 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 546EBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:35:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED5320674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:34:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A46A205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:35:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRxZTVMa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED5320674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQE2lzbc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A46A205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jabDy-0005Ke-1C
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46098)
+	id 1jabEx-0006nl-9r
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:35:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jabDA-0004HL-U4
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jabDA-0004Hh-Tn
  for qemu-devel@nongnu.org; Mon, 18 May 2020 04:33:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30787
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46481
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jabD9-0005v6-NY
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jabDA-0005vE-3K
  for qemu-devel@nongnu.org; Mon, 18 May 2020 04:33:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589790801;
+ s=mimecast20190719; t=1589790803;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=xgGz94sVb4d0ezexUgevgjLRHz035twUg3/hSMAyx78=;
- b=FRxZTVMaEEazb4dTcXQbFKBimbCHxoLv8wkl15dhvisaSqzPX5C6ecaTrEzoBVnVBvv+fN
- beijL0G3yC/asLsnijiuqqLrhdmGy6ffHFreEmBZ2TqkGHkAC77XHnj85HZecSwgNHIRAg
- ViQM0LHicZMIEX5+c/5LJXOY9VkrvZg=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=xgGz94sVb4d0ezexUgevgjLRHz035twUg3/hSMAyx78=;
+ b=VQE2lzbcM4ZZh8/7OOGt5WBEhSiI73jfOcjcQp23iBGDfg2umiyj5fdoIji3Y4bAxxaPhp
+ 5oA6Hpdgjx+bjhapzzksHdV5O/QytRL7LmOos5KUgGnxKKWd/enC0RlNUzwmVyVTOFOOWN
+ OqlvlUhRV3VcKHV3Y7rWK385JdNl6nE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-xUC71YBxMbWxsr8k-0Yt4A-1; Mon, 18 May 2020 04:33:20 -0400
-X-MC-Unique: xUC71YBxMbWxsr8k-0Yt4A-1
+ us-mta-508-whazOjatMZK3x6JjO7oCSw-1; Mon, 18 May 2020 04:33:21 -0400
+X-MC-Unique: whazOjatMZK3x6JjO7oCSw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CF57835B41;
- Mon, 18 May 2020 08:33:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6B86800D24;
+ Mon, 18 May 2020 08:33:20 +0000 (UTC)
 Received: from thuth.com (ovpn-112-182.ams2.redhat.com [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 629CA64441;
- Mon, 18 May 2020 08:33:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC99E64453;
+ Mon, 18 May 2020 08:33:19 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Subject: [PATCH] travis.yml: Use clang++ in the Clang tests
-Date: Mon, 18 May 2020 10:33:15 +0200
-Message-Id: <20200518083316.25065-1-thuth@redhat.com>
+Date: Mon, 18 May 2020 10:33:16 +0200
+Message-Id: <20200518083316.25065-2-thuth@redhat.com>
+In-Reply-To: <20200518083316.25065-1-thuth@redhat.com>
+References: <20200518083316.25065-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
