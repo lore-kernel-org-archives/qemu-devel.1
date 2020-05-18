@@ -2,92 +2,96 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C05EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B2CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:53:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4112A20657
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13DBC20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vR6pORsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4112A20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="umZ3hOPf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DBC20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaloz-0001eS-FZ
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:53:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56106)
+	id 1jalpP-000297-Am
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:53:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaleb-0002sW-Cv
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:25 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:40609)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jalfN-0003u6-LP
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:43:13 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:45590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jalea-0004aA-Ja
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:25 -0400
-Received: by mail-lf1-x141.google.com with SMTP id h188so9158756lfd.7
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:42:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=b/SGzR0VfdaMngvwcIJ4Z6wJcDUJ7yTUrhHwIwtU8Nc=;
- b=vR6pORsEQJYY+6BWYa/rt208WbTjJV1lTvi6Csxxm69Q1KZ2SYch6sCRvc4Xuh34G2
- eIgmyJvfzsoN2tJb41/01Dnmf4w8XQVPE68M4DxHnIooF7J+p9XAYvjmQipN2wF9gyq1
- 7z2ZTpHIOXJbeeuCwLdV1jmhVjNyAhWjFsRLGGCd2FqNhrFIx4jIjSpAOL8ud1FL7l3I
- hrW4d9unyzjnqK60Y3KIEMnvJTJOqBrFA5D9HH3rJ2kw3RPf/JXalYYs/KYnypD+lvQE
- nyXUjB3Nf+q9AnJst6M6msFvwrw/KY4hkXgNIXKYAvWX0956b2JTWnB+gDejMxpcKJ/K
- 1uPg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jalfM-0004uw-Hn
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:43:13 -0400
+Received: by mail-pl1-x633.google.com with SMTP id u22so4643006plq.12
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:43:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WjBsVqmqsW61rukNgTjlzeCpjl3qN8eIkL3edsWl7aE=;
+ b=umZ3hOPftmXq4ROZS0ZULsDCmyV/OzLSIhJfV38TIJk7bSt1WSzQ4qbhCNVpkE29bu
+ 1+iMfvyg4DzhK9RiZaItRo8WjG4NC7l0UDFC8OTfAQFpcJhKPq/1zCJwIk3ZoV63nNXE
+ qAplIewPCnpue74Vt0Uzm1HmphS86gKCc9bDyEdPX9/iMy2uwAUl1Ah+m3j87diLwjih
+ DzjYE2E6RBK3E+4nx4stWMya8zOX1Bs/eD1uaTCXBWiHlT7aHFe0e9KMv6t9S/7sZSBl
+ Vdm7KHU/fLQ7gRdUu39EzaD/XHC9Ip2HuIKpEYxdyvAQG0c16wHcy3HhQsUY7AGlhxKK
+ urkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=b/SGzR0VfdaMngvwcIJ4Z6wJcDUJ7yTUrhHwIwtU8Nc=;
- b=G+5K286tPTdI+B8+zoo4KfmQyPXDY3NeECyK/TuGCNMXyjmEIP2ojEtMJPdRT99JK7
- IXTgBJTaPMYZnFCNNOyPMf3i/bLfEFclORoPny6g4J2zHB3HvvZOeEfpNC/66dXbmFVQ
- ZovfYRwPndnMI3js1FOl+0Ii+19wPf0oj08dySS0xjui2Abu38KifOZn4L8TNXdm6/mh
- D/9MZVJyRjEWMzdYLvXpxye6APqxNjZJz9ZsWKWMWssF9+5QknwPuNXNVc0MKkg6YH9Y
- HA50GyLko1RiUE1XwqVCoZ5vc81MfBwRlrK4uEMZ+LY9Adenh8vLgzEXgbaYeFyte4R1
- 8AFQ==
-X-Gm-Message-State: AOAM530UXQ+MT+dDBy2mMoKZH8igKrJolKIq/Im2JJtUNWagTn5p2kKC
- SJPxG3VFdtGtpBeNbdRbUQQMqd2wVVM=
-X-Google-Smtp-Source: ABdhPJyamsHgs/VxRrmwr53YcnMxgiKnEwx+XkmKJ5C3Ou7haCxDdfF/Flk9hM5/YW0s40OtFGDY/g==
-X-Received: by 2002:a19:f108:: with SMTP id p8mr12832449lfh.101.1589830942922; 
- Mon, 18 May 2020 12:42:22 -0700 (PDT)
-Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id r15sm7593128lfp.34.2020.05.18.12.42.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 12:42:22 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/22] target/mips: fpu: Remove now unused UNFUSED_FMA and
- FLOAT_FMA macros
-Date: Mon, 18 May 2020 21:41:38 +0200
-Message-Id: <20200518194149.16281-12-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
-References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WjBsVqmqsW61rukNgTjlzeCpjl3qN8eIkL3edsWl7aE=;
+ b=cUpFGu6pPw2Xg4/JXjS3UprWluAFUPD74Fka0CqYiwAumgB5d0PLVRZatnuSugmUlw
+ GCbVrXNQl4UrmXTJCZKRMLKgizuUbsnB4L7f6881UPfC7gKQAnIThKksf7hxZHbDF89r
+ VrFhhQc/bL8J74hskL0uehx5LcNk5R7+T6YwjdtTgtr8+vEI1GeUdsW/BRA4Jvt8IlF4
+ SAlzCeGsDmzI0FtCZ/BUpbLGpa20n1ezgd+E03Qfa1ehAch/UPhvb4ObG+7TjzjFVjef
+ HXOw7tofjzDmML+GsQcxflcjuI+MRYOmVpcCCrZoE/GFkI+qgFD3tbWq+SAw8uRRsSvX
+ 4Xwg==
+X-Gm-Message-State: AOAM530G3xyBoN6jHnHNH2i8sBZs2OZo2qGaOiSNOdQh/eoE7IlRmbmy
+ qJSmxpK0RIkBCTQ8oG8HSwBayQ==
+X-Google-Smtp-Source: ABdhPJwKGYQDRXmIZtX8Pppbxs9vniUN5NFNSwdEA+MsdUaFPp5JAnhIsVcKcqDPBIXYfy+/tV0/3w==
+X-Received: by 2002:a17:902:9693:: with SMTP id
+ n19mr17923807plp.277.1589830990985; 
+ Mon, 18 May 2020 12:43:10 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id q18sm2509898pgt.74.2020.05.18.12.43.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 12:43:09 -0700 (PDT)
+Subject: Re: [RISU 0/9] risu cleanups and improvements
+From: Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200513180953.20376-1-richard.henderson@linaro.org>
+ <CAFEAcA_xBwNPWFd3w36JnuBsZSKb+q-aWXHfrLe1Rb-29eXpjQ@mail.gmail.com>
+ <3cf98ff2-8256-eb3a-7ae0-3eeb1b27c331@linaro.org>
+Message-ID: <4781e63a-0150-fc5e-46cc-5d4cdfa7880c@linaro.org>
+Date: Mon, 18 May 2020 12:43:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x141.google.com
+In-Reply-To: <3cf98ff2-8256-eb3a-7ae0-3eeb1b27c331@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::633;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x633.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 12
-X-Spam_score: 1.2
-X-Spam_bar: +
-X-Spam_report: (1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335, SPF_PASS=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,83 +105,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After demacroing <MADD|MSUB|NMADD|NMSUB>.<D|S|PS>, these macros
-are not needed anymore.
+On 5/18/20 12:33 PM, Richard Henderson wrote:
+> On 5/18/20 11:39 AM, Peter Maydell wrote:
+>> Richard: if you feed an old trace file to the new risu, what
+>> error message does it give?
+> 
+> Bah, it should have generated an error vs the magic number, but doesn't -- it
+> silently exits with success.  Alex, expect a v2.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
----
- target/mips/fpu_helper.c | 50 ----------------------------------------
- 1 file changed, 50 deletions(-)
+Double bah.  Typo in git checkout, so I didn't actually switch branches for the
+test.  It does print an error, but not a useful one:
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index 927bac24ac..e8e50e4bc0 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1446,56 +1446,6 @@ FLOAT_MINMAX(mina_d, 64, minnummag)
- #undef FLOAT_MINMAX
- 
- /* ternary operations */
--#define UNFUSED_FMA(prefix, a, b, c, flags)                          \
--{                                                                    \
--    a = prefix##_mul(a, b, &env->active_fpu.fp_status);              \
--    if ((flags) & float_muladd_negate_c) {                           \
--        a = prefix##_sub(a, c, &env->active_fpu.fp_status);          \
--    } else {                                                         \
--        a = prefix##_add(a, c, &env->active_fpu.fp_status);          \
--    }                                                                \
--    if ((flags) & float_muladd_negate_result) {                      \
--        a = prefix##_chs(a);                                         \
--    }                                                                \
--}
--
--/* FMA based operations */
--#define FLOAT_FMA(name, type)                                        \
--uint64_t helper_float_ ## name ## _d(CPUMIPSState *env,              \
--                                     uint64_t fdt0, uint64_t fdt1,   \
--                                     uint64_t fdt2)                  \
--{                                                                    \
--    UNFUSED_FMA(float64, fdt0, fdt1, fdt2, type);                    \
--    update_fcr31(env, GETPC());                                      \
--    return fdt0;                                                     \
--}                                                                    \
--                                                                     \
--uint32_t helper_float_ ## name ## _s(CPUMIPSState *env,              \
--                                     uint32_t fst0, uint32_t fst1,   \
--                                     uint32_t fst2)                  \
--{                                                                    \
--    UNFUSED_FMA(float32, fst0, fst1, fst2, type);                    \
--    update_fcr31(env, GETPC());                                      \
--    return fst0;                                                     \
--}                                                                    \
--                                                                     \
--uint64_t helper_float_ ## name ## _ps(CPUMIPSState *env,             \
--                                      uint64_t fdt0, uint64_t fdt1,  \
--                                      uint64_t fdt2)                 \
--{                                                                    \
--    uint32_t fst0 = fdt0 & 0XFFFFFFFF;                               \
--    uint32_t fsth0 = fdt0 >> 32;                                     \
--    uint32_t fst1 = fdt1 & 0XFFFFFFFF;                               \
--    uint32_t fsth1 = fdt1 >> 32;                                     \
--    uint32_t fst2 = fdt2 & 0XFFFFFFFF;                               \
--    uint32_t fsth2 = fdt2 >> 32;                                     \
--                                                                     \
--    UNFUSED_FMA(float32, fst0, fst1, fst2, type);                    \
--    UNFUSED_FMA(float32, fsth0, fsth1, fsth2, type);                 \
--    update_fcr31(env, GETPC());                                      \
--    return ((uint64_t)fsth0 << 32) | fst0;                           \
--}
--#undef FLOAT_FMA
- 
- uint64_t helper_float_madd_d(CPUMIPSState *env, uint64_t fst0,
-                              uint64_t fst1, uint64_t fst2)
--- 
-2.20.1
+match status...
+mismatch on regs!
+
+I'll improve this.
+
+
+r~
 
 
