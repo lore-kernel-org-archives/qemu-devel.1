@@ -2,104 +2,124 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E8BC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 17:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 17:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EE0920826
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 17:35:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE0920826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A78020671
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 17:36:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="E4BcrohE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A78020671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jajfP-0005gM-DO
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 13:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39252)
+	id 1jajgO-0006yo-CZ
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 13:36:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jajea-0004P7-R2; Mon, 18 May 2020 13:34:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61006
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jaje8-0003nI-Ct; Mon, 18 May 2020 13:33:48 -0400
+Received: from mail-eopbgr60097.outbound.protection.outlook.com
+ ([40.107.6.97]:6018 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jajeZ-0003wi-Lz; Mon, 18 May 2020 13:34:16 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04IHXK8q104099; Mon, 18 May 2020 13:34:14 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 312c22anah-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 13:34:14 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04IHXOtM104284;
- Mon, 18 May 2020 13:34:13 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 312c22an9y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 13:34:13 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04IHURkx029078;
- Mon, 18 May 2020 17:34:12 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma02wdc.us.ibm.com with ESMTP id 313wgs0he8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 17:34:12 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04IHYBAS23986652
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 May 2020 17:34:11 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 653AA6E04C;
- Mon, 18 May 2020 17:34:11 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4AFFF6E052;
- Mon, 18 May 2020 17:34:10 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.206.55])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Mon, 18 May 2020 17:34:10 +0000 (GMT)
-Subject: Re: [PATCH v2 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
-To: qemu-devel@nongnu.org
-References: <158961125979.14027.17199612590911195654@45ef0f9c86ae>
-From: Collin Walling <walling@linux.ibm.com>
-Message-ID: <442b7d7a-84a8-9d29-8ccf-c533483840e8@linux.ibm.com>
-Date: Mon, 18 May 2020 13:34:09 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jaje5-0003tB-2b; Mon, 18 May 2020 13:33:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hvSvo4NZeBnBV5DqQJLN4aSMiXzkWKpTlV70TMJxHPTQXEWoOU8Q9Dc+iG8XpyhgEB09TqDjdVIOvCy5WPQJMhKmDaP7VyM4N4vY192NNZgwNZ2TeyNQFB2kPl18s2zEac1v17QfRPqTiCkd+A4H48r8uTd8mfRu4P+Fe6M76L36pyHZ1gQgn4/xFBb+NMXKrAwHfaJlXDZuy693V8LhHTJdU6FdD1ctcWrbO6JIw+/+fnJuZ9pqMyChuhnlx4/Ok8vbZaEHpclh37Lo/63HLhvd5UXYyzmjMAnXqg9OJX8HNBsunc6dQT0G60zql1r7WESmPhOg6mtxfLr7J48z2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4A2nw0onGuWmOSkuPkrIdRoaoQ/dYTAF1c0sy8LUW3Y=;
+ b=mbXUy02SdmJKYxYwl2d8X/n+Ft+685du/YZAyBdu5slBWlMV3z3qGu3EC18AycWFe9N5CV1eMcLoBarFnKiHiCdw8RBeYePiHv8KYpVhb4UyqQhBt5/8dCU8VgSjTPAZr9rbuOi8UoieGJii33ZKEQrkTrUrBjWErae45P/bbUQko9KE52SN4L1a7TwQ6+j1y0YhUkJXHEtTFC2JPtyRxwaIYESllBqQsxowqrv25uDZvycYmHsT6x/odoO9/yZgDo/jb4l4AHsdQf60dDMeDW6JXbp++hoV+C0ST3D0MbGk6M0a/ewuEdb2QhmBrwA+PNnGLq/vB59NnDHZ+BB5CQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4A2nw0onGuWmOSkuPkrIdRoaoQ/dYTAF1c0sy8LUW3Y=;
+ b=E4BcrohEBgaiPAb95Xt9dyzF9dvRyn5Q6fecjLYZw1xDnU6dpbMcpHda+OBSNZUJUAb01zUIIJe+gNiuTKpH3SL04VhOU7HEKOIwkI42Ok+Ak0LjkM9gl9j5VUjsXkeVqJkRT4wneNAfjSchqYMNNTyTk9LA3UXI7HLvnl0LEaY=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
+ by VI1PR08MB4239.eurprd08.prod.outlook.com (2603:10a6:803:fd::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Mon, 18 May
+ 2020 17:33:41 +0000
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::2c53:d56b:77ba:8aac]) by VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::2c53:d56b:77ba:8aac%7]) with mapi id 15.20.3000.034; Mon, 18 May 2020
+ 17:33:41 +0000
+Subject: Re: [PATCH v4 9/9] iotests: rename and move 169 and 199 tests
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20200515211505.3042-1-vsementsov@virtuozzo.com>
+ <20200515211505.3042-10-vsementsov@virtuozzo.com>
+ <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d0194c87-1689-2b44-a696-19078f1efa3f@virtuozzo.com>
+Date: Mon, 18 May 2020 20:33:35 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <158961125979.14027.17199612590911195654@45ef0f9c86ae>
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/68.8.0
+In-Reply-To: <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-18_06:2020-05-15,
- 2020-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0
- cotscore=-2147483648 lowpriorityscore=0 adultscore=0 malwarescore=0
- mlxlogscore=999 priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005180143
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 10:31:16
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-ClientProxiedBy: AM0PR04CA0005.eurprd04.prod.outlook.com
+ (2603:10a6:208:122::18) To VI1PR08MB5503.eurprd08.prod.outlook.com
+ (2603:10a6:803:137::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.187) by
+ AM0PR04CA0005.eurprd04.prod.outlook.com (2603:10a6:208:122::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20 via Frontend
+ Transport; Mon, 18 May 2020 17:33:40 +0000
+X-Originating-IP: [185.215.60.187]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 86e18482-b2f1-41aa-0cc7-08d7fb519b69
+X-MS-TrafficTypeDiagnostic: VI1PR08MB4239:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR08MB423920F3134A56DFEBA841EAC1B80@VI1PR08MB4239.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 04073E895A
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zRh63nkkxG5MNYuh6u4ZcoK65k+Q6iut1Zx/QiZ0ArPV7TuIBkdGh2jZh5tdFwKzG2qvsnsBFbUh7TQvk2BNkQSbbWl+mvNLYnk3Cq+zWtNagGHFndU/HTZfZgDFxmFSfAu2LM+kjWVHtQFAeMT4XOvhfqFQI9fS8ZP8sw2IrqZ3pYOCfVQy2yoT5/KdBkLerRL9cMZpvQDiKGe6k4OxOZrnkbm61iiq1hmXaBPQ0+vUaVlVSo1CdTQYFvP+3smS1McKoEC+gjD994sYWi3U9wtFV1mcrmyuONdD5NgLl0dQ3bHI2XRidJefxEb3IqgpWkROnmC0oP2VjpWz9JLUlWIUc7uGmeaONr47w/2fC3XvMVXQ2q76Ve7bPpUBXghGqxJcCLhvArbw3D0NGQQGRZoig2CmEUxAT8fXX9ZWbmdRI+4V+r3+51boKYmTS/GnWRN9WkD2PCbXZdfzIoNhPJodMM2GFKNgEgKC9/iPTvQ9ApLSfJnSmK3QS+IOj4p9
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39840400004)(136003)(376002)(366004)(346002)(5660300002)(6486002)(316002)(478600001)(31696002)(31686004)(16576012)(4326008)(956004)(16526019)(2616005)(2906002)(186003)(86362001)(6666004)(52116002)(26005)(8676002)(36756003)(66476007)(8936002)(107886003)(66946007)(66556008)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: pRKzpA80vlgr7FDz0sp9GgSIJHUavicA2UCALa84r2uqWV+o//j5AmdmCPgDtv42RDBwcsyH93CzxG6S/U6lF3w59llprRkdeF0uey2ENdnki5fICi6i0HdWynghgKWlmu4kYVCxcljhRjo9gh7faOf/T7iBAqCBvpMP+Ej/fiA/fEQMoc7Y/gSruvYp7M5UHDDP2sOQp/sZdFGjRbHYXJPWbSp92hEwbcRuiFZUpxKaDb2hBir+VC31DCSj5eDUS+b6T4SW0FksEK683iyjfa9zGpRauEfEk7YMlsYr3jZgQdw90lMPvQ7xSXP2IK0h0+g8V8YYuW6NmxYXbr+N6IDKs7kdfZDLjlxLNsnfsgOlkAZzZYIpV2XddtWkAO7mf/hotpeErjyOyJz4E6k6xJvUWeoCh8SDGJA7VpzlxOjaYdR9HUL5eSwZgG7nBEhJPdDwIWz0zgHJQfVaUg0sRnj5HzjLg/tcqe3QdGSF89XshZZEy/YSuCHESU+2MLGC
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86e18482-b2f1-41aa-0cc7-08d7fb519b69
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2020 17:33:41.5894 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3r2zZoq31v6Mox0nWRS1OnufJzVRs3UWJBEn9mAVURKcxvVqoM5+x106jf5iG8A9Sj8lEdqFoFtdWKBbXzrIBLrnvq4QXfnpgsPaID7jvFg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4239
+Received-SPF: pass client-ip=40.107.6.97;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 13:33:42
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,116 +133,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, mst@redhat.com, svens@linux.ibm.com,
- pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/16/20 2:41 AM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200515222032.18838-1-walling@linux.ibm.com/
+18.05.2020 19:12, Thomas Huth wrote:
+> On 15/05/2020 23.15, Vladimir Sementsov-Ogievskiy wrote:
+>> Rename bitmaps migration tests and move them to tests subdirectory to
+>> demonstrate new human-friendly test naming.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test}   | 0
+>>   .../{199.out => tests/migrate-bitmaps-postcopy-test.out}          | 0
+>>   tests/qemu-iotests/{169 => tests/migrate-bitmaps-test}            | 0
+>>   tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out}    | 0
+>>   4 files changed, 0 insertions(+), 0 deletions(-)
+>>   rename tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test} (100%)
+>>   rename tests/qemu-iotests/{199.out => tests/migrate-bitmaps-postcopy-test.out} (100%)
+>>   rename tests/qemu-iotests/{169 => tests/migrate-bitmaps-test} (100%)
+>>   rename tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out} (100%)
+>>
+>> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+>> similarity index 100%
+>> rename from tests/qemu-iotests/199
+>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+>> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+>> similarity index 100%
+>> rename from tests/qemu-iotests/199.out
+>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/tests/migrate-bitmaps-test
+>> similarity index 100%
+>> rename from tests/qemu-iotests/169
+>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test
+>> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/tests/migrate-bitmaps-test.out
+>> similarity index 100%
+>> rename from tests/qemu-iotests/169.out
+>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test.out
 > 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Message-id: 20200515222032.18838-1-walling@linux.ibm.com
-> Subject: [PATCH v2 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
-> Type: series
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> f8cb821 s390: guest support for diagnose 0x318
-> 6b87c59 s390/kvm: header sync for diag318
-> af06627 s390/sclp: add extended-length sccb support for kvm guest
-> 39b848c s390/sclp: use cpu offset to locate cpu entries
-> 1dd8e02 s390/sclp: read sccb from mem based on sccb length
-> aad956d s390/sclp: rework sclp boundary and length checks
-> 428b1e4 s390/sclp: check sccb len before filling in data
-> 850e1b8 s390/sclp: get machine once during read scp/cpu info
-> 
-> === OUTPUT BEGIN ===
-> 1/8 Checking commit 850e1b88729f (s390/sclp: get machine once during read scp/cpu info)
-> 2/8 Checking commit 428b1e46e016 (s390/sclp: check sccb len before filling in data)
-> WARNING: line over 80 characters
-> #23: FILE: hw/s390x/sclp.c:78:
-> +    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
-> 
-> ERROR: line over 90 characters
-> #48: FILE: hw/s390x/sclp.c:137:
-> +    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
-> 
-> total: 1 errors, 1 warnings, 45 lines checked
-> 
-> Patch 2/8 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 3/8 Checking commit aad956d5ac92 (s390/sclp: rework sclp boundary and length checks)
-> 4/8 Checking commit 1dd8e02af7b2 (s390/sclp: read sccb from mem based on sccb length)
-> 5/8 Checking commit 39b848c3be15 (s390/sclp: use cpu offset to locate cpu entries)
-> 6/8 Checking commit af06627cc5fb (s390/sclp: add extended-length sccb support for kvm guest)
-> WARNING: line over 80 characters
-> #91: FILE: hw/s390x/sclp.c:137:
-> +        warn_report("insufficient sccb size to store full read scp info response");
-> 
-> WARNING: line over 80 characters
-> #115: FILE: target/s390x/cpu_features_def.inc.h:100:
-> +DEF_FEAT(EXTENDED_LENGTH_SCCB, "els", STFL, 140, "Extended-length SCCB facility")
-> 
-> total: 0 errors, 2 warnings, 76 lines checked
-> 
-> Patch 6/8 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 7/8 Checking commit 6b87c5992768 (s390/kvm: header sync for diag318)
-> 8/8 Checking commit f8cb821134a7 (s390: guest support for diagnose 0x318)
-> ERROR: line over 90 characters
-> #226: FILE: target/s390x/cpu_features_def.inc.h:125:
-> +/* Features exposed via SCLP SCCB Facilities byte 134 (bit numbers relative to byte-134) */
-> 
-> WARNING: line over 80 characters
-> #227: FILE: target/s390x/cpu_features_def.inc.h:126:
-> +DEF_FEAT(DIAG_318, "diag_318", SCLP_FAC134, 0, "Control program name and version codes")
-> 
-> total: 1 errors, 1 warnings, 262 lines checked
-> 
-> Patch 8/8 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20200515222032.18838-1-walling@linux.ibm.com/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+> I like the idea ... but the path name + file names get now quite long.
+> While you're at it, what about renaming the "qemu-iotests" directory to
+> just "iotests" or even just "io" now?
 
-I'll have these fixed for next round, but there's not much I can do with
-regards to the styling in cpu_features_def.inc.h :/
+I'm for, and I remember, someone else already said about it. OK, I'll add a patch if send a next version.
+
 
 -- 
-Regards,
-Collin
-
-Stay safe and stay healthy
+Best regards,
+Vladimir
 
