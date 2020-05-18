@@ -2,87 +2,120 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49020C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C173C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:15:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1966320671
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:14:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DE2E20715
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2uAoCpY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1966320671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QxvMTgBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE2E20715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jakHm-0003RC-5U
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 14:14:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44992)
+	id 1jakIE-0003su-Hd
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 14:15:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <johnnymarler@gmail.com>)
- id 1jakGx-0002g2-P1
- for qemu-devel@nongnu.org; Mon, 18 May 2020 14:13:55 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43878)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <johnnymarler@gmail.com>)
- id 1jakGw-00060D-RE
- for qemu-devel@nongnu.org; Mon, 18 May 2020 14:13:55 -0400
-Received: by mail-lj1-x243.google.com with SMTP id l19so10904426lje.10
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 11:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=enOA4m3VcOe8cQIwJnS/mJ9sBamwq+crpLDaM/D0dUc=;
- b=H2uAoCpYDe38K6FkUKnVdViOdC42gzJD0sMzxiREgGMPgBJXhUt0/4JfXbfhbC+poH
- bl2RCNkHvVGMC0jOv4LG0KZN0RdPnEs/QwptgIWep4MjHH4k0ybF8akopyzQ1QDiM10a
- Zt829FLl2/OAORUZC9JsMrJ5j3gvAv79uJ4G1A6bvgkssmn5q1FtEGXLH2y4n3/PzobS
- +4nDCBdOe0HQa4T3PJ/4hHkry6xjym3DfRJD1OiUq99p7HNRUjYa5+lyximQGndRe11I
- MPq2/JuheqNj7z/asEjspRdypcfURMLzkTQQBI7kagzn/VeF+Wg+d0ikWvVEYqYbUcMH
- 8Qjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=enOA4m3VcOe8cQIwJnS/mJ9sBamwq+crpLDaM/D0dUc=;
- b=G3QqGP2GIhfADqyUdwAr8fKgdsXFR49vw99iogZSZ9R0Z2el9jl5M9dPGehTjuUqZT
- wpAtzQSBrGEGVOL14iZ2luPeqRRSJQ+V9aLdKLlI+V9HsmnznzwUNwKYFQnEaTlC5X14
- sRs9d33s9jhr/ez+uH4gX0Fmkww6zxhn79DrfJ8xArhhzmjkVf3DeLC+/DC9sBjxQNcl
- 64PT8sXAY62Vg6rH2lh85KniWKVxKyutb8WEwui0GchhcYrICNlyO/BubPiTekX2jYwb
- jRdUJPMbzIAhuZVflNOfd1W9lImQ/WJVURyvLQqhaksEOx0pKAbCq3nDFwdqAtMKsjEo
- S8pw==
-X-Gm-Message-State: AOAM533KbpM6Oll9aFWg2AZF5OXtFfyoVyukP0GE6msd8Q49fi5u+VwW
- b9QtRrxKs60HeWrX+OQhFBxiL+hp40BqywV6tJEaUF2sfVA=
-X-Google-Smtp-Source: ABdhPJwdlhMZ3uySsybRyQVUnDFN/ASey1EUTGIa9kNjLOlnEuRxzP1Nkd0YyDdPPc5EbZR21KA0XJCL4w77z0xE2oM=
-X-Received: by 2002:a2e:6c08:: with SMTP id h8mr10756711ljc.48.1589825632365; 
- Mon, 18 May 2020 11:13:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jakHC-0002wi-ON; Mon, 18 May 2020 14:14:10 -0400
+Received: from mail-am6eur05on2120.outbound.protection.outlook.com
+ ([40.107.22.120]:8358 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jakHA-00063X-CU; Mon, 18 May 2020 14:14:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R0sooKji3VSk4prQiuu3pmWTyPfnX7fQv2cYjcPp7CHWu/TsRAJAU8nvCqwsrMEsKCv+BfoWYzduznM5xnDv0HpmO82nFxPqyftiU4P8B3NIxmGgWjC+aPaqvQ/ezbNfmLq3JlSQtYSv6zjde8N2A5CuU95Aez1nXftaPjJvnPgDQyJbOq608xPUdiDhzScKea/Aiitx8iCwQGJLZbVo38iP53ehNUPa7JBLsqj4X9hfvB/X4i3esSB5S3drdP48xk3HZfq5ng3E2/mtviXe28uUJ1ldlIciKgVR5F35rXDMb/XkUgdz/jAy2G+PJDX5ZOe/5xxxDfB3NDsD0q1koQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UJMAWBeUUDWajDIQORgYH5C0xZ4YAT8OLcJ1qa9V5KM=;
+ b=iiNFv3HzLr7ZjK1WwFd0Sojsi/gf6tOpPqw21RUId/HrjTpBs0Hz6RIVy0Z2fYIni8AmC+q51WmtOSv7+KsR7CLcRQ3okg9Js8RnhqyGSEX2tlzpgTOjCvbvOsUEXCPwqazYm7kLDHyq+pIEf6jL/oMG3f3eCbHZhv8luUZB/kxPkH489j9vY7Mk7TSf6SRRbQkD4d/uOBb88gDVW2svkqRPzKCqFvG5dPTiIyhLkKAMhV7Q7C/xWiKRUIkxAWiYxEZWLcQJaWyS3v2nTFrooRjTV+M3KveX7QXSfJDeuPZ51zJu1ZBtfyWmkvPA/vVv6eUeFnQTWJaNpE4fHBrQcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UJMAWBeUUDWajDIQORgYH5C0xZ4YAT8OLcJ1qa9V5KM=;
+ b=QxvMTgBT9LxhQaOwhGprYujFj0s6JVaNyTh6T6GEPlyUb5qvxDPHS4OPAqmvWdNyiVOYVzHYQoNIMBPDYvMpIJm+dZ9zPHDCzRb1SgY+TdkKSCgrhK9MHRNn3/h9VmiTuJqmr3COIC+WwjbpL6dEQQQ4g8p0BYlK2R17gYa1WCI=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5430.eurprd08.prod.outlook.com (10.141.172.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.27; Mon, 18 May 2020 18:14:05 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.034; Mon, 18 May 2020
+ 18:14:05 +0000
+Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-2-jsnow@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b4618eb0-5303-40ab-b5e2-5a08d5738a81@virtuozzo.com>
+Date: Mon, 18 May 2020 21:14:03 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <20200514055403.18902-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR05CA0147.eurprd05.prod.outlook.com
+ (2603:10a6:207:3::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <20200502161225.14346-1-johnnymarler@gmail.com>
- <CACKT+Ao+hRRuSarAcWy0PDzV8u5CF9KQq07dgVsLmQddSTfj6Q@mail.gmail.com>
- <CACKT+ApwXFEK3tu5=ZpOZrGNYLXcO6w9rv7QUEDrJKBkCQ8wGw@mail.gmail.com>
-In-Reply-To: <CACKT+ApwXFEK3tu5=ZpOZrGNYLXcO6w9rv7QUEDrJKBkCQ8wGw@mail.gmail.com>
-From: Jonathan Marler <johnnymarler@gmail.com>
-Date: Mon, 18 May 2020 12:13:41 -0600
-Message-ID: <CACKT+AoOJGtBE+9wwo8Pkp2=1WCA-3m7i80rhNa9yxc24FH+7A@mail.gmail.com>
-Subject: Re: [PATCH] linux-user/mmap.c: fix integer underflow in target_mremap
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="00000000000012741a05a5f020f7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=johnnymarler@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.187) by
+ AM3PR05CA0147.eurprd05.prod.outlook.com (2603:10a6:207:3::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.25 via Frontend Transport; Mon, 18 May 2020 18:14:04 +0000
+X-Originating-IP: [185.215.60.187]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 709a2c0e-7f52-4351-50ee-08d7fb573fed
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5430:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5430323BC650CBB67AD7680EC1B80@AM7PR08MB5430.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 04073E895A
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gwge5wrWRxl/wbCgdjE0umcAr3I5hWZD6jNOZQT+zBYksHzST+vlIFb2B8oRbhbMCtMQZdJKp9LdOGQnPKUGfmOcRJdiMRjn5fo5gQ90wdKuVzwEBBM4xseQVTsW6b8pbrzczWi0fOBv+7pKHek2tg5VgRXV/4qcPWtn7di0qYZBCWUSurY5gJiDNtbZGSlsBtRYS36Iv+kkreBCZ3lTNh3BTHk6TVWT4xlBZ8CYGinq2olXdKqnycjvBC9eAGiiiMlHWc+jb87jqJsDh+JBlNV5G1pH/R3AR40y7X8PM+ue4vtO2dOiH935i5BultXvqe/Pyshzd1gAVsCeUmMafMp4rIgGJlnDosPH/Vd4eqppE8DXTDhLyb6OjXPRkVPImU942iaFV9ssNAk5SMNzJqjMg/RWSrjWLAwbC3H1To8G95og8JTwwOrSWOtulrPZkIiLs+Q/bLHWLXIP/9s1LHs4qPuuiI6BvMaCmUVwb5myb3b4yzcTso1LtAslCNY+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(396003)(346002)(366004)(376002)(39840400004)(66556008)(5660300002)(2616005)(956004)(66946007)(8936002)(316002)(31696002)(6486002)(36756003)(7416002)(66476007)(54906003)(478600001)(16576012)(86362001)(4326008)(26005)(186003)(52116002)(4744005)(31686004)(16526019)(8676002)(2906002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: /9HRT5793j5abM7UkMxKPetbxbF9rpgwu1N4mZb6144xn98bqJIf0y7ynSxid3SRiMyqeSJMwkxpj/brFRHNt87nKFyCRtlUNpXOSLpwWPGQ83rAM2FKNHn7GgiDigPnx2s3/hrC6RH6Hru267lQogS82CbUb6tcHcTROA5AN81GxGUZanI9YzKEnoz4nyDLp6ACIxBZpISOp2cMPJZtW4Bl2i+AJK/wpS73tdbXeN9CO9kaahVKdt4tW3L0lIpOTwgc8p+mfPLVBnapM+4Znzg/jI1+1cjriCooKUut26us+sONz692sM05t/HLPw/LrrTrXUHevVBYc4JBTTKyCUIrO9BFFcIyBoMP6wdUcjnp3WRW79E7s83JB6kveyhXT6JKBwrVMjlXyFwmgFgElhhMdUOkGIFymgKwMRBx+vyRL89JP3ihC2jtqspGmCjnAaDHW7caHJQ0wQOLbKo2l53a/bfw+TaZSOcZJN+voJShcD7h8C2/HI2+bNFpBfCQ
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 709a2c0e-7f52-4351-50ee-08d7fb573fed
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2020 18:14:05.0404 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gHlc67ezolXMgtNFn1OWsMd7WB91SWDmljJregeR9mZGnG2f6Ct5epgJbRy7Kq1+JUPgndi2Sct9uFw+6gqF4mPs+JNUjz1MNmTe7+Yh96U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5430
+Received-SPF: pass client-ip=40.107.22.120;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 14:14:05
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,141 +129,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000012741a05a5f020f7
-Content-Type: text/plain; charset="UTF-8"
+14.05.2020 08:53, John Snow wrote:
+> move python/qemu/*.py to python/qemu/lib/*.py.
+> 
+> To create a namespace package, the 'qemu' directory itself shouldn't
+> have module files in it. Thus, these files will go under a 'lib' package
+> directory instead.
 
-Been a few more days.  Not sure how often I should be pinging.  If this is
-too much to ping every few days let me know.
+Hmm..
 
-On Fri, May 15, 2020 at 7:36 AM Jonathan Marler <johnnymarler@gmail.com>
-wrote:
+On the first glance, it looks better to have
 
-> Been a couple weeks, checking to see if anyone has looked at this.
->
-> On Sat, May 2, 2020 at 5:43 PM Jonathan Marler <johnnymarler@gmail.com>
-> wrote:
->
->> FYI, I applied this patch to the qemu build that zig uses to run
->> non-native tests (
->> https://github.com/ziglang/qemu-static/blob/master/patch/mremap-underflow.diff
->> )
->>
->> After applying it, my new code that calls mremap now passes,
->> whereas before the fix I was getting a segfault.
->>
->> On Sat, May 2, 2020 at 10:12 AM Jonathan Marler <johnnymarler@gmail.com>
->> wrote:
->>
->>> Fixes: https://bugs.launchpad.net/bugs/1876373
->>>
->>> This code path in mmap occurs when a page size is decreased with
->>> mremap.  When a section of pages is shrunk, qemu calls mmap_reserve on the
->>> pages that were released.  However, it has the diff operation reversed,
->>> subtracting the larger old_size from the smaller new_size.  Instead, it
->>> should be subtracting the smaller new_size from the larger old_size.  You
->>> can also see in the previous line of the change that this mmap_reserve call
->>> only occurs when old_size > new_size.
->>>
->>> Signed-off-by: Jonathan Marler <johnnymarler@gmail.com>
->>> ---
->>>  linux-user/mmap.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->>> index e378033797..caab62909e 100644
->>> --- a/linux-user/mmap.c
->>> +++ b/linux-user/mmap.c
->>> @@ -708,7 +708,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong
->>> old_size,
->>>          if (prot == 0) {
->>>              host_addr = mremap(g2h(old_addr), old_size, new_size,
->>> flags);
->>>              if (host_addr != MAP_FAILED && reserved_va && old_size >
->>> new_size) {
->>> -                mmap_reserve(old_addr + old_size, new_size - old_size);
->>> +                mmap_reserve(old_addr + old_size, old_size - new_size);
->>>              }
->>>          } else {
->>>              errno = ENOMEM;
->>> --
->>> 2.23.1
->>>
->>>
+   from qemu import QEMUMachine
 
---00000000000012741a05a5f020f7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+than
+  
+   from qemu.lib import QEMUMachine
 
-<div dir=3D"ltr">Been a few more days.=C2=A0 Not sure how often I should be=
- pinging.=C2=A0 If this is too much to ping every few days let me know.</di=
-v><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On F=
-ri, May 15, 2020 at 7:36 AM Jonathan Marler &lt;<a href=3D"mailto:johnnymar=
-ler@gmail.com">johnnymarler@gmail.com</a>&gt; wrote:<br></div><blockquote c=
-lass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px soli=
-d rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">Been a couple weeks, =
-checking to see if anyone has looked at this.</div><br><div class=3D"gmail_=
-quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat, May 2, 2020 at 5:43 PM=
- Jonathan Marler &lt;<a href=3D"mailto:johnnymarler@gmail.com" target=3D"_b=
-lank">johnnymarler@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"g=
-mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
-,204,204);padding-left:1ex"><div dir=3D"ltr">FYI, I applied this patch to t=
-he qemu build that zig uses=C2=A0to run non-native tests (
+why do we need this extra ".lib" part?
 
-<a href=3D"https://github.com/ziglang/qemu-static/blob/master/patch/mremap-=
-underflow.diff" target=3D"_blank">https://github.com/ziglang/qemu-static/bl=
-ob/master/patch/mremap-underflow.diff</a>)<div><br><div>After applying it, =
-my new code that calls mremap now passes, whereas=C2=A0before the fix I was=
- getting a segfault.</div></div></div><br><div class=3D"gmail_quote"><div d=
-ir=3D"ltr" class=3D"gmail_attr">On Sat, May 2, 2020 at 10:12 AM Jonathan Ma=
-rler &lt;<a href=3D"mailto:johnnymarler@gmail.com" target=3D"_blank">johnny=
-marler@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" =
-style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
-dding-left:1ex">Fixes: <a href=3D"https://bugs.launchpad.net/bugs/1876373" =
-rel=3D"noreferrer" target=3D"_blank">https://bugs.launchpad.net/bugs/187637=
-3</a><br>
-<br>
-This code path in mmap occurs when a page size is decreased with mremap.=C2=
-=A0 When a section of pages is shrunk, qemu calls mmap_reserve on the pages=
- that were released.=C2=A0 However, it has the diff operation reversed, sub=
-tracting the larger old_size from the smaller new_size.=C2=A0 Instead, it s=
-hould be subtracting the smaller new_size from the larger old_size.=C2=A0 Y=
-ou can also see in the previous line of the change that this mmap_reserve c=
-all only occurs when old_size &gt; new_size.<br>
-<br>
-Signed-off-by: Jonathan Marler &lt;<a href=3D"mailto:johnnymarler@gmail.com=
-" target=3D"_blank">johnnymarler@gmail.com</a>&gt;<br>
----<br>
-=C2=A0linux-user/mmap.c | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c<br>
-index e378033797..caab62909e 100644<br>
---- a/linux-user/mmap.c<br>
-+++ b/linux-user/mmap.c<br>
-@@ -708,7 +708,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong ol=
-d_size,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (prot =3D=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0host_addr =3D mremap(g2h(ol=
-d_addr), old_size, new_size, flags);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (host_addr !=3D MAP_FAIL=
-ED &amp;&amp; reserved_va &amp;&amp; old_size &gt; new_size) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mmap_reserve(old_a=
-ddr + old_size, new_size - old_size);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mmap_reserve(old_a=
-ddr + old_size, old_size - new_size);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0errno =3D ENOMEM;<br>
--- <br>
-2.23.1<br>
-<br>
-</blockquote></div>
-</blockquote></div>
-</blockquote></div>
+Is it needed only for internal use?
 
---00000000000012741a05a5f020f7--
+Assume we have installed qemu package. Can we write
+
+   from qemu import QEMUMachine
+
+? Or we still need qemu.lib ?
+
+I don't remember any python package, which made me to write "import from package_name.lib ..."
+
+
+-- 
+Best regards,
+Vladimir
 
