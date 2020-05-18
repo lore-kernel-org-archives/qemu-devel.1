@@ -2,78 +2,120 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C20E2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01F8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:24:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DA9C20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:18:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B766920657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:24:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYD2+Y1b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA9C20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRtnMIWi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B766920657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jagbE-0005XK-QX
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:18:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40558)
+	id 1jaggW-0008BR-OR
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:24:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jagab-00052E-Bf
- for qemu-devel@nongnu.org; Mon, 18 May 2020 10:17:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52668
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jagft-0007MP-Id
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 10:23:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44692
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jagaa-0006EU-EV
- for qemu-devel@nongnu.org; Mon, 18 May 2020 10:17:57 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jagfs-0008GL-C4
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 10:23:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589811475;
+ s=mimecast20190719; t=1589811803;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D9Yg9MojHhlMTkJENp2mrc6kyrENhxyWBFVM4B6Hyo4=;
- b=eYD2+Y1bLvSJysOT8ofOg8MbftwZKk0WGm2Zx6NfuVHL2zWXsuI37BUAWwYK5k2ay8C1Xv
- ry8E5x65YPNPDsN7xeynihrlP0Ibowk+cxL7hYFGn65VfUqZo5l/G4Jsa6JyQ1eyz0NFsz
- vsKG1KYIbYxJQpu8DcfoXB6bgYSKkVc=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=zG/pdTPIl0thVsg5cBJUuqqaoaidrjdYlobZqwqJn6Q=;
+ b=TRtnMIWiYIzZ5EswzjU8S0MoL8Nk5kmXP4oVquVhBDnoFTQoOaQBuwFWzjNpRkebjJAN2r
+ PxRtshFRGYvPj5b4j/NIxtiBOcXinBBktDPvnsrFi5HTG3WrGw1irCpTAtDfneyTYNbx46
+ EbblvoNOPNU2kyoU6ZBMQ2Ao10kvz1s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-DyBWQpQVNNKQrqgqq8cn4A-1; Mon, 18 May 2020 10:17:53 -0400
-X-MC-Unique: DyBWQpQVNNKQrqgqq8cn4A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-443-RpGz8YU4ONuaDyNR477x-w-1; Mon, 18 May 2020 10:23:18 -0400
+X-MC-Unique: RpGz8YU4ONuaDyNR477x-w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3ACD9EC1A2;
- Mon, 18 May 2020 14:17:52 +0000 (UTC)
-Received: from gondolin (ovpn-113-28.ams2.redhat.com [10.36.113.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DE21649D6;
- Mon, 18 May 2020 14:17:51 +0000 (UTC)
-Date: Mon, 18 May 2020 16:17:48 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v2 1/1] vfio-ccw: allow non-prefetch ORBs
-Message-ID: <20200518161748.0f12d64e.cohuck@redhat.com>
-In-Reply-To: <c354be6e-d451-c332-a070-017f033af1c9@linux.ibm.com>
-References: <20200512181535.18630-1-jrossi@linux.ibm.com>
- <20200512181535.18630-2-jrossi@linux.ibm.com>
- <20200514172021.5a66bc56.cohuck@redhat.com>
- <5e5a1a3d037cf3bcbd87da051b09b173@linux.vnet.ibm.com>
- <c354be6e-d451-c332-a070-017f033af1c9@linux.ibm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B160C108BD13;
+ Mon, 18 May 2020 14:23:17 +0000 (UTC)
+Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D87B66EA26;
+ Mon, 18 May 2020 14:23:10 +0000 (UTC)
+Subject: Re: [PATCH v1 10/17] virtio-mem: Paravirtualized memory hot(un)plug
+From: David Hildenbrand <david@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-11-david@redhat.com> <20200515153714.GG2954@work-vm>
+ <c782acd6-e282-fb33-863c-965d1e27d3b6@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
 Organization: Red Hat GmbH
+Message-ID: <42978cec-f162-f3e6-b016-313c41aa74ea@redhat.com>
+Date: Mon, 18 May 2020 16:23:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+In-Reply-To: <c782acd6-e282-fb33-863c-965d1e27d3b6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,152 +137,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>,
- qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 07:06:29 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+>>> +
+>>> +static int virtio_mem_pre_save(void *opaque)
+>>> +{
+>>> +    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
+>>> +
+>>> +    vmem->migration_addr = vmem->addr;
+>>> +    vmem->migration_block_size = vmem->block_size;
+>>
+>> You might look at VMSTATE_WITH_TMP could avoid you having the dummy
+>> fields.
+> 
+> Thanks, will have a look.
 
-> On 5/14/20 2:39 PM, Jared Rossi wrote:
-> > On 2020-05-14 11:20, Cornelia Huck wrote: =20
-> >> On Tue, 12 May 2020 14:15:35 -0400
-> >> Jared Rossi <jrossi@linux.ibm.com> wrote:
-> >> =20
-> >>> Remove the explicit prefetch check when using vfio-ccw devices.
-> >>> This check does not trigger in practice as all Linux channel programs
-> >>> are intended to use prefetch.
-> >>>
-> >>> It is no longer required to force the PFCH flag when using vfio-ccw
-> >>> devices. =20
-> >>
-> >> That's not quite true: Only kernels that include the currently-queued
-> >> patch do not require it. Maybe
-> >>
-> >> "Newer Linux kernel versions do not require to force the PFCH flag wit=
-h
-> >> vfio-ccw devices anymore." =20
->=20
-> I like it.
->=20
-> >>
-> >> ?
-> >> =20
-> >=20
-> > This is a good point and your proposed message is reasonable.
+VMSTATE_WITH_TMP looks too complicated for this simple use case. I'll
+just drop these migration sanity checks for now.
 
-I'll use it, then :)
+Thanks!
 
-> >  =20
-> >>>
-> >>> Signed-off-by: Jared Rossi <jrossi@linux.ibm.com>
-> >>> ---
-> >>> =C2=A0hw/vfio/ccw.c | 13 +++----------
-> >>> =C2=A01 file changed, 3 insertions(+), 10 deletions(-)
-> >>>
-> >>> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> >>> index 50cc2ec75c..e649377b68 100644
-> >>> --- a/hw/vfio/ccw.c
-> >>> +++ b/hw/vfio/ccw.c
-> >>> @@ -74,16 +74,9 @@ static IOInstEnding
-> >>> vfio_ccw_handle_request(SubchDev *sch)
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0 struct ccw_io_region *region =3D vcdev->io_r=
-egion;
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0 int ret;
-> >>>
-> >>> -=C2=A0=C2=A0=C2=A0 if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(vcdev->force_orb_pf=
-ch)) {
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w=
-arn_once_pfch(vcdev, sch, "requires PFCH flag set");
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-ch_gen_unit_exception(sch);
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c=
-ss_inject_io_interrupt(sch);
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-eturn IOINST_CC_EXPECTED;
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-ch->orb.ctrl0 |=3D ORB_CTRL0_MASK_PFCH;
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w=
-arn_once_pfch(vcdev, sch, "PFCH flag forced");
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >>> +=C2=A0=C2=A0=C2=A0 if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH) &&
-> >>> vcdev->force_orb_pfch) {
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sch->orb.ctrl0 |=3D ORB_C=
-TRL0_MASK_PFCH;
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 warn_once_pfch(vcdev, sch=
-, "PFCH flag forced");
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >>>
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0 QEMU_BUILD_BUG_ON(sizeof(region->orb_area) !=
-=3D sizeof(ORB)); =20
-> >>
-> >> Let me spell out what happens:
-> >> - PFCH bit set -> no change
-> >> - PFCH bit not set, but force_orb_pfch set -> no change
-> >> - neither PFCH bit nor force_orb_pfch set:
-> >> =C2=A0 - older kernels: QEMU makes the request, the kernel rejects it,=
- guest
-> >> =C2=A0=C2=A0=C2=A0 gets a unit exception (same result for the guest as=
- before, only a
-> >> =C2=A0=C2=A0=C2=A0 different code flow)
-> >> =C2=A0 - newer kernels: QEMU makes the request, the kernel forwards th=
-e
-> >> =C2=A0=C2=A0=C2=A0 request (logging a rate-limited warning); the resul=
-t depends on
-> >> =C2=A0=C2=A0=C2=A0 whether the guest actually tries to rewrite the cha=
-nnel program or
-> >> =C2=A0=C2=A0=C2=A0 not
-> >> =20
-> >=20
-> > This is correct, but I think it is worth noting that while the exceptio=
-n
-> > is the same in the case of new QEMU + old kernel, the logging is differ=
-ent.
-> > The old kernel code did not issue any warning if a non-prefetch ORB was
-> > rejected, it simply raised the exception. In reality, the old kernel co=
-de
-> > path was not accessible because QEMU would always reject ORBs before th=
-en
-> > with the "requires PFCH flag set" message.=C2=A0 The new QEMU code does=
- not
-> > issue a warning in this case.
-> >=20
-> > I considered keeping a warning for the non-prefetch path, but it seemed
-> > excessive to me, since it causes a redundant warning when used with the
-> > new kernel code (which I expect to be the case normally). Do you think
-> > some sort of warning should still be issued by QEMU in this case, even
-> > if it is redundant with the kernel warning? =20
->=20
-> Hrm...  Keeping the warning out of QEMU might be beneficial.  Sure, when
-> running with new kernels the message will be redundant, but if running
-> with an old kernel the result will just be a silent error.
+-- 
+Thanks,
 
-I don't think we need to care about that situation that much; I'd hope
-that any distribution will pick both patches (or at least not the QEMU
-patch without the kernel patch).
-
->=20
-> >  =20
-> >> I think that is what we want, and I think I'll queue this patch with
-> >> the tweaked commit message, but I'd like a second opinion. =20
->=20
-> I don't have a strong opinion of the messaging, but think everything
-> else looks fine.  If you'd like to queue this patch with the tweaked
-> commit message:
-
-Ok, then I'll just go ahead and queue it.
-
->=20
-> Reviewed-by: Eric Farman <farman@linux.ibm.com>
->=20
-> >>
-> >> (We should also deprecate force_orb_pfch in the future.) =20
->=20
-> +1
->=20
+David / dhildenb
 
 
