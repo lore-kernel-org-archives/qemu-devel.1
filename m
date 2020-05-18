@@ -2,71 +2,92 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D42CC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B43BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:44:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47D2A207E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:43:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D2A207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFA28207E8
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:44:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FjihzZwM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA28207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jairJ-0006SL-GA
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59150)
+	id 1jaisj-0000Os-5x
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:44:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jaijQ-0000oL-Pv
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:35:12 -0400
-Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:56069)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jaijP-0004GS-FR
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:35:12 -0400
-Received: from player694.ha.ovh.net (unknown [10.108.57.18])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 336F813148D
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 18:35:09 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player694.ha.ovh.net (Postfix) with ESMTPSA id 9CFCD12675EAA;
- Mon, 18 May 2020 16:35:01 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-100R003f4d9a749-ae72-4d6c-b92f-c371044073bb,2E2A9519E3FAC9D985F861812C9F86F7BE89492F)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 16/24] ppc/pnv: Put "*-pnv-chip" and "pnv-xive" on the
- main system bus
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-17-armbru@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5abeb1b9-16d4-2984-720f-2f0d776ec19e@kaod.org>
-Date: Mon, 18 May 2020 18:34:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jaip5-00025C-LA
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:41:03 -0400
+Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:46135)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jaip4-0005qu-ME
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:41:03 -0400
+Received: by mail-pl1-x629.google.com with SMTP id b12so4430219plz.13
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:41:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=DXF5hhG17BDEOETPzoe+bSK9+O1lQ05HYEEgNG7hh+w=;
+ b=FjihzZwM2wYtERi0Zws7yos2C7KGw20k78/MJFU1LrZ+TmbscZxA63HJVgPAJsmHFp
+ F4FBLdZqtGUGycqOLe8S7ZaVCK6hpDvQZ+M+0q7u6KiRhn1z2XVGh2qRmPQoZ7Zp3zL6
+ DHScloroEExBlpVlx7ZUTHKQBMYe/lAE1MbsNks1Dw4epwKA1TfwDT1LPOqnjcstQFeg
+ C7HqdDxicOgVUoNNtmlBj+GnH15B5bP1u+dIB6iqIoNf33MQL5iGWWNbwK2NzHd8x6i6
+ yMFc2hmZPaRISftqap7jE0VpMTxqls3hSKI8B0OxMZBd5dJnpmdU2LsuOAGTg3ga6SEg
+ TkSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=DXF5hhG17BDEOETPzoe+bSK9+O1lQ05HYEEgNG7hh+w=;
+ b=XwW+f5EMJv/IIxd0fHYtyM2UswB3Bt5MIhU2FZjA+T+MwjxONN6Uc3JSQt75xBcqa1
+ iD3KzwPHXGMPj1FeL4pvvqqUEnJ7HpJGD7fDP4zEfqWpDELoKyRqMO9GHuwTnHNHtsj9
+ 9kajFeNz0Za+WQE/kh+gMF5Ir+gpv4TQid0zgqnEeo+31MmYy0SCaXTTG1bJhDQ+7uAn
+ RoCiAuvxGAnrvRk0op1B2X4E18epCozZS4ktmUR6sSq+rgBOGfOyPP+EN7oUSHmO2FSb
+ G/+m2MobmYwEpu7RY0lN3ZhLQ2EMt4qtJyxZpkPA9eeI9lgebIZna7XiBm6uL4IGxQ5z
+ +DSw==
+X-Gm-Message-State: AOAM530A0Pm8FSb/0z80ORsGhSdwaNc5+i3oQlDNkCpVbXwPBSl92MqT
+ DXPEdNWZD0ojgmGPCQJg1zlvpf8W/5A=
+X-Google-Smtp-Source: ABdhPJynd/2Be65qIgIa3vW4+ZGuWClcnIbZKlqM5zJMqMaeLiHdBgLxJ66ZQHfzAV8SlKX2Qg0fiw==
+X-Received: by 2002:a17:90a:dd45:: with SMTP id
+ u5mr302350pjv.156.1589820060313; 
+ Mon, 18 May 2020 09:41:00 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id x132sm5790610pfd.214.2020.05.18.09.40.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 09:40:59 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/8] decodetree: Split out MultiPattern from IncMultiPattern
+Date: Mon, 18 May 2020 09:40:48 -0700
+Message-Id: <20200518164052.18689-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200518164052.18689-1-richard.henderson@linaro.org>
+References: <20200518164052.18689-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200518050408.4579-17-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 13347824871068306259
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddthedguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.61.98; envelope-from=clg@kaod.org;
- helo=8.mo177.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 12:35:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,82 +101,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 7:04 AM, Markus Armbruster wrote:
-> pnv_init() creates "power10_v1.0-pnv-chip", "power8_v2.0-pnv-chip",
-> "power8e_v2.1-pnv-chip", "power8nvl_v1.0-pnv-chip", or
-> "power9_v2.0-pnv-chip" sysbus devices in a way that leaves them
-> unplugged.
-> 
-> pnv_chip_power9_instance_init() creates a "pnv-xive" sysbus device in
-> a way that leaves it unplugged.
-> 
-> Create them the common way that puts them into the main system bus.
-> Affects machines powernv8, powernv9, and powernv10.  Visible in "info
-> qtree".  Here's the change for powernv9:
-> 
->      bus: main-system-bus
->        type System
->     +  dev: power9_v2.0-pnv-chip, id ""
->     +    chip-id = 0 (0x0)
->     +    ram-start = 0 (0x0)
->     +    ram-size = 1879048192 (0x70000000)
->     +    nr-cores = 1 (0x1)
->     +    cores-mask = 72057594037927935 (0xffffffffffffff)
->     +    nr-threads = 1 (0x1)
->     +    num-phbs = 6 (0x6)
->     +    mmio 000603fc00000000/0000000400000000
->     [...]
->     +  dev: pnv-xive, id ""
->     +    ic-bar = 1692157036462080 (0x6030203100000)
->     +    vc-bar = 1689949371891712 (0x6010000000000)
->     +    pc-bar = 1690499127705600 (0x6018000000000)
->     +    tm-bar = 1692157036986368 (0x6030203180000)
-> 
-> Cc: "Cédric Le Goater" <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/ppc/pnv.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index da637822f9..8d4fc8109a 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
->      pnv->chips = g_new0(PnvChip *, pnv->num_chips);
->      for (i = 0; i < pnv->num_chips; i++) {
->          char chip_name[32];
-> -        Object *chip = object_new(chip_typename);
-> +        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
->  
->          pnv->chips[i] = PNV_CHIP(chip);
->  
-> @@ -1317,8 +1317,8 @@ static void pnv_chip_power9_instance_init(Object *obj)
->      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(obj);
->      int i;
->  
-> -    object_initialize_child(obj, "xive", &chip9->xive, sizeof(chip9->xive),
-> -                            TYPE_PNV_XIVE, &error_abort, NULL);
-> +    sysbus_init_child_obj(obj, "xive", &chip9->xive, sizeof(chip9->xive),
-> +                          TYPE_PNV_XIVE);
->      object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
->                                "xive-fabric");
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ scripts/decodetree.py | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-OK. But why only XIVE and not all sub-devices of the PnvChip device ? 
-
-Shouldn't they be initialized in the same way, calling sysbus_init_child_obj ? 
-
-Thanks,
-
-C.
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 7af6b3056d..ea313bcdea 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -371,7 +371,32 @@ class Pattern(General):
+ # end Pattern
  
+ 
+-class IncMultiPattern(General):
++class MultiPattern(General):
++    """Class representing a set of instruction patterns"""
++
++    def __init__(self, lineno, pats):
++        self.file = input_file
++        self.lineno = lineno
++        self.pats = pats
++        self.base = None
++        self.fixedbits = 0
++        self.fixedmask = 0
++        self.undefmask = 0
++        self.width = None
++
++    def __str__(self):
++        r = 'group'
++        if self.fixedbits is not None:
++            r += ' ' + str_match_bits(self.fixedbits, self.fixedmask)
++        return r
++
++    def output_decl(self):
++        for p in self.pats:
++            p.output_decl()
++# end MultiPattern
++
++
++class IncMultiPattern(MultiPattern):
+     """Class representing an overlapping set of instruction patterns"""
+ 
+     def __init__(self, lineno, pats, fixb, fixm, udfm, w):
+@@ -384,16 +409,6 @@ class IncMultiPattern(General):
+         self.undefmask = udfm
+         self.width = w
+ 
+-    def __str__(self):
+-        r = "{"
+-        for p in self.pats:
+-           r = r + ' ' + str(p)
+-        return r + "}"
+-
+-    def output_decl(self):
+-        for p in self.pats:
+-            p.output_decl()
+-
+     def output_code(self, i, extracted, outerbits, outermask):
+         global translate_prefix
+         ind = str_indent(i)
+-- 
+2.20.1
 
 
