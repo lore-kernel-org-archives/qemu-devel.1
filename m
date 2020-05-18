@@ -2,93 +2,88 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F341C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 615ABC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2656B20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CD17207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:13:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPO2G5bb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2656B20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XmKgEizO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CD17207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jagOe-0008Kp-9h
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
+	id 1jagWa-00039E-BN
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:13:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jagMV-0004JO-Kf; Mon, 18 May 2020 10:03:23 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39225)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jagW2-0002c3-NC
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 10:13:14 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jagMU-0001BP-Nd; Mon, 18 May 2020 10:03:23 -0400
-Received: by mail-wm1-x344.google.com with SMTP id w64so10563494wmg.4;
- Mon, 18 May 2020 07:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ynbMaAjpiD0x7UQ7qyXtXy4p3Mbw7B/2c81S4GZ2qwY=;
- b=BPO2G5bbStMKoFidT2VTx7PyLs2AYrJD/RBVIMqaeenYWBRdzL2WdryUCuQCPWh2jI
- 5mQ93bcfwgrCxHAJ/50H2TjtRxTFaNaNQRCABd0TXTwDbEEqlvX2dhlcOpAF513pM4rY
- VcC/wcwMDiile1YVcJwMZta5RWiCiyXRhaJp5pqjzv22qGrK1+dlr/IjYT285uUf809Z
- P++/5JlNgowdNArhzIBAXr2ADwvClY8PL7v+kER9RY1yndW8LhvcuSDbGnl1X5+sXQKO
- EXQtONRJiuKMWaZVg+vYrsr2JvVe1QE1XJ7mOZjdgQRDcQKYPOYdwJtDBgn5TgPmjy5v
- iIJg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jagW1-0004my-PX
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 10:13:14 -0400
+Received: by mail-wm1-x343.google.com with SMTP id m185so5742124wme.3
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 07:13:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qO0DEQsgPpTJ3W4/yS4w/C15HNNzg8b4HlcX8EpUruc=;
+ b=XmKgEizOBA1chni4ASZaRYuql3iwXDMa7UlnILXK2ermaciojwvuDedMYpVfDQI+Qq
+ cJz9LaZqXPOD2VOO+tNge51ZKsr6MBkBU5DmyMeR5kjsfZtdJi92hxE62LT10hNYjUjS
+ rLGJDt7duZlqcDUyILQdAHELxiev9CE7VStJTBz+Iw3UOZm8OcyvWJntl2TIinkdUPLt
+ Od+SRWvoEeelSMTMGjp8urvH/SMAx3uIal2BAcR1CZiqpzBBXKGe1TAAueMPi2O4/e+t
+ 1sC7bPjmdkXJycEdaMvMOITHj7VZBN4NF33VdsmUPfUx9m41lZStxoUONsMz0IzuMuNO
+ RelA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ynbMaAjpiD0x7UQ7qyXtXy4p3Mbw7B/2c81S4GZ2qwY=;
- b=QHGftmVvBSlO3EwE8vcgJpmZgdaIJdGy4SzsV3UHxgu6XRz5QCdGJ1QhYaJsE1H539
- hKhUsBqXLv43PyA+HNBWWsUQLpUAoJ4LdDkE1xNlUEs1dXjVB/AaS8FH2TQu6Q+dFBwk
- 6l+POA6I16BMy1OjJ7XvF/sK6v1xqgJbgppfEd8VX97p9md2N1EFZNBE3p6m1zmKc3au
- KQ4FmzEcrozos9lItWTOwBD2NqCI6+shJwKU/6nK8eY4Ux1xfWxg5MVNqhW2WOcnIW8T
- dfI5CcvdUsMiVrorTpn/9+wfDMgb6HxIK91tcTNu+CwvDGgXXoRJzeBa8FaUMTmJHRhk
- QIsg==
-X-Gm-Message-State: AOAM5322Ldcf/wuXAQWsplJq+Ks3OhYtQ9njtlYmGaz7lEIcsO8zwVc9
- RLLDB/u4HlDdsGaTwSZ5qdcyWpFf77E=
-X-Google-Smtp-Source: ABdhPJx2/rd8jVm3HNh1/wmz2D+7CQsQ4ipbpDiGkGN3TY9a38KhiUdJ+MoZ+WdrlRF+LFWAY0e6dw==
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr20554002wme.154.1589810600658; 
- Mon, 18 May 2020 07:03:20 -0700 (PDT)
-Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id s67sm16611946wmf.3.2020.05.18.07.03.18
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qO0DEQsgPpTJ3W4/yS4w/C15HNNzg8b4HlcX8EpUruc=;
+ b=nrCYTZKnCQbZcA1RXglG2aRYuTGcfI627UH1hkddCsGNKF35VhLVkj7geMEBuccqA1
+ /bO9qyCqtcwGZfa79YWiJIA/G4ZPkrz9Qs/2dmDZyDOiYZ40B2gDjQ23gnua9N/Zc/vX
+ CSCOVs/Uz8O76SEbOIrBmFDaBvSwtkisStib/QoPsL/NKtu7x/el2VeyP+ENOxupOoKp
+ f3clVx1Dry2XYfW2LgoZlJ8415aEEJAQ5vaTGK+E8BzlERTSX3eBiDdWhtW+ASYpu25R
+ y7J8aNVW/AAmmNLSgHj/pSIXnotOK2NS7jdAlsWmcHf6QeM3MhMxDWhcCohmdrJqITQf
+ 4i6Q==
+X-Gm-Message-State: AOAM530903mSCtB7NpQ7YCz9GcIAd0fHoXK5lrNQjnT2JIetuUJoURXl
+ tC2/1UGs0s4t2X1NIoGv+/lqVdB8hp1nGg==
+X-Google-Smtp-Source: ABdhPJwvuMNjRlNLAqLGkh/rkKOrGl4INw95jA/HZYbCECL48A7X9o1M6xUCYK8++K5Sc/CFtHdwhA==
+X-Received: by 2002:a1c:6344:: with SMTP id x65mr20647401wmb.51.1589811192092; 
+ Mon, 18 May 2020 07:13:12 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id l19sm17229075wmj.14.2020.05.18.07.13.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 07:03:19 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] hw/timer/exynos4210_mct: Replace hw_error() by
- qemu_log_mask()
-Date: Mon, 18 May 2020 16:03:09 +0200
-Message-Id: <20200518140309.5220-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200518140309.5220-1-f4bug@amsat.org>
-References: <20200518140309.5220-1-f4bug@amsat.org>
+ Mon, 18 May 2020 07:13:11 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] target/arm: Allow user-mode code to write CPSR.E via MSR
+Date: Mon, 18 May 2020 15:13:09 +0100
+Message-Id: <20200518141309.11998-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -103,97 +98,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hw_error() calls exit(). This a bit overkill when we can log
-the accesses as unimplemented or guest error.
+Using the MSR instruction to write to CPSR.E is deprecated, but it is
+required to work from any mode including unprivileged code.  We were
+incorrectly forbidding usermode code from writing it because
+CPSR_USER did not include the CPSR_E bit.
 
-When fuzzing the devices, we don't want the whole process to
-exit. Replace some hw_error() calls by qemu_log_mask().
+We use CPSR_USER in only three places:
+ * as the mask of what to allow userspace MSR to write to CPSR
+ * when deciding what bits a linux-user signal-return should be
+   able to write from the sigcontext structure
+ * in target_user_copy_regs() when we set up the initial
+   registers for the linux-user process
 
-Per the datasheet "Exynos 4412 RISC Microprocessor Rev 1.00"
-Chapter 25 "Multi Core Timer (MCT)" figure 1 and table 4,
-the default value on the APB bus is 0.
+In the first two cases not being able to update CPSR.E is a
+bug, and in the third case it doesn't matter because CPSR.E
+is always 0 there. So we can fix both bugs by adding CPSR_E
+to CPSR_EXEC.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+(The recommended way to change CPSR.E is to use the 'SETEND'
+instruction, which we do correctly allow from usermode code.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-v2: Fixes -Wsometimes-uninitialized:
+Bug reported on IRC. Quick-and-dirty test case at:
+ https://people.linaro.org/~peter.maydell/msr-setend.c
 
-hw/timer/exynos4210_mct.c:1158:5: error: variable 'value' is used uninitialized whenever switch default is taken [-Werror,-Wsometimes-uninitialized]
-    default:
-    ^~~~~~~
-hw/timer/exynos4210_mct.c:1163:12: note: uninitialized use occurs here
-    return value;
-           ^~~~~
-hw/timer/exynos4210_mct.c:1063:19: note: initialize the variable 'value' to silence this warning
-    uint32_t value;
-                  ^
-                   = 0
----
- hw/timer/exynos4210_mct.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ target/arm/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
-index 570cf7075b..29a4b10676 100644
---- a/hw/timer/exynos4210_mct.c
-+++ b/hw/timer/exynos4210_mct.c
-@@ -54,7 +54,6 @@
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5d995368d4f..677584e5da0 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1230,7 +1230,7 @@ void pmu_init(ARMCPU *cpu);
+ #define CACHED_CPSR_BITS (CPSR_T | CPSR_AIF | CPSR_GE | CPSR_IT | CPSR_Q \
+     | CPSR_NZCV)
+ /* Bits writable in user mode.  */
+-#define CPSR_USER (CPSR_NZCV | CPSR_Q | CPSR_GE)
++#define CPSR_USER (CPSR_NZCV | CPSR_Q | CPSR_GE | CPSR_E)
+ /* Execution state bits.  MRS read as zero, MSR writes ignored.  */
+ #define CPSR_EXEC (CPSR_T | CPSR_IT | CPSR_J | CPSR_IL)
  
- #include "qemu/osdep.h"
- #include "qemu/log.h"
--#include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
-@@ -62,7 +61,6 @@
- #include "hw/ptimer.h"
- 
- #include "hw/arm/exynos4210.h"
--#include "hw/hw.h"
- #include "hw/irq.h"
- 
- //#define DEBUG_MCT
-@@ -1062,7 +1060,7 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
-     int index;
-     int shift;
-     uint64_t count;
--    uint32_t value;
-+    uint32_t value = 0;
-     int lt_i;
- 
-     switch (offset) {
-@@ -1158,8 +1156,8 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
-         break;
- 
-     default:
--        hw_error("exynos4210.mct: bad read offset "
--                TARGET_FMT_plx "\n", offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         break;
-     }
-     return value;
-@@ -1484,8 +1482,8 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
-         break;
- 
-     default:
--        hw_error("exynos4210.mct: bad write offset "
--                TARGET_FMT_plx "\n", offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         break;
-     }
- }
 -- 
-2.21.3
+2.20.1
 
 
