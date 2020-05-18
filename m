@@ -2,98 +2,98 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BDEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B557C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:59:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACBDE20758
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:59:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBDE20758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5F9C20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:59:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bpmz6zaT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5F9C20758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaj71-0005bI-S4
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60846)
+	id 1jaj7D-00060R-Vb
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:59:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1jaitJ-0001IZ-Gz; Mon, 18 May 2020 12:45:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54438
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1jaitE-0007ia-4E; Mon, 18 May 2020 12:45:25 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04IGVE5M157015; Mon, 18 May 2020 12:45:17 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31293u3yeq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 12:45:17 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04IGZCq9168959;
- Mon, 18 May 2020 12:45:17 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.106])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31293u3yde-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 12:45:17 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
- by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04IGeFqe025841;
- Mon, 18 May 2020 16:43:45 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma04fra.de.ibm.com with ESMTP id 313wne01gf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 18 May 2020 16:43:45 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 04IGgUAw53477880
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 May 2020 16:42:30 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CA461A4060;
- Mon, 18 May 2020 16:43:42 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 69229A405B;
- Mon, 18 May 2020 16:43:42 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.158.244])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 18 May 2020 16:43:42 +0000 (GMT)
-From: Pierre Morel <pmorel@linux.ibm.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH v3 0/1] s390x: css: pong, channel subsystem test device
-Date: Mon, 18 May 2020 18:43:40 +0200
-Message-Id: <1589820221-23538-1-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-18_06:2020-05-15,
- 2020-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 suspectscore=1 adultscore=0 lowpriorityscore=0
- cotscore=-2147483648 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005180136
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pmorel@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 10:31:16
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jaj6F-0004iU-8D
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:58:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37711)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jaj6E-0002PW-Cr
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:58:46 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l17so12736074wrr.4
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ikwELEoSWJp/aWCMXVUREuJ623/MKUr+OjCV/7IqSl0=;
+ b=Bpmz6zaTShovRqw1KYqMpIRNQlWvnU94TO+Y+m9JPzJMFNV8EhV2BKqeljVFm00dGE
+ ohtiGV99TMkNjNd/V3DArjJL7qwTm3g6SnD767JyZ4vzVJGvgN731WVHZMoY8hQ/s+dl
+ ByR3qsZGA6hpjaa97ScrrZt74xv+8Etpkviw6nHECpnWjJlSf+MHNR+b9sLFML1Kz37M
+ kQzh49GawbZ7vYLes6yY9+fkfddM3ZGGN7d1+I/9slGi0m0sGPMcNK04qP5NxMDQuih7
+ u6Q/ZHuHeTxPmyYQrHPjXbDJ+ikpeXFqs8BrsMaDUeuMMJSeO3vIHNHGF0ZF0ACEfApv
+ l1wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ikwELEoSWJp/aWCMXVUREuJ623/MKUr+OjCV/7IqSl0=;
+ b=X6FouZapmufpW844bbPQUzoPBvxLETf4WclPf5axO291EzdXnP9vGUB+E1wDoJRTF5
+ 2wbBEAApoQXZKg5/GwxR7okERXsGqWFYDwzHKUzIoSrjURf3R2ULtXazVZaHJmeSAsqH
+ q4Xc0aa/2p8MPRuGnlPULhFX6D0J7+fKt//Ru9EKdrWZuX1+Q/sORT7jubzpAn0d0UlI
+ iMO3BJX+gQOh+PRwMkASv4JdgqlCKXMMqWA0ZEpDlCAmzlJJjUyaY8WM6spVAxvvE20l
+ l3dzr1sLGnR8mLrKK+IV+HN4pz/2iay67HkuDnq+PK2TOymW9OREJ5ujZT6wHLAV99kT
+ K93w==
+X-Gm-Message-State: AOAM531vH/z47bgc2ztU3MKzBE6udJF7JRAWOaCuaVTFtHbOvXGHV6HQ
+ ML4d2pFSii7XUtQnDq+OXL8DzRsZGmc=
+X-Google-Smtp-Source: ABdhPJzgqtwjeSdYYv3RyNk61nKd+lRaf8EbZWxVXXhgKulE9gVZCFNN96wD3xJDJoPw/alWpNCP9g==
+X-Received: by 2002:adf:dc86:: with SMTP id r6mr20067388wrj.45.1589821124925; 
+ Mon, 18 May 2020 09:58:44 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id q4sm216098wma.9.2020.05.18.09.58.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 09:58:44 -0700 (PDT)
+Subject: Re: [PATCH] hw/m68k/mcf52xx: Replace hw_error() by qemu_log_mask()
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200518094904.24226-1-f4bug@amsat.org>
+ <6a1d8e73-9417-2e52-a2a9-e5d1c00a0a2a@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c879f8bc-9c48-20ef-7717-c63a65a146a1@amsat.org>
+Date: Mon, 18 May 2020 18:58:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <6a1d8e73-9417-2e52-a2a9-e5d1c00a0a2a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,57 +106,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com
+Cc: Thomas Huth <huth@tuxfamily.org>, Jason Wang <jasowang@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch series presents a device to test the channel subsystem.
+On 5/18/20 6:32 PM, Thomas Huth wrote:
+> On 18/05/2020 11.49, Philippe Mathieu-Daudé wrote:
+>> hw_error() calls exit(). This a bit overkill when we can log
+>> the accesses as unimplemented or guest error.
+> 
+> Good idea. hw_error() is also mainly for CPU errors, it really should
+> not be used for non-CPU devices.
+> 
+>> When fuzzing the devices, we don't want the whole process to
+>> exit. Replace some hw_error() calls by qemu_log_mask().
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/m68k/mcf5206.c  |  7 +++++--
+>>   hw/m68k/mcf5208.c  | 14 +++++++++-----
+>>   hw/m68k/mcf_intc.c |  4 +++-
+>>   hw/net/mcf_fec.c   |  8 +++++---
+>>   4 files changed, 22 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
+>> index b155dd8170..34a863a588 100644
+>> --- a/hw/m68k/mcf5206.c
+>> +++ b/hw/m68k/mcf5206.c
+>> @@ -8,6 +8,7 @@
+>>   
+>>   #include "qemu/osdep.h"
+>>   #include "qemu/error-report.h"
+>> +#include "qemu/log.h"
+>>   #include "cpu.h"
+>>   #include "hw/hw.h"
+>>   #include "hw/irq.h"
+>> @@ -306,7 +307,8 @@ static uint64_t m5206_mbar_read(m5206_mbar_state *s,
+>>       case 0x170: return s->uivr[0];
+>>       case 0x1b0: return s->uivr[1];
+>>       }
+>> -    hw_error("Bad MBAR read offset 0x%x", (int)offset);
+>> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad MBAR offset 0x%" HWADDR_PRIX "\n",
+> 
+> offset seems to be uint64_t in this function, so I think this should
+> rather use PRIx64 instead of HWADDR_PRIX ? Or maybe check whether we can
+> change the offset to uint32_t ?
 
-Currently the pong device does the following:
-- on PONG_WRITE requests:
-  read the CCW buffer, expect a string with an integer in the buffer.
-  store the integer in a variable initialy initialized to zero.
+Too many copy/pasting, sorry.
 
-- on PONG_READ requests:
-  Store the value of the variable + 1 as a string in a buffer
-  send back the buffer
+> 
+>> +                  __func__, offset);
+>>       return 0;
+>>   }
+>>   
+>> @@ -360,7 +362,8 @@ static void m5206_mbar_write(m5206_mbar_state *s, uint32_t offset,
+>>           s->uivr[1] = value;
+>>           break;
+>>       default:
+>> -        hw_error("Bad MBAR write offset 0x%x", (int)offset);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad MBAR offset 0x%x\n",
+>> +                      __func__, offset);
+> 
+> Here offset seems to be uint32_t ... so I guess it should be fine for
+> the _read function, too.
+> 
+>>           break;
+>>       }
+>>   }
+>> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+>> index b84c152ce3..cd8a32e0c6 100644
+>> --- a/hw/m68k/mcf5208.c
+>> +++ b/hw/m68k/mcf5208.c
+>> @@ -9,10 +9,10 @@
+>>   #include "qemu/osdep.h"
+>>   #include "qemu/units.h"
+>>   #include "qemu/error-report.h"
+>> +#include "qemu/log.h"
+>>   #include "qapi/error.h"
+>>   #include "qemu-common.h"
+>>   #include "cpu.h"
+>> -#include "hw/hw.h"
+>>   #include "hw/irq.h"
+>>   #include "hw/m68k/mcf.h"
+>>   #include "hw/m68k/mcf_fec.h"
+>> @@ -111,7 +111,8 @@ static void m5208_timer_write(void *opaque, hwaddr offset,
+>>       case 4:
+>>           break;
+>>       default:
+>> -        hw_error("m5208_timer_write: Bad offset 0x%x\n", (int)offset);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
+>> +                      __func__, offset);
+>>           break;
+> 
+> Should the "break" be replaced by a "return" now?
 
-- defines a Control Unit property of type CCW_PONG_CU_TYPE
-  for the guest to recognize the PONG device when using a
-  SENSE_ID command.
+I was not sure, OK.
 
-Pierre Morel (1):
-  s390x: css: pong, channel subsystem test device
-
- default-configs/s390x-softmmu.mak |   1 +
- hw/s390x/Kconfig                  |   3 +
- hw/s390x/Makefile.objs            |   1 +
- hw/s390x/ccw-pong.c               | 134 ++++++++++++++++++++++++++++++
- include/hw/s390x/pong.h           |  48 +++++++++++
- 5 files changed, 187 insertions(+)
- create mode 100644 hw/s390x/ccw-pong.c
- create mode 100644 include/hw/s390x/pong.h
-
--- 
-2.25.1
-
-
-
-Changelog:
-
-from v2 to v3
-- rebase to devel
-- use device_class_set_props()
-
-from v1 to v2
-- use ccw_dstream_xxx_buf (Connie)
-- adding a cu_type property
-- testing the ccw.count
-- conditional compiling for TEST_DEVICES (Connie, Thomas)
-- suppress the device categorie (Connie ?)
-- adding write callback and some funny protocol
-
+> 
+>>       }
+>>       m5208_timer_update(s);
+>> @@ -136,7 +137,8 @@ static uint64_t m5208_timer_read(void *opaque, hwaddr addr,
+>>       case 4:
+>>           return ptimer_get_count(s->timer);
+>>       default:
+>> -        hw_error("m5208_timer_read: Bad offset 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+>>           return 0;
+>>       }
+>>   }
+>> @@ -164,7 +166,8 @@ static uint64_t m5208_sys_read(void *opaque, hwaddr addr,
+>>           return 0;
+>>   
+>>       default:
+>> -        hw_error("m5208_sys_read: Bad offset 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+>>           return 0;
+>>       }
+>>   }
+>> @@ -172,7 +175,8 @@ static uint64_t m5208_sys_read(void *opaque, hwaddr addr,
+>>   static void m5208_sys_write(void *opaque, hwaddr addr,
+>>                               uint64_t value, unsigned size)
+>>   {
+>> -    hw_error("m5208_sys_write: Bad offset 0x%x\n", (int)addr);
+>> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
+>> +                  __func__, addr);
+>>   }
+>>   
+>>   static const MemoryRegionOps m5208_sys_ops = {
+>> diff --git a/hw/m68k/mcf_intc.c b/hw/m68k/mcf_intc.c
+>> index d9e03a06ab..7dddf17d33 100644
+>> --- a/hw/m68k/mcf_intc.c
+>> +++ b/hw/m68k/mcf_intc.c
+>> @@ -8,6 +8,7 @@
+>>   
+>>   #include "qemu/osdep.h"
+>>   #include "qemu/module.h"
+>> +#include "qemu/log.h"
+>>   #include "cpu.h"
+>>   #include "hw/hw.h"
+>>   #include "hw/irq.h"
+>> @@ -127,7 +128,8 @@ static void mcf_intc_write(void *opaque, hwaddr addr,
+>>           }
+>>           break;
+>>       default:
+>> -        hw_error("mcf_intc_write: Bad write offset %d\n", offset);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%02x\n",
+>> +                      __func__, offset);
+>>           break;
+> 
+> "return" instead of "break" ?
+> 
+>>       }
+>>       mcf_intc_update(s);
+>> diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+>> index 9327ac8a30..b3a92c0114 100644
+>> --- a/hw/net/mcf_fec.c
+>> +++ b/hw/net/mcf_fec.c
+>> @@ -7,7 +7,7 @@
+>>    */
+>>   
+>>   #include "qemu/osdep.h"
+>> -#include "hw/hw.h"
+>> +#include "qemu/log.h"
+>>   #include "hw/irq.h"
+>>   #include "net/net.h"
+>>   #include "qemu/module.h"
+>> @@ -392,7 +392,8 @@ static uint64_t mcf_fec_read(void *opaque, hwaddr addr,
+>>       case 0x188: return s->emrbr;
+>>       case 0x200 ... 0x2e0: return s->mib[(addr & 0x1ff) / 4];
+>>       default:
+>> -        hw_error("mcf_fec_read: Bad address 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%" HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+>>           return 0;
+>>       }
+>>   }
+>> @@ -492,7 +493,8 @@ static void mcf_fec_write(void *opaque, hwaddr addr,
+>>           s->mib[(addr & 0x1ff) / 4] = value;
+>>           break;
+>>       default:
+>> -        hw_error("mcf_fec_write Bad address 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%" HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+> 
+> return here?
+> 
+>>       }
+>>       mcf_fec_update(s);
+>>   }
+>>
+> 
+>   Thomas
+> 
+> 
 
