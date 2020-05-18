@@ -2,80 +2,99 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A47AEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A5BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ECDB20756
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ECDB20756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3E15A2075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:34:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QbTPhUoU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E15A2075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jalP6-00063R-I4
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:26:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54064)
+	id 1jalWu-00039P-93
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jalOR-0005VX-Hh
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55250)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jalWB-0002EG-51
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:33:43 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35961)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jalOP-0000AP-Jz
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:25:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jalON-00089x-Nd
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:25:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B1B6C2E806E
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:25:39 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jalW6-0001D9-R6
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:33:42 -0400
+Received: by mail-pl1-x642.google.com with SMTP id f15so4649601plr.3
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=GvYUoWusKR0krSbBIoHRgl0073So+unYTj9MN115Ds4=;
+ b=QbTPhUoU0/t8OY6OGBiM1177WL99hI5tnAsuGNyiglBhyIDyhxYB8v61ADRECz9C32
+ EW/h2qVKk7DVHGtM81rUTB7gb25zbyrVG/1SVBbvqS8B6LX4YfK5JEqn7vUin+fIuE9G
+ IFaFwpuMXUerbEbyrM6UM4HF3KrSZW28gxUQrMkypx5/EMIgeCifXBmpJ9RM6bugd1Vv
+ GDmmyeLeRvL0laon2vc/OB7o5OUV3W4bkx8KkMMv2v2sdVItyMaJ8Kx5DIBSOGgmy9UK
+ pMKhk/wknWrU5BMMFyeJ8D3uHgtf8CoQZ4l5CwuQ+7HA56igHNsu16zMyGk9eUEngCk3
+ QJMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=GvYUoWusKR0krSbBIoHRgl0073So+unYTj9MN115Ds4=;
+ b=IHJpU6iob3sQGzyhKsScK1JHWbovHJJ7XGLhYGUX7/VNyeLsecktS3u6kFZMApyO4R
+ 1X6TVIXnT+mqmNLruwRbOU+5p48RH0QS81jBjbX1zcnMPsM7oTcRFLKBz20jvivEtn4U
+ plA4it7K1yj+xx+6Ax8xPwQAWQINTjkCMSwhMQzGKVI3EpEUZ0WRTL3IfVrj56u0sD/g
+ /Ib06IgkgcCeQkjGUzMLBsUthuWIG4npQVQgPcoN9FRPJI9ldNUcfBNZlVXcUXapgoK+
+ y/eceq4Ry03o34GRjzCzNCkvCokECuyaUIWJER2UfkVgDro1XHCSweB9L2jdeRoxQcsP
+ 0gtg==
+X-Gm-Message-State: AOAM532ym7bExS0HT9IyQEaWU70g2HznYi7g2aIVmfPxrF/tGJ9cL/sL
+ XHG+N2rOK1sEI+BLuPTVnyBVuA==
+X-Google-Smtp-Source: ABdhPJx+ekzBahHcRIK5XrJBE5LrZ0Vo4MFjzsCszbqL+oQIG+268MpNmVWtFJwrXz5vGVdpE0F4Tw==
+X-Received: by 2002:a17:90a:5b:: with SMTP id 27mr1090052pjb.190.1589830417291; 
+ Mon, 18 May 2020 12:33:37 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id m9sm8305701pgd.1.2020.05.18.12.33.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 12:33:36 -0700 (PDT)
+Subject: Re: [RISU 0/9] risu cleanups and improvements
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200513180953.20376-1-richard.henderson@linaro.org>
+ <CAFEAcA_xBwNPWFd3w36JnuBsZSKb+q-aWXHfrLe1Rb-29eXpjQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3cf98ff2-8256-eb3a-7ae0-3eeb1b27c331@linaro.org>
+Date: Mon, 18 May 2020 12:33:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2020 19:19:59 -0000
-From: Heiko Sieger <1856335@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Heiko Sieger (h-sieger)
-References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Message-Id: <158982959954.16968.1128436464563225360.malone@soybean.canonical.com>
-Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 78b4f8094f9dc5aae307204e88fd656f7d7b1887
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 13:40:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <CAFEAcA_xBwNPWFd3w36JnuBsZSKb+q-aWXHfrLe1Rb-29eXpjQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,96 +103,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With regard to Jan's comment earlier and the virsh capabilities listing
-the cores and siblings, also note the following lines from virsh
-capabilities for a 3900X CPU:
+On 5/18/20 11:39 AM, Peter Maydell wrote:
+> On Wed, 13 May 2020 at 19:09, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> This patch set does alter the format of the trace files, and thus
+>> means we'll have to re-generate these.  However, the space saved
+>> for sve trace files is significant, so I consider it worthwhile.
+>>
+>> In addition, the new --dump option allows one to inspect the
+>> contents of the trace file.
+> 
+> Alex, would you mind reviewing these risu patches, given that they're
+> mostly trace related? (Also you're the one who'll have to regenerate
+> a lot of trace files :-))
+> 
+> Richard: if you feed an old trace file to the new risu, what
+> error message does it give?
 
-    <cache>
-      <bank id=3D'0' level=3D'3' type=3D'both' size=3D'16' unit=3D'MiB' cpu=
-s=3D'0-2,12-14'/>
-      <bank id=3D'1' level=3D'3' type=3D'both' size=3D'16' unit=3D'MiB' cpu=
-s=3D'3-5,15-17'/>
-      <bank id=3D'2' level=3D'3' type=3D'both' size=3D'16' unit=3D'MiB' cpu=
-s=3D'6-8,18-20'/>
-      <bank id=3D'3' level=3D'3' type=3D'both' size=3D'16' unit=3D'MiB' cpu=
-s=3D'9-11,21-23'/>
-    </cache>
+Bah, it should have generated an error vs the magic number, but doesn't -- it
+silently exits with success.  Alex, expect a v2.
 
-virsh capabilities is perfectly able to identify the L3 cache structure
-and associate the right cpus. It would be ideal to just use the above
-output inside the libvirt domain configuration to "manually" define the
-L3 cache, or something to that effect on the qemu command line.
 
-Users could then decide to pin only part of the cpus, usually a multiple
-of 6 (in the case of the 3900X) to align with the CCX.
-
-I'm now on kernel 5.6.11 and QEMU v5.0.0.r533.gdebe78ce14-1 (from Arch
-Linux AUR qemu-git), running q35-5.1. I will try the host-passthrough
-with host-cache-info=3Don option Jan posted. Question - is host-cache-
-info=3Don the same as <cache mode=3D"passthrough"/> under <cpu mode=3Dhost-
-passthrough...?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
-
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
-
-Status in QEMU:
-  New
-
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
-
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
-
-  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
-/>
-
-  In windows, coreinfo reports correctly:
-
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
-
-  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
-/>
-
-  in windows, coreinfo reports incorrectly:
-
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
-
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter:
-  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
-
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, that
-  if you are nto a business user, you can't ever have a machine with
-  more than two CCX (6 cores) as consumer versions of Windows only
-  supports two sockets. (Should this be reported as a separate bug?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
+r~
 
