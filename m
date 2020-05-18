@@ -2,85 +2,71 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FCAC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CF7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 23:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2F742067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:54:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8c+LXOS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F742067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE6262067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 23:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE6262067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1janiW-0005xh-T4
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 17:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40666)
+	id 1jaopi-0006Qk-U2
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 19:06:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1janhr-0005SE-DY
- for qemu-devel@nongnu.org; Mon, 18 May 2020 17:53:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50651
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jaooq-0005pn-Ip; Mon, 18 May 2020 19:05:12 -0400
+Resent-Date: Mon, 18 May 2020 19:05:12 -0400
+Resent-Message-Id: <E1jaooq-0005pn-Ip@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21313)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1janhp-0005Rc-6M
- for qemu-devel@nongnu.org; Mon, 18 May 2020 17:53:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589838831;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5SdP6aOJIjg8JxVKmnhFe6cEgTeBKIgENH/aoYi2dzg=;
- b=f8c+LXOSwQ8RgFBE8Vsn8vqtYCbof/5xDdw95iveN4gaZ2J5BuYc+0wmwzFtN55rEscfuP
- G+ixCEpWX6ti/JQsCnp0KaJS8Ys5lchOHEIUk5sBobrM5ENG3yuNUxW4N4x5D3YHfokgyD
- ncjAgyHjvD7s1Uxje/u1w2oTqb+lJDk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-7lqpaOLYN76AblsELuojeg-1; Mon, 18 May 2020 17:53:47 -0400
-X-MC-Unique: 7lqpaOLYN76AblsELuojeg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E8F9835B40;
- Mon, 18 May 2020 21:53:45 +0000 (UTC)
-Received: from x1.home (ovpn-112-50.phx2.redhat.com [10.3.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ED8522B7BB;
- Mon, 18 May 2020 21:53:42 +0000 (UTC)
-Date: Mon, 18 May 2020 15:53:42 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH Kernel v22 5/8] vfio iommu: Implementation of ioctl for
- dirty pages tracking
-Message-ID: <20200518155342.4dd7df99@x1.home>
-In-Reply-To: <1589781397-28368-6-git-send-email-kwankhede@nvidia.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <1589781397-28368-6-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jaool-0004tE-Rn; Mon, 18 May 2020 19:05:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589843099; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=HfwJ4tXhpNDfm6xwGF59QIIFRiqMblY+7T1cSxDhMWVBZSr4OuTOeLxfA1Ep5ge9U0Xtu2kyorWf5kRQdzkrNvjbQ7ig5qT331ciAjHsoU7JD2e3WLsqJuWVvzjkZ6f95UzdXepSP2vpHfCHWGbGtPoG4flyovcdgKJMuxwvFj8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589843099;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=2EzsKRY043vlEy5OcPc7+PzoyH2OCs0hJ5lG7PwIfz4=; 
+ b=LCbP6gv0Sw/2JXlaAIInr1YE+yogvInyhIgaglVWj/l8GNJ+9Qdboq3iD5j4d2ne/gag9e1mNxxoSfr+o1t26WAbbR4Md6+FlgRKqN83uDdz+sF0ZGFx3fuiFZmZusJVY+blkHkjjGhFGXqFWsYXO2QXK4g+i4iPv1ekfiRvPRw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589843098345663.2666767528046;
+ Mon, 18 May 2020 16:04:58 -0700 (PDT)
+Message-ID: <158984309668.8315.11399952335249023026@45ef0f9c86ae>
+In-Reply-To: <20200518122041.10694-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH v7 00/14] LUKS: encryption slot management using amend
+ interface
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mlevitsk@redhat.com
+Date: Mon, 18 May 2020 16:04:58 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 19:05:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,519 +80,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ mlevitsk@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 11:26:34 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start dirty pages tracking while migration is active
-> - Stop dirty pages tracking.
-> - Get dirty pages bitmap. Its user space application's responsibility to
->   copy content of dirty pages from source to destination during migration.
-> 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> 
-> Bitmap is populated for already pinned pages when bitmap is allocated for
-> a vfio_dma with the smallest supported page size. Update bitmap from
-> pinning functions when tracking is enabled. When user application queries
-> bitmap, check if requested page size is same as page size used to
-> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> error.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> 
-> Fixed error reported by build bot by changing pgsize type from uint64_t
-> to size_t.
-> Reported-by: kbuild test robot <lkp@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 313 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 307 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index de17787ffece..bf740fef196f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -72,6 +72,7 @@ struct vfio_iommu {
->  	uint64_t		pgsize_bitmap;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -92,6 +93,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
->  };
->  
->  struct vfio_group {
-> @@ -126,6 +128,19 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> +
-> +/*
-> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> + * further casts to signed integer for unaligned multi-bit operation,
-> + * __bitmap_set().
-> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> + * system.
-> + */
-> +#define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
-> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> +
->  static int put_pfn(unsigned long pfn, int prot);
->  
->  /*
-> @@ -176,6 +191,74 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
->  }
->  
-> +
-> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	uint64_t npages = dma->size / pgsize;
-> +
-> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> +		return -EINVAL;
-> +
-> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-
-Curious that the extra 8-bytes are added in the next patch, but they're
-just as necessary here.
-
-We also have the explanation above about why we have the signed int
-size limitation, but we sort of ignore that when adding the bytes here.
-That limitation is derived from __bitmap_set(), whereas we only need
-these extra bits for bitmap_shift_left(), where I can't spot a signed
-int limitation.  Do you come to the same conclusion?  Maybe worth a
-comment why we think we can exceed DIRTY_BITMAP_PAGES_MAX for that
-extra padding.
-
-> +	if (!dma->bitmap)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> +{
-> +	kfree(dma->bitmap);
-> +	dma->bitmap = NULL;
-> +}
-> +
-> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	struct rb_node *p;
-> +
-> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> +
-> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
-> +	}
-> +}
-> +
-> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-
-Nit, the previous function above sets the initial value in the for()
-statement, it looks like it would fit in 80 columns here too.  We have
-examples either way in the code, so not a must fix.
-
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		int ret;
-> +
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret) {
-> +			struct rb_node *p = rb_prev(n);
-> +
-> +			for (; p; p = rb_prev(p)) {
-
-Same.
-
-> +				struct vfio_dma *dma = rb_entry(n,
-> +							struct vfio_dma, node);
-> +
-> +				vfio_dma_bitmap_free(dma);
-> +			}
-> +			return ret;
-> +		}
-> +		vfio_dma_populate_bitmap(dma, pgsize);
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-
-And another.
-
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_dma_bitmap_free(dma);
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -568,6 +651,17 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  			vfio_unpin_page_external(dma, iova, do_accounting);
->  			goto pin_unwind;
->  		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap,
-> +				   (iova - dma->iova) >> pgshift, 1);
-> +		}
->  	}
->  
->  	ret = i;
-> @@ -802,6 +896,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> +	vfio_dma_bitmap_free(dma);
->  	kfree(dma);
->  	iommu->dma_avail++;
->  }
-> @@ -829,6 +924,99 @@ static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	}
->  }
->  
-> +static int update_user_bitmap(u64 __user *bitmap, struct vfio_dma *dma,
-> +			      dma_addr_t base_iova, size_t pgsize)
-> +{
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned long nbits = dma->size >> pgshift;
-> +	unsigned long bit_offset = (dma->iova - base_iova) >> pgshift;
-> +	unsigned long copy_offset = bit_offset / BITS_PER_LONG;
-> +	unsigned long shift = bit_offset % BITS_PER_LONG;
-> +	unsigned long leftover;
-> +
-> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> +	if (dma->iommu_mapped)
-> +		bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
-
-We already calculated 'dma->size >> pgshift' as nbits above, we should
-use nbits here.  I imagine the compiler will optimize this, so take it
-as a nit.
-
-> +
-> +	if (shift) {
-> +		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
-> +				  nbits + shift);
-> +
-> +		if (copy_from_user(&leftover, (u64 *)bitmap + copy_offset,
-> +				   sizeof(leftover)))
-> +			return -EFAULT;
-> +
-> +		bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
-> +	}
-> +
-> +	if (copy_to_user((u64 *)bitmap + copy_offset, dma->bitmap,
-> +			 DIRTY_BITMAP_BYTES(nbits + shift)))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
-> +				  dma_addr_t iova, size_t size, size_t pgsize)
-> +{
-> +	struct vfio_dma *dma;
-> +	struct rb_node *n;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	int ret;
-> +
-> +	/*
-> +	 * GET_BITMAP request must fully cover vfio_dma mappings.  Multiple
-> +	 * vfio_dma mappings may be clubbed by specifying large ranges, but
-> +	 * there must not be any previous mappings bisected by the range.
-> +	 * An error will be returned if these conditions are not met.
-> +	 */
-> +	dma = vfio_find_dma(iommu, iova, 1);
-> +	if (dma && dma->iova != iova)
-> +		return -EINVAL;
-> +
-> +	dma = vfio_find_dma(iommu, iova + size - 1, 0);
-> +	if (dma && dma->iova + dma->size != iova + size)
-> +		return -EINVAL;
-> +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *ldma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		if (ldma->iova >= iova)
-> +			break;
-> +	}
-> +
-> +	dma = n ? rb_entry(n, struct vfio_dma, node) : NULL;
-> +
-> +	while (dma && (dma->iova >= iova) &&
-
-'dma->iova >= iova' is necessarily true per the above loop, right?
-We'd have NULL if we never reach an iova within range.
-
-> +		(dma->iova + dma->size <= iova + size)) {
-
-I think 'dma->iova < iova + size' is sufficient here, we've already
-tested that there are no dmas overlapping the ends, they're all either
-fully contained or fully outside.
-
-> +
-
-The double loop here is a little unnecessary, we could combine them
-into:
-
-for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-	struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-
-	if (dma->iova < iova)
-		continue;
-
-	if (dma->iova > iova + size)
-		break;
-
-	ret = update_user_bitmap(bitmap, dma, iova, pgsize);
-	if (ret)
-		return ret;
-
-	/*
-	 * Re-populate bitmap to include all pinned pages which are
-	 * considered as dirty but exclude pages which are unpinned and
-	 * pages which are marked dirty by vfio_dma_rw()
-	 */
-	bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
-	vfio_dma_populate_bitmap(dma, pgsize);
-}
-
-I think what you have works, but it's a little more complicated than it
-needs to be.  Thanks,
-
-Alex
-
-> +		ret = update_user_bitmap(bitmap, dma, iova, pgsize);
-> +		if (ret)
-> +			return ret;
-> +
-> +		/*
-> +		 * Re-populate bitmap to include all pinned pages which are
-> +		 * considered as dirty but exclude pages which are unpinned and
-> +		 * pages which are marked dirty by vfio_dma_rw()
-> +		 */
-> +		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
-> +		vfio_dma_populate_bitmap(dma, pgsize);
-> +
-> +		n = rb_next(&dma->node);
-> +		dma = n ? rb_entry(n, struct vfio_dma, node) : NULL;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> +{
-> +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX) ||
-> +	    (bitmap_size < DIRTY_BITMAP_BYTES(npages)))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -1046,7 +1234,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	unsigned long vaddr = map->vaddr;
->  	size_t size = map->size;
->  	int ret = 0, prot = 0;
-> -	uint64_t mask;
-> +	size_t pgsize;
->  	struct vfio_dma *dma;
->  
->  	/* Verify that none of our __u64 fields overflow */
-> @@ -1061,11 +1249,11 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  
->  	mutex_lock(&iommu->lock);
->  
-> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
-> +	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
->  
-> -	WARN_ON(mask & PAGE_MASK);
-> +	WARN_ON((pgsize - 1) & PAGE_MASK);
->  
-> -	if (!prot || !size || (size | iova | vaddr) & mask) {
-> +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
->  		ret = -EINVAL;
->  		goto out_unlock;
->  	}
-> @@ -1142,6 +1330,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	else
->  		ret = vfio_pin_map_dma(iommu, dma, size);
->  
-> +	if (!ret && iommu->dirty_page_tracking) {
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret)
-> +			vfio_remove_dma(iommu, dma);
-> +	}
-> +
->  out_unlock:
->  	mutex_unlock(&iommu->lock);
->  	return ret;
-> @@ -2288,6 +2482,104 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret = 0;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    flags);
-> +
-> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +			return -EINVAL;
-> +
-> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			size_t pgsize;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			pgsize = 1 << __ffs(iommu->pgsize_bitmap);
-> +			if (!iommu->dirty_page_tracking) {
-> +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> +				if (!ret)
-> +					iommu->dirty_page_tracking = true;
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking) {
-> +				iommu->dirty_page_tracking = false;
-> +				vfio_dma_bitmap_free_all(iommu);
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (dirty.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> +			unsigned long pgshift;
-> +			size_t data_size = dirty.argsz - minsz;
-> +			size_t iommu_pgsize;
-> +
-> +			if (!data_size || data_size < sizeof(range))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +					   sizeof(range)))
-> +				return -EFAULT;
-> +
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap.data,
-> +				       range.bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(range.bitmap.pgsize);
-> +			ret = verify_bitmap_size(range.size >> pgshift,
-> +						 range.bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +			mutex_lock(&iommu->lock);
-> +
-> +			iommu_pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> +
-> +			/* allow only smallest supported pgsize */
-> +			if (range.bitmap.pgsize != iommu_pgsize) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +			if (range.iova & (iommu_pgsize - 1)) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +			if (!range.size || range.size & (iommu_pgsize - 1)) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(range.bitmap.data,
-> +						iommu, range.iova, range.size,
-> +						range.bitmap.pgsize);
-> +			else
-> +				ret = -EINVAL;
-> +out_unlock:
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> @@ -2355,10 +2647,19 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  
->  	vaddr = dma->vaddr + offset;
->  
-> -	if (write)
-> +	if (write) {
->  		*copied = copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
-> -	else
-> +		if (*copied && iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> +				   *copied >> pgshift);
-> +		}
-> +	} else
->  		*copied = copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxODEyMjA0MS4xMDY5
+NC0xLW1sZXZpdHNrQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMjAwNTE4MTIyMDQxLjEwNjk0LTEtbWxldml0c2tA
+cmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjcgMDAvMTRdIExVS1M6IGVuY3J5cHRpb24gc2xv
+dCBtYW5hZ2VtZW50IHVzaW5nIGFtZW5kIGludGVyZmFjZQpUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCmExNzBhYTUgaW90ZXN0czogYWRkIHRlc3RzIGZvciBibG9ja2Rldi1hbWVuZApjY2Y0YWQ4
+IGJsb2NrL3Fjb3cyOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQKZjY2OTgyMyBibG9jay9jcnlw
+dG86IGltcGxlbWVudCBibG9ja2Rldi1hbWVuZApkMTRlMDMyIGJsb2NrL2NvcmU6IGFkZCBnZW5l
+cmljIGluZnJhc3RydWN0dXJlIGZvciB4LWJsb2NrZGV2LWFtZW5kIHFtcCBjb21tYW5kCmNkNjAy
+NDMgaW90ZXN0czogcWVtdS1pbWcgdGVzdHMgZm9yIGx1a3Mga2V5IG1hbmFnZW1lbnQKNjY5OTI0
+ZSBpb3Rlc3RzOiBmaWx0ZXIgZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUgb3B0aW9ucwo5
+YjJhMjkwIGJsb2NrL3Fjb3cyOiBleHRlbmQgcWVtdS1pbWcgYW1lbmQgaW50ZXJmYWNlIHdpdGgg
+Y3J5cHRvIG9wdGlvbnMKZmU3MGNhYyBibG9jay9jcnlwdG86IGltcGxlbWVudCB0aGUgZW5jcnlw
+dGlvbiBrZXkgbWFuYWdlbWVudAowNWU0MjY0IGJsb2NrL2NyeXB0bzogcmVuYW1lIHR3byBmdW5j
+dGlvbnMKNTBlYzg4NSBibG9jay9hbWVuZDogcmVmYWN0b3IgcWNvdzIgYW1lbmQgb3B0aW9ucwph
+ODI0ZjdkIGJsb2NrL2FtZW5kOiBzZXBhcmF0ZSBhbWVuZCBhbmQgY3JlYXRlIG9wdGlvbnMgZm9y
+IHFlbXUtaW1nCmNlZTNjZWIgYmxvY2svYW1lbmQ6IGFkZCAnZm9yY2UnIG9wdGlvbgowZDE1ZTk1
+IHFjcnlwdG8vbHVrczogaW1wbGVtZW50IGVuY3J5cHRpb24ga2V5IG1hbmFnZW1lbnQKZmMxNzk3
+OSBxY3J5cHRvL2NvcmU6IGFkZCBnZW5lcmljIGluZnJhc3RydWN0dXJlIGZvciBjcnlwdG8gb3B0
+aW9ucyBhbWVuZG1lbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTQgQ2hlY2tpbmcgY29tbWl0
+IGZjMTc5NzlhYzgzMiAocWNyeXB0by9jb3JlOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBm
+b3IgY3J5cHRvIG9wdGlvbnMgYW1lbmRtZW50KQoyLzE0IENoZWNraW5nIGNvbW1pdCAwZDE1ZTk1
+YzMzNTQgKHFjcnlwdG8vbHVrczogaW1wbGVtZW50IGVuY3J5cHRpb24ga2V5IG1hbmFnZW1lbnQp
+CjMvMTQgQ2hlY2tpbmcgY29tbWl0IGNlZTNjZWJlOTFjNiAoYmxvY2svYW1lbmQ6IGFkZCAnZm9y
+Y2UnIG9wdGlvbikKNC8xNCBDaGVja2luZyBjb21taXQgYTgyNGY3ZDI0ZWVjIChibG9jay9hbWVu
+ZDogc2VwYXJhdGUgYW1lbmQgYW5kIGNyZWF0ZSBvcHRpb25zIGZvciBxZW11LWltZykKRVJST1I6
+IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEg
+ZG8gLSB3aGlsZSBsb29wCiMzMjogRklMRTogYmxvY2svcWNvdzIuYzo1NjM3OgorI2RlZmluZSBR
+Q09XX0NPTU1PTl9PUFRJT05TICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfU0laRSwgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BU
+X1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5o
+ZWxwID0gIlZpcnR1YWwgZGlzayBzaXplIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BU
+X0NPTVBBVF9MRVZFTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5
+cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XAorICAgICAgICAuaGVscCA9ICJDb21wYXRpYmlsaXR5IGxldmVsICh2MiBbMC4xMF0gb3IgdjMg
+WzEuMV0pIiAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFt
+ZSA9IEJMT0NLX09QVF9CQUNLSU5HX0ZJTEUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
+CisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiRmlsZSBuYW1lIG9mIGEgYmFzZSBpbWFn
+ZSIgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfQkFDS0lOR19GTVQsICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NUUklORywgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkltYWdlIGZvcm1h
+dCBvZiB0aGUgYmFzZSBpbWFnZSIgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0RBVEFfRklMRSwgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJ
+TkcsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9
+ICJGaWxlIG5hbWUgb2YgYW4gZXh0ZXJuYWwgZGF0YSBmaWxlIiAgICAgICAgICAgICAgICBcCisg
+ICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9EQVRB
+X0ZJTEVfUkFXLCAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0g
+UUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAg
+ICAgICAgLmhlbHAgPSAiVGhlIGV4dGVybmFsIGRhdGEgZmlsZSBtdXN0IHN0YXkgdmFsaWQgIiAg
+ICAgICAgICAgXAorICAgICAgICAgICAgICAgICJhcyBhIHJhdyBpbWFnZSIgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
+ICAgICAubmFtZSA9IEJMT0NLX09QVF9FTkNSWVBULCAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiRW5jcnlwdCB0aGUgaW1h
+Z2Ugd2l0aCBmb3JtYXQgJ2FlcycuIChEZXByZWNhdGVkICIgXAorICAgICAgICAgICAgICAgICJp
+biBmYXZvciBvZiAiIEJMT0NLX09QVF9FTkNSWVBUX0ZPUk1BVCAiPWFlcykiLCAgICBcCisgICAg
+fSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9FTkNSWVBU
+X0ZPUk1BVCwgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVN
+VV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAg
+ICAgLmhlbHAgPSAiRW5jcnlwdCB0aGUgaW1hZ2UsIGZvcm1hdCBjaG9pY2VzOiAnYWVzJywgJ2x1
+a3MnIiwgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfS0VZX1NFQ1JF
+VCgiZW5jcnlwdC4iLCAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgIklEIG9mIHNlY3Jl
+dCBwcm92aWRpbmcgcWNvdyBBRVMga2V5IG9yIExVS1MgcGFzc3BocmFzZSIpLCAgXAorICAgIEJM
+T0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX0FMRygiZW5jcnlwdC4iKSwgICAgICAgICAg
+ICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19DSVBIRVJfTU9ERSgiZW5jcnlw
+dC4iKSwgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtTX0lWR0VO
+X0FMRygiZW5jcnlwdC4iKSwgICAgICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRf
+REVGX0xVS1NfSVZHRU5fSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICBcCisgICAgQkxP
+Q0tfQ1JZUFRPX09QVF9ERUZfTFVLU19IQVNIX0FMRygiZW5jcnlwdC4iKSwgICAgICAgICAgICAg
+ICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtTX0lURVJfVElNRSgiZW5jcnlwdC4i
+KSwgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tf
+T1BUX0NMVVNURVJfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAg
+LnR5cGUgPSBRRU1VX09QVF9TSVpFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXAorICAgICAgICAuaGVscCA9ICJxY293MiBjbHVzdGVyIHNpemUiLCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0gc3RyaW5naWZ5KERF
+RkFVTFRfQ0xVU1RFUl9TSVpFKSAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1BSRUFMTE9DLCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJQcmVhbGxv
+Y2F0aW9uIG1vZGUgKGFsbG93ZWQgdmFsdWVzOiBvZmYsICIgICAgICAgICBcCisgICAgICAgICAg
+ICAgICAgIm1ldGFkYXRhLCBmYWxsb2MsIGZ1bGwpIiAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BU
+X0xBWllfUkVGQ09VTlRTLCAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5
+cGUgPSBRRU1VX09QVF9CT09MLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XAorICAgICAgICAuaGVscCA9ICJQb3N0cG9uZSByZWZjb3VudCB1cGRhdGVzIiwgICAgICAgICAg
+ICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0gIm9mZiIgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
+CisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1JFRkNPVU5UX0JJVFMsICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJXaWR0aCBvZiBh
+IHJlZmVyZW5jZSBjb3VudCBlbnRyeSBpbiBiaXRzIiwgICAgICAgICBcCisgICAgICAgIC5kZWZf
+dmFsdWVfc3RyID0gIjE2IiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0NP
+TVBSRVNTSU9OX1RZUEUsICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUg
+PSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgICAgICAuaGVscCA9ICJDb21wcmVzc2lvbiBtZXRob2QgdXNlZCBmb3IgaW1hZ2UgY2x1c3Rl
+ciAiICAgICAgICBcCisgICAgICAgICAgICAgICAgImNvbXByZXNzaW9uIiwgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmRlZl92YWx1ZV9zdHIgPSAiemxp
+YiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0KCnRvdGFsOiAx
+IGVycm9ycywgMCB3YXJuaW5ncywgMjQ0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTQgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvMTQgQ2hlY2tpbmcgY29tbWl0IDUwZWM4ODU3NzQxMCAo
+YmxvY2svYW1lbmQ6IHJlZmFjdG9yIHFjb3cyIGFtZW5kIG9wdGlvbnMpCjYvMTQgQ2hlY2tpbmcg
+Y29tbWl0IDA1ZTQyNjQ1Y2VjMyAoYmxvY2svY3J5cHRvOiByZW5hbWUgdHdvIGZ1bmN0aW9ucykK
+Ny8xNCBDaGVja2luZyBjb21taXQgZmU3MGNhY2M2ODRkIChibG9jay9jcnlwdG86IGltcGxlbWVu
+dCB0aGUgZW5jcnlwdGlvbiBrZXkgbWFuYWdlbWVudCkKOC8xNCBDaGVja2luZyBjb21taXQgOWIy
+YTI5MDRhNTI1IChibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVyZmFjZSB3
+aXRoIGNyeXB0byBvcHRpb25zKQo5LzE0IENoZWNraW5nIGNvbW1pdCA2Njk5MjRlMmM0ODYgKGlv
+dGVzdHM6IGZpbHRlciBmZXcgbW9yZSBsdWtzIHNwZWNpZmljIGNyZWF0ZSBvcHRpb25zKQoxMC8x
+NCBDaGVja2luZyBjb21taXQgY2Q2MDI0MzljNmVkIChpb3Rlc3RzOiBxZW11LWltZyB0ZXN0cyBm
+b3IgbHVrcyBrZXkgbWFuYWdlbWVudCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
+ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTU6IApuZXcgZmlsZSBt
+b2RlIDEwMDc1NQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MzEgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMTAvMTQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTEvMTQgQ2hlY2tpbmcg
+Y29tbWl0IGQxNGUwMzIwMWQ5ZCAoYmxvY2svY29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1
+cmUgZm9yIHgtYmxvY2tkZXYtYW1lbmQgcW1wIGNvbW1hbmQpCldBUk5JTkc6IGFkZGVkLCBtb3Zl
+ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMx
+OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjIx
+IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEy
+LzE0IENoZWNraW5nIGNvbW1pdCBmNjY5ODIzNjVmNTIgKGJsb2NrL2NyeXB0bzogaW1wbGVtZW50
+IGJsb2NrZGV2LWFtZW5kKQoxMy8xNCBDaGVja2luZyBjb21taXQgY2NmNGFkOGViMjRhIChibG9j
+ay9xY293MjogaW1wbGVtZW50IGJsb2NrZGV2LWFtZW5kKQoxNC8xNCBDaGVja2luZyBjb21taXQg
+YTE3MGFhNWI5MDgwIChpb3Rlc3RzOiBhZGQgdGVzdHMgZm9yIGJsb2NrZGV2LWFtZW5kKQpXQVJO
+SU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5l
+ZWQgdXBkYXRpbmc/CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMs
+IDEgd2FybmluZ3MsIDU5MSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8xNCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDIwMDUxODEyMjA0MS4xMDY5NC0xLW1sZXZpdHNrQHJlZGhhdC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
