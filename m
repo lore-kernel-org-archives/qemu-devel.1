@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7D2C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1A6C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3250020674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3250020674
+	by mail.kernel.org (Postfix) with ESMTPS id 1D09020674
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 08:22:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D09020674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jab2a-0006bS-Df
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:22:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45162)
+	id 1jab2b-0006cV-Aw
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 04:22:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jab1v-0005jE-Ir
- for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51114)
+ id 1jab1w-0005ki-Sy
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51136)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jab1u-000386-G7
- for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:47 -0400
+ id 1jab1u-000387-G7
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 04:21:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jab1q-0004DO-49
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:42 +0000
+ id 1jab1q-00043s-Qq
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AB86B2E818D
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:31 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 391572E824D
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:21:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2020 08:13:27 -0000
+Date: Mon, 18 May 2020 08:14:41 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1837094@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
 References: <156347205992.30489.16276823737610194084.malonedeb@soybean.canonical.com>
-Message-Id: <158978960770.22208.17657857732858908573.malone@wampee.canonical.com>
+Message-Id: <158978968163.22954.295445845100130972.malone@gac.canonical.com>
 Subject: [Bug 1837094] Re: UndefinedBehaviorSanitizer crash around
  slirp::ip_reass()
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -66,7 +66,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c561542a5f127bcef8ce47d364a0cf06fd418ddb
+X-Launchpad-Hash: 68616629ce8390fa3dcaa37b4063bcffc944c7b9
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 04:21:44
@@ -94,16 +94,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I apologize for not understanding this bug was a security issue, and not
-insisting on it.
+Fixed in QEMU release v5.0.0
 
-It has been fixed in SLiRP by "Fix use-afte-free in ip_reass() (CVE-2020-19=
-83)":
-https://gitlab.freedesktop.org/slirp/libslirp/commit/9bd6c591
-
-And in QEMU by commit 7769c23774 "slirp: update to fix CVE-2020-1983".
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2020-1983
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
