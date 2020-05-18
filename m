@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92199C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21C3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 598FD20715
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6890320715
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:53:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ijhNGJt7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598FD20715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="iKjOTEpo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6890320715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaZdl-00057L-GO
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 02:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33502)
+	id 1jaZeX-00070l-FZ
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 02:53:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jaZZl-0005y0-Hr
- for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:37 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:17229)
+ id 1jaZa7-0006nk-16
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:59 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:17268)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jaZZi-0004MW-S4
- for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:37 -0400
+ id 1jaZa5-0004OJ-RJ
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:58 -0400
 Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
  hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ec22f330000>; Sun, 17 May 2020 23:46:12 -0700
+ id <B5ec22f4b0000>; Sun, 17 May 2020 23:46:35 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate102.nvidia.com (PGP Universal service);
- Sun, 17 May 2020 23:48:33 -0700
+ Sun, 17 May 2020 23:48:56 -0700
 X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Sun, 17 May 2020 23:48:33 -0700
+ by hqpgpgate102.nvidia.com on Sun, 17 May 2020 23:48:56 -0700
 Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 18 May
- 2020 06:48:32 +0000
+ 2020 06:48:55 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 18 May 2020 06:48:24 +0000
+ Transport; Mon, 18 May 2020 06:48:48 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH QEMU v22 13/18] vfio: Get migration capability flags for
- container
-Date: Mon, 18 May 2020 11:43:13 +0530
-Message-ID: <1589782398-24406-14-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH QEMU v22 16/18] vfio: Add ioctl to get dirty pages bitmap
+ during dma unmap.
+Date: Mon, 18 May 2020 11:43:16 +0530
+Message-ID: <1589782398-24406-17-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589782398-24406-1-git-send-email-kwankhede@nvidia.com>
 References: <1589782398-24406-1-git-send-email-kwankhede@nvidia.com>
@@ -61,16 +61,16 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1589784372; bh=JNjKlN0vKZPPS1PavuXbSBturKW8V18Gp9dWsQv+bX0=;
+ t=1589784395; bh=S0+BmY8S+in8BE9ktmqbNT/3F47M/wR3Rf9e5lCucDY=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=ijhNGJt7l63xeSA61jC6vfYEPdyol0ld9ajAJO6XtafypXuzqce71B4Lzr3lglgO4
- AFGtEh92H/J8ubxilo2qUaEd1GJtaGk/NHULEQoh8lpAvc00Yf84CYFvzoCzioluTu
- 6QKF160OnNPLFwYjmLInzBL1eSc0krgEBUirxzzOfiDI0QBNdak2delvmXLATHHO/i
- WXiHy2huMNVPUjsFkCUg1ZoocUgjXQkDM5l8FIjWxjPQzAlEfELTCmbv5T/kS5FShQ
- Y+WHPeZLvDbqQp22o9s6gk7Dy1MilC0WWLbPACngdCBcHuqD4GRkBWu6QEnqly6ndI
- +RmbP69sDrrWg==
+ b=iKjOTEpoXKQQO4eFYODxg0Z/4BBSxWHRf4vxbmQMmVEkuEhBsUqkovFJscFfVRsnz
+ 3P7DaliXgxWHxTioH5YLGepXliX2Xn3X/T24eYv5xoRCH+5ChO6xfnWuirUZvA4icC
+ LhQBZPDir9kLGfuacsacDC8BV4cSPyV4oVi9mGQbkgHYIq8IzB5lcrKjGv4OLp2gGV
+ +LN1gZmXvIn/6pGyelFPVheRnGJtJZfNEWGO1D13472/dlRz222EGHSHvoQW/I8clK
+ 7i9hitpo/eDr2QbFvnLth5shP3lgSt778z45HEOM+//Bk/QcBYzpCnAF5kwjpzPOeY
+ Csq90Kd3P5dSQ==
 Received-SPF: pass client-ip=216.228.121.143;
  envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 02:29:50
@@ -99,168 +99,157 @@ Cc: cohuck@redhat.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
  quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
  mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
  zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
- changpeng.liu@intel.com, eskultet@redhat.com, Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com
+ dgilbert@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added helper functions to get IOMMU info capability chain.
-Added function to get migration capability information from that
-capability chain for IOMMU container.
+With vIOMMU, IO virtual address range can get unmapped while in pre-copy
+phase of migration. In that case, unmap ioctl should return pages pinned
+in that range and QEMU should find its correcponding guest physical
+addresses and report those dirty.
 
-Similar change was proposed earlier:
-https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg03759.html
+Note: This patch is not yet tested. I'm trying to see how I can test this
+code path.
 
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/common.c              | 91 +++++++++++++++++++++++++++++++++++++++----
- include/hw/vfio/vfio-common.h |  3 ++
- 2 files changed, 86 insertions(+), 8 deletions(-)
+ hw/vfio/common.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 83 insertions(+), 4 deletions(-)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 2c2db4bcba20..8e9d1431178c 100644
+index 4cad6fc20c35..9b29de654c7f 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -1227,6 +1227,75 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-     return 0;
+@@ -311,11 +311,85 @@ static bool vfio_devices_are_stopped_and_saving(void)
+     return true;
  }
  
-+static int vfio_get_iommu_info(VFIOContainer *container,
-+                               struct vfio_iommu_type1_info **info)
++static bool vfio_devices_are_running_and_saving(void)
 +{
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
 +
-+    size_t argsz = sizeof(struct vfio_iommu_type1_info);
-+
-+    *info = g_new0(struct vfio_iommu_type1_info, 1);
-+again:
-+    (*info)->argsz = argsz;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
-+        g_free(*info);
-+        *info = NULL;
-+        return -errno;
-+    }
-+
-+    if (((*info)->argsz > argsz)) {
-+        argsz = (*info)->argsz;
-+        *info = g_realloc(*info, argsz);
-+        goto again;
-+    }
-+
-+    return 0;
-+}
-+
-+static struct vfio_info_cap_header *
-+vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    void *ptr = info;
-+
-+    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-+        return NULL;
-+    }
-+
-+    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-+        if (hdr->id == id) {
-+            return hdr;
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
++                (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
++                continue;
++            } else {
++                return false;
++            }
 +        }
 +    }
-+
-+    return NULL;
++    return true;
 +}
 +
-+static void vfio_get_iommu_info_migration(VFIOContainer *container,
-+                                         struct vfio_iommu_type1_info *info)
++static int vfio_dma_unmap_bitmap(VFIOContainer *container,
++                                 hwaddr iova, ram_addr_t size,
++                                 IOMMUTLBEntry *iotlb)
 +{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_iommu_type1_info_cap_migration *cap_mig;
++    struct vfio_iommu_type1_dma_unmap *unmap;
++    struct vfio_bitmap *bitmap;
++    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
++    int ret;
 +
-+    hdr = vfio_get_iommu_info_cap(info, VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION);
-+    if (!hdr) {
-+        return;
++    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
++    if (!unmap) {
++        return -ENOMEM;
 +    }
 +
-+    cap_mig = container_of(hdr, struct vfio_iommu_type1_info_cap_migration,
-+                            header);
-+
-+    container->dirty_pages_supported = true;
-+    container->max_dirty_bitmap_size = cap_mig->max_dirty_bitmap_size;
-+    container->dirty_pgsizes = cap_mig->pgsize_bitmap;
++    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
++    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
++    bitmap = (struct vfio_bitmap *)&unmap->data;
 +
 +    /*
 +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-+     * TARGET_PAGE_SIZE to mark those dirty.
++     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
++     * TARGET_PAGE_SIZE.
 +     */
-+    assert(container->dirty_pgsizes & TARGET_PAGE_SIZE);
++
++    bitmap->pgsize = TARGET_PAGE_SIZE;
++    bitmap->size = ROUND_UP(pages / 8, sizeof(uint64_t));
++
++    if (bitmap->size > container->max_dirty_bitmap_size) {
++        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
++        ret = -E2BIG;
++        goto unmap_exit;
++    }
++
++    bitmap->data = g_malloc0(bitmap->size);
++    if (!bitmap->data) {
++        error_report("UNMAP: Error allocating bitmap of size 0x%llx",
++                     bitmap->size);
++        ret = -ENOMEM;
++        goto unmap_exit;
++    }
++
++    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
++    if (!ret) {
++        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
++                iotlb->translated_addr, pages);
++    } else {
++        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %d", -errno);
++    }
++
++    g_free(bitmap->data);
++unmap_exit:
++    g_free(unmap);
++    return ret;
 +}
 +
- static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-                                   Error **errp)
+ /*
+  * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
+  */
+ static int vfio_dma_unmap(VFIOContainer *container,
+-                          hwaddr iova, ram_addr_t size)
++                          hwaddr iova, ram_addr_t size,
++                          IOMMUTLBEntry *iotlb)
  {
-@@ -1291,6 +1360,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container->space = space;
-     container->fd = fd;
-     container->error = NULL;
-+    container->dirty_pages_supported = false;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
+     struct vfio_iommu_type1_dma_unmap unmap = {
+         .argsz = sizeof(unmap),
+@@ -324,6 +398,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
+         .size = size,
+     };
  
-@@ -1303,7 +1373,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     case VFIO_TYPE1v2_IOMMU:
-     case VFIO_TYPE1_IOMMU:
-     {
--        struct vfio_iommu_type1_info info;
-+        struct vfio_iommu_type1_info *info;
- 
++    if (iotlb && container->dirty_pages_supported &&
++        vfio_devices_are_running_and_saving()) {
++        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
++    }
++
+     while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
          /*
-          * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
-@@ -1312,15 +1382,20 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-          * existing Type1 IOMMUs generally support any IOVA we're
-          * going to actually try in practice.
-          */
--        info.argsz = sizeof(info);
--        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
--        /* Ignore errors */
--        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
-+        ret = vfio_get_iommu_info(container, &info);
-+        if (ret) {
-+                goto free_container_exit;
-+        }
-+
-+        if (!(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
-             /* Assume 4k IOVA page size */
--            info.iova_pgsizes = 4096;
-+            info->iova_pgsizes = 4096;
-         }
--        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
--        container->pgsizes = info.iova_pgsizes;
-+        vfio_host_win_add(container, 0, (hwaddr)-1, info->iova_pgsizes);
-+        container->pgsizes = info->iova_pgsizes;
-+
-+        vfio_get_iommu_info_migration(container, info);
-+        g_free(info);
-         break;
+          * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
+@@ -371,7 +450,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
+      * the VGA ROM space.
+      */
+     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
+-        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
++        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
+          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
+         return 0;
      }
-     case VFIO_SPAPR_TCE_v2_IOMMU:
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c78033e4149d..5a57a78ec517 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -79,6 +79,9 @@ typedef struct VFIOContainer {
-     unsigned iommu_type;
-     Error *error;
-     bool initialized;
-+    bool dirty_pages_supported;
-+    uint64_t dirty_pgsizes;
-+    uint64_t max_dirty_bitmap_size;
-     unsigned long pgsizes;
-     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
+@@ -519,7 +598,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+                          iotlb->addr_mask + 1, vaddr, ret);
+         }
+     } else {
+-        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
++        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
+         if (ret) {
+             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+                          "0x%"HWADDR_PRIx") = %d (%m)",
+@@ -822,7 +901,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     }
+ 
+     if (try_unmap) {
+-        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
++        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
+         if (ret) {
+             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+                          "0x%"HWADDR_PRIx") = %d (%m)",
 -- 
 2.7.0
 
