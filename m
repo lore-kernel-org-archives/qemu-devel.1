@@ -7,98 +7,98 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB66C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2697C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA948206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A668206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVlkt29R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA948206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsbWCurp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A668206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jadt7-0002Qw-2E
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:24:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40152)
+	id 1jadto-0003iV-QW
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:25:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jadsa-0001wP-EW
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:24:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26851
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jadt5-0002Y2-TY
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:24:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48975
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jadsY-0008RP-St
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:24:19 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jadt4-0008Sc-Qt
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:24:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589801057;
+ s=mimecast20190719; t=1589801089;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8b7SIVmJcPxZQRtuKK/ErsjbRd3Sjcsi8EHh2GNBBwU=;
- b=MVlkt29RqweN0gDpCkLiNHkzg+TBQChqrWkpdmxCTQfhRTbMi2Qz9LKExaR5XRY/5Gwlvz
- nBx5MOF+2vCY3HfbaACYcUxUrRahC4eRme2wBTt+QUHvL2vjn1iViwd/nPu+1/UouGfp13
- qdRed1DDlPu2uj7Bqhvp3LK4ldpkKlw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-3Bg-zP0GMmepLRw18Onz_g-1; Mon, 18 May 2020 07:24:15 -0400
-X-MC-Unique: 3Bg-zP0GMmepLRw18Onz_g-1
-Received: by mail-wm1-f72.google.com with SMTP id t82so2862019wmf.4
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 04:24:15 -0700 (PDT)
+ bh=95OJlbsIq+3zM0doJ7T9YqKQycJAvmjcXl5ajA7kBEk=;
+ b=VsbWCurpx2w3x7x6bH8sHNFsQWrKtt4SiMXYnNcEKvXzguhOJuY5fFrcL1cWzqVx7Vkb8k
+ G4ih7v7hcaq+TVKA+78tjKZhnfbBU0P+xX4RCKrhBFhOzg/xsb7GmOlVoopTriwPx8Kenp
+ zGdZAtawDqjGAMwQNXHC89HJE4ZLaQI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-BWI1O0GpOgKu7xeXzo1NjA-1; Mon, 18 May 2020 07:24:46 -0400
+X-MC-Unique: BWI1O0GpOgKu7xeXzo1NjA-1
+Received: by mail-wr1-f70.google.com with SMTP id q13so5506538wrn.14
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 04:24:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8b7SIVmJcPxZQRtuKK/ErsjbRd3Sjcsi8EHh2GNBBwU=;
- b=l9+wlsOiuMMg/nBUS0Loie/9hmYug+/WumcO9QNMqB8TM2FRY8t0hQmxm9MnlqUtrh
- 6HxnB1ElxvIFOSHwNMJ4f2iG3SmBnBx8Tk10JLZt0X8XV5ZfZN0JItlUZvP9S4H6YXz1
- uCMyhHGRcuQ3K72mH6Bc+UNtZEsmlq8F2NPlGdLl+8qYm7LzM2XlCiI0J+bCjTWY+8ur
- Yl4ajhiVusq0bVPwFGmw8jDzeQtn1Rk4bYraFvuvuapDxiBvXul2fslvjyAuCfDpmfWC
- giuXlkRrCRij2333uD0I/ZFp+KU2JHygNE2bYJBRKapSh6e0l0Y6DV8qr3KoTu/6Ms15
- E7vA==
-X-Gm-Message-State: AOAM533Zi0r+t4WAnjva0ApJQ5kPJT21Ru14jj0NVFyF278gueZVWqsa
- e7pDHDfSuGSNFB8rdpSvALb+uVQMdlKt+rJdeWLJVBK+Y+lJA4YlzLcJVMpkT9t4gWpX9SDawGF
- vzlzLnPJTpfqUoPo=
-X-Received: by 2002:adf:c508:: with SMTP id q8mr18404586wrf.4.1589801054277;
- Mon, 18 May 2020 04:24:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzeXEm/q5KfGVNEZyIwY+qwv1kygU+H1ekbcrgS9ErQNUTrR8xN2LGygdGpkgEhkORjY83RLA==
-X-Received: by 2002:adf:c508:: with SMTP id q8mr18404558wrf.4.1589801054032;
- Mon, 18 May 2020 04:24:14 -0700 (PDT)
+ bh=95OJlbsIq+3zM0doJ7T9YqKQycJAvmjcXl5ajA7kBEk=;
+ b=oA20YOM4qON0TgOBdAAD/UZitiXNU7teyKJQzsSx3RQokl2EUIXFnibYBFrYHxGscK
+ CeEESf6czjMPuZndwkecaYo2CEqQVl++TwBGEF9JgK4kjpXaFqTp60HjiBUNNDZ2coVT
+ aQ8VL3WhcMGfOQwOz9+3MZzLwbPezuB6FrB0+DxhI/G8UsVTBRolA1nS37pYLFaUCg9p
+ J7ikVL9KBkqFHntq9usA1NPpCNdrauJV6bBib9jeSSgLczlvDYYgjVctvmbqPX2KTnI0
+ +TEeXZZ4bUR6hq+YsH9NzLEf6ouqpEG7fwbsO5scbzmKuhUSIkaGl3A+Vp4FGoTi4eSD
+ Rcog==
+X-Gm-Message-State: AOAM533mBc3lXhPKmiCRo61Q3FwmBnDl2wGO6c7wIDKfPej5gEGrb+8Y
+ 2W307l8mP523oBK3c/zgi45hUgoq/dWDweZZN3/3PIR53JIs9jNywxdArtLbMe+8tRHQ+0ucgGQ
+ 4FBGNMdIyzwAQYto=
+X-Received: by 2002:a5d:4f81:: with SMTP id d1mr20328022wru.95.1589801085171; 
+ Mon, 18 May 2020 04:24:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJykODMZpB3pqyppYtEhzNwjKu/E5ALQVTNnIzo2rAkHldj+Mpz3GFPireH/MQ8MdGEim6HPig==
+X-Received: by 2002:a5d:4f81:: with SMTP id d1mr20328009wru.95.1589801084948; 
+ Mon, 18 May 2020 04:24:44 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id r9sm15952464wmg.47.2020.05.18.04.24.13
+ by smtp.gmail.com with ESMTPSA id m65sm16493556wmm.17.2020.05.18.04.24.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 May 2020 04:24:13 -0700 (PDT)
-Subject: Re: [PATCH] replay: synchronize on every virtual timer callback
+ Mon, 18 May 2020 04:24:44 -0700 (PDT)
+Subject: Re: [PATCH] icount: fix shift=auto for record/replay
 To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <158875304273.3986.105601155554744438.stgit@pasha-ThinkPad-X280>
+References: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c74e9498-75b4-d80c-e380-3d448497cfd0@redhat.com>
-Date: Mon, 18 May 2020 13:24:12 +0200
+Message-ID: <4f87511a-53bb-f37a-a529-c34c9e7da08c@redhat.com>
+Date: Mon, 18 May 2020 13:24:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <158875304273.3986.105601155554744438.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:51:00
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,42 +113,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com,
- dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru
+ dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+ Alex
++Alex
 
-On 5/6/20 10:17 AM, Pavel Dovgalyuk wrote:
-> Sometimes virtual timer callbacks depend on order
-> of virtual timer processing and warping of virtual clock.
-> Therefore every callback should be logged to make replay deterministic.
-> This patch creates a checkpoint before every virtual timer callback.
-> With these checkpoints virtual timers processing and clock warping
-> events order is completely deterministic.
+On 5/6/20 9:52 AM, Pavel Dovgalyuk wrote:
+> This patch fixes shift=auto when record/replay is enabled.
+> Now user does not need to guess the best shift value.
 > 
 > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > ---
->   util/qemu-timer.c |    5 +++++
->   1 file changed, 5 insertions(+)
+>   cpus.c |    4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-> index d548d3c1ad..47833f338f 100644
-> --- a/util/qemu-timer.c
-> +++ b/util/qemu-timer.c
-> @@ -588,6 +588,11 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
->           qemu_mutex_lock(&timer_list->active_timers_lock);
+> diff --git a/cpus.c b/cpus.c
+> index 5670c96bcf..dfb9f4717f 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -379,7 +379,8 @@ static void icount_adjust(void)
 >   
->           progress = true;
-> +        /*
-> +         * Callback may insert new checkpoints, therefore add new checkpoint
-> +         * for the virtual timers.
-> +         */
-> +        need_replay_checkpoint = timer_list->clock->type == QEMU_CLOCK_VIRTUAL;
->       }
->       qemu_mutex_unlock(&timer_list->active_timers_lock);
+>       seqlock_write_lock(&timers_state.vm_clock_seqlock,
+>                          &timers_state.vm_clock_lock);
+> -    cur_time = cpu_get_clock_locked();
+> +    cur_time = REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
+> +                                   cpu_get_clock_locked());
+>       cur_icount = cpu_get_icount_locked();
 >   
+>       delta = cur_icount - cur_time;
+> @@ -685,6 +686,7 @@ static const VMStateDescription icount_vmstate_timers = {
+>       .fields = (VMStateField[]) {
+>           VMSTATE_INT64(qemu_icount_bias, TimersState),
+>           VMSTATE_INT64(qemu_icount, TimersState),
+> +        VMSTATE_INT16(icount_time_shift, TimersState),
+>           VMSTATE_END_OF_LIST()
+>       },
+>       .subsections = (const VMStateDescription*[]) {
 > 
 > 
 
