@@ -2,85 +2,91 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2490FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7439FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF937205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D00120657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ubCe1pER"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF937205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cW9YW0La"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D00120657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jal4z-0002cq-2B
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:05:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51338)
+	id 1jal7M-0003px-DM
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jal4I-0001i5-8i
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:04:54 -0400
-Received: from mail-oo1-xc31.google.com ([2607:f8b0:4864:20::c31]:34590)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jal4H-0002ZQ-4S
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:04:53 -0400
-Received: by mail-oo1-xc31.google.com with SMTP id s139so2290049oos.1
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:04:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=R7rJdqi+lpeDF5cDwPxgi2/om4RFbIn37QJspD6jnNE=;
- b=ubCe1pERX5dWDL0ahYilz1rxU5dOlyK+7KC77qJ+Xyvpa5eBGl3vb5yMQBjYX3HeLJ
- 9TqyDPZv9xjUBOAyj06oMjewC4xmPtCAqWiNBVz88a24dVFsFfgvFf18/XwP98YL5dvL
- xTWbCrQpMg3FT61kEcrzOGRRyN8zi6wNH54S3FB6w6EJW3VcmqBcscukA30NRc40UOPx
- iK6w28jEOCzFTyTcdSX5kFWXVQC5qxPrC0U8ZoB4hFFz0k59sgnCRorvGPJ6Be/94gVW
- yUUM81MH2lOdodatwq5nUfA+rrYEp1GmgJ+lboln1uHPp4EncAWxtgzCT1z5RbA4mmeT
- UGmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=R7rJdqi+lpeDF5cDwPxgi2/om4RFbIn37QJspD6jnNE=;
- b=d9UjxQON2NY5qi7vyVuAFa8JDntyfs0wmss5qUVCbde1ZbiKn1EZOvez7pw05zzHRE
- 81J7RDQ+um1y7fd0E0WRda5fsiGijyn9tbKIfwLE74M1Acde9GwFnDgiIgi7YHvVNALo
- nCHHNWxSU0lBH2O+Dxnxcjv9xso703YoALTQ94a6UReOD+rPxltWuYpaFp0+Oe2Nih11
- a96DdX9F+NhSqM0oVMp1VOU3U3K58tBcovlSU4s1LcsFf+NHrag8hsZXkM4nCYPINFTg
- rkAmsooY0KyMoRkz946EFT67lw8r5mc/JH8vEITYl1NC/AOoOirB+MexVMK/edw4hvHn
- O5mg==
-X-Gm-Message-State: AOAM530sX5iUe99LfBe37/erPbmWItIxnftAct+13dYs7r2qd7mUHpmt
- nQrzjFmUAMkcMx3hCA0OZaiUNBtc+NTqf+NzTwTqHQ==
-X-Google-Smtp-Source: ABdhPJwjZBDQwWtOT5BUuLe6pA9byNalm0eX7tAAXuqn9W+h811E5RKFK9p/hOunsQWtgiQUjzh5SBLeRZ3DVi/NSuE=
-X-Received: by 2002:a4a:8253:: with SMTP id t19mr14014107oog.69.1589828691943; 
- Mon, 18 May 2020 12:04:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jal6l-0003NV-IZ
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:07:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33612
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jal6d-0003Cc-Kh
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:07:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589828837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pAr1TNMV+Sis+fk5c59Z21sKhjqff1V2LJoU+Mdod6k=;
+ b=cW9YW0La7XuuUFl8mxD8313Ono6yjQXOff8L2V1b2mw0aQk8KusPzjJaiN9bOGYMjd1Jhw
+ uxHLYr/AmVrhW2L2t/Y5QkDwYpd01iX+Ptj8ELlJLqfRfWm91yhfkXIMNByY3lusbgDgD5
+ PvOxyCm5pGAIj0LM6G6MLLjwxB+HVHo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-LCpbwamANf-Gi3XZEOIMwQ-1; Mon, 18 May 2020 15:07:13 -0400
+X-MC-Unique: LCpbwamANf-Gi3XZEOIMwQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D1F764ACA;
+ Mon, 18 May 2020 19:07:12 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B32F56297D;
+ Mon, 18 May 2020 19:07:11 +0000 (UTC)
+Subject: Re: [PATCH v4 6/9] qemu-img: Add bitmap sub-command
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200513011648.166876-1-eblake@redhat.com>
+ <20200513011648.166876-7-eblake@redhat.com>
+ <92016f3f-a7c1-5384-5968-b89de5f01ecb@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <54ab6b66-d22d-820b-f4ad-2859f856de92@redhat.com>
+Date: Mon, 18 May 2020 14:07:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200518151255.10785-1-kraxel@redhat.com>
-In-Reply-To: <20200518151255.10785-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 May 2020 20:04:40 +0100
-Message-ID: <CAFEAcA8dDuroKd2C8V7Mk=pGih_hVORuFFzPMB5A7q1Dbwg66A@mail.gmail.com>
-Subject: Re: [PULL 0/8] Vga 20200518 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c31;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc31.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <92016f3f-a7c1-5384-5968-b89de5f01ecb@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:51:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,36 +99,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 16:18, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit debe78ce14bf8f8940c2bdf3ef387505e9e035a9:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-fpu-20200515' into staging (2020-05-15 19:51:16 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20200518-pull-request
->
-> for you to fetch changes up to 3fcf15df0073a76d37e2816597771d4c9763e413:
->
->   ramfb: fix size calculation (2020-05-18 15:43:51 +0200)
->
-> ----------------------------------------------------------------
-> vga: ati-vga bugfix, ramfb cleanups and fixes.
->
+On 5/18/20 6:42 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 13.05.2020 04:16, Eric Blake wrote:
+>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>> --merge (note that --clear is a bit of fluff, because the same can be
+>> accomplished by removing a bitmap and then adding a new one in its
+>> place, but it matches what QMP commands exist).  Listing is omitted,
+>> because it does not require a bitmap name and because it was already
+>> possible with 'qemu-img info'.  A single command line can play one or
+>> more bitmap commands in sequence on the same bitmap name (although all
+>> added bitmaps share the same granularity, and and all merged bitmaps
+>> come from the same source file).  Merge defaults to other bitmaps in
+>> the primary image, but can also be told to merge bitmaps from a
+>> distinct image.
+>>
+>> While this supports --image-opts for the file being modified, I did
+>> not think it worth the extra complexity to support that for the source
+>> file in a cross-file merges.  Likewise, I chose to have --merge only
+>> take a single source rather than following the QMP support for
+>> multiple merges in one go (although you can still use more than one
+>> --merge in the command line); in part because qemu-img is offline and
+>> therefore atomicity is not an issue.
+>>
+
+>> +
+>> +    blk = img_open(image_opts, filename, fmt, BDRV_O_RDWR, false, false,
+>> +                   false);
+> 
+> fit in one line
+
+That line would be exactly 80; I tend to wrap at 79 or earlier rather 
+than exactly on 80.
+
+> 
+>> +    if (!blk) {
+>> +        goto out;
+>> +    }
+>> +    bs = blk_bs(blk);
+>> +    if (src_filename) {
+>> +        src = img_open(NULL, src_filename, src_fmt, 0, false, false,
+>> +                       false);
+> 
+> s/NULL/false/
+
+D'oh.  And yet it still compiles.  Fixing.
+
+> 
+> also, fit in one line
+
+Yes, this one's shorter.  Fixing.
 
 
-Applied, thanks.
+>> +
+>> +        if (err) {
+>> +            error_reportf_err(err, "Operation %s on bitmap %s failed",
+> 
+> s/failed/failed: /
+> 
+>> +                              op, bitmap);
+>> +            ret = -1;
+> 
+> dead assignment: you never set ret after first initialization to -1.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+Fixing both.
 
--- PMM
+> 
+>> +            goto out;
+>> +        }
+>> +        g_free(act);
+>> +    }
+>> +
+>> +    ret = 0;
+>> +
+>> + out:
+>> +    blk_unref(src);
+>> +    blk_unref(blk);
+>> +    qemu_opts_del(opts);
+>> +    if (ret) {
+>> +        return 1;
+>> +    }
+>> +    return 0;
+> 
+> Hmm, as it's the only usage of ret, you may initialize it to 1 at 
+> function start, and here just "return ret;"
+
+Yep, done.
+
+>> +DEF("bitmap", img_bitmap,
+>> +    "bitmap (--merge SOURCE | --add | --remove | --clear | --enable | 
+>> --disable)... [-b source_file [-F source_fmt]] [-g granularity] 
+>> [--object objectdef] [--image-opts | -f fmt] filename bitmap")
+>> +SRST
+>> +.. option:: bitmap (--merge SOURCE | --add | --remove | --clear | 
+>> --enable | --disable)... [-b SOURCE_FILE [-F SOURCE_FMT]] [-g 
+>> GRANULARITY] [--object OBJECTDEF] [--image-opts | -f FMT] FILENAME BITMAP
+> 
+> Not about this patch, but it's a pity that we have triple duplications 
+> (triplications ?) of such lines..
+
+Yes, it is annoying.  But as you say, it's a cleanup for another day, 
+for someone who is interested.
+
+> 
+> With at least s/NULL/false/ and s/failed/failed: / (or with all my tiny 
+> suggestions):
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Thanks; squashing in:
+
+diff --git i/qemu-img.c w/qemu-img.c
+index 8c99e68ba8aa..f940137cb0e5 100644
+--- i/qemu-img.c
++++ w/qemu-img.c
+@@ -4493,7 +4493,7 @@ typedef struct ImgBitmapAction {
+  static int img_bitmap(int argc, char **argv)
+  {
+      Error *err = NULL;
+-    int c, ret = -1;
++    int c, ret = 1;
+      QemuOpts *opts = NULL;
+      const char *fmt = NULL, *src_fmt = NULL, *src_filename = NULL;
+      const char *filename, *bitmap;
+@@ -4641,8 +4641,7 @@ static int img_bitmap(int argc, char **argv)
+      }
+      bs = blk_bs(blk);
+      if (src_filename) {
+-        src = img_open(NULL, src_filename, src_fmt, 0, false, false,
+-                       false);
++        src = img_open(false, src_filename, src_fmt, 0, false, false, 
+false);
+          if (!src) {
+              goto out;
+          }
+@@ -4695,9 +4694,8 @@ static int img_bitmap(int argc, char **argv)
+          }
+
+          if (err) {
+-            error_reportf_err(err, "Operation %s on bitmap %s failed",
++            error_reportf_err(err, "Operation %s on bitmap %s failed: ",
+                                op, bitmap);
+-            ret = -1;
+              goto out;
+          }
+          g_free(act);
+@@ -4709,10 +4707,7 @@ static int img_bitmap(int argc, char **argv)
+      blk_unref(src);
+      blk_unref(blk);
+      qemu_opts_del(opts);
+-    if (ret) {
+-        return 1;
+-    }
+-    return 0;
++    return ret;
+  }
+
+  #define C_BS      01
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
