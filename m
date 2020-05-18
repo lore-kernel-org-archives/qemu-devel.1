@@ -2,120 +2,95 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C173C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C28C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:19:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DE2E20715
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 605D520715
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 18:19:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QxvMTgBT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE2E20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qVRLuH6I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 605D520715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jakIE-0003su-Hd
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 14:15:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45030)
+	id 1jakMJ-0005ga-Bk
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 14:19:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jakHC-0002wi-ON; Mon, 18 May 2020 14:14:10 -0400
-Received: from mail-am6eur05on2120.outbound.protection.outlook.com
- ([40.107.22.120]:8358 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jakHA-00063X-CU; Mon, 18 May 2020 14:14:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R0sooKji3VSk4prQiuu3pmWTyPfnX7fQv2cYjcPp7CHWu/TsRAJAU8nvCqwsrMEsKCv+BfoWYzduznM5xnDv0HpmO82nFxPqyftiU4P8B3NIxmGgWjC+aPaqvQ/ezbNfmLq3JlSQtYSv6zjde8N2A5CuU95Aez1nXftaPjJvnPgDQyJbOq608xPUdiDhzScKea/Aiitx8iCwQGJLZbVo38iP53ehNUPa7JBLsqj4X9hfvB/X4i3esSB5S3drdP48xk3HZfq5ng3E2/mtviXe28uUJ1ldlIciKgVR5F35rXDMb/XkUgdz/jAy2G+PJDX5ZOe/5xxxDfB3NDsD0q1koQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UJMAWBeUUDWajDIQORgYH5C0xZ4YAT8OLcJ1qa9V5KM=;
- b=iiNFv3HzLr7ZjK1WwFd0Sojsi/gf6tOpPqw21RUId/HrjTpBs0Hz6RIVy0Z2fYIni8AmC+q51WmtOSv7+KsR7CLcRQ3okg9Js8RnhqyGSEX2tlzpgTOjCvbvOsUEXCPwqazYm7kLDHyq+pIEf6jL/oMG3f3eCbHZhv8luUZB/kxPkH489j9vY7Mk7TSf6SRRbQkD4d/uOBb88gDVW2svkqRPzKCqFvG5dPTiIyhLkKAMhV7Q7C/xWiKRUIkxAWiYxEZWLcQJaWyS3v2nTFrooRjTV+M3KveX7QXSfJDeuPZ51zJu1ZBtfyWmkvPA/vVv6eUeFnQTWJaNpE4fHBrQcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UJMAWBeUUDWajDIQORgYH5C0xZ4YAT8OLcJ1qa9V5KM=;
- b=QxvMTgBT9LxhQaOwhGprYujFj0s6JVaNyTh6T6GEPlyUb5qvxDPHS4OPAqmvWdNyiVOYVzHYQoNIMBPDYvMpIJm+dZ9zPHDCzRb1SgY+TdkKSCgrhK9MHRNn3/h9VmiTuJqmr3COIC+WwjbpL6dEQQQ4g8p0BYlK2R17gYa1WCI=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5430.eurprd08.prod.outlook.com (10.141.172.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3000.27; Mon, 18 May 2020 18:14:05 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.034; Mon, 18 May 2020
- 18:14:05 +0000
-Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-2-jsnow@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b4618eb0-5303-40ab-b5e2-5a08d5738a81@virtuozzo.com>
-Date: Mon, 18 May 2020 21:14:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200514055403.18902-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR05CA0147.eurprd05.prod.outlook.com
- (2603:10a6:207:3::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jakL1-0005CI-EL
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 14:18:07 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36050)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jakKz-0007nO-5i
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 14:18:06 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id k13so10902094wrx.3
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 11:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=FJO4qJ67f0bY76ix4YdjsV5Gxks7TV5H6cFHfg1stzs=;
+ b=qVRLuH6IE04zHAyve3cjKiMU76cle5F49Kp4q5EnQKnmJ4C8c9+MbuJatDfqy8aQLP
+ 5qKC7DxSjagnrW4Z/J0EhGml5Z6ugcgrngE9/hv6bXqi+Wbg4ZGxXTwQZGN9MIXvUjkO
+ 4whugE4yI4eFMpPzcd2i90SBT63YEDYU0wTBG9XDfrWIf8F6v5knQcgCNcICjXRrV7ZA
+ QcknuUyTVVPJ6IghOiCi3xD5ARQOjWoyzYZqOVHWLwMN/lwGoNelHDrJl+gF3eTz0BDX
+ MjzVLqaCdKaWGm2yzTWwpqtybw9FLXl//gC9HdbUjwoHef6Sph48iJd+UUKAmc4rJ+vl
+ Q/ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=FJO4qJ67f0bY76ix4YdjsV5Gxks7TV5H6cFHfg1stzs=;
+ b=qyFmT0GB7RHiRNd3zo9ycZAE+0lTT8/cHJvhPVvOF4jz8OxVcLk5S3kyQyzRtj75Pl
+ i4ctxpHdhtkb5BIcJakBy7V67Q6N1AsPgbuJdvDZYohyMczOoLihrQzzDvK3k0RpFSSg
+ HdYEPcEc+Ig16ACegXJUPhPBfA6iXoeFmnl6emGdYRGOi6qh9jxw5wWFVbivVJXpzUG9
+ PQBpvFqZhrk9My7VfuwkyhlIazZaPXa7qBK9JshqQKa4HgC0tf/AMpM0QbqmVW9Jb8L2
+ HTxS2z+bowEfoGCHds4LsPH4Lxu1DvflR7rdl17NIQsBQs0nFO6qDKo/MHSXruOTij3D
+ 1GRQ==
+X-Gm-Message-State: AOAM5339XCBZv0JG/RUAa1gVPEfPydK5kZIzYoEh8SVu29OaHQdWsXAU
+ zWvZzPIlGSjcoMQtk071YzwiCw==
+X-Google-Smtp-Source: ABdhPJxeK3PGutTNZkiv1QxzKWzQbdWJmKdt+eG3li1zxj+yw/PioGYMx5mlqybYd1feIweTAE/JWQ==
+X-Received: by 2002:a05:6000:1107:: with SMTP id
+ z7mr20458737wrw.93.1589825883473; 
+ Mon, 18 May 2020 11:18:03 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t82sm491730wmf.10.2020.05.18.11.18.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 11:18:02 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B3D681FF7E;
+ Mon, 18 May 2020 19:18:01 +0100 (BST)
+References: <1b5c9fee-6574-ddf4-b2d0-aa12e6fc9c84@suse.de>
+User-agent: mu4e 1.4.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: sharing intention for developing per-target, dynamically
+ loadable accelerator modules
+In-reply-to: <1b5c9fee-6574-ddf4-b2d0-aa12e6fc9c84@suse.de>
+Date: Mon, 18 May 2020 19:18:01 +0100
+Message-ID: <87k119jeee.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.187) by
- AM3PR05CA0147.eurprd05.prod.outlook.com (2603:10a6:207:3::25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3000.25 via Frontend Transport; Mon, 18 May 2020 18:14:04 +0000
-X-Originating-IP: [185.215.60.187]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 709a2c0e-7f52-4351-50ee-08d7fb573fed
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5430:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5430323BC650CBB67AD7680EC1B80@AM7PR08MB5430.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 04073E895A
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gwge5wrWRxl/wbCgdjE0umcAr3I5hWZD6jNOZQT+zBYksHzST+vlIFb2B8oRbhbMCtMQZdJKp9LdOGQnPKUGfmOcRJdiMRjn5fo5gQ90wdKuVzwEBBM4xseQVTsW6b8pbrzczWi0fOBv+7pKHek2tg5VgRXV/4qcPWtn7di0qYZBCWUSurY5gJiDNtbZGSlsBtRYS36Iv+kkreBCZ3lTNh3BTHk6TVWT4xlBZ8CYGinq2olXdKqnycjvBC9eAGiiiMlHWc+jb87jqJsDh+JBlNV5G1pH/R3AR40y7X8PM+ue4vtO2dOiH935i5BultXvqe/Pyshzd1gAVsCeUmMafMp4rIgGJlnDosPH/Vd4eqppE8DXTDhLyb6OjXPRkVPImU942iaFV9ssNAk5SMNzJqjMg/RWSrjWLAwbC3H1To8G95og8JTwwOrSWOtulrPZkIiLs+Q/bLHWLXIP/9s1LHs4qPuuiI6BvMaCmUVwb5myb3b4yzcTso1LtAslCNY+
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(396003)(346002)(366004)(376002)(39840400004)(66556008)(5660300002)(2616005)(956004)(66946007)(8936002)(316002)(31696002)(6486002)(36756003)(7416002)(66476007)(54906003)(478600001)(16576012)(86362001)(4326008)(26005)(186003)(52116002)(4744005)(31686004)(16526019)(8676002)(2906002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: /9HRT5793j5abM7UkMxKPetbxbF9rpgwu1N4mZb6144xn98bqJIf0y7ynSxid3SRiMyqeSJMwkxpj/brFRHNt87nKFyCRtlUNpXOSLpwWPGQ83rAM2FKNHn7GgiDigPnx2s3/hrC6RH6Hru267lQogS82CbUb6tcHcTROA5AN81GxGUZanI9YzKEnoz4nyDLp6ACIxBZpISOp2cMPJZtW4Bl2i+AJK/wpS73tdbXeN9CO9kaahVKdt4tW3L0lIpOTwgc8p+mfPLVBnapM+4Znzg/jI1+1cjriCooKUut26us+sONz692sM05t/HLPw/LrrTrXUHevVBYc4JBTTKyCUIrO9BFFcIyBoMP6wdUcjnp3WRW79E7s83JB6kveyhXT6JKBwrVMjlXyFwmgFgElhhMdUOkGIFymgKwMRBx+vyRL89JP3ihC2jtqspGmCjnAaDHW7caHJQ0wQOLbKo2l53a/bfw+TaZSOcZJN+voJShcD7h8C2/HI2+bNFpBfCQ
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 709a2c0e-7f52-4351-50ee-08d7fb573fed
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2020 18:14:05.0404 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gHlc67ezolXMgtNFn1OWsMd7WB91SWDmljJregeR9mZGnG2f6Ct5epgJbRy7Kq1+JUPgndi2Sct9uFw+6gqF4mPs+JNUjz1MNmTe7+Yh96U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5430
-Received-SPF: pass client-ip=40.107.22.120;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 14:14:05
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -129,47 +104,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.05.2020 08:53, John Snow wrote:
-> move python/qemu/*.py to python/qemu/lib/*.py.
-> 
-> To create a namespace package, the 'qemu' directory itself shouldn't
-> have module files in it. Thus, these files will go under a 'lib' package
-> directory instead.
 
-Hmm..
+Claudio Fontana <cfontana@suse.de> writes:
 
-On the first glance, it looks better to have
+> Hello all,
+>
+> my intention would be to develop per-target, dynamically loadable acceler=
+ator modules.
+>
+> This would allow to distribute a single QEMU base binary, and then provid=
+e accelerators as optional additional binary packages to install,
+> with the first separate optional package being TCG.
+>
+> CONFIG_TCG would become 'm' as a result, but then also CONFIG_KVM, CONFIG=
+_HAX, CONFIG_WHPX, CONFIG_HVF.
+>
+> Here are some elements that seem to be needed:
+>
+> 1 - The module CONFIG_MODULE part of the build system would need some ext=
+ension to add per-target modules. I have some tentative results that shows =
+that this is possible (but a bit clunky atm).
+>     There is some existing instability in the existing Makefile infrastru=
+cture of modules that shows up when trying to extend it.
+>
+> 2 - new "accelerator drivers" seems to be needed, either in addition or a=
+s additional functionality inside the current AccelState.
+>
+> 3 - for target/i386 in particular, there is some refactoring work needed =
+to split even more different unrelated bits and pieces.
+>     dependencies of hw/i386 machine stuff with accelerator-specific
+> stuff are also painful.
 
-   from qemu import QEMUMachine
+There are a couple of per-arch hacks in the main TCG cpu loops it would
+be good to excise from the code.
 
-than
-  
-   from qemu.lib import QEMUMachine
+>
+> 4 - CPU Arch Classes could be extended with per-accelerator methods. Init=
+ial fooling around shows it should probably work.
+>     One alternative would be trying to play with the dynamic linker (weak=
+ symbols, creative use of dlsym etc), but I have not sorted out the details=
+ of this option.
+>
+> 5 - cputlb, in particular tlb_flush and friends is a separate problem
+> since it is not part of the cpuclass. Should it be?
 
-why do we need this extra ".lib" part?
+tlb_flush and friends are TCG implementation details for softmmu that
+ensure a lookup for any address will always return to a guest specific
+tlb_fill to rebuild the cache. The behaviour is not guest-specific
+per-se although we do partition the table entries based on the guest
+size.
 
-Is it needed only for internal use?
+Perhaps we can make it more dynamic but it would have to ensure both the
+slow path and the fast path are using the same mask and shifts when
+walking the table.
 
-Assume we have installed qemu package. Can we write
+> 6 - a painpoint is represented by the fact that in USER mode, the accel c=
+lass is not applied, which causes a lot of uncleanliness all around
+>     (tcg_allowed outside of the AccelClass).
 
-   from qemu import QEMUMachine
+The user-mode run loops are a whole separate chunk of code. I don't know
+if it is worth trying to make them plugable as you will only ever have
+one per linux-user binary.
 
-? Or we still need qemu.lib ?
+> 7 - I have not really thought about the KConfig aspects because I am not =
+super-familiar
+>
+> 8 - cpus.c needs some good splitting
 
-I don't remember any python package, which made me to write "import from package_name.lib ..."
+Although there are several different run loops in there I think they
+share a lot of commonality which is why they are bundled together. They
+all share the same backend for dealing with ioevents and generic
+pause/unpause machinery. But feel free to prove me wrong ;-)
+
+> ... more things to find out and think about ...
+>
+> Overall, I think that the activity has the potential to provide benefits =
+overall beyond the actual goal, in the form of cleanups, leaner configurati=
+ons,
+> minor fixes, maybe improving the CONFIG_MODULE instabilities if any
+> etc.
+
+There are certainly some ugly bits we could shave down in such an
+exercise.
+
+> As an example, the first activity I would plan to submit as RFC is point =
+8 above,
+> there is the split between cpus.c and cpus-tcg.c that results in lots of =
+TCG-specific code being removed from non-tcg builds (using CONFIG_TCG).
+>
+> One thing that should be kept in check is any performance impact of
+> the changes, in particular for point 4, hot paths should probably
+> avoid going through too many pointer indirections.
+
+Maybe - certainly for TCG you have pretty much lost if you have exited
+the main execution loop I doubt it would show up much. Not so sure about
+the HW accelerators. Most of the performance sensitive stuff is dealt
+with close to the ioctls IIRC.
+
+> Does anybody share similar goals? Any major obstacle or blocker that woul=
+d put the feasibility into question?
+> Any suggestion on any of this? In particular point 4 and 5 come to
+> mind, as well as some better understanding of the reasons behind 6, or
+> even suggestions on how to best to 2.
+
+For linux-user each CPU run loop is it's own special snowflake because
+pretty much every architecture has it's own special set of EXCP_ exits
+to deal with various bits. There are per-arch EXCP_ flags for system
+emulation as well but not nearly as many.
+
+>
+> Anyway, I will continue to work on the first RFC for some smaller initial=
+ steps and hopefully have something to submit soon.
+>
+> Ciao ciao,
+>
+> Claudio
 
 
--- 
-Best regards,
-Vladimir
+--=20
+Alex Benn=C3=A9e
 
