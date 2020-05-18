@@ -2,60 +2,87 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA99C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 677C8C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:23:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D07D207C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A1D12075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 21:23:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=rev.ng header.i=@rev.ng header.b="Eqw+5hKC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D07D207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rev.ng
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2ur7v9t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A1D12075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jan7h-0007BH-Cw
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 17:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36912)
+	id 1janEC-0001EQ-9n
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 17:23:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ale@rev.ng>) id 1jan6c-0006CV-4A
- for qemu-devel@nongnu.org; Mon, 18 May 2020 17:15:26 -0400
-Received: from rev.ng ([5.9.113.41]:55737)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ale@rev.ng>) id 1jan6Z-0003fH-QZ
- for qemu-devel@nongnu.org; Mon, 18 May 2020 17:15:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rev.ng;
- s=dkim; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:
- Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:Content-Description:
- Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
- In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=TOV48mPEFkcUh5YE5b2AkLA7EIX7tfClTQmNPF8ep9o=; b=Eqw+5hKC63QiXsFxoQ7qUANOLJ
- 2KbebrM/73Ow8E0hD4CigEG7v+8FNrHSkssQfpsc8KsLHEZfvd7EKQS79ntPK6zSrS8RJWCpAdoYS
- 36pjHLKgIISWLItzeY+B9jwfqP+N1FAopzFZb2AVjJEeZxWUEcHU/KQbz3cKQICZ9qEk=;
-Date: Mon, 18 May 2020 23:15:08 +0200
-From: Alessandro Di Federico <ale.qemu@rev.ng>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Subject: Simplifying the Hexagon frontend
-Message-ID: <20200518231508.141b524f@orange>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1janDI-0000n8-Rr
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 17:22:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36120)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1janDI-0005UJ-5C
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 17:22:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589836939;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IkK71Gq+Bu7lhGENbaurdAcE8yt6gEPQ8HiSG1ntfhI=;
+ b=H2ur7v9tf9WYdGrYLDt+zpchFnyxJYrXXv1tqyn8DKOZBMDORR36WGN6RLlaPtUbNTD6sO
+ IaPRoBT2q3zcu9bvK0pDRDb9mZ6VGH09vqpG3qsgHk0EmQxln9PUWxJ+MZ1C0OMLTx/LyK
+ SVNJxp/NONe+KKsm6LRglN1QpUP4I4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-hNbEy4_IMFG-jVZ5rUEsYg-1; Mon, 18 May 2020 17:22:15 -0400
+X-MC-Unique: hNbEy4_IMFG-jVZ5rUEsYg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A2CA80B71E;
+ Mon, 18 May 2020 21:22:14 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B50EB79583;
+ Mon, 18 May 2020 21:22:10 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 5/5] iotests: add 287 for
+ block-dirty-bitmap-populate
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200514034922.24834-1-jsnow@redhat.com>
+ <20200514034922.24834-6-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ed800a34-ccfc-e4af-7565-36eeefb44868@redhat.com>
+Date: Mon, 18 May 2020 16:22:08 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=5.9.113.41; envelope-from=ale@rev.ng; helo=rev.ng
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 17:15:15
+In-Reply-To: <20200514034922.24834-6-jsnow@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 16:37:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,91 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>,
- =?UTF-8?B?TmljY29sw7I=?= Izzo <nizzo@rev.ng>,
- Brian Cain <bcain@codeaurora.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ vsementsov@virtuozzo.com, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, this e-mail is intended to bootstrap a public discussion on how to
-improve the Hexagon frontend implementation. At rev.ng, Niccol=C3=B2 and I,
-developed an Hexagon frontend, and we're (finally!) joining forces with
-the QuIC guys to merge our efforts (did you see our talk [1]?).
+On 5/13/20 10:49 PM, John Snow wrote:
+> Give block-dirty-bitmap-populate a workout.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   tests/qemu-iotests/287     |  242 ++
+>   tests/qemu-iotests/287.out | 4544 ++++++++++++++++++++++++++++++++++++
 
-The status is as follows:
+Sheesh, that output file is a workout indeed.
 
-* QuIC has its own fully working implementation that has been submitted
-  for review.
-* We're working to integrate in their implementation our mechanism to
-  automatically generate code to generate tiny code. But this will take
-  some more work.
+>   tests/qemu-iotests/group   |    1 +
+>   3 files changed, 4787 insertions(+)
+>   create mode 100755 tests/qemu-iotests/287
+>   create mode 100644 tests/qemu-iotests/287.out
 
-In the following, some initial considerations on how the latest
-patchset could be simplified.
+287 has been created in the meantime (commit dd488fc1c00); we'll have to 
+rebase.  (Vladimir's series to rename iotests to something sensible 
+instead of three digits may help...)
 
-Here you can find a graph I've put together of the build process:
+> +
+> +class Drive:
+> +    def __init__(self, path, vm):
+> +        self.path = path
+> +        self.vm = vm
+> +        self.fmt = None
+> +        self.size = None
+> +        self.node = None
+> +
+> +    def img_create(self, fmt, size):
+> +        self.fmt = fmt
+> +        self.size = size
+> +        iotests.qemu_img_create('-f', self.fmt, self.path, str(self.size))
 
-    https://rev.ng/downloads/qemu-hexagon/temporary/graph.svg
-    https://rev.ng/downloads/qemu-hexagon/temporary/graph.dot
+Are we creating images with backing files anywhere in this test?  Should 
+we be?  (The question of what is allocated in the top layer is more 
+interesting to answer when there is a backing layer)
 
-Colors indicate language.
-Oval nodes are generated.
-Rectangles are hand-written.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Taylor, I think some simplifications can be made to the process in order
-to ease the review process.
-
-* As far as I understand, from he "Source of Truth" set of files
-  (`alu.idef`, `encode_pp.def`...), through `gen_semantics`, you
-  generate `semantics_generated.pyinc`, which is then included by
-  `do_qemu.py` script, which does the real job.
-
-  I would suggest to keep `gen_semantics` and all its inputs
-  out-of-tree. It increases complexity in a non-negligible way, while
-  bringing a reduced benefit in terms of automation.
-
-  I'd suggest replace `gen_semantics`'s output
-  (`semantics_generated.pyinc`) with a human readable JSON file that
-  could be manipulated by hand and is then parsed by `do_qemu.py`. I
-  think JSON is more appropriate than generating executable python code
-  that is then imported.
-
-* I suggest to switch to the decoding approach developed by Richard.
-  That would simplify the build process and reduce the code that has to
-  be reviewed.
-  I'm not 100% of the effort required to do this, maybe Richard can
-  weigh on this.
-
-* The current implementation can generate a helper function for each
-  Hexagon instruction and, for a subset of instructions, it has an
-  "override" mechanism to directly generate tiny code instructions
-  corresponding to the semantics of the original instruction (i.e.,
-  without using helpers).
-
-  This override mechanism is implemented with the `fWRAP` macros. They
-  have benefits, but they are quite convoluted. We should strive to
-  minimize the number of macros and alternative macro implementations
-  to what's strictly necessary in order to generate as much code as we
-  can from the "Source of Truth", but no more than that.
-
-  As a simpler override mechanism, we could use weak functions. But I
-  think that, for simplicity, we should try to get in tree a simpler
-  version of the frontend that relies exclusively on helper functions.
-  It won't have optimal performances, but it will be fully functional.
-
-  Later on, once our work for automatically generating functions
-  generating tiny code is mature enough, we can extend the existing
-  implementation with an appropriate override system.
-
-In the meantime, we're setting up a Dockerfile based on Debian 10
-providing a minimal C toolchain that we can use to automate testing.
-
-Feedback is more than welcome.
-
---=20
-Alessandro Di Federico
-rev.ng
-
-[1] https://www.youtube.com/watch?v=3D3EpnTYBOXCI
 
