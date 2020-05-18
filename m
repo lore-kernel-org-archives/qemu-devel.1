@@ -8,79 +8,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F080CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8471CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3FA220643
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45A3C20643
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:26:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXoJRev8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FA220643
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sT/+HRQK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A3C20643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jamK9-0001cG-Vo
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:25:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58674)
+	id 1jamLD-0002rX-Cu
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:26:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam5z-0006nB-KX
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:43 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:42459)
+ id 1jam62-0006pR-0m
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:46 -0400
+Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:42653)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam5y-0002MX-LZ
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:43 -0400
-Received: by mail-lj1-x241.google.com with SMTP id d21so11231169ljg.9
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:42 -0700 (PDT)
+ id 1jam61-0002Ml-77
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:45 -0400
+Received: by mail-lf1-x133.google.com with SMTP id x27so9087687lfg.9
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cPuU8XqF+WMyN6udIulgxqgBxWZp8WI7wIWPM0gVVZQ=;
- b=pXoJRev8ZtnfFIXJQvBOSSdqRq9w2UFg3R0V8ABxYRVWoDTid6ib0a/wzZKg/TOkcT
- hdxOPMB1yrfNfn0xcR33+lHHpIN4KQog0MUiTGlMYkUt7gctOWgckzW3U7zy8rG0KnyJ
- fsHwuiHS8bN94uu51gMgjUhAuhRz0GsUavVGSlqZgmJqukIoowr6/J8YvlE8+0MRiKJK
- jsX1/q+GpCjOM2n11J7xPpD8vK6B32nPuULBLG40iRwfwLoXQv6eYlY5G7x1+pftz+n7
- mj/bNNvMgwW/y3rYWODHnDJwSJaqyxmws/OMaVcCylylwMLj3QAtmWQZUq4cVRUepGJt
- c++Q==
+ bh=nKBOP3sAKZGNKClZzjzrnEWKBOYywazv7l68ING4cbY=;
+ b=sT/+HRQKG47q6LiU9Ukm091qfwJT4uRw1lnx7Au+2rJ8ao8xFqboZG1pR5avvsRtjQ
+ rPnbKX1rAcmC9y6Nir94K7HgKroIEj/Ep9Yet83CK+qEIm1/8t2YjETNuhCQWHjolzy8
+ l2a0wjGG2GpOcv4miSJa2edkkCdXcacpATBL7XbOCvblu0wO7OOoim5Yx8qO1rJuH0eX
+ OycV6ED60NhE02aDOmVaplCbtG+9MPiNjlc83hqOwMphb7ZySK87S1Um5tUslQdPdXOw
+ TBGasMJyZG/fbmRppd1oQ5pGNWbazwew1415mV4ykheqk061YD9uRuoWO+OOdPOhPil7
+ p6aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cPuU8XqF+WMyN6udIulgxqgBxWZp8WI7wIWPM0gVVZQ=;
- b=jnDBMcl+vOBoBs2s1aL4H7NkRcoGLGovfQhetPUvxN9ZimSo0IHZe4dMMZo4k2fhXR
- SD1MOV6W7KskWor4ZP0k7NHwUTl/t3nav0taaFScbmgLMN1P8xnJ3cSq14itRDFEPvVu
- LzDjLDbECTeLeryap5pgliHGQEK0ATZ5utasBJ3ujyZx0qGiHsFWvf9gjN0Ex3SbI+UN
- I5WbN9yQpPLB7HBhVBL7Uh0s+jIAUdsnc8/+Gw7V/DzBWuRuMW0nItT93c8as394n12O
- OiRy6IFhxYgRv8uk6ZtvkuXALBfuBVEJ2KvKWDLigm5/MlKc/UoC4/TOFjXMx1BGQKNi
- c8uA==
-X-Gm-Message-State: AOAM5330IYSYfabTOHhOTz8s/mf0KcFtN0fhYSFWciaNAIsSV0W52fKH
- 39rirXNBZssHyJ0YJZAuktwBdtUbE7A=
-X-Google-Smtp-Source: ABdhPJxfp0x22ZkrASJfC6VQNmFUYFgf4nlEMC21MbKcDD2f8x9lt3q/i7Uog56lAUVhwi6J5ssofw==
-X-Received: by 2002:a05:651c:545:: with SMTP id
- q5mr11798003ljp.57.1589832640846; 
- Mon, 18 May 2020 13:10:40 -0700 (PDT)
+ bh=nKBOP3sAKZGNKClZzjzrnEWKBOYywazv7l68ING4cbY=;
+ b=HK1j51K5133nMFkCAuMXCmYrELNl5bAvnBUcXY8DnwfAZm3Jc5M2NXZhfiEG3K5c9R
+ 2pUlQScoTJqoacHqJ9EHcltny25I3mCxU4emp+Frn6pjuDspBpLjizClwEbgKdhhSw0f
+ zn9YutYL0y+0+YbdOX4MFX5wZ9fQ6l6wX6lJV/cajTxKsmoRA/Ze+Xn46rrYDvYxw9fD
+ h85VXaUVxGFv3uJItMrFL1NVZafcNg+aEzdDduLuRypNRlFR1npW8R9/trHcEhgd10M1
+ Qu8j22aETl/7jI5KTSe6b30v79V/Tzd948R58hSfFzwV+yYTVCNZqM9l0lkV4RvCPz97
+ OuhQ==
+X-Gm-Message-State: AOAM532R/RXCeLil9EcTcxXwJGSORkRAGxUFRyJqA1E94cJzEHwkHpkK
+ 2q86IwCMVUMOMM8OAe/XtcCerz8CkjI=
+X-Google-Smtp-Source: ABdhPJwlG/7zaqhRCTadfPJ+gZ4pACQJV7Jr1k2rXlQbGoG1Y7COSXDi8mREV3fBVSk1WJMCkXSJOw==
+X-Received: by 2002:ac2:48b2:: with SMTP id u18mr12276499lfg.122.1589832643432; 
+ Mon, 18 May 2020 13:10:43 -0700 (PDT)
 Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.39
+ by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 13:10:40 -0700 (PDT)
+ Mon, 18 May 2020 13:10:43 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 16/21] target/mips: fpu: Refactor conversion from ieee to
- mips exception flags
-Date: Mon, 18 May 2020 22:09:15 +0200
-Message-Id: <20200518200920.17344-17-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v6 18/21] target/mips: msa: Split helpers for MADDV.<B|H|W|D>
+Date: Mon, 18 May 2020 22:09:17 +0200
+Message-Id: <20200518200920.17344-19-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x241.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::133;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x133.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 12
@@ -88,8 +86,8 @@ X-Spam_score: 1.2
 X-Spam_bar: +
 X-Spam_report: (1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,254 +106,180 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The original coversion function is used for regular and MSA floating
-point instructions handling. Since there are some nuanced differences
-between regular and MSA floating point exception handling, provide two
-instances of the conversion function, rather than just a single common
-one. Inline both instances of this function instances for the sake of
-performance. Improve variable naming in surrounding code for clarity.
+Achieves clearer code and slightly better performance.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- target/mips/fpu_helper.c | 55 +++++++++++++++-------------
- target/mips/internal.h   |  1 -
- target/mips/msa_helper.c | 77 +++++++++++++++++++++++++++-------------
- 3 files changed, 82 insertions(+), 51 deletions(-)
+ target/mips/helper.h     |  6 ++-
+ target/mips/msa_helper.c | 79 ++++++++++++++++++++++++++++++++++++----
+ target/mips/translate.c  | 19 ++++++++--
+ 3 files changed, 92 insertions(+), 12 deletions(-)
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index dbb8ca5692..7a3a61cab3 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -189,43 +189,48 @@ void helper_ctc1(CPUMIPSState *env, target_ulong arg1, uint32_t fs, uint32_t rt)
-     }
- }
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 84fdd9fd27..e479a22559 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -950,6 +950,11 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
  
--int ieee_ex_to_mips(int xcpt)
-+static inline int ieee_to_mips_xcpt(int ieee_xcpt)
- {
--    int ret = 0;
--    if (xcpt) {
--        if (xcpt & float_flag_invalid) {
--            ret |= FP_INVALID;
--        }
--        if (xcpt & float_flag_overflow) {
--            ret |= FP_OVERFLOW;
--        }
--        if (xcpt & float_flag_underflow) {
--            ret |= FP_UNDERFLOW;
--        }
--        if (xcpt & float_flag_divbyzero) {
--            ret |= FP_DIV0;
--        }
--        if (xcpt & float_flag_inexact) {
--            ret |= FP_INEXACT;
--        }
-+    int mips_xcpt = 0;
++DEF_HELPER_4(msa_maddv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_d, void, env, i32, i32, i32)
 +
-+    if (ieee_xcpt & float_flag_invalid) {
-+        mips_xcpt |= FP_INVALID;
-+    }
-+    if (ieee_xcpt & float_flag_overflow) {
-+        mips_xcpt |= FP_OVERFLOW;
-     }
--    return ret;
-+    if (ieee_xcpt & float_flag_underflow) {
-+        mips_xcpt |= FP_UNDERFLOW;
-+    }
-+    if (ieee_xcpt & float_flag_divbyzero) {
-+        mips_xcpt |= FP_DIV0;
-+    }
-+    if (ieee_xcpt & float_flag_inexact) {
-+        mips_xcpt |= FP_INEXACT;
-+    }
-+
-+    return mips_xcpt;
- }
- 
- static inline void update_fcr31(CPUMIPSState *env, uintptr_t pc)
- {
--    int tmp = ieee_ex_to_mips(get_float_exception_flags(
--                                  &env->active_fpu.fp_status));
-+    int ieee_exception_flags = get_float_exception_flags(
-+                                   &env->active_fpu.fp_status);
-+    int mips_exception_flags = 0;
-+
-+    if (ieee_exception_flags) {
-+        mips_exception_flags = ieee_to_mips_xcpt(ieee_exception_flags);
-+    }
- 
--    SET_FP_CAUSE(env->active_fpu.fcr31, tmp);
-+    SET_FP_CAUSE(env->active_fpu.fcr31, mips_exception_flags);
- 
--    if (tmp) {
-+    if (mips_exception_flags)  {
-         set_float_exception_flags(0, &env->active_fpu.fp_status);
- 
--        if (GET_FP_ENABLE(env->active_fpu.fcr31) & tmp) {
-+        if (GET_FP_ENABLE(env->active_fpu.fcr31) & mips_exception_flags) {
-             do_raise_exception(env, EXCP_FPE, pc);
-         } else {
--            UPDATE_FP_FLAGS(env->active_fpu.fcr31, tmp);
-+            UPDATE_FP_FLAGS(env->active_fpu.fcr31, mips_exception_flags);
-         }
-     }
- }
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 1bf274b3ef..684356e309 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -224,7 +224,6 @@ uint32_t float_class_s(uint32_t arg, float_status *fst);
- uint64_t float_class_d(uint64_t arg, float_status *fst);
- 
- extern unsigned int ieee_rm[];
--int ieee_ex_to_mips(int xcpt);
- void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask);
- 
- static inline void restore_rounding_mode(CPUMIPSState *env)
+ DEF_HELPER_4(msa_asub_s_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_asub_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_asub_s_w, void, env, i32, i32, i32)
+@@ -1069,7 +1074,6 @@ DEF_HELPER_5(msa_subs_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subsus_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subsuu_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_maddv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_msubv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_u_df, void, env, i32, i32, i32, i32)
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 4065cfe4f7..c520405929 100644
+index c520405929..6af9d3b752 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -5419,54 +5419,81 @@ static inline void check_msacsr_cause(CPUMIPSState *env, uintptr_t retaddr)
- #define CLEAR_IS_INEXACT   2
- #define RECIPROCAL_INEXACT 4
+@@ -2883,7 +2883,77 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
+  * +---------------+----------------------------------------------------------+
+  */
  
--static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
-+
-+static inline int ieee_to_mips_xcpt_msa(int ieee_xcpt)
- {
--    int ieee_ex;
-+    int mips_xcpt = 0;
- 
--    int c;
-+    if (ieee_xcpt & float_flag_invalid) {
-+        mips_xcpt |= FP_INVALID;
-+    }
-+    if (ieee_xcpt & float_flag_overflow) {
-+        mips_xcpt |= FP_OVERFLOW;
-+    }
-+    if (ieee_xcpt & float_flag_underflow) {
-+        mips_xcpt |= FP_UNDERFLOW;
-+    }
-+    if (ieee_xcpt & float_flag_divbyzero) {
-+        mips_xcpt |= FP_DIV0;
-+    }
-+    if (ieee_xcpt & float_flag_inexact) {
-+        mips_xcpt |= FP_INEXACT;
-+    }
-+
-+    return mips_xcpt;
+-/* TODO: insert Int Multiply group helpers here */
++static inline int64_t msa_maddv_df(uint32_t df, int64_t dest, int64_t arg1,
++                                   int64_t arg2)
++{
++    return dest + arg1 * arg2;
 +}
 +
-+static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
++void helper_msa_maddv_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
 +{
-+    int ieee_exception_flags;
-+    int mips_exception_flags = 0;
-     int cause;
-     int enable;
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_maddv_df(DF_BYTE, pwt->b[0],  pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_maddv_df(DF_BYTE, pwt->b[1],  pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_maddv_df(DF_BYTE, pwt->b[2],  pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_maddv_df(DF_BYTE, pwt->b[3],  pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_maddv_df(DF_BYTE, pwt->b[4],  pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_maddv_df(DF_BYTE, pwt->b[5],  pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_maddv_df(DF_BYTE, pwt->b[6],  pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_maddv_df(DF_BYTE, pwt->b[7],  pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_maddv_df(DF_BYTE, pwt->b[8],  pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_maddv_df(DF_BYTE, pwt->b[9],  pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_maddv_df(DF_BYTE, pwt->b[10], pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_maddv_df(DF_BYTE, pwt->b[11], pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_maddv_df(DF_BYTE, pwt->b[12], pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_maddv_df(DF_BYTE, pwt->b[13], pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_maddv_df(DF_BYTE, pwt->b[14], pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_maddv_df(DF_BYTE, pwt->b[15], pws->b[15], pwt->b[15]);
++}
++
++void helper_msa_maddv_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_maddv_df(DF_HALF, pwd->h[0],  pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_maddv_df(DF_HALF, pwd->h[1],  pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_maddv_df(DF_HALF, pwd->h[2],  pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_maddv_df(DF_HALF, pwd->h[3],  pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_maddv_df(DF_HALF, pwd->h[4],  pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_maddv_df(DF_HALF, pwd->h[5],  pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_maddv_df(DF_HALF, pwd->h[6],  pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_maddv_df(DF_HALF, pwd->h[7],  pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_maddv_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_maddv_df(DF_WORD, pwd->w[0],  pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_maddv_df(DF_WORD, pwd->w[1],  pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_maddv_df(DF_WORD, pwd->w[2],  pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_maddv_df(DF_WORD, pwd->w[3],  pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_maddv_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_maddv_df(DF_DOUBLE, pwd->d[0],  pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_maddv_df(DF_DOUBLE, pwd->d[1],  pws->d[1],  pwt->d[1]);
++}
  
--    ieee_ex = get_float_exception_flags(&env->active_tc.msa_fp_status);
-+    ieee_exception_flags = get_float_exception_flags(
-+                               &env->active_tc.msa_fp_status);
  
-     /* QEMU softfloat does not signal all underflow cases */
-     if (denormal) {
--        ieee_ex |= float_flag_underflow;
-+        ieee_exception_flags |= float_flag_underflow;
-+    }
-+    if (ieee_exception_flags) {
-+        mips_exception_flags = ieee_to_mips_xcpt_msa(ieee_exception_flags);
-     }
--
--    c = ieee_ex_to_mips(ieee_ex);
-     enable = GET_FP_ENABLE(env->active_tc.msacsr) | FP_UNIMPLEMENTED;
- 
-     /* Set Inexact (I) when flushing inputs to zero */
--    if ((ieee_ex & float_flag_input_denormal) &&
-+    if ((ieee_exception_flags & float_flag_input_denormal) &&
-             (env->active_tc.msacsr & MSACSR_FS_MASK) != 0) {
-         if (action & CLEAR_IS_INEXACT) {
--            c &= ~FP_INEXACT;
-+            mips_exception_flags &= ~FP_INEXACT;
-         } else {
--            c |=  FP_INEXACT;
-+            mips_exception_flags |= FP_INEXACT;
-         }
-     }
- 
-     /* Set Inexact (I) and Underflow (U) when flushing outputs to zero */
--    if ((ieee_ex & float_flag_output_denormal) &&
-+    if ((ieee_exception_flags & float_flag_output_denormal) &&
-             (env->active_tc.msacsr & MSACSR_FS_MASK) != 0) {
--        c |= FP_INEXACT;
-+        mips_exception_flags |= FP_INEXACT;
-         if (action & CLEAR_FS_UNDERFLOW) {
--            c &= ~FP_UNDERFLOW;
-+            mips_exception_flags &= ~FP_UNDERFLOW;
-         } else {
--            c |=  FP_UNDERFLOW;
-+            mips_exception_flags |= FP_UNDERFLOW;
-         }
-     }
- 
-     /* Set Inexact (I) when Overflow (O) is not enabled */
--    if ((c & FP_OVERFLOW) != 0 && (enable & FP_OVERFLOW) == 0) {
--        c |= FP_INEXACT;
-+    if ((mips_exception_flags & FP_OVERFLOW) != 0 &&
-+           (enable & FP_OVERFLOW) == 0) {
-+        mips_exception_flags |= FP_INEXACT;
-     }
- 
-     /* Clear Exact Underflow when Underflow (U) is not enabled */
--    if ((c & FP_UNDERFLOW) != 0 && (enable & FP_UNDERFLOW) == 0 &&
--            (c & FP_INEXACT) == 0) {
--        c &= ~FP_UNDERFLOW;
-+    if ((mips_exception_flags & FP_UNDERFLOW) != 0 &&
-+           (enable & FP_UNDERFLOW) == 0 &&
-+           (mips_exception_flags & FP_INEXACT) == 0) {
-+        mips_exception_flags &= ~FP_UNDERFLOW;
-     }
- 
-     /*
-@@ -5474,11 +5501,11 @@ static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
-      * divide by zero
-      */
-     if ((action & RECIPROCAL_INEXACT) &&
--            (c & (FP_INVALID | FP_DIV0)) == 0) {
--        c = FP_INEXACT;
-+            (mips_exception_flags & (FP_INVALID | FP_DIV0)) == 0) {
-+        mips_exception_flags = FP_INEXACT;
-     }
- 
--    cause = c & enable;    /* all current enabled exceptions */
-+    cause = mips_exception_flags & enable; /* all current enabled exceptions */
- 
-     if (cause == 0) {
-         /*
-@@ -5486,7 +5513,7 @@ static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
-          * with all current exceptions
-          */
-         SET_FP_CAUSE(env->active_tc.msacsr,
--                (GET_FP_CAUSE(env->active_tc.msacsr) | c));
-+            (GET_FP_CAUSE(env->active_tc.msacsr) | mips_exception_flags));
-     } else {
-         /* Current exceptions are enabled */
-         if ((env->active_tc.msacsr & MSACSR_NX_MASK) == 0) {
-@@ -5495,11 +5522,11 @@ static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
-              * with all enabled exceptions
-              */
-             SET_FP_CAUSE(env->active_tc.msacsr,
--                    (GET_FP_CAUSE(env->active_tc.msacsr) | c));
-+                (GET_FP_CAUSE(env->active_tc.msacsr) | mips_exception_flags));
-         }
-     }
- 
--    return c;
-+    return mips_exception_flags;
+ /*
+@@ -4816,12 +4886,6 @@ void helper_msa_sld_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     msa_sld_df(df, pwd, pws, env->active_tc.gpr[rt]);
  }
  
- static inline int get_enabled_exceptions(const CPUMIPSState *env, int c)
+-static inline int64_t msa_maddv_df(uint32_t df, int64_t dest, int64_t arg1,
+-                                   int64_t arg2)
+-{
+-    return dest + arg1 * arg2;
+-}
+-
+ static inline int64_t msa_msubv_df(uint32_t df, int64_t dest, int64_t arg1,
+                                    int64_t arg2)
+ {
+@@ -5002,7 +5066,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df, uint32_t wd,  \
+     }                                                                         \
+ }
+ 
+-MSA_TEROP_DF(maddv)
+ MSA_TEROP_DF(msubv)
+ MSA_TEROP_DF(dpadd_s)
+ MSA_TEROP_DF(dpadd_u)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 25b595a17d..42f2a759e5 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -29057,6 +29057,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         }
+         break;
++    case OPC_MADDV_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_maddv_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_maddv_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_maddv_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_maddv_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_ASUB_S_df:
+         switch (df) {
+         case DF_BYTE:
+@@ -29283,9 +29299,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_SUBS_U_df:
+         gen_helper_msa_subs_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MADDV_df:
+-        gen_helper_msa_maddv_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_SPLAT_df:
+         gen_helper_msa_splat_df(cpu_env, tdf, twd, tws, twt);
+         break;
 -- 
 2.20.1
 
