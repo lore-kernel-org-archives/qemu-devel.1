@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D7FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69506C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E44F520758
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E04120758
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:57:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5XV+Qnj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44F520758
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSu7d5PQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E04120758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaj39-00081V-3p
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:55:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
+	id 1jaj5B-000256-Dj
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:57:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jaizc-0002bD-0C; Mon, 18 May 2020 12:51:56 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:41436)
+ id 1jaj3K-00009N-2z; Mon, 18 May 2020 12:55:46 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:39129)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jaiza-000170-Up; Mon, 18 May 2020 12:51:55 -0400
-Received: by mail-il1-x142.google.com with SMTP id b71so10498704ilg.8;
- Mon, 18 May 2020 09:51:54 -0700 (PDT)
+ id 1jaj3J-0001iC-4R; Mon, 18 May 2020 12:55:45 -0400
+Received: by mail-io1-xd43.google.com with SMTP id x5so11374433ioh.6;
+ Mon, 18 May 2020 09:55:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=JLl6Oqn+XkPIiE3xybVEx94h32oZCJQ+9UbkT17BpeA=;
- b=b5XV+QnjRfTHqw0pZPs3qZJfegfmLONpgr0x61Gp36IOOaJ7jZICv4W4a9k6luZebj
- PVstfIbyByrQoXdLx5I8khqNEUaWNWTWj+QeNq/gj5y6g2uXH5LqhiV60L1IurhfBPhL
- D45BsfKSHGBaBeK27yYZ3EFP90h9XqJSaxxFZYOh4uG1UNqCuqXrhToL2W6pofkQuAMG
- 0JBFg4Ci/9qUIUE/eG9kvSUVWhPoTfz+kRzy46/Y6sQmAF5QLuzib1NrpfbEvYNmKmxQ
- Zq208dqaDgNhyySup74o/3bcRskazOjG3XWt479OTRUKiNF5KjfC1IN3LOPXWj9e70Dm
- poog==
+ bh=Ol0ORCGLTTuGNMRHjrIAOAqtx3daiObs8nq3fxwOcNM=;
+ b=nSu7d5PQzivLEqe9GLyI58sGSC+c4/nr9FoJRlSQL/URJ+/d1tzuMFlUHDh751Ibnr
+ TuvYBNcinysfWXV3l7ccigQoznczl/Goqh0+Rwvmko3bdZxKUECaQx0H/xr24gVhYFX8
+ 6A1n6U8irBGKf08Ms+FXNs736swCn8mvDmD9AgNHl3+XTDKSCU3OWsE0NmH57wVF97Zl
+ jyHJoEDr3Jbp4XE/sswKlj2b9SzroC+bh+XNdn8JNIQ0VsZXS+neb7dZA8bHx/km83jN
+ ZhQ+o6DorX8miuy15g58k1kObZLlyHS6QNcpKeJ7jeKW/9BGEPi89Ny5BReyXEcXNhGj
+ V+uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=JLl6Oqn+XkPIiE3xybVEx94h32oZCJQ+9UbkT17BpeA=;
- b=Ygd2TTiGMwRPyuFCnjw6hCG8PJjomS5qJy4pX3neNFbdxd2fTjC5Zyd8C76ASN+t1P
- Cj/PAh36jwLRrwLlTD6ba6qoX9U0Loxzbnp8W9lbKQBJH1jct2UTjtPSsM4HmfmbjRd5
- iun8+PeljVJPhN1BK2hxhr6b8gVrknRJxxq8njd5q15vF2tPJauVnJFo8llWa4hJAYbb
- UBZviYT8JTUg0mdWH+7JDJbP65EjZzvdk2XgNI60mt1mCBrJd/E8uFcyvMiUZm5OgS8n
- gCiNnVnIksdqAN+YjoML2Ey9nUry53pImxl7O0fch1sZn2haO0qD+geQZvoVjvYMtChU
- fr8A==
-X-Gm-Message-State: AOAM533D3by0jHeXhQ+kStG0SS5QngJjqgDqq3A1RseGqK0xi3rj0GH4
- 1y92oQS9xT66WbhZSC6MBNRf+8Tt8r29G5rreQc=
-X-Google-Smtp-Source: ABdhPJzqg8DZK/AmXwEY6sp1P30kYAkcIMYENIKplcLqEcsneMxrkw5Z7oDURrJATwgBILkDhSrCU/vmqQhO4ykIU0M=
-X-Received: by 2002:a92:de02:: with SMTP id x2mr17846069ilm.267.1589820713247; 
- Mon, 18 May 2020 09:51:53 -0700 (PDT)
+ bh=Ol0ORCGLTTuGNMRHjrIAOAqtx3daiObs8nq3fxwOcNM=;
+ b=j5gEAwQ+tpMlTINGA+AcdLkeO+pospSKBIeLinqdR6YOfpdK9+sFW6q2xXai2VJIpP
+ bNxGSHYbYf+3OQZ2UTRLYxgz1lMt4jjtzblU5dt7YHfcCQwByAd2eVBgTEpd22Ty/lb/
+ dvqO/vNl75PrWNeD8mfN6oYJ3MBGkPaLtzVdeMQU2e7fJwIh3QpG5tjPYkg+3llBibRp
+ lV1TQ1JFn2YYQYLm6z1hHFh/qP9bVgr9PIAtOUA3EIlD2JiXslI58v8fOAlF9XXYk2Uk
+ w+GECVHm9lf20m2KFrfz8IOFG4iF5wFUawY8SpXDB2+zUNAz2KDex9HlTkcumGs+M3Ua
+ xHTA==
+X-Gm-Message-State: AOAM531Tnw5+WXOl0aB4mjHNDo/IlEhcygI0st1/qfrIAtNLf5iZHtNz
+ E4WEAmcG8xtFpmZQBH8sfA1B7yCa9V4lwZpU260=
+X-Google-Smtp-Source: ABdhPJwFXLE0/NAwksdqDOgpM2P+9Afs7WHw0wRXDp6XyaCC7/YsedlKzPh8y9jVqesoR/WPbnIx9mxgMLxJ+qZMvyE=
+X-Received: by 2002:a02:a118:: with SMTP id f24mr17042201jag.8.1589820942980; 
+ Mon, 18 May 2020 09:55:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200518140309.5220-1-f4bug@amsat.org>
- <20200518140309.5220-3-f4bug@amsat.org>
-In-Reply-To: <20200518140309.5220-3-f4bug@amsat.org>
+References: <20200515170804.5707-1-philmd@redhat.com>
+ <20200515170804.5707-6-philmd@redhat.com>
+In-Reply-To: <20200515170804.5707-6-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 18 May 2020 09:43:02 -0700
-Message-ID: <CAKmqyKN4bSSdvAyoPjAYZoiMLuPT=SDrVkq5OSb3Pk4Q0Jhp4w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] hw/arm/pxa2xx: Replace hw_error() by
- qemu_log_mask()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 18 May 2020 09:46:52 -0700
+Message-ID: <CAKmqyKPAcizLC=wmNpmatpcxXtp9YcaruJGCC_=SpPgSYP-BHA@mail.gmail.com>
+Subject: Re: [PATCH v2 05/10] Makefile: Remove dangerous EOL trailing backslash
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -96,172 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+ Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 18, 2020 at 7:03 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
+On Fri, May 15, 2020 at 10:11 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> hw_error() calls exit(). This a bit overkill when we can log
-> the accesses as unimplemented or guest error.
+> One might get caught trying to understand unexpected Makefile
+> behavior. Trailing backslash can help to split very long lines,
+> but are rather dangerous when nothing follow. Preserve other
+> developers debugging time by removing this one.
 >
-> When fuzzing the devices, we don't want the whole process to
-> exit. Replace some hw_error() calls by qemu_log_mask().
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/arm/pxa2xx_gpio.c    |  7 ++++---
->  hw/display/pxa2xx_lcd.c |  8 +++++---
->  hw/dma/pxa2xx_dma.c     | 14 +++++++++-----
->  3 files changed, 18 insertions(+), 11 deletions(-)
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/arm/pxa2xx_gpio.c b/hw/arm/pxa2xx_gpio.c
-> index f8df3cc227..a01db54a51 100644
-> --- a/hw/arm/pxa2xx_gpio.c
-> +++ b/hw/arm/pxa2xx_gpio.c
-> @@ -9,7 +9,6 @@
+> diff --git a/Makefile b/Makefile
+> index 34275f57c9..84453789f9 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -420,7 +420,7 @@ MINIKCONF_ARGS =3D \
 >
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> -#include "hw/hw.h"
->  #include "hw/irq.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/sysbus.h"
-> @@ -199,7 +198,8 @@ static uint64_t pxa2xx_gpio_read(void *opaque, hwaddr=
- offset,
->          return s->status[bank];
+>  MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig
+>  MINIKCONF_DEPS =3D $(MINIKCONF_INPUTS) $(wildcard $(SRC_PATH)/hw/*/Kconf=
+ig)
+> -MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py \
+> +MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py
 >
->      default:
-> -        hw_error("%s: Bad offset " REG_FMT "\n", __func__, offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX =
-"\n",
-> +                      __func__, offset);
->      }
->
->      return 0;
-> @@ -252,7 +252,8 @@ static void pxa2xx_gpio_write(void *opaque, hwaddr of=
-fset,
->          break;
->
->      default:
-> -        hw_error("%s: Bad offset " REG_FMT "\n", __func__, offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX =
-"\n",
-> +                      __func__, offset);
->      }
->  }
->
-> diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
-> index 464e93161a..d5f2e82a4e 100644
-> --- a/hw/display/pxa2xx_lcd.c
-> +++ b/hw/display/pxa2xx_lcd.c
-> @@ -11,7 +11,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> -#include "hw/hw.h"
-> +#include "qemu/log.h"
->  #include "hw/irq.h"
->  #include "migration/vmstate.h"
->  #include "ui/console.h"
-> @@ -407,7 +407,8 @@ static uint64_t pxa2xx_lcdc_read(void *opaque, hwaddr=
- offset,
->
->      default:
->      fail:
-> -        hw_error("%s: Bad offset " REG_FMT "\n", __func__, offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX =
-"\n",
-> +                      __func__, offset);
->      }
->
->      return 0;
-> @@ -562,7 +563,8 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr of=
-fset,
->
->      default:
->      fail:
-> -        hw_error("%s: Bad offset " REG_FMT "\n", __func__, offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX =
-"\n",
-> +                      __func__, offset);
->      }
->  }
->
-> diff --git a/hw/dma/pxa2xx_dma.c b/hw/dma/pxa2xx_dma.c
-> index 88ed4b6ff1..8a2eeb32bc 100644
-> --- a/hw/dma/pxa2xx_dma.c
-> +++ b/hw/dma/pxa2xx_dma.c
-> @@ -9,6 +9,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "hw/hw.h"
->  #include "hw/irq.h"
->  #include "hw/qdev-properties.h"
-> @@ -268,7 +269,8 @@ static uint64_t pxa2xx_dma_read(void *opaque, hwaddr =
-offset,
->      unsigned int channel;
->
->      if (size !=3D 4) {
-> -        hw_error("%s: Bad access width\n", __func__);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad access width %u\n",
-> +                      __func__, size);
->          return 5;
->      }
->
-> @@ -315,8 +317,8 @@ static uint64_t pxa2xx_dma_read(void *opaque, hwaddr =
-offset,
->              return s->chan[channel].cmd;
->          }
->      }
-> -
-> -    hw_error("%s: Bad offset 0x" TARGET_FMT_plx "\n", __func__, offset);
-> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n"=
-,
-> +                  __func__, offset);
->      return 7;
->  }
->
-> @@ -327,7 +329,8 @@ static void pxa2xx_dma_write(void *opaque, hwaddr off=
-set,
->      unsigned int channel;
->
->      if (size !=3D 4) {
-> -        hw_error("%s: Bad access width\n", __func__);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad access width %u\n",
-> +                      __func__, size);
->          return;
->      }
->
-> @@ -420,7 +423,8 @@ static void pxa2xx_dma_write(void *opaque, hwaddr off=
-set,
->              break;
->          }
->      fail:
-> -        hw_error("%s: Bad offset " TARGET_FMT_plx "\n", __func__, offset=
-);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX =
-"\n",
-> +                      __func__, offset);
->      }
->  }
->
+>  $(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MIN=
+IKCONF_DEPS) $(BUILD_DIR)/config-host.mak
+>         $(call quiet-command, $(MINIKCONF) $(MINIKCONF_ARGS) > $@.tmp, "G=
+EN", "$@.tmp")
 > --
 > 2.21.3
 >
