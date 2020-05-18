@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1540AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 212EBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7E4620715
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD540207D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 06:52:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="YqQz9tGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E4620715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="EfJ0uFej"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD540207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaZdG-0003ww-0W
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 02:52:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33248)
+	id 1jaZdT-0004FA-0j
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 02:52:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jaZYO-0004JK-BY
- for qemu-devel@nongnu.org; Mon, 18 May 2020 02:47:12 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8707)
+ id 1jaZZT-0005On-La
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:19 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:13573)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jaZYM-00041F-W0
- for qemu-devel@nongnu.org; Mon, 18 May 2020 02:47:12 -0400
+ id 1jaZZS-0004LN-Hm
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 02:48:19 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ec22f200000>; Sun, 17 May 2020 23:45:52 -0700
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ec22fa40007>; Sun, 17 May 2020 23:48:05 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Sun, 17 May 2020 23:47:09 -0700
+ Sun, 17 May 2020 23:48:17 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Sun, 17 May 2020 23:47:09 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 18 May
- 2020 06:47:09 +0000
+ by hqpgpgate101.nvidia.com on Sun, 17 May 2020 23:48:17 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 18 May
+ 2020 06:48:16 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 18 May 2020 06:47:01 +0000
+ Transport; Mon, 18 May 2020 06:48:09 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH QEMU v22 05/18] vfio: Add migration region initialization and
- finalize function
-Date: Mon, 18 May 2020 11:43:05 +0530
-Message-ID: <1589782398-24406-6-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH QEMU v22 11/18] iommu: add callback to get address limit IOMMU
+ supports
+Date: Mon, 18 May 2020 11:43:11 +0530
+Message-ID: <1589782398-24406-12-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589782398-24406-1-git-send-email-kwankhede@nvidia.com>
 References: <1589782398-24406-1-git-send-email-kwankhede@nvidia.com>
@@ -61,19 +61,19 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1589784352; bh=hkQfZR7OVUxKsSIeTLti5Ek4LyshIITpjYcsyKuZKdE=;
+ t=1589784485; bh=O9XV7D5FxmOFBmprNRbpwsU4to7+MGZBhc9zVXWkdKk=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=YqQz9tGIELs01T3R9nZtNqFpTnDHXRr6YdjpKa7IXnO3DCm0amcPRuQSKleaydjgv
- Xls/OTvF55iM5p8qa681S0aatIBZIs0D6J9Ggn5J49eEGoTbogIxsl7lo2U3Vm2wHj
- Vugz6w+VXHuqTcQFFCbM253zTO8xQ1qhBxGVPfy6Cis+DVKzFIQyoLZXd/gl91t/Fj
- avxHCbfBG+HLT50PTHjFq10YunSuTIOIDSzFKhqRE0CmyLa/nUnA27Mpq34nWHfY3Y
- //ojYRKd/kazArCvPrdTo+hYpTCELGT7B66n1nGyFVA+Va26hcn1Y1gWyqVELTHaey
- G6cgeFMnr2iUg==
-Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate25.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 02:29:57
+ b=EfJ0uFejm1F+7pVUB8dNQnRVloB2Urha9kIEDiHDH/VUy06gxvpLfMn/ok67oyu5G
+ 3pFtATroGOqqy33b1DWWMozFTqjfUDMjvwWiNRD2GNjlQtNrlqtj8x7gpcc8acKXd4
+ sKjK9WnnrZsCHBShaDk8w3ImwTUXPqg4Fdt1WLPiPf62xc+ZdAfMDeyhF23LBgPIhw
+ oJSgQK+Npeo5mptCpxW7G5djbatEZYQUYpkHvfLHWDGueCGAZDThkhki/068BS1CSR
+ ZRORy2xGeLMiQ88Tlxr+X/xYlvB9td460KpHj9U2sawdYTfnhNo+VvxT23m+qE8YlR
+ yeMV4pseWYSlg==
+Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate26.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 02:30:17
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -70
 X-Spam_score: -7.1
@@ -105,220 +105,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- Migration functions are implemented for VFIO_DEVICE_TYPE_PCI device in this
-  patch series.
-- VFIO device supports migration or not is decided based of migration region
-  query. If migration region query is successful and migration region
-  initialization is successful then migration is supported else migration is
-  blocked.
+Add optional method to get address limit IOMMU supports
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/Makefile.objs         |   2 +-
- hw/vfio/migration.c           | 138 ++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/trace-events          |   3 +
- include/hw/vfio/vfio-common.h |   9 +++
- 4 files changed, 151 insertions(+), 1 deletion(-)
- create mode 100644 hw/vfio/migration.c
+ hw/i386/intel_iommu.c |  9 +++++++++
+ include/exec/memory.h | 18 ++++++++++++++++++
+ memory.c              | 11 +++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index 9bb1c09e8477..8b296c889ed9 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += common.o spapr.o
-+obj-y += common.o spapr.o migration.o
- obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
- obj-$(CONFIG_VFIO_CCW) += ccw.o
- obj-$(CONFIG_VFIO_PLATFORM) += platform.o
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-new file mode 100644
-index 000000000000..bf9384907ec0
---- /dev/null
-+++ b/hw/vfio/migration.c
-@@ -0,0 +1,138 @@
-+/*
-+ * Migration support for VFIO devices
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index df7ad254ac15..d0b88c20c31e 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3577,6 +3577,14 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+     return;
+ }
+ 
++static hwaddr vtd_iommu_get_address_limit(IOMMUMemoryRegion *iommu_mr)
++{
++    VTDAddressSpace *vtd_as = container_of(iommu_mr, VTDAddressSpace, iommu);
++    IntelIOMMUState *s = vtd_as->iommu_state;
++
++    return VTD_ADDRESS_SIZE(s->aw_bits) - 1;
++}
++
+ /* Do the initialization. It will also be called when reset, so pay
+  * attention when adding new initialization stuff.
+  */
+@@ -3878,6 +3886,7 @@ static void vtd_iommu_memory_region_class_init(ObjectClass *klass,
+     imrc->translate = vtd_iommu_translate;
+     imrc->notify_flag_changed = vtd_iommu_notify_flag_changed;
+     imrc->replay = vtd_iommu_replay;
++    imrc->get_address_limit = vtd_iommu_get_address_limit;
+ }
+ 
+ static const TypeInfo vtd_iommu_memory_region_info = {
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e000bd2f97b2..2d0cbd46d2a6 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -355,6 +355,16 @@ typedef struct IOMMUMemoryRegionClass {
+      * @iommu: the IOMMUMemoryRegion
+      */
+     int (*num_indexes)(IOMMUMemoryRegion *iommu);
++
++    /*
++     * Return address limit this IOMMU supports.
++     *
++     * Optional method: if this method is not provided, then
++     * memory_region_iommu_get_address_limit() will return 0.
++     *
++     * @iommu: the IOMMUMemoryRegion
++     */
++    hwaddr (*get_address_limit)(IOMMUMemoryRegion *iommu);
+ } IOMMUMemoryRegionClass;
+ 
+ typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+@@ -1364,6 +1374,14 @@ int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
+ int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
+ 
+ /**
++ * memory_region_iommu_get_address_limit : return the maximum address limit
++ * that this IOMMU supports.
 + *
-+ * Copyright NVIDIA, Inc. 2020
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2. See
-+ * the COPYING file in the top-level directory.
++ * @iommu_mr: the memory region
 + */
++hwaddr memory_region_iommu_get_address_limit(IOMMUMemoryRegion *iommu_mr);
 +
-+#include "qemu/osdep.h"
-+#include <linux/vfio.h>
-+
-+#include "hw/vfio/vfio-common.h"
-+#include "cpu.h"
-+#include "migration/migration.h"
-+#include "migration/qemu-file.h"
-+#include "migration/register.h"
-+#include "migration/blocker.h"
-+#include "migration/misc.h"
-+#include "qapi/error.h"
-+#include "exec/ramlist.h"
-+#include "exec/ram_addr.h"
-+#include "pci.h"
-+#include "trace.h"
-+
-+static void vfio_migration_region_exit(VFIODevice *vbasedev)
++/**
+  * memory_region_name: get a memory region's name
+  *
+  * Returns the string that was used to initialize the memory region.
+diff --git a/memory.c b/memory.c
+index 601b74990620..52f1a4cd37f0 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1887,6 +1887,17 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+     }
+ }
+ 
++hwaddr memory_region_iommu_get_address_limit(IOMMUMemoryRegion *iommu_mr)
 +{
-+    VFIOMigration *migration = vbasedev->migration;
++    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
 +
-+    if (!migration) {
-+        return;
-+    }
-+
-+    if (migration->region.size) {
-+        vfio_region_exit(&migration->region);
-+        vfio_region_finalize(&migration->region);
-+    }
-+}
-+
-+static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
-+{
-+    VFIOMigration *migration = vbasedev->migration;
-+    Object *obj = NULL;
-+    int ret = -EINVAL;
-+
-+    if (!vbasedev->ops->vfio_get_object) {
-+        return ret;
-+    }
-+
-+    obj = vbasedev->ops->vfio_get_object(vbasedev);
-+    if (!obj) {
-+        return ret;
-+    }
-+
-+    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
-+                            "migration");
-+    if (ret) {
-+        error_report("%s: Failed to setup VFIO migration region %d: %s",
-+                     vbasedev->name, index, strerror(-ret));
-+        goto err;
-+    }
-+
-+    if (!migration->region.size) {
-+        ret = -EINVAL;
-+        error_report("%s: Invalid region size of VFIO migration region %d: %s",
-+                     vbasedev->name, index, strerror(-ret));
-+        goto err;
-+    }
-+
-+    return 0;
-+
-+err:
-+    vfio_migration_region_exit(vbasedev);
-+    return ret;
-+}
-+
-+static int vfio_migration_init(VFIODevice *vbasedev,
-+                               struct vfio_region_info *info)
-+{
-+    int ret;
-+
-+    vbasedev->migration = g_new0(VFIOMigration, 1);
-+
-+    ret = vfio_migration_region_init(vbasedev, info->index);
-+    if (ret) {
-+        error_report("%s: Failed to initialise migration region",
-+                     vbasedev->name);
-+        g_free(vbasedev->migration);
-+        vbasedev->migration = NULL;
-+        return ret;
++    if (imrc->get_address_limit) {
++        return imrc->get_address_limit(iommu_mr);
 +    }
 +
 +    return 0;
 +}
 +
-+/* ---------------------------------------------------------------------- */
-+
-+int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
-+{
-+    struct vfio_region_info *info;
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
-+                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
-+    if (ret) {
-+        goto add_blocker;
-+    }
-+
-+    ret = vfio_migration_init(vbasedev, info);
-+    if (ret) {
-+        goto add_blocker;
-+    }
-+
-+    trace_vfio_migration_probe(vbasedev->name, info->index);
-+    return 0;
-+
-+add_blocker:
-+    error_setg(&vbasedev->migration_blocker,
-+               "VFIO device doesn't support migration");
-+    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_free(vbasedev->migration_blocker);
-+    }
-+    return ret;
-+}
-+
-+void vfio_migration_finalize(VFIODevice *vbasedev)
-+{
-+    if (vbasedev->migration_blocker) {
-+        migrate_del_blocker(vbasedev->migration_blocker);
-+        error_free(vbasedev->migration_blocker);
-+    }
-+
-+    vfio_migration_region_exit(vbasedev);
-+    g_free(vbasedev->migration);
-+}
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 8cdc27946cb8..fd034ac53684 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -143,3 +143,6 @@ vfio_display_edid_link_up(void) ""
- vfio_display_edid_link_down(void) ""
- vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
- vfio_display_edid_write_error(void) ""
-+
-+# migration.c
-+vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index d69a7f3ae31e..d4b268641173 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -57,6 +57,10 @@ typedef struct VFIORegion {
-     uint8_t nr; /* cache the region number for debug */
- } VFIORegion;
- 
-+typedef struct VFIOMigration {
-+    VFIORegion region;
-+} VFIOMigration;
-+
- typedef struct VFIOAddressSpace {
-     AddressSpace *as;
-     QLIST_HEAD(, VFIOContainer) containers;
-@@ -113,6 +117,8 @@ typedef struct VFIODevice {
-     unsigned int num_irqs;
-     unsigned int num_regions;
-     unsigned int flags;
-+    VFIOMigration *migration;
-+    Error *migration_blocker;
- } VFIODevice;
- 
- struct VFIODeviceOps {
-@@ -204,4 +210,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
- int vfio_spapr_remove_window(VFIOContainer *container,
-                              hwaddr offset_within_address_space);
- 
-+int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
-+void vfio_migration_finalize(VFIODevice *vbasedev);
-+
- #endif /* HW_VFIO_VFIO_COMMON_H */
+ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+                                              IOMMUNotifier *n)
+ {
 -- 
 2.7.0
 
