@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DD3C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2204C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:13:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 525A22075F
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79F8E20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:13:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6v75whn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 525A22075F
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqJ43xXy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79F8E20758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jam8i-0002ot-Gf
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:13:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58682)
+	id 1jam8n-00032U-Ka
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:13:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam62-0006qe-HB
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:46 -0400
-Received: from mail-lj1-x233.google.com ([2a00:1450:4864:20::233]:34497)
+ id 1jam5q-0006M1-NH
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:34 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:33748)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam5z-0002Me-RL
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:46 -0400
-Received: by mail-lj1-x233.google.com with SMTP id b6so11272302ljj.1
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:43 -0700 (PDT)
+ id 1jam5p-0002Ib-UK
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:34 -0400
+Received: by mail-lf1-x143.google.com with SMTP id z22so9237918lfd.0
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=2ITjMgpxMDXhLrKll92k92Sf+OWlp5gufeGg5gaD7lw=;
- b=j6v75whnuJqK/2ASV1CHUvszMryncVFmACiap3Y0aKjIe3lt+Ez3wG7IDK378YjQle
- axRaBpAgv3gAU1kIgBpC4pW4xCFHnFG6hQ0IaYbJ34xW6D22l7S7sX6MH8/hFj85JdoG
- QAnRAWg8LCQmfVn7p5c3yrZ8SHuzLPcFkTHugIScL6ta75u2Q1wJ2qBohGMfgLYCciEm
- 9jnsYg47xTFlRwO1EtCMgR/jY4E0jXlRvfI11kXQ9ZppcOOm3W1jv7PnbSIocwfQxpgM
- mpNqQCxD4JOol9q0M5zO6dhqyeI66tYDlma7ow6ThtzI/Tc/XZe93wn1/NWxNk07/POd
- 0q/A==
+ bh=Tui45N4i4oKQrSI5sRjLLrl8vmVjoxfftdTdtvM+nMU=;
+ b=GqJ43xXydGMEgw5ywTZoyad9D0C+CVxBs8A+nGNNhnnGQXZPbHKy66/Hw4VPjWCmJb
+ naB7w8F5/xE8wqBJvxCfkKqsIWNJ2GBVm81JTXVaZuQkl6mfnrcUkRWTfoqVZTenPfdB
+ 6s7LW35rX/o0nbq6ZEn4jG8MoNpg4YAV2yvGN86pur5aBoIrwvEj8QiAq4JgxcBoaEWB
+ VA68od1sPpjJLdEQ6Fo7H4xsN7QZ/PBFjxf9Krwcek6b+8rUDlz/mEPoLVrp7q4dYrYy
+ OLOCyI6t+l8MQgDf/LIS49GcmlXwLSU1gGynZfwK57I3cR6k6wMUfJKih8VqTuBgoqsS
+ aWgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2ITjMgpxMDXhLrKll92k92Sf+OWlp5gufeGg5gaD7lw=;
- b=rKggNYExS8NvAuWvHXxdbDHuiusJW/TBGEsijD86rqlzUsQvW6Lk+WD450PnPPyRkg
- rCnSKGdFVHOTVXlIXS6FZ38hpACmHeZ9BiqXwl6SOCsvdKxcFlN57spSPhVRjL6b+M5A
- mgcu/ceptE6+PmZMDlD7jQBnr6vMPNh0fy65SQDaHX6oumt87ixseOPsld+NMrYjJszf
- t3hsTd4len8rjq94VOGO0NEWRPn2pd6JOCLsZwU/f2OcUT5/L3im+a4N04bZ8jXNViP5
- RO15bLzcxRC5UbNwfHxZpylDe3jWLCbrpiVrW8s6rI2FwsJgIDAhLK8ZGmkYj82igMtN
- iLAQ==
-X-Gm-Message-State: AOAM533YlNy27w04BOk+j75lhPEZ2qRJJdaTDkjp/Rb0KmqxhwtvwoEC
- LAGUb/NHrwiy8OPjhh03buRI+I2wuWY=
-X-Google-Smtp-Source: ABdhPJwY2pYp+jjbX5P8nKg+EM011pCB7QwU+gkfVWfEidPUmnDSuN2pil9uQAigKbXvhU0jALCbVA==
-X-Received: by 2002:a2e:980d:: with SMTP id a13mr11563120ljj.277.1589832642040; 
- Mon, 18 May 2020 13:10:42 -0700 (PDT)
+ bh=Tui45N4i4oKQrSI5sRjLLrl8vmVjoxfftdTdtvM+nMU=;
+ b=Xtb+lkcLdB13UuareuN0pMuVtcvmtN5sXXUxd0uQer7HkS1TQ2Uj9NPd1mp4iVlkQb
+ fMBQrIP2xIVm7zJixFks7GXcV9gb37a7Ipu8Mwc4R1Bv6CtxU1puJ4nuZSvTalwjZCQ2
+ GV4r1KSIr1l3qfZIiuxRi9IrRaJv3RSwuwvTjpmZPk7tZImBVLWDb/i5QNGdx6/lgvrl
+ 5B44pShdaMUj9GX+KX/WXy7SMsMu5yxGIJboX34a/A2+UdXWK/hvdfZyfEi7aSI3fqLI
+ OpjoHf6CiJKal/aCgAdJyt/N9coORSnceTnADiZEMkBR/wxCRsNRvqZuF41OUTbBkTDG
+ +dYQ==
+X-Gm-Message-State: AOAM532G6QwTIxPKMToKFdvLH/Twqcq7X7yr6y3yKp1rH5pAJG5V4KUV
+ f/ZRONm6yOBV3dmfrDYxRx3vkV2CE3Q=
+X-Google-Smtp-Source: ABdhPJzLC6QOtayZSRqi8e1LNHCuN8TxDGAeZUxJ7/7qCazSKjsU+LJVTVkBmWbHA4LGpursvxYNpA==
+X-Received: by 2002:a05:6512:104c:: with SMTP id
+ c12mr5660109lfb.200.1589832632159; 
+ Mon, 18 May 2020 13:10:32 -0700 (PDT)
 Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.41
+ by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 13:10:41 -0700 (PDT)
+ Mon, 18 May 2020 13:10:31 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 17/21] MAINTAINERS: Change Aleksandar Rikalo's email address
-Date: Mon, 18 May 2020 22:09:16 +0200
-Message-Id: <20200518200920.17344-18-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v6 08/21] target/mips: fpu: Demacro NMADD.<D|S|PS>
+Date: Mon, 18 May 2020 22:09:07 +0200
+Message-Id: <20200518200920.17344-9-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::233;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x233.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 12
@@ -102,96 +102,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aleksandar Rikalo wants to use a different email address from
-now on.
+This is just a cosmetic change to enable tools like gcov, gdb,
+callgrind, etc. to better display involved source code.
 
 Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- .mailmap    |  3 ++-
- MAINTAINERS | 12 ++++++------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ target/mips/fpu_helper.c | 44 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/.mailmap b/.mailmap
-index 6412067bde..e3628c7a66 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -42,7 +42,8 @@ Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-devel <qemu
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@mips.com>
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@imgtec.com>
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <amarkovic@wavecomp.com>
--Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
-+Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <arikalo@wavecomp.com>
-+Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <aleksandar.rikalo@rt-rk.com>
- Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
- James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1f84e3ae2c..8d5562c5c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -212,7 +212,7 @@ F: disas/microblaze.c
- MIPS TCG CPUs
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: target/mips/
- F: default-configs/*mips*
-@@ -1041,7 +1041,7 @@ MIPS Machines
- -------------
- Jazz
- M: Hervé Poussineau <hpoussin@reactos.org>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: hw/mips/mips_jazz.c
- F: hw/display/jazz_led.c
-@@ -1062,7 +1062,7 @@ F: tests/acceptance/machine_mips_malta.py
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index e37fc4075d..d4c065f281 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -1495,7 +1495,6 @@ uint64_t helper_float_ ## name ## _ps(CPUMIPSState *env,             \
+     update_fcr31(env, GETPC());                                      \
+     return ((uint64_t)fsth0 << 32) | fst0;                           \
+ }
+-FLOAT_FMA(nmadd, float_muladd_negate_result)
+ FLOAT_FMA(nmsub, float_muladd_negate_result | float_muladd_negate_c)
+ #undef FLOAT_FMA
  
- Mipssim
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Odd Fixes
- F: hw/mips/mips_mipssim.c
- F: hw/net/mipsnet.c
-@@ -1070,7 +1070,7 @@ F: hw/net/mipsnet.c
- R4000
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Obsolete
- F: hw/mips/mips_r4k.c
+@@ -1577,6 +1576,49 @@ uint64_t helper_float_msub_ps(CPUMIPSState *env, uint64_t fdt0,
+     return ((uint64_t)fsth0 << 32) | fstl0;
+ }
  
-@@ -1085,7 +1085,7 @@ F: include/hw/isa/vt82c686.h
++uint64_t helper_float_nmadd_d(CPUMIPSState *env, uint64_t fst0,
++                             uint64_t fst1, uint64_t fst2)
++{
++    fst0 = float64_mul(fst0, fst1, &env->active_fpu.fp_status);
++    fst0 = float64_add(fst0, fst2, &env->active_fpu.fp_status);
++    fst0 = float64_chs(fst0);
++
++    update_fcr31(env, GETPC());
++    return fst0;
++}
++
++uint32_t helper_float_nmadd_s(CPUMIPSState *env, uint32_t fst0,
++                             uint32_t fst1, uint32_t fst2)
++{
++    fst0 = float32_mul(fst0, fst1, &env->active_fpu.fp_status);
++    fst0 = float32_add(fst0, fst2, &env->active_fpu.fp_status);
++    fst0 = float32_chs(fst0);
++
++    update_fcr31(env, GETPC());
++    return fst0;
++}
++
++uint64_t helper_float_nmadd_ps(CPUMIPSState *env, uint64_t fdt0,
++                              uint64_t fdt1, uint64_t fdt2)
++{
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fsth0 = fdt0 >> 32;
++    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
++    uint32_t fsth1 = fdt1 >> 32;
++    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
++    uint32_t fsth2 = fdt2 >> 32;
++
++    fstl0 = float32_mul(fstl0, fstl1, &env->active_fpu.fp_status);
++    fstl0 = float32_add(fstl0, fstl2, &env->active_fpu.fp_status);
++    fstl0 = float32_chs(fstl0);
++    fsth0 = float32_mul(fsth0, fsth1, &env->active_fpu.fp_status);
++    fsth0 = float32_add(fsth0, fsth2, &env->active_fpu.fp_status);
++    fsth0 = float32_chs(fsth0);
++
++    update_fcr31(env, GETPC());
++    return ((uint64_t)fsth0 << 32) | fstl0;
++}
++
  
- Boston
- M: Paul Burton <pburton@wavecomp.com>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
-@@ -2582,7 +2582,7 @@ F: disas/i386.c
- MIPS TCG target
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: tcg/mips/
- 
+ #define FLOAT_FMADDSUB(name, bits, muladd_arg)                          \
+ uint ## bits ## _t helper_float_ ## name(CPUMIPSState *env,             \
 -- 
 2.20.1
 
