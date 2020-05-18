@@ -7,94 +7,93 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA36DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A564DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:16:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 708EA20643
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:11:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 716FE207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:16:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEGurffk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 708EA20643
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IH/fIqjv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716FE207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaboB-00079Z-Ke
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 05:11:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51110)
+	id 1jabtD-00015u-Qo
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 05:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabnX-0006i0-TN
- for qemu-devel@nongnu.org; Mon, 18 May 2020 05:10:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40412
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabsV-0000Vd-Rk
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 05:16:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60861
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabnW-0007W9-C5
- for qemu-devel@nongnu.org; Mon, 18 May 2020 05:10:59 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabsU-00008t-3F
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 05:16:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589793057;
+ s=mimecast20190719; t=1589793364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=datTDL3xLtt9An9huHFRm8NAi1StmLKwus16g4K1PgA=;
- b=PEGurffkjGJrsAdP0UxCO1CQUHRPPa9JPS53N5prfDOxrfJzymDS7wM1IxKeAAS0FMcSx7
- f3CREkmbY5ebycGHDfAyh+X854ngXTjZfgQhy7MEydxneTdEORroWTyc6bVvl+/jGBIgIj
- OXT+1DPn2UjzyrERkxQU4szlyyCq1Wo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-KyFQ9xlqPyOT_RPyHUeieg-1; Mon, 18 May 2020 05:10:55 -0400
-X-MC-Unique: KyFQ9xlqPyOT_RPyHUeieg-1
-Received: by mail-wm1-f70.google.com with SMTP id e15so7007672wme.1
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 02:10:55 -0700 (PDT)
+ bh=Qd1QOf1vGuqRSKOfb4zyT2zsQafyvJNhEuPavwQJFNM=;
+ b=IH/fIqjvyx9vM9y2n2zZoO4AyAET6ToJ7Y3qSgji51K3KiuxMhgCxh7iRHf4eyS1R7e7J7
+ 9DYSY1Mo/hTQ8iCwJqWtZQyAI/RSpkz8UxHKkOaWCAAGVMlIcp9wwqVjgRbCr43uUU2mcm
+ jKr8fSF6Fl8KFhxHVdZpEvRVyXFrHYw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-2E-RsIgpN0uaa0aj2v4ahg-1; Mon, 18 May 2020 05:16:02 -0400
+X-MC-Unique: 2E-RsIgpN0uaa0aj2v4ahg-1
+Received: by mail-wm1-f72.google.com with SMTP id l26so2826270wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 02:16:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=datTDL3xLtt9An9huHFRm8NAi1StmLKwus16g4K1PgA=;
- b=tbT/fChCpW9y23ov9sj4OKwoxiq+PQmPlT0elja7rvaAVriWAl1iANbU/skkZhr3kw
- LT+C1rETh2fTQmEztSe8KS9o7jx7+eA9dm+69/Q7xvsJYb2X2b6rMcXT4MYwG4K+lk6h
- 80hL/BU9XeXtF7yy1pN3Rynd83bo/N8VJUDLj4ZtVQyz3NtmfgZKAdS6IHC0A6ra5ZeV
- BEiULjLL50tr5+YkE+jyflQP1MdNJW9y9UC6T9Mc3dONdx5R7PQ7iqkLMHhynxVF4GMo
- TCwADClUqoJPMsSyPu3Wia3nJW+01+9QVJiXnSiWglp02sHupWUV0Xd2pbZ7QJZd9SMp
- vRwA==
-X-Gm-Message-State: AOAM532rnKiZjMzF4XfMjGRbK47NDCJUFIBh1NtQXlVHZJ7E0MZUihTE
- tdJX6QOEHuf+KMjw8rnmDOvN8vW6S7UZR5XvRVA2IoyfXPP4A++QUQjS7wdSkQhbahtm7rF+hns
- Ga1p7bLYnNDgoS5w=
-X-Received: by 2002:a1c:9d50:: with SMTP id g77mr18689115wme.56.1589793054236; 
- Mon, 18 May 2020 02:10:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWBrnfBdotHSkGNuTqFU586mbr0dLLdPxzFOkLxe1IsV+oUNe18NknKd9iVhSk6Q/EzJr1WQ==
-X-Received: by 2002:a1c:9d50:: with SMTP id g77mr18689089wme.56.1589793053954; 
- Mon, 18 May 2020 02:10:53 -0700 (PDT)
+ bh=Qd1QOf1vGuqRSKOfb4zyT2zsQafyvJNhEuPavwQJFNM=;
+ b=OtzuAMX3q/r6KHLTiCEWHkjY6KWWQvoCxIEl1hVV380Z0v5kz4gNMSjb8pq23tvACC
+ 7YyNnxLDmhuIgPwShCErRdQ5WxzyixhAjGf9wd0Ugu8dt63UEDiIjnt++sOfLmtlP+Db
+ qUBkGRxUVbkftAZJaKon0LyFjqqq6VcbNntIs8yJy2SbjQAczmrIStDvLaSTj1vl7/Be
+ BSTzbB2ECRXNiSgsyQUj+s3rZHbeAipuGUF9pUxMsV5rHi9kMzptBTfEFFk/nhyIC45f
+ E1+ElTdsQPmdn/zvpFzWZCMGvBki2BtzXYtQdboZbfP1OqgrVKSU2OlVNF9sEzbAq2Yp
+ snRg==
+X-Gm-Message-State: AOAM532P2xmaLdIohMKDHAX8n0vcOasHjff0vSK3pnVpe7NOlypt8Ds3
+ zTcVX2xCKaf/XejBqmmyO8utamUWbruBO8yACg63J3s5KW+23ttxR0+fcnbmDtfS5bu3/z4IYWD
+ gdHonHZ/g+tUC2oY=
+X-Received: by 2002:a1c:e903:: with SMTP id q3mr17682647wmc.76.1589793361367; 
+ Mon, 18 May 2020 02:16:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1iIMCMHR4o29sbjuqp2Ia/nmZXSRTSjhHLrWAER2k/8UFEQRd9lgzODaNJND2wZAG8tcBWA==
+X-Received: by 2002:a1c:e903:: with SMTP id q3mr17682546wmc.76.1589793360162; 
+ Mon, 18 May 2020 02:16:00 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id u23sm1340475wmu.20.2020.05.18.02.10.52
+ by smtp.gmail.com with ESMTPSA id c80sm16288168wme.15.2020.05.18.02.15.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 May 2020 02:10:53 -0700 (PDT)
-Subject: Re: [PATCH 24/24] qdev: Assert onboard devices all get realized
- properly
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-25-armbru@redhat.com>
+ Mon, 18 May 2020 02:15:59 -0700 (PDT)
+Subject: Re: [PATCH] travis.yml: Use clang++ in the Clang tests
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200518083316.25065-1-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <deccdf13-388d-0941-79df-23086032f125@redhat.com>
-Date: Mon, 18 May 2020 11:10:52 +0200
+Message-ID: <2e571780-e8d6-406f-0475-afa43bcb0815@redhat.com>
+Date: Mon, 18 May 2020 11:15:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200518050408.4579-25-armbru@redhat.com>
+In-Reply-To: <20200518083316.25065-1-thuth@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:51:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -113,59 +112,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 7:04 AM, Markus Armbruster wrote:
-> This would have caught some of the bugs I just fixed.
+On 5/18/20 10:33 AM, Thomas Huth wrote:
+> Our configure script does not look for clang++ automatically, so we
+> should use --cxx=clang++ to make sure that we test our C++ code with
+> Clang, too. And while we're at it, also use --host-cc=clang here
+> to avoid that we use the normal "cc" as host C compiler.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   hw/core/qdev.c | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
+>   .travis.yml | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 0df995eb94..fe2dea8968 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -429,6 +429,19 @@ void qdev_init_nofail(DeviceState *dev)
->       object_unref(OBJECT(dev));
->   }
+> diff --git a/.travis.yml b/.travis.yml
+> index 1ec8a7b465..564be50a3c 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -205,14 +205,15 @@ jobs:
+>       # Test with Clang for compile portability (Travis uses clang-5.0)
+>       - name: "Clang (user)"
+>         env:
+> -        - CONFIG="--disable-system"
+> +        - CONFIG="--disable-system --host-cc=clang --cxx=clang++"
+>           - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
+>         compiler: clang
 >   
-> +static int qdev_assert_realized_properly(Object *obj, void *opaque)
-> +{
-> +    DeviceState *dev = DEVICE(object_dynamic_cast(obj, TYPE_DEVICE));
-> +    DeviceClass *dc;
-> +
-> +    if (dev) {
-> +        dc = DEVICE_GET_CLASS(dev);
-> +        assert(dev->realized);
-> +        assert(dev->parent_bus || !dc->bus_type);
-
-Nice :)
+>   
+>       - name: "Clang (main-softmmu)"
+>         env:
+> -        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
+> +        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS}
+> +                  --host-cc=clang --cxx=clang++"
+>           - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
+>         compiler: clang
+>         before_script:
+> @@ -222,7 +223,8 @@ jobs:
+>   
+>       - name: "Clang (other-softmmu)"
+>         env:
+> -        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
+> +        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}
+> +                  --host-cc=clang --cxx=clang++"
+>           - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
+>         compiler: clang
+>   
+> 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +    }
-> +    return 0;
-> +}
-> +
->   void qdev_machine_creation_done(void)
->   {
->       /*
-> @@ -436,6 +449,9 @@ void qdev_machine_creation_done(void)
->        * only create hotpluggable devices
->        */
->       qdev_hotplug = true;
-> +
-> +    object_child_foreach_recursive(object_get_root(),
-> +                                   qdev_assert_realized_properly, NULL);
->   }
->   
->   bool qdev_machine_modified(void)
-> 
-
 
 
