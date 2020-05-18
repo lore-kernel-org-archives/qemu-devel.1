@@ -7,117 +7,91 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1D9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A881C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:50:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573E92065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1037820671
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:50:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+wxljOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573E92065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8HmA0m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1037820671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jafCT-0007FB-H7
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:48:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53378)
+	id 1jafEK-0000jB-4M
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:50:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafBb-0006KH-68
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:48:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38137
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jafDM-0008BN-CQ
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:49:52 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32231
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jafBa-00067Z-6u
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:48:02 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jafDL-0006kF-FU
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:49:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589806081;
+ s=mimecast20190719; t=1589806190;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=C0+Q9JxIyb0o9T+oXGno9I8d6+UGiR3hsP345RxBtC0=;
- b=N+wxljObb1QZca0XrPDcaAVZBRgJwYvE0RdLQR7Gtg9cDUQDF4Dxd6gJD62jzCkbZtWjmb
- fK0p6ikx9vGwYFg90P0PtlKK9goILeP3zXaJW5ri7oNJempJnAbwdW085yFQPpHbkPR5VQ
- iG0/BypeCgUT4Sd1SSp0X8OnDHLGHyE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-GxhuEgTeOgmOimvU0vCCDg-1; Mon, 18 May 2020 08:47:54 -0400
-X-MC-Unique: GxhuEgTeOgmOimvU0vCCDg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CBFDEC1A3;
- Mon, 18 May 2020 12:47:53 +0000 (UTC)
-Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 100C45D9DC;
- Mon, 18 May 2020 12:47:51 +0000 (UTC)
-Subject: Re: [PATCH v2 8/9] pc-bios: s390x: Replace 0x00 with 0x0 or 0
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200514123729.156283-1-frankja@linux.ibm.com>
- <20200514123729.156283-9-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <1e02198f-73ed-b9cc-1e8a-f120f17a601f@redhat.com>
-Date: Mon, 18 May 2020 14:47:51 +0200
+ in-reply-to:in-reply-to:references:references;
+ bh=qtV5b4Z/XtezT8P8ZBmElN4tH8V6CxN5eoS0EIqEjTE=;
+ b=g8HmA0m+M8GIKpk3hbmeD0cA8/jKN8jqWMe0TR08IecQGyl11YBBU9Ppc7Hi/UXvm52y74
+ DxzE8sVizkxXrA7P6Um4QfoHJQ/aFC1h5my/6ki9IbYQJpOThfiB8Ja2e/g5hwIi5z5mBE
+ G4yQXCFuDxQoixn8U90s85ItdQNDbvg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-YxMtbU78MwWhUavXdb_ogg-1; Mon, 18 May 2020 08:49:49 -0400
+X-MC-Unique: YxMtbU78MwWhUavXdb_ogg-1
+Received: by mail-wr1-f71.google.com with SMTP id z8so5570061wrp.7
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 05:49:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qtV5b4Z/XtezT8P8ZBmElN4tH8V6CxN5eoS0EIqEjTE=;
+ b=HwQ6YmmzLMWf0gIEU5OKiEkRHHAR28suNLRwMu7I4Rt7BxQ21ZgE2e+j5W4j6XXSg5
+ jAwq56j/XftA8fu1zKTuT5AUmf961iifbKWF9tpQvv8uPp3z7X1A+40Zc4WF5opsVddF
+ ERLasswWnfvDJwztyCPKO1JsMPvKhPcBJLq36LGeHVn5qFZtshiFn2IKk/0n6yYbiHXX
+ qSzdWMjQ9UiKB0j1p+pIhrJcuENtmpM/GMLP0b479kwLSWHD/hu55DtDhCHpI7SBvP1f
+ 48liSF9MQHvWQaYFLIhH7F0bj5BYOCb43EEQvdSCHwxzM1NQqRktUxFn+bIvfVoML+ug
+ NtKw==
+X-Gm-Message-State: AOAM533xkJ/sicGqvdhga4Uws41AFgy8HpqPOTdaMfofH35Bv1OUMrCO
+ Pw/m6uqCjSnZjSSjWL4aV6h4oljMio00xctea2psrKkV7BYQf8ANUxQX1RNbGUOuaX2LNFk9ToY
+ 7/n2y3ksOBxAr7Jw=
+X-Received: by 2002:a1c:2943:: with SMTP id p64mr3612188wmp.42.1589806187898; 
+ Mon, 18 May 2020 05:49:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwT7XuFpYriz4sbAWsGHNC0Yg+i8COo+5P/Ky2+Hf/GqKYTA6lqdkDQbsQ/014q6EPI2U86+A==
+X-Received: by 2002:a1c:2943:: with SMTP id p64mr3612153wmp.42.1589806187646; 
+ Mon, 18 May 2020 05:49:47 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.90.67])
+ by smtp.gmail.com with ESMTPSA id e22sm16814111wrc.41.2020.05.18.05.49.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 05:49:47 -0700 (PDT)
+Subject: Re: [PATCH] hw: Use QEMU_IS_ALIGNED() on parallel flash block size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200511205246.24621-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <60f129c2-499d-01e1-e0ee-9fd6ac759736@redhat.com>
+Date: Mon, 18 May 2020 14:49:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200514123729.156283-9-frankja@linux.ibm.com>
+In-Reply-To: <20200511205246.24621-1-philmd@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -140,87 +114,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, qemu-riscv@nongnu.org,
+ qemu-block@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-arm@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Leif Lindholm <leif@nuviainc.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.05.20 14:37, Janosch Frank wrote:
-> 0x00 looks odd, time to replace it with 0 or 0x0 (for pointers).
-
-"(for addresses)" maybe?
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
+On 11/05/20 22:52, Philippe Mathieu-Daudé wrote:
+> Use the QEMU_IS_ALIGNED() macro to verify the flash block size
+> is properly aligned. It is quicker to process when reviewing.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  pc-bios/s390-ccw/dasd-ipl.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+>  hw/arm/sbsa-ref.c       | 2 +-
+>  hw/arm/virt.c           | 2 +-
+>  hw/block/pflash_cfi01.c | 2 +-
+>  hw/block/pflash_cfi02.c | 2 +-
+>  hw/i386/pc_sysfw.c      | 2 +-
+>  hw/riscv/virt.c         | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-> index b932531e6f..764ee89e92 100644
-> --- a/pc-bios/s390-ccw/dasd-ipl.c
-> +++ b/pc-bios/s390-ccw/dasd-ipl.c
-> @@ -98,18 +98,18 @@ static int run_dynamic_ccw_program(SubChannelId schid, uint16_t cutype,
->  
->  static void make_readipl(void)
+> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> index 8409ba853d..b379e4a76a 100644
+> --- a/hw/arm/sbsa-ref.c
+> +++ b/hw/arm/sbsa-ref.c
+> @@ -241,7 +241,7 @@ static void sbsa_flash_map1(PFlashCFI01 *flash,
 >  {
-> -    Ccw0 *ccwIplRead = (Ccw0 *)0x00;
-> +    Ccw0 *ccwIplRead = (Ccw0 *)0x0;
+>      DeviceState *dev = DEVICE(flash);
 >  
->      /* Create Read IPL ccw at address 0 */
->      ccwIplRead->cmd_code = CCW_CMD_READ_IPL;
-> -    ccwIplRead->cda = 0x00; /* Read into address 0x00 in main memory */
-> +    ccwIplRead->cda = 0x0; /* Read into address 0x00 in main memory */
->      ccwIplRead->chain = 0; /* Chain flag */
->      ccwIplRead->count = 0x18; /* Read 0x18 bytes of data */
->  }
->  
->  static void run_readipl(SubChannelId schid, uint16_t cutype)
+> -    assert(size % SBSA_FLASH_SECTOR_SIZE == 0);
+> +    assert(QEMU_IS_ALIGNED(size, SBSA_FLASH_SECTOR_SIZE));
+>      assert(size / SBSA_FLASH_SECTOR_SIZE <= UINT32_MAX);
+>      qdev_prop_set_uint32(dev, "num-blocks", size / SBSA_FLASH_SECTOR_SIZE);
+>      qdev_init_nofail(dev);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 634db0cfe9..0a99fddb3d 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -978,7 +978,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
 >  {
-> -    if (do_cio(schid, cutype, 0x00, CCW_FMT0)) {
-> +    if (do_cio(schid, cutype, 0x0, CCW_FMT0)) {
->          panic("dasd-ipl: Failed to run Read IPL channel program\n");
+>      DeviceState *dev = DEVICE(flash);
+>  
+> -    assert(size % VIRT_FLASH_SECTOR_SIZE == 0);
+> +    assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
+>      assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
+>      qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
+>      qdev_init_nofail(dev);
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index f586bac269..11922c0f96 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -964,7 +964,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+>      if (blk) {
+>          qdev_prop_set_drive(dev, "drive", blk, &error_abort);
 >      }
->  }
-> @@ -133,10 +133,10 @@ static void check_ipl2(uint32_t ipl2_addr)
->  {
->      Ccw0 *ccw = u32toptr(ipl2_addr);
->  
-> -    if (ipl2_addr == 0x00) {
-> +    if (ipl2_addr == 0) {
->          panic("IPL2 address invalid. Is this disk really bootable?\n");
+> -    assert(size % sector_len == 0);
+> +    assert(QEMU_IS_ALIGNED(size, sector_len));
+>      qdev_prop_set_uint32(dev, "num-blocks", size / sector_len);
+>      qdev_prop_set_uint64(dev, "sector-length", sector_len);
+>      qdev_prop_set_uint8(dev, "width", bank_width);
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index c6b6f2d082..895f7daee3 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -1003,7 +1003,7 @@ PFlashCFI02 *pflash_cfi02_register(hwaddr base,
+>      if (blk) {
+>          qdev_prop_set_drive(dev, "drive", blk, &error_abort);
 >      }
-> -    if (ccw->cmd_code == 0x00) {
-> +    if (ccw->cmd_code == 0) {
->          panic("IPL2 ccw data invalid. Is this disk really bootable?\n");
->      }
->  }
-> @@ -161,7 +161,7 @@ static void ipl1_fixup(void)
->      memcpy(ccwRead, (void *)0x08, 16);
->  
->      /* Disable chaining so we don't TIC to IPL2 channel program */
-> -    ccwRead->chain = 0x00;
-> +    ccwRead->chain = 0;
->  
->      ccwSeek->cmd_code = CCW_CMD_DASD_SEEK;
->      ccwSeek->cda = ptr2u32(seekData);
-> @@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
->   */
->  void dasd_ipl(SubChannelId schid, uint16_t cutype)
+> -    assert(size % sector_len == 0);
+> +    assert(QEMU_IS_ALIGNED(size, sector_len));
+>      qdev_prop_set_uint32(dev, "num-blocks", size / sector_len);
+>      qdev_prop_set_uint32(dev, "sector-length", sector_len);
+>      qdev_prop_set_uint8(dev, "width", width);
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index f5f3f466b0..fad41f0e73 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -168,7 +168,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
+>                           blk_name(blk), strerror(-size));
+>              exit(1);
+>          }
+> -        if (size == 0 || size % FLASH_SECTOR_SIZE != 0) {
+> +        if (size == 0 || !QEMU_IS_ALIGNED(size, FLASH_SECTOR_SIZE)) {
+>              error_report("system firmware block device %s has invalid size "
+>                           "%" PRId64,
+>                           blk_name(blk), size);
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index daae3ebdbb..71481d59c2 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -112,7 +112,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
 >  {
-> -    PSWLegacy *pswl = (PSWLegacy *) 0x00;
-> +    PSWLegacy *pswl = (PSWLegacy *) 0x0;
->      uint32_t ipl2_addr;
+>      DeviceState *dev = DEVICE(flash);
 >  
->      /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
+> -    assert(size % VIRT_FLASH_SECTOR_SIZE == 0);
+> +    assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
+>      assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
+>      qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
+>      qdev_init_nofail(dev);
 > 
 
-
--- 
-Thanks,
-
-David / dhildenb
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
