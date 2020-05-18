@@ -2,65 +2,67 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D161C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB147C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:44:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5008720657
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B530B20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:44:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RR0H6jl4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5008720657
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2pCAKmn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B530B20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jahuv-00030y-Hn
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51204)
+	id 1jahwX-0004Pj-Uw
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:44:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahuA-0002WC-91
- for qemu-devel@nongnu.org; Mon, 18 May 2020 11:42:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54194
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahvy-0003qq-S8
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 11:44:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55857
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahu8-0005Sv-97
- for qemu-devel@nongnu.org; Mon, 18 May 2020 11:42:13 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahvy-00069e-4L
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 11:44:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589816530;
+ s=mimecast20190719; t=1589816645;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=mB6BDBJ+CuTDL72XJJfdDfBqx/qKpuCEOTyB1FXcPuo=;
- b=RR0H6jl4SBOSWG6l/wuadmuVNp7K9IYyBdcCnG7556U/Rj1t0+jL+jNQ9w8c1Fk3rzXsyX
- ZsOSOGnwiUFTJc5VqTSs24d5JDqpWQNRICKyGJodNgzzXThnx2SoATx0dbnZG5GxyM6JmN
- wVWGhMdqKb5vifDq9KUkeq5XZN9MoLA=
+ bh=LN62g+qrMbIeFmb6T3YAdQ5Q+LUQbgbHqfVuZLacLoE=;
+ b=O2pCAKmnJkUBxiwk2hYCJzetIRupfrRvZuK3s9Og3aDsPA1qkmsHBFpUi8EPmx6wu4bb/h
+ 5K2lhVROciSGZnNcANLjBxjXcQr8nHL9WknYQQnnjYXq/GQXLHBheSnj3I1tkNGUW+m/qw
+ R9WJdw+nX0ivRS/nXk5/5bNhEWDhBJc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-aUtumVmbOfu2vfT4fhqI8g-1; Mon, 18 May 2020 11:42:08 -0400
-X-MC-Unique: aUtumVmbOfu2vfT4fhqI8g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-241-_ijGppXVPvic48oyFL2PzQ-1; Mon, 18 May 2020 11:44:00 -0400
+X-MC-Unique: _ijGppXVPvic48oyFL2PzQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB0AB8C2534;
- Mon, 18 May 2020 15:42:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A088E1800D42;
+ Mon, 18 May 2020 15:43:58 +0000 (UTC)
 Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7DBC60C05;
- Mon, 18 May 2020 15:41:57 +0000 (UTC)
-Subject: Re: [PATCH v1 3/3] virtio-balloon: unref the iothread when unrealizing
-To: Alexander Duyck <alexander.duyck@gmail.com>
-References: <20200518083704.52646-1-david@redhat.com>
- <20200518083704.52646-4-david@redhat.com>
- <CAKgT0UfNdU9quX75MrV0EQk-v0EP4w8g6UVFj2k2qRO=VUvRCQ@mail.gmail.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DE931001925;
+ Mon, 18 May 2020 15:43:53 +0000 (UTC)
+Subject: Re: [PATCH v2 2/8] s390/sclp: check sccb len before filling in data
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200515222032.18838-1-walling@linux.ibm.com>
+ <20200515222032.18838-3-walling@linux.ibm.com>
+ <292a440b-d147-e94a-2c00-49a2fa3659b1@redhat.com>
+ <8924d502-711f-a8ca-14ba-3fe21a5249f4@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -106,18 +108,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <299d4475-bfd4-34b7-749f-ed11076d23c3@redhat.com>
-Date: Mon, 18 May 2020 17:41:56 +0200
+Message-ID: <d3fe4493-c35a-4e88-045a-ea769231d9b8@redhat.com>
+Date: Mon, 18 May 2020 17:43:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UfNdU9quX75MrV0EQk-v0EP4w8g6UVFj2k2qRO=VUvRCQ@mail.gmail.com>
+In-Reply-To: <8924d502-711f-a8ca-14ba-3fe21a5249f4@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
@@ -141,55 +143,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Wang <wei.w.wang@intel.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.05.20 17:35, Alexander Duyck wrote:
-> On Mon, May 18, 2020 at 1:37 AM David Hildenbrand <david@redhat.com> wrote:
+On 18.05.20 16:32, Collin Walling wrote:
+> On 5/18/20 7:46 AM, David Hildenbrand wrote:
+>> On 16.05.20 00:20, Collin Walling wrote:
+>>> The SCCB must be checked for a sufficient length before it is filled
+>>> with any data. If the length is insufficient, then the SCLP command
+>>> is suppressed and the proper response code is set in the SCCB header.
+>>>
+>>> Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>> ---
+>>>  hw/s390x/sclp.c | 22 ++++++++++------------
+>>>  1 file changed, 10 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>>> index 61e2e2839c..2bd618515e 100644
+>>> --- a/hw/s390x/sclp.c
+>>> +++ b/hw/s390x/sclp.c
+>>> @@ -75,6 +75,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>>>      int rnsize, rnmax;
+>>>      IplParameterBlock *ipib = s390_ipl_get_iplb();
+>>>  
+>>> +    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
+>>> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+>>> +        return;
+>>> +    }
+>>> +
 >>
->> We took a reference when realizing, so let's drop that reference when
->> unrealizing.
+>> (replied to v1 by mistake)
 >>
->> Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
->> Cc: Wei Wang <wei.w.wang@intel.com>
->> Cc: Alexander Duyck <alexander.duyck@gmail.com>
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/virtio/virtio-balloon.c | 1 +
->>  1 file changed, 1 insertion(+)
+>> Lines too long.
 >>
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index a4fcf2d777..3f8fc50be0 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
->> @@ -820,6 +820,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev)
+>> Please run scripts/checkpatch.pl before submitting.
 >>
->>      if (s->free_page_bh) {
->>          qemu_bh_delete(s->free_page_bh);
->> +        object_unref(OBJECT(s->iothread));
->>          virtio_balloon_free_page_stop(s);
->>          precopy_remove_notifier(&s->free_page_report_notify);
->>      }
 > 
-> I'm not entirely sure about this order of operations. It seems like it
-> would make more sense to remove the notifier, stop the hinting, delete
-> the bh, and then release the IO thread.
+> I do. The changes in this patch are replaced by the #3. I opted to be
+> sloppy here for ease of readability.
+> 
+> But if it's truly an issue I can clean it up for next round.
 
-This is the reverse order of the steps in
-virtio_balloon_device_realize(). And I guess it should be fine. The
-notifier cannot really be active/trigger while we are removing devices
-(cannot happen with concurrent migration). After qemu_bh_delete(), the
-iothread is effectively unused.
+No good reason to be sloppy and make checkpatch (+ David) complain ;)
 
-I am unsure about many things regarding free page hinting (e.g., if the
-virtio_balloon_free_page_stop() is of any use while we are ripping out
-the device and it will be gone in a second).
 
 -- 
 Thanks,
