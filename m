@@ -8,74 +8,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52797C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4D9C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:18:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CC4120758
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAB0F2075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:18:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmqaJPvO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC4120758
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvXbf6Op"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB0F2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jamDU-0000dk-A8
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:18:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58650)
+	id 1jamDe-0000mj-TW
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:18:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam5v-0006at-1O
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:39 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44264)
+ id 1jam64-0006uA-Fs
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:48 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:35710)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jam5u-0002Ko-7s
- for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:38 -0400
-Received: by mail-lj1-x243.google.com with SMTP id k5so4664491lji.11
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:37 -0700 (PDT)
+ id 1jam63-0002N5-Iy
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 16:10:48 -0400
+Received: by mail-lj1-x243.google.com with SMTP id g4so11253282ljl.2
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:10:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HYRUeAwktwnZJjXPTxlxiB/3mxTEsXooJ/Wo/+9Cf9s=;
- b=RmqaJPvOb8UqVZiUFtnm18r0Tt+efIXuq2mwJ1/He0g3Da/3PH/sYkCWWsK6czPaM0
- Vjpl8CYVWBZAGCVRklsebYkFFN83gkAKCrZxeI/ohpnD9inJiTQFRxYqn+h47+ly0wIO
- 4cQCscVOJoq8AqDGsMCYm0tYkSBwEz5siiFEV2UjysfxbDXjuozsaRYEXd0LiC965kz1
- Uwr2xjLAlYcrNmKaFQM+IajMGGmAGgI04QAIjGfQmrmQ4rzCjLzsOsFfnIA+WFyqcU3l
- IusgIm7Ep9N63Bc1OD7WboNEQPNl5rDFGCF3WPKXs789zId9BVv5Xwjo2McY2jW4APuw
- NMaQ==
+ bh=L66Agc2lHgpy7FO0yh6pn/rfQ2aSoQ2VmphzAuOdIik=;
+ b=WvXbf6Op/tEIC9dFN2IdaH5OujHm7XX7lFsH1jUlHLk6XoZc1OQ1wwoYvpj6CONjAF
+ eL0h+gRP58/I2ZJ81M5j8X5/I1g1Fl+pkj8DCeTjbu1dGoLBspBczSCE0yHuG9Gnqq6z
+ y3tNr+ACo5AjOFQ7+peyEPLArDmTGmF3XYo/sf18uQq1CvXZ8F8bjRETTKQq3xUS6oCp
+ Z9WgLOJxj738GusgYC+3FTABJ1/aPuzUgoPxXaI39gFkoRm/jiQ6mdZ0PXv4Zf8lOiUj
+ zrGpNRMuCReWEsVJ99HDQVt5QRLukoGIWPr2rgZsa1T6/3UjsDeo2hKAX/cUA/mWMgdB
+ TIWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HYRUeAwktwnZJjXPTxlxiB/3mxTEsXooJ/Wo/+9Cf9s=;
- b=HA8v9bhv9hHINC1JRLYzDwQ0QbtU4Oks72h6lsHOL9vpMpKj2wqvn+LEWUgkL8ANR/
- q3Dpql/4c3lWw6Jk2Duo8FGbAdVBIk0ndQXmkWbArxdRX8orkHbBidd87eAV8EkVjO+V
- x5dg9oPkFSklfsI0pOvkTS0tRWFACJyxL3ZIkYjZnTApqqLC09XTqM6lVOhy2AT79GqO
- w1arRh4e/zlFO2c5JJQqakSqtkT3bV8FYLXvGdsYjF3RoNI1NbeKNPa9affMaycn31Xy
- ukbeOS6sfGAH/lq/pecRxKcVLFMmw74YCfTtCYZRT0ofu/QzCjn5AGCSiHLNGyOBmcPC
- WyJw==
-X-Gm-Message-State: AOAM533xvL9Rp6gikSVf0Wg9HbS8kBcCDEiYX5TOGYfjPhcjdFVRwgGm
- r4ZIbw/goCS+et97RyNd1oK0enagUr8=
-X-Google-Smtp-Source: ABdhPJwUiNIs00Jc9pCt6LNCM2fnV0ejx4DhkaTKieEOJi33dBvUfPq9DE98a48ZLqULS+2hCzMLlA==
-X-Received: by 2002:a2e:9e97:: with SMTP id f23mr11242989ljk.228.1589832636427; 
- Mon, 18 May 2020 13:10:36 -0700 (PDT)
+ bh=L66Agc2lHgpy7FO0yh6pn/rfQ2aSoQ2VmphzAuOdIik=;
+ b=Yuhn/esIGfZMM79ypITwKZv0XDy82NXgTlszFwTKjoL2fsudqOL2MXfUd67bGZHDTa
+ ZhtU/yWC0haScTKPY0HSD6W/Wn1RJro5089S3jFRR0FX10PZ4pKW6NJ1S4yhsVykmjvi
+ j6A1JpQsvKFZO7ET0LcU1hzEi4b13QxoW3Gl7eqFx/Xfi4cwltNc1vjbFr9xH3TPkPPL
+ 4xKGo9ui5EZkQtcCe5Tuw630zUOLPTjzP1KML1kDOiERXcdyYDBpldGd/2c4NKNmHhFn
+ w3S37J3jULxzCa724pSbeHkdYgobQDHNolNtMKLAtU0Be0+D6mIYM7A7Ea5zNMz6DDNq
+ v2Kw==
+X-Gm-Message-State: AOAM5304ANiKaeM1RWMM4Dt5OoN7n7+SQo4aPdztfU2aTwk5QShs+CPO
+ 1DGbjut21AL467DcvLH60w/1WFcfRE4=
+X-Google-Smtp-Source: ABdhPJyf1g4dysbByR92ocgFfoS3dY93iMoS4HxSgC1TO07yloBtOhiSt9G/YV7C85kFrYuMwBakZw==
+X-Received: by 2002:a2e:a313:: with SMTP id l19mr11581209lje.133.1589832645909; 
+ Mon, 18 May 2020 13:10:45 -0700 (PDT)
 Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.35
+ by smtp.gmail.com with ESMTPSA id c78sm8700591lfd.63.2020.05.18.13.10.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 13:10:36 -0700 (PDT)
+ Mon, 18 May 2020 13:10:45 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 12/21] target/mips: fpu: Remove now unused FLOAT_CLASS macro
-Date: Mon, 18 May 2020 22:09:11 +0200
-Message-Id: <20200518200920.17344-13-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v6 20/21] hw/mips: Add some logging for bad register offset
+ cases
+Date: Mon, 18 May 2020 22:09:19 +0200
+Message-Id: <20200518200920.17344-21-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::243;
  envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x243.google.com
@@ -101,69 +103,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After demacroing CLASS.<D|S>, this macro is not needed anymore.
+Log the cases where a guest attempts read or write using bad
+register offset.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- target/mips/fpu_helper.c | 39 ---------------------------------------
- 1 file changed, 39 deletions(-)
+ hw/mips/mips_malta.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index b3903f5357..e227e53f70 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1128,45 +1128,6 @@ FLOAT_RINT(rint_d, 64)
- #define FLOAT_CLASS_POSITIVE_SUBNORMAL 0x100
- #define FLOAT_CLASS_POSITIVE_ZERO      0x200
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index e4c4de1b4e..88869b828e 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -427,10 +427,9 @@ static uint64_t malta_fpga_read(void *opaque, hwaddr addr,
+         break;
  
--#define FLOAT_CLASS(name, bits)                                      \
--uint ## bits ## _t float_ ## name(uint ## bits ## _t arg,            \
--                                  float_status *status)              \
--{                                                                    \
--    if (float ## bits ## _is_signaling_nan(arg, status)) {           \
--        return FLOAT_CLASS_SIGNALING_NAN;                            \
--    } else if (float ## bits ## _is_quiet_nan(arg, status)) {        \
--        return FLOAT_CLASS_QUIET_NAN;                                \
--    } else if (float ## bits ## _is_neg(arg)) {                      \
--        if (float ## bits ## _is_infinity(arg)) {                    \
--            return FLOAT_CLASS_NEGATIVE_INFINITY;                    \
--        } else if (float ## bits ## _is_zero(arg)) {                 \
--            return FLOAT_CLASS_NEGATIVE_ZERO;                        \
--        } else if (float ## bits ## _is_zero_or_denormal(arg)) {     \
--            return FLOAT_CLASS_NEGATIVE_SUBNORMAL;                   \
--        } else {                                                     \
--            return FLOAT_CLASS_NEGATIVE_NORMAL;                      \
--        }                                                            \
--    } else {                                                         \
--        if (float ## bits ## _is_infinity(arg)) {                    \
--            return FLOAT_CLASS_POSITIVE_INFINITY;                    \
--        } else if (float ## bits ## _is_zero(arg)) {                 \
--            return FLOAT_CLASS_POSITIVE_ZERO;                        \
--        } else if (float ## bits ## _is_zero_or_denormal(arg)) {     \
--            return FLOAT_CLASS_POSITIVE_SUBNORMAL;                   \
--        } else {                                                     \
--            return FLOAT_CLASS_POSITIVE_NORMAL;                      \
--        }                                                            \
--    }                                                                \
--}                                                                    \
--                                                                     \
--uint ## bits ## _t helper_float_ ## name(CPUMIPSState *env,          \
--                                         uint ## bits ## _t arg)     \
--{                                                                    \
--    return float_ ## name(arg, &env->active_fpu.fp_status);          \
--}
--
--#undef FLOAT_CLASS
--
- uint64_t float_class_d(uint64_t arg, float_status *status)
- {
-     if (float64_is_signaling_nan(arg, status)) {
+     default:
+-#if 0
+-        printf("malta_fpga_read: Bad register offset 0x" TARGET_FMT_lx "\n",
+-               addr);
+-#endif
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "malta_fpga_read: Bad register offset 0x"
++                      TARGET_FMT_lx "\n", addr);
+         break;
+     }
+     return val;
+@@ -515,10 +514,9 @@ static void malta_fpga_write(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-#if 0
+-        printf("malta_fpga_write: Bad register offset 0x" TARGET_FMT_lx "\n",
+-               addr);
+-#endif
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "malta_fpga_write: Bad register offset 0x"
++                      TARGET_FMT_lx "\n", addr);
+         break;
+     }
+ }
 -- 
 2.20.1
 
