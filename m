@@ -2,98 +2,96 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10503C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2F9C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAEB920787
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8A0F20787
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 09:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqV0WB+q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAEB920787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPQC681b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A0F20787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jabxP-0003pj-VQ
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 05:21:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52042)
+	id 1jabxs-0004aM-0f
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 05:21:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabwB-0002Nd-BU
- for qemu-devel@nongnu.org; Mon, 18 May 2020 05:19:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50270
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabwp-0003LU-O9
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 05:20:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44196
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabwA-00010a-EE
- for qemu-devel@nongnu.org; Mon, 18 May 2020 05:19:55 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jabwo-00014X-Qv
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 05:20:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589793592;
+ s=mimecast20190719; t=1589793633;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GZ6+mVL/n/8Gz9SckLvTC6fPATZRuj9QWoQ5aId9N3c=;
- b=JqV0WB+qyj0AxZGBuK9YbX1iHZFV72Fe8u3jIKnHetdfzAomhy1vCvvGC2l0vaX44MYqrb
- wkY8f4+S+UnkaHP6+4XC+dsJB8AhI0JH4B5BUXGF8ywfIguuh63urickK6rjhV2dlo7Drl
- sCywMIL0j4aC8sxiMod5Tbd9FY2e3Qk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-smhXdW51MfiFhH2P7uqnQw-1; Mon, 18 May 2020 05:19:51 -0400
-X-MC-Unique: smhXdW51MfiFhH2P7uqnQw-1
-Received: by mail-wm1-f69.google.com with SMTP id f9so2007942wml.9
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 02:19:51 -0700 (PDT)
+ bh=26tLFnlPLiAEWSiHegUZMo+1itJ4wSaQMYZeBdznfVI=;
+ b=DPQC681bUFOio4+GIpAs0t+bU1NSwOrfujp3oaL3x66G9qgdIzMRx0F4xty/JbMu0k2I5X
+ Nxo3LTEHn3H2koT0q16+3er2oRpDglD9nwXEnZDKwYUUYET4sppDxSTK6ZUSKaunJouucM
+ ruNdu44zvs++Cen4N+NP4N3ZZmF++mI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-7-FLMoCcP4ixdWfbKeAerw-1; Mon, 18 May 2020 05:20:31 -0400
+X-MC-Unique: 7-FLMoCcP4ixdWfbKeAerw-1
+Received: by mail-wm1-f70.google.com with SMTP id o8so2057408wmd.0
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 02:20:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=GZ6+mVL/n/8Gz9SckLvTC6fPATZRuj9QWoQ5aId9N3c=;
- b=bI5dG8E0ORXlF3nmAhEnPKKDxKo+QuYqeySzbs5np/1lPgLvO8+4OIgnc+KDisyC8c
- S8csUlNR3UOeoklyTf0KggmcIX+7zaXrlM0sw1LdmYWVso3ZJBfsXYsJZB5Ou8RTo4fr
- fwhk6puFTDEbihHeW5TRgEdtFGKBWHHwjexpGl0e1eKczrurFyKbNWbrHSaLJ9lHC1xF
- S15XFIWmilG0p0hNi/w4XyN0Vqc7cxAf6NDF5RU40MAKc876RkCk9s2gAqY0kzHv07Mq
- b4oLtoxZjx3c4U0XUzBOu0Ah0jT7OhyBb0cJ501PnpZjPbbAuj2VfsrFbi6YL3HoD1iD
- S69g==
-X-Gm-Message-State: AOAM5339yZT1WSmv/VwDVv9YfgQ06bgPn+N8zI2bpHYlMuAKdizR1Qtr
- GItn7JDo1wf2y+k8yXi/sOFYBl/IoWNB27RHtUrDmEJxE2kw6+zeWX7GX5aG12rktxoWcXGI+uq
- TjUh0w3geG8a3AFc=
-X-Received: by 2002:a5d:4d0f:: with SMTP id z15mr18559614wrt.411.1589793590118; 
- Mon, 18 May 2020 02:19:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz+mkIBUvk/G3Z0NV99b/NIYef/oBrhe5PLL/MbJrS10BtUZkEr44YkicKaRSIuy4PJ9BTtzg==
-X-Received: by 2002:a5d:4d0f:: with SMTP id z15mr18559595wrt.411.1589793589928; 
- Mon, 18 May 2020 02:19:49 -0700 (PDT)
+ bh=26tLFnlPLiAEWSiHegUZMo+1itJ4wSaQMYZeBdznfVI=;
+ b=KPqXrYHuSeMYUvs1pie0X9+T/SaWOS2Rd8rXov0rt9YaWJTOeNjr/vaOw7w2Ao/DJg
+ 3Z6mA2zR1yScdp2suOPQyLmbUs0F4hIK87z9v51VQDt4M5EoPFx9ad1ULgab1kt7X4YD
+ vGRFLK1Wxk7CiU00qdXdAiyyK6zCwHtXoVP5EH3T+NhoZghuQlUCWWR9+WOnzDQ+/Rdi
+ 4yAjQ25R4CGVSG72JzEu3O6zy/ekE/XcJmSINX+xtnL7azG18STq/KKKmPAb4zNk/Ps2
+ 7bT+E3ZDLY6HAJl6b2uXN0dhVarBxz2MAtp0LWtZHjimpGraX6Gv4GAz7zCmMZQ0zgmO
+ ouuQ==
+X-Gm-Message-State: AOAM532mrrD0jjnCWmDkoZbuhL3TgwYuVlx22sQwgdRS0b/3CMZwXGfw
+ 0JOR/iAgVrqWA8cyMnUAkYSNrK9OUL+reAm2lXRdmpp1+tjm/sRrQuUgu1Zhfxu6D3tf1ATyVRx
+ 0p2s2AEJql9/lHkA=
+X-Received: by 2002:a1c:9cca:: with SMTP id f193mr17979935wme.71.1589793630741; 
+ Mon, 18 May 2020 02:20:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqFjlq/wh617Shg1D+p5f9g64z31sAvpKmryzx600bWn+60XrY6cvnFaXB3DdaSniYmijVBg==
+X-Received: by 2002:a1c:9cca:: with SMTP id f193mr17979921wme.71.1589793630559; 
+ Mon, 18 May 2020 02:20:30 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id l12sm17072298wrh.20.2020.05.18.02.19.48
+ by smtp.gmail.com with ESMTPSA id x6sm15118331wrv.57.2020.05.18.02.20.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 May 2020 02:19:49 -0700 (PDT)
-Subject: Re: [PATCH v1 3/3] virtio-balloon: unref the iothread when unrealizing
+ Mon, 18 May 2020 02:20:30 -0700 (PDT)
+Subject: Re: [PATCH v1 0/3] virtio-balloon: free page hinting fixes
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20200518083704.52646-1-david@redhat.com>
- <20200518083704.52646-4-david@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1f6b1036-db76-c753-36e5-b3a471f4412d@redhat.com>
-Date: Mon, 18 May 2020 11:19:48 +0200
+Message-ID: <ed47036d-5224-9493-5d15-a2a464f5050a@redhat.com>
+Date: Mon, 18 May 2020 11:20:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200518083704.52646-4-david@redhat.com>
+In-Reply-To: <20200518083704.52646-1-david@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -113,41 +111,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Wang <wei.w.wang@intel.com>,
+Cc: Alexander Bulekov <alxndr@bu.edu>, Wei Wang <wei.w.wang@intel.com>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
  Alexander Duyck <alexander.duyck@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/18/20 10:37 AM, David Hildenbrand wrote:
-> We took a reference when realizing, so let's drop that reference when
-> unrealizing.
+> Some fixes for VIRTIO_BALLOON_F_FREE_PAGE_HINT. First issue was reported by
+> Alexander Bulekov [1], the other ones were discovered by me when digging
+> into the details.
 > 
-> Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
-> Cc: Wei Wang <wei.w.wang@intel.com>
-> Cc: Alexander Duyck <alexander.duyck@gmail.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   hw/virtio/virtio-balloon.c | 1 +
->   1 file changed, 1 insertion(+)
+> [1] https://lkml.kernel.org/r/20200511044121.eihns2tdimdzgi4i@mozz.bu.edu
 > 
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index a4fcf2d777..3f8fc50be0 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -820,6 +820,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev)
->   
->       if (s->free_page_bh) {
->           qemu_bh_delete(s->free_page_bh);
-> +        object_unref(OBJECT(s->iothread));
->           virtio_balloon_free_page_stop(s);
->           precopy_remove_notifier(&s->free_page_report_notify);
->       }
+> David Hildenbrand (3):
+>    virtio-balloon: fix free page hinting without an iothread
+>    virtio-balloon: fix free page hinting check on unrealize
+>    virtio-balloon: unref the iothread when unrealizing
+> 
+>   hw/virtio/virtio-balloon.c | 38 ++++++++++++++++++++------------------
+>   1 file changed, 20 insertions(+), 18 deletions(-)
 > 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+All this series deserves a 'Cc: qemu-stable@nongnu.org' tag, right?
 
 
