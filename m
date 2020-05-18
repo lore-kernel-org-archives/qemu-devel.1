@@ -2,72 +2,84 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB73C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 13:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 13:27:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 027942065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 13:26:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027942065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3FE5C2065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 13:27:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE5C2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jafmY-0007Ey-8X
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 09:26:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60332)
+	id 1jafnd-0000CF-GF
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 09:27:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jafl8-00064m-0e
- for qemu-devel@nongnu.org; Mon, 18 May 2020 09:24:46 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:54777)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jafl6-00084m-Rd
- for qemu-devel@nongnu.org; Mon, 18 May 2020 09:24:45 -0400
-Received: from player795.ha.ovh.net (unknown [10.110.208.43])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id AB0DE13A10D
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 15:24:42 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id C066C12587748;
- Mon, 18 May 2020 13:24:27 +0000 (UTC)
-Subject: Re: [PATCH 11/24] pnv/phb4: Bury unwanted "pnv-phb4-pec-stack" devices
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-12-armbru@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <cda0c610-d2a4-503f-ba05-09a974bb0f02@kaod.org>
-Date: Mon, 18 May 2020 15:24:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jafme-0007UQ-Md
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 09:26:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53854)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jafmJ-0000EG-9U
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 09:26:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jafmE-00070p-Of
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:25:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 090E92E8131
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 13:25:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200518050408.4579-12-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 10131410315895278419
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddthedgieefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.34.219; envelope-from=clg@kaod.org;
- helo=4.mo173.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 09:24:42
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 May 2020 13:15:50 -0000
+From: Fishface60 <richard.maw@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: richard-maw schoenebeck
+X-Launchpad-Bug-Reporter: Fishface60 (richard-maw)
+X-Launchpad-Bug-Modifier: Fishface60 (richard-maw)
+References: <158886102295.5250.16201751310283363946.malonedeb@chaenomeles.canonical.com>
+ <158962979567.22424.13386143965250658312.malone@wampee.canonical.com>
+Message-Id: <CAB2Vqoa=vn5XWRu6fOe3VyjpKJx75csQ4NvhsmHtE4wEZz6mXA@mail.gmail.com>
+Subject: Re: [Bug 1877384] Re: 9pfs file create with mapped-xattr can fail on
+ overlayfs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a410e005585f44944ce3e680dcd2e5357e1c3bc1
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 09:25:56
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -55
+X-Spam_score: -5.6
+X-Spam_bar: -----
+X-Spam_report: (-5.6 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
+ FORGED_GMAIL_RCVD=1, FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,91 +88,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1877384 <1877384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 7:03 AM, Markus Armbruster wrote:
-> The number of stacks is controlled by property "num-stacks".
-> pnv_pec_instance_init() creates the maximum supported number, because
-> the property has not been set then.  pnv_pec_realize() realizes only
-> the wanted number.  Works, although it can leave unrealized devices
-> hanging around in the QOM composition tree.  Affects machine powernv9.
+Swamped with other work at the moment, but this hasn't been forgotten.
+I might be able to take a look at it next week.
 
+On Sat, 16 May 2020 at 12:55, Christian Schoenebeck
+<1877384@bugs.launchpad.net> wrote:
+>
+> Yes, that compile error with QEMU + recent kernel headers is a bit
+> annoying, and AFAICS it is not fixed in Debian yet.
+>
+> Would you mind writing a test case for this bug that you fixed, to
+> prevent this accidentally being broken in future again?
+>
+> Please note that 9pfs is currently only been taken care of by 2 people,
+> and both only on a side channel. The 9pfs code base is complex and error
+> prone to edge cases like this one, so active assistance would be very
+> much appreciated!
+>
+> If you might consider writing a test case, I would give you quick, easy
+> and short instructions how to compile the 9pfs test cases, and which
+> source files to touch. There is no guest OS installation required for
+> the test cases.
+>
+> Thanks!
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1877384
+>
+> Title:
+>   9pfs file create with mapped-xattr can fail on overlayfs
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   QEMU Version: 3.1.0 as packaged in debian buster, but the code appears =
+to do the same in master.
+>   qemu command-line: qemu-system-x86_64 -m 1G -nographic -nic "user,model=
+=3Dvirtio-net-pci,tftp=3D$(pwd),net=3D10.0.2.0/24,host=3D10.0.2.2" -fsdev l=
+ocal,id=3Dfs,path=3D$thisdir/..,security_model=3Dmapped-xattr -device virti=
+o-9p-pci,fsdev=3Dfs,mount_tag=3Dfs -drive "file=3D$rootdisk,if=3Dvirtio,for=
+mat=3Draw" -kernel "$kernel" -initrd "$initrd" -append "$append"
+>
+>
+>   I'm using CI that runs in a Docker container and runs a qemu VM with co=
+de and results shared via virtio 9p.
+>   The 9p fsdev is configured with security_model=3Dmapped-xattr
+>   When the test code attempts to create a log file in an existing directo=
+ry, open with O_CREAT fails with -ENOENT.
+>
+>   The relevant strace excerpt is:
+>
+>   28791 openat(11, ".", O_RDONLY|O_NOFOLLOW|O_PATH|O_DIRECTORY) =3D 20
+>   28791 openat(20, "src", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW|O_DIREC=
+TORY) =3D 21
+>   28791 fcntl(21, F_SETFL, O_RDONLY|O_DIRECTORY) =3D 0
+>   28791 close(20)                         =3D 0
+>   28791 openat(21, "client.log", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK|O_N=
+OFOLLOW, 0600) =3D 20
+>   28791 fcntl(20, F_SETFL, O_WRONLY|O_CREAT|O_NONBLOCK|O_NOFOLLOW) =3D 0
+>   28791 lsetxattr("/proc/self/fd/21/client.log", "user.virtfs.uid", "\0\0=
+\0", 4, 0) =3D -1 ENOENT (No such file or directory)
+>
+>   My hypothesis for what's going wrong is since the Docker container's
+>   overlayfs copies-up on writes, when it opens the file it's created a
+>   new version of the `src` directory containing a `client.log`, but this
+>   new src directory isn't accessible by file descriptor 20 and the
+>   lsetxattr call is instead attempting to set attributes on the path in
+>   the old `src` directory.
+>
+>   Looking at the code, a fix would be to change `hw/9pfs/9p-local.c` and
+>   change `local_open2` to instead of calling `local_set_xattrat` to set
+>   the xattrs by directory file descriptor and file name, to have a
+>   version of local_set_xattrat` which uses `fsetxattr` to set the virtfs
+>   attributes instead of the `fsetxattrat_nofollow` helper.
+>
+>   This reliably happened for me in CI, but I don't have access to the CI
+>   host or the time to strip the test down to make a minimal test case,
+>   and had difficulty reproducing the error on other machines.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1877384/+subscriptions
 
+-- =
 
-> Bury the unwanted devices by making pnv_pec_realize() unparent them.
-> Visible in "info qom-tree":
-> 
->      /machine (powernv9-machine)
->        /chip[0] (power9_v2.0-pnv-chip)
->          [...]
->          /pec[0] (pnv-phb4-pec)
->            /stack[0] (pnv-phb4-pec-stack)
->              [...]
->     -      /stack[1] (pnv-phb4-pec-stack)
->     -        /phb (pnv-phb4)
->     -          /pcie-mmcfg-mmio[0] (qemu:memory-region)
->     -          /root (pnv-phb4-root-port)
->     -          /source (xive-source)
->     -      /stack[2] (pnv-phb4-pec-stack)
->     -        /phb (pnv-phb4)
->     -          /pcie-mmcfg-mmio[0] (qemu:memory-region)
->     -          /root (pnv-phb4-root-port)
->     -          /source (xive-source)
->            /xscom-pec-0.0-nest[0] (qemu:memory-region)
->            /xscom-pec-0.0-pci[0] (qemu:memory-region)
->          /pec[1] (pnv-phb4-pec)
->            /stack[0] (pnv-phb4-pec-stack)
->              [...]
->            /stack[1] (pnv-phb4-pec-stack)
->              [...]
->     -      /stack[2] (pnv-phb4-pec-stack)
->     -        /phb (pnv-phb4)
->     -          /pcie-mmcfg-mmio[0] (qemu:memory-region)
->     -          /root (pnv-phb4-root-port)
->     -          /source (xive-source)
->            /xscom-pec-0.1-nest[0] (qemu:memory-region)
->            /xscom-pec-0.1-pci[0] (qemu:memory-region)
->          /pec[2] (pnv-phb4-pec)
->            /stack[0] (pnv-phb4-pec-stack)
->              [...]
->            /stack[1] (pnv-phb4-pec-stack)
->              [...]
->            /stack[2] (pnv-phb4-pec-stack)
->              [...]
-> 
-> Cc: Cédric Le Goater <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877384
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Title:
+  9pfs file create with mapped-xattr can fail on overlayfs
 
-Thanks,
+Status in QEMU:
+  New
 
-C. 
+Bug description:
+  QEMU Version: 3.1.0 as packaged in debian buster, but the code appears to=
+ do the same in master.
+  qemu command-line: qemu-system-x86_64 -m 1G -nographic -nic "user,model=
+=3Dvirtio-net-pci,tftp=3D$(pwd),net=3D10.0.2.0/24,host=3D10.0.2.2" -fsdev l=
+ocal,id=3Dfs,path=3D$thisdir/..,security_model=3Dmapped-xattr -device virti=
+o-9p-pci,fsdev=3Dfs,mount_tag=3Dfs -drive "file=3D$rootdisk,if=3Dvirtio,for=
+mat=3Draw" -kernel "$kernel" -initrd "$initrd" -append "$append"
 
-> ---
->  hw/pci-host/pnv_phb4_pec.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
-> index 911d147ffd..565345a018 100644
-> --- a/hw/pci-host/pnv_phb4_pec.c
-> +++ b/hw/pci-host/pnv_phb4_pec.c
-> @@ -397,6 +397,9 @@ static void pnv_pec_realize(DeviceState *dev, Error **errp)
->              return;
->          }
->      }
-> +    for (; i < PHB4_PEC_MAX_STACKS; i++) {
-> +        object_unparent(OBJECT(&pec->stacks[i]));
-> +    }
->  
->      /* Initialize the XSCOM regions for the PEC registers */
->      snprintf(name, sizeof(name), "xscom-pec-%d.%d-nest", pec->chip_id,
-> 
+  =
 
+  I'm using CI that runs in a Docker container and runs a qemu VM with code=
+ and results shared via virtio 9p.
+  The 9p fsdev is configured with security_model=3Dmapped-xattr
+  When the test code attempts to create a log file in an existing directory=
+, open with O_CREAT fails with -ENOENT.
+
+  The relevant strace excerpt is:
+
+  28791 openat(11, ".", O_RDONLY|O_NOFOLLOW|O_PATH|O_DIRECTORY) =3D 20
+  28791 openat(20, "src", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW|O_DIRECTO=
+RY) =3D 21
+  28791 fcntl(21, F_SETFL, O_RDONLY|O_DIRECTORY) =3D 0
+  28791 close(20)                         =3D 0
+  28791 openat(21, "client.log", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK|O_NOF=
+OLLOW, 0600) =3D 20
+  28791 fcntl(20, F_SETFL, O_WRONLY|O_CREAT|O_NONBLOCK|O_NOFOLLOW) =3D 0
+  28791 lsetxattr("/proc/self/fd/21/client.log", "user.virtfs.uid", "\0\0\0=
+", 4, 0) =3D -1 ENOENT (No such file or directory)
+
+  My hypothesis for what's going wrong is since the Docker container's
+  overlayfs copies-up on writes, when it opens the file it's created a
+  new version of the `src` directory containing a `client.log`, but this
+  new src directory isn't accessible by file descriptor 20 and the
+  lsetxattr call is instead attempting to set attributes on the path in
+  the old `src` directory.
+
+  Looking at the code, a fix would be to change `hw/9pfs/9p-local.c` and
+  change `local_open2` to instead of calling `local_set_xattrat` to set
+  the xattrs by directory file descriptor and file name, to have a
+  version of local_set_xattrat` which uses `fsetxattr` to set the virtfs
+  attributes instead of the `fsetxattrat_nofollow` helper.
+
+  This reliably happened for me in CI, but I don't have access to the CI
+  host or the time to strip the test down to make a minimal test case,
+  and had difficulty reproducing the error on other machines.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877384/+subscriptions
 
