@@ -2,83 +2,91 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCB2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 10:22:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E27CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 10:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCE2C20657
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 10:22:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08B4F20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 10:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DJLtG0XK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE2C20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYMTQHav"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B4F20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jacv3-0004bX-TO
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 06:22:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
+	id 1jacys-0006M7-7S
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 06:26:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jacuK-0004AJ-QK
- for qemu-devel@nongnu.org; Mon, 18 May 2020 06:22:04 -0400
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:39545)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jacy5-0005us-84
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 06:25:57 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37697)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jacuJ-0008CK-Da
- for qemu-devel@nongnu.org; Mon, 18 May 2020 06:22:04 -0400
-Received: by mail-oi1-x22b.google.com with SMTP id s198so8539815oie.6
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 03:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aPryGPByiMttvtOCwvZ6iKIXuRXD8el9vgPBtdhRL3k=;
- b=DJLtG0XK5YhhtC6qa3hh5a1JKM3+G2AzRxYUZ/hEqkKNlWS+w3bs7by/CWBKDYkC6i
- wRRLLCPuMSoh0TcrGFFXhDxBHLzrQ7OzvevPFXU2E8zAlULDBmQBJLCXzTRya7Z4nB3k
- CMwymudyki36n72QkMQIMRITU1JXlrT6wxrhs1opsW6tkRTTDnHu8HhV4Efvp1BSau2D
- gU2iXJZdQTdSpKKx5/r+PUlTkoHcFP9RWO2FGuXIuzxcSkkpsbg/voWAbOhiBhhT8tp8
- DMDvNBGNGjGXH90mYEMkZiLBqQ0bkMUl7uBUTeKZqOB56/csZ39ee8iyXElmSQRIzxWS
- zzgA==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jacy4-0000r8-CH
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 06:25:56 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l17so11192850wrr.4
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 03:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=T60dzz1iJ37QtgjSGPbMqPJWV4r36t32vvRLMJg4DWQ=;
+ b=ZYMTQHav73G4nLCFdOpTNfm1MRvsjfFmgMOX6JZRJfmVjIMyVlookTlhlm/EOKZatt
+ lftskhFsPopVEUHqq7YdHT/hOzdQjY30KZNY9I3a3Xt/rQtaoWjXU7XAdqRoh6qGBCIN
+ KGJyOI50K677QAK838KYWHNNzU8CCQgdKVIasFC9H4te36FLNE8uAQhO7Y3J5bFTiCwU
+ kYF5263rRBde/v1liKNQ7sEa3rtVXTIo4DqlagE7ErQKw0+0L8hGjHl1aikNB6CA5ubj
+ Kni6xW6oDWZWYqc3GWruxGfVr08du02UIGF2b8lF2YqouDutucrpFw89WiPSpMZqNrps
+ dBMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aPryGPByiMttvtOCwvZ6iKIXuRXD8el9vgPBtdhRL3k=;
- b=l01I61tNoIewl6D0GWzH0iUlQc1iy2wzj0YqggY62xgD6YjbfaqeHutr6SnmKCU4pe
- 6YhvGCUuYD1PJJDrS89vLq0tA7LM5IURwxHgCYgUpo69XAeswPuE+yzYq8LLfPxjrpYq
- R76U3RUDdvc0rjPl/A/FmPjiDC9Fw6xoJi9y8MGHds/ZfaZ9Y4IPmc1/NRAed8oisx7s
- 2lcS19yzw9BSELee8RBpHrnwVcreSkAuzLmcZzzSEGdPEo6m58ITTAt14RR6LPu61Vid
- OhCptEeZC2iDBvPMgQKqaBhjfu9zQMEt7wRN2D5lDAyd68/qAAeQFsaKSdUDxdh34YgW
- gcIw==
-X-Gm-Message-State: AOAM530puRIbQSaAGRUrbXXAUnaPRab+NYD7epRyNVXlFQy6UwKeU4i3
- oiy4IkjDiLLHdTS5Cvmv+uBSZKD1cCnD0qFZAYB22w==
-X-Google-Smtp-Source: ABdhPJwoGF7+oGdQNH3m2Exhg0gdB7chpenzC7dj7J5RJ1ovt+Q7lH5+f3t6ajR2eEMge2bR+d/dmBRL7rZw/piMqn8=
-X-Received: by 2002:aca:eb96:: with SMTP id j144mr9621457oih.48.1589797321914; 
- Mon, 18 May 2020 03:22:01 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=T60dzz1iJ37QtgjSGPbMqPJWV4r36t32vvRLMJg4DWQ=;
+ b=oMchLx2+LkiOC6UYq6OEr8+4rsbd7ZaXcVd3lw/aipWDIFiUDflLoQsJJCjgjxBXK7
+ ilHU9hfxVF2+VuX+BDP/84AGKUakSec/Sf94eBy2mxZRmQlyKjSLafdqTTXQLpcEllYj
+ jFwNriWgZYV7VPxkv3YxHpzmCyiNYvtPIK0pOhVIUYUxtd1ITUQyLEejihVfuVtZQKGf
+ fro0OpxTSbjBDJjlAk6zrqgFX6ihI/VtFW+UTY3PhthVLBcmOA1VhNJ/VZd7RVitkNiF
+ fbAjL3XwsXdGmBV0/CX/AXGHHzNihSFf5voxAOp8wU1uDlFrOWXIAjIbYXW7Vwjy1hQD
+ 759A==
+X-Gm-Message-State: AOAM531QGHQ9DkqPduNvJ2qDDhoHZFmA1qKX1sLb0CfDe2j9BpKZWPBV
+ YTRWqWvg3xwR7OJG0+/JnB81J2lBZLE=
+X-Google-Smtp-Source: ABdhPJwZzbLHyNna6nHpNGV8uznzZYimDl5p9KslDVtEp2Wp/7vzWMwv0fZVg9egIDtJMdYILs9XSQ==
+X-Received: by 2002:a5d:526f:: with SMTP id l15mr18805997wrc.367.1589797554301; 
+ Mon, 18 May 2020 03:25:54 -0700 (PDT)
+Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id z12sm10314018wrq.7.2020.05.18.03.25.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 03:25:53 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] hw/i386/vmport: Allow QTest use without crashing
+Date: Mon, 18 May 2020 12:25:51 +0200
+Message-Id: <20200518102551.8516-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <9d75f1f6-3440-8dec-9266-4841362844d0@gmail.com>
-In-Reply-To: <9d75f1f6-3440-8dec-9266-4841362844d0@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 May 2020 11:21:51 +0100
-Message-ID: <CAFEAcA-yTm7h_EGZ4_iKVGJ0GMFinWOyQXyKsYgs8s933Bnn1Q@mail.gmail.com>
-Subject: Re: [RFC] Various questions about TCG implementation, DRM patches
- dealing with pointers over guest-host barrier.
-To: "Catherine A. Frederick" <agrecascino123@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22b;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22b.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -93,113 +101,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 00:23, Catherine A. Frederick
-<agrecascino123@gmail.com> wrote:
-> Hi, I've been patching TCG for my own purposes recently and I was
-> wondering a few things. That being:
->
-> - Is the TCG backend expected to handle bad cases for instructions? I
-> was wondering as I found a situation where a very large shift constant
-> reaches the backend and causes an illegal instruction to be generated.
-> Is the frontend expected to clean this up, or is the backend supposed to
-> be able to deal with these? I currently patched the bug via clipping the
-> shift constant between 0 and 64.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The semantics of TCG IR ops are described in tcg/README. If the
-behaviour described there isn't what the guest requires then
-the frontend needs to emit code to handle special cases the way
-the guest architecture says they're handled. If a backend doesn't
-behave as the IR op spec requires then the backend is buggy. For shifts
-in particular (shl/shr/sar/rotl/rotr) the IR op has "unspecified
-behaviour" for out of range shift values: this is required to
-not crash, but the result value is not specified and could be
-anything. (The IR spec uses "undefined behaviour" to mean "could
-do anything, including crashing. The reason shifts are made to
-be only unspecified-behaviour is that it allows a frontend to
-emit code that unconditionally does a shift and then uses movcond
-or similar to only use the result in the case where the shift is
-in range.)
+Trying libFuzzer on the vmport device, we get:
 
-> - I've been implementing an instruction scheduler(list scheduler, with
-> priority given to most successors) for TCG and currently if I replace
-> instructions in s->ops(the TCG context) I get a crash later in
-> tcg_reg_alloc_op, even if the instruction stream is identical. Is there
-> anything else I need to move when I do this?
+  AddressSanitizer:DEADLYSIGNAL
+  =================================================================
+  ==29476==ERROR: AddressSanitizer: SEGV on unknown address 0x000000008840 (pc 0x56448bec4d79 bp 0x7ffeec9741b0 sp 0x7ffeec9740e0 T0)
+  ==29476==The signal is caused by a READ memory access.
+    #0 0x56448bec4d78 in vmport_ioport_read (qemu-fuzz-i386+0x1260d78)
+    #1 0x56448bb5f175 in memory_region_read_accessor (qemu-fuzz-i386+0xefb175)
+    #2 0x56448bb30c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
+    #3 0x56448bb2ea27 in memory_region_dispatch_read1 (qemu-fuzz-i386+0xecaa27)
+    #4 0x56448bb2e443 in memory_region_dispatch_read (qemu-fuzz-i386+0xeca443)
+    #5 0x56448b961ab1 in flatview_read_continue (qemu-fuzz-i386+0xcfdab1)
+    #6 0x56448b96336d in flatview_read (qemu-fuzz-i386+0xcff36d)
+    #7 0x56448b962ec4 in address_space_read_full (qemu-fuzz-i386+0xcfeec4)
 
-This one's out of my field of knowledge; Richard might know.
+This is easily reproducible using:
 
-> - Is insn_start necessary to have in order(and what does it do?)? These
-> currently are serializing instructions in my scheduler and significantly
-> limit my reordering as they create lots of dependencies every few
-> instructions.
+  $ echo inb 0x5658 | qemu-system-i386 -M isapc,accel=qtest -qtest stdio
+  [I 1589796572.009763] OPENED
+  [R +0.008069] inb 0x5658
+  Segmentation fault (core dumped)
 
-The primary purpose of insn_start is to save information about the
-current instruction in a metadata area associated with the generated
-TB, so that if the guest takes an unexpected exception (typically,
-because a guest load or store faults) then we can restore the CPU
-state to what it should be at the point of the fault. This is more
-efficient than if we had to emit a "write new PC value to CPU state"
-operation at the end of every guest insn. At runtime, at the point
-when we determine that we need to generate a guest exception, we know
-the host PC (inside the generated code) where the fault occurred.
-We look up that PC value in the metadata to determine which guest
-PC value that corresponds to [in accel/tcg/translate-all.c
-cpu_restore_state_from_tb()], and use that to correctly set the
-guest PC value and sometimes other state [by calling the frontend's
-restore_state_to_opc() function, passing it the data that the
-frontend handed to the insn_start opcode. (Eg on 32-bit arm we use
-this mechanism to fix up the condexec bits, and to provide correct
-values for the exception syndrome register.) If you wanted to be
-able to reorder TCG ops across guest insn boundaries you'd need to
-make the "guest-PC-to-insn-start-data" lookup handle that. You'd
-also need to ensure that you don't reorder anything that updates
-information visible to the guest (a visible effect of the insn)
-before anything that could generate an exception in a preceding insn.
+  $ coredumpctl gdb -q
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  0x00005605b54d0f21 in vmport_ioport_read (opaque=0x5605b7531ce0, addr=0, size=4) at hw/i386/vmport.c:77
+  77          eax = env->regs[R_EAX];
+  (gdb) p cpu
+  $1 = (X86CPU *) 0x0
+  (gdb) bt
+  #0  0x00005605b54d0f21 in vmport_ioport_read (opaque=0x5605b7531ce0, addr=0, size=4) at hw/i386/vmport.c:77
+  #1  0x00005605b53db114 in memory_region_read_accessor (mr=0x5605b7531d80, addr=0, value=0x7ffc9d261a30, size=4, shift=0, mask=4294967295, attrs=...) at memory.c:434
+  #2  0x00005605b53db5d4 in access_with_adjusted_size (addr=0, value=0x7ffc9d261a30, size=1, access_size_min=4, access_size_max=4, access_fn=
+      0x5605b53db0d2 <memory_region_read_accessor>, mr=0x5605b7531d80, attrs=...) at memory.c:544
+  #3  0x00005605b53de156 in memory_region_dispatch_read1 (mr=0x5605b7531d80, addr=0, pval=0x7ffc9d261a30, size=1, attrs=...) at memory.c:1396
+  #4  0x00005605b53de228 in memory_region_dispatch_read (mr=0x5605b7531d80, addr=0, pval=0x7ffc9d261a30, op=MO_8, attrs=...) at memory.c:1424
+  #5  0x00005605b537c80a in flatview_read_continue (fv=0x5605b7650290, addr=22104, attrs=..., ptr=0x7ffc9d261b4b, len=1, addr1=0, l=1, mr=0x5605b7531d80) at exec.c:3200
+  #6  0x00005605b537c95d in flatview_read (fv=0x5605b7650290, addr=22104, attrs=..., buf=0x7ffc9d261b4b, len=1) at exec.c:3239
+  #7  0x00005605b537c9e6 in address_space_read_full (as=0x5605b5f74ac0 <address_space_io>, addr=22104, attrs=..., buf=0x7ffc9d261b4b, len=1) at exec.c:3252
+  #8  0x00005605b53d5a5d in address_space_read (len=1, buf=0x7ffc9d261b4b, attrs=..., addr=22104, as=0x5605b5f74ac0 <address_space_io>) at include/exec/memory.h:2401
+  #9  0x00005605b53d5a5d in cpu_inb (addr=22104) at ioport.c:88
 
-insn_start is also handy simply for debugging purposes -- in debug
-disassembly output we indicate where instruction boundaries are in
-the host generated code and in the TCG IR opcode dump, which makes
-it easier to figure out what the generated code was trying to do.
+X86CPU is NULL because QTest accelerator does not use CPU.
+Fix by returning default values when QTest accelerator is used.
 
-Finally, I haven't checked, but I suspect the new TCG plugin APIs
-implicitly assume that code for each insn is generated serially,
-ie that a plugin can do "for each instruction" type work on a
-callback that hangs off the insn_start op.
+Reported-by: Clang AddressSanitizer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/i386/vmport.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-> - Is it "okay" to use g2h and h2g directly in code in syscall.c?
-> Currently it seems like TYPE_PTRVOID doesn't do this conversion, and as
-> such, most of the calls made over the guest-host barrier made by DRM
-> seem to fail spectacularly across bittedness lines. I think a more ideal
-> solution would be implementing types that do this automatically, so I
-> don't have to deal with the difference in struct size using macros, but
-> in the short term I don't really have another option.
+diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+index 1aaaab691a..4ec95f8778 100644
+--- a/hw/i386/vmport.c
++++ b/hw/i386/vmport.c
+@@ -24,6 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/hw_accel.h"
++#include "sysemu/qtest.h"
+ #include "qemu/log.h"
+ #include "vmport.h"
+ #include "cpu.h"
+@@ -64,10 +65,14 @@ static uint64_t vmport_ioport_read(void *opaque, hwaddr addr,
+     VMPortState *s = opaque;
+     CPUState *cs = current_cpu;
+     X86CPU *cpu = X86_CPU(cs);
+-    CPUX86State *env = &cpu->env;
++    CPUX86State *env;
+     unsigned char command;
+     uint32_t eax;
+ 
++    if (qtest_enabled()) {
++        return -1;
++    }
++    env = &cpu->env;
+     cpu_synchronize_state(cs);
+ 
+     eax = env->regs[R_EAX];
+@@ -90,6 +95,9 @@ static void vmport_ioport_write(void *opaque, hwaddr addr,
+ {
+     X86CPU *cpu = X86_CPU(current_cpu);
+ 
++    if (qtest_enabled()) {
++        return;
++    }
+     cpu->env.regs[R_EAX] = vmport_ioport_read(opaque, addr, 4);
+ }
+ 
+@@ -97,6 +105,9 @@ static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
+ {
+     X86CPU *cpu = X86_CPU(current_cpu);
+ 
++    if (qtest_enabled()) {
++        return -1;
++    }
+     cpu->env.regs[R_EBX] = VMPORT_MAGIC;
+     return 6;
+ }
+@@ -105,6 +116,9 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
+ {
+     X86CPU *cpu = X86_CPU(current_cpu);
+ 
++    if (qtest_enabled()) {
++        return -1;
++    }
+     cpu->env.regs[R_EBX] = 0x1177;
+     return ram_size;
+ }
+-- 
+2.21.3
 
-Usually syscall.c code wants to use lock_user/lock_user_string/
-lock_user_struct rather than directly using g2h/h2g. This is
-important because the lock_user functions will check whether the
-guest can actually access the memory, so that you can return a
-suitable error (usually TARGET_EFAULT). Otherwise if the guest
-hands you a buffer it doesn't have access to then your g2h-then-access
-will probably make QEMU crash.
-
-I think that the reason TYPE_PTRVOID is not converted within a struct
-is that almost always the syscall.c wrapper for the ioctl will
-need to actively do something to convert the data being pointed
-to, which means it will need to call lock_user() on it, which means
-it wants the guest address, not the host address. So an IOCTL
-definition that uses TYPE_PTRVOID will be an IOCTL_SPECIAL()
-which provides a C function to handle that conversion.
-If the buffer being pointed to is literally just a byte buffer
-of data that needs no conversion, I think you can specify that
-with MK_PTR(TYPE_CHAR). If it's anything more complicated then
-it's going to need an IOCTL_SPECIAL and a conversion function.
-
-thanks
--- PMM
 
