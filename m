@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2048EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD9012067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F191206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:24:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5aiakq+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD9012067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKQsLgpE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F191206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaeoG-0000Xl-1U
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48326)
+	id 1jaeod-0000wY-Mx
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jaelS-0004Fm-JB
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60852
+ id 1jaelP-00047m-Ck
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:20:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42288
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jaelR-0007GW-AR
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:02 -0400
+ id 1jaelO-0007FS-6g
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:20:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589804460;
+ s=mimecast20190719; t=1589804457;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dsgqU2fCeeqtGztSWxp8X5jcXBeehDEWFntkqnhVWqc=;
- b=D5aiakq+4LxCGlUWHqQg8qF1SoVcpJ1dvR5PCw4YmgVJ8d8/pzwz0r4/rpLNWzpWMZbR8E
- ZsfuVGjautMITf4kFUEKwrISDYppKcfE3LI0sMOWRfBh7kNrB4hopjuu2EaUWM5nCTArEO
- jG9rN5+r06WugvYZsLTCPxt51vvwSeA=
+ bh=2n60p2aBFgtdm6aQnuMCvTJkxbq8be4dOXpjU9xF/lI=;
+ b=BKQsLgpE93Pz4xPtNmswh6cG640pvUZgRpCsGG01vJaFcL9CJ8Oh1uEKFmljSbgNRyz0Rn
+ DjWj0pTXU5ov+KesNodZ6c81cmzoXPjfui45VcPx7+CBJGQn+8bMBBwVEZ9go2gkRbVM04
+ wDJqXBi2gok42qpXfR7EYhBG6b/29YM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-E9-GYp0iN4aaNuKCdYTIXw-1; Mon, 18 May 2020 08:20:58 -0400
-X-MC-Unique: E9-GYp0iN4aaNuKCdYTIXw-1
+ us-mta-360-FDTWKmt-PLqlcqgAeOkcxw-1; Mon, 18 May 2020 08:20:55 -0400
+X-MC-Unique: FDTWKmt-PLqlcqgAeOkcxw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0C618014D7;
- Mon, 18 May 2020 12:20:57 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.189])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66A4E60BF1;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 063E3107B265;
  Mon, 18 May 2020 12:20:55 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.189])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6429060BF1;
+ Mon, 18 May 2020 12:20:51 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 04/14] block/amend: separate amend and create options for
- qemu-img
-Date: Mon, 18 May 2020 15:20:31 +0300
-Message-Id: <20200518122041.10694-5-mlevitsk@redhat.com>
+Subject: [PATCH v7 03/14] block/amend: add 'force' option
+Date: Mon, 18 May 2020 15:20:30 +0300
+Message-Id: <20200518122041.10694-4-mlevitsk@redhat.com>
 In-Reply-To: <20200518122041.10694-1-mlevitsk@redhat.com>
 References: <20200518122041.10694-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -71,10 +70,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -103,290 +102,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some options are only useful for creation
-(or hard to be amended, like cluster size for qcow2), while some other
-options are only useful for amend, like upcoming keyslot management
-options for luks
+'force' option will be used for some unsafe amend operations.
 
-Since currently only qcow2 supports amend, move all its options
-to a common macro and then include it in each action option list.
-
-In future it might be useful to remove some options which are
-not supported anyway from amend list, which currently
-cause an error message if amended.
+This includes things like erasing last keyslot in luks based formats
+(which destroys the data, unless the master key is backed up
+by external means), but that _might_ be desired result.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c             | 173 +++++++++++++++++++++-----------------
- include/block/block_int.h |   4 +
- qemu-img.c                |  18 ++--
- 3 files changed, 107 insertions(+), 88 deletions(-)
+ block.c                   | 4 +++-
+ block/qcow2.c             | 1 +
+ docs/tools/qemu-img.rst   | 5 ++++-
+ include/block/block.h     | 1 +
+ include/block/block_int.h | 1 +
+ qemu-img-cmds.hx          | 4 ++--
+ qemu-img.c                | 8 +++++++-
+ 7 files changed, 19 insertions(+), 5 deletions(-)
 
+diff --git a/block.c b/block.c
+index 0653ccb913..94a6e851b4 100644
+--- a/block.c
++++ b/block.c
+@@ -6356,6 +6356,7 @@ void bdrv_remove_aio_context_notifier(BlockDriverState *bs,
+ 
+ int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                        BlockDriverAmendStatusCB *status_cb, void *cb_opaque,
++                       bool force,
+                        Error **errp)
+ {
+     if (!bs->drv) {
+@@ -6367,7 +6368,8 @@ int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                    bs->drv->format_name);
+         return -ENOTSUP;
+     }
+-    return bs->drv->bdrv_amend_options(bs, opts, status_cb, cb_opaque, errp);
++    return bs->drv->bdrv_amend_options(bs, opts, status_cb,
++                                       cb_opaque, force, errp);
+ }
+ 
+ /*
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 5c6b11344e..6dccc77b58 100644
+index ad9ab4fafa..5c6b11344e 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -5634,89 +5634,103 @@ void qcow2_signal_corruption(BlockDriverState *bs, bool fatal, int64_t offset,
-     s->signaled_corruption = true;
- }
+@@ -5325,6 +5325,7 @@ static void qcow2_amend_helper_cb(BlockDriverState *bs,
+ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                                BlockDriverAmendStatusCB *status_cb,
+                                void *cb_opaque,
++                               bool force,
+                                Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+index 0080f83a76..2aad60a65c 100644
+--- a/docs/tools/qemu-img.rst
++++ b/docs/tools/qemu-img.rst
+@@ -249,11 +249,14 @@ Command description:
  
-+#define QCOW_COMMON_OPTIONS                                         \
-+    {                                                               \
-+        .name = BLOCK_OPT_SIZE,                                     \
-+        .type = QEMU_OPT_SIZE,                                      \
-+        .help = "Virtual disk size"                                 \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_COMPAT_LEVEL,                             \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "Compatibility level (v2 [0.10] or v3 [1.1])"       \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_BACKING_FILE,                             \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "File name of a base image"                         \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_BACKING_FMT,                              \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "Image format of the base image"                    \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_DATA_FILE,                                \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "File name of an external data file"                \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_DATA_FILE_RAW,                            \
-+        .type = QEMU_OPT_BOOL,                                      \
-+        .help = "The external data file must stay valid "           \
-+                "as a raw image"                                    \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_ENCRYPT,                                  \
-+        .type = QEMU_OPT_BOOL,                                      \
-+        .help = "Encrypt the image with format 'aes'. (Deprecated " \
-+                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",    \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_ENCRYPT_FORMAT,                           \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "Encrypt the image, format choices: 'aes', 'luks'", \
-+    },                                                              \
-+    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
-+        "ID of secret providing qcow AES key or LUKS passphrase"),  \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
-+    {                                                               \
-+        .name = BLOCK_OPT_CLUSTER_SIZE,                             \
-+        .type = QEMU_OPT_SIZE,                                      \
-+        .help = "qcow2 cluster size",                               \
-+        .def_value_str = stringify(DEFAULT_CLUSTER_SIZE)            \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_PREALLOC,                                 \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "Preallocation mode (allowed values: off, "         \
-+                "metadata, falloc, full)"                           \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_LAZY_REFCOUNTS,                           \
-+        .type = QEMU_OPT_BOOL,                                      \
-+        .help = "Postpone refcount updates",                        \
-+        .def_value_str = "off"                                      \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_REFCOUNT_BITS,                            \
-+        .type = QEMU_OPT_NUMBER,                                    \
-+        .help = "Width of a reference count entry in bits",         \
-+        .def_value_str = "16"                                       \
-+    },                                                              \
-+    {                                                               \
-+        .name = BLOCK_OPT_COMPRESSION_TYPE,                         \
-+        .type = QEMU_OPT_STRING,                                    \
-+        .help = "Compression method used for image cluster "        \
-+                "compression",                                      \
-+        .def_value_str = "zlib"                                     \
-+    }
-+
- static QemuOptsList qcow2_create_opts = {
-     .name = "qcow2-create-opts",
-     .head = QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
-     .desc = {
--        {
--            .name = BLOCK_OPT_SIZE,
--            .type = QEMU_OPT_SIZE,
--            .help = "Virtual disk size"
--        },
--        {
--            .name = BLOCK_OPT_COMPAT_LEVEL,
--            .type = QEMU_OPT_STRING,
--            .help = "Compatibility level (v2 [0.10] or v3 [1.1])"
--        },
--        {
--            .name = BLOCK_OPT_BACKING_FILE,
--            .type = QEMU_OPT_STRING,
--            .help = "File name of a base image"
--        },
--        {
--            .name = BLOCK_OPT_BACKING_FMT,
--            .type = QEMU_OPT_STRING,
--            .help = "Image format of the base image"
--        },
--        {
--            .name = BLOCK_OPT_DATA_FILE,
--            .type = QEMU_OPT_STRING,
--            .help = "File name of an external data file"
--        },
--        {
--            .name = BLOCK_OPT_DATA_FILE_RAW,
--            .type = QEMU_OPT_BOOL,
--            .help = "The external data file must stay valid as a raw image"
--        },
--        {
--            .name = BLOCK_OPT_ENCRYPT,
--            .type = QEMU_OPT_BOOL,
--            .help = "Encrypt the image with format 'aes'. (Deprecated "
--                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",
--        },
--        {
--            .name = BLOCK_OPT_ENCRYPT_FORMAT,
--            .type = QEMU_OPT_STRING,
--            .help = "Encrypt the image, format choices: 'aes', 'luks'",
--        },
--        BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",
--            "ID of secret providing qcow AES key or LUKS passphrase"),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
--        {
--            .name = BLOCK_OPT_CLUSTER_SIZE,
--            .type = QEMU_OPT_SIZE,
--            .help = "qcow2 cluster size",
--            .def_value_str = stringify(DEFAULT_CLUSTER_SIZE)
--        },
--        {
--            .name = BLOCK_OPT_PREALLOC,
--            .type = QEMU_OPT_STRING,
--            .help = "Preallocation mode (allowed values: off, metadata, "
--                    "falloc, full)"
--        },
--        {
--            .name = BLOCK_OPT_LAZY_REFCOUNTS,
--            .type = QEMU_OPT_BOOL,
--            .help = "Postpone refcount updates",
--            .def_value_str = "off"
--        },
--        {
--            .name = BLOCK_OPT_REFCOUNT_BITS,
--            .type = QEMU_OPT_NUMBER,
--            .help = "Width of a reference count entry in bits",
--            .def_value_str = "16"
--        },
--        {
--            .name = BLOCK_OPT_COMPRESSION_TYPE,
--            .type = QEMU_OPT_STRING,
--            .help = "Compression method used for image cluster compression",
--            .def_value_str = "zlib"
--        },
-+        QCOW_COMMON_OPTIONS,
-+        { /* end of list */ }
-+    }
-+};
-+
-+static QemuOptsList qcow2_amend_opts = {
-+    .name = "qcow2-amend-opts",
-+    .head = QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
-+    .desc = {
-+        QCOW_COMMON_OPTIONS,
-         { /* end of list */ }
-     }
- };
-@@ -5776,6 +5790,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_inactivate            = qcow2_inactivate,
+ .. program:: qemu-img-commands
  
-     .create_opts         = &qcow2_create_opts,
-+    .amend_opts          = &qcow2_amend_opts,
-     .strong_runtime_opts = qcow2_strong_runtime_opts,
-     .mutable_opts        = mutable_opts,
-     .bdrv_co_check       = qcow2_co_check,
+-.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
++.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] [--force] -o OPTIONS FILENAME
+ 
+   Amends the image format specific *OPTIONS* for the image file
+   *FILENAME*. Not all file formats support this operation.
+ 
++  --force allows some unsafe operations. Currently for -f luks, it allows to
++  erase the last encryption key, and to overwrite an active encryption key.
++
+ .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=FLUSH_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+ 
+   Run a simple sequential I/O benchmark on the specified image. If ``-w`` is
+diff --git a/include/block/block.h b/include/block/block.h
+index 4de8d8f8a6..5b44a838d9 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -392,6 +392,7 @@ typedef void BlockDriverAmendStatusCB(BlockDriverState *bs, int64_t offset,
+                                       int64_t total_work_size, void *opaque);
+ int bdrv_amend_options(BlockDriverState *bs_new, QemuOpts *opts,
+                        BlockDriverAmendStatusCB *status_cb, void *cb_opaque,
++                       bool force,
+                        Error **errp);
+ 
+ /* check if a named node can be replaced when doing drive-mirror */
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index c305dce746..3646926d78 100644
+index 7ba8c89036..c305dce746 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -413,6 +413,10 @@ struct BlockDriver {
+@@ -433,6 +433,7 @@ struct BlockDriver {
+     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
+                               BlockDriverAmendStatusCB *status_cb,
+                               void *cb_opaque,
++                              bool force,
+                               Error **errp);
  
-     /* List of options for creating images, terminated by name == NULL */
-     QemuOptsList *create_opts;
-+
-+    /* List of options for image amend */
-+    QemuOptsList *amend_opts;
-+
-     /*
-      * If this driver supports reopening images this contains a
-      * NULL-terminated list of the runtime options that can be
+     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index c9c54de1df..9920f1f9d4 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -10,9 +10,9 @@ HXCOMM When amending the rST sections, please remember to copy the usage
+ HXCOMM over to the per-command sections in qemu-img.texi.
+ 
+ DEF("amend", img_amend,
+-    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
++    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] [--force] -o options filename")
+ SRST
+-.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
++.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] [--force] -o OPTIONS FILENAME
+ ERST
+ 
+ DEF("bench", img_bench,
 diff --git a/qemu-img.c b/qemu-img.c
-index ef422d5471..8f69366f03 100644
+index 6a4327aaba..ef422d5471 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -3936,11 +3936,11 @@ static int print_amend_option_help(const char *format)
-         return 1;
+@@ -71,6 +71,7 @@ enum {
+     OPTION_SHRINK = 266,
+     OPTION_SALVAGE = 267,
+     OPTION_TARGET_IS_ZERO = 268,
++    OPTION_FORCE = 269,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -3958,6 +3959,7 @@ static int img_amend(int argc, char **argv)
+     BlockBackend *blk = NULL;
+     BlockDriverState *bs = NULL;
+     bool image_opts = false;
++    bool force = false;
+ 
+     cache = BDRV_DEFAULT_CACHE;
+     for (;;) {
+@@ -3965,6 +3967,7 @@ static int img_amend(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force", no_argument, 0, OPTION_FORCE},
+             {0, 0, 0, 0}
+         };
+         c = getopt_long(argc, argv, ":ho:f:t:pq",
+@@ -4012,6 +4015,9 @@ static int img_amend(int argc, char **argv)
+         case OPTION_IMAGE_OPTS:
+             image_opts = true;
+             break;
++        case OPTION_FORCE:
++            force = true;
++            break;
+         }
      }
  
--    /* Every driver supporting amendment must have create_opts */
--    assert(drv->create_opts);
-+    /* Every driver supporting amendment must have amend_opts */
-+    assert(drv->amend_opts);
+@@ -4089,7 +4095,7 @@ static int img_amend(int argc, char **argv)
  
-     printf("Creation options for '%s':\n", format);
--    qemu_opts_print_help(drv->create_opts, false);
-+    qemu_opts_print_help(drv->amend_opts, false);
-     printf("\nNote that not all of these options may be amendable.\n");
-     return 0;
- }
-@@ -3950,7 +3950,7 @@ static int img_amend(int argc, char **argv)
-     Error *err = NULL;
-     int c, ret = 0;
-     char *options = NULL;
--    QemuOptsList *create_opts = NULL;
-+    QemuOptsList *amend_opts = NULL;
-     QemuOpts *opts = NULL;
-     const char *fmt = NULL, *filename, *cache;
-     int flags;
-@@ -4081,11 +4081,11 @@ static int img_amend(int argc, char **argv)
-         goto out;
-     }
- 
--    /* Every driver supporting amendment must have create_opts */
--    assert(bs->drv->create_opts);
-+    /* Every driver supporting amendment must have amend_opts */
-+    assert(bs->drv->amend_opts);
- 
--    create_opts = qemu_opts_append(create_opts, bs->drv->create_opts);
--    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-+    amend_opts = qemu_opts_append(amend_opts, bs->drv->amend_opts);
-+    opts = qemu_opts_create(amend_opts, NULL, 0, &error_abort);
-     qemu_opts_do_parse(opts, options, NULL, &err);
-     if (err) {
+     /* In case the driver does not call amend_status_cb() */
+     qemu_progress_print(0.f, 0);
+-    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL, &err);
++    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL, force, &err);
+     qemu_progress_print(100.f, 0);
+     if (ret < 0) {
          error_report_err(err);
-@@ -4108,7 +4108,7 @@ out:
- out_no_progress:
-     blk_unref(blk);
-     qemu_opts_del(opts);
--    qemu_opts_free(create_opts);
-+    qemu_opts_free(amend_opts);
-     g_free(options);
- 
-     if (ret) {
 -- 
 2.17.2
 
