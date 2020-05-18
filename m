@@ -6,75 +6,81 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6798C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DE4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:16:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B108720674
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62FBC207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:16:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x8oz22uu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B108720674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iDN3LTry"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62FBC207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaiPx-0006vQ-RH
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55330)
+	id 1jaiQq-0008Ox-J3
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:16:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jaiNE-000335-Pe
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:12:16 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39572)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jaiPI-0006W3-1M
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:14:24 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jaiND-0006Hv-0A
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:12:16 -0400
-Received: by mail-oi1-x243.google.com with SMTP id s198so9459384oie.6
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:12:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jaiPF-0006ar-NX
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:14:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id v12so12500310wrp.12
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=BPSGc1YOAbwiDqGSIPUq/PBsbDFhhz8vXhf0ZS70vnA=;
- b=x8oz22uumUoP6A+CO8dA0XbrRX4DdTY7++0C960rhAkQL2bAmiDeWn+k9dqlQx8vil
- QjF56wGpVk39pfx8nwVkKxFVEawv5sscJ6b1bmbuxrOZx9dShf4cTORkwiJj12Ap8Uv1
- ILQGhn5zxKW/QFP5Ia7FB2r2/sWd8OyItfveA825sCZ2wmgJG/Bu9FyjK85ehN48sWrp
- WWgub6JxfJ14Hiwr3X4tCVWj7iIkzfnvytYnVkOXlCtlx4E2VlqwHp4FakUMEbaYghxF
- ZNEVeJFzBG2t+MW/nUPCezcPI5HZ+U9LGkXkhXlioPQcSl8pXJdChfOYM4cRUtLo9xwF
- HAGg==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=14EgnQXdDLU6UwJteERXQ0fKaVmPe5bjR0oM2Xdh7xw=;
+ b=iDN3LTryQTw9m8EQf4JTn+VGcvgnSjZ9WlxIfAfBF+FlVPgNfm6LikVAtZJPW1KdIc
+ 7OxFf6e5cFiFXGheZENUQ1Y+K7iPL7GcWXkJPCvn6eIam7aY3tl5Mncl9hWAQ7JPs4tK
+ ujIyDGj1P9SMkgqrqMS6mjwU03QqEBpDusMn2ozCpA/N1sB4bBwfCtA1XvnMgbPN7ZmH
+ bEwySpm0pIKTeoekeXKHnk06Ey9iGdWDUDUrMgTVlXw7nA9VJaPd0n0kH+8sGgKymhiZ
+ 58FtGfbN9EdaRuUhevGAIFwRSVQ7j//tNiKFey7Qk65anWFNhqQmESDfyTmzBWSxcXnP
+ 2+wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=BPSGc1YOAbwiDqGSIPUq/PBsbDFhhz8vXhf0ZS70vnA=;
- b=AvTuZeGBVc7X9vyYlO81wr5iD7czy9QQ8nW0sZJO3NSJRU/Xec++5lXpSQJ3myubc0
- PXRY4Pv/P6jKzbhikE2gVlNMcaTbwttMmWpxjltCYZQcYeUpG3C3PHKcrj7bAkwtHTfx
- rd1Kg8GkJzPeqmruzIAOPzyAnX8p506TO1WniqEIW1pnrWzXLirOOu33Y7TGLlHrhkRJ
- E2LGSBe4ba0DozHBdGDNb0ww8nXFdtZXp/IUT6ShjX/27U3qOsXNSAqZY2fZNCAx7Ret
- asbY4sEVf10q6i9Cj0bvEoB0QN8I2fDHPJP7DyvjaVh7HRnPmMLfsr3PJ4eOvOdZ7G49
- a/Zw==
-X-Gm-Message-State: AOAM533faBSc0Wl6C+NY82ZN8pANPfRtdu7WcZZxc9vT6Qzi2uTm3hjI
- PmRTAr28wNt+h1nIQHgBgzmxZG3o3Ksc8jHChedDEw==
-X-Google-Smtp-Source: ABdhPJwVPkvmnyBFGfSqQO36dYU4yQaoMbq8NJKMnZxBnOljQTUxrKffpT9sNkKNu0DVXBGl/i/3CwmM9KVFbSqsw8I=
-X-Received: by 2002:aca:895:: with SMTP id 143mr66214oii.163.1589818333787;
- Mon, 18 May 2020 09:12:13 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=14EgnQXdDLU6UwJteERXQ0fKaVmPe5bjR0oM2Xdh7xw=;
+ b=F/dSzTfIooTtlCkeg8FZ2TgW2XerzMVgVDS2680M6EPZrXDUFH/v/AR1S57AvzL6uR
+ iaZZ776IZj87CurQpkww9Qf14NQ5vAu6isdjEe/GJS1ONruMwh6AgzHpTxPCx4IlwqPC
+ Q6JogyUwmanS3lmLgIGNR3HKyN07HMbjXmVFSH39P0qqR9ZVz8dwIKLKnl45+KsP8SkY
+ NL8oi/ezdtj7Xx/Rz7BfF6QXvpR3eChO2cMT3TuG7yFDYUzyDCw0VqeGBrkCvSt3CQtZ
+ mckyM4KEzKLBluRmudvbI13c4GNDyr6pnAs3COyUGqqZgQRW6+dE+Ri5i3akZpPZZzHO
+ vlxw==
+X-Gm-Message-State: AOAM533jLfiKeaLe0QvcogT4FykoT5LgXKW8smYg49+W+dU2akCpDtia
+ ByBD0r8vbhs7GCSEuzGfITSqQQ==
+X-Google-Smtp-Source: ABdhPJwnTVp6SRCT+Bvpp7CW3q/J5ppBT7E8TWgCloUi/LSbfD+g+XSRJSfraWrP4sGAuNMLB8X+gw==
+X-Received: by 2002:adf:e5c8:: with SMTP id a8mr19965873wrn.335.1589818460274; 
+ Mon, 18 May 2020 09:14:20 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f5sm17512051wro.18.2020.05.18.09.14.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 09:14:19 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8ACF71FF7E;
+ Mon, 18 May 2020 17:14:18 +0100 (BST)
+References: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
+User-agent: mu4e 1.4.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+Subject: Re: [PATCH] icount: fix shift=auto for record/replay
+In-reply-to: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
+Date: Mon, 18 May 2020 17:14:18 +0100
+Message-ID: <87r1vhjk4l.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200518155308.15851-1-f4bug@amsat.org>
- <20200518155308.15851-8-f4bug@amsat.org>
-In-Reply-To: <20200518155308.15851-8-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 May 2020 17:12:02 +0100
-Message-ID: <CAFEAcA97bYXyN-GSXUk_OetroaHFExXFwYH1bhexHwRW0+NEVw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 7/7] hw/core/loader: Assert loading ROM regions
- succeeds at reset
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,54 +102,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: pbonzini@redhat.com, dovgaluk@ispras.ru, qemu-devel@nongnu.org,
+ pavel.dovgaluk@ispras.ru, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 16:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
+
+Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com> writes:
+
+> This patch fixes shift=3Dauto when record/replay is enabled.
+> Now user does not need to guess the best shift value.
 >
-> If we are unable to load a blob in a ROM region, we should not
-> ignore it and let the machine boot.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > ---
-> RFC: Maybe more polite with user to use hw_error()?
-> ---
->  hw/core/loader.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  cpus.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index 8bbb1797a4..4e046388b4 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -1146,8 +1146,12 @@ static void rom_reset(void *unused)
->              void *host =3D memory_region_get_ram_ptr(rom->mr);
->              memcpy(host, rom->data, rom->datasize);
->          } else {
-> -            address_space_write_rom(rom->as, rom->addr, MEMTXATTRS_UNSPE=
-CIFIED,
-> -                                    rom->data, rom->datasize);
-> +            MemTxResult res;
-> +
-> +            res =3D address_space_write_rom(rom->as, rom->addr,
-> +                                          MEMTXATTRS_UNSPECIFIED,
-> +                                          rom->data, rom->datasize);
-> +            assert(res =3D=3D MEMTX_OK);
+> diff --git a/cpus.c b/cpus.c
+> index 5670c96bcf..dfb9f4717f 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -379,7 +379,8 @@ static void icount_adjust(void)
+>=20=20
+>      seqlock_write_lock(&timers_state.vm_clock_seqlock,
+>                         &timers_state.vm_clock_lock);
+> -    cur_time =3D cpu_get_clock_locked();
+> +    cur_time =3D REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
+> +                                   cpu_get_clock_locked());
+>      cur_icount =3D cpu_get_icount_locked();
+>=20=20
+>      delta =3D cur_icount - cur_time;
+> @@ -685,6 +686,7 @@ static const VMStateDescription icount_vmstate_timers=
+ =3D {
+>      .fields =3D (VMStateField[]) {
+>          VMSTATE_INT64(qemu_icount_bias, TimersState),
+>          VMSTATE_INT64(qemu_icount, TimersState),
+> +        VMSTATE_INT16(icount_time_shift, TimersState),
 
-We shouln't assert(), because this is easy for a user to trigger
-by loading an ELF file that's been linked to the wrong address.
-Something helpful that ideally includes the name of the ELF file
-and perhaps the address might be nice.
+Surely we should be bumping .version_id/.minimum_version_id here so we
+error out gracefully. No recordings pre this change would work right?
 
-(But overall I'm a bit wary of this and other patches in the series
-just because they add checks that were previously not there, and
-I'm not sure whether users might be accidentally relying on
-the continues-anyway behaviour.)
+>          VMSTATE_END_OF_LIST()
+>      },
+>      .subsections =3D (const VMStateDescription*[]) {
 
-thanks
--- PMM
+
+--=20
+Alex Benn=C3=A9e
 
