@@ -2,124 +2,164 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEC6C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF21C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758C2206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45200206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 20:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="X3ryQkBM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758C2206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grEgV2Jm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45200206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jalwE-0003YG-Ht
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:00:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56676)
+	id 1jalxY-0004bx-Fn
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 16:02:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jalkA-0001Wn-2s; Mon, 18 May 2020 15:48:10 -0400
-Received: from mail-eopbgr40094.outbound.protection.outlook.com
- ([40.107.4.94]:49534 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jaljz-0005jB-JJ; Mon, 18 May 2020 15:48:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j3JG16PNo9opx9EbBuk7uKfBm4Fzncktl70ZmKm7+sMMy0U5N6gsvScGMLhi3Y9RUs75edpZufTA6WnGrARjjCOIqelMcB8yxuLTjEfrwA7iFU/wzh/medp8VPYVjoeAtAY5xFjnVj0CcuXOdoaYMKYWeLuE8mS3MIh3xjD9wMelM4eY9FgmV+I1/laVe7TxWIMLub8dgTD4gUS0S6PCU2KyBXE2b7C51OhFQlyaunOHRXm++y1rw3S1AUcUyINr8ATzSYbQF1opau/unD5IKG3JYmYy41puCNESadMn9cJzpnRhP2LNyRmWkJPMtLn3p34LDQifacS2JcSoZLG5Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kk6hMg2Ll51AUN1kRSIRJ0MkjeuW+45u0VTwWNWb7SU=;
- b=SYEJUYpDOhb5ULNGKkPF1i/O/qJPV+MA/wjNk3/ZnfqxUZ/4r+9dis1fyCvZftGYkNXspjYxt6OgG8cSzniQshJbYuBXU/OdoCdTsDpF9rEi0eeKf0FSaGl21nWkf6MYzN/uwpxJfEZn671rI4KfhFvB7n9XePh05Y/r5D17RC0NDTcNhKyFEuI2GnOOwpxv9xVKmZ4egWmpoe2Z9paVzCaNno+yJyMAmePyUnL2SvsqpkcAk/7ICq51VBppNXtNOBchYZecS3ptZIpWLaj+4jlHss+gsEtFW8lS4EC7PWFaofyBh18K7Ugj/tao5LxTZyim/K9D1QUml5WSi8I+Sw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kk6hMg2Ll51AUN1kRSIRJ0MkjeuW+45u0VTwWNWb7SU=;
- b=X3ryQkBMHdtNEwD2T7NvBSEsVy5TPF/rYEVM3TyOSwPNbgHu/MFC8duJCRoLF23I1svlHqr1SAd07zm2wwJ6EJcYRBTDPpB8X3ukW0EjydSO5CqeWo9mHj1n60gQ0Q1yDqiEfLzGyJuFLjG8BZXZw/WMiSYx3CbGsH5J5wWqqzg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5301.eurprd08.prod.outlook.com (2603:10a6:20b:dd::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.27; Mon, 18 May
- 2020 19:47:56 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.034; Mon, 18 May 2020
- 19:47:56 +0000
-Subject: Re: [PATCH v4 7/9] qcow2: Expose bitmaps' size during measure
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200513011648.166876-1-eblake@redhat.com>
- <20200513011648.166876-8-eblake@redhat.com>
- <dcca62f0-3960-a9df-61d1-a6b9c2b1cf17@virtuozzo.com>
- <a61b5d9f-ecdd-d37a-4df9-727a5c105b41@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f25ae162-b3b2-3d40-7066-965c626d3da6@virtuozzo.com>
-Date: Mon, 18 May 2020 22:47:54 +0300
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jalsY-00081E-SD
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:56:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36962
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jalsY-0000EQ-3i
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:56:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589831809;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=20PF+jdABvKti4gXLW8haLWOwOcu2Dbrh/5XwD+HQ4o=;
+ b=grEgV2Jm2Q5ZpoglHCoZ/FuHISWl1eyQ+FGxlrsIIstF4uNUlM4Dh3IhCzWEg1UxX7+ce0
+ WL0W0vPydS52oIQYlaelfOEkJuxS1Vi9NaGj75aXhZ8ALk4c03gD3DJk07fzhTIomgyXRi
+ boPwE5+K7t+bGwSZEWNIiy+TNolZuiI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-446-K4YUepdUOiapX4B_FAuEUw-1; Mon, 18 May 2020 15:56:45 -0400
+X-MC-Unique: K4YUepdUOiapX4B_FAuEUw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3A7FBFC6;
+ Mon, 18 May 2020 19:56:43 +0000 (UTC)
+Received: from [10.10.118.232] (ovpn-118-232.rdu2.redhat.com [10.10.118.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26B7A6EA19;
+ Mon, 18 May 2020 19:56:37 +0000 (UTC)
+Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
+ test?
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
+References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
+ <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
+ <20200515102321.GH1300305@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <613f5cf5-7019-7447-6ba1-8050ab05303a@redhat.com>
+Date: Mon, 18 May 2020 15:56:36 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <a61b5d9f-ecdd-d37a-4df9-727a5c105b41@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR07CA0008.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.187) by
- AM0PR07CA0008.eurprd07.prod.outlook.com (2603:10a6:208:ac::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.12 via Frontend Transport; Mon, 18 May 2020 19:47:55 +0000
-X-Originating-IP: [185.215.60.187]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8ccf7559-595f-4633-5a4d-08d7fb645c3a
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5301:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB530198B0630F331DC355173FC1B80@AM7PR08MB5301.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-Forefront-PRVS: 04073E895A
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Exb07aQZfCfBftXFXXkTj+hHzxFqG9Bgp9nnj1+3bSd9pMtFySJcK6fGRuZljjwOTRJZtd2PsxWshIzgj/8XGDODuz3JHC9iDLbu+OHrrn1/noy+2LZwuVHdDD14pDjtZtFTAabH3KU+92C38TLx+5IPtTnBmRlh2S9z1z9qYpm1ha5PKqi3vnnH8gILjeaQfAgGMMwcWv22oHrPCKimdwiMwAGVX1eFDmOILx/dDE5TMjGd0vKCEOzbxTJVcYGo3Xu7iG+4batAql1viq8KSq/2Vp0Y7N5G9tCbTTl6pzXDRgwipneaBu3Aa1lWiQPoPT83AkCoRHIijlocQsbcpDN3GDbymFHggpOMMwKEllA1L1aNoAk8hDEi92z4/ioyD5s/+IAgyeQF3hFqDlZAwmILjCLQN/zELDbxI3Q6UWMW29Nj7g5syc9qDGkf1qrYJZ4zIeGXTRy/rGN0mdknvtoY9VMVXZymQTCGrO2xVPCDIhXIFUSD7z7pU00VQsnZ
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(366004)(346002)(136003)(376002)(39840400004)(66556008)(4326008)(31696002)(66476007)(6486002)(2906002)(36756003)(52116002)(86362001)(8676002)(53546011)(8936002)(956004)(2616005)(16526019)(316002)(66946007)(5660300002)(186003)(16576012)(31686004)(26005)(478600001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: wEzeMB8ujCfR+TRRYPi2NJPtEP6/ycdn8rplxOuwAl9OfII/OsbZNDkxUmbVf97Q9NgScUbA5bn3UAQgPq5FQe/gbee6eoygHXo6nmYgWv2lhzdzs4c76iIWu9hxrvpILJmaJsMtde0jMrVpxKsI3ZQ5HOd2D0w80MHSXxPtr9kipZ2c3acl/zt5IaZg8eEbzNRLCQf6oundvCiScGyg5cQxJQ80nf442d2IpvWf/Gd65Aen5TFrw/PnVbkHE/z/nTZ2cHzHkY48EvCWmXIe+4vsoR8Tzt3xxkmSFPA2/6Z6CpaXRY0srykB+J6nIa1cUti72pwhBfGAWB2IbBTv+yF1wsxPk5XBSEvXvtrUtziooLZpGPvsP9m5kZYGurTmoPT3/DygQnCzjtH1nyI4NWrVqW/g4qIOag9pvonnd/PhY4ziWCym00kp4tpDG911vPtCJ8vn+imlQ/m4qyahhYJCwf4ZSxPWGUAeuQncgEtiEx3UfCJl1XNWxvD3Zgl7
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ccf7559-595f-4633-5a4d-08d7fb645c3a
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2020 19:47:56.0118 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YdGCGaDUm/xHKkfwr5hDbTB4qYmHgA9HzJzpgYa6q9bkpdf7zl/og4+AOSGymmRN15mJytFPOFuqX3KK6xLSAQYFquj9HPTm2qb/ueF6qr4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5301
-Received-SPF: pass client-ip=40.107.4.94;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 15:47:57
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <20200515102321.GH1300305@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 23:32:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,170 +172,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nsoffer@redhat.com, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-discuss@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-18.05.2020 22:17, Eric Blake wrote:
-> On 5/18/20 8:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 13.05.2020 04:16, Eric Blake wrote:
->>> It's useful to know how much space can be occupied by qcow2 persistent
->>> bitmaps, even though such metadata is unrelated to the guest-visible
->>> data.  Report this value as an additional QMP field, present when
->>> measuring an existing image and output format that both support
->>> bitmaps.  Update iotest 178 and 190 to updated output, as well as new
->>> coverage in 190 demonstrating non-zero values made possible with the
->>> recently-added qemu-img bitmap command.
->>>
-> 
->>> @@ -616,6 +616,7 @@ Command description:
->>>
->>>       required size: 524288
->>>       fully allocated size: 1074069504
->>> +    bitmaps: 0
->>>
->>>     The ``required size`` is the file size of the new image.  It may be smaller
->>>     than the virtual disk size if the image format supports compact representation.
->>> @@ -625,6 +626,13 @@ Command description:
->>>     occupy with the exception of internal snapshots, dirty bitmaps, vmstate data,
->>>     and other advanced image format features.
->>>
->>> +  The ``bitmaps size`` is the additional size required if the
->>
->> you called it "bitmaps" in example output above. Should it be consistent? Either "``bitmaps``" here, or "bitmaps size: 0" above?
-> 
-> "bitmaps size: 0" is better. Will fix the description above.
-> 
->>> +++ b/qapi/block-core.json
->>> @@ -633,18 +633,23 @@
->>>   # efficiently so file size may be smaller than virtual disk size.
->>>   #
->>>   # The values are upper bounds that are guaranteed to fit the new image file.
->>> -# Subsequent modification, such as internal snapshot or bitmap creation, may
->>> -# require additional space and is not covered here.
->>> +# Subsequent modification, such as internal snapshot or further bitmap
->>> +# creation, may require additional space and is not covered here.
->>>   #
->>> -# @required: Size required for a new image file, in bytes.
->>> +# @required: Size required for a new image file, in bytes, when copying just
->>> +#            guest-visible contents.
->>>   #
->>>   # @fully-allocated: Image file size, in bytes, once data has been written
->>> -#                   to all sectors.
->>> +#                   to all sectors, when copying just guest-visible contents.
->>
->> "copying just guest-visible" sounds like something less than "all fully-allocated sectors"..
->> But I don't have better suggestion.. Just, "not including bitmaps" sounds weird too.
-> 
-> If we ever add support for copying internal snapshots, that would not be included either.  Maybe "copying just allocated guest-visible contents" for @required, and no change to the wording for @fully-allocated.
-
-Not sure is it better or not, so, I'm OK with any variant.
-
-> 
-> 
->>> @@ -4796,13 +4797,38 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-> 
->>>
->>> +        FOR_EACH_DIRTY_BITMAP(in_bs, bm) {
->>> +            if (bdrv_dirty_bitmap_get_persistence(bm)) {
->>> +                const char *name = bdrv_dirty_bitmap_name(bm);
->>> +                uint32_t granularity = bdrv_dirty_bitmap_granularity(bm);
->>> +                uint64_t bmbits = DIV_ROUND_UP(bdrv_dirty_bitmap_size(bm),
->>> +                                               granularity);
->>> +                uint64_t bmclusters = DIV_ROUND_UP(DIV_ROUND_UP(bmbits,
->>> + CHAR_BIT),
->>> +                                                   cluster_size);
->>> +
->>> +                /* Assume the entire bitmap is allocated */
->>> +                bitmaps_size += bmclusters * cluster_size;
->>> +                /* Also reserve space for the bitmap table entries */
->>> +                bitmaps_size += ROUND_UP(bmclusters * sizeof(uint64_t),
->>> +                                         cluster_size);
->>> +                /* And space for contribution to bitmap directory size */
->>> +                bitmap_dir_size += ROUND_UP(strlen(name) + 24,
->>> +                                            sizeof(uint64_t));
->>
->> Could we instead reuse code from qcow2_co_can_store_new_dirty_bitmap(), which calls calc_dir_entry_size() for this thing?
->> Possibly, make a function qcow2_measure_bitmaps in block/qcow2-bitmaps.c with this FOR_EACH? All details about qcow2 bitmap structures sounds better in block/qcow2-bitmaps.c
-> 
-> Could do.  Sounds like I'm better off submitting a v5 for this patch, although I'll go ahead and stage 1-6 for pull request today to minimize future rebase churn.
-
-Thanks!
-
-> 
-> 
->>> +    info->has_bitmaps = version >= 3 && in_bs &&
->>> +        bdrv_supports_persistent_dirty_bitmap(in_bs);
->>> +    info->bitmaps = bitmaps_size;
->>
->> AFAIK, in QAPI, if has_<something> field is false, than <something> must be zero. Maybe, it's only about nested structured fields, not about simple numbers, but I think it's better keep bitmaps 0 in case when has_bitmaps is false.
-> 
-> During creation (including when parsing QMP from the user over the monitor), everything is indeed guaranteed to be zero-initialized.  But we don't have any requirement that things remain zero-initialized even when has_FOO is false; at the same time, it's easy enough to make this code conditional.
-> 
->>
->> Also, it seems a bit better to check version earlier, and don't do all the calculations, if we are not going to use them.. But it's a rare backward-compatibility case, I don't care.
-> 
-> I'll see how easy or hard it is for my v5 patch.
-> 
-> 
->>> @@ -5275,9 +5285,24 @@ static int img_measure(int argc, char **argv)
->>>           goto out;
->>>       }
->>>
->>> +    if (bitmaps) {
->>> +        if (!info->has_bitmaps) {
->>> +            error_report("no bitmaps measured, either source or destination "
->>> +                         "format lacks bitmap support");
->>> +            goto out;
->>> +        } else {
->>> +            info->required += info->bitmaps;
->>> +            info->fully_allocated += info->bitmaps;
->>> +            info->has_bitmaps = false;
->>
->> And here, I think better to zero info->bitmaps as well.
-> 
-> Here, the object is going to be subsequently freed; I'm less worried about wasting time doing local cleanups than I am about the earlier case about letting an object escape immediate scope in a different state than the usual preconditions.
-> 
-> 
->>> +$QEMU_IMG bitmap --add --granularity 512 -f qcow2 "$TEST_IMG" b1
->>> +$QEMU_IMG bitmap --add -g 2M -f qcow2 "$TEST_IMG" b2
->>> +
->>> +# No bitmap without a source
->>> +$QEMU_IMG measure --bitmaps -O qcow2 --size 10M
->>
->> should this be ored to  'echo "unexpected success"' as following failures?
->>
-> 
-> Can't hurt.
-> 
-> 
->>> +# Compute expected output:
->>> +echo
->>> +val2T=$((2*1024*1024*1024*1024))
->>> +cluster=$((64*1024))
->>> +b1clusters=$(( (val2T/512/8 + cluster - 1) / cluster ))
->>> +b2clusters=$(( (val2T/2/1024/1024/8 + cluster - 1) / cluster ))
->>
->> comment on the following calculations won't hurt, at least something like
->>   "bitmap clusters + bitmap tables + bitmaps directory"
-> 
-> Sure.
-> 
->>
->>> +echo expected bitmap $((b1clusters * cluster +
->>> +            (b1clusters * 8 + cluster - 1) / cluster * cluster +
->>> +            b2clusters * cluster +
->>> +            (b2clusters * 8 + cluster - 1) / cluster * cluster +
->>> +            cluster))
->>> +$QEMU_IMG measure -O qcow2 -o cluster_size=64k -f qcow2 "$TEST_IMG"
->>> +$QEMU_IMG measure --bitmaps -O qcow2 -o cluster_size=64k -f qcow2 "$TEST_IMG"
->>> +
-> 
 
 
--- 
-Best regards,
-Vladimir
+On 5/15/20 6:23 AM, Daniel P. Berrangé wrote:
+> On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
+>> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
+>>> Hello,
+>>>
+>>> Following Markus thread on deprecating unmaintained (untested) code
+>>> (machines) [1] and the effort done to gather the information shared in
+>>> the replies [2], and the various acceptance tests added, is it
+>>> feasible to require for the next release that each new device/machine
+>>> is provided a test covering it?
+>>>
+>>> If no, what is missing?
+>>
+>> If a qtest is feasible, yes, I think we should require one for new
+>> devices. But what about machines - you normally need a test image for
+>> this. In that case, there is still the question where testing images
+>> could be hosted. Not every developer has a web space where they could
+>> put their test images onto. And what about images that contain non-free
+>> code?
+> 
+> Yep, it isn't feasible to make this a hard rule.
+> 
+> IMHO this is where a support tier classification comes into play
+> 
+>  - Tier 1: actively maintained, qtest coverage available. Expected
+>            to work reliably at all times since every commit is CI
+> 	   tested
+> 
+>   - Tier 2: actively maintained, no qtest coverage. Should usually
+>            work but regression may creep in due to reliance on the
+> 	   maintainer to manually test on adhoc basis
+> 
+>   - Tier 3: not actively maintained, unknown state but liable to
+>             be broken indefinitely
+> 
+> Tier 1 is obviously the most desirable state we would like everthing to
+> be at. Contributors will have to fix problems their patches cause as
+> they will be blocked by CI.
+> 
+> Tier 2 is an admission that reality gets in the way. Ideally stuff in
+> this tier will graduate to Tier 1 at some point. Even if it doesn't
+> though, it is still valid to keep it in QEMU long term. Contributors
+> shouldn't gratuitously break stuff in these board, but if they do,
+> then the maintainer is ultimately responsible for fixing it, as the
+> contributors don't have a test rig for it.
+> 
+> Tier 3 is abandonware. If a maintainer doesn't appear, users should
+> not expect it to continue to exist long term. Contributors are free
+> to send patches which break this, and are under no obligation to
+> fix problems in these boards. We may deprecate & delete it after a
+> while
+> 
+> 
+> Over time we'll likely add more criteria to stuff in Tier 1. This
+> could lead to some things dropping from Tier 1 to Tier 2. This is
+> OK, as it doesn't make those things worse than they already were.
+> We're just saying that Tier 2 isn't as thoroughly tested as we
+> would like it to be in an ideal world.
+> 
+> Regards,
+> Daniel
+> 
+
+I really like the idea of device support tiers codified directly in the
+QEMU codebase, to give upstream users some idea of which devices we
+expect to work and which we ... don't, really.
+
+Not every last device we offer is enterprise production ready, but we
+don't necessarily do a good job of explaining which devices fall into
+which categories, and we've got quite a few of them.
+
+I wonder if a 2.5th tier would be useful; something like a "hobbyist"
+tier for pet project SoC boards and the like -- they're not abandoned,
+but we also don't expect them to work, exactly.
+
+Mild semantic difference from Tier 3.
+
+--js
+
 
