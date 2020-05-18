@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CA9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:31:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF5AF204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:30:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 316BC20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 12:31:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRhxfXkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5AF204EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNfB4/SN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 316BC20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaeuS-0000cX-WC
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:30:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48388)
+	id 1jaeva-000250-BO
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 08:31:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jaeli-0004qk-FA
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29982
+ id 1jaels-0005Id-NO
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51684
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jaelh-0007Kf-A6
- for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:18 -0400
+ id 1jaelr-0007ML-U7
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 08:21:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589804476;
+ s=mimecast20190719; t=1589804487;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/aNtaIdHi17kr+BJQmjaiZhSW6vHT4GHWaG+2ROaVtc=;
- b=WRhxfXkVRls7RuKvJiJr34PtOlNxzy4QB5hqiEiGBCfWEMg+tdn1Q5LNxx+ZcHcMyZ8sbt
- aDUKtRZPT5/v3IoxiYcsfAtxm19p0oiv0Oj1obJ/tKNw9rlIj+OheS7PHljs8Y83MqQaRE
- JigPQkC9TrM1GFfOTH6va7HvkF3ltDE=
+ bh=oR6W2LNs+z+FDCHQl2sWFN/guDM1mvSAdTKT3OW+2tk=;
+ b=BNfB4/SNzTFAi+O7dL/XQi7Gz3AwY0CtbbJ/jCln1Vfn4KNQ+Dbn1ObKKsVauGdV4XWw1y
+ YcLiBMYRWeKX7aRaAAspL6Sr0w5ehQdhv4uFb5FlgViokPsEh9YizyvcvBTlb2yk8KL0A1
+ NG8vABErpfSSk2tLFqzA4TtxY4S86N4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-G6h37KKwN1C1vWSduUCEOA-1; Mon, 18 May 2020 08:21:12 -0400
-X-MC-Unique: G6h37KKwN1C1vWSduUCEOA-1
+ us-mta-363-8wNg1vrkOAKV4vi_sW2YJA-1; Mon, 18 May 2020 08:21:23 -0400
+X-MC-Unique: 8wNg1vrkOAKV4vi_sW2YJA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C77001005510;
- Mon, 18 May 2020 12:21:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96464835B5E;
+ Mon, 18 May 2020 12:21:22 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.189])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7B19060BF1;
- Mon, 18 May 2020 12:21:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4BCFD60BF1;
+ Mon, 18 May 2020 12:21:20 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 09/14] iotests: filter few more luks specific create options
-Date: Mon, 18 May 2020 15:20:36 +0300
-Message-Id: <20200518122041.10694-10-mlevitsk@redhat.com>
+Subject: [PATCH v7 13/14] block/qcow2: implement blockdev-amend
+Date: Mon, 18 May 2020 15:20:40 +0300
+Message-Id: <20200518122041.10694-14-mlevitsk@redhat.com>
 In-Reply-To: <20200518122041.10694-1-mlevitsk@redhat.com>
 References: <20200518122041.10694-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -101,207 +101,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows more tests to be able to have same output on both qcow2 luks encrypted images
-and raw luks images
+Currently the implementation only supports amending the encryption
+options, unlike the qemu-img version
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/087.out       | 6 +++---
- tests/qemu-iotests/134.out       | 2 +-
- tests/qemu-iotests/158.out       | 4 ++--
- tests/qemu-iotests/188.out       | 2 +-
- tests/qemu-iotests/189.out       | 4 ++--
- tests/qemu-iotests/198.out       | 4 ++--
- tests/qemu-iotests/263.out       | 4 ++--
- tests/qemu-iotests/284.out       | 6 +++---
- tests/qemu-iotests/common.filter | 6 ++++--
- 9 files changed, 20 insertions(+), 18 deletions(-)
+ block/qcow2.c        | 39 +++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json | 16 +++++++++++++++-
+ 2 files changed, 54 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
-index f23bffbbf1..d5ff53302e 100644
---- a/tests/qemu-iotests/087.out
-+++ b/tests/qemu-iotests/087.out
-@@ -34,7 +34,7 @@ QMP_VERSION
- 
- === Encrypted image QCow ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -46,7 +46,7 @@ QMP_VERSION
- 
- === Encrypted image LUKS ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -58,7 +58,7 @@ QMP_VERSION
- 
- === Missing driver ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
- Testing: -S
- QMP_VERSION
- {"return": {}}
-diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
-index f2878f5f3a..e4733c0b81 100644
---- a/tests/qemu-iotests/134.out
-+++ b/tests/qemu-iotests/134.out
-@@ -1,5 +1,5 @@
- QA output created by 134
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
- 
- == reading whole image ==
- read 134217728/134217728 bytes at offset 0
-diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
-index fa2294bb85..52ea9a488f 100644
---- a/tests/qemu-iotests/158.out
-+++ b/tests/qemu-iotests/158.out
-@@ -1,6 +1,6 @@
- QA output created by 158
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encryption=on size=134217728
- 
- == writing whole image ==
- wrote 134217728/134217728 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == writing part of a cluster ==
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
-index 4b9aadd51c..5426861b18 100644
---- a/tests/qemu-iotests/188.out
-+++ b/tests/qemu-iotests/188.out
-@@ -1,5 +1,5 @@
- QA output created by 188
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216
- 
- == reading whole image ==
- read 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
-index e536d95d53..bc213cbe14 100644
---- a/tests/qemu-iotests/189.out
-+++ b/tests/qemu-iotests/189.out
-@@ -1,6 +1,6 @@
- QA output created by 189
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
- 
- == writing whole image ==
- wrote 16777216/16777216 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
- read 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10 size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == writing part of a cluster ==
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-index 7714995c02..4b800e70db 100644
---- a/tests/qemu-iotests/198.out
-+++ b/tests/qemu-iotests/198.out
-@@ -1,12 +1,12 @@
- QA output created by 198
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
- 
- == writing whole image base ==
- wrote 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10 size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == writing whole image layer ==
- wrote 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
-index 4cf5c79ed8..54bfbeeff8 100644
---- a/tests/qemu-iotests/263.out
-+++ b/tests/qemu-iotests/263.out
-@@ -2,7 +2,7 @@ QA output created by 263
- 
- testing LUKS qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- == reading the whole image ==
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
- 
- testing legacy AES qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=aes encrypt.key-secret=sec0 size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- == reading the whole image ==
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/284.out b/tests/qemu-iotests/284.out
-index 1855369c56..a929239302 100644
---- a/tests/qemu-iotests/284.out
-+++ b/tests/qemu-iotests/284.out
-@@ -2,7 +2,7 @@ QA output created by 284
- 
- testing LUKS qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 512
- == checking image refcounts ==
-@@ -21,7 +21,7 @@ wrote 1/1 bytes at offset 512
- 
- == rechecking image refcounts ==
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 2048
- == checking image refcounts ==
-@@ -40,7 +40,7 @@ wrote 1/1 bytes at offset 2048
- 
- == rechecking image refcounts ==
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 32768
- == checking image refcounts ==
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 279e0bbb0d..dd39f3d6be 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -150,8 +150,10 @@ _filter_img_create()
-         -e "s# block_state_zero=\\(on\\|off\\)##g" \
-         -e "s# log_size=[0-9]\\+##g" \
-         -e "s# refcount_bits=[0-9]\\+##g" \
--        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
--        -e "s# iter-time=[0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?key-secret=[a-zA-Z0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?iter-time=[0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?slot=[0-9]\\+##g" \
-+        -e "s# encrypt\\.format=[a-zA-Z0-9]\\+##g" \
-         -e "s# force_size=\\(on\\|off\\)##g" \
-         -e "s# compression_type=[a-zA-Z0-9]\\+##g"
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 9b2154c58e..c61ba1f145 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5570,6 +5570,44 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+     return 0;
  }
+ 
++static int coroutine_fn qcow2_co_amend(BlockDriverState *bs,
++                                       BlockdevAmendOptions *opts,
++                                       bool force,
++                                       Error **errp)
++{
++    BlockdevAmendOptionsQcow2 *qopts = &opts->u.qcow2;
++    BDRVQcow2State *s = bs->opaque;
++    int ret = 0;
++
++    if (qopts->has_encrypt) {
++        if (!s->crypto) {
++            error_setg(errp, "image is not encrypted, can't amend");
++            return -EOPNOTSUPP;
++        }
++
++        if (qopts->encrypt->format != Q_CRYPTO_BLOCK_FORMAT_LUKS) {
++            error_setg(errp,
++                       "Amend can't be used to change the qcow2 encryption format");
++            return -EOPNOTSUPP;
++        }
++
++        if (s->crypt_method_header != QCOW_CRYPT_LUKS) {
++            error_setg(errp,
++                       "Only LUKS encryption options can be amended for qcow2 with blockdev-amend");
++            return -EOPNOTSUPP;
++        }
++
++        ret = qcrypto_block_amend_options(s->crypto,
++                                          qcow2_crypto_hdr_read_func,
++                                          qcow2_crypto_hdr_write_func,
++                                          bs,
++                                          qopts->encrypt,
++                                          force,
++                                          errp);
++    }
++    return ret;
++}
++
+ /*
+  * If offset or size are negative, respectively, they will not be included in
+  * the BLOCK_IMAGE_CORRUPTED event emitted.
+@@ -5786,6 +5824,7 @@ BlockDriver bdrv_qcow2 = {
+     .mutable_opts        = mutable_opts,
+     .bdrv_co_check       = qcow2_co_check,
+     .bdrv_amend_options  = qcow2_amend_options,
++    .bdrv_co_amend       = qcow2_co_amend,
+ 
+     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
+     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 94b5233077..bf16dd6bfc 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4680,6 +4680,19 @@
+   'data': { }
+ }
+ 
++##
++# @BlockdevAmendOptionsQcow2:
++#
++# Driver specific image amend options for qcow2.
++# For now, only encryption options can be amended
++#
++# @encrypt          Encryption options to be amended
++#
++# Since: 5.1
++##
++{ 'struct': 'BlockdevAmendOptionsQcow2',
++  'data': { '*encrypt':         'QCryptoBlockAmendOptions' } }
++
+ ##
+ # @BlockdevAmendOptions:
+ #
+@@ -4694,7 +4707,8 @@
+       'driver':         'BlockdevDriver' },
+   'discriminator': 'driver',
+   'data': {
+-      'luks':           'BlockdevAmendOptionsLUKS' } }
++      'luks':           'BlockdevAmendOptionsLUKS',
++      'qcow2':          'BlockdevAmendOptionsQcow2' } }
+ 
+ ##
+ # @x-blockdev-amend:
 -- 
 2.17.2
 
