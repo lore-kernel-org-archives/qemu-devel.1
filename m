@@ -2,85 +2,131 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 406D2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D161C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BD0220657
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:40:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5008720657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 15:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v7/5Lyws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BD0220657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RR0H6jl4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5008720657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jahsg-0001Zr-6M
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:40:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
+	id 1jahuv-00030y-Hn
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 11:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jahrb-0000b0-KQ
- for qemu-devel@nongnu.org; Mon, 18 May 2020 11:39:35 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33461)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jahrZ-0004tR-E6
- for qemu-devel@nongnu.org; Mon, 18 May 2020 11:39:35 -0400
-Received: by mail-ot1-x343.google.com with SMTP id v17so8434893ote.0
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 08:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=PNQuBFCv9wrH4GrYqjG8sxVuv9PD9ornhzuaxzknjsU=;
- b=v7/5LywsgAo+5PX+qO8OrOS0aXR4rZfuvf7schO7mhJ6tP3VAfgDeFQBgz39fHR2Fo
- ZTuVD4k6zSXhLHNGzGLuGXTSEMJ1CezkcvwcEGbxXAwHj6PR5KdGt6hTamYUBKEIqhwE
- PKaJFSl/+GrhtmSXQk4Mej3ovzNnXJZ7Nh9hwVityqfMTW/LeBYRrPwqGi1K0FJ+rOi2
- H9vlFY2Q9mSSKEDAopYZT0kt+JOLDIqptZKJTfa103Q2ckCnqFnljJVtzGZOAT9Znrk6
- 4ozimLQdLtnNOlZUYW9JLxR2Nd9PjlqJkqh7xGR8rje5Bsq2TmlSo11Zs7cs5aprCkUP
- Ul+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=PNQuBFCv9wrH4GrYqjG8sxVuv9PD9ornhzuaxzknjsU=;
- b=ijNJwk6Zv/aKWlahObIT4rVEUakBojj9ED1ffTP1Gdu/6pvVvmIlLB+Mim/8I7mDl3
- jBRrbkW4gxVNoGojpiU/1pmi2eLy7Nb3xIM4jkI0C3Q4V0JGAKirVpGHieNCZ0cwLCmN
- 2OwMM/YMA4UVBnKpF54nyBRhkBAO+kma1uUoRlbQTNANiOR2xihrOyR+YuVvG5NC8SzM
- USPcowcOisJFoLEKblFq7DR0XVY5KPvFChSs0/3YfZeb28suKlodE6uec1q76PjjBXcF
- FYmvgsVuiAB1ULP7NXZrUblaRwUIR50o2hRNX9W17xHcECXZeryKjnjU4GGIf30OuRl8
- Cz5g==
-X-Gm-Message-State: AOAM533CeHp+qN8RhpF6nGA8KfmaTKE+AV2pn8YtFgnHEZT2iT6CXU2u
- V6Jmuu+2+d8cQgqhGP4es+lt9s99Y693M8VCHyP6HA==
-X-Google-Smtp-Source: ABdhPJxtHk8MZE26N3bjqDUwT3b4FYy8medXiMBvlDtmfhvVl8dWgEzAT8SdUPZF5NI+HtinIFJCLMXs2MKHWa5Ml7Q=
-X-Received: by 2002:a05:6830:158b:: with SMTP id
- i11mr3181822otr.135.1589816371525; 
- Mon, 18 May 2020 08:39:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahuA-0002WC-91
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 11:42:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54194
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jahu8-0005Sv-97
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 11:42:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589816530;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=mB6BDBJ+CuTDL72XJJfdDfBqx/qKpuCEOTyB1FXcPuo=;
+ b=RR0H6jl4SBOSWG6l/wuadmuVNp7K9IYyBdcCnG7556U/Rj1t0+jL+jNQ9w8c1Fk3rzXsyX
+ ZsOSOGnwiUFTJc5VqTSs24d5JDqpWQNRICKyGJodNgzzXThnx2SoATx0dbnZG5GxyM6JmN
+ wVWGhMdqKb5vifDq9KUkeq5XZN9MoLA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-aUtumVmbOfu2vfT4fhqI8g-1; Mon, 18 May 2020 11:42:08 -0400
+X-MC-Unique: aUtumVmbOfu2vfT4fhqI8g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB0AB8C2534;
+ Mon, 18 May 2020 15:42:01 +0000 (UTC)
+Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7DBC60C05;
+ Mon, 18 May 2020 15:41:57 +0000 (UTC)
+Subject: Re: [PATCH v1 3/3] virtio-balloon: unref the iothread when unrealizing
+To: Alexander Duyck <alexander.duyck@gmail.com>
+References: <20200518083704.52646-1-david@redhat.com>
+ <20200518083704.52646-4-david@redhat.com>
+ <CAKgT0UfNdU9quX75MrV0EQk-v0EP4w8g6UVFj2k2qRO=VUvRCQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <299d4475-bfd4-34b7-749f-ed11076d23c3@redhat.com>
+Date: Mon, 18 May 2020 17:41:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200512064900.28554-1-pauldzim@gmail.com>
-In-Reply-To: <20200512064900.28554-1-pauldzim@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 May 2020 16:39:19 +0100
-Message-ID: <CAFEAcA93EM=90r5yjpPyGFE5rD=z9SOLHW0UJ=WUxGsZgqbVPQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/7] dwc-hsotg (aka dwc2) USB host controller emulation
-To: Paul Zimmerman <pauldzim@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <CAKgT0UfNdU9quX75MrV0EQk-v0EP4w8g6UVFj2k2qRO=VUvRCQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -95,25 +141,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Wei Wang <wei.w.wang@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 May 2020 at 07:49, Paul Zimmerman <pauldzim@gmail.com> wrote:
->
-> Gerd, Peter, what do you think about accepting this patch series? The
-> only possibly disruptive patch is #5, which modifies the dev-storage.c
-> code a bit, the rest is all new code which shouldn't affect anything
-> else. Felippe Mathieu-Daud=C3=A9 has done quite a bit of review of the
-> patches, and has said he thinks it could be accepted now.
+On 18.05.20 17:35, Alexander Duyck wrote:
+> On Mon, May 18, 2020 at 1:37 AM David Hildenbrand <david@redhat.com> wrote:
+>>
+>> We took a reference when realizing, so let's drop that reference when
+>> unrealizing.
+>>
+>> Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+>> Cc: Wei Wang <wei.w.wang@intel.com>
+>> Cc: Alexander Duyck <alexander.duyck@gmail.com>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/virtio/virtio-balloon.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>> index a4fcf2d777..3f8fc50be0 100644
+>> --- a/hw/virtio/virtio-balloon.c
+>> +++ b/hw/virtio/virtio-balloon.c
+>> @@ -820,6 +820,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev)
+>>
+>>      if (s->free_page_bh) {
+>>          qemu_bh_delete(s->free_page_bh);
+>> +        object_unref(OBJECT(s->iothread));
+>>          virtio_balloon_free_page_stop(s);
+>>          precopy_remove_notifier(&s->free_page_report_notify);
+>>      }
+> 
+> I'm not entirely sure about this order of operations. It seems like it
+> would make more sense to remove the notifier, stop the hinting, delete
+> the bh, and then release the IO thread.
 
-I had some minor comments but other than those I think it looks good.
-I'm assuming Gerd will review the usb-storage patch.
+This is the reverse order of the steps in
+virtio_balloon_device_realize(). And I guess it should be fine. The
+notifier cannot really be active/trigger while we are removing devices
+(cannot happen with concurrent migration). After qemu_bh_delete(), the
+iothread is effectively unused.
 
-thanks
--- PMM
+I am unsure about many things regarding free page hinting (e.g., if the
+virtio_balloon_free_page_stop() is of any use while we are ripping out
+the device and it will be gone in a second).
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
