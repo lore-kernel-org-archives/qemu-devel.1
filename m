@@ -2,87 +2,93 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD391C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F11DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 948F82070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18DB320657
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTMTX0X3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 948F82070A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPYWizxe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18DB320657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jalrk-0006Zs-PT
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:56:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56778)
+	id 1jalsX-0007ok-At
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jalli-0004jb-05
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:49:46 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40505)
+ id 1jalem-00036S-Ts
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:36 -0400
+Received: from mail-lf1-x131.google.com ([2a00:1450:4864:20::131]:45678)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jallh-0006AW-5U
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:49:45 -0400
-Received: by mail-wm1-x343.google.com with SMTP id n18so828442wmj.5
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:49:44 -0700 (PDT)
+ id 1jalek-0004dP-R4
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:36 -0400
+Received: by mail-lf1-x131.google.com with SMTP id a4so9129597lfh.12
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:42:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Ipzj20sx2kFB62u6f1HeUGWmBEWRAXVMZx2qZpWNk6o=;
- b=eTMTX0X3URrPesADAgFkkhd8emTwhLHq5oZPL3AmYvYeH61a93CUb+I/SelTlIQarw
- b0DTgzI5uRxwhWgPvCCB6667qW4WIDGNspnOXKsIbva2CeFKrBGXDplXDkFlOI9LwSuj
- CLVnYKtnFC6+k+mmWplyM2owOYNzqdqdI1KrY37VsLKq2pxynO20POykRyIQNCxjMg/o
- r1w5p+UF1+ctbDOEbyMOpYV8QcSRQfeqFm/KctQhAdJbnswxaOMu3OLzB3lzHUs1hoYA
- Gi6MhAdmvtnD0Mhm3y7eFYLEC2soezzvQwXHTXfvkAvWTG9R3MJf8lyp5FCfnOnzGWo2
- DfHg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2ITjMgpxMDXhLrKll92k92Sf+OWlp5gufeGg5gaD7lw=;
+ b=bPYWizxeol3qNe6vy1pQAkiUlapi3s8Lxy/ocPLMgF9CxIuKkayl7QTJibJFCILlZ6
+ n4Thj8boZJe5/3tvv55N4stmB8pzQahB16V1KXaC5cj1Y8rSxdTLD7biaCPt8QfoIcKc
+ Yudr3P8tysrSG7vQaowvTpJDaU7/84Jd0imIbdn8ZEivKa76JR4atINVBLB1cJMw9h9o
+ H7TcBw5yYXEf7c1JEXCBrS1GZznDxqqa3ozkiuKHf52LT3XrJ6QIA4wmspTgBx78eKcW
+ wzERVN0rbJv1DKxh7C++ireU6tH98qfUEwUImpJYwwQlTArP/letAmBV2qVwp0wD0DEn
+ jLzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ipzj20sx2kFB62u6f1HeUGWmBEWRAXVMZx2qZpWNk6o=;
- b=ok/yaXy2VRjT48ZVpG1uDrvfcew5XYadip/hdNwW+wE7aNvmXUvgnir5uYUAgqGBYt
- zf7Tl/8l2Bj4mLVqxVqGDeZ2smibAV3oCaEC8smoyJFPE68xFGnhnTHr8csWhLfejMdd
- 2jqxlLjuJ7XHzzH3mG7zu+9GZ12imCXF5TpU0FAz4xen9eOfRaHq76kmV/6QFnPgYJI5
- DfprhnhF9VGGm7g1eL9BltkaEBix0KKjjL7/Oztuam7sfTfzQ5Ok71TXzkZEI0Ph/8aY
- rlRhfLMqpaXQ0mhyaNUy+14IdLtzZoMdQG/vSUL40oS5pt4UozH00eO8YVTRHxBxmQJP
- T7Vw==
-X-Gm-Message-State: AOAM531r+5vg3MG9N8aXpeHBdZavrfUOURUvpuByxPeFCGIVk9Rm6JXy
- 3DVJzF1u3lAI7EwID2zmybF3xsbUIsJKvYPj7UbHrDio
-X-Google-Smtp-Source: ABdhPJxLVWpG7ECIsoQXonKpD7XwiLX0mjF6rz1S4RwXXE2EhK90mtSlEB3Vmnwz96NdS0ljznKgpYJU6vLpG+efDqA=
-X-Received: by 2002:a1c:f211:: with SMTP id s17mr1132578wmc.168.1589831383456; 
- Mon, 18 May 2020 12:49:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
- <20200518194149.16281-2-aleksandar.qemu.devel@gmail.com>
-In-Reply-To: <20200518194149.16281-2-aleksandar.qemu.devel@gmail.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=2ITjMgpxMDXhLrKll92k92Sf+OWlp5gufeGg5gaD7lw=;
+ b=eDLixE+rhLsGzXm3J2LRpwi7fB5Wvk0Y/2xziqzwiuSamcrnG8NRDS7g88q4TJszWO
+ eHJXKKVfPoL/qaKROTyET95hdG5kcoSDkaS85jOw3gTKYzETcHrKxSistarRoy8LfJNt
+ UDJ5XjWRRlwMGg1nzwr9T3kewslrD+bqLV95TtS8OR8LZbFJ8FlEeU4+TvlUMlXF0M1z
+ Z30bsCk0GkJaZHh78YakqXYj8rwsCDOlUaamWWH9KBfCinzWX4FrSlVaGnmzjicxQuYm
+ DoTIzKZfE+8Eq/L2Vu9uhGU/WOdZdKvihZtu/xFinsizqP5FuI9zOpVPYzTZONAvhPua
+ Jdpg==
+X-Gm-Message-State: AOAM533NeI/3NMnmey5GCPuJIIV8PZZgiO3IgDY2FxqpTtWCXdEmNDFc
+ QlPb3Py1CZkPWcabSZVYGbL/uWCc9Z8=
+X-Google-Smtp-Source: ABdhPJzWPJ/BIDHK0lU8YMsKhZfQE7sXQvMlqiafDwWJziTrxKXmuglt+USh1+B8cgd8WyBBIl/9Mg==
+X-Received: by 2002:ac2:490f:: with SMTP id n15mr110316lfi.39.1589830953138;
+ Mon, 18 May 2020 12:42:33 -0700 (PDT)
+Received: from localhost.localdomain ([109.245.227.98])
+ by smtp.gmail.com with ESMTPSA id r15sm7593128lfp.34.2020.05.18.12.42.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 12:42:32 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Mon, 18 May 2020 21:49:25 +0200
-Message-ID: <CAHiYmc5SQjhsJUXMkf0_w=4JmSk66rzgJtSjmAHxT7cBsdp4cA@mail.gmail.com>
-Subject: Re: [PATCH v5 01/22] hw/tpm: fix usage of bool in tpm-tis.c
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 18/22] MAINTAINERS: Change Aleksandar Rikalo's email address
+Date: Mon, 18 May 2020 21:41:45 +0200
+Message-Id: <20200518194149.16281-19-aleksandar.qemu.devel@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
+References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::131;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x131.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 12
+X-Spam_score: 1.2
+X-Spam_bar: +
+X-Spam_report: (1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,70 +101,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com, Jafar Abdi <cafer.abdi@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: aleksandar.rikalo@syrmia.com,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BF=D0=BE=D0=BD, 18. =D0=BC=D0=B0=D1=98 2020. =D1=83 21:42 Aleksandar Ma=
-rkovic
-<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> From: Jafar Abdi <cafer.abdi@gmail.com>
->
+Aleksandar Rikalo wants to use a different email address from
+now on.
 
-This patch was selected by mistake to be included in this series. A ne
-version of this series will be sent without this patch.
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+---
+ .mailmap    |  3 ++-
+ MAINTAINERS | 12 ++++++------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-Sorry about this.
+diff --git a/.mailmap b/.mailmap
+index 6412067bde..e3628c7a66 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -42,7 +42,8 @@ Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-devel <qemu
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@mips.com>
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@imgtec.com>
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <amarkovic@wavecomp.com>
+-Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
++Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <arikalo@wavecomp.com>
++Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <aleksandar.rikalo@rt-rk.com>
+ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1f84e3ae2c..8d5562c5c7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -212,7 +212,7 @@ F: disas/microblaze.c
+ MIPS TCG CPUs
+ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Maintained
+ F: target/mips/
+ F: default-configs/*mips*
+@@ -1041,7 +1041,7 @@ MIPS Machines
+ -------------
+ Jazz
+ M: Hervé Poussineau <hpoussin@reactos.org>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Maintained
+ F: hw/mips/mips_jazz.c
+ F: hw/display/jazz_led.c
+@@ -1062,7 +1062,7 @@ F: tests/acceptance/machine_mips_malta.py
+ 
+ Mipssim
+ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -1070,7 +1070,7 @@ F: hw/net/mipsnet.c
+ R4000
+ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Obsolete
+ F: hw/mips/mips_r4k.c
+ 
+@@ -1085,7 +1085,7 @@ F: include/hw/isa/vt82c686.h
+ 
+ Boston
+ M: Paul Burton <pburton@wavecomp.com>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
+@@ -2582,7 +2582,7 @@ F: disas/i386.c
+ MIPS TCG target
+ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Maintained
+ F: tcg/mips/
+ 
+-- 
+2.20.1
 
-Aleksnadar
-
-> Clean up wrong usage of FALSE and TRUE in places that use "bool" from std=
-bool.h.
->
-> FALSE and TRUE (with capital letters) are the constants defined by glib f=
-or
-> being used with the "gboolean" type of glib. But some parts of the code a=
-lso use
-> TRUE and FALSE for variables that are declared as "bool" (the type from <=
-stdbool.h>).
->
-> Signed-off-by: Jafar Abdi <cafer.abdi@gmail.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> ---
->  hw/tpm/tpm_tis_common.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
-> index 9ce64d4836..1af4bce139 100644
-> --- a/hw/tpm/tpm_tis_common.c
-> +++ b/hw/tpm/tpm_tis_common.c
-> @@ -536,7 +536,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
-ddr,
->              while ((TPM_TIS_IS_VALID_LOCTY(s->active_locty) &&
->                      locty > s->active_locty) ||
->                      !TPM_TIS_IS_VALID_LOCTY(s->active_locty)) {
-> -                bool higher_seize =3D FALSE;
-> +                bool higher_seize =3D false;
->
->                  /* already a pending SEIZE ? */
->                  if ((s->loc[locty].access & TPM_TIS_ACCESS_SEIZE)) {
-> @@ -546,7 +546,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
-ddr,
->                  /* check for ongoing seize by a higher locality */
->                  for (l =3D locty + 1; l < TPM_TIS_NUM_LOCALITIES; l++) {
->                      if ((s->loc[l].access & TPM_TIS_ACCESS_SEIZE)) {
-> -                        higher_seize =3D TRUE;
-> +                        higher_seize =3D true;
->                          break;
->                      }
->                  }
-> --
-> 2.20.1
->
 
