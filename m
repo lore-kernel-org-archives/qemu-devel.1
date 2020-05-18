@@ -2,84 +2,87 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB400C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBC1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:47:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAB79207D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2046E207D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:47:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e9Cv00Aa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB79207D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hMeoOSF5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2046E207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaiv1-0003Fx-Sm
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:47:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60174)
+	id 1jaivD-0003f6-Aw
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:47:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jaip2-0001yt-Ak
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:41:00 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:50989)
+ id 1jaiuH-0002Nk-3D
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:46:25 -0400
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:39561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jaip1-0005pj-73
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:41:00 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id nu7so84693pjb.0
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:40:58 -0700 (PDT)
+ id 1jaiuG-0008FC-0B
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:46:24 -0400
+Received: by mail-pg1-x52a.google.com with SMTP id u35so5088368pgk.6
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:46:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=23ujhSNHwAa6m2PV/44zvOLpUgf1M+P1yqoPvCdPMfY=;
- b=e9Cv00AaKl1LCY9WqohCEiRKz1OrlndQHn+JPCOweENat+0toMfJxMg5CumlBmXvxd
- hUC5RLplZiB4EFPPexZIsv4hDojSJ4qlB9ftV6GfWwFoDRiUVhmvl+qdtm6AYXLYJjq7
- KpVTeE1YzZ8qjM0/Bc2c65CcZivBPJjcjzD+WDBSdkpxuaAfgVo23oFfeGDixC/IE18i
- DZo9w+zKUrVx4LpWtv33/Cx2WwNTIEutYFiTV6lSJPYPTtjgDMa4K8BDXNpVIrZP6nOf
- kOHE/EEXo/shb/yBgMVWrnT3aDSbu89DDsRmjzF3oylNXcUs7Peb9SWesRKARk+YVr86
- wIbQ==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=W1gVnHhKErLz5E7eZ+YiA/fgbauyC9Hl3zRIXfD3Xxs=;
+ b=hMeoOSF5I7mY7fDETPUZO18NNOkj7K9b01h3KvSlinBxjatklqa4Wni2UY6yZ1+B6l
+ eYLgcMNQeeqo/om2NEvS2ghgaPfMXi9L4np29/BpXH6X4tVHOGSVCOrW0MyDrAxH1GDP
+ 4n21LRulva4G2lIpJhyrydAZY4bRTS1UaOC8noE4BuY8mgrC4gIy01bJf38gdID+/GOz
+ GjInY86Ucnv96QYfPand2hb3rPXw0WkrjXpbHmF6E5gQ+6K0900HMGG+9W7W2VSkt/5D
+ pevBwM4nUdhZODYw7lL02a/nbSbWPxZG7dexyOnsqhiFU5rU+/guE53pwAqzPca9oI7H
+ ltRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=23ujhSNHwAa6m2PV/44zvOLpUgf1M+P1yqoPvCdPMfY=;
- b=RnuL0hFz+PvkwrtkgHpSWlcL+bScrQeDTDylQr+ZlcfLPHO/NPRNRp7oBU6fh3D+eZ
- InO34UgW3mFZyCWjVMxDlhNdFD9Eve42M9pD5WMHm8PqplVkNDWaoD5BmR61V6J9A69e
- vbFs3otgcoxmkzAl1iCpaGbWH3ekXMGTeGdNY0aun1Gi6LP7nboOOTs6qdawOlvT6JEH
- NzNTQVECu7n+QfgpdyyvuxG0oeJCILRXPKA5+ZPcX1OnDSeKZ/G2z3pVlRBptc3UkSUV
- 0rx2O06GzwosMGi98M7fwpYc9bLSZYQXYhKZc/AmNKUVvXgHtlG2McNjpJTgLyBXoosJ
- oAXQ==
-X-Gm-Message-State: AOAM531cygHL5pooGbkgknDOPVushe1//3I1NirWmX9xb0GVEDWykFEM
- aVY9kpT6RB0BnZaY3fiD/dUBL9s2jcw=
-X-Google-Smtp-Source: ABdhPJyV4aVyh8kLIouKAbUVdQbIZS7R9friQa7pJTK0HlWF3K2n9Fi7xx/ZcVQkh4sb1qYQJxPGSg==
-X-Received: by 2002:a17:902:6949:: with SMTP id
- k9mr17288565plt.47.1589820057328; 
- Mon, 18 May 2020 09:40:57 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id x132sm5790610pfd.214.2020.05.18.09.40.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 09:40:56 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=W1gVnHhKErLz5E7eZ+YiA/fgbauyC9Hl3zRIXfD3Xxs=;
+ b=APdohhZBhBbUP9LevAZ7yWRhkfks4o2+EanfqV4FUfE6N/yvRluR1yUOwCLjcs4yIE
+ m4z4KQNwZqBkLVkuTB1mcDIBOLuL/jXwTqxFJN8ak1YnBeYJVbHjLei9CNQs8LRCHEmA
+ v6Y2qQI/vNoL5fJy6WsBUrqi305aXZcLh+exlK6p0xOGpI0YDLRont7LLCn7fjQxHZjx
+ oVoJJUEgVjJPZzzqQ5cydtIFLKs5j83/PDnDCSM/ySfTsVhMZ3yyRau9Ret2LgeenwRV
+ XrQ5dL4flUSVzCE8669Ua5iMgYw2Qv1IeXvfYkJ4/BnxrsEETeJ3JVOrV9BKSwWIEdlc
+ qsXg==
+X-Gm-Message-State: AOAM532Jxq8O20SFzw8UylEdWrPtFuuhO+4n5UqYMHQDpQ6KxKspHjrn
+ pg2HNtZj9QDSC0vTyeXkjno98Q==
+X-Google-Smtp-Source: ABdhPJxtpSx1XTUQuKLKejU+5ELLSec9/d/4lnKOlgv4aNKu5QaT2vyWT4+to/Ck6yhF2ujbtDwtJQ==
+X-Received: by 2002:aa7:85da:: with SMTP id z26mr17068464pfn.25.1589820382606; 
+ Mon, 18 May 2020 09:46:22 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id gv4sm86430pjb.6.2020.05.18.09.46.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 09:46:21 -0700 (PDT)
+Subject: Re: [RISU 5/9] Use EXIT_FAILURE, EXIT_SUCCESS
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200513180953.20376-1-richard.henderson@linaro.org>
+ <20200513180953.20376-6-richard.henderson@linaro.org>
+ <CAFEAcA-pKnqGywy4UACdA0eJfNqiWOahka3C1hwP2JmndJrOfw@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/8] decodetree: Tidy error_with_file
-Date: Mon, 18 May 2020 09:40:46 -0700
-Message-Id: <20200518164052.18689-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200518164052.18689-1-richard.henderson@linaro.org>
-References: <20200518164052.18689-1-richard.henderson@linaro.org>
+Message-ID: <0757b371-a064-964c-961f-3839fcdd10e3@linaro.org>
+Date: Mon, 18 May 2020 09:46:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102e.google.com
+In-Reply-To: <CAFEAcA-pKnqGywy4UACdA0eJfNqiWOahka3C1hwP2JmndJrOfw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52a;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,61 +104,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use proper varargs to print the arguments.
+On 5/18/20 8:54 AM, Peter Maydell wrote:
+> On Wed, 13 May 2020 at 19:10, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Some of the time we exit via the return value from main.
+>> This can make it easier to tell what it is we're returning.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> I don't really see the benefit personally, but
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- scripts/decodetree.py | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+It wasn't so much for the direct calls of exit, but when we return an "int"
+that gets passed to exit later.
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index f9d204aa36..b559db3086 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -51,23 +51,27 @@ def error_with_file(file, lineno, *args):
-     global output_file
-     global output_fd
- 
-+    prefix = ''
-+    if file:
-+        prefix += '{0}:'.format(file)
-     if lineno:
--        r = '{0}:{1}: error:'.format(file, lineno)
--    elif input_file:
--        r = '{0}: error:'.format(file)
--    else:
--        r = 'error:'
--    for a in args:
--        r += ' ' + str(a)
--    r += '\n'
--    sys.stderr.write(r)
-+        prefix += '{0}:'.format(lineno)
-+    if prefix:
-+        prefix += ' '
-+    print(prefix, end='error: ', file=sys.stderr)
-+    print(*args, file=sys.stderr)
-+
-     if output_file and output_fd:
-         output_fd.close()
-         os.remove(output_file)
-     exit(1)
-+# end error_with_file
-+
- 
- def error(lineno, *args):
--    error_with_file(input_file, lineno, args)
-+    error_with_file(input_file, lineno, *args)
-+# end error
-+
- 
- def output(*args):
-     global output_fd
--- 
-2.20.1
 
+r~
 
