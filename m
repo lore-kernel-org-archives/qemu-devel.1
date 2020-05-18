@@ -2,92 +2,112 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DE4C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE82C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62FBC207D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:16:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4A64207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 16:22:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iDN3LTry"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62FBC207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AIZHomal"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4A64207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaiQq-0008Ox-J3
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:16:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55594)
+	id 1jaiXa-0003Uz-Qp
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 12:22:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jaiPI-0006W3-1M
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:14:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45188)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jaiPF-0006ar-NX
- for qemu-devel@nongnu.org; Mon, 18 May 2020 12:14:23 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v12so12500310wrp.12
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:14:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=14EgnQXdDLU6UwJteERXQ0fKaVmPe5bjR0oM2Xdh7xw=;
- b=iDN3LTryQTw9m8EQf4JTn+VGcvgnSjZ9WlxIfAfBF+FlVPgNfm6LikVAtZJPW1KdIc
- 7OxFf6e5cFiFXGheZENUQ1Y+K7iPL7GcWXkJPCvn6eIam7aY3tl5Mncl9hWAQ7JPs4tK
- ujIyDGj1P9SMkgqrqMS6mjwU03QqEBpDusMn2ozCpA/N1sB4bBwfCtA1XvnMgbPN7ZmH
- bEwySpm0pIKTeoekeXKHnk06Ey9iGdWDUDUrMgTVlXw7nA9VJaPd0n0kH+8sGgKymhiZ
- 58FtGfbN9EdaRuUhevGAIFwRSVQ7j//tNiKFey7Qk65anWFNhqQmESDfyTmzBWSxcXnP
- 2+wQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jaiWj-0002dK-4A
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:22:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58007)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jaiWh-0008H0-F1
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 12:22:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589818921;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=98ZpnwHAx2gFbTHwDFEFfv30HBGfx3r1A/dVzSn7Vko=;
+ b=AIZHomalYmVUdnyIIitekjgQ72QJjP3MjO0eutKKMPNuO0EcYSgAgxYFAMMuTPbEpyq8Xq
+ 7l/wLpYdZ3+4sjQK0FKKE/zM+r/wFSqib+cxa/OuE4yxBavWo8j/Wzffx3UMca5lrBTNKv
+ cPuM/fKWyCTr62E6tTEnm5P7OFs/7Og=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-SWBbLHPeOzyaOX59V99TwQ-1; Mon, 18 May 2020 12:21:57 -0400
+X-MC-Unique: SWBbLHPeOzyaOX59V99TwQ-1
+Received: by mail-wr1-f71.google.com with SMTP id p8so5876961wrj.5
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 09:21:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=14EgnQXdDLU6UwJteERXQ0fKaVmPe5bjR0oM2Xdh7xw=;
- b=F/dSzTfIooTtlCkeg8FZ2TgW2XerzMVgVDS2680M6EPZrXDUFH/v/AR1S57AvzL6uR
- iaZZ776IZj87CurQpkww9Qf14NQ5vAu6isdjEe/GJS1ONruMwh6AgzHpTxPCx4IlwqPC
- Q6JogyUwmanS3lmLgIGNR3HKyN07HMbjXmVFSH39P0qqR9ZVz8dwIKLKnl45+KsP8SkY
- NL8oi/ezdtj7Xx/Rz7BfF6QXvpR3eChO2cMT3TuG7yFDYUzyDCw0VqeGBrkCvSt3CQtZ
- mckyM4KEzKLBluRmudvbI13c4GNDyr6pnAs3COyUGqqZgQRW6+dE+Ri5i3akZpPZZzHO
- vlxw==
-X-Gm-Message-State: AOAM533jLfiKeaLe0QvcogT4FykoT5LgXKW8smYg49+W+dU2akCpDtia
- ByBD0r8vbhs7GCSEuzGfITSqQQ==
-X-Google-Smtp-Source: ABdhPJwnTVp6SRCT+Bvpp7CW3q/J5ppBT7E8TWgCloUi/LSbfD+g+XSRJSfraWrP4sGAuNMLB8X+gw==
-X-Received: by 2002:adf:e5c8:: with SMTP id a8mr19965873wrn.335.1589818460274; 
- Mon, 18 May 2020 09:14:20 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f5sm17512051wro.18.2020.05.18.09.14.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 09:14:19 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8ACF71FF7E;
- Mon, 18 May 2020 17:14:18 +0100 (BST)
-References: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
-Subject: Re: [PATCH] icount: fix shift=auto for record/replay
-In-reply-to: <158875154623.957.4036561733593052357.stgit@pasha-ThinkPad-X280>
-Date: Mon, 18 May 2020 17:14:18 +0100
-Message-ID: <87r1vhjk4l.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=98ZpnwHAx2gFbTHwDFEFfv30HBGfx3r1A/dVzSn7Vko=;
+ b=VYavCk9VRhilRwjR+q7eksjh9kk1TD/2uFDjvaZfx1vGUClFJPqjKpECLbOmukSaD0
+ x65YaczzbXOvR/Y6lUkJuxs6ALccz2yNigdlpTpewNegJlYDQ3yZiHEXmGPSEy695Q09
+ YopLgZ2ucrq1ojhZp4czb6NtmECIRH1hL+sBzVbBqB5hD9yAb1NAzPW0l3Ttan7nCcmt
+ u2h+EF2YGtRQHgaWQGj7K0CLf+zBysYLt0uen9OIZCG68xAAUlgy0RDKFmLcCz2CTRiP
+ 8Mu7AKDgK9U4JHmAiZJ0JLd/S6Qj4har8TVH9t3j6qgja8p486J6einVNqBHePsR8jKb
+ aQ/A==
+X-Gm-Message-State: AOAM530ak6Jw1GzSd+ZTTtfPpqsYfa7OpnGmizP22Gfzv7d9vXmoqdPP
+ cgDboMsFw5P3wXzY1/69Fymf2cqyUOui/lCu+KYqTPjDtC86jpYBaa1eJXcKHn2h29+cp3yrxSv
+ x7EID1mOpJNMASZA=
+X-Received: by 2002:a5d:56c7:: with SMTP id m7mr20425775wrw.256.1589818916459; 
+ Mon, 18 May 2020 09:21:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyNLpin204qLIT/3CoZ4qali1DTnEcMIdk0nKim3vnvtnA0qpBpc+ZafDtFysGupxsVNwrq6Q==
+X-Received: by 2002:a5d:56c7:: with SMTP id m7mr20425739wrw.256.1589818916248; 
+ Mon, 18 May 2020 09:21:56 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id d4sm11139955wre.22.2020.05.18.09.21.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 09:21:55 -0700 (PDT)
+Subject: Re: KVM call for agenda for 2020-05-19
+To: quintela@redhat.com, kvm-devel <kvm@vger.kernel.org>,
+ qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Bin Meng <bin.meng@windriver.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Erik Skultety
+ <eskultet@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>, Bin Meng <bmeng.cn@gmail.com>
+References: <87o8r24p2a.fsf@secure.mitica>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <133d4900-c852-f45d-ab19-a9253013fd20@redhat.com>
+Date: Mon, 18 May 2020 18:21:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <87o8r24p2a.fsf@secure.mitica>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/17 22:52:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -102,52 +122,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, dovgaluk@ispras.ru, qemu-devel@nongnu.org,
- pavel.dovgaluk@ispras.ru, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/5/20 1:08 PM, Juan Quintela wrote:
+> 
+> 
+> Hi
+> 
+> Please, send any topic that you are interested in covering.
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com> writes:
+Last minute suggestion after recent IRC chat with Alex Bennée and Thomas 
+Huth:
 
-> This patch fixes shift=3Dauto when record/replay is enabled.
-> Now user does not need to guess the best shift value.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
->  cpus.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/cpus.c b/cpus.c
-> index 5670c96bcf..dfb9f4717f 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -379,7 +379,8 @@ static void icount_adjust(void)
->=20=20
->      seqlock_write_lock(&timers_state.vm_clock_seqlock,
->                         &timers_state.vm_clock_lock);
-> -    cur_time =3D cpu_get_clock_locked();
-> +    cur_time =3D REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
-> +                                   cpu_get_clock_locked());
->      cur_icount =3D cpu_get_icount_locked();
->=20=20
->      delta =3D cur_icount - cur_time;
-> @@ -685,6 +686,7 @@ static const VMStateDescription icount_vmstate_timers=
- =3D {
->      .fields =3D (VMStateField[]) {
->          VMSTATE_INT64(qemu_icount_bias, TimersState),
->          VMSTATE_INT64(qemu_icount, TimersState),
-> +        VMSTATE_INT16(icount_time_shift, TimersState),
+"Move some of the build/CI infrastructure to GitLab."
 
-Surely we should be bumping .version_id/.minimum_version_id here so we
-error out gracefully. No recordings pre this change would work right?
+Pro/Con?
 
->          VMSTATE_END_OF_LIST()
->      },
->      .subsections =3D (const VMStateDescription*[]) {
+  - GitLab does not offer s390x/ppc64el => keep Travis for these?
 
+How to coordinate efforts?
 
---=20
-Alex Benn=C3=A9e
+What we want to improve? Priorities?
+
+Who can do which task / is motivated.
+
+What has bugged us recently:
+- Cross-build images (currently rebuilt all the time on Shippable)
+
+Long term interests:
+
+- Collect quality metrics
+   . build time
+   . test duration
+   . performances
+   . binary size
+   . runtime memory used
+
+- Collect code coverage
+
+Note, this is orthogonal to the "Gating CI" task Cleber is working on:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg688150.html
+
+> 
+> At the end of Monday I will send an email with the agenda or the
+> cancellation of the call, so hurry up.
+> 
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
+> 
+>   Call details:
+> 
+> By popular demand, a google calendar public entry with it
+> 
+>    https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+> 
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
+> 
+> If you need phone number details,  contact me privately
+> 
+> Thanks, Juan.
+> 
+> 
+
 
