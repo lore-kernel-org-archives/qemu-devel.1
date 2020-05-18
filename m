@@ -2,92 +2,87 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD391C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54B3620657
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 948F82070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fn0fcvaJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B3620657
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTMTX0X3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 948F82070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jalrZ-0006H1-IC
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:55:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56132)
+	id 1jalrk-0006Zs-PT
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:56:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jalei-00031k-CB
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:32 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44389)
+ id 1jalli-0004jb-05
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:49:46 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40505)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaleh-0004cx-LY
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:32 -0400
-Received: by mail-lf1-x142.google.com with SMTP id w15so1790236lfe.11
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:42:31 -0700 (PDT)
+ id 1jallh-0006AW-5U
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:49:45 -0400
+Received: by mail-wm1-x343.google.com with SMTP id n18so828442wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:49:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6bLqctmqV5Mx2G6wit9y/QaIjTbRVw7Js7a4gwFi+NU=;
- b=fn0fcvaJ0juLIw8fI2SGidOP8FMjX2jniKm5W/QvQlLQoNiSmk7kOZ07eaYW58Iell
- tH/V6n+2z4paLr5EaQcqPxo76XaDdoZhKgmJod76Cn6CoYO26XndrEjnHEtTgNXBZQtB
- R6cC8ICeGQ5xCt98qWu8P+SBBpY6kRcfKJmPxRkc3PIChuZYghvEdcpmYAs03uFappIE
- y+ZtCIJV94Dn7IBpuDUctQiu0f84GIhw3E0zwbMTTDQyZiz0q/wfcuDUiwQiboWrNNpc
- V0eB4YS1Qp4EwwLxiej1BfO084CnjSQz7gPiWobshOwbGN1WLsdbrvxPHqbZOPU9fwQN
- lTLQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ipzj20sx2kFB62u6f1HeUGWmBEWRAXVMZx2qZpWNk6o=;
+ b=eTMTX0X3URrPesADAgFkkhd8emTwhLHq5oZPL3AmYvYeH61a93CUb+I/SelTlIQarw
+ b0DTgzI5uRxwhWgPvCCB6667qW4WIDGNspnOXKsIbva2CeFKrBGXDplXDkFlOI9LwSuj
+ CLVnYKtnFC6+k+mmWplyM2owOYNzqdqdI1KrY37VsLKq2pxynO20POykRyIQNCxjMg/o
+ r1w5p+UF1+ctbDOEbyMOpYV8QcSRQfeqFm/KctQhAdJbnswxaOMu3OLzB3lzHUs1hoYA
+ Gi6MhAdmvtnD0Mhm3y7eFYLEC2soezzvQwXHTXfvkAvWTG9R3MJf8lyp5FCfnOnzGWo2
+ DfHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6bLqctmqV5Mx2G6wit9y/QaIjTbRVw7Js7a4gwFi+NU=;
- b=KDTuxauxRgb1zd4y0aNndagmwzq2yORc27iTje5WkzpvS2IevLLKCYQ8t2htX48imA
- gEAXLkenJ3w57BVycFrsnm8um9ZO7sHNIT1yNQRcZcg1us+rO2TN/R06thqHV1jfqqIv
- zWwpbILpRcY3AQ1ejzt42R4FxKSk/tOML4AxZxyxp5+rSnOUqQrDblSWgfY4P3ADs+e2
- Xq4Uno4wMuIuaGk43peLnXtcFWRF6jsShfaMlFkgXXdvaOZKe5kDwQyZpcCdgom3s+81
- AKCSMZvgLCIgZOZs0jZNo0FWkyR0lpuGEENaYRCU+K4Bq57zJY2G8LrA5g0xJ6wzcJGX
- 7C/w==
-X-Gm-Message-State: AOAM530jm/Y9xFmRsDlJQtRkGD2kZRgkArFyWyujmpqqHn0bVV2IIU0D
- 5FTm/ey4uaxXZADxUUtVt02+Rur8Wqk=
-X-Google-Smtp-Source: ABdhPJwR/a3woBg0lqsU23EJtnH3lnovEJbqUWzdJrEZECod2QYjVlSJeM0G5tQS9V1kkEp1vYstXw==
-X-Received: by 2002:ac2:511d:: with SMTP id q29mr7540386lfb.24.1589830950029; 
- Mon, 18 May 2020 12:42:30 -0700 (PDT)
-Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id r15sm7593128lfp.34.2020.05.18.12.42.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 12:42:29 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 16/22] target/mips: fpu: Name better paired-single variables
-Date: Mon, 18 May 2020 21:41:43 +0200
-Message-Id: <20200518194149.16281-17-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
-References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ipzj20sx2kFB62u6f1HeUGWmBEWRAXVMZx2qZpWNk6o=;
+ b=ok/yaXy2VRjT48ZVpG1uDrvfcew5XYadip/hdNwW+wE7aNvmXUvgnir5uYUAgqGBYt
+ zf7Tl/8l2Bj4mLVqxVqGDeZ2smibAV3oCaEC8smoyJFPE68xFGnhnTHr8csWhLfejMdd
+ 2jqxlLjuJ7XHzzH3mG7zu+9GZ12imCXF5TpU0FAz4xen9eOfRaHq76kmV/6QFnPgYJI5
+ DfprhnhF9VGGm7g1eL9BltkaEBix0KKjjL7/Oztuam7sfTfzQ5Ok71TXzkZEI0Ph/8aY
+ rlRhfLMqpaXQ0mhyaNUy+14IdLtzZoMdQG/vSUL40oS5pt4UozH00eO8YVTRHxBxmQJP
+ T7Vw==
+X-Gm-Message-State: AOAM531r+5vg3MG9N8aXpeHBdZavrfUOURUvpuByxPeFCGIVk9Rm6JXy
+ 3DVJzF1u3lAI7EwID2zmybF3xsbUIsJKvYPj7UbHrDio
+X-Google-Smtp-Source: ABdhPJxLVWpG7ECIsoQXonKpD7XwiLX0mjF6rz1S4RwXXE2EhK90mtSlEB3Vmnwz96NdS0ljznKgpYJU6vLpG+efDqA=
+X-Received: by 2002:a1c:f211:: with SMTP id s17mr1132578wmc.168.1589831383456; 
+ Mon, 18 May 2020 12:49:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x142.google.com
+References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
+ <20200518194149.16281-2-aleksandar.qemu.devel@gmail.com>
+In-Reply-To: <20200518194149.16281-2-aleksandar.qemu.devel@gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Mon, 18 May 2020 21:49:25 +0200
+Message-ID: <CAHiYmc5SQjhsJUXMkf0_w=4JmSk66rzgJtSjmAHxT7cBsdp4cA@mail.gmail.com>
+Subject: Re: [PATCH v5 01/22] hw/tpm: fix usage of bool in tpm-tis.c
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 12
-X-Spam_score: 1.2
-X-Spam_bar: +
-X-Spam_report: (1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,159 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: aleksandar.rikalo@syrmia.com, Jafar Abdi <cafer.abdi@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use consistently 'l' and 'h' for low and high halves.
+=D0=BF=D0=BE=D0=BD, 18. =D0=BC=D0=B0=D1=98 2020. =D1=83 21:42 Aleksandar Ma=
+rkovic
+<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> From: Jafar Abdi <cafer.abdi@gmail.com>
+>
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
----
- target/mips/fpu_helper.c | 62 ++++++++++++++++++++--------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+This patch was selected by mistake to be included in this series. A ne
+version of this series will be sent without this patch.
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index 56ba49104e..dbb8ca5692 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1059,14 +1059,14 @@ uint32_t helper_float_recip1_s(CPUMIPSState *env, uint32_t fst0)
- 
- uint64_t helper_float_recip1_ps(CPUMIPSState *env, uint64_t fdt0)
- {
--    uint32_t fst2;
-+    uint32_t fstl2;
-     uint32_t fsth2;
- 
--    fst2 = float32_div(float32_one, fdt0 & 0XFFFFFFFF,
--                       &env->active_fpu.fp_status);
-+    fstl2 = float32_div(float32_one, fdt0 & 0XFFFFFFFF,
-+                        &env->active_fpu.fp_status);
-     fsth2 = float32_div(float32_one, fdt0 >> 32, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- uint64_t helper_float_rsqrt1_d(CPUMIPSState *env, uint64_t fdt0)
-@@ -1091,15 +1091,15 @@ uint32_t helper_float_rsqrt1_s(CPUMIPSState *env, uint32_t fst0)
- 
- uint64_t helper_float_rsqrt1_ps(CPUMIPSState *env, uint64_t fdt0)
- {
--    uint32_t fst2;
-+    uint32_t fstl2;
-     uint32_t fsth2;
- 
--    fst2 = float32_sqrt(fdt0 & 0XFFFFFFFF, &env->active_fpu.fp_status);
-+    fstl2 = float32_sqrt(fdt0 & 0XFFFFFFFF, &env->active_fpu.fp_status);
-     fsth2 = float32_sqrt(fdt0 >> 32, &env->active_fpu.fp_status);
--    fst2 = float32_div(float32_one, fst2, &env->active_fpu.fp_status);
-+    fstl2 = float32_div(float32_one, fstl2, &env->active_fpu.fp_status);
-     fsth2 = float32_div(float32_one, fsth2, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- uint64_t helper_float_rint_d(CPUMIPSState *env, uint64_t fs)
-@@ -1367,19 +1367,19 @@ uint32_t helper_float_recip2_s(CPUMIPSState *env, uint32_t fst0, uint32_t fst2)
- 
- uint64_t helper_float_recip2_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
- {
--    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
-+    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
-     uint32_t fsth0 = fdt0 >> 32;
--    uint32_t fst2 = fdt2 & 0XFFFFFFFF;
-+    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
-     uint32_t fsth2 = fdt2 >> 32;
- 
--    fst2 = float32_mul(fst0, fst2, &env->active_fpu.fp_status);
-+    fstl2 = float32_mul(fstl0, fstl2, &env->active_fpu.fp_status);
-     fsth2 = float32_mul(fsth0, fsth2, &env->active_fpu.fp_status);
--    fst2 = float32_chs(float32_sub(fst2, float32_one,
-+    fstl2 = float32_chs(float32_sub(fstl2, float32_one,
-                                        &env->active_fpu.fp_status));
-     fsth2 = float32_chs(float32_sub(fsth2, float32_one,
-                                        &env->active_fpu.fp_status));
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- uint64_t helper_float_rsqrt2_d(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
-@@ -1404,51 +1404,51 @@ uint32_t helper_float_rsqrt2_s(CPUMIPSState *env, uint32_t fst0, uint32_t fst2)
- 
- uint64_t helper_float_rsqrt2_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
- {
--    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
-+    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
-     uint32_t fsth0 = fdt0 >> 32;
--    uint32_t fst2 = fdt2 & 0XFFFFFFFF;
-+    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
-     uint32_t fsth2 = fdt2 >> 32;
- 
--    fst2 = float32_mul(fst0, fst2, &env->active_fpu.fp_status);
-+    fstl2 = float32_mul(fstl0, fstl2, &env->active_fpu.fp_status);
-     fsth2 = float32_mul(fsth0, fsth2, &env->active_fpu.fp_status);
--    fst2 = float32_sub(fst2, float32_one, &env->active_fpu.fp_status);
-+    fstl2 = float32_sub(fstl2, float32_one, &env->active_fpu.fp_status);
-     fsth2 = float32_sub(fsth2, float32_one, &env->active_fpu.fp_status);
--    fst2 = float32_chs(float32_div(fst2, FLOAT_TWO32,
-+    fstl2 = float32_chs(float32_div(fstl2, FLOAT_TWO32,
-                                        &env->active_fpu.fp_status));
-     fsth2 = float32_chs(float32_div(fsth2, FLOAT_TWO32,
-                                        &env->active_fpu.fp_status));
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- uint64_t helper_float_addr_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt1)
- {
--    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
-+    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
-     uint32_t fsth0 = fdt0 >> 32;
--    uint32_t fst1 = fdt1 & 0XFFFFFFFF;
-+    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
-     uint32_t fsth1 = fdt1 >> 32;
--    uint32_t fst2;
-+    uint32_t fstl2;
-     uint32_t fsth2;
- 
--    fst2 = float32_add(fst0, fsth0, &env->active_fpu.fp_status);
--    fsth2 = float32_add(fst1, fsth1, &env->active_fpu.fp_status);
-+    fstl2 = float32_add(fstl0, fsth0, &env->active_fpu.fp_status);
-+    fsth2 = float32_add(fstl1, fsth1, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- uint64_t helper_float_mulr_ps(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt1)
- {
--    uint32_t fst0 = fdt0 & 0XFFFFFFFF;
-+    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
-     uint32_t fsth0 = fdt0 >> 32;
--    uint32_t fst1 = fdt1 & 0XFFFFFFFF;
-+    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
-     uint32_t fsth1 = fdt1 >> 32;
--    uint32_t fst2;
-+    uint32_t fstl2;
-     uint32_t fsth2;
- 
--    fst2 = float32_mul(fst0, fsth0, &env->active_fpu.fp_status);
--    fsth2 = float32_mul(fst1, fsth1, &env->active_fpu.fp_status);
-+    fstl2 = float32_mul(fstl0, fsth0, &env->active_fpu.fp_status);
-+    fsth2 = float32_mul(fstl1, fsth1, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
--    return ((uint64_t)fsth2 << 32) | fst2;
-+    return ((uint64_t)fsth2 << 32) | fstl2;
- }
- 
- #define FLOAT_MINMAX(name, bits, minmaxfunc)                            \
--- 
-2.20.1
+Sorry about this.
 
+Aleksnadar
+
+> Clean up wrong usage of FALSE and TRUE in places that use "bool" from std=
+bool.h.
+>
+> FALSE and TRUE (with capital letters) are the constants defined by glib f=
+or
+> being used with the "gboolean" type of glib. But some parts of the code a=
+lso use
+> TRUE and FALSE for variables that are declared as "bool" (the type from <=
+stdbool.h>).
+>
+> Signed-off-by: Jafar Abdi <cafer.abdi@gmail.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> ---
+>  hw/tpm/tpm_tis_common.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+> index 9ce64d4836..1af4bce139 100644
+> --- a/hw/tpm/tpm_tis_common.c
+> +++ b/hw/tpm/tpm_tis_common.c
+> @@ -536,7 +536,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
+ddr,
+>              while ((TPM_TIS_IS_VALID_LOCTY(s->active_locty) &&
+>                      locty > s->active_locty) ||
+>                      !TPM_TIS_IS_VALID_LOCTY(s->active_locty)) {
+> -                bool higher_seize =3D FALSE;
+> +                bool higher_seize =3D false;
+>
+>                  /* already a pending SEIZE ? */
+>                  if ((s->loc[locty].access & TPM_TIS_ACCESS_SEIZE)) {
+> @@ -546,7 +546,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
+ddr,
+>                  /* check for ongoing seize by a higher locality */
+>                  for (l =3D locty + 1; l < TPM_TIS_NUM_LOCALITIES; l++) {
+>                      if ((s->loc[l].access & TPM_TIS_ACCESS_SEIZE)) {
+> -                        higher_seize =3D TRUE;
+> +                        higher_seize =3D true;
+>                          break;
+>                      }
+>                  }
+> --
+> 2.20.1
+>
 
