@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B65AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C06B1C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 620B420643
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E8EB207F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 19:43:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gjIh11zC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620B420643
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZ66SOUK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E8EB207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jalfh-00043z-EF
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:43:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56050)
+	id 1jalfl-0004FG-OR
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 15:43:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaleO-0002Km-2n
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:12 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37402)
+ id 1jaleQ-0002Mr-0Q
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:14 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44387)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jaleM-0004Pp-Sg
- for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:11 -0400
-Received: by mail-lf1-x141.google.com with SMTP id x22so6226299lfd.4
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:42:10 -0700 (PDT)
+ id 1jaleP-0004QK-BV
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 15:42:13 -0400
+Received: by mail-lf1-x143.google.com with SMTP id w15so1789530lfe.11
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 12:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=J6WzEkuNK1tTO24Rs5ze3D460XBKSrdmIKSuTThJzYI=;
- b=gjIh11zCtGYEAXJOAe8nyrRoa1yUy/Sd/3o+0qx+RN/GQ6u3ls8g7JPRRGLcCiKIsI
- hXQEB8CxCRMaFjlrEta9L741x2s9U7Ax1O1jJ3NtDOP+DS/CRHoYV0XgSLAKtD68lI5P
- MrnxDOQA/OMCuF83tWf+MssmUQSiXtXjJBKpcNrEDV2TyO9aSqKfBwdbuqX48bxaKtUm
- ZgwMq9gnLOW8IwK+oFFJA9AhPQIsRbcQHUVxF4oeZpufv8x8I/XAezguR89TX0K//yx8
- b0wtQ4RyDD9hJmpgyYEX0eZXOt92aQz4Zju71GBtzycG9H7fG0dWjVk2tckmjEiqnuYD
- hyJg==
+ bh=PFsEe1qeGnF4uO+MCybzbHkG6H4gczYaK/HdWDtkK9A=;
+ b=lZ66SOUKnpv1LJXIRI8J4lVNAU2URwsvP72xcnSbBw2FU6DvQUiWHHsSG3T+e5+r0S
+ 6dI45bgtFnxN9nJMTNYgDO6TH0Kcdld5FY8R9o/91gcXeJPp/ZL6iTDMTDbVu8qYps6D
+ TlAbqIYwRMzes2UTxr5CF1B6u7VarDfMhIDAk5i1LGiyPvs2B5/zG0zmreCownLdN3/8
+ xZgcCKlXuz9TQ5fcOGn1zabiaR9KhWjhv+V82x6lNP7PNFP7og0bF8dl28RbaWYjgapS
+ mZJMuHIYMV3fFCamMYa2GzPTz7I3GqnrnD/r75ddNegC0DpPNrS07i1sV2JnORb+XLIR
+ EVaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=J6WzEkuNK1tTO24Rs5ze3D460XBKSrdmIKSuTThJzYI=;
- b=rqpQMDvaJsN263fxDuPMTn/ru/oquTItgDvZ8AuD7P8maFJO+Dc9x/grgbSkvnRFDO
- k4cl3kJ+czfV6U0yaIVDWZFWqRC/Zfp18E5huqXNO7R1d5rQkfALpbNjgwZNsK5mNhMU
- hjwLmSwhxn/RCc7uNGozsUPep1Se0LVP1XgTBXapLmmbdUL3DZ/1icD/7nip4UA5fIUf
- PcUrt5/ELsCyqJYit8F7GJWGrjpsVQpWlzG4hQaymXS7fJrcmXxjaor/2umvIgJ8MsKV
- MDOqmI7gKYR6YXvGaDOm+qe4Sq4vdn2pLwF4rbTM6dMjI7Q+Y7nBMOAhg3hEMUmZpW+Q
- u81A==
-X-Gm-Message-State: AOAM533ePg2WDdwMVJydFCnU0mzLi6KGLHNd/yfQc1YtFapALirHBA4m
- pARTA5vUqxeQ0yzSK8rkMhJQMz0dIBU=
-X-Google-Smtp-Source: ABdhPJwRvkvMtKiY6AXev2qVPNi+j3IFL1oTomWl3/QkZe03jXl9dHdAiE1jLff1UB1UnqYNtsJavA==
-X-Received: by 2002:ac2:58d7:: with SMTP id u23mr12299776lfo.119.1589830928556; 
- Mon, 18 May 2020 12:42:08 -0700 (PDT)
+ bh=PFsEe1qeGnF4uO+MCybzbHkG6H4gczYaK/HdWDtkK9A=;
+ b=Jxp8Y3w6PPeufBxGo9BdlhfCSnmOZhzgcykv/92UVIiIlpsf41OQ1tBKp42EY0netA
+ k3g7ZPAq+R11+eMQzlPRW6iUg09DvNonQLBcYqIWSWCFgaLXtPlkwPs5O0KDCpXS9IbH
+ 27/I2OQ7mC0DG6b38NzOC+Bbj/yEFhNbWUh2d0VB+R94PHW1OQ9x9UVo66rg/w4nVIUt
+ w3oyzF7plo+7fqmGcF9qfiLU8lK3FZ/vcIOnLQLpim3SnrQ/mR4l0leSOCc/WIh2GhAW
+ 7Zmihx7J9icQ2wSB6TT+5f9+JAlPD6UTIQZuY9HJ6Y/jyaKjkmNPJepRJXJR5haSfycU
+ vqKQ==
+X-Gm-Message-State: AOAM532LOCtDNtOttSaR2RenurhpA/AL3wI4OiQsDTvPD6s/G/uKESt+
+ Gido8YohFfVJUUgEoUnXRKPLuGryuBU=
+X-Google-Smtp-Source: ABdhPJxAfQwyiJTNyOTeZT9yX2wrCv6XrWOUpekDpxAXWpWfaK0LvPYBqQjGVW7h5VKiQ9QMwwqGcA==
+X-Received: by 2002:a19:651a:: with SMTP id z26mr12350822lfb.195.1589830931680; 
+ Mon, 18 May 2020 12:42:11 -0700 (PDT)
 Received: from localhost.localdomain ([109.245.227.98])
- by smtp.gmail.com with ESMTPSA id r15sm7593128lfp.34.2020.05.18.12.42.06
+ by smtp.gmail.com with ESMTPSA id r15sm7593128lfp.34.2020.05.18.12.42.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 12:42:08 -0700 (PDT)
+ Mon, 18 May 2020 12:42:11 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 01/22] hw/tpm: fix usage of bool in tpm-tis.c
-Date: Mon, 18 May 2020 21:41:28 +0200
-Message-Id: <20200518194149.16281-2-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v5 03/22] target/mips: fpu: Demacro SUB.<D|S|PS>
+Date: Mon, 18 May 2020 21:41:30 +0200
+Message-Id: <20200518194149.16281-4-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
 References: <20200518194149.16281-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x141.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 12
@@ -86,8 +86,8 @@ X-Spam_score: 1.2
 X-Spam_bar: +
 X-Spam_report: (1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_SBL_CSS=3.335, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,50 +100,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com, Jafar Abdi <cafer.abdi@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: aleksandar.rikalo@syrmia.com,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jafar Abdi <cafer.abdi@gmail.com>
+This is just a cosmetic change to enable tools like gcov, gdb,
+callgrind, etc. to better display involved source code.
 
-Clean up wrong usage of FALSE and TRUE in places that use "bool" from stdbool.h.
-
-FALSE and TRUE (with capital letters) are the constants defined by glib for
-being used with the "gboolean" type of glib. But some parts of the code also use
-TRUE and FALSE for variables that are declared as "bool" (the type from <stdbool.h>).
-
-Signed-off-by: Jafar Abdi <cafer.abdi@gmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- hw/tpm/tpm_tis_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/mips/fpu_helper.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
-index 9ce64d4836..1af4bce139 100644
---- a/hw/tpm/tpm_tis_common.c
-+++ b/hw/tpm/tpm_tis_common.c
-@@ -536,7 +536,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
-             while ((TPM_TIS_IS_VALID_LOCTY(s->active_locty) &&
-                     locty > s->active_locty) ||
-                     !TPM_TIS_IS_VALID_LOCTY(s->active_locty)) {
--                bool higher_seize = FALSE;
-+                bool higher_seize = false;
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 984f3f4dfb..715a872cae 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -1208,7 +1208,6 @@ uint64_t helper_float_ ## name ## _ps(CPUMIPSState *env,           \
+     return ((uint64_t)wth2 << 32) | wt2;                           \
+ }
  
-                 /* already a pending SEIZE ? */
-                 if ((s->loc[locty].access & TPM_TIS_ACCESS_SEIZE)) {
-@@ -546,7 +546,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
-                 /* check for ongoing seize by a higher locality */
-                 for (l = locty + 1; l < TPM_TIS_NUM_LOCALITIES; l++) {
-                     if ((s->loc[l].access & TPM_TIS_ACCESS_SEIZE)) {
--                        higher_seize = TRUE;
-+                        higher_seize = true;
-                         break;
-                     }
-                 }
+-FLOAT_BINOP(sub)
+ FLOAT_BINOP(mul)
+ FLOAT_BINOP(div)
+ #undef FLOAT_BINOP
+@@ -1249,6 +1248,42 @@ uint64_t helper_float_add_ps(CPUMIPSState *env,
+     return ((uint64_t)wth2 << 32) | wtl2;
+ }
+ 
++uint64_t helper_float_sub_d(CPUMIPSState *env,
++                            uint64_t fdt0, uint64_t fdt1)
++{
++    uint64_t dt2;
++
++    dt2 = float64_sub(fdt0, fdt1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return dt2;
++}
++
++uint32_t helper_float_sub_s(CPUMIPSState *env,
++                            uint32_t fst0, uint32_t fst1)
++{
++    uint32_t wt2;
++
++    wt2 = float32_sub(fst0, fst1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return wt2;
++}
++
++uint64_t helper_float_sub_ps(CPUMIPSState *env,
++                             uint64_t fdt0, uint64_t fdt1)
++{
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fsth0 = fdt0 >> 32;
++    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
++    uint32_t fsth1 = fdt1 >> 32;
++    uint32_t wtl2;
++    uint32_t wth2;
++
++    wtl2 = float32_sub(fstl0, fstl1, &env->active_fpu.fp_status);
++    wth2 = float32_sub(fsth0, fsth1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return ((uint64_t)wth2 << 32) | wtl2;
++}
++
+ 
+ /* MIPS specific binary operations */
+ uint64_t helper_float_recip2_d(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
 -- 
 2.20.1
 
