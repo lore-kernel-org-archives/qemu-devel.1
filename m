@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382A7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE68C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:05:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06D89207E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7026320674
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:05:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5I658dF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D89207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8/so8U7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7026320674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jagNM-0005hR-5j
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:04:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37606)
+	id 1jagOd-0008Kk-KH
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:05:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jagMQ-00047D-Af; Mon, 18 May 2020 10:03:18 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36592)
+ id 1jagMT-0004Dt-GV; Mon, 18 May 2020 10:03:21 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43506)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jagMP-00018w-FK; Mon, 18 May 2020 10:03:17 -0400
-Received: by mail-wm1-x343.google.com with SMTP id u188so10572623wmu.1;
- Mon, 18 May 2020 07:03:16 -0700 (PDT)
+ id 1jagMS-0001Ao-NE; Mon, 18 May 2020 10:03:21 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i15so11967621wrx.10;
+ Mon, 18 May 2020 07:03:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=evhhH7dZopCrkDO4cvbqtNz/8xpqFu/oQnLDI6akZY4=;
- b=c5I658dFWf1VZZuazd4Kj7w50u2EWUkexys7LVKJz/4e9PWYc7o/3YHfSterxEtqKv
- mzmub8+2u9jz67AlDVD3oFFpzsMProfzUjy+GgjxyBAh4yE0Qz2IxrFHql09LbgQYop1
- buYYt/byehj13JRAODn4zh1JwAFICDAL898QHmR2qdxMUwTKnkgefmpb/FFviptln4d/
- eeEmCtVx7bmxafl9DkzMJyH9P02tOTd+dkvJuzXx3Y1sOvtNKdCUXTWKKsgnWoInSKSe
- qEucls1v8jV00GG3e4olhDFs1ODhFCtMaWIIIQBAjxNrAXz4YMtSv0bQXPJH4s8iYLOb
- pSLw==
+ bh=dzTzLzxMdN66CsSdC/DPlwfEMmQojypcIwHvyzPMcJ8=;
+ b=l8/so8U7RSFSkjcZPGJWBi8xfvYfzxays7nz7cAPHjbtEb3zzyNCwX/C8dqgHN1X7F
+ bEMFerxZgv+cV/IDK5nxotmhrGL09Mo6Qjb2sV3AISY8U9lGM3gQq3XqR35047Ua6j9s
+ pw4IOoKInzpvkspS8vifz8cPGvxJ+g3PkamH9QQk604xztKlA+qfiCLhmDtigQvxzAZA
+ /JWroTVqmqHH2/yUuTPN7DQMAa21m2VGK2MoLlaYblKdWmN7E9RdosSCqbzrMO/12rEa
+ S5fcsy5V3q6PpjQgy7UYKq8NDgORsF9JZx9kzjlQ53VLDkfbHUirLh4EPa2ucsxt8NE7
+ oXYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=evhhH7dZopCrkDO4cvbqtNz/8xpqFu/oQnLDI6akZY4=;
- b=C8DgrLZEsf7DyN8A1FBM7E4yB91+bTTT+di64y2fR6phw8A25Xl+RiNaIQHEDvyqeQ
- x2MsO0JUjW5jcl2FUakbECA0zuTsOJKSUkYWoaVfPQZJQYMAv118F8LRjEYqizjvFKu0
- C7SaW0AXOQFm9f9vPtwlAjjVKZYuzo9+jieS6Abm2/NT2pqFx9JDgtwTqIqiYj2O5Xeq
- hDdxQaWlFVU7XzlCoNKvOs+9eYorPhWpTI7uyjTHD75S1+kDVzu0ehjw0XWHuNtk464o
- PUcrm2rLiSd5JegLIsC0O0ylCUbCN4U+EPBphMfWYsF7YTZm0kyQgRDLP9L+hbkeyOcu
- hgbQ==
-X-Gm-Message-State: AOAM530Eqq2d7NFOzYP5VU55IXGWYpnBQ7J414gQ83On5XxUGWtnm2YQ
- BLa6IbQGfIoKglK+daBVISEEP1rNdTQ=
-X-Google-Smtp-Source: ABdhPJyTTkvW4v/gaD04reToEP32Uo2nhozCh2vwY0/Eor44Lqn8G0w0tEWlT3O+f3AAO8m7GIxnWA==
-X-Received: by 2002:a05:600c:2055:: with SMTP id
- p21mr20273588wmg.127.1589810594949; 
- Mon, 18 May 2020 07:03:14 -0700 (PDT)
+ bh=dzTzLzxMdN66CsSdC/DPlwfEMmQojypcIwHvyzPMcJ8=;
+ b=tRwSUYnQ8YwwihgeB9DzVzEzqYj47DQwzLpF0Rr/GwNnP9OxOJUrXOqgWL+T19lTV8
+ BGnmIivV6YwRTgzf5PBZo7JOIklq1rdA9dIw3wQdxz3jqs1X7vPTP+zcVF9+7ICfAy68
+ zaQfuaT4cf+rdIqYPHKKfpdeIeNaDo8P+M8Qh+DtnEHnU1gtixEV3BBmbp9nsl4hrXp4
+ +aowu34r9uN3gH2EEq/hqtjkjUzXH6kNvFuZ6IRnEEFwMWOwr1pKvvvcz+lyM5seQK4q
+ XohRynOBYaru0JvgI7CGSbAqLdpoLN0N7mk6HA3N6vXGQgSVLD7qPzlY3Y+xPXwccwp9
+ hKQw==
+X-Gm-Message-State: AOAM533yEZtu0081f11tU/CHl49EjHID21GR2K3weuMbv35FfMeAlYsy
+ Nv8y9mzgMW1GAqHu4wFE70EthcKP8BI=
+X-Google-Smtp-Source: ABdhPJyuAKIcsGIWhRc8I810yjCeefo7L6aCocACKSU0dgRd64eLug1YriIF2cPQ3pAJYNgcTfAhKA==
+X-Received: by 2002:a05:6000:146:: with SMTP id
+ r6mr20764381wrx.9.1589810598703; 
+ Mon, 18 May 2020 07:03:18 -0700 (PDT)
 Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id s67sm16611946wmf.3.2020.05.18.07.03.11
+ by smtp.gmail.com with ESMTPSA id s67sm16611946wmf.3.2020.05.18.07.03.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 07:03:12 -0700 (PDT)
+ Mon, 18 May 2020 07:03:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] hw/arm/integratorcp: Replace hw_error() by
+Subject: [PATCH v2 3/4] hw/char/xilinx_uartlite: Replace hw_error() by
  qemu_log_mask()
-Date: Mon, 18 May 2020 16:03:06 +0200
-Message-Id: <20200518140309.5220-2-f4bug@amsat.org>
+Date: Mon, 18 May 2020 16:03:08 +0200
+Message-Id: <20200518140309.5220-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200518140309.5220-1-f4bug@amsat.org>
 References: <20200518140309.5220-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -103,8 +103,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>,
  Alistair Francis <alistair@alistair23.me>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  qemu-arm@nongnu.org,
@@ -120,87 +121,35 @@ the accesses as unimplemented or guest error.
 When fuzzing the devices, we don't want the whole process to
 exit. Replace some hw_error() calls by qemu_log_mask().
 
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/integratorcp.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ hw/char/xilinx_uartlite.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
-index 6d69010d06..5fb54e5aa7 100644
---- a/hw/arm/integratorcp.c
-+++ b/hw/arm/integratorcp.c
-@@ -20,6 +20,7 @@
- #include "exec/address-spaces.h"
- #include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
-+#include "qemu/log.h"
- #include "qemu/error-report.h"
- #include "hw/char/pl011.h"
- #include "hw/hw.h"
-@@ -144,8 +145,9 @@ static uint64_t integratorcm_read(void *opaque, hwaddr offset,
-         /* ??? Voltage control unimplemented.  */
-         return 0;
-     default:
--        hw_error("integratorcm_read: Unimplemented offset 0x%x\n",
--                 (int)offset);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Unimplemented offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         return 0;
-     }
- }
-@@ -252,8 +254,9 @@ static void integratorcm_write(void *opaque, hwaddr offset,
-         /* ??? Voltage control unimplemented.  */
-         break;
-     default:
--        hw_error("integratorcm_write: Unimplemented offset 0x%x\n",
--                 (int)offset);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Unimplemented offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         break;
-     }
- }
-@@ -394,7 +397,8 @@ static uint64_t icp_pic_read(void *opaque, hwaddr offset,
-     case 5: /* INT_SOFTCLR */
-     case 11: /* FRQ_ENABLECLR */
-     default:
--        printf ("icp_pic_read: Bad register offset 0x%x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         return 0;
-     }
- }
-@@ -430,7 +434,8 @@ static void icp_pic_write(void *opaque, hwaddr offset,
-     case 8: /* FRQ_STATUS */
-     case 9: /* FRQ_RAWSTAT */
-     default:
--        printf ("icp_pic_write: Bad register offset 0x%x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         return;
-     }
-     icp_pic_update(s);
-@@ -504,7 +509,8 @@ static uint64_t icp_control_read(void *opaque, hwaddr offset,
-     case 3: /* CP_DECODE */
-         return 0x11;
-     default:
--        hw_error("icp_control_read: Bad offset %x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-         return 0;
-     }
- }
-@@ -524,7 +530,8 @@ static void icp_control_write(void *opaque, hwaddr offset,
-         /* Nothing interesting implemented yet.  */
-         break;
-     default:
--        hw_error("icp_control_write: Bad offset %x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX "\n",
-+                      __func__, offset);
-     }
- }
+diff --git a/hw/char/xilinx_uartlite.c b/hw/char/xilinx_uartlite.c
+index c6512285d7..ae4ccd00c7 100644
+--- a/hw/char/xilinx_uartlite.c
++++ b/hw/char/xilinx_uartlite.c
+@@ -23,7 +23,7 @@
+  */
  
+ #include "qemu/osdep.h"
+-#include "hw/hw.h"
++#include "qemu/log.h"
+ #include "hw/irq.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
+@@ -135,7 +135,8 @@ uart_write(void *opaque, hwaddr addr,
+     switch (addr)
+     {
+         case R_STATUS:
+-            hw_error("write to UART STATUS?\n");
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: write to UART STATUS\n",
++                          __func__);
+             break;
+ 
+         case R_CTRL:
 -- 
 2.21.3
 
