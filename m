@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0939FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 145A7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:47:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC7DB206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDBA2206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 11:47:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNrQ3Dp2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7DB206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N163LBG0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDBA2206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaeBe-0003mO-UW
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43346)
+	id 1jaeFJ-0005Bm-Vs
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 07:47:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeAs-0002wl-2K
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:43:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39541
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeDw-0004e4-U3
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:46:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20658
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeAq-0005rf-P4
- for qemu-devel@nongnu.org; Mon, 18 May 2020 07:43:13 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jaeDw-0006kU-4L
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 07:46:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589802191;
+ s=mimecast20190719; t=1589802382;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=exxQg6xXV4XOIBBv+r/FHTrxi87WhCI4Sx+8FB0xUyE=;
- b=QNrQ3Dp2xeaJzdBmIm8mxUPqMd/d2qRcjZxK+3fa9jwZWi2VDMr/ikquqRPynpcC7LVdmh
- G7nSgzQQCdG0nQpP/eDEV6sFg2A4TzEfkOrlyvrx/cqOqLaarlNAf05rqqjyRJP6eCWYuJ
- o2YF6jON2dho8dPOIKsqKKKucPOmnUs=
+ bh=E4tN3TXSTycD/Mgo2gyP62CScRVuBPGUplOqfxlDmOs=;
+ b=N163LBG0Yc66a2CG8lNXqbE8h0J7D+QCNels9cXyE2YQmpmHmFRsIdmqZTKbXiBp7x7Pd1
+ 7u/20+zv4N2AMtqYmCPf0rspQoIuhr5S7qcJXckEVCZ0POop2mTB9ZbiOJa/pw+rPU7jtn
+ ow7ygTUwxkn6D5eLcUEFg96sPzbHj9o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-hhCWquhUPR2a4_P2bHu5KA-1; Mon, 18 May 2020 07:43:09 -0400
-X-MC-Unique: hhCWquhUPR2a4_P2bHu5KA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-113-G184Yr4BMcS0tkhNn1GpCg-1; Mon, 18 May 2020 07:46:21 -0400
+X-MC-Unique: G184Yr4BMcS0tkhNn1GpCg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F962800D24;
- Mon, 18 May 2020 11:43:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DD391005510;
+ Mon, 18 May 2020 11:46:14 +0000 (UTC)
 Received: from [10.36.113.224] (ovpn-113-224.ams2.redhat.com [10.36.113.224])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 42CB32E163;
- Mon, 18 May 2020 11:43:02 +0000 (UTC)
-Subject: Re: [PATCH v1 2/8] s390/sclp: check sccb len before filling in data
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7BC995D9DC;
+ Mon, 18 May 2020 11:46:09 +0000 (UTC)
+Subject: Re: [PATCH v2 2/8] s390/sclp: check sccb len before filling in data
 To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
  qemu-s390x@nongnu.org
-References: <20200508230823.22956-1-walling@linux.ibm.com>
- <20200508230823.22956-3-walling@linux.ibm.com>
+References: <20200515222032.18838-1-walling@linux.ibm.com>
+ <20200515222032.18838-3-walling@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -106,14 +106,14 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1cd4a378-4534-ce87-c32d-cc1ab0c3956d@redhat.com>
-Date: Mon, 18 May 2020 13:43:01 +0200
+Message-ID: <292a440b-d147-e94a-2c00-49a2fa3659b1@redhat.com>
+Date: Mon, 18 May 2020 13:46:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200508230823.22956-3-walling@linux.ibm.com>
+In-Reply-To: <20200515222032.18838-3-walling@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -141,30 +141,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
  pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
  pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.05.20 01:08, Collin Walling wrote:
+On 16.05.20 00:20, Collin Walling wrote:
 > The SCCB must be checked for a sufficient length before it is filled
 > with any data. If the length is insufficient, then the SCLP command
 > is suppressed and the proper response code is set in the SCCB header.
 > 
+> Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
 > Signed-off-by: Collin Walling <walling@linux.ibm.com>
 > ---
 >  hw/s390x/sclp.c | 22 ++++++++++------------
->  smp.max_cpus    |  0
->  2 files changed, 10 insertions(+), 12 deletions(-)
->  create mode 100644 smp.max_cpus
+>  1 file changed, 10 insertions(+), 12 deletions(-)
 > 
 > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 156ffe3223..d08a291e40 100644
+> index 61e2e2839c..2bd618515e 100644
 > --- a/hw/s390x/sclp.c
 > +++ b/hw/s390x/sclp.c
-> @@ -76,6 +76,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> @@ -75,6 +75,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
 >      int rnsize, rnmax;
 >      IplParameterBlock *ipib = s390_ipl_get_iplb();
 >  
@@ -174,10 +173,11 @@ On 09.05.20 01:08, Collin Walling wrote:
 > +    }
 > +
 
+(replied to v1 by mistake)
+
 Lines too long.
 
 Please run scripts/checkpatch.pl before submitting.
-
 
 -- 
 Thanks,
