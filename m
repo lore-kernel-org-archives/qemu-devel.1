@@ -2,90 +2,109 @@ Return-Path: <SRS0=vczr=7A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83023C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55329C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:32:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 517C220756
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:32:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rD4snTRV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517C220756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B0F320671
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 May 2020 14:32:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B0F320671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jagoB-00064W-ED
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:31:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41888)
+	id 1jagp4-0007Xl-9V
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 10:32:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jagmc-0003yX-0u
- for qemu-devel@nongnu.org; Mon, 18 May 2020 10:30:22 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33214)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jagmY-0001U4-ST
- for qemu-devel@nongnu.org; Mon, 18 May 2020 10:30:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l11so12208344wru.0
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 07:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8TBzzcsFazlljQPoOpAMIzgSdLt0n2ByqDt37jz37+s=;
- b=rD4snTRV3Wwn3W3X1jN40jdKx5l3FCSpwB7/3dBRSKfHRpcCf67NZFaz9DbiLFOE4P
- t/Vry0Kf3vdMl9+zMMBvFkehxo6KD7umFIltUk5k+APjCnaZ40zGKfyR2ls8KnHgO0Nq
- J/wUf2498NYLLUYOv+kqe+AiBd3ki/72QyBJcMSEBGFHNyvy15ql7URnbhuPCaT4nEY2
- Bl4XNl9de1w1IVCiEpGbCaoVUzLXSQRK0ncL0e4DRlGPrFDck7KJzX5QGMs4MVQdbcjx
- avPjA0fkwmxgIbzJ2iFbEpa0opGAp7m61ps7OM6Wp1B7mgkjye+1MSUuIDTWN2ouATo9
- f39w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8TBzzcsFazlljQPoOpAMIzgSdLt0n2ByqDt37jz37+s=;
- b=iSGb9uj4t+rcn9JZbobhXMuW3Ih1XwjSbFDr8emnwmY9haFMJu9PFADs4gXpsL/GnG
- gb5lXRblWmQyDVnFeetWmuzoGGXXEnIMbkkV5rGmeXiANU7kIV6gWI/G7ABVMQEM6AXM
- bB2VbgvWsXi/GPM+hRCHURUcbMfwJCBwBSUtfdBBaUfJoeXfxUplsjcQiZzfwpWNy7FA
- uJYYqUrYG8MI2C4FAAAMbMYGnPpms+Tphl9aawAnX7/WQJ03fNau/j/oj1gbApkLLpxK
- McqV98uy1usGp7KlV08+9dvJnsHRIgJZFDl1kewL5KOdyZeNeAMJBk85W6520dO4ExMZ
- JP1Q==
-X-Gm-Message-State: AOAM533DTvG2aMvUWuNHiblRVJrst+AQrdAJxmTlwCRuCn/seq2t6zvp
- roZqDZhza/L0hP9tDXumbUpfEQ==
-X-Google-Smtp-Source: ABdhPJxqb6Cxnd1sG32koSvumhLJM+CoWGxJnefpHXSR3VV+jERTOHAoLjbVfsL4i9HNkXNIk7Nd9Q==
-X-Received: by 2002:adf:c38c:: with SMTP id p12mr21142380wrf.357.1589812216950; 
- Mon, 18 May 2020 07:30:16 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x24sm17756487wrd.51.2020.05.18.07.30.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 07:30:16 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32
-Date: Mon, 18 May 2020 15:30:14 +0100
-Message-Id: <20200518143014.20689-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jagnZ-0005c1-W7; Mon, 18 May 2020 10:31:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14478
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jagnY-0001sQ-Mx; Mon, 18 May 2020 10:31:21 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04IE39Ld160575; Mon, 18 May 2020 10:31:16 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 313r0y0fdq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 18 May 2020 10:31:16 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04IE3Rhv162276;
+ Mon, 18 May 2020 10:31:15 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 313r0y0fdc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 18 May 2020 10:31:15 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04IEU8b5001064;
+ Mon, 18 May 2020 14:31:15 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma01wdc.us.ibm.com with ESMTP id 3127t688fd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 18 May 2020 14:31:14 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04IEVDnO28770590
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 18 May 2020 14:31:13 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AAD306E054;
+ Mon, 18 May 2020 14:31:13 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9D7216E056;
+ Mon, 18 May 2020 14:31:12 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.206.55])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 18 May 2020 14:31:12 +0000 (GMT)
+Subject: Re: [PATCH v2 6/8] s390/sclp: add extended-length sccb support for
+ kvm guest
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200515222032.18838-1-walling@linux.ibm.com>
+ <20200515222032.18838-7-walling@linux.ibm.com>
+ <d72f56c0-fed0-12ea-dfa6-f3441952a30e@linux.ibm.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <ae819a26-2436-ec4d-3476-1a1fdca07d4b@linux.ibm.com>
+Date: Mon, 18 May 2020 10:31:11 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <d72f56c0-fed0-12ea-dfa6-f3441952a30e@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-18_06:2020-05-15,
+ 2020-05-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ cotscore=-2147483648
+ phishscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015 suspectscore=0
+ impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005180126
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 10:31:16
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,68 +117,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: thuth@redhat.com, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Arm signal-handling code has some parts ifdeffed with a
-TARGET_CONFIG_CPU_32, which is always defined. This is a leftover
-from when this code's structure was based on the Linux kernel
-signal handling code, where it was intended to support 26-bit
-Arm CPUs. The kernel dropped its CONFIG_CPU_32 in kernel commit
-4da8b8208eded0ba21e3 in 2009.
+On 5/18/20 4:55 AM, Janosch Frank wrote:
+> On 5/16/20 12:20 AM, Collin Walling wrote:
+>> As more features and facilities are added to the Read SCP Info (RSCPI)
+>> response, more space is required to store them. The space used to store
+>> these new features intrudes on the space originally used to store CPU
+>> entries. This means as more features and facilities are added to the
+>> RSCPI response, less space can be used to store CPU entries.
+>>
+>> With the Extended-Length SCCB (ELS) facility, a KVM guest can execute
+>> the RSCPI command and determine if the SCCB is large enough to store a
+>> complete reponse. If it is not large enough, then the required length
+>> will be set in the SCCB header.
+>>
+>> The caller of the SCLP command is responsible for creating a
+>> large-enough SCCB to store a complete response. Proper checking should
+>> be in place, and the caller should execute the command once-more with
+>> the large-enough SCCB.
+>>
+>> This facility also enables an extended SCCB for the Read CPU Info
+>> (RCPUI) command.
+>>
+>> When this facility is enabled, the boundary violation response cannot
+>> be a result from the RSCPI, RSCPI Forced, or RCPUI commands.
+>>
+>> In order to tolerate kernels that do not yet have full support for this
+>> feature, a "fixed" offset to the start of the CPU Entries within the
+>> Read SCP Info struct is set to allow for the original 248 max entries
+>> when this feature is disabled.
+>>
+>> Additionally, this is introduced as a CPU feature to protect the guest
+>> from migrating to a machine that does not support storing an extended
+>> SCCB. This could otherwise hinder the VM from being able to read all
+>> available CPU entries after migration (such as during re-ipl).
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  hw/s390x/sclp.c                     | 21 ++++++++++++++++++++-
+>>  include/hw/s390x/sclp.h             |  1 +
+>>  target/s390x/cpu_features_def.inc.h |  1 +
+>>  target/s390x/gen-features.c         |  1 +
+>>  target/s390x/kvm.c                  |  4 ++++
+>>  5 files changed, 27 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>> index 755f5f3fab..bde4c5420e 100644
+>> --- a/hw/s390x/sclp.c
+>> +++ b/hw/s390x/sclp.c
+>> @@ -56,6 +56,18 @@ static bool sccb_has_valid_boundary(uint64_t sccb_addr, uint32_t code,
+>>      uint64_t allowed_len = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
+>>  
+>>      switch (code & SCLP_CMD_CODE_MASK) {
+>> +    case SCLP_CMDW_READ_SCP_INFO:
+>> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+>> +    case SCLP_CMDW_READ_CPU_INFO:
+>> +        /*
+>> +         * An extended-length SCCB is only allowed for RSCPI and RSCPU and is
+>> +         * allowed to exceed the 4k boundary. The respective commands will
+>> +         * set the length field to the required length if an insufficient
+>> +         * SCCB length is provided.
+>> +         */
+>> +        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB)) {
+>> +            return true;
+>> +        }
+>>      default:
+>>          if (current_len <= allowed_len) {
+>>              return true;
+>> @@ -72,6 +84,10 @@ static bool sccb_has_sufficient_len(SCCB *sccb, int num_cpus, int data_len)
+>>  
+>>      if (be16_to_cpu(sccb->h.length) < required_len) {
+>>          sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+>> +        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) &&
+>> +            sccb->h.control_mask[2] & SCLP_VARIABLE_LENGTH_RESPONSE) {
+>> +            sccb->h.length = required_len;
+>> +        }
+>>          return false;
+>>      }
+>>      return true;
+>> @@ -101,7 +117,9 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+>>   */
+>>  static int get_read_scp_info_data_len(void)
+>>  {
+>> -    return offsetof(ReadInfo, entries);
+>> +    return s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) ?
+>> +           offsetof(ReadInfo, entries) :
+>> +           SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
+>>  }
+>>  
+>>  /* Provide information about the configuration, CPUs and storage */
+>> @@ -116,6 +134,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>>      CPUEntry *entries_start = (void *)sccb + data_len;
+>>  
+>>      if (!sccb_has_sufficient_len(sccb, machine->possible_cpus->len, data_len)) {
+>> +        warn_report("insufficient sccb size to store full read scp info response");
+>>          return;
+>>      }
+>>  
+>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+>> index 822eff4396..ef2d63eae9 100644
+>> --- a/include/hw/s390x/sclp.h
+>> +++ b/include/hw/s390x/sclp.h
+>> @@ -110,6 +110,7 @@ typedef struct CPUEntry {
+>>      uint8_t reserved1;
+>>  } QEMU_PACKED CPUEntry;
+>>  
+>> +#define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
+>>  typedef struct ReadInfo {
+>>      SCCBHeader h;
+>>      uint16_t rnmax;
+>> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
+>> index 60db28351d..3548d65a69 100644
+>> --- a/target/s390x/cpu_features_def.inc.h
+>> +++ b/target/s390x/cpu_features_def.inc.h
+>> @@ -97,6 +97,7 @@ DEF_FEAT(GUARDED_STORAGE, "gs", STFL, 133, "Guarded-storage facility")
+>>  DEF_FEAT(VECTOR_PACKED_DECIMAL, "vxpd", STFL, 134, "Vector packed decimal facility")
+>>  DEF_FEAT(VECTOR_ENH, "vxeh", STFL, 135, "Vector enhancements facility")
+>>  DEF_FEAT(MULTIPLE_EPOCH, "mepoch", STFL, 139, "Multiple-epoch facility")
+>> +DEF_FEAT(EXTENDED_LENGTH_SCCB, "els", STFL, 140, "Extended-length SCCB facility")
+>>  DEF_FEAT(TEST_PENDING_EXT_INTERRUPTION, "tpei", STFL, 144, "Test-pending-external-interruption facility")
+>>  DEF_FEAT(INSERT_REFERENCE_BITS_MULT, "irbm", STFL, 145, "Insert-reference-bits-multiple facility")
+>>  DEF_FEAT(MSA_EXT_8, "msa8-base", STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)")
+>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+>> index 8ddeebc544..6857f657fb 100644
+>> --- a/target/s390x/gen-features.c
+>> +++ b/target/s390x/gen-features.c
+>> @@ -522,6 +522,7 @@ static uint16_t full_GEN12_GA1[] = {
+>>      S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
+>>      S390_FEAT_AP_FACILITIES_TEST,
+>>      S390_FEAT_AP,
+>> +    S390_FEAT_EXTENDED_LENGTH_SCCB,
+>>  };
+>>  
+>>  static uint16_t full_GEN12_GA2[] = {
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index 69881a0da0..380fb81822 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -2456,6 +2456,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>>          KVM_S390_VM_CRYPTO_ENABLE_APIE)) {
+>>          set_bit(S390_FEAT_AP, model->features);
+>>      }
+>> +
+>> +    /* Extended-Length SCCB is handled entirely within QEMU */
+>> +    set_bit(S390_FEAT_EXTENDED_LENGTH_SCCB, model->features);
+>> +
+> 
+> We need to fence this for secure guests as the SIDA is only 4k at the
+> moment.
+> 
 
-QEMU has never had 26-bit CPU support and is unlikely to ever
-add it; we certainly aren't going to support 26-bit Linux
-binaries via linux-user mode. The ifdef is just unhelpful
-noise, so remove it entirely.
+I don't know much about the SE stuff, so I'll take your word for it.
+Should this follow the same fencing as diag 318 and simply check for pv
+mode?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Based-on: <20200518142801.20503-1-peter.maydell@linaro.org>
-("[PATCH v2] target/arm: Allow user-mode code to write CPSR.E via MSR")
-to avoid a textual conflict.
+> Do we need to take extra steps for migration safety?
+> I guess this is only available with host-passthrough or -model?
+> 
+>>      /* strip of features that are not part of the maximum model */
+>>      bitmap_and(model->features, model->features, model->def->full_feat,
+>>                 S390_FEAT_MAX);
+>>
+> 
+> 
 
- linux-user/arm/signal.c | 6 ------
- 1 file changed, 6 deletions(-)
 
-diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
-index 698985a647e..f21d1535e4d 100644
---- a/linux-user/arm/signal.c
-+++ b/linux-user/arm/signal.c
-@@ -126,8 +126,6 @@ struct rt_sigframe_v2
-     abi_ulong retcode[4];
- };
- 
--#define TARGET_CONFIG_CPU_32 1
--
- /*
-  * For ARM syscalls, we encode the syscall number into the instruction.
-  */
-@@ -187,9 +185,7 @@ setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
-     __put_user(env->regs[13], &sc->arm_sp);
-     __put_user(env->regs[14], &sc->arm_lr);
-     __put_user(env->regs[15], &sc->arm_pc);
--#ifdef TARGET_CONFIG_CPU_32
-     __put_user(cpsr_read(env), &sc->arm_cpsr);
--#endif
- 
-     __put_user(/* current->thread.trap_no */ 0, &sc->trap_no);
-     __put_user(/* current->thread.error_code */ 0, &sc->error_code);
-@@ -549,11 +545,9 @@ restore_sigcontext(CPUARMState *env, struct target_sigcontext *sc)
-     __get_user(env->regs[13], &sc->arm_sp);
-     __get_user(env->regs[14], &sc->arm_lr);
-     __get_user(env->regs[15], &sc->arm_pc);
--#ifdef TARGET_CONFIG_CPU_32
-     __get_user(cpsr, &sc->arm_cpsr);
-     cpsr_write(env, cpsr, CPSR_USER | CPSR_EXEC, CPSRWriteByInstr);
-     arm_rebuild_hflags(env);
--#endif
- 
-     err |= !valid_user_regs(env);
- 
 -- 
-2.20.1
+--
+Regards,
+Collin
 
+Stay safe and stay healthy
 
