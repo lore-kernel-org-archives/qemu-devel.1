@@ -2,95 +2,86 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 010BDC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 17:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B80C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 17:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C06C720708
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 17:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B26220709
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 17:13:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J+t2n9bh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C06C720708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyegRFRk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B26220709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb5dw-0006sG-VR
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 13:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60796)
+	id 1jb5nd-0004JI-BG
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 13:13:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb5bJ-0004X8-Ol
- for qemu-devel@nongnu.org; Tue, 19 May 2020 13:00:21 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37266)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb5bH-0000Hq-TI
- for qemu-devel@nongnu.org; Tue, 19 May 2020 13:00:21 -0400
-Received: by mail-pf1-x441.google.com with SMTP id y198so197929pfb.4
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 10:00:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vpjLHWY8x5R66trQfUAgPxcH3HDBjTQaYzaO9OU16nk=;
- b=J+t2n9bhm5GeG1ho5bcj1/n28BDVAlvKoxqbDeYg7/hwXMcNMv0UPs60z4ug0FHjan
- Eq5h7RQy+M5moYi6J6dWfuwsvk1YXdOImLpRRFAYMM48pXnyqwjsjEksZxp6OQYY7yc/
- XApX9I3I9+PEWYjJI3gFQVeiaKpnRCXOqu55mBhzw+zzBvD9KWDAULUcCMvxN5D/12gP
- N18wNwGfm3ZAO92VPq+SwKSQqbkpSPJLq4HpHDcLMjB2fjEjJVoBQQvzGxrDXUVdflTS
- 1w3b9A+P+d0ZBX+/VQARzFjeyoWREyeUXAMcoBC+qr2kYGOvzLOmP6xD2aLLOJSCjFbQ
- qJ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vpjLHWY8x5R66trQfUAgPxcH3HDBjTQaYzaO9OU16nk=;
- b=t2ltazppBEvQtOzSUNI6Vb7VDmlUbuLBoRtjR+R4cGse4k2u5CC9vsbAbqpk/83Wzp
- BkDSov9ngmTZGzBIpbtO6zcXMbsPCQeOa5goJckLwdEW3Dv7zUK3w++PsyOHhwh5J8g/
- 7hepqYMwax1bQYMoNsl9GZ/qcY/JO/hfW9vXpPDeSiZ9tZqY/Qg1wkCG7E7Jj63/p48Y
- ixPdxpl9zjj/NEpuOBz9lIYclThaym8UBed/kMbNw08Q3bQgSwFzEv4omO3tN1Wl2dWw
- pAdRmsdbmhDzTfPMzJcbqMoPlw3ICiwV6lxSp8sYduE2eD7T1adhxrcZ9LfqbMLKh7Ey
- dPhw==
-X-Gm-Message-State: AOAM531A10v8qbG9LVLYIvyk5ON8G8+WwIw0bkvLYqx+69IfmpcaSbko
- Qy52x3EFUlHOVHWjcnH3can00g==
-X-Google-Smtp-Source: ABdhPJy0g6Q+ZD0gSMNvj+be2qj7VOsoCNwS7H6S+RfqKsg4XsvDBjitynk4MQhVdOUXQ+PAulM4/A==
-X-Received: by 2002:a62:a518:: with SMTP id v24mr27307pfm.295.1589907616199;
- Tue, 19 May 2020 10:00:16 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id u20sm48706pfn.144.2020.05.19.10.00.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 10:00:15 -0700 (PDT)
-Subject: Re: [PATCH] Provide a NetBSD specific aarch64 cpu_signal_handler
-To: Nick Hudson <skrll@netbsd.org>, qemu-devel@nongnu.org
-References: <20200517101529.5367-1-skrll@netbsd.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a854b977-3fa3-fa11-982a-12ec7cb80461@linaro.org>
-Date: Tue, 19 May 2020 10:00:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jb5mS-0002mE-2m
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 13:11:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24942
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jb5mR-0002Sr-59
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 13:11:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589908309;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QqQP2gEWiHT1RhvkO6A6rp0yPTnbuodhCHyBJ6H7YKQ=;
+ b=RyegRFRkOHxneAmOZH2kxbbC7ggeAjhGG2GL9QaBuDCrJspE4aEsu/5YLHCp4aZARNDWRD
+ EWWlJfbVcIfEdNEuRteqOkbiK3t6Hk0/kz+OfsuCCYBSOaT7mRg4GbTvOOLhYKSGb8mJVS
+ fOq531XMB9jw/maLXykyVfqZrnjZB34=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-6ArE6UUoOj-WBPTaYoCVug-1; Tue, 19 May 2020 13:11:47 -0400
+X-MC-Unique: 6ArE6UUoOj-WBPTaYoCVug-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08D7A57093;
+ Tue, 19 May 2020 17:11:46 +0000 (UTC)
+Received: from localhost (ovpn-114-215.ams2.redhat.com [10.36.114.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 94E3A50F54;
+ Tue, 19 May 2020 17:11:45 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/7] block/nvme: poll queues without q->lock
+Date: Tue, 19 May 2020 18:11:32 +0100
+Message-Id: <20200519171138.201667-2-stefanha@redhat.com>
+In-Reply-To: <20200519171138.201667-1-stefanha@redhat.com>
+References: <20200519171138.201667-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200517101529.5367-1-skrll@netbsd.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:56:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,25 +94,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/17/20 3:15 AM, Nick Hudson wrote:
-> Fix qemu build on NetBSD/evbarm-aarch64 by providing a NetBSD specific
-> cpu_signal_handler.
-> 
-> Signed-off-by: Nick Hudson <skrll@netbsd.org>
-> ---
->  accel/tcg/user-exec.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
+QSBsb3Qgb2YgQ1BVIHRpbWUgaXMgc3BlbnQgc2ltcGx5IGxvY2tpbmcvdW5sb2NraW5nIHEtPmxv
+Y2sgZHVyaW5nCnBvbGxpbmcuIENoZWNrIGZvciBjb21wbGV0aW9uIG91dHNpZGUgdGhlIGxvY2sg
+dG8gbWFrZSBxLT5sb2NrIGRpc2FwcGVhcgpmcm9tIHRoZSBwcm9maWxlLgoKU2lnbmVkLW9mZi1i
+eTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPgotLS0KIGJsb2NrL252bWUu
+YyB8IDEyICsrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKykKCmRp
+ZmYgLS1naXQgYS9ibG9jay9udm1lLmMgYi9ibG9jay9udm1lLmMKaW5kZXggZWIyZjU0ZGQ5ZC4u
+N2ViNDUxMjY2NiAxMDA2NDQKLS0tIGEvYmxvY2svbnZtZS5jCisrKyBiL2Jsb2NrL252bWUuYwpA
+QCAtNTEyLDYgKzUxMiwxOCBAQCBzdGF0aWMgYm9vbCBudm1lX3BvbGxfcXVldWVzKEJEUlZOVk1l
+U3RhdGUgKnMpCiAKICAgICBmb3IgKGkgPSAwOyBpIDwgcy0+bnJfcXVldWVzOyBpKyspIHsKICAg
+ICAgICAgTlZNZVF1ZXVlUGFpciAqcSA9IHMtPnF1ZXVlc1tpXTsKKyAgICAgICAgY29uc3Qgc2l6
+ZV90IGNxZV9vZmZzZXQgPSBxLT5jcS5oZWFkICogTlZNRV9DUV9FTlRSWV9CWVRFUzsKKyAgICAg
+ICAgTnZtZUNxZSAqY3FlID0gKE52bWVDcWUgKikmcS0+Y3EucXVldWVbY3FlX29mZnNldF07CisK
+KyAgICAgICAgLyoKKyAgICAgICAgICogcS0+bG9jayBpc24ndCBuZWVkZWQgZm9yIGNoZWNraW5n
+IGNvbXBsZXRpb24gYmVjYXVzZQorICAgICAgICAgKiBudm1lX3Byb2Nlc3NfY29tcGxldGlvbigp
+IG9ubHkgcnVucyBpbiB0aGUgZXZlbnQgbG9vcCB0aHJlYWQgYW5kCisgICAgICAgICAqIGNhbm5v
+dCByYWNlIHdpdGggaXRzZWxmLgorICAgICAgICAgKi8KKyAgICAgICAgaWYgKChsZTE2X3RvX2Nw
+dShjcWUtPnN0YXR1cykgJiAweDEpID09IHEtPmNxX3BoYXNlKSB7CisgICAgICAgICAgICBjb250
+aW51ZTsKKyAgICAgICAgfQorCiAgICAgICAgIHFlbXVfbXV0ZXhfbG9jaygmcS0+bG9jayk7CiAg
+ICAgICAgIHdoaWxlIChudm1lX3Byb2Nlc3NfY29tcGxldGlvbihzLCBxKSkgewogICAgICAgICAg
+ICAgLyogS2VlcCBwb2xsaW5nICovCi0tIAoyLjI1LjMKCg==
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-Queued to tcg-next.
-
-
-r~
 
