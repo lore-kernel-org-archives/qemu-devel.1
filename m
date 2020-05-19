@@ -2,165 +2,87 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABC6C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F19CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 846CD20715
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6847D2072C
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A2fEZwIO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 846CD20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="lvLNfHNK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6847D2072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaq7a-0002ck-Mi
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 20:28:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60464)
+	id 1jaqLf-0006qW-F9
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 20:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jaq71-00025d-7K
- for qemu-devel@nongnu.org; Mon, 18 May 2020 20:28:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33265
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jaq6z-00015z-UL
- for qemu-devel@nongnu.org; Mon, 18 May 2020 20:28:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589848081;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=K31F4z2igiwiqzkJMQwvyZI2XYusp4J5MfgZeVfGP5Y=;
- b=A2fEZwIOIQYYiYc5MmJy9A5OL8NoX+3lm0cOKznNI7lu9n6nZ/5OqvOl24aELaVl6abxLf
- 73Dzzc4Zaw+YXoYiotvtif6ZnsUqFZq7dkj7M9pm4cryfyWEumQC9EgSoC3Wd3kYoIvH82
- 0ltSTTcjqeOMOVKv1INKp0nPcxQWiZo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-59mHP4KjOnaBwnvfO6Ne5g-1; Mon, 18 May 2020 20:27:59 -0400
-X-MC-Unique: 59mHP4KjOnaBwnvfO6Ne5g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0A97107B267;
- Tue, 19 May 2020 00:27:57 +0000 (UTC)
-Received: from [10.10.112.125] (ovpn-112-125.rdu2.redhat.com [10.10.112.125])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DA595C1B5;
- Tue, 19 May 2020 00:27:54 +0000 (UTC)
-Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-2-jsnow@redhat.com>
- <b4618eb0-5303-40ab-b5e2-5a08d5738a81@virtuozzo.com>
- <20b3fb10-8028-eb12-49a9-a3cc9dd45ed0@redhat.com>
- <07ff57d4-8348-4409-ca8a-ff4c5278b973@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <45dc0bb0-6b22-1703-0435-9d49d3df9978@redhat.com>
-Date: Mon, 18 May 2020 20:27:54 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1jaqHj-00058G-US; Mon, 18 May 2020 20:39:07 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:41638)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1jaqHh-0004Lh-NR; Mon, 18 May 2020 20:39:07 -0400
+Received: by mail-ej1-x643.google.com with SMTP id x1so10341810ejd.8;
+ Mon, 18 May 2020 17:39:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=XHr1u4Up0QpG/c/A3SDWCSoQmzZzYbzXevGQqA1OMKo=;
+ b=lvLNfHNKiG8o0SqLjl2nCcZzw9vBV4OE+lBoxXHzK+MozzrdbUUCn2of2X8BJrR+KZ
+ 5FEDgw36ldHQ/jtvF8FR2943+7l0EV/OARDlnPzJpti3x+tLtLh4wKUnF8d5dFMcmCfS
+ 34jSvxo17Y9AgjuBPgHSbaK0ocLQz5AJTiYuM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=XHr1u4Up0QpG/c/A3SDWCSoQmzZzYbzXevGQqA1OMKo=;
+ b=QOY68aEe7pvIyZulGCmf1tOyzJ3Urao8I7VsSFmY7h66JXMnWB3SzM17wClwfUAnVQ
+ 8h3+Pz+ivviXSGiVqZpvkMtNF7aeb36xyYcmxjFu4rRvNJQM1G8ENYt5ioigV469BrBd
+ AyNBTBoXKQlKo6v2PEw/yhYyOER1Tckldh90XE4rfDod9Y3L/aThBtr41vN+9KhBRAtv
+ /KC1XCCwzRMv7SZiZVBdN6C+jG2aWNcmlT//hI8I43+sUSYyGKF9zD9WM44sB5hFP6Id
+ sSiwnS/eFOFwiHB7ocpH4/YP0Jrvxr5hL6wiMwveCaPX/R/XQTvKARJCiothG23O5TV+
+ Pv3w==
+X-Gm-Message-State: AOAM532Rk9wtZTVqRSmHUTP1XWdarCRVBBtpg6Re9MhSUoh6S3o4zEKJ
+ 4f6+fdcHJtZ8lUz0c8G8l/r/jH3NAE7SqfMxAxs=
+X-Google-Smtp-Source: ABdhPJwZChou1Bb5wOYcg8osKciwiWRWy8ZwA3j9RL67LklW2PsHGvu/TQ+glnPn7MeJrKoppZ9X7CplNDRfOakcIKw=
+X-Received: by 2002:a17:906:1f87:: with SMTP id
+ t7mr13935251ejr.50.1589848743574; 
+ Mon, 18 May 2020 17:39:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <07ff57d4-8348-4409-ca8a-ff4c5278b973@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 20:24:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200518050408.4579-1-armbru@redhat.com>
+ <20200518050408.4579-5-armbru@redhat.com>
+ <9fc4a6e2-fa90-ba62-91cf-e22eb3ef4cdc@kaod.org>
+In-Reply-To: <9fc4a6e2-fa90-ba62-91cf-e22eb3ef4cdc@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 19 May 2020 00:38:51 +0000
+Message-ID: <CACPK8XcxVrA3E-c=jkszXd2Z6PMLO=tWDF60DTu-E3cyUdXD2A@mail.gmail.com>
+Subject: Re: [PATCH 04/24] aspeed: Don't create unwanted "ftgmac100",
+ "aspeed-mmi" devices
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=joel.stan@gmail.com; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -173,94 +95,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 18 May 2020 at 12:19, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> On 5/18/20 7:03 AM, Markus Armbruster wrote:
+> > These devices are optional, and controlled by @nb_nics.
+> > aspeed_soc_ast2600_init() and aspeed_soc_init() create the maximum
+> > supported number.  aspeed_soc_ast2600_realize() and
+> > aspeed_soc_realize() realize only the wanted number.  Works, although
+> > it can leave unrealized devices hanging around in the QOM composition
+> > tree.  Affects machines ast2500-evb, ast2600-evb, palmetto-bmc,
+> > romulus-bmc, swift-bmc, tacoma-bmc, and witherspoon-bmc.
+> >
+> > Make the init functions create only the wanted ones.  Visible in "info
+> > qom-tree"; here's the change for ast2600-evb:
+> >
+> >      /machine (ast2600-evb-machine)
+> >        [...]
+> >        /soc (ast2600-a1)
+> >          [...]
+> >          /ftgmac100[0] (ftgmac100)
+> >            /ftgmac100[0] (qemu:memory-region)
+> >     -    /ftgmac100[1] (ftgmac100)
+> >     -    /ftgmac100[2] (ftgmac100)
+> >     -    /ftgmac100[3] (ftgmac100)
+> >          /gpio (aspeed.gpio-ast2600)
+> >          [...]
+> >          /mii[0] (aspeed-mmi)
+> >            /aspeed-mmi[0] (qemu:memory-region)
+> >     -    /mii[1] (aspeed-mmi)
+> >     -    /mii[2] (aspeed-mmi)
+> >     -    /mii[3] (aspeed-mmi)
+> >          /rtc (aspeed.rtc)
+> >
+> > I'm not sure creating @nb_nics devices makes sense.  How many does the
+> > physical chip provide?
+>
+> The AST2400, AST2500 SoC have 2 macs and the AST2600 has 4. Each machine
+> define the one it uses, generally MAC0 but the tacoma board uses MAC3.
+>
+> Shouldn't the model reflect the real address space independently from
+> the NIC backends defined on the command line ?
 
+Agreed, the MAC hardware is present in all instances of the AST2600,
+so they should be present in qemu. Only some boards wire up a network
+device to the other side.
 
-On 5/18/20 3:33 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 18.05.2020 21:23, John Snow wrote:
->>
->>
->> On 5/18/20 2:14 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> 14.05.2020 08:53, John Snow wrote:
->>>> move python/qemu/*.py to python/qemu/lib/*.py.
->>>>
->>>> To create a namespace package, the 'qemu' directory itself shouldn't
->>>> have module files in it. Thus, these files will go under a 'lib'
->>>> package
->>>> directory instead.
->>>
->>> Hmm..
->>>
->>> On the first glance, it looks better to have
->>>
->>>    from qemu import QEMUMachine
->>>
->>> than
->>>      from qemu.lib import QEMUMachine
->>>
->>> why do we need this extra ".lib" part?
->>>
->>> Is it needed only for internal use?
->>>
->>> Assume we have installed qemu package. Can we write
->>>
->>>    from qemu import QEMUMachine
->>>
->>> ? Or we still need qemu.lib ?
->>>
->>> I don't remember any python package, which made me to write "import from
->>> package_name.lib ..."
->>>
->>>
->>
->> It's a strategy to create "qemu" as a PEP420 namespace package; i.e.
->> "qemu" forms a namespace, but you need a name for the actual package
->> underneath it.
->>
->> "qemu.lib" is one package, with qmp, qtest, and machine modules. "qemu"
->> isn't really a package in this system, it's just a namespace.
->>
->> The idea is that this allows us to create a more modular rollout of
->> various python scripts and services as desired instead of monolithically
->> bundling them all inside of a "qemu" package.
->>
->> It also allows us to fork or split out the sub-packages to separate
->> repos, if we wish. i.e., let's say we create a "qemu.sdk" subpackage, we
->> can eventually fork it off into its own repo with its own installer and
->> so forth. These subpackages can be installed and managed separately.
->>
-> 
-> Okay, I understand.. No real objections than.
-> 
-> Still, maybe, everything should not go into lib, maybe something like
-> 
-> qemu/vm/  - qmp, QEMUMachine, etc
-> qemu/qtest/  - qtest
-> 
-> would be more user friendly? But I'm not sure. I just thought that "lib"
-> is too generic.
-> 
+It would be advantageous for us to be able to specify which device is
+being connected to on the command line. Currently we do this by
+connecting all devices up to the one we care about which is an ugly
+workaround.
 
-lib is a very generic name, I agree.
-
-Splitting accel, qmp and QEMUMachine in one package and keeping qtest in
-another is fine too. I'm not sure if I like "vm" for the name of that
-core package, though.
-
-I want to avoid using "qemu/sdk" because I have some plans for trying to
-generate and package a "real" SDK using that namespace.
-
-"devkit"? "testkit"? "core"? Naming things is always the worst part.
-
---js
-
+> How should we proceed in such cases ?
+>
+> Thanks,
+>
+> C.
+>
+> >
+> > Cc: "C=C3=A9dric Le Goater" <clg@kaod.org>
+> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> > Cc: Andrew Jeffery <andrew@aj.id.au>
+> > Cc: Joel Stanley <joel@jms.id.au>
+> > Cc: qemu-arm@nongnu.org
+> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> > ---
+> >  hw/arm/aspeed_ast2600.c | 2 +-
+> >  hw/arm/aspeed_soc.c     | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+> > index 71a0acfe26..0a6a77dd54 100644
+> > --- a/hw/arm/aspeed_ast2600.c
+> > +++ b/hw/arm/aspeed_ast2600.c
+> > @@ -188,7 +188,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
+> >                                sizeof(s->wdt[i]), typename);
+> >      }
+> >
+> > -    for (i =3D 0; i < sc->macs_num; i++) {
+> > +    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
+> >          sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac10=
+0[i]),
+> >                                sizeof(s->ftgmac100[i]), TYPE_FTGMAC100)=
+;
+> >
+> > diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> > index cf6b6dd116..7ca860392a 100644
+> > --- a/hw/arm/aspeed_soc.c
+> > +++ b/hw/arm/aspeed_soc.c
+> > @@ -203,7 +203,7 @@ static void aspeed_soc_init(Object *obj)
+> >                                sizeof(s->wdt[i]), typename);
+> >      }
+> >
+> > -    for (i =3D 0; i < sc->macs_num; i++) {
+> > +    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
+> >          sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac10=
+0[i]),
+> >                                sizeof(s->ftgmac100[i]), TYPE_FTGMAC100)=
+;
+> >      }
+> >
+>
 
