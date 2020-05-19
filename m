@@ -2,87 +2,97 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D985FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 12:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5D9C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 12:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F3EE20709
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 12:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07E8B20709
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 12:24:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xl/C5nms"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F3EE20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwOq4gfN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E8B20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb1Ft-0005mM-S8
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 08:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51114)
+	id 1jb1Hx-0007KJ-7Q
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 08:24:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jb1F4-0004ui-2V
- for qemu-devel@nongnu.org; Tue, 19 May 2020 08:21:06 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44155)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jb1HP-0006ut-NF
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 08:23:31 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jb1F2-0002Or-3i
- for qemu-devel@nongnu.org; Tue, 19 May 2020 08:21:05 -0400
-Received: by mail-oi1-x244.google.com with SMTP id y85so7286232oie.11
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 05:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=8/gZGNNUOMV0cNspyJua+QUzz3j0JQh8jq+6Z4+9XIc=;
- b=xl/C5nmsn8hHP41gZxCIkruWmIRYKYMIGB/O2pJclNNg9Bjms3yD5E94NP3Id5qdco
- GPw/Ynq+Fep0xOXtMn1sLFHVXhzxys4yyoPG/b6kwlJow8Bh6cKofVUI40ByKa7GPtZ+
- Pj4TlLl0GyoBfItBXQoMAPCBva6lUpO7qJPVCb49PEvGZUIgivzZxAq1MzG87JAfJ9rQ
- vzIZgKyyuxBSu5SBr9u2FjMW/yGpop/Fby8yw6HZkcv8JC3hf7FZFNyhwA5TmK4XtPP4
- jFkF3rO48HnEDxGpIN5OwlcFHNZfCvKcOG9NkRIeQ3HfoWZtaDybARA8GEKkSqBBmWIb
- 987Q==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jb1HO-0002hj-Uj
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 08:23:31 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y3so15710181wrt.1
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 05:23:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=cmomrfrMuz30m9mL0Mm0PbDiJG4YVUioSObXfgfGDa0=;
+ b=hwOq4gfNIBFWuruSuBcaOjRoPR+eirMpekJ6vnFPpXjC1hYkm7L6o2ws1phXiq009K
+ fK6BCyAkAP8sH3qGWemPq5MkyFGg9/omIBQsFHXniT5aRqK/iB7+bz/EVxxdjEq1aL18
+ HKL1t+k/X4TQvycvW4BYaB31yoFqGAaeg1Ln2iY9x0jpDVhtT2EWfwhiUQnAWefMOq+2
+ DVz/wo4M72KGJc6+SoD7zvkDP/AU7oLAYUf4RPLYc7dNKX+B6WhIY8B8HRaFkiISijBJ
+ I7EeKAuTCG7VVsI8H2D9Uf4Hw4B/tJl8iZir5iS1YTIHqtJAPwpmZ2eOWNpRNsHD+YJo
+ qSKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8/gZGNNUOMV0cNspyJua+QUzz3j0JQh8jq+6Z4+9XIc=;
- b=PXPCWSjUMaaAmaFx2I7kIK5CxAp+wzhIUY7JlTAiE1z9YhqFqR3qZNr+sVEWt9p2OH
- pTwKTxVPW83C5m4/eeoXPqORWhboyHZXunbOU0YoMIVi5k3eChpHxEwSWU3+Ewmjqoz+
- nVcXLVsLf7Z+NRzKiiJwCMLDiZcg2jtuB5l/FbLSHeZZtZd7DCNNxGXeWDFWKJUyVUmt
- fWYn0LDAL4Dj3Uo+Ybof/biVzvAY6l9tuGEz0/MKYXogHFU9tKmx//tuzRcyeoi7qe+8
- HvPyW3RieyRdPiZRnwjBQ6XzprfBikrEvRfYYpXN83USRT9WL9FcccT8W2op+gYf590G
- q5yA==
-X-Gm-Message-State: AOAM531eM8WW1oy6LOwLetq9gCjsckx47jYRJwjM4S4XLtj2y2nec/3g
- cSddb3bFJev63C1Ny86Km4oku/lmn51SEio7+mRhpA==
-X-Google-Smtp-Source: ABdhPJx62nq7PczRR5OTY9N7Lsn/a95RAsGm383b2c1f/a8hDbeSIXlAn2Pv9r6UoqPXa+cO48FDwyBRhljHs04F5Bg=
-X-Received: by 2002:aca:eb96:: with SMTP id j144mr2711690oih.48.1589890862477; 
- Tue, 19 May 2020 05:21:02 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cmomrfrMuz30m9mL0Mm0PbDiJG4YVUioSObXfgfGDa0=;
+ b=tUg9VGB2ybrWhJV+ATeQV2hbGPuPk7nEobNJlSSk9xduz947kJVlJ9wO5WY4iy0LbX
+ axNGpsUNjm/6Yd1Sy0jxjxbYyw4z+qxSeJCvmyPxug5kC7Qkc3QWYGsbrt+iyd+iCflW
+ B44wDUk12ZF/OIE4HJB1Tg86CFxY7b48QW1Kp5HPQ/ezwLqKPeWouAGRL8yeY54p+dEZ
+ nL64xKzHjSPwtBPk9YEbNITXxLVIulJ0k6hR0Zc5oXZlKrNwY1ydkI1hTUZg7T7CofsS
+ nOgYLIC7KaZJQ9ZPtF9CAYgIpiO6m6zsUoymQ55HF9bl8iY84WvwHfv6SMv8r3fswnDf
+ sZ5w==
+X-Gm-Message-State: AOAM531uU0N7wSFfW3w0BDCuoZOk8eUy1I0xu2xRjf7fMb6ZyE0rxYkR
+ vyaJ+uwLnDQq9pWsr4bPJBE=
+X-Google-Smtp-Source: ABdhPJzULbnOdxyUxTAzMoWLtZUEI0lcFnWaMuMSaw4bLC+GmeX6sb6PoYLb9Ug0nakalu2JslIjAg==
+X-Received: by 2002:a05:6000:1104:: with SMTP id
+ z4mr27493484wrw.57.1589891009239; 
+ Tue, 19 May 2020 05:23:29 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id f128sm4152802wme.1.2020.05.19.05.23.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 May 2020 05:23:28 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: Fix OUTL debug output
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200517110147.26026-1-f4bug@amsat.org>
+ <234cbf5d-aed7-7b6c-e43d-ae47f8251916@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d4f069cd-6357-480a-3732-71e97d0e9aea@amsat.org>
+Date: Tue, 19 May 2020 14:23:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200504101443.3165-1-roger.pau@citrix.com>
- <20200511134043.GH2116@perard.uk.xensource.com>
- <20200519112806.GF54375@Air-de-Roger>
-In-Reply-To: <20200519112806.GF54375@Air-de-Roger>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 May 2020 13:20:51 +0100
-Message-ID: <CAFEAcA-RWR_6OQV1EgeYj0WmE89FDKqcywTpgfrMyr8FrELN+Q@mail.gmail.com>
-Subject: Re: [PATCH] xen: fix build without pci passthrough
-To: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+In-Reply-To: <234cbf5d-aed7-7b6c-e43d-ae47f8251916@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -97,45 +107,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony PERARD <anthony.perard@citrix.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paul Durrant <paul@xen.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 May 2020 at 12:28, Roger Pau Monn=C3=A9 <roger.pau@citrix.com> w=
-rote:
->
-> On Mon, May 11, 2020 at 02:40:43PM +0100, Anthony PERARD wrote:
-> > On Mon, May 04, 2020 at 12:14:43PM +0200, Roger Pau Monne wrote:
-> > > diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
-> > > index 179775db7b..660dd8a008 100644
-> > > --- a/hw/xen/xen_pt.h
-> > > +++ b/hw/xen/xen_pt.h
-> > > @@ -1,6 +1,7 @@
-> > >  #ifndef XEN_PT_H
-> > >  #define XEN_PT_H
-> > >
-> > > +#include "qemu/osdep.h"
-> >
-> > Why do you need osdep?
->
-> For CONFIG_XEN_PCI_PASSTHROUGH IIRC.
+On 5/19/20 5:39 AM, Richard Henderson wrote:
+> On 5/17/20 4:01 AM, Philippe Mathieu-Daudé wrote:
+>> Fix OUTL instructions incorrectly displayed as OUTW.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   target/i386/misc_helper.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> as far as it goes.  We should of course never be printing to stderr, but
+> logging or tracing.
 
-All .c files should always include osdep as the first include
-in the file, and .h files should never include osdep (we note
-this in CODING_STYLE.rst).
+Yes, this is what the cpu_io() functions do in ioport.c, but they use 
+MEMTXATTRS_UNSPECIFIED.
 
-If you added this #include to fix a compile issue that would
-suggest that there's a .c file somewhere that's missing the
-mandatory osdep include. I did a quick eyeball of all the files
-that include xen_pt.h, though, and none of them are missing the
-osdep include. So I think you should be able to simply drop the
-osdep include here. If that produces an error, let us know what
-fails and we can work out what's gone wrong.
+If we could replace one with another, I'm not sure which one is the 
+correct one.
 
-thanks
--- PMM
+Maybe keep cpu_io() from ioport.c but add a MemTxAttrs argument?
+
+Regards,
+
+Phil.
 
