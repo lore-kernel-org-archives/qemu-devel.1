@@ -2,99 +2,103 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36962C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35ED1C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E88920578
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F375020578
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:25:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rv1z+amA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E88920578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YX8smZQK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F375020578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb6w5-0004qW-52
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:25:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42024)
+	id 1jb6w7-0004tf-4O
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb6uv-0003G3-DC
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:24:41 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:50669)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb6uo-0000Mr-Uw
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:24:41 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id nu7so56302pjb.0
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HyXzx429zRXdub+45prHC1R5bNg0TUEB0xLij2OIMHU=;
- b=Rv1z+amA16vd3R1T/Rz/Cpoic4bSPjTEz2slD7JuE+DZCsvCLQd4EOSrL+qmsMCj71
- ZwyWJCq0gzzTb8S8thyGMEUXc67bRjQ/O7DaiVSRBHPLmbFl8fV/Khgyfdok1e3AWEDB
- 6v1ARTSRNqTOi1c0sXwOYrp6ReXTs0mniuGMr1vkWfAtvBnlIRKezdD/Kk7gXfTDooh8
- MuPi4Mq43xHAXQGt0yNUoI4sdi09hchhasbUUzAR7UeKF7nE14p/bY0PwtMJaMP7Tzsq
- /728HsTjjG1spFyRKcjFkhvVf/x8C1/BNQfMAQ91jljQSqHLEeS6FIskmtkJARRCS0bu
- +IOA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6rC-0005eP-AF
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42466
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6rB-0008SE-CY
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589912447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jq7M0GNbAMnwTwtOhCF9XvyRYicoQZiXqGW42a5oD/A=;
+ b=YX8smZQKsIzTcUet4vxLzf7gLGb8x638jHnYejJvsUqPQZ35/64dqs0bWsMz/kL0Z5CNw4
+ qXwo9HZ34TOMcoCOYB3MHbxJ0yXcBbKUYcpvVXItTli9bMR0G57SQp3XyXfsnz3iVmtrsd
+ zw3ypiQE/Mp3DKOqPbzHz1kGdezB6+g=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-URk7aF8NNhe3NcaEviA6pw-1; Tue, 19 May 2020 14:20:45 -0400
+X-MC-Unique: URk7aF8NNhe3NcaEviA6pw-1
+Received: by mail-wr1-f69.google.com with SMTP id e14so196103wrv.11
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:20:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HyXzx429zRXdub+45prHC1R5bNg0TUEB0xLij2OIMHU=;
- b=l9f0nB+0lhV75pcC9urgBnUl05wacJzKsjFTxG/Uvk4mUDQCWDsqO9ZVciw2a3FmZY
- qv/U3CiTgUlvCrnpDrE6nvtvrMbURbWElXEcV0w1524vcyipaqi9xzbhriUda7RkhLt2
- 32pH06d1ExyV0tizm6c2yJrh5H011aJcySbWnVwMaUJSbUgNOieSgcwLslHKbtbJl0SV
- 3YnWAyB+u2S4JvS9diP++mAzVUAGUyzYXHcRqU7VWnlToxmeYPOv/DNv6adRVVMRQXKE
- O509ngJ+nsJ7VI0ZqH14wO25DcSvchbmfY8IbXrBVwt5JXPwPkhuTkF7QvnDAMpn26QL
- gBvg==
-X-Gm-Message-State: AOAM530EqU3m7Wp0MHfO+nJZIPMyIthpPPETryVXMMTT0EDOTv739Gdk
- l+BaI84F/SLrsegXfhXz/qRjvQ==
-X-Google-Smtp-Source: ABdhPJxwEHR7iidWzcyhJJ4Rn3Z/Gd8Ezz6UWhYTiSKNjAmfInFxAVVA0npYYduaM/IWRFNkhefW+Q==
-X-Received: by 2002:a17:90b:30cf:: with SMTP id
- hi15mr868198pjb.209.1589912671896; 
- Tue, 19 May 2020 11:24:31 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id i10sm150295pfa.166.2020.05.19.11.24.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 11:24:30 -0700 (PDT)
-Subject: Re: [PATCH 2/2] target/i386: fix IEEE x87 floating-point exception
- raising
-To: Joseph Myers <joseph@codesourcery.com>
-References: <alpine.DEB.2.21.2005152117400.3469@digraph.polyomino.org.uk>
- <alpine.DEB.2.21.2005152120280.3469@digraph.polyomino.org.uk>
- <5dd2d81c-cedd-7835-6b3c-7e089254dc95@linaro.org>
- <alpine.DEB.2.21.2005191757210.10766@digraph.polyomino.org.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <76d7fa28-5dd9-3af4-f663-d251bbdbf4f4@linaro.org>
-Date: Tue, 19 May 2020 11:24:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=jq7M0GNbAMnwTwtOhCF9XvyRYicoQZiXqGW42a5oD/A=;
+ b=BU+3h90rQNiJwM33JxkRCd/pT82XclaPcgyf+PCKGwU9bGwQhfFMvqRQI1xCJqAbXF
+ RU4gyOFrodnBLsZMF+HRMMK2yCXgzTwhyHBXsZjJ7mEGiClegKNWhSQVhsryW7gx5PYm
+ ivBUGmz/ZPFJwljMajvGDIK7IGD26MS5/7qt46XfoN2xLhhsOabmDsgrC86l6nO9kBaC
+ u8fhtmuxHrkoRJfrZMs3d8hcqF6cNqpKpGeFpnhZlKXeG12DUh19Sl3q/Jawaev0gTC1
+ IafYS/u6YJrjY9Q6kR2ApTB99YrbTUN+PnYdf3wplZ/Y4R3P+re1sH1kKXkGwlL69tQa
+ kcRQ==
+X-Gm-Message-State: AOAM532FNT5hgetYOPyq2YegQxakQJ44dWB4/zrAmaTbpPUBkv6CSFlb
+ Dm9yBXo9EZarparzFjqQJihqQYmZU7NIgKIjG/1TUohY629WE0H0xjFer+K1LStVy6Pl+q6571y
+ U2wG8PFLtSa0emKI=
+X-Received: by 2002:adf:f702:: with SMTP id r2mr173874wrp.191.1589912444140;
+ Tue, 19 May 2020 11:20:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzq4xfSE71w5ZhKwWI8R11/+g1xtfz/aFvWL6CRdzCbcxXMMOyuVM3CQsJJHsW2UDuNewqOYQ==
+X-Received: by 2002:adf:f702:: with SMTP id r2mr173845wrp.191.1589912443903;
+ Tue, 19 May 2020 11:20:43 -0700 (PDT)
+Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id h1sm508829wme.42.2020.05.19.11.20.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 May 2020 11:20:43 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v6 3/5] softmmu/vl: Allow -fw_cfg 'blob_id' option to set
+ any file pathname
+Date: Tue, 19 May 2020 20:20:22 +0200
+Message-Id: <20200519182024.14638-4-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200519182024.14638-1-philmd@redhat.com>
+References: <20200519182024.14638-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.2005191757210.10766@digraph.polyomino.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:19:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,41 +111,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- rth@twiddle.net
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/20 11:12 AM, Joseph Myers wrote:
-> On Tue, 19 May 2020, Richard Henderson wrote:
-> 
->> To retain the hard float fast path, we need to leave float_flag_invalid set
->> when the accrued exception bit is set.  To me this suggests keep all of the
->> FPUS_* bits in fp_status and only convert to FPUS_* when we read the fp status
->> word.
-> 
-> There is no hard float fast path that I can see for floatx80.  The issue 
-> of the fast path might be relevant for fixing SSE exception handling 
-> (which has some similar issues to x87), but not for floatx80.
+This is to silent:
 
-Oops, yes.  Wasn't thinking for a moment.
+  $ qemu-system-x86_64 \
+    -object tls-cipher-suites,id=ciphersuite0,priority=@SYSTEM \
+    -fw_cfg name=etc/edk2/https/ciphers,blob_id=ciphersuite0
+  qemu-system-x86_64: -fw_cfg name=etc/edk2/https/ciphers,blob_id=ciphersuite0: warning: externally provided fw_cfg item names should be prefixed with "opt/"
 
-> Note that another bug in the x87 emulation is the lack of setting C1 for 
-> most instructions with inexact results based on the direction of rounding 
-> (which will require a new feature to be added to the softfloat code to 
-> record that information so the x87 emulation can use it).
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ softmmu/vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Wow, I don't believe I ever knew about that detail.
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f76c53ad2e..3b77dcc00d 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -2052,7 +2052,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+                    FW_CFG_MAX_FILE_PATH - 1);
+         return -1;
+     }
+-    if (strncmp(name, "opt/", 4) != 0) {
++    if (!nonempty_str(blob_id) && strncmp(name, "opt/", 4) != 0) {
+         warn_report("externally provided fw_cfg item names "
+                     "should be prefixed with \"opt/\"");
+     }
+-- 
+2.21.3
 
-This looks similar to the indication that PPC gives (and qemu does not
-implement) in FPSCR.FR ("The last instruction incremented the fraction during
-rounding").
-
-I guess it's not quite the same -- ppc indicates the fraction was incremented,
-while x87 indicates that the value rounded up.  Which could be computed from
-(fraction incremented) ^ sign, I suppose.
-
-
-r~
 
