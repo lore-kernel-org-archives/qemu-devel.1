@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC03C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F71C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5EE20657
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6DCC20657
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HyIXsoxA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5EE20657
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ROiaR31o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DCC20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jasQj-0001t4-Nj
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 22:56:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46852)
+	id 1jasQp-000294-0k
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 22:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOU-0005Oi-8x
+ id 1jasOU-0005Pb-Im
  for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:14 -0400
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:38280)
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:46370)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOS-0002QT-9l
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:13 -0400
-Received: by mail-pl1-x633.google.com with SMTP id m7so5030170plt.5
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:09 -0700 (PDT)
+ id 1jasOS-0002Qa-Cx
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:14 -0400
+Received: by mail-pg1-x532.google.com with SMTP id p21so5721508pgm.13
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gp7XyqY5TSPLzgj7BvWTrIZcix0W6XLqOIrqT5GCvsY=;
- b=HyIXsoxAP0wm0sYWYWZhjK6tlGuJOz37NebDzEA3e7y8poh5KhOnNV2xrvh0kT3h18
- 95+L7kkD6xE8XAtgUMsYO1zE+xE8f29S7/uz0iedk8wMRwzUezX9yu0grqj/5W8ke7Vu
- JRiEcu2/HltpqkWL2C8LJ8eVjsIs7ZBzyw+VdXx0XgvuHxmT5xpXj3AEkQSo0wFc1ke9
- 0VeCrAekKiVaOxE1ejGGp1SHlVql/GHlkNFQi+64w54oAFYXi4VWZ7gOeF9cvZ8R75nU
- 9iimmt8JOeqXAIZytaj1QDbrhZOm66BK4+h5NkcK64+/x/+ilSWfK7wq+9+QYN4f+laF
- NIXQ==
+ bh=i6cN+V0oyKOXcFzwj12P4di1SZQuQTGDgSJO64rVCwQ=;
+ b=ROiaR31orw2RW3U4tEeg/VJDeewODccnoD9B1iUPsw4wXgaO2J0YF5aIXil3ZTkYuX
+ 3QA/vVU13JsLYPA9n+B5tVDPxB4cbXTqnEdh+qCbL2AmhIu1qZ6ooB60ACnJlFGQTzQE
+ b3vFuyPX0JHu41y9ADcldb5YlytGwZpT3pz82lE4U+AYCb64u5Sb/VHplzipZnSezWed
+ w1E8sxa12bg0Fg9Y4KIi1DPPIRLB+hGt6Ct0axhk8glOL4V/JB5HmO6BryoNTcAd/+rS
+ lHVebDPnGZ2iNIKwO8G0ztjldVu7AnDNZCujS8eKpM5liJlgMsQJ3r0eDW8ecy4ntNUV
+ P1NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gp7XyqY5TSPLzgj7BvWTrIZcix0W6XLqOIrqT5GCvsY=;
- b=ofLZDHTzZqONKtocMSSSlmfXjwANL3LCtd0E93Nz5zLutLhTxWDvpSqIokmsiHiGsp
- RXbW/K00vzBEZ4KOKAXNhIsY7SJ3XLv0knI6tEdjF8WJzNMBZTVIAip3lLn/FDSZK9Dm
- D+g9gE8efSgOysOCtfJhN1ivi3sYjdgwbD8lkBc5co1I6vxARtcMma/n9ftqTPPrcOdi
- +b4l2e1V3PkJTv0a8TK3o6Kr6KVInNspfqSi71cT9lytNfdhuBgKcPkW+gkL3xUpdxTF
- CVIQcks7JxX+QBtpq5Suq9U9eP7/gOusJ+MKOWR2YNIope0TmlbxlrU/w2ZDyf0I8+c/
- t6DQ==
-X-Gm-Message-State: AOAM532Ir89+OrbWzslATEGGiylfp+qhO9AYdnFaOpyafH4ef2YElOAM
- CelGMeoyZZbwmPpYYQJ0mJ5yOnWIWWM=
-X-Google-Smtp-Source: ABdhPJxvjtSWjfxfHUaEL5GKp+nI7aBpQgXqMli2YYe2PVncY+3Ro8es4fcw/fVwbgOEqmOTuccOmg==
-X-Received: by 2002:a17:90a:ee91:: with SMTP id
- i17mr2400729pjz.45.1589856847730; 
- Mon, 18 May 2020 19:54:07 -0700 (PDT)
+ bh=i6cN+V0oyKOXcFzwj12P4di1SZQuQTGDgSJO64rVCwQ=;
+ b=jfOFLCo4f2VW4NYGXGZ0dx3uuly8QkLklF8YYu8+nO7ULP99U21Ug22ueb6v7Ki/Vo
+ CMglNru9oocjOiGRnmGYghhxczSLJcAC8l7gchK+rdATqXbI0FafWukplgQJ3sJJNb0r
+ 1CTa2CnAFB6OAdpow/qyL4uVGweqfVP/WhiY2u51EjQp1XvDisKWU4eTlx0ZGgHdEij8
+ 1dCRkdjtraFBV4xCT35fz0Lnv0CFGZPIhJFDQZjICXLKVuNXyuQTgnKl74OnApDG6B97
+ Ax9yoMgMSrgUpqlWhpz/2dZ7j2kADZnbvcobDW9JvqBY2DyAwAZ9NXNO5nM8B3m5sEUf
+ Q54w==
+X-Gm-Message-State: AOAM533GXq6pqhAUqLFRG8X7UN8z236lMox1slHnOSuQC2BAaKoY34vS
+ a5Wim8IcQOKbVHmis4J+seOcJfDuPDc=
+X-Google-Smtp-Source: ABdhPJwagflODUIfoYLsyWoyOIbyRbp3OAQ1BUCwDJx10gyzkHijKu9l6eyYavebln1LbOYJwehmRg==
+X-Received: by 2002:a62:fc52:: with SMTP id e79mr20575485pfh.297.1589856849122; 
+ Mon, 18 May 2020 19:54:09 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.06
+ by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 19:54:07 -0700 (PDT)
+ Mon, 18 May 2020 19:54:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RISU v2 08/17] Add enum RisuResult
-Date: Mon, 18 May 2020 19:53:46 -0700
-Message-Id: <20200519025355.4420-9-richard.henderson@linaro.org>
+Subject: [RISU v2 09/17] Unify i/o functions and use RisuResult
+Date: Mon, 18 May 2020 19:53:47 -0700
+Message-Id: <20200519025355.4420-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200519025355.4420-1-richard.henderson@linaro.org>
 References: <20200519025355.4420-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::633;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x633.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x532.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,244 +105,390 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Formalize the random set of numbers into an enum.  Doing this
-makes it easy to see that one of the responses in
-recv_and_compare_register_info was inconsistent.
+Push the trace check down from the function calling the reginfo
+function down into the i/o function.  This means we don't have
+to pass a function pointer.
+
+Return a RisuResult from the i/o functions.  This fixes a minor bug
+in send_register_info (even before the conversion to RisuResult),
+which returned the write_fn result directly.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h    | 25 +++++++++++++++++--------
- reginfo.c | 32 ++++++++++++++++----------------
- risu.c    | 18 +++++++++---------
- 3 files changed, 42 insertions(+), 33 deletions(-)
+ risu.h    | 25 ++++++++---------
+ comms.c   |  8 +++---
+ reginfo.c | 60 ++++++++++++++++++++--------------------
+ risu.c    | 82 ++++++++++++++++++++++---------------------------------
+ 4 files changed, 80 insertions(+), 95 deletions(-)
 
 diff --git a/risu.h b/risu.h
-index a7aa929..e6d07eb 100644
+index e6d07eb..f44b781 100644
 --- a/risu.h
 +++ b/risu.h
-@@ -57,6 +57,14 @@ typedef enum {
-     OP_COMPAREMEM = 4,
- } RisuOp;
+@@ -34,13 +34,6 @@ void process_arch_opt(int opt, const char *arg);
  
-+/* Result of operation */
-+typedef enum {
-+    RES_OK = 0,
-+    RES_END,
-+    RES_MISMATCH,
-+    RES_BAD_IO,
-+} RisuResult;
+ #include REGINFO_HEADER(ARCH)
+ 
+-/* Socket related routines */
+-int master_connect(int port);
+-int apprentice_connect(const char *hostname, int port);
+-int send_data_pkt(int sock, void *pkt, int pktlen);
+-int recv_data_pkt(int sock, void *pkt, int pktlen);
+-void send_response_byte(int sock, int resp);
+-
+ extern uintptr_t image_start_address;
+ extern void *memblock;
+ 
+@@ -80,6 +73,13 @@ typedef struct {
+    uint32_t risu_op;
+ } trace_header_t;
+ 
++/* Socket related routines */
++int master_connect(int port);
++int apprentice_connect(const char *hostname, int port);
++RisuResult send_data_pkt(int sock, void *pkt, int pktlen);
++RisuResult recv_data_pkt(int sock, void *pkt, int pktlen);
++void send_response_byte(int sock, int resp);
 +
- /* The memory block should be this long */
- #define MEMBLOCKLEN 8192
+ /* Functions operating on reginfo */
  
-@@ -82,20 +90,21 @@ typedef struct {
+ /* Function prototypes for read/write helper functions.
+@@ -88,23 +88,22 @@ typedef struct {
+  * recv_and_compare_register_info which can either be backed by the
+  * traditional network socket or a trace file.
   */
- typedef int (*write_fn) (void *ptr, size_t bytes);
- typedef int (*read_fn) (void *ptr, size_t bytes);
--typedef void (*respond_fn) (int response);
-+typedef void (*respond_fn) (RisuResult response);
+-typedef int (*write_fn) (void *ptr, size_t bytes);
+-typedef int (*read_fn) (void *ptr, size_t bytes);
+-typedef void (*respond_fn) (RisuResult response);
++RisuResult write_buffer(void *ptr, size_t bytes);
++RisuResult read_buffer(void *ptr, size_t bytes);
++void respond(RisuResult response);
  
--/* Send the register information from the struct ucontext down the socket.
-- * Return the response code from the master.
-+/*
-+ * Send the register information from the struct ucontext down the socket.
+ /*
+  * Send the register information from the struct ucontext down the socket.
   * NB: called from a signal handler.
   */
--int send_register_info(write_fn write_fn, void *uc);
-+RisuResult send_register_info(write_fn write_fn, void *uc);
+-RisuResult send_register_info(write_fn write_fn, void *uc);
++RisuResult send_register_info(void *uc);
  
--/* Read register info from the socket and compare it with that from the
-- * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
-+/*
-+ * Read register info from the socket and compare it with that from the
-+ * ucontext.
+ /*
+  * Read register info from the socket and compare it with that from the
+  * ucontext.
   * NB: called from a signal handler.
   */
--int recv_and_compare_register_info(read_fn read_fn,
--                                   respond_fn respond, void *uc);
-+RisuResult recv_and_compare_register_info(read_fn read_fn,
-+                                          respond_fn respond, void *uc);
+-RisuResult recv_and_compare_register_info(read_fn read_fn,
+-                                          respond_fn respond, void *uc);
++RisuResult recv_and_compare_register_info(void *uc);
  
  /* Print a useful report on the status of the last comparison
   * done in recv_and_compare_register_info(). This is called on
-diff --git a/reginfo.c b/reginfo.c
-index 2d67c93..b909a1f 100644
---- a/reginfo.c
-+++ b/reginfo.c
-@@ -21,7 +21,7 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
- static int mem_used;
- static int packet_mismatch;
- 
--int send_register_info(write_fn write_fn, void *uc)
-+RisuResult send_register_info(write_fn write_fn, void *uc)
+diff --git a/comms.c b/comms.c
+index 861e845..21968da 100644
+--- a/comms.c
++++ b/comms.c
+@@ -168,7 +168,7 @@ ssize_t safe_writev(int fd, struct iovec *iov_in, int iovcnt)
+  * Note that both ends must agree on the length of the
+  * block of data.
+  */
+-int send_data_pkt(int sock, void *pkt, int pktlen)
++RisuResult send_data_pkt(int sock, void *pkt, int pktlen)
  {
-     struct reginfo ri;
-     trace_header_t header;
-@@ -34,7 +34,7 @@ int send_register_info(write_fn write_fn, void *uc)
-     header.pc = get_pc(&ri);
-     header.risu_op = op;
-     if (write_fn(&header, sizeof(header)) != 0) {
--        return -1;
+     unsigned char resp;
+     /* First we send the packet length as a network-order 32 bit value.
+@@ -196,7 +196,7 @@ int send_data_pkt(int sock, void *pkt, int pktlen)
+     return resp;
+ }
+ 
+-int recv_data_pkt(int sock, void *pkt, int pktlen)
++RisuResult recv_data_pkt(int sock, void *pkt, int pktlen)
+ {
+     uint32_t net_pktlen;
+     recv_bytes(sock, &net_pktlen, sizeof(net_pktlen));
+@@ -206,10 +206,10 @@ int recv_data_pkt(int sock, void *pkt, int pktlen)
+          * a response back.
+          */
+         recv_and_discard_bytes(sock, net_pktlen);
+-        return 1;
 +        return RES_BAD_IO;
      }
- 
-     switch (op) {
-@@ -46,10 +46,10 @@ int send_register_info(write_fn write_fn, void *uc)
-          * (b) end of test (c) a non-risuop UNDEF
-          */
-         if (write_fn(&ri, reginfo_size()) != 0) {
--            return -1;
-+            return RES_BAD_IO;
-         }
-         /* For OP_TEST_END, force return 1 to exit. */
--        return op == OP_TESTEND;
-+        return op == OP_TESTEND ? RES_END : RES_OK;
-     case OP_SETMEMBLOCK:
-         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
-         break;
-@@ -63,7 +63,7 @@ int send_register_info(write_fn write_fn, void *uc)
-     default:
-         abort();
-     }
+     recv_bytes(sock, pkt, pktlen);
 -    return 0;
 +    return RES_OK;
  }
  
+ void send_response_byte(int sock, int resp)
+diff --git a/reginfo.c b/reginfo.c
+index b909a1f..fee025e 100644
+--- a/reginfo.c
++++ b/reginfo.c
+@@ -21,10 +21,11 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
+ static int mem_used;
+ static int packet_mismatch;
+ 
+-RisuResult send_register_info(write_fn write_fn, void *uc)
++RisuResult send_register_info(void *uc)
+ {
+     struct reginfo ri;
+     trace_header_t header;
++    RisuResult res;
+     RisuOp op;
+ 
+     reginfo_init(&ri, uc);
+@@ -33,8 +34,9 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
+     /* Write a header with PC/op to keep in sync */
+     header.pc = get_pc(&ri);
+     header.risu_op = op;
+-    if (write_fn(&header, sizeof(header)) != 0) {
+-        return RES_BAD_IO;
++    res = write_buffer(&header, sizeof(header));
++    if (res != RES_OK) {
++        return res;
+     }
+ 
+     switch (op) {
+@@ -45,11 +47,12 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
+          * Do a simple register compare on (a) explicit request
+          * (b) end of test (c) a non-risuop UNDEF
+          */
+-        if (write_fn(&ri, reginfo_size()) != 0) {
+-            return RES_BAD_IO;
++        res = write_buffer(&ri, reginfo_size());
++        /* For OP_TEST_END, force exit. */
++        if (res == RES_OK && op == OP_TESTEND) {
++            res = RES_END;
+         }
+-        /* For OP_TEST_END, force return 1 to exit. */
+-        return op == OP_TESTEND ? RES_END : RES_OK;
++        break;
+     case OP_SETMEMBLOCK:
+         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
+         break;
+@@ -58,12 +61,11 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
+                               get_reginfo_paramreg(&ri) + (uintptr_t)memblock);
+         break;
+     case OP_COMPAREMEM:
+-        return write_fn(memblock, MEMBLOCKLEN);
+-        break;
++        return write_buffer(memblock, MEMBLOCKLEN);
+     default:
+         abort();
+     }
+-    return RES_OK;
++    return res;
+ }
+ 
  /* Read register info from the socket and compare it with that from the
-@@ -74,10 +74,10 @@ int send_register_info(write_fn write_fn, void *uc)
+@@ -74,29 +76,29 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
   * that says whether it is register or memory data, so if the two
   * sides get out of sync then we will fail obscurely.
   */
--int recv_and_compare_register_info(read_fn read_fn,
--                                   respond_fn resp_fn, void *uc)
-+RisuResult recv_and_compare_register_info(read_fn read_fn,
-+                                          respond_fn resp_fn, void *uc)
+-RisuResult recv_and_compare_register_info(read_fn read_fn,
+-                                          respond_fn resp_fn, void *uc)
++RisuResult recv_and_compare_register_info(void *uc)
  {
--    int resp = 0;
-+    RisuResult resp = RES_OK;
+-    RisuResult resp = RES_OK;
++    RisuResult res;
      trace_header_t header;
      RisuOp op;
  
-@@ -85,18 +85,18 @@ int recv_and_compare_register_info(read_fn read_fn,
+     reginfo_init(&master_ri, uc);
      op = get_risuop(&master_ri);
  
-     if (read_fn(&header, sizeof(header)) != 0) {
--        return -1;
-+        return RES_BAD_IO;
+-    if (read_fn(&header, sizeof(header)) != 0) {
+-        return RES_BAD_IO;
++    res = read_buffer(&header, sizeof(header));
++    if (res != RES_OK) {
++        return res;
      }
  
      if (header.risu_op != op) {
          /* We are out of sync */
--        resp = 2;
-+        resp = RES_BAD_IO;
-         resp_fn(resp);
-         return resp;
+-        resp = RES_BAD_IO;
+-        resp_fn(resp);
+-        return resp;
++        res = RES_BAD_IO;
++        respond(res);
++        return res;
      }
  
      /* send OK for the header */
--    resp_fn(0);
-+    resp_fn(RES_OK);
+-    resp_fn(RES_OK);
++    respond(RES_OK);
  
      switch (op) {
      case OP_COMPARE:
-@@ -107,12 +107,12 @@ int recv_and_compare_register_info(read_fn read_fn,
+@@ -105,16 +107,16 @@ RisuResult recv_and_compare_register_info(read_fn read_fn,
+         /* Do a simple register compare on (a) explicit request
+          * (b) end of test (c) a non-risuop UNDEF
           */
-         if (read_fn(&apprentice_ri, reginfo_size())) {
+-        if (read_fn(&apprentice_ri, reginfo_size())) {
++        res = read_buffer(&apprentice_ri, reginfo_size());
++        if (res != RES_OK) {
              packet_mismatch = 1;
--            resp = 2;
-+            resp = RES_BAD_IO;
+-            resp = RES_BAD_IO;
          } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
              /* register mismatch */
--            resp = 2;
-+            resp = RES_MISMATCH;
+-            resp = RES_MISMATCH;
++            res = RES_MISMATCH;
          } else if (op == OP_TESTEND) {
--            resp = 1;
-+            resp = RES_END;
+-            resp = RES_END;
++            res = RES_END;
          }
-         resp_fn(resp);
+-        resp_fn(resp);
++        respond(res);
          break;
-@@ -127,10 +127,10 @@ int recv_and_compare_register_info(read_fn read_fn,
+     case OP_SETMEMBLOCK:
+         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&master_ri);
+@@ -125,20 +127,20 @@ RisuResult recv_and_compare_register_info(read_fn read_fn,
+         break;
+     case OP_COMPAREMEM:
          mem_used = 1;
-         if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
+-        if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
++        res = read_buffer(apprentice_memblock, MEMBLOCKLEN);
++        if (res != RES_OK) {
              packet_mismatch = 1;
--            resp = 2;
-+            resp = RES_BAD_IO;
+-            resp = RES_BAD_IO;
          } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
              /* memory mismatch */
--            resp = 2;
-+            resp = RES_MISMATCH;
+-            resp = RES_MISMATCH;
++            res = RES_MISMATCH;
          }
-         resp_fn(resp);
+-        resp_fn(resp);
++        respond(res);
          break;
+     default:
+         abort();
+     }
+ 
+-    return resp;
++    return res;
+ }
+ 
+ /* Print a useful report on the status of the last comparison
 diff --git a/risu.c b/risu.c
-index 24ada8f..8796975 100644
+index 8796975..78c6b8f 100644
 --- a/risu.c
 +++ b/risu.c
-@@ -69,7 +69,7 @@ int write_trace(void *ptr, size_t bytes)
-     return (res == bytes) ? 0 : 1;
+@@ -46,44 +46,15 @@ static sigjmp_buf jmpbuf;
+ 
+ #define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
+ 
+-/* Master functions */
++/* I/O functions */
+ 
+-int read_sock(void *ptr, size_t bytes)
+-{
+-    return recv_data_pkt(comm_fd, ptr, bytes);
+-}
+-
+-int write_trace(void *ptr, size_t bytes)
++RisuResult read_buffer(void *ptr, size_t bytes)
+ {
+     size_t res;
+ 
+-#ifdef HAVE_ZLIB
+-    if (comm_fd == STDOUT_FILENO) {
+-#endif
+-        res = write(comm_fd, ptr, bytes);
+-#ifdef HAVE_ZLIB
+-    } else {
+-        res = gzwrite(gz_trace_file, ptr, bytes);
++    if (!trace) {
++        return recv_data_pkt(comm_fd, ptr, bytes);
+     }
+-#endif
+-    return (res == bytes) ? 0 : 1;
+-}
+-
+-void respond_sock(RisuResult r)
+-{
+-    send_response_byte(comm_fd, r);
+-}
+-
+-/* Apprentice function */
+-
+-int write_sock(void *ptr, size_t bytes)
+-{
+-    return send_data_pkt(comm_fd, ptr, bytes);
+-}
+-
+-int read_trace(void *ptr, size_t bytes)
+-{
+-    size_t res;
+ 
+ #ifdef HAVE_ZLIB
+     if (comm_fd == STDIN_FILENO) {
+@@ -95,21 +66,34 @@ int read_trace(void *ptr, size_t bytes)
+     }
+ #endif
+ 
+-    return (res == bytes) ? 0 : 1;
++    return res == bytes ? RES_OK : RES_BAD_IO;
  }
  
--void respond_sock(int r)
-+void respond_sock(RisuResult r)
+-void respond_trace(RisuResult r)
++RisuResult write_buffer(void *ptr, size_t bytes)
  {
-     send_response_byte(comm_fd, r);
- }
-@@ -98,11 +98,11 @@ int read_trace(void *ptr, size_t bytes)
-     return (res == bytes) ? 0 : 1;
+-    switch (r) {
+-    case RES_OK:
+-    case RES_END:
+-        break;
+-    default:
+-        /* mismatch - if tracing we need to report, otherwise barf */
+-        if (!trace) {
+-            abort();
+-        }
+-        break;
++    size_t res;
++
++    if (!trace) {
++        return send_data_pkt(comm_fd, ptr, bytes);
++    }
++
++#ifdef HAVE_ZLIB
++    if (comm_fd == STDOUT_FILENO) {
++#endif
++        res = write(comm_fd, ptr, bytes);
++#ifdef HAVE_ZLIB
++    } else {
++        res = gzwrite(gz_trace_file, ptr, bytes);
++    }
++#endif
++
++    return res == bytes ? RES_OK : RES_BAD_IO;
++}
++
++void respond(RisuResult r)
++{
++    if (!trace) {
++        send_response_byte(comm_fd, r);
+     }
  }
  
--void respond_trace(int r)
-+void respond_trace(RisuResult r)
- {
-     switch (r) {
--    case 0: /* test ok */
--    case 1: /* end of test */
-+    case RES_OK:
-+    case RES_END:
-         break;
-     default:
-         /* mismatch - if tracing we need to report, otherwise barf */
-@@ -115,7 +115,7 @@ void respond_trace(int r)
- 
- static void master_sigill(int sig, siginfo_t *si, void *uc)
- {
--    int r;
-+    RisuResult r;
+@@ -119,9 +103,9 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
      signal_count++;
  
      if (trace) {
-@@ -125,7 +125,7 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
+-        r = send_register_info(write_trace, uc);
++        r = send_register_info(uc);
+     } else {
+-        r = recv_and_compare_register_info(read_sock, respond_sock, uc);
++        r = recv_and_compare_register_info(uc);
      }
  
      switch (r) {
--    case 0:
-+    case RES_OK:
-         /* match OK */
-         advance_pc(uc);
-         return;
-@@ -137,7 +137,7 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
- 
- static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
- {
--    int r;
-+    RisuResult r;
+@@ -141,9 +125,9 @@ static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
      signal_count++;
  
      if (trace) {
-@@ -147,11 +147,11 @@ static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+-        r = recv_and_compare_register_info(read_trace, respond_trace, uc);
++        r = recv_and_compare_register_info(uc);
+     } else {
+-        r = send_register_info(write_sock, uc);
++        r = send_register_info(uc);
      }
  
      switch (r) {
--    case 0:
-+    case RES_OK:
-         /* match OK */
-         advance_pc(uc);
-         return;
--    case 1:
-+    case RES_END:
-         /* end of test */
-         exit(EXIT_SUCCESS);
-     default:
 -- 
 2.20.1
 
