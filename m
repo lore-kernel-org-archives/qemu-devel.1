@@ -2,66 +2,87 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7AB6C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A98C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C6DB207FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:21:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6DB207FB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C137C207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:41:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fEVB3UkR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C137C207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4zK-00081j-N0
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:21:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56836)
+	id 1jb5JO-0007T9-Po
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb4yS-000724-58
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:20:13 -0400
-Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:57160)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb4yQ-0007jv-7d
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:20:11 -0400
-Received: from player696.ha.ovh.net (unknown [10.110.171.148])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 155442363B5
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 18:20:07 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player696.ha.ovh.net (Postfix) with ESMTPSA id 72DC812938A03;
- Tue, 19 May 2020 16:19:59 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-106R00652b81922-5089-440c-ac07-4a2fd88bd71a,3DCE2E61E2D7C1BA27EF92566E0C35A5904F621F)
- smtp.auth=clg@kaod.org
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jb5In-000729-V8
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:41:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54360
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jb5Il-0004Mu-Kb
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:41:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589906469;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Vs9RR+f0f+ZLomLB4oyhtCogs8uNqHMxfl8dr8+axfI=;
+ b=fEVB3UkR+aW/ZMdUHGbUAPnL1O8nDSdLaP/7ZxMBRYBZYugeyJ1JZ1FlkrDwciRkh0Fh8D
+ lAyEPaxAmrCtLhmj8geyBMImHnSKn36Wrpeuv9JmyOXKj1+B+EYoUIa5+Nnfs8YL49Xhd1
+ svucD9fgJF4Sz6ATUOc8MFYNducNkAc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-xQKu9ZVaP-yoIhtkEoFVZw-1; Tue, 19 May 2020 12:41:01 -0400
+X-MC-Unique: xQKu9ZVaP-yoIhtkEoFVZw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C01C8005AA;
+ Tue, 19 May 2020 16:41:00 +0000 (UTC)
+Received: from localhost (ovpn-115-92.phx2.redhat.com [10.3.115.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE068797E9;
+ Tue, 19 May 2020 16:40:59 +0000 (UTC)
+Date: Tue, 19 May 2020 12:40:58 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH] arm/aspeed: Rework NIC attachment
-Date: Tue, 19 May 2020 18:19:57 +0200
-Message-Id: <20200519161957.1056027-1-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
+Subject: Re: [PULL 0/1] machine queue, 2020-05-13
+Message-ID: <20200519164058.GK577771@habkost.net>
+References: <20200513140057.576234-1-ehabkost@redhat.com>
+ <20200513142255.GA577771@habkost.net>
+ <CAFEAcA-6SO-OFKnYqJ+mq_OT=W-k1CPe1cigzY7mbkqJAtLgTA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 519884282638732049
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgleekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeegtddutdeugeefvefhhfdvgefhjeffvedvtefhkeeiheffhfdvffelleegvdenucffohhmrghinhepohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.33.104.253; envelope-from=clg@kaod.org;
- helo=12.mo4.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 12:20:08
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAFEAcA-6SO-OFKnYqJ+mq_OT=W-k1CPe1cigzY7mbkqJAtLgTA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:19:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,197 +95,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The AST2400 and AST2500 SoCs have two MACs but only the first MAC0 is
-active on the Aspeed machines using these SoCs. The AST2600 has four
-MACs. The AST2600 EVB machine activates MAC1, MAC2 and MAC3 and the
-Tacoma BMC machine activates MAC2.
+--bCsyhTFzCvuiizWE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Introduce a bit-field property "macs-mask" under the Aspeed SoC model
-to link the active MACs of the machine being started with the available
-network devices.
+On Thu, May 14, 2020 at 10:58:16AM +0100, Peter Maydell wrote:
+> On Wed, 13 May 2020 at 15:23, Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
+> >
+> > Peter, note that my PGP key had expired 2 weeks ago, so you'll
+> > probably see a few signature check warnings.
+>=20
+> I couldn't find your updated key on the keyservers -- which
+> server did you upload it to?
 
-Inactive MACs will have no peer and QEMU will warn the user with :
+I have pushed it to the server my gpg version defaults to:
+hkp://hkps.pool.sks-keyservers.net.  I assumed would feed other
+keyservers.
 
-    qemu-system-arm: warning: nic ftgmac100.0 has no peer
-    qemu-system-arm: warning: nic ftgmac100.1 has no peer
-    qemu-system-arm: warning: nic ftgmac100.3 has no peer
+I have now manually published the updated key on keys.gnupg.net,
+pgp.mit.edu, and I'm including it below:
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
----
 
- To be applied on top of patch "arm/aspeed: Compute the number of CPUs
- from the SoC definition" 
- 
- http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.1006073-1-clg@kaod.org/
- 
- include/hw/arm/aspeed.h     |  1 +
- include/hw/arm/aspeed_soc.h |  6 ++++++
- hw/arm/aspeed.c             |  6 ++++++
- hw/arm/aspeed_ast2600.c     | 11 ++++++++---
- hw/arm/aspeed_soc.c         | 10 ++++++++--
- 5 files changed, 29 insertions(+), 5 deletions(-)
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 18521484b90e..842dff485f5b 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -39,6 +39,7 @@ typedef struct AspeedMachineClass {
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-+    uint32_t macs_mask;
-     void (*i2c_init)(AspeedBoardState *bmc);
- } AspeedMachineClass;
- 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 914115f3ef77..fdb9e05bc47c 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -34,6 +34,11 @@
- #define ASPEED_CPUS_NUM  2
- #define ASPEED_MACS_NUM  4
- 
-+#define ASPEED_MAC0_ON   (1 << 0)
-+#define ASPEED_MAC1_ON   (1 << 1)
-+#define ASPEED_MAC2_ON   (1 << 2)
-+#define ASPEED_MAC3_ON   (1 << 3)
-+
- typedef struct AspeedSoCState {
-     /*< private >*/
-     DeviceState parent;
-@@ -55,6 +60,7 @@ typedef struct AspeedSoCState {
-     AspeedSDMCState sdmc;
-     AspeedWDTState wdt[ASPEED_WDTS_NUM];
-     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
-+    uint32_t macs_mask;
-     AspeedMiiState mii[ASPEED_MACS_NUM];
-     AspeedGPIOState gpio;
-     AspeedGPIOState gpio_1_8v;
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 6f8f4b88f8ab..79c683864d7e 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -283,6 +283,8 @@ static void aspeed_machine_init(MachineState *machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), amc->num_cs, "num-cs",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&bmc->soc), amc->macs_mask, "macs-mask",
-+                            &error_abort);
-     object_property_set_link(OBJECT(&bmc->soc), OBJECT(&bmc->ram_container),
-                              "dram", &error_abort);
-     if (machine->kernel_filename) {
-@@ -556,12 +558,14 @@ static int aspeed_soc_num_cpus(const char *soc_name)
- static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
- 
-     mc->init = aspeed_machine_init;
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->no_parallel = 1;
-     mc->default_ram_id = "ram";
-+    amc->macs_mask = ASPEED_MAC0_ON;
- 
-     aspeed_machine_class_props_init(oc);
- }
-@@ -680,6 +684,7 @@ static void aspeed_machine_ast2600_evb_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "w25q512jv";
-     amc->spi_model = "mx66u51235f";
-     amc->num_cs    = 1;
-+    amc->macs_mask  = ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_ON;
-     amc->i2c_init  = ast2600_evb_i2c_init;
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-@@ -698,6 +703,7 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "mx66l1g45g";
-     amc->spi_model = "mx66l1g45g";
-     amc->num_cs    = 2;
-+    amc->macs_mask  = ASPEED_MAC2_ON;
-     amc->i2c_init  = witherspoon_bmc_i2c_init; /* Same board layout */
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 114b94f8f44d..fa85122f6d78 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -247,6 +247,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
-     Error *err = NULL, *local_err = NULL;
-     qemu_irq irq;
-+    NICInfo *nd = &nd_table[0];
- 
-     /* IO space */
-     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
-@@ -462,8 +463,12 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-+        if ((s->macs_mask & (1 << i)) && nd->used) {
-+            qemu_check_nic_model(nd, TYPE_FTGMAC100);
-+            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
-+            nd++;
-+        }
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
-@@ -471,7 +476,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         error_propagate(&err, local_err);
-         if (err) {
-             error_propagate(errp, err);
--           return;
-+            return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
-                         sc->memmap[ASPEED_ETH1 + i]);
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 984d29087dce..d2c6a5760790 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -234,6 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     AspeedSoCState *s = ASPEED_SOC(dev);
-     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
-     Error *err = NULL, *local_err = NULL;
-+    NICInfo *nd = &nd_table[0];
- 
-     /* IO space */
-     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
-@@ -405,8 +406,12 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-+        if ((s->macs_mask & (1 << i)) && nd->used) {
-+            qemu_check_nic_model(nd, TYPE_FTGMAC100);
-+            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
-+            nd++;
-+        }
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
-@@ -455,6 +460,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-                        aspeed_soc_get_irq(s, ASPEED_SDHCI));
- }
- static Property aspeed_soc_properties[] = {
-+    DEFINE_PROP_UINT32("macs-mask", AspeedSoCState, macs_mask, 0x1),
-     DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
--- 
-2.25.4
+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
+DQwb/9wJbA=3D=3D
+=3DoaU8
+-----END PGP PUBLIC KEY BLOCK-----
+
+--=20
+Eduardo
+
+--bCsyhTFzCvuiizWE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEWjIv1avE09usz9GqKAeTb5hNxaYFAl7EDBYACgkQKAeTb5hN
+xaaQqw//V+6nJX59kDP1lg3uRDo+eDcae5CiBlEIbQJ9Wur8aTn2LydHx/0oFcmp
+a/rzlgtHOG2+uXCDmyLwty7JNiMjoQdb6Js6bQYrgxGIc5cn/hWaXTjBSDXsRpfz
+LE6fmaUI3+I2rKYQpdnl4AkKwmzIG4cxGxLESks/KigS1blxUkb7cGDbKywIW2R1
+i8K4I2xGiWRBiYCeKQ43+MmyVLkYEjQaESMblyRky2RAWgeqfnRIA8VOBIZX97fZ
+b1lfg+J06Csq89qiEt0wmZ3BOCThk5zOqGlquKKRq3fvyPl+KeA2iv2dT13+YwWK
+ZQ+hL8tcj5KsizfEahGMpyWmadamJeXTBmA9vphREbil9ZapGiSkP1TDOV0MnZ4p
+ZcbPy2Zul7SdD6PQsKxWZwhUVtpNrioXbmeTsGwnK9H6Y8W5aZK3fOk3FrbHQ53h
+AhhTPTD6z3JUCHwBFholgmUfCHHV+FRU2nXZwIeUXrCAMFCIc4NNOhTr8ftYIiKc
+JpiBYZIYPxspGTlTD2M0yg9eT/VpW9jjnjsPbnOEAuAZpU1Pvum66ctWWvRyVl9u
+MJZ44SW43PGEaV3ain8K/MZ6j4FIO7AVkIiTr/TJBNwNuPbfHCuk2wD3YVkVHJzs
+H3xItTID8E7/FT+xKg/9FRAPOXYgD2kX4kvsmRO49AFnSLTxiwo=
+=vjKD
+-----END PGP SIGNATURE-----
+
+--bCsyhTFzCvuiizWE--
 
 
