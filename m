@@ -2,80 +2,81 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F640C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B47C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:43:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45CC720C09
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:43:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE0E820C09
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:43:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="krIQPmgS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45CC720C09
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Sc5qGe/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0E820C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbA1E-0001Dt-Dy
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:43:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39104)
+	id 1jbA1U-0001bh-C2
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=401675184=alistair.francis@wdc.com>)
- id 1jb9yI-0004bC-6y; Tue, 19 May 2020 17:40:22 -0400
+ id 1jb9yM-0004ks-GH; Tue, 19 May 2020 17:40:26 -0400
 Received: from esa2.hgst.iphmx.com ([68.232.143.124]:10366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=401675184=alistair.francis@wdc.com>)
- id 1jb9yG-0008RL-FL; Tue, 19 May 2020 17:40:21 -0400
+ id 1jb9yK-0008RL-7d; Tue, 19 May 2020 17:40:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1589924443; x=1621460443;
+ t=1589924448; x=1621460448;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=8F8a9zRpcDfMqrY5c2yGF+yjuL1qF8edKe6nQ2idqxM=;
- b=krIQPmgSmC2iGe/SC6J3jOx8nBuNh+vhK9S7Sc+bdUYLnaNEKzmbYgFz
- V1pDKHivIktm2ufxdbgyNQCMec6AHe0yEvpdusuV9S3Wo33Z/IagDl4K3
- 0iGyeQ1HM6lLB3xixYaU/VF+dSQbf1ykp71GYBcP2s4hJoNO9EM3ZsDNJ
- J+uk4I4WEPJuxstgRdiRNfJsu4xVlyamQlVTwtXFIX+lWs/TXCInV7tYh
- LYkMfBMzq12vjL2PC+KegvOOKwRYcPd2unUEXDwys5JY+BecGE9T6yNGM
- IZLT0hjjaO90P0trlpH6cRKKQrzgegq9qB5xUTgSI0XiFL0RT/7sNi43Q w==;
-IronPort-SDR: rh+B+RMxZEev9kzr3o69WMTbl8DHJIc0b/VvpSa/8faBbzlS4Xxk+oG89tGcYiRoj2q3EKdjKG
- 0T+Z0hSG0uTLMqgL4V4KCaS13WzHO9J6DJi9RrLr1pd7tN+QKFUguW1t2dVQypT6N3jPAY6tu8
- GsaFnwet7hqdCp7bfkOcuzvVPBPw5iGrdnRVtMFsN7BT9PG1PGMb2Gyzg8oX4GRLtTJphRZRPL
- BNrm0f/zpgCMwLIuqEC1uU9gffbi1122tozd+weeBzKllEjl6tGt0BU4OD40yRJG2+LftKG2PQ
- Bh4=
-X-IronPort-AV: E=Sophos;i="5.73,411,1583164800"; d="scan'208";a="240814189"
+ bh=+kozNLIq7guLVIoQ+locoYKjibuFfqPO/TSpnNe8/tw=;
+ b=Sc5qGe/6PMw6RYC7bfCieCF73JUb3fKikZGOUc1TqC+VgVmOKKkGh1qP
+ iInxiSSxXNBw4ryyy+VuVFfxdXgkD0I7/GumX4xPRrveWi7f8PtOxCDwG
+ SgetG639hgbWxRlZSElKECfQT2S+78cSvbGfFmO8aFVUzK8is9aLf+CD1
+ ek6Z5IiJ+i/kxj6KDoQtwOHkEHDuPMAIx00JUlLoDMbiPg5g6UAbdzDbZ
+ /1AIEr9oSTlPr7vZnlbSNv+N2zRS3Z/CPW8zliEGWjm5TdPiy9T3lxF0L
+ AkGGlJ9IhA4m6ZSeq3upZi4GJ79syR8oDlwSQkkvofYR1zY7tIPq8vPo0 A==;
+IronPort-SDR: V54GoKxgCcSBzfCsAwOPzXxx9IjWAqxUEjQGZi86kMJnKZ6U1bmVnOI/Uz/lpJufG5Uq6FU9Lg
+ HhWuDjnX/a/Ty3wlKF8qd3hMb83DBvhxN0uiQ8JDeUfK8gFBYHz8/oTibL69X1jF6V3ce+iP0n
+ CBTHzEXAi48+iHeudY3jBxtjaCHn+jaJihIBsYzuxZRnDJOd4r+v5THFuYd6UIhbziDRCxbcBV
+ GDuFOUl3xVi65orSekKON1ZIVX20MhJPKhbL+vG//UNvApX3ARhJK/2R1UeJ88I1qkFnQokewl
+ 7DY=
+X-IronPort-AV: E=Sophos;i="5.73,411,1583164800"; d="scan'208";a="240814200"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 20 May 2020 05:40:12 +0800
-IronPort-SDR: kf/Ne/uK2TY+9WTvJ4DhrRB8HABbQ2LV34mzaab8wzH1+YFsbNCyu/jjdR5y2fO9sKBdoL2zwn
- w0ea31uhHmemuaGLs2F29o1hYlZa5LmCU=
+ by ob1.hgst.iphmx.com with ESMTP; 20 May 2020 05:40:25 +0800
+IronPort-SDR: 5GGlCo6zi66GJWG22cAc1spgR3ftkmp1Yf7Q/rWjJyMVa+bMNe/NzbtGruT6rpHi29Ey0hqMTN
+ 4X99fyf2Cqo0zpObvhYszXXcoAM8PB3wo=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 May 2020 14:29:30 -0700
-IronPort-SDR: MZFOkxiZxDm7+wT1p73JtEoBdLTO7hEzXVyLV7BcD+XOQQ0ugiG6b+tX1rT68sspNGONm3tlZl
- lNDCqvEx1N2w==
+ 19 May 2020 14:29:39 -0700
+IronPort-SDR: eUeqXox3rXE6JExt9ngHhPfckaikBDaHVxMW/SpCoV9/VQLl6Q/mgy53PCICsMfWzKKMZef224
+ VJLWmA80yQIw==
 WDCIronportException: Internal
 Received: from usa005149.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.14])
- by uls-op-cesaip01.wdc.com with ESMTP; 19 May 2020 14:39:59 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 19 May 2020 14:40:08 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v3 3/9] target/riscv: Add the lowRISC Ibex CPU
-Date: Tue, 19 May 2020 14:31:32 -0700
-Message-Id: <24ba2634ff761e7a1e6b28b15929b03db3f59008.1589923785.git.alistair.francis@wdc.com>
+Subject: [PATCH v3 6/9] hw/intc: Initial commit of lowRISC Ibex PLIC
+Date: Tue, 19 May 2020 14:31:41 -0700
+Message-Id: <e51121b9a3e0799f7119f6caf38ae21c2e5c31ee.1589923785.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1589923785.git.alistair.francis@wdc.com>
 References: <cover.1589923785.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=401675184=alistair.francis@wdc.com;
@@ -107,60 +108,386 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ibex is a small and efficient, 32-bit, in-order RISC-V core with
-a 2-stage pipeline that implements the RV32IMC instruction set
-architecture.
+The Ibex core contains a PLIC that although similar to the RISC-V spec
+is not RISC-V spec compliant.
 
-For more details on lowRISC see here:
-https://github.com/lowRISC/ibex
+This patch implements a Ibex PLIC in a somewhat generic way.
+
+As the current RISC-V PLIC needs tidying up, my hope is that as the Ibex
+PLIC move towards spec compliance this PLIC implementation can be
+updated until it can replace the current PLIC.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/riscv/cpu.h |  1 +
- target/riscv/cpu.c | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ include/hw/intc/ibex_plic.h |  63 +++++++++
+ hw/intc/ibex_plic.c         | 261 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                 |   2 +
+ hw/intc/Makefile.objs       |   1 +
+ 4 files changed, 327 insertions(+)
+ create mode 100644 include/hw/intc/ibex_plic.h
+ create mode 100644 hw/intc/ibex_plic.c
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index d0e7f5b9c5..8733d7467f 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -35,6 +35,7 @@
- #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
- #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
- #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
-+#define TYPE_RISCV_CPU_IBEX             RISCV_CPU_TYPE_NAME("lowrisc-ibex")
- #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
- #define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
- #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 5eb3c02735..eb2bbc87ae 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -156,6 +156,15 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
-     set_feature(env, RISCV_FEATURE_PMP);
- }
- 
-+static void rv32imcu_nommu_cpu_init(Object *obj)
+diff --git a/include/hw/intc/ibex_plic.h b/include/hw/intc/ibex_plic.h
+new file mode 100644
+index 0000000000..ddc7909903
+--- /dev/null
++++ b/include/hw/intc/ibex_plic.h
+@@ -0,0 +1,63 @@
++/*
++ * QEMU RISC-V lowRISC Ibex PLIC
++ *
++ * Copyright (c) 2020 Western Digital
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef HW_IBEX_PLIC_H
++#define HW_IBEX_PLIC_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_IBEX_PLIC "ibex-plic"
++#define IBEX_PLIC(obj) \
++    OBJECT_CHECK(IbexPlicState, (obj), TYPE_IBEX_PLIC)
++
++typedef struct IbexPlicState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion mmio;
++
++    uint32_t *pending;
++    uint32_t *source;
++    uint32_t *priority;
++    uint32_t *enable;
++    uint32_t threshold;
++    uint32_t claim;
++
++    /* config */
++    uint32_t num_cpus;
++    uint32_t num_sources;
++
++    uint32_t pending_base;
++    uint32_t pending_num;
++
++    uint32_t source_base;
++    uint32_t source_num;
++
++    uint32_t priority_base;
++    uint32_t priority_num;
++
++    uint32_t enable_base;
++    uint32_t enable_num;
++
++    uint32_t threshold_base;
++
++    uint32_t claim_base;
++} IbexPlicState;
++
++#endif /* HW_IBEX_PLIC_H */
+diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
+new file mode 100644
+index 0000000000..41079518c6
+--- /dev/null
++++ b/hw/intc/ibex_plic.c
+@@ -0,0 +1,261 @@
++/*
++ * QEMU RISC-V lowRISC Ibex PLIC
++ *
++ * Copyright (c) 2020 Western Digital
++ *
++ * Documentation avaliable: https://docs.opentitan.org/hw/ip/rv_plic/doc/
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "hw/qdev-properties.h"
++#include "hw/core/cpu.h"
++#include "hw/boards.h"
++#include "hw/pci/msi.h"
++#include "target/riscv/cpu_bits.h"
++#include "target/riscv/cpu.h"
++#include "hw/intc/ibex_plic.h"
++
++static bool addr_between(uint32_t addr, uint32_t base, uint32_t num)
 +{
-+    CPURISCVState *env = &RISCV_CPU(obj)->env;
-+    set_misa(env, RV32 | RVI | RVM | RVC | RVU);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-+    set_resetvec(env, 0x8090);
-+    set_feature(env, RISCV_FEATURE_PMP);
++    uint32_t end = base + (num * 0x04);
++
++    if (addr >= base && addr < end) {
++        return true;
++    }
++
++    return false;
 +}
 +
- static void rv32imacu_nommu_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-@@ -619,6 +628,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
-     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
- #if defined(TARGET_RISCV32)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32imcu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
++static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
++{
++    int pending_num = irq / 32;
++
++    s->pending[pending_num] |= level << (irq % 32);
++}
++
++static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
++{
++    int i;
++
++    for (i = 0; i < s->pending_num; i++) {
++        uint32_t irq_num = ctz64(s->pending[i]) + (i * 32);
++
++        if (!(s->pending[i] & s->enable[i])) {
++            /* No pending and enabled IRQ */
++            continue;
++        }
++
++        if (s->priority[irq_num] > s->threshold) {
++            if (!s->claim) {
++                s->claim = irq_num;
++            }
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static void ibex_plic_update(IbexPlicState *s)
++{
++    CPUState *cpu;
++    int level, i;
++
++    for (i = 0; i < s->num_cpus; i++) {
++        cpu = qemu_get_cpu(i);
++
++        if (!cpu) {
++            continue;
++        }
++
++        level = ibex_plic_irqs_pending(s, 0);
++
++        riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
++    }
++}
++
++static void ibex_plic_reset(DeviceState *dev)
++{
++    IbexPlicState *s = IBEX_PLIC(dev);
++
++    s->threshold = 0x00000000;
++    s->claim = 0x00000000;
++}
++
++static uint64_t ibex_plic_read(void *opaque, hwaddr addr,
++                               unsigned int size)
++{
++    IbexPlicState *s = opaque;
++    int offset;
++    uint32_t ret = 0;
++
++    if (addr_between(addr, s->pending_base, s->pending_num)) {
++        offset = (addr - s->pending_base) / 4;
++        ret = s->pending[offset];
++    } else if (addr_between(addr, s->source_base, s->source_num)) {
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Interrupt source mode not supported\n", __func__);
++    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
++        offset = (addr - s->priority_base) / 4;
++        ret = s->priority[offset];
++    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
++        offset = (addr - s->enable_base) / 4;
++        ret = s->enable[offset];
++    } else if (addr_between(addr, s->threshold_base, 1)) {
++        ret = s->threshold;
++    } else if (addr_between(addr, s->claim_base, 1)) {
++        int pending_num = s->claim / 32;
++        s->pending[pending_num] &= ~(1 << (s->claim % 32));
++
++        ret = s->claim;
++    }
++
++    return ret;
++}
++
++static void ibex_plic_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned int size)
++{
++    IbexPlicState *s = opaque;
++
++    if (addr_between(addr, s->pending_base, s->pending_num)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Pending registers are read only\n", __func__);
++    } else if (addr_between(addr, s->source_base, s->source_num)) {
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Interrupt source mode not supported\n", __func__);
++    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
++        uint32_t irq = ((addr - s->priority_base) >> 2) + 1;
++        s->priority[irq] = value & 7;
++    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
++        uint32_t enable_reg = (addr - s->enable_base) / 4;
++
++        s->enable[enable_reg] = value;
++    } else if (addr_between(addr, s->threshold_base, 1)) {
++        s->threshold = value & 3;
++    } else if (addr_between(addr, s->claim_base, 1)) {
++        if (s->claim == value) {
++            /* Interrupt was completed */
++            s->claim = 0;
++        }
++    }
++
++    ibex_plic_update(s);
++}
++
++static const MemoryRegionOps ibex_plic_ops = {
++    .read = ibex_plic_read,
++    .write = ibex_plic_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static void ibex_plic_irq_request(void *opaque, int irq, int level)
++{
++    IbexPlicState *s = opaque;
++
++    ibex_plic_irqs_set_pending(s, irq, level > 0);
++    ibex_plic_update(s);
++}
++
++static Property ibex_plic_properties[] = {
++    DEFINE_PROP_UINT32("num-cpus", IbexPlicState, num_cpus, 1),
++    DEFINE_PROP_UINT32("num-sources", IbexPlicState, num_sources, 80),
++
++    DEFINE_PROP_UINT32("pending-base", IbexPlicState, pending_base, 0),
++    DEFINE_PROP_UINT32("pending-num", IbexPlicState, pending_num, 3),
++
++    DEFINE_PROP_UINT32("source-base", IbexPlicState, source_base, 0x0c),
++    DEFINE_PROP_UINT32("source-num", IbexPlicState, source_num, 3),
++
++    DEFINE_PROP_UINT32("priority-base", IbexPlicState, priority_base, 0x18),
++    DEFINE_PROP_UINT32("priority-num", IbexPlicState, priority_num, 80),
++
++    DEFINE_PROP_UINT32("enable-base", IbexPlicState, enable_base, 0x200),
++    DEFINE_PROP_UINT32("enable-num", IbexPlicState, enable_num, 3),
++
++    DEFINE_PROP_UINT32("threshold-base", IbexPlicState, threshold_base, 0x20c),
++
++    DEFINE_PROP_UINT32("claim-base", IbexPlicState, claim_base, 0x210),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void ibex_plic_init(Object *obj)
++{
++    IbexPlicState *s = IBEX_PLIC(obj);
++
++    memory_region_init_io(&s->mmio, obj, &ibex_plic_ops, s,
++                          TYPE_IBEX_PLIC, 0x400);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++}
++
++static void ibex_plic_realize(DeviceState *dev, Error **errp)
++{
++    IbexPlicState *s = IBEX_PLIC(dev);
++    int i;
++
++    s->pending = g_new0(uint32_t, s->pending_num);
++    s->source = g_new0(uint32_t, s->source_num);
++    s->priority = g_new0(uint32_t, s->priority_num);
++    s->enable = g_new0(uint32_t, s->enable_num);
++
++    qdev_init_gpio_in(dev, ibex_plic_irq_request, s->num_sources);
++
++    /*
++     * We can't allow the supervisor to control SEIP as this would allow the
++     * supervisor to clear a pending external interrupt which will result in
++     * a lost interrupt in the case a PLIC is attached. The SEIP bit must be
++     * hardware controlled when a PLIC is attached.
++     */
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int smp_cpus = ms->smp.cpus;
++    for (i = 0; i < smp_cpus; i++) {
++        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(i));
++        if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
++            error_report("SEIP already claimed");
++            exit(1);
++        }
++    }
++
++    msi_nonbroken = true;
++}
++
++static void ibex_plic_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = ibex_plic_reset;
++    device_class_set_props(dc, ibex_plic_properties);
++    dc->realize = ibex_plic_realize;
++}
++
++static const TypeInfo ibex_plic_info = {
++    .name          = TYPE_IBEX_PLIC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IbexPlicState),
++    .instance_init = ibex_plic_init,
++    .class_init    = ibex_plic_class_init,
++};
++
++static void ibex_plic_register_types(void)
++{
++    type_register_static(&ibex_plic_info);
++}
++
++type_init(ibex_plic_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7d27a44d15..34b7c1745d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1238,8 +1238,10 @@ L: qemu-riscv@nongnu.org
+ S: Supported
+ F: hw/riscv/opentitan.c
+ F: hw/char/ibex_uart.c
++F: hw/intc/ibex_plic.c
+ F: include/hw/riscv/opentitan.h
+ F: include/hw/char/ibex_uart.h
++F: include/hw/intc/ibex_plic.h
+ 
+ SH4 Machines
+ ------------
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index f726d87532..a61e6728fe 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) += arm_gicv3_cpuif.o
+ obj-$(CONFIG_MIPS_CPS) += mips_gic.o
+ obj-$(CONFIG_NIOS2) += nios2_iic.o
+ obj-$(CONFIG_OMPIC) += ompic.o
++obj-$(CONFIG_IBEX) += ibex_plic.o
 -- 
 2.26.2
 
