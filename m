@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B880C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14FBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:01:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A4FE20825
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1B84207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:01:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TMsD5Aea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4FE20825
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hpskyoq5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B84207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb3jS-0002Ao-9D
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:00:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44932)
+	id 1jb3ki-0005Cr-P4
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:01:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ez-00015y-CK
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28932
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3f1-0001B2-Hf
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53922
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ey-0003UN-8b
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:00 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ez-0003V5-MK
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589900159;
+ s=mimecast20190719; t=1589900160;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uygfuq9qutNukd4dKNLLsVjlqjhCsSD4Bsytkavs1ug=;
- b=TMsD5Aea9DT+ZjVkP0u+Ek31AZaPMeM8AMp3/BZ6cAuAcf8RGEfJC8DQ797FvRSovVsFsm
- UmGbcObnStH/MkTthMlsPEkqLC13+xRuq2WqLa7CNSKwHl7BUkvCZQRbkfvLf4DEdtZs9P
- Aq9GM4F/VVCHDNzIQKlByU9XTy3pYsQ=
+ bh=/22LRD+VJufGTHanGktF1ynIproRu9kuTfNaJ/fg4RM=;
+ b=Hpskyoq5j8wDOSryX0NwOCgDW6NnS9dgEGN1YbnIYDEF7MgKL4uEk6coX4ePsJr9YQ8TSn
+ QIBBxHtN+drRtxkUO5FHjThAKnWP8at327Qo9k6bNssbpDPyTr3R6npw0gELAKKIxkdXqY
+ dLC7IpI+Fvwn02yhFc4jCCkR5/jCeaA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-_kfN5gwBPem9MC1sRYf93g-1; Tue, 19 May 2020 10:55:57 -0400
-X-MC-Unique: _kfN5gwBPem9MC1sRYf93g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-377-wbHvFdhkNfGBN0QcqI0Hsg-1; Tue, 19 May 2020 10:55:59 -0400
+X-MC-Unique: wbHvFdhkNfGBN0QcqI0Hsg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1A4C1855A06
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6242580B72E
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AEC5810027A5;
- Tue, 19 May 2020 14:55:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3166A60C84;
+ Tue, 19 May 2020 14:55:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0402A11358D1; Tue, 19 May 2020 16:55:52 +0200 (CEST)
+ id 2A27411358DC; Tue, 19 May 2020 16:55:52 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 20/55] isa: isa_create(), isa_try_create() are now unused, drop
-Date: Tue, 19 May 2020 16:55:16 +0200
-Message-Id: <20200519145551.22836-21-armbru@redhat.com>
+Subject: [PATCH 31/55] auxbus: Convert a use of qdev_set_parent_bus()
+Date: Tue, 19 May 2020 16:55:27 +0200
+Message-Id: <20200519145551.22836-32-armbru@redhat.com>
 In-Reply-To: <20200519145551.22836-1-armbru@redhat.com>
 References: <20200519145551.22836-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:56:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,52 +100,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Convert qdev_set_parent_bus()/qdev_init_nofail() to qdev_realize();
+recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
+why.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/hw/isa/isa.h |  2 --
- hw/isa/isa-bus.c     | 16 ----------------
- 2 files changed, 18 deletions(-)
+ hw/display/xlnx_dp.c | 2 +-
+ hw/misc/auxbus.c     | 4 +---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index 3b6215fafe..52b61eed88 100644
---- a/include/hw/isa/isa.h
-+++ b/include/hw/isa/isa.h
-@@ -103,8 +103,6 @@ void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16);
- IsaDma *isa_get_dma(ISABus *bus, int nchan);
- MemoryRegion *isa_address_space(ISADevice *dev);
- MemoryRegion *isa_address_space_io(ISADevice *dev);
--ISADevice *isa_create(ISABus *bus, const char *name);
--ISADevice *isa_try_create(ISABus *bus, const char *name);
- ISADevice *isa_new(const char *name);
- ISADevice *isa_try_new(const char *name);
- bool isa_realize_and_unref(ISADevice *dev, ISABus *bus, Error **errp);
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 9a95ac3f96..630985604d 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -160,22 +160,6 @@ static void isa_device_init(Object *obj)
-     dev->isairq[1] = -1;
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index b1d90cab1d..75de65ec96 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -1266,7 +1266,7 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
+ 
+     aux_realize_bus(s->aux_bus);
+ 
+-    qdev_init_nofail(DEVICE(s->dpcd));
++    qdev_realize(DEVICE(s->dpcd), BUS(s->aux_bus), &error_fatal);
+     aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
+ 
+     qdev_realize_and_unref(DEVICE(s->edid), BUS(aux_get_i2c_bus(s->aux_bus)),
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index 9b4ccfa39c..682c35ece8 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -70,7 +70,6 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+     bus = AUX_BUS(qbus_create(TYPE_AUX_BUS, parent, name));
+     auxtoi2c = object_new_with_props(TYPE_AUXTOI2C, OBJECT(bus), "i2c",
+                                      &error_abort, NULL);
+-    qdev_set_parent_bus(DEVICE(auxtoi2c), BUS(bus));
+ 
+     bus->bridge = AUXTOI2C(auxtoi2c);
+ 
+@@ -83,7 +82,7 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+ 
+ void aux_realize_bus(AUXBus *bus)
+ {
+-    qdev_init_nofail(DEVICE(bus->bridge));
++    qdev_realize(DEVICE(bus->bridge), BUS(bus), &error_fatal);
  }
  
--ISADevice *isa_create(ISABus *bus, const char *name)
--{
--    DeviceState *dev;
--
--    dev = qdev_create(BUS(bus), name);
--    return ISA_DEVICE(dev);
--}
--
--ISADevice *isa_try_create(ISABus *bus, const char *name)
--{
--    DeviceState *dev;
--
--    dev = qdev_try_create(BUS(bus), name);
--    return ISA_DEVICE(dev);
--}
--
- ISADevice *isa_new(const char *name)
- {
-     return ISA_DEVICE(qdev_new(name));
+ void aux_map_slave(AUXSlave *aux_dev, hwaddr addr)
+@@ -280,7 +279,6 @@ DeviceState *aux_create_slave(AUXBus *bus, const char *type)
+ 
+     dev = qdev_new(type);
+     assert(dev);
+-    qdev_set_parent_bus(dev, &bus->qbus);
+     return dev;
+ }
+ 
 -- 
 2.21.1
 
