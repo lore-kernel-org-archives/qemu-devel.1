@@ -2,88 +2,86 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA92C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19453C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 981D52072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:20:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D43BC2075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:21:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0/dfvX8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 981D52072C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbFllE/K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43BC2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb42C-0001v2-Pf
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:20:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45110)
+	id 1jb43K-0004Vw-0q
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:21:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3fD-0001jR-Nq
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53112
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb3fb-0002dw-HE
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52220
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3f3-0003X7-La
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:15 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb3fZ-0003cO-9E
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589900163;
+ s=mimecast20190719; t=1589900196;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rvAZ4/N5DHxEnNBSW1K+xbt+fN1NTHTUP8hI7FZxgEE=;
- b=D0/dfvX8LWcPi4j4jjLSo6XiU63LZGOzKKH+9yAkMc4HNBhTpqp9hOxonOvegMYMd8iifl
- zn4SKWINBnvR6jliArvb0MXN+13L1YUQbrkyqCyXPvx4D2/XBExu+DWW8p87oIVW4+U0KZ
- BM86Za/ml1jImBFVuET/a++ZXZJrprk=
+ bh=g7sznRWAeMw8hCddLs8RkqgjbvLii3Oxy6wCtC0neHk=;
+ b=GbFllE/KC2Boo1ip1miUiwS0plzz1UUzM979vgHLrL17YzUfyvDm0OWzy8Zl+rHBewtB4V
+ H9Ti93EeAxjno80b4rICJbakb/FihHacM38nnVYqnKeRUt/4AI46zIooa8F4OzsytdyACx
+ uDSrb3lJsLNAws8GtbJ6qEfuWgBoI3w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-p_Fr-HkBOAaBdQCzZGgDtg-1; Tue, 19 May 2020 10:55:58 -0400
-X-MC-Unique: p_Fr-HkBOAaBdQCzZGgDtg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-419-8WcL7Xx6MNqNgpFtgtn_Bg-1; Tue, 19 May 2020 10:56:34 -0400
+X-MC-Unique: 8WcL7Xx6MNqNgpFtgtn_Bg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75F938015D1;
- Tue, 19 May 2020 14:55:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E9B66F7E0;
- Tue, 19 May 2020 14:55:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0AEF111358D3; Tue, 19 May 2020 16:55:52 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 22/55] ssi: Convert uses of ssi_create_slave_no_init() with
- Coccinelle
-Date: Tue, 19 May 2020 16:55:18 +0200
-Message-Id: <20200519145551.22836-23-armbru@redhat.com>
-In-Reply-To: <20200519145551.22836-1-armbru@redhat.com>
-References: <20200519145551.22836-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C599A1005510;
+ Tue, 19 May 2020 14:56:33 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E41A360BEC;
+ Tue, 19 May 2020 14:56:32 +0000 (UTC)
+Date: Tue, 19 May 2020 16:56:30 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v3] docs/s390x: document vfio-ccw
+Message-ID: <20200519165630.4631bca0.cohuck@redhat.com>
+In-Reply-To: <73ebd9a0-f173-efed-c9b1-1ec30ead90b3@redhat.com>
+References: <20200518075522.97643-1-cohuck@redhat.com>
+ <73ebd9a0-f173-efed-c9b1-1ec30ead90b3@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,231 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Alistair Francis <alistair@alistair23.me>,
- berrange@redhat.com, ehabkost@redhat.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace
+On Tue, 19 May 2020 15:19:21 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-    dev = ssi_create_slave_no_init(bus, type_name);
-    ...
-    qdev_init_nofail(dev);
+> On 18/05/2020 09.55, Cornelia Huck wrote:
+> > Add a basic example for passing a dasd via vfio-ccw.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> > 
+> > v2->v3: moved uuid generation (Thomas)
+> > 
+> > ---
+> >  docs/system/s390x/vfio-ccw.rst | 77 ++++++++++++++++++++++++++++++++++
+> >  docs/system/target-s390x.rst   |  1 +
+> >  2 files changed, 78 insertions(+)
+> >  create mode 100644 docs/system/s390x/vfio-ccw.rst
+> > 
+> > diff --git a/docs/system/s390x/vfio-ccw.rst b/docs/system/s390x/vfio-ccw.rst
+> > new file mode 100644
+> > index 000000000000..fff23d9afff7
+> > --- /dev/null
+> > +++ b/docs/system/s390x/vfio-ccw.rst
+> > @@ -0,0 +1,77 @@
+> > +Subchannel passthrough via vfio-ccw
+> > +===================================
+> > +
+> > +vfio-ccw (based upon the mediated vfio device infrastructure) allows to
+> > +make certain I/O subchannels and their devices available to a guest. The
+> > +host will not interact with those subchannels/devices any more.
+> > +
+> > +Note that while vfio-ccw should work with most non-QDIO devices, only ECKD
+> > +DASDs have really been tested.
+> > +
+> > +Example configuration
+> > +---------------------
+> > +
+> > +Step 1: configure the host device
+> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > +
+> > +As every mdev is identified by a uuid, the first step is to obtain one::
+> > +
+> > +  [root@host ~]# uuidgen
+> > +  7e270a25-e163-4922-af60-757fc8ed48c6
+> > +
+> > +Note: it is recommended to use the ``mdevctl`` tool for actually configuring
+> > +the host device.
+> > +
+> > +To define the same device as configured below to be started
+> > +automatically, use
+> > +
+> > +::
+> > +
+> > +   [root@host ~]# driverctl -b css set-override 0.0.0313 vfio_ccw
+> > +   [root@host ~]# mdevctl define -u 7e270a25-e163-4922-af60-757fc8ed48c6\  
+> 
+> Maybe add a space before the backslash?
+> 
+> > +                  -p 0.0.0313 -t vfio-ccw_io -a
+> > +
+> > +If using ``mdevctl``  is not possible or wanted, follow the manual procedure
+> > +below.  
+> 
+> Nit: Doubled whitespaces after mdevctl. With that fixed:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-by
+Thanks!
 
-    dev = qdev_new(type_name);
-    ...
-    qdev_realize_and_unref(dev, bus, &error_fatal);
-
-Recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
-why.
-
-    @@
-    type SSIBus;
-    identifier bus;
-    expression dev, qbus, expr;
-    expression list args;
-    @@
-    -    bus = (SSIBus *)qbus;
-    +    bus = qbus; // TODO fix up decl
-         ...
-    -    dev = ssi_create_slave_no_init(bus, args);
-    +    dev = qdev_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(dev);
-    +    qdev_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = ssi_create_slave_no_init(bus, args);
-    +    dev = qdev_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(dev);
-    +    qdev_realize_and_unref(dev, BUS(bus), &error_fatal);
-
-Bus declarations fixed up manually.
-
-Cc: Alistair Francis <alistair@alistair23.me>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/arm/aspeed.c                     |  4 ++--
- hw/arm/msf2-som.c                   |  8 ++++----
- hw/arm/sabrelite.c                  |  4 ++--
- hw/arm/xilinx_zynq.c                |  4 ++--
- hw/arm/xlnx-zcu102.c                | 16 ++++++++--------
- hw/microblaze/petalogix_ml605_mmu.c |  4 ++--
- 6 files changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index c425c01e06..adbfbbd6b4 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -225,12 +225,12 @@ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         qemu_irq cs_line;
- 
--        fl->flash = ssi_create_slave_no_init(s->spi, flashtype);
-+        fl->flash = qdev_new(flashtype);
-         if (dinfo) {
-             qdev_prop_set_drive(fl->flash, "drive", blk_by_legacy_dinfo(dinfo),
-                                 errp);
-         }
--        qdev_init_nofail(fl->flash);
-+        qdev_realize_and_unref(fl->flash, BUS(s->spi), &error_fatal);
- 
-         cs_line = qdev_get_gpio_in_named(fl->flash, SSI_GPIO_CS, 0);
-         sysbus_connect_irq(SYS_BUS_DEVICE(s), i + 1, cs_line);
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-index e398703742..ca9cbe1acb 100644
---- a/hw/arm/msf2-som.c
-+++ b/hw/arm/msf2-som.c
-@@ -47,7 +47,7 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     DriveInfo *dinfo = drive_get_next(IF_MTD);
-     qemu_irq cs_line;
--    SSIBus *spi_bus;
-+    BusState *spi_bus;
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *ddr = g_new(MemoryRegion, 1);
- 
-@@ -82,14 +82,14 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
-     soc = MSF2_SOC(dev);
- 
-     /* Attach SPI flash to SPI0 controller */
--    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
--    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    spi_bus = qdev_get_child_bus(dev, "spi0");
-+    spi_flash = qdev_new("s25sl12801");
-     qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-     if (dinfo) {
-         qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-                                     &error_fatal);
-     }
--    qdev_init_nofail(spi_flash);
-+    qdev_realize_and_unref(spi_flash, spi_bus, &error_fatal);
-     cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
- 
-diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
-index 6f0e233d77..dfd6643822 100644
---- a/hw/arm/sabrelite.c
-+++ b/hw/arm/sabrelite.c
-@@ -80,13 +80,13 @@ static void sabrelite_init(MachineState *machine)
-                 qemu_irq cs_line;
-                 DriveInfo *dinfo = drive_get_next(IF_MTD);
- 
--                flash_dev = ssi_create_slave_no_init(spi_bus, "sst25vf016b");
-+                flash_dev = qdev_new("sst25vf016b");
-                 if (dinfo) {
-                     qdev_prop_set_drive(flash_dev, "drive",
-                                         blk_by_legacy_dinfo(dinfo),
-                                         &error_fatal);
-                 }
--                qdev_init_nofail(flash_dev);
-+                qdev_realize_and_unref(flash_dev, BUS(spi_bus), &error_fatal);
- 
-                 cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-                 sysbus_connect_irq(SYS_BUS_DEVICE(spi_dev), 1, cs_line);
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 5fbd2b2e31..0e0f0976c4 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -157,12 +157,12 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
- 
-         for (j = 0; j < num_ss; ++j) {
-             DriveInfo *dinfo = drive_get_next(IF_MTD);
--            flash_dev = ssi_create_slave_no_init(spi, "n25q128");
-+            flash_dev = qdev_new("n25q128");
-             if (dinfo) {
-                 qdev_prop_set_drive(flash_dev, "drive",
-                                     blk_by_legacy_dinfo(dinfo), &error_fatal);
-             }
--            qdev_init_nofail(flash_dev);
-+            qdev_realize_and_unref(flash_dev, BUS(spi), &error_fatal);
- 
-             cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-             sysbus_connect_irq(busdev, i * num_ss + j + 1, cs_line);
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 4229b2d936..77c84b82ab 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -149,21 +149,21 @@ static void xlnx_zcu102_init(MachineState *machine)
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
--        SSIBus *spi_bus;
-+        BusState *spi_bus;
-         DeviceState *flash_dev;
-         qemu_irq cs_line;
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         gchar *bus_name = g_strdup_printf("spi%d", i);
- 
--        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-         g_free(bus_name);
- 
--        flash_dev = ssi_create_slave_no_init(spi_bus, "sst25wf080");
-+        flash_dev = qdev_new("sst25wf080");
-         if (dinfo) {
-             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                 &error_fatal);
-         }
--        qdev_init_nofail(flash_dev);
-+        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
- 
-         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
- 
-@@ -171,22 +171,22 @@ static void xlnx_zcu102_init(MachineState *machine)
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
--        SSIBus *spi_bus;
-+        BusState *spi_bus;
-         DeviceState *flash_dev;
-         qemu_irq cs_line;
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-         gchar *bus_name = g_strdup_printf("qspi%d", bus);
- 
--        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-         g_free(bus_name);
- 
--        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-+        flash_dev = qdev_new("n25q512a11");
-         if (dinfo) {
-             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                 &error_fatal);
-         }
--        qdev_init_nofail(flash_dev);
-+        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
- 
-         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
- 
-diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
-index 2e7a3fa119..d4bfa233c9 100644
---- a/hw/microblaze/petalogix_ml605_mmu.c
-+++ b/hw/microblaze/petalogix_ml605_mmu.c
-@@ -186,12 +186,12 @@ petalogix_ml605_init(MachineState *machine)
-             DriveInfo *dinfo = drive_get_next(IF_MTD);
-             qemu_irq cs_line;
- 
--            dev = ssi_create_slave_no_init(spi, "n25q128");
-+            dev = qdev_new("n25q128");
-             if (dinfo) {
-                 qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                     &error_fatal);
-             }
--            qdev_init_nofail(dev);
-+            qdev_realize_and_unref(dev, BUS(spi), &error_fatal);
- 
-             cs_line = qdev_get_gpio_in_named(dev, SSI_GPIO_CS, 0);
-             sysbus_connect_irq(busdev, i+1, cs_line);
--- 
-2.21.1
+Fixed the nits and queued to s390-next.
 
 
