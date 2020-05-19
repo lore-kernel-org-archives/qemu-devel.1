@@ -2,79 +2,94 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47296C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93448C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:53:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 117C52081A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54CBB207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5bFyUet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 117C52081A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7RaFTWA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54CBB207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb3aV-0003kT-8a
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
+	id 1jb3cP-0005pO-If
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:53:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jb3Zh-0002VF-I1
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:50:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41244
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb3Yp-0001Aj-LQ
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:49:39 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37826
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jb3Zg-0002Mv-8F
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:50:33 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb3Yo-00026f-2c
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:49:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589899831;
+ s=mimecast20190719; t=1589899776;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J9a8OMPGHHcvAQHYPMu0j2PBUOZZuVTRahZ0ZBMTIm0=;
- b=f5bFyUetOL6UWnRpcCNpiX8XcdspTh968dnCXQKGhO7H9wWhBnqy+HIQbfzpzwFL+Qe6w0
- Nzv67lvYgoZDskRBEtbqxx4funfJ+BAWVmuhc8I6zAgFvQFNqRHu2obH1iDbnG9mRAcxBP
- 67ZBDRkS8CKKJ264De88TsWrTWzL8YI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-kiGMppGtOlSKEJ366xdUzA-1; Tue, 19 May 2020 10:50:27 -0400
-X-MC-Unique: kiGMppGtOlSKEJ366xdUzA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A84A85B68B;
- Tue, 19 May 2020 14:50:25 +0000 (UTC)
-Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D46801059583;
- Tue, 19 May 2020 14:50:22 +0000 (UTC)
-Date: Tue, 19 May 2020 15:50:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH 5/6] migration/qemu-file.c: Don't ratelimit a shutdown fd
-Message-ID: <20200519145020.GG2798@work-vm>
-References: <cover.1589193382.git.lukasstraub2@web.de>
- <f3ea4250e6982598ffffc73924a6917dbc823c87.1589193382.git.lukasstraub2@web.de>
- <1dc261c8dce6421b80071c0eb3528afd@huawei.com>
- <20200518115534.GD2786@work-vm> <20200519150846.2b0aa66f@luklap>
+ bh=TMINj0/vZPDe4Rk3XKJQB3+IoZUi/4p432CuSfDqfso=;
+ b=c7RaFTWAfk6ox7ySsD6LmIkb6M8/g53iu6KTm35hcvdJ6VLBzHuN6W+4R85HbPE6D+1IW+
+ /xUHA/Bzhpt6N3WUeWyMYMYVQ1S1uXzmRcguvQIJsFILfeQ8y8Lqlo0r0DHorqeC0u/a5U
+ ++sTlFho9BrjW4Wk6qpWGxkUwULk+TU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-hIqA7F96O_iXhMZE4a6TyQ-1; Tue, 19 May 2020 10:49:34 -0400
+X-MC-Unique: hIqA7F96O_iXhMZE4a6TyQ-1
+Received: by mail-wm1-f69.google.com with SMTP id t82so1080129wmf.4
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 07:49:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TMINj0/vZPDe4Rk3XKJQB3+IoZUi/4p432CuSfDqfso=;
+ b=b4TorzAfL9iNu4jitbrraMQnSyo3Z9/h5/4OIDBjUI0xeQlA+prKrq00j72stVChFu
+ rUItnD6gBBBaQ0scGhML+TBOgr31pfA0uqLEqwVjtWmaPR5tHvDxGj2cInS3POQ9S2t0
+ OBM2tk+HlgGdZ/z5cNpKulRiADVI4dEfkeSU6fCH81D7bedAinqcy10DroHtd9bQMJ2n
+ ePDZfI34HQa2BRw9HyngZuvUcTsdWyjoQzrnryOjPSYfjiKI353D7WbpLwd9sldb+AFI
+ gG0safISmqhPcHSeIYnedgZgh9XKH2Lz0Vz+xrHjAQ54H4x9V+U3LvkRm5wLiUWJ9/2G
+ rzDw==
+X-Gm-Message-State: AOAM533S9KRpwj1FXtLQRf93FbQJ3gpvrCKFk76PTC9vGTHQC2wI9QKD
+ gzZ++U5UHIdNy2G2UnTfUQk/e16muODbj5KGw+8InKAnGH1dOKtdlflTQfaB4UA3EYKBqW4yakS
+ iRX8fUBDTDcMVR30=
+X-Received: by 2002:adf:e582:: with SMTP id l2mr27940062wrm.392.1589899772811; 
+ Tue, 19 May 2020 07:49:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywnf9jAZQPCABrIXoTQnEtttw/DRrvUIRgZr1DalOHJppqDHRn5fayf8aWZhTlNbAmN86cJA==
+X-Received: by 2002:adf:e582:: with SMTP id l2mr27940027wrm.392.1589899772418; 
+ Tue, 19 May 2020 07:49:32 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id r14sm4741821wmb.2.2020.05.19.07.49.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 May 2020 07:49:31 -0700 (PDT)
+Subject: Re: [PATCH] virtio-crypto: Convert DPRINTF to trace event
+To: teachk <teachk@foxmail.com>, qemu-devel@nongnu.org
+References: <20200516140540.51-1-teachk@foxmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <44bccfbe-b082-260a-1be4-fe710c3218b8@redhat.com>
+Date: Tue, 19 May 2020 16:49:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200519150846.2b0aa66f@luklap>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200516140540.51-1-teachk@foxmail.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -84,7 +99,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,131 +112,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Hou Weiying <weiying_hou@outlook.com>, arei.gonglei@huawei.com,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> On Mon, 18 May 2020 12:55:34 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+Hi,
+
+On 5/16/20 4:05 PM, teachk wrote:
+> From: Hou Weiying <weiying_hou@outlook.com>
 > 
-> > * Zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
-> > > > This causes the migration thread to hang if we failover during checkpoint. A
-> > > > shutdown fd won't cause network traffic anyway.
-> > > >   
-> > > 
-> > > I'm not quite sure if this modification can take side effect on normal migration process or not,
-> > > There are several places calling it.
-> > > 
-> > > Maybe Juan and Dave can help ;)
-> > >   
-> > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > > > ---
-> > > >  migration/qemu-file.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/migration/qemu-file.c b/migration/qemu-file.c index
-> > > > 1c3a358a14..0748b5810f 100644
-> > > > --- a/migration/qemu-file.c
-> > > > +++ b/migration/qemu-file.c
-> > > > @@ -660,7 +660,7 @@ int64_t qemu_ftell(QEMUFile *f)  int
-> > > > qemu_file_rate_limit(QEMUFile *f)  {
-> > > >      if (f->shutdown) {
-> > > > -        return 1;
-> > > > +        return 0;
-> > > >      }  
-> > 
-> > This looks wrong to me; I'd be curious to understand how it's hanging
-> > for you.
-> > '1' means 'stop what you're doing', 0 means carry on; carrying on with a
-> > shutdown fd sounds wrong.
-> > 
-> > If we look at ram.c we have:
-> > 
-> >         while ((ret = qemu_file_rate_limit(f)) == 0 ||
-> >                 !QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
-> >             int pages;
-> >         ....
-> > 
-> > so if it returns '1', as it does at the moment it should cause it to
-> > exit the ram_save_iterate loop - which is what we want if it's failing.
-> > Thus I think you need to find the actual place it's stuck in this case -
-> > I suspect it's repeatedly calling ram_save_iterate and then exiting it,
-> > but if that's happening perhaps we're missing a qemu_file_get_error
-> > check somewhere.
+> Signed-off-by: Hou Weiying <weiying_hou@outlook.com>
+> ---
+>   hw/virtio/trace-events            | 12 ++++++++++++
+>   hw/virtio/virtio-crypto.c         | 26 ++++++++++++++------------
+>   include/hw/virtio/virtio-crypto.h | 11 -----------
+>   3 files changed, 26 insertions(+), 23 deletions(-)
 > 
-> Hi,
-> the problem is in ram_save_host_page and migration_rate_limit, here is a backtrace:
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index e83500bee9..f7c20f211a 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -73,3 +73,15 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+>   virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+>   virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+>   virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
+> +
+> +# virtio-crypto.c
+> +virtio_crypto_cipher_session_helper_cipher_alg_and_direction(uint32_t cipher_alg, uint8_t direction) "cipher_alg=%" PRIu32 ", info->direction=%" PRIu32
 
-Ah...
+direction (last format) can be simply "%u" (the correct format is PRIu8, 
+but we don't use it).
 
-> #0  0x00007f7b502921a8 in futex_abstimed_wait_cancelable (private=0, abstime=0x7f7ada7fb3f0, clockid=0, expected=0, futex_word=0x55bc358b9908) at ../sysdeps/unix/sysv/linux/futex-internal.h:208
-> #1  do_futex_wait (sem=sem@entry=0x55bc358b9908, abstime=abstime@entry=0x7f7ada7fb3f0, clockid=0) at sem_waitcommon.c:112
-> #2  0x00007f7b502922d3 in __new_sem_wait_slow (sem=0x55bc358b9908, abstime=0x7f7ada7fb3f0, clockid=0) at sem_waitcommon.c:184
-> #3  0x000055bc3382b6c1 in qemu_sem_timedwait (sem=0x55bc358b9908, ms=100) at util/qemu-thread-posix.c:306
-> #4  0x000055bc3363950b in migration_rate_limit () at migration/migration.c:3365
+> +virtio_crypto_cipher_session_helper_keylen(uint32_t keylen) "keylen=%" PRIu32
+> +virtio_crypto_create_sym_session_auth_keylen(uint32_t auth_keylen) "auth_keylen=%" PRIu32
+> +virtio_crypto_create_sym_session_session_id(int64_t session_id) "create session_id=%" PRIu64 " successfully"
 
-OK, so how about:
+session_id is signed, so you would need PRIi64, but since session_id is 
+positive on success, instead use 'uint64_t session_id' in trace event.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index b6b662e016..4e885385a8 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3356,6 +3356,10 @@ bool migration_rate_limit(void)
-     bool urgent = false;
-     migration_update_counters(s, now);
-     if (qemu_file_rate_limit(s->to_dst_file)) {
-+
-+        if (qemu_file_get_error(mis->from_src_file)) {
-+            return false;
-+        }
-         /*
-          * Wait for a delay to do rate limiting OR
-          * something urgent to post the semaphore.
+Otherwise patch looks good, thanks for removing this DPRINTF!
 
-Does that work?
-I wonder if we also need to kick the rate_limit_sem when we yank the
-socket.
+Regards,
 
-Dave
+Phil.
 
-> #5  0x000055bc332b70d3 in ram_save_host_page (rs=0x7f7acc001a70, pss=0x7f7ada7fb4b0, last_stage=true) at /home/lukas/qemu/migration/ram.c:1696
-> #6  0x000055bc332b71fa in ram_find_and_save_block (rs=0x7f7acc001a70, last_stage=true) at /home/lukas/qemu/migration/ram.c:1750
-> #7  0x000055bc332b8bbd in ram_save_complete (f=0x55bc36661330, opaque=0x55bc33fbc678 <ram_state>) at /home/lukas/qemu/migration/ram.c:2606
-> #8  0x000055bc3364112c in qemu_savevm_state_complete_precopy_iterable (f=0x55bc36661330, in_postcopy=false) at migration/savevm.c:1344
-> #9  0x000055bc33641556 in qemu_savevm_state_complete_precopy (f=0x55bc36661330, iterable_only=true, inactivate_disks=false) at migration/savevm.c:1442
-> #10 0x000055bc33641982 in qemu_savevm_live_state (f=0x55bc36661330) at migration/savevm.c:1569
-> #11 0x000055bc33645407 in colo_do_checkpoint_transaction (s=0x55bc358b9840, bioc=0x7f7acc059990, fb=0x7f7acc4627b0) at migration/colo.c:464
-> #12 0x000055bc336457ca in colo_process_checkpoint (s=0x55bc358b9840) at migration/colo.c:589
-> #13 0x000055bc336459e4 in migrate_start_colo_process (s=0x55bc358b9840) at migration/colo.c:666
-> #14 0x000055bc336393d7 in migration_iteration_finish (s=0x55bc358b9840) at migration/migration.c:3312
-> #15 0x000055bc33639753 in migration_thread (opaque=0x55bc358b9840) at migration/migration.c:3477
-> #16 0x000055bc3382bbb5 in qemu_thread_start (args=0x55bc357c27c0) at util/qemu-thread-posix.c:519
-> #17 0x00007f7b50288f27 in start_thread (arg=<optimized out>) at pthread_create.c:479
-> #18 0x00007f7b501ba31f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+> +virtio_crypto_sym_op_helper_src_len(uint32_t src_len) "src_len=%" PRIu32
+> +virtio_crypto_sym_op_helper_dst_len(uint32_t dst_len) "dst_len=%" PRIu32
+> +virtio_crypto_sym_op_helper_hash_result_len(uint32_t hash_result_len) "hash_result_len=%" PRIu32
+> +virtio_crypto_handle_close_session(uint64_t session_id) "close session id %" PRIu64
+
+> +virtio_crypto_sym_op_helper_iv_len(uint32_t iv_len) "iv_len %" PRIu32
+> +virtio_crypto_sym_op_helper_aad_len(uint32_t aad_len) "aad_len %" PRIu32
+> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> index bd9165c565..676948a4dd 100644
+> --- a/hw/virtio/virtio-crypto.c
+> +++ b/hw/virtio/virtio-crypto.c
+> @@ -24,6 +24,7 @@
+>   #include "hw/virtio/virtio-access.h"
+>   #include "standard-headers/linux/virtio_ids.h"
+>   #include "sysemu/cryptodev-vhost.h"
+> +#include "trace.h"
+>   
+>   #define VIRTIO_CRYPTO_VM_VERSION 1
+>   
+> @@ -49,8 +50,9 @@ virtio_crypto_cipher_session_helper(VirtIODevice *vdev,
+>       info->cipher_alg = ldl_le_p(&cipher_para->algo);
+>       info->key_len = ldl_le_p(&cipher_para->keylen);
+>       info->direction = ldl_le_p(&cipher_para->op);
+> -    DPRINTF("cipher_alg=%" PRIu32 ", info->direction=%" PRIu32 "\n",
+> -             info->cipher_alg, info->direction);
+> +    trace_virtio_crypto_cipher_session_helper_cipher_alg_and_direction(
+> +            info->cipher_alg, info->direction);
+> +
+>   
+>       if (info->key_len > vcrypto->conf.max_cipher_key_len) {
+>           error_report("virtio-crypto length of cipher key is too big: %u",
+> @@ -60,7 +62,7 @@ virtio_crypto_cipher_session_helper(VirtIODevice *vdev,
+>       /* Get cipher key */
+>       if (info->key_len > 0) {
+>           size_t s;
+> -        DPRINTF("keylen=%" PRIu32 "\n", info->key_len);
+> +        trace_virtio_crypto_cipher_session_helper_keylen(info->key_len);
+>   
+>           info->cipher_key = g_malloc(info->key_len);
+>           s = iov_to_buf(*iov, num, 0, info->cipher_key, info->key_len);
+> @@ -130,7 +132,8 @@ virtio_crypto_create_sym_session(VirtIOCrypto *vcrypto,
+>               }
+>               /* get auth key */
+>               if (info.auth_key_len > 0) {
+> -                DPRINTF("auth_keylen=%" PRIu32 "\n", info.auth_key_len);
+> +                trace_virtio_crypto_create_sym_session_auth_keylen(
+> +                            info.auth_key_len);
+>                   info.auth_key = g_malloc(info.auth_key_len);
+>                   s = iov_to_buf(iov, out_num, 0, info.auth_key,
+>                                  info.auth_key_len);
+> @@ -165,8 +168,7 @@ virtio_crypto_create_sym_session(VirtIOCrypto *vcrypto,
+>                                        vcrypto->cryptodev,
+>                                        &info, queue_index, &local_err);
+>       if (session_id >= 0) {
+> -        DPRINTF("create session_id=%" PRIu64 " successfully\n",
+> -                session_id);
+> +        trace_virtio_crypto_create_sym_session_session_id(session_id);
+>   
+>           ret = session_id;
+>       } else {
+> @@ -193,7 +195,7 @@ virtio_crypto_handle_close_session(VirtIOCrypto *vcrypto,
+>       Error *local_err = NULL;
+>   
+>       session_id = ldq_le_p(&close_sess_req->session_id);
+> -    DPRINTF("close session, id=%" PRIu64 "\n", session_id);
+> +    trace_virtio_crypto_handle_close_session(session_id);
+>   
+>       ret = cryptodev_backend_sym_close_session(
+>                 vcrypto->cryptodev, session_id, queue_id, &local_err);
+> @@ -474,7 +476,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>       op_info->len_to_cipher = len_to_cipher;
+>       /* Handle the initilization vector */
+>       if (op_info->iv_len > 0) {
+> -        DPRINTF("iv_len=%" PRIu32 "\n", op_info->iv_len);
+> +        trace_virtio_crypto_sym_op_helper_iv_len(op_info->iv_len);
+>           op_info->iv = op_info->data + curr_size;
+>   
+>           s = iov_to_buf(iov, out_num, 0, op_info->iv, op_info->iv_len);
+> @@ -488,7 +490,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>   
+>       /* Handle additional authentication data if exists */
+>       if (op_info->aad_len > 0) {
+> -        DPRINTF("aad_len=%" PRIu32 "\n", op_info->aad_len);
+> +        trace_virtio_crypto_sym_op_helper_aad_len(op_info->aad_len);
+>           op_info->aad_data = op_info->data + curr_size;
+>   
+>           s = iov_to_buf(iov, out_num, 0, op_info->aad_data, op_info->aad_len);
+> @@ -503,7 +505,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>   
+>       /* Handle the source data */
+>       if (op_info->src_len > 0) {
+> -        DPRINTF("src_len=%" PRIu32 "\n", op_info->src_len);
+> +        trace_virtio_crypto_sym_op_helper_src_len(op_info->src_len);
+>           op_info->src = op_info->data + curr_size;
+>   
+>           s = iov_to_buf(iov, out_num, 0, op_info->src, op_info->src_len);
+> @@ -520,11 +522,11 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>       op_info->dst = op_info->data + curr_size;
+>       curr_size += op_info->dst_len;
+>   
+> -    DPRINTF("dst_len=%" PRIu32 "\n", op_info->dst_len);
+> +    trace_virtio_crypto_sym_op_helper_dst_len(op_info->dst_len);
+>   
+>       /* Handle the hash digest result */
+>       if (hash_result_len > 0) {
+> -        DPRINTF("hash_result_len=%" PRIu32 "\n", hash_result_len);
+> +        trace_virtio_crypto_sym_op_helper_hash_result_len(hash_result_len);
+>           op_info->digest_result = op_info->data + curr_size;
+>       }
+>   
+> diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
+> index ffe2391ece..f59f91f11e 100644
+> --- a/include/hw/virtio/virtio-crypto.h
+> +++ b/include/hw/virtio/virtio-crypto.h
+> @@ -19,17 +19,6 @@
+>   #include "sysemu/iothread.h"
+>   #include "sysemu/cryptodev.h"
+>   
+> -
+> -#define DEBUG_VIRTIO_CRYPTO 0
+> -
+> -#define DPRINTF(fmt, ...) \
+> -do { \
+> -    if (DEBUG_VIRTIO_CRYPTO) { \
+> -        fprintf(stderr, "virtio_crypto: " fmt, ##__VA_ARGS__); \
+> -    } \
+> -} while (0)
+> -
+> -
+>   #define TYPE_VIRTIO_CRYPTO "virtio-crypto-device"
+>   #define VIRTIO_CRYPTO(obj) \
+>           OBJECT_CHECK(VirtIOCrypto, (obj), TYPE_VIRTIO_CRYPTO)
 > 
-> It hangs in ram_save_host_page for at least 10 Minutes.
-> 
-> Regards,
-> Lukas Straub
-> 
-> > Dave
-> > 
-> > > >      if (qemu_file_get_error(f)) {
-> > > >          return 1;
-> > > > --
-> > > > 2.20.1  
-> > >   
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
