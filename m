@@ -2,70 +2,95 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E406C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D886DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:12:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67DC2206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67DC2206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9DE61206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:12:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="QPGtoDU+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE61206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb1wv-0005BH-LY
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 09:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56924)
+	id 1jb22X-0002Cf-JU
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 09:12:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1wB-00047W-69
- for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:39 -0400
-Received: from 8.mo7.mail-out.ovh.net ([46.105.77.114]:39218)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1wA-0003Xx-5m
- for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:38 -0400
-Received: from player770.ha.ovh.net (unknown [10.108.54.52])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id CAE4716520E
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 15:05:35 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player770.ha.ovh.net (Postfix) with ESMTPSA id ADED11299E16D;
- Tue, 19 May 2020 13:05:28 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G001b0574fb4-ff16-412f-b191-6c4689859cfc,3DCE2E61E2D7C1BA27EF92566E0C35A5904F621F)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 16/24] ppc/pnv: Put "*-pnv-chip" and "pnv-xive" on the
- main system bus
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-17-armbru@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9569bf4c-9cfa-219e-cfaf-74eeae3a0504@kaod.org>
-Date: Tue, 19 May 2020 15:05:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jb1zf-0000aQ-Dc
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 09:09:15 -0400
+Received: from mout.web.de ([212.227.15.14]:47021)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jb1ze-0004Ol-0R
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 09:09:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1589893742;
+ bh=LpMEMSMq5Jv8CFBhSOaLVllE0uAwzkcaLYAGx83EERc=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=QPGtoDU+us+jCSKKsdP6yVWRU8FYRXN2dcuu2YMrjtPIuyTfIsAc/W5ZhjKpTo0vM
+ ZXWjmXxY6atZwfQJ50fhN/7lBe8+euVo/I4nuExehyZoRpRIGrkL8GWmOqpWaDCfRL
+ PbFgeQxsUY+xxGIf12ZSOTO7xtZX08dgM57gGMrA=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.149]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MHmlu-1jond20e2Q-00EyeJ; Tue, 19
+ May 2020 15:09:02 +0200
+Date: Tue, 19 May 2020 15:08:46 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 5/6] migration/qemu-file.c: Don't ratelimit a shutdown fd
+Message-ID: <20200519150846.2b0aa66f@luklap>
+In-Reply-To: <20200518115534.GD2786@work-vm>
+References: <cover.1589193382.git.lukasstraub2@web.de>
+ <f3ea4250e6982598ffffc73924a6917dbc823c87.1589193382.git.lukasstraub2@web.de>
+ <1dc261c8dce6421b80071c0eb3528afd@huawei.com>
+ <20200518115534.GD2786@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200518050408.4579-17-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 15681252429346016083
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgiedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.77.114; envelope-from=clg@kaod.org;
- helo=8.mo7.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:05:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+Content-Type: multipart/signed; boundary="Sig_/brIqmroYSohKuiwD.WTf4jE";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:YNhuJfh65ul/Nj33SB1Mf5ntofnVJN6M8soggGAQnsj6O2/Wu4f
+ FCN5OSN78QHMEOKlvR23E+BHHDWNXixFIO+q3KRrRCzYwM4wKYBtUJcmpC7/xmkHOyM7KPn
+ 2Ku64STCkXWfz2pORwmGocTx2bf6ZPcwMqTz8GLsb6vuKcU6vselbUDFiuiMhM0iXd0JsW0
+ O/yUobfEwhCQCwty21VjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gZtd+3q3CEE=:WBznwl8EjvyIfgYGuc7hnS
+ 6PYnXBy2m/91FHPmriIEtGe4VlVuVf1EXPX95d693nJtcIlRR2XCCUkaw/dlEoa6WcexkHbf6
+ pgLlugXrXXWjDpFCXbQSdBLguFj9cYEH1GctlQfn56SnxkNP3W24Q2zLCWWc9Fp/aj/mZpVOy
+ kmmdyLf12mWm9U2YUSP+XlwM8MTWFKQVGMMl5VJx11Ye/LQvF0EShuabMQlkie7nPqqnZmruc
+ uAKHORVI+6Iwb5VlhcIr64jC7T5dyEwumF4pCD7/jM8aCO9ZLY+psQXhcS1j0S/oubVYESwMe
+ tO4XvVWYMm6DnkS+gAK3g0Z7g1jZGBU3QrhSuyShqDpZZYggyqu8OzusN59tKQu5I69D23044
+ kOjtO6JyAlY9Oda1MUL6Fo5PQYjzbd0kAlJP+TgrF43TaN+VS4j7TwSNRQkJeZ0CjE3jCe3qL
+ 9dMsBGxQWtBqr/HaRFwnHIoioMH+B1CCdxPOznCxtPc0CmooiCisSndxzzjUCpVLrh+C4p4wC
+ LSTtZKBmLfBW6m7K1qc8lnH9oZMejjadANs4vDv8Fpq2wMCjCK4uFyjNbgWFYIT/BzKId67YY
+ 7h/QaoLwonOYmTk2FusmKkYCJRTrH6nMzfTaXwVMzSsgHgYRioiMWOdEejchrLexenQXB/Iu0
+ 8U/pLFGbNBR5Pva1ewTxiRZhK8jwwGsja4XHr0WqPxaZ+rlpEZdSwpurdiqJMyajBT7wq6EyN
+ rl9EXNQp59IdNOq+3RgXLJzHxGwGxf/UIuSazqs8O55JlnEHqyg0rVk1focsfjSdp5D5d3oh1
+ 4qgo4bmhf/6I8ELwHOcGk28JAwk8X8i1lp7EH9hyjFQN2oURZB8ljfqQt/JICJnlaq6qyahot
+ CTgO9hxhhyOAkWgPmCWykxxgg10Go+ko4iawVZT2O0aWkJHUdsPZHh/QCIiR8s+z9ZdFCWDa5
+ vUZ8IRUwf7gQB1phWQKs3a6nL/nFXPjzMZfYy7mQdgP7lsnvgCeHT6fX/UjcakbpO/kEbx0TS
+ YXaIy6LVmPHemEelXUZ/6xLW9T8Q+rAtJCslLLZm1eJf2k7sBsdCC4vG21QQOlH7KZEy39paW
+ HADTBGzxARODuI6ZYOk3r9RNn46gKB7O6A6yzbA1PmzoK4FKLnFB4Di/fvYoc3j7pnSY7LVtG
+ RrMRMntzTMOVO0lx1PKZXHbm2oSrCYEm7ImzcPDjGYsb9sz331z1H0HVuPM55dNFtBOO5Ilqe
+ uu83PnTPrArDBoUMs
+Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:09:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -80,82 +105,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Juan Quintela <quintela@redhat.com>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 7:04 AM, Markus Armbruster wrote:
-> pnv_init() creates "power10_v1.0-pnv-chip", "power8_v2.0-pnv-chip",
-> "power8e_v2.1-pnv-chip", "power8nvl_v1.0-pnv-chip", or
-> "power9_v2.0-pnv-chip" sysbus devices in a way that leaves them
-> unplugged.
-> 
-> pnv_chip_power9_instance_init() creates a "pnv-xive" sysbus device in
-> a way that leaves it unplugged.
-> 
-> Create them the common way that puts them into the main system bus.
-> Affects machines powernv8, powernv9, and powernv10.  Visible in "info
-> qtree".  Here's the change for powernv9:
-> 
->      bus: main-system-bus
->        type System
->     +  dev: power9_v2.0-pnv-chip, id ""
->     +    chip-id = 0 (0x0)
->     +    ram-start = 0 (0x0)
->     +    ram-size = 1879048192 (0x70000000)
->     +    nr-cores = 1 (0x1)
->     +    cores-mask = 72057594037927935 (0xffffffffffffff)
->     +    nr-threads = 1 (0x1)
->     +    num-phbs = 6 (0x6)
->     +    mmio 000603fc00000000/0000000400000000
->     [...]
->     +  dev: pnv-xive, id ""
->     +    ic-bar = 1692157036462080 (0x6030203100000)
->     +    vc-bar = 1689949371891712 (0x6010000000000)
->     +    pc-bar = 1690499127705600 (0x6018000000000)
->     +    tm-bar = 1692157036986368 (0x6030203180000)
-> 
-> Cc: "Cédric Le Goater" <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+--Sig_/brIqmroYSohKuiwD.WTf4jE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+On Mon, 18 May 2020 12:55:34 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-Thanks,
+> * Zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> > > This causes the migration thread to hang if we failover during checkp=
+oint. A
+> > > shutdown fd won't cause network traffic anyway.
+> > >  =20
+> >=20
+> > I'm not quite sure if this modification can take side effect on normal =
+migration process or not,
+> > There are several places calling it.
+> >=20
+> > Maybe Juan and Dave can help ;)
+> >  =20
+> > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > > ---
+> > >  migration/qemu-file.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/migration/qemu-file.c b/migration/qemu-file.c index
+> > > 1c3a358a14..0748b5810f 100644
+> > > --- a/migration/qemu-file.c
+> > > +++ b/migration/qemu-file.c
+> > > @@ -660,7 +660,7 @@ int64_t qemu_ftell(QEMUFile *f)  int
+> > > qemu_file_rate_limit(QEMUFile *f)  {
+> > >      if (f->shutdown) {
+> > > -        return 1;
+> > > +        return 0;
+> > >      } =20
+>=20
+> This looks wrong to me; I'd be curious to understand how it's hanging
+> for you.
+> '1' means 'stop what you're doing', 0 means carry on; carrying on with a
+> shutdown fd sounds wrong.
+>=20
+> If we look at ram.c we have:
+>=20
+>         while ((ret =3D qemu_file_rate_limit(f)) =3D=3D 0 ||
+>                 !QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
+>             int pages;
+>         ....
+>=20
+> so if it returns '1', as it does at the moment it should cause it to
+> exit the ram_save_iterate loop - which is what we want if it's failing.
+> Thus I think you need to find the actual place it's stuck in this case -
+> I suspect it's repeatedly calling ram_save_iterate and then exiting it,
+> but if that's happening perhaps we're missing a qemu_file_get_error
+> check somewhere.
 
-C. 
+Hi,
+the problem is in ram_save_host_page and migration_rate_limit, here is a ba=
+cktrace:
 
-> ---
->  hw/ppc/pnv.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index da637822f9..8d4fc8109a 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
->      pnv->chips = g_new0(PnvChip *, pnv->num_chips);
->      for (i = 0; i < pnv->num_chips; i++) {
->          char chip_name[32];
-> -        Object *chip = object_new(chip_typename);
-> +        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
->  
->          pnv->chips[i] = PNV_CHIP(chip);
->  
-> @@ -1317,8 +1317,8 @@ static void pnv_chip_power9_instance_init(Object *obj)
->      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(obj);
->      int i;
->  
-> -    object_initialize_child(obj, "xive", &chip9->xive, sizeof(chip9->xive),
-> -                            TYPE_PNV_XIVE, &error_abort, NULL);
-> +    sysbus_init_child_obj(obj, "xive", &chip9->xive, sizeof(chip9->xive),
-> +                          TYPE_PNV_XIVE);
->      object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
->                                "xive-fabric");
->  
-> 
+#0  0x00007f7b502921a8 in futex_abstimed_wait_cancelable (private=3D0, abst=
+ime=3D0x7f7ada7fb3f0, clockid=3D0, expected=3D0, futex_word=3D0x55bc358b990=
+8) at ../sysdeps/unix/sysv/linux/futex-internal.h:208
+#1  do_futex_wait (sem=3Dsem@entry=3D0x55bc358b9908, abstime=3Dabstime@entr=
+y=3D0x7f7ada7fb3f0, clockid=3D0) at sem_waitcommon.c:112
+#2  0x00007f7b502922d3 in __new_sem_wait_slow (sem=3D0x55bc358b9908, abstim=
+e=3D0x7f7ada7fb3f0, clockid=3D0) at sem_waitcommon.c:184
+#3  0x000055bc3382b6c1 in qemu_sem_timedwait (sem=3D0x55bc358b9908, ms=3D10=
+0) at util/qemu-thread-posix.c:306
+#4  0x000055bc3363950b in migration_rate_limit () at migration/migration.c:=
+3365
+#5  0x000055bc332b70d3 in ram_save_host_page (rs=3D0x7f7acc001a70, pss=3D0x=
+7f7ada7fb4b0, last_stage=3Dtrue) at /home/lukas/qemu/migration/ram.c:1696
+#6  0x000055bc332b71fa in ram_find_and_save_block (rs=3D0x7f7acc001a70, las=
+t_stage=3Dtrue) at /home/lukas/qemu/migration/ram.c:1750
+#7  0x000055bc332b8bbd in ram_save_complete (f=3D0x55bc36661330, opaque=3D0=
+x55bc33fbc678 <ram_state>) at /home/lukas/qemu/migration/ram.c:2606
+#8  0x000055bc3364112c in qemu_savevm_state_complete_precopy_iterable (f=3D=
+0x55bc36661330, in_postcopy=3Dfalse) at migration/savevm.c:1344
+#9  0x000055bc33641556 in qemu_savevm_state_complete_precopy (f=3D0x55bc366=
+61330, iterable_only=3Dtrue, inactivate_disks=3Dfalse) at migration/savevm.=
+c:1442
+#10 0x000055bc33641982 in qemu_savevm_live_state (f=3D0x55bc36661330) at mi=
+gration/savevm.c:1569
+#11 0x000055bc33645407 in colo_do_checkpoint_transaction (s=3D0x55bc358b984=
+0, bioc=3D0x7f7acc059990, fb=3D0x7f7acc4627b0) at migration/colo.c:464
+#12 0x000055bc336457ca in colo_process_checkpoint (s=3D0x55bc358b9840) at m=
+igration/colo.c:589
+#13 0x000055bc336459e4 in migrate_start_colo_process (s=3D0x55bc358b9840) a=
+t migration/colo.c:666
+#14 0x000055bc336393d7 in migration_iteration_finish (s=3D0x55bc358b9840) a=
+t migration/migration.c:3312
+#15 0x000055bc33639753 in migration_thread (opaque=3D0x55bc358b9840) at mig=
+ration/migration.c:3477
+#16 0x000055bc3382bbb5 in qemu_thread_start (args=3D0x55bc357c27c0) at util=
+/qemu-thread-posix.c:519
+#17 0x00007f7b50288f27 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:479
+#18 0x00007f7b501ba31f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
 
+It hangs in ram_save_host_page for at least 10 Minutes.
+
+Regards,
+Lukas Straub
+
+> Dave
+>=20
+> > >      if (qemu_file_get_error(f)) {
+> > >          return 1;
+> > > --
+> > > 2.20.1 =20
+> >  =20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+
+
+--Sig_/brIqmroYSohKuiwD.WTf4jE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7D2l4ACgkQNasLKJxd
+slidKBAAhl/RoEkwdTdpEQIL9Mzq3SiuPIiLpAhWXuuGYvVZhVcTdEDoBLASsi6f
+B0eNmB/N9ecXihDbUrR6FpIXdZDb7jJ7xg5OOoWQDsC1g7jaAKUBZPQTx8syRwMT
+TJ39OFCr+WVD2oGceMusZZtmAuzZeWrxBioHHvPHevFNzM683nBIahtLunRgwlEv
+tD0SJm7QgwyRWzvMOMLQx1mL1Oqr/cqKaSZts/Q814My5yARgZkaMWaiYHhxJbJt
+pTNmA+QCh40lQpX8S47sECUu3n67yXL6fR7VPtNOvRJ5i7sc3ou2WjrS3ECmqSLu
+E7IyrmOudaqixG6rMmeL6jvCLMSqbj5QKbmQKWO99cYHwJ1uebb8KwIlYwJHauxo
+XZmBCQDEqaEfsqazi3NZBYaMxupW+OoJxEXYEzaCM2A3xe8LGU7gAFJthjKVsPeQ
+mru1+Wo6ArNQQYV7F2NsWoKzf1Kq8XZmbZU7tymDHf6aX0tses23ZI1sGYqcgiol
+kC7YA7BQbyvtwLHZu/Qx0lmkp5x3DLlyz3uUk6z2BzPPfG+7B5S8YOtAEWTX+ByU
+WtUYa5olZWybfE9CXhleOuN8zdBxi3iAX+3hPh7MYDmZAIVtpDOxPXgICBb2FLXa
+tuKWW06Ickewq25EuLoIQ7wQxhOWOyL90hMQiFjrA44hdkKEctI=
+=mD5Q
+-----END PGP SIGNATURE-----
+
+--Sig_/brIqmroYSohKuiwD.WTf4jE--
 
