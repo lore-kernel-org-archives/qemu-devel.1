@@ -2,83 +2,83 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A99C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B83DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:03:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E150420674
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4118C20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:03:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPRpokFC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E150420674
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DOUm4Kug"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4118C20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jasVQ-0002ZL-1K
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 23:01:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46926)
+	id 1jasX6-0004mP-EQ
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 23:03:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOd-0005mh-Bh
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:23 -0400
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:46616)
+ id 1jasOc-0005ie-1C
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:22 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:35247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOc-0002XL-2Y
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:23 -0400
-Received: by mail-pf1-x42e.google.com with SMTP id 145so5851239pfw.13
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:21 -0700 (PDT)
+ id 1jasOa-0002X7-T3
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:21 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id n18so5869244pfa.2
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7oeS1yq+JuN20j7v7YlPjXCqUmCXhfYGwbcqS/Ex0lQ=;
- b=iPRpokFCK6wQcIorE/5znHNzBns5F8QhUi/eWDuUptzms0PHkODWyIbYVqxtwwktIm
- PlNAN7WNt293oK9k1AuTMZfp4Hg/E3D6NqVUhQHm/ghahTFPO1CL+REgj3MTwRr+KDpn
- u8yE1blINsgBpTdlbINjfATn7iIP4FJUuMbqK8erfqp4fN2e2plnv+4JmtfLBkDtgFOm
- SSwBUWxI4CtWsoZBQ8FlLz50xt57rt4YbE/gFcCkuh4Ndy1RfIVKZjGgrneD5ttHLkEy
- ZbD3rnGnaVUUtyphXOVTpV6OWpl1UpFAgzDL0orpiijBMFvfE/c9fl8Qmz9raAhI2TAB
- KQgQ==
+ bh=hhzEI0zY7uuhea/eDo3m8LR1KeJI+fOWQZOyopQnOJc=;
+ b=DOUm4KugWp/kOGDAKBupoFDC4SqvBW90J9aXblWXvgZeGWiKVjvmUmslh5vjIBVCXz
+ GxzF4JkYikUtnNbzTDVN9Lzr1LpibCDVdwSBJkxfPMDgkUEgnOp4Rt8A7Rj+MskHS43G
+ G8HWgtdCaDplTZK8yJYTfOifAsYt+yWc83g4bC6s8y4ZLpO6O1HEnOasE1GZdwZGrPa+
+ BpnO5t86Tuq6Nhj6AFC6sQIxt0/XS5Jzy/Kb52oVWcz+s3G3bBI5ArRsrvwOsEYdHphO
+ YqSwIG6RjWbhJLatGe3qKdEArwBHpRzyJwtifjJR/iZe5mi1nanE6UxCsDK6jSVOh5rf
+ yZTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7oeS1yq+JuN20j7v7YlPjXCqUmCXhfYGwbcqS/Ex0lQ=;
- b=ktybrfxp4qz5i+3EcI9X9fGmqby7GmkFttdeITMXStfpJNMbeJjfiTEdaYCTvy+YHy
- 2fuvYnKjhuFF7mrAXqkPPA+dNsFoz13RGkONXMMiU+Zcpby39BfGtsR4SL26A0A9BRJu
- 5rCt0YNQA/fSbrZFT+loeNbOeoX4il1YtAgA93hsKWJgxUvuBHVa3nk9pLhBiCio0+TF
- JHWoH5vg5iD2YtUQzxh2sO39/LjzF2/rKVyqzSQajpwq1bin2gph66us03mijsDr3Ulb
- EGYUC4GQiVaWt5Ula1CZkGLwz0Y9wp/RJvVh+eN8r/7mxPkAQh3AH1s8PAi58O7Zj7zq
- +oWQ==
-X-Gm-Message-State: AOAM5327z6X4sUyk3j5PxhMpF0vmYmJcR30/5YBurVMkwItLzZUy2eIL
- ZisNuaN0P3pBkOvA+QsToyve1aVaPto=
-X-Google-Smtp-Source: ABdhPJytF1N+m1lqm7ajke1BaElmisfGDMoSrO7KgH4x4sfrdnVvBl+zuDoQn7tVHa8dB4Q/rb2FEQ==
-X-Received: by 2002:a63:c146:: with SMTP id p6mr11521519pgi.55.1589856860213; 
- Mon, 18 May 2020 19:54:20 -0700 (PDT)
+ bh=hhzEI0zY7uuhea/eDo3m8LR1KeJI+fOWQZOyopQnOJc=;
+ b=k37VGu/Z+lg/4cJT/T3ETM/fS8wwi0S7dfopHYf4LQV4cHosJjSCNWpqOXlW0z5ZBo
+ GzkWt4P+iR+S0pMU7xkNo1QuigTlIL2gkWT7Al4mK9yPYhUJTAAhWP8NayY08V+oftD6
+ Kf4Sm+OqjdvP0IfRk+Rjxr8Vi+owVH1kvj+k73nOcZs4Vt2cZnKKSm3Kv7Wgx6mHLve1
+ JfjtYlSoeOzPglvapQlokiSk0oM0eqs1JjjW4dlvPibuuHdAaTIwCCxZuF0SfljJi7cq
+ Gr72jX1Y/8v6J/+MvAMAN32jJsWAUqA1AQ+csJuqnPbmVy6x37RJ1kDjfkI+wiueGlGL
+ nzzg==
+X-Gm-Message-State: AOAM530x5bTsyhCk7m8ojia70PiIFIGd/QFSi5F2q8rdGAW95oFKLtus
+ VkfFgLHV/RrEk19PlDeK3ASZM2ZQ23g=
+X-Google-Smtp-Source: ABdhPJzJkT9Eh0XkzjMGkyco7yQZYC6fhHdpSb3ztbdWLHiLiSgqcZxydJOl3cAIjrQVHqyoJjCMRA==
+X-Received: by 2002:a63:fb14:: with SMTP id o20mr17903000pgh.144.1589856858940; 
+ Mon, 18 May 2020 19:54:18 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.19
+ by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 19:54:19 -0700 (PDT)
+ Mon, 18 May 2020 19:54:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RISU v2 17/17] Add --dump option to inspect trace files
-Date: Mon, 18 May 2020 19:53:55 -0700
-Message-Id: <20200519025355.4420-18-richard.henderson@linaro.org>
+Subject: [RISU v2 16/17] aarch64: Reorg sve reginfo to save space
+Date: Mon, 18 May 2020 19:53:54 -0700
+Message-Id: <20200519025355.4420-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200519025355.4420-1-richard.henderson@linaro.org>
 References: <20200519025355.4420-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,373 +105,259 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adjust some of the aarch64 code to look at the reginfo struct
-instead of looking at test_sve, so that we do not need to pass
-the --test-sve option in order to dump sve trace files.
+Mirror the signal frame by storing all of the registers
+as a lump.  Use the signal macros to pull out the values.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h                 |   1 +
- risu.c                 | 108 ++++++++++++++++++++++++++++++++++++++++-
- risu_reginfo_aarch64.c |  55 +++++++++++++--------
- risu_reginfo_arm.c     |   4 ++
- risu_reginfo_i386.c    |   4 ++
- risu_reginfo_m68k.c    |   4 ++
- risu_reginfo_ppc64.c   |   4 ++
- 7 files changed, 159 insertions(+), 21 deletions(-)
+ risu_reginfo_aarch64.h |  16 +----
+ risu_reginfo_aarch64.c | 135 +++++++++++++++++++++--------------------
+ 2 files changed, 73 insertions(+), 78 deletions(-)
 
-diff --git a/risu.h b/risu.h
-index 054cef7..3bfe765 100644
---- a/risu.h
-+++ b/risu.h
-@@ -23,6 +23,7 @@
- extern const struct option * const arch_long_opts;
- extern const char * const arch_extra_help;
- void process_arch_opt(int opt, const char *arg);
-+void arch_init(void);
- #define FIRST_ARCH_OPT   0x100
+diff --git a/risu_reginfo_aarch64.h b/risu_reginfo_aarch64.h
+index c33b86f..01076b4 100644
+--- a/risu_reginfo_aarch64.h
++++ b/risu_reginfo_aarch64.h
+@@ -17,20 +17,8 @@
  
- /* GCC computed include to pull in the correct risu_reginfo_*.h for
-diff --git a/risu.c b/risu.c
-index 95b4674..d7c7556 100644
---- a/risu.c
-+++ b/risu.c
-@@ -249,6 +249,93 @@ static int apprentice(void)
-     }
- }
+ struct simd_reginfo {
+     __uint128_t vregs[32];
+-    char end[0];
+ };
  
-+static int dump_trace(void)
-+{
-+    trace_header_t header;
-+    union {
-+        struct reginfo ri;
-+        unsigned char memblock[MEMBLOCKLEN];
-+    } u;
-+    const char *op_name;
-+
-+    while (1) {
-+        if (read_buffer(&header, sizeof(header))) {
-+            fprintf(stderr, "Trace header read failed\n");
-+            return EXIT_FAILURE;
-+        }
-+
-+        if (header.magic != RISU_MAGIC) {
-+            fprintf(stderr, "Unexpected header magic (%#x)\n", header.magic);
-+            return EXIT_FAILURE;
-+        }
-+
-+        switch (header.risu_op) {
-+        case OP_COMPARE:
-+           op_name = "COMPARE";
-+           break;
-+        case OP_TESTEND:
-+           op_name = "TESTEND";
-+           break;
-+        case OP_SETMEMBLOCK:
-+           op_name = "SETMEMBLOCK";
-+           break;
-+        case OP_GETMEMBLOCK:
-+           op_name = "GETMEMBLOCK";
-+           break;
-+        case OP_COMPAREMEM:
-+           op_name = "COMPAREMEM";
-+           break;
-+        case OP_SIGILL:
-+           op_name = "SIGILL";
-+           break;
-+        default:
-+           op_name = "<unknown>";
-+           break;
-+        }
-+
-+        switch (header.risu_op) {
-+        case OP_COMPARE:
-+        case OP_TESTEND:
-+        case OP_SIGILL:
-+            if (header.size > sizeof(u.ri)) {
-+                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
-+                return EXIT_FAILURE;
-+            }
-+            if (read_buffer(&u.ri, header.size)) {
-+                fprintf(stderr, "Reginfo read failed\n");
-+                return EXIT_FAILURE;
-+            }
-+            if (header.size != reginfo_size(&u.ri)) {
-+                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
-+                return EXIT_FAILURE;
-+            }
-+            printf("%s: (pc %#lx)\n", op_name, (unsigned long)header.pc);
-+            reginfo_dump(&u.ri, stdout);
-+            putchar('\n');
-+            if (header.risu_op == OP_TESTEND) {
-+                return EXIT_SUCCESS;
-+            }
-+            break;
-+
-+        case OP_COMPAREMEM:
-+            if (header.size != MEMBLOCKLEN) {
-+                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
-+                return EXIT_FAILURE;
-+            }
-+            if (read_buffer(&u.memblock, MEMBLOCKLEN)) {
-+                fprintf(stderr, "Memblock read failed\n");
-+                return EXIT_FAILURE;
-+            }
-+            /* TODO: Dump 8k of data? */
-+            /* fall through */
-+
-+        default:
-+            printf("%s\n", op_name);
-+            break;
-+        }
-+    }
-+}
-+
- static int ismaster;
+-#ifdef SVE_MAGIC
+-struct sve_reginfo {
+-    /* SVE */
+-    uint16_t    vl; /* current VL */
+-    __uint128_t zregs[SVE_NUM_ZREGS][SVE_VQ_MAX];
+-    uint16_t    pregs[SVE_NUM_PREGS][SVE_VQ_MAX];
+-    uint16_t    ffr[SVE_VQ_MAX];
+-    char end[0];
+-};
+-#endif
+-
+ /* The kernel headers set this based on future arch extensions.
+    The current arch maximum is 16.  Save space below.  */
+ #undef SVE_VQ_MAX
+@@ -47,11 +35,13 @@ struct reginfo {
+     /* FP/SIMD */
+     uint32_t fpsr;
+     uint32_t fpcr;
++    uint32_t sve_vl;
  
- static void usage(void)
-@@ -261,6 +348,7 @@ static void usage(void)
-     fprintf(stderr, "between master and apprentice risu processes.\n\n");
-     fprintf(stderr, "Options:\n");
-     fprintf(stderr, "  --master          Be the master (server)\n");
-+    fprintf(stderr, "  -d, --dump=FILE   Dump " TRACE_TYPE " trace file\n");
-     fprintf(stderr, "  -t, --trace=FILE  Record/playback " TRACE_TYPE " trace file\n");
-     fprintf(stderr,
-             "  -h, --host=HOST   Specify master host machine (apprentice only)"
-@@ -281,11 +369,12 @@ static struct option * setup_options(char **short_opts)
-         {"host", required_argument, 0, 'h'},
-         {"port", required_argument, 0, 'p'},
-         {"trace", required_argument, 0, 't'},
-+        {"dump", required_argument, 0, 'd'},
-         {0, 0, 0, 0}
+     union {
+         struct simd_reginfo simd;
+ #ifdef SVE_MAGIC
+-        struct sve_reginfo sve;
++        char sve[SVE_SIG_CONTEXT_SIZE(16) - SVE_SIG_REGS_OFFSET]
++            __attribute__((aligned(16)));
+ #endif
      };
-     struct option *lopts = &default_longopts[0];
- 
--    *short_opts = "h:p:t:";
-+    *short_opts = "d:h:p:t:";
- 
-     if (arch_long_opts) {
-         const size_t osize = sizeof(struct option);
-@@ -316,6 +405,7 @@ int main(int argc, char **argv)
-     char *trace_fn = NULL;
-     struct option *longopts;
-     char *shortopts;
-+    bool dump = false;
- 
-     longopts = setup_options(&shortopts);
- 
-@@ -330,6 +420,10 @@ int main(int argc, char **argv)
-         case 0:
-             /* flag set by getopt_long, do nothing */
-             break;
-+        case 'd':
-+            trace_fn = optarg;
-+            trace = dump = true;
-+            break;
-         case 't':
-             trace_fn = optarg;
-             trace = true;
-@@ -351,6 +445,11 @@ int main(int argc, char **argv)
-         }
-     }
- 
-+    if (dump && ismaster) {
-+        usage();
-+        exit(1);
-+    }
-+
-     if (trace) {
-         if (strcmp(trace_fn, "-") == 0) {
-             comm_fd = ismaster ? STDOUT_FILENO : STDIN_FILENO;
-@@ -366,6 +465,10 @@ int main(int argc, char **argv)
-         }
-     }
- 
-+    if (dump) {
-+        return dump_trace();
-+    }
-+
-     imgfile = argv[optind];
-     if (!imgfile) {
-         fprintf(stderr, "Error: must specify image file name\n\n");
-@@ -375,6 +478,9 @@ int main(int argc, char **argv)
- 
-     load_image(imgfile);
- 
-+    /* Select requested SVE vector length. */
-+    arch_init();
-+
-     if (ismaster) {
-         if (!trace) {
-             fprintf(stderr, "master port %d\n", port);
+ };
 diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-index a1020ac..fb8e11a 100644
+index 7044648..a1020ac 100644
 --- a/risu_reginfo_aarch64.c
 +++ b/risu_reginfo_aarch64.c
-@@ -44,8 +44,6 @@ const char * const arch_extra_help
- void process_arch_opt(int opt, const char *arg)
- {
- #ifdef SVE_MAGIC
--    long want, got;
--
-     assert(opt == FIRST_ARCH_OPT);
-     test_sve = strtol(arg, 0, 10);
+@@ -71,15 +71,30 @@ void process_arch_opt(int opt, const char *arg)
  
-@@ -53,22 +51,37 @@ void process_arch_opt(int opt, const char *arg)
-         fprintf(stderr, "Invalid value for VQ (1-%d)\n", SVE_VQ_MAX);
-         exit(EXIT_FAILURE);
-     }
--    want = sve_vl_from_vq(test_sve);
--    got = prctl(PR_SVE_SET_VL, want);
--    if (want != got) {
--        if (got < 0) {
--            perror("prctl PR_SVE_SET_VL");
--        } else {
--            fprintf(stderr, "Unsupported value for VQ (%d != %d)\n",
--                    test_sve, (int)sve_vq_from_vl(got));
--        }
--        exit(EXIT_FAILURE);
--    }
- #else
-     abort();
- #endif
- }
- 
-+void arch_init(void)
-+{
-+#ifdef SVE_MAGIC
-+    long want, got1, got2;
-+
-+    if (test_sve == 0) {
-+        return;
-+    }
-+
-+    want = sve_vl_from_vq(test_sve);
-+    asm(".arch_extension sve\n\trdvl %0, #1" : "=r"(got1));
-+    if (want != got1) {
-+        got2 = prctl(PR_SVE_SET_VL, want);
-+        if (want != got2) {
-+            if (got2 < 0) {
-+                perror("prctl PR_SVE_SET_VL");
-+                got2 = got1;
-+            }
-+            fprintf(stderr, "Unsupported value for VQ (%d != %d)\n",
-+                    test_sve, (int)sve_vq_from_vl(got1));
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+#endif
-+}
-+
  int reginfo_size(struct reginfo *ri)
  {
+-    int size = offsetof(struct reginfo, simd.end);
  #ifdef SVE_MAGIC
-@@ -170,6 +183,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+-    if (test_sve) {
+-        size = offsetof(struct reginfo, sve.end);
++    if (ri->sve_vl) {
++        int vq = sve_vq_from_vl(ri->sve_vl);
++        return (offsetof(struct reginfo, sve) +
++                SVE_SIG_CONTEXT_SIZE(vq) - SVE_SIG_REGS_OFFSET);
+     }
+ #endif
+-    return size;
++    return offsetof(struct reginfo, simd) + sizeof(ri->simd);
+ }
+ 
++#ifdef SVE_MAGIC
++static uint64_t *reginfo_zreg(struct reginfo *ri, int vq, int i)
++{
++    return (uint64_t *)(ri->sve + SVE_SIG_ZREG_OFFSET(vq, i) -
++                        SVE_SIG_REGS_OFFSET);
++}
++
++static uint16_t *reginfo_preg(struct reginfo *ri, int vq, int i)
++{
++    return (uint16_t *)(ri->sve + SVE_SIG_PREG_OFFSET(vq, i) -
++                        SVE_SIG_REGS_OFFSET);
++}
++#endif
++
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ {
+@@ -152,8 +167,6 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+             return;
+         }
+ 
+-        ri->sve.vl = sve->vl;
+-
          if (sve->head.size < SVE_SIG_CONTEXT_SIZE(vq)) {
              if (sve->head.size == sizeof(*sve)) {
                  /* SVE state is empty -- not an error.  */
-+                goto do_simd;
-             } else {
-                 fprintf(stderr, "risu_reginfo_aarch64: "
-                         "failed to get complete SVE state\n");
-@@ -182,6 +196,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
-                SVE_SIG_CONTEXT_SIZE(vq) - SVE_SIG_REGS_OFFSET);
-         return;
-     }
-+ do_simd:
- #endif /* SVE_MAGIC */
+@@ -164,24 +177,9 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+             return;
+         }
  
-     for (i = 0; i < 32; i++) {
-@@ -260,8 +275,9 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
-     fprintf(f, "  fpcr   : %08x\n", ri->fpcr);
- 
- #ifdef SVE_MAGIC
--    if (test_sve) {
--        int q, vq = test_sve;
-+    if (ri->sve_vl) {
-+        int vq = sve_vq_from_vl(ri->sve_vl);
-+        int q;
- 
-         fprintf(f, "  vl     : %d\n", ri->sve_vl);
- 
-@@ -339,13 +355,12 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
-     }
- 
- #ifdef SVE_MAGIC
--    if (test_sve) {
-+    if (m->sve_vl != a->sve_vl) {
-+        fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
-+    }
-+    if (m->sve_vl) {
-         int vq = sve_vq_from_vl(m->sve_vl);
- 
--        if (m->sve_vl != a->sve_vl) {
--            fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
+-        /* Copy ZREG's one at a time */
+-        for (i = 0; i < SVE_NUM_ZREGS; i++) {
+-            memcpy(&ri->sve.zregs[i],
+-                   (void *)sve + SVE_SIG_ZREG_OFFSET(vq, i),
+-                   SVE_SIG_ZREG_SIZE(vq));
 -        }
 -
-         for (i = 0; i < SVE_NUM_ZREGS; i++) {
-             uint64_t *zm = reginfo_zreg(m, vq, i);
-             uint64_t *za = reginfo_zreg(a, vq, i);
-diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-index 3832e27..2982435 100644
---- a/risu_reginfo_arm.c
-+++ b/risu_reginfo_arm.c
-@@ -36,6 +36,10 @@ void process_arch_opt(int opt, const char *arg)
-     abort();
- }
- 
-+void arch_init(void)
-+{
-+}
-+
- int reginfo_size(struct reginfo *ri)
- {
-     return sizeof(struct reginfo);
-diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-index 902d33e..68f2323 100644
---- a/risu_reginfo_i386.c
-+++ b/risu_reginfo_i386.c
-@@ -74,6 +74,10 @@ void process_arch_opt(int opt, const char *arg)
+-        /* Copy PREG's one at a time */
+-        for (i = 0; i < SVE_NUM_PREGS; i++) {
+-            memcpy(&ri->sve.pregs[i],
+-                   (void *)sve + SVE_SIG_PREG_OFFSET(vq, i),
+-                   SVE_SIG_PREG_SIZE(vq));
+-        }
+-
+-        /* Finally the FFR */
+-        memcpy(&ri->sve.ffr, (void *)sve + SVE_SIG_FFR_OFFSET(vq),
+-               SVE_SIG_FFR_SIZE(vq));
+-
++        ri->sve_vl = sve->vl;
++        memcpy(ri->sve, (char *)sve + SVE_SIG_REGS_OFFSET,
++               SVE_SIG_CONTEXT_SIZE(vq) - SVE_SIG_REGS_OFFSET);
+         return;
      }
+ #endif /* SVE_MAGIC */
+@@ -225,18 +223,20 @@ static void sve_dump_preg_diff(FILE *f, int vq, const uint16_t *p1,
+     fprintf(f, "\n");
  }
  
-+void arch_init(void)
-+{
-+}
-+
- int reginfo_size(struct reginfo *ri)
+-static void sve_dump_zreg_diff(FILE *f, int vq, const __uint128_t *z1,
+-                               const __uint128_t *z2)
++static void sve_dump_zreg_diff(FILE *f, int vq, const uint64_t *za,
++                               const uint64_t *zb)
  {
-     return sizeof(struct reginfo);
-diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
-index 361f172..499fdc4 100644
---- a/risu_reginfo_m68k.c
-+++ b/risu_reginfo_m68k.c
-@@ -23,6 +23,10 @@ void process_arch_opt(int opt, const char *arg)
-     abort();
- }
+     const char *pad = "";
+     int q;
  
-+void arch_init(void)
-+{
-+}
+     for (q = 0; q < vq; ++q) {
+-        if (z1[q] != z2[q]) {
++        uint64_t za0 = za[2 * q], za1 = za[2 * q + 1];
++        uint64_t zb0 = zb[2 * q], zb1 = zb[2 * q + 1];
 +
- int reginfo_size(struct reginfo *ri)
- {
-     return sizeof(struct reginfo);
-diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
-index c86313c..3b04747 100644
---- a/risu_reginfo_ppc64.c
-+++ b/risu_reginfo_ppc64.c
-@@ -32,6 +32,10 @@ void process_arch_opt(int opt, const char *arg)
-     abort();
- }
++        if (za0 != zb0 || za1 != zb1) {
+             fprintf(f, "%sq%-2d: %016" PRIx64 "%016" PRIx64
+-                    " vs %016" PRIx64 "%016" PRIx64"\n", pad, q,
+-                    (uint64_t)(z1[q] >> 64), (uint64_t)z1[q],
+-                    (uint64_t)(z2[q] >> 64), (uint64_t)z2[q]);
++                    " vs %016" PRIx64 "%016" PRIx64"\n",
++                    pad, q, za1, za0, zb1, zb0);
+             pad = "      ";
+         }
+     }
+@@ -263,28 +263,30 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
+     if (test_sve) {
+         int q, vq = test_sve;
  
-+void arch_init(void)
-+{
-+}
+-        fprintf(f, "  vl     : %d\n", ri->sve.vl);
++        fprintf(f, "  vl     : %d\n", ri->sve_vl);
+ 
+-        for (i = 0; i < 32; i++) {
+-            fprintf(f, "  Z%-2d q%-2d: %016" PRIx64 "%016" PRIx64 "\n", i, 0,
+-                    (uint64_t)(ri->sve.zregs[i][0] >> 64),
+-                    (uint64_t)ri->sve.zregs[i][0]);
++        for (i = 0; i < SVE_NUM_ZREGS; i++) {
++            uint64_t *z = reginfo_zreg(ri, vq, i);
 +
- int reginfo_size(struct reginfo *ri)
- {
-     return sizeof(struct reginfo);
++            fprintf(f, "  Z%-2d q%-2d: %016" PRIx64 "%016" PRIx64 "\n",
++                    i, 0, z[1], z[0]);
+             for (q = 1; q < vq; ++q) {
+-                fprintf(f, "      q%-2d: %016" PRIx64 "%016" PRIx64 "\n", q,
+-                        (uint64_t)(ri->sve.zregs[i][q] >> 64),
+-                        (uint64_t)ri->sve.zregs[i][q]);
++                fprintf(f, "      q%-2d: %016" PRIx64 "%016" PRIx64 "\n",
++                        q, z[q * 2 + 1], z[q * 2]);
+             }
+         }
+ 
+-        for (i = 0; i < 16; i++) {
+-            fprintf(f, "  P%-2d    : ", i);
+-            sve_dump_preg(f, vq, &ri->sve.pregs[i][0]);
++        for (i = 0; i < SVE_NUM_PREGS + 1; i++) {
++            uint16_t *p = reginfo_preg(ri, vq, i);
++
++            if (i == SVE_NUM_PREGS) {
++                fprintf(f, "  FFR    : ");
++            } else {
++                fprintf(f, "  P%-2d    : ", i);
++            }
++            sve_dump_preg(f, vq, p);
+             fprintf(f, "\n");
+         }
+-        fprintf(f, "  FFR    : ");
+-        sve_dump_preg(f, vq, &ri->sve.ffr[0]);
+-        fprintf(f, "\n");
+-
+         return !ferror(f);
+     }
+ #endif
+@@ -338,31 +340,34 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+ 
+ #ifdef SVE_MAGIC
+     if (test_sve) {
+-        int vq = sve_vq_from_vl(m->sve.vl);
++        int vq = sve_vq_from_vl(m->sve_vl);
+ 
+-        if (m->sve.vl != a->sve.vl) {
+-            fprintf(f, "  vl    : %d vs %d\n", m->sve.vl, a->sve.vl);
++        if (m->sve_vl != a->sve_vl) {
++            fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
+         }
+ 
+         for (i = 0; i < SVE_NUM_ZREGS; i++) {
+-            if (!sve_zreg_is_eq(vq, &m->sve.zregs[i], &a->sve.zregs[i])) {
+-                fprintf(f, "  Z%-2d ", i);
+-                sve_dump_zreg_diff(f, vq, &m->sve.zregs[i][0],
+-                                   &a->sve.zregs[i][0]);
+-            }
+-        }
+-        for (i = 0; i < SVE_NUM_PREGS; i++) {
+-            if (!sve_preg_is_eq(vq, &m->sve.pregs[i], &a->sve.pregs[i])) {
+-                fprintf(f, "  P%-2d    : ", i);
+-                sve_dump_preg_diff(f, vq, &m->sve.pregs[i][0],
+-                                   &a->sve.pregs[i][0]);
+-            }
+-        }
+-        if (!sve_preg_is_eq(vq, &m->sve.ffr, &a->sve.ffr)) {
+-            fprintf(f, "  FFR   : ");
+-            sve_dump_preg_diff(f, vq, &m->sve.pregs[i][0], &a->sve.pregs[i][0]);
+-        }
++            uint64_t *zm = reginfo_zreg(m, vq, i);
++            uint64_t *za = reginfo_zreg(a, vq, i);
+ 
++            if (!sve_zreg_is_eq(vq, zm, za)) {
++                fprintf(f, "  Z%-2d ", i);
++                sve_dump_zreg_diff(f, vq, zm, za);
++            }
++        }
++        for (i = 0; i < SVE_NUM_PREGS + 1; i++) {
++            uint16_t *pm = reginfo_preg(m, vq, i);
++            uint16_t *pa = reginfo_preg(a, vq, i);
++
++            if (!sve_preg_is_eq(vq, pm, pa)) {
++                if (i == SVE_NUM_PREGS) {
++                    fprintf(f, "  FFR   : ");
++                } else {
++                    fprintf(f, "  P%-2d    : ", i);
++                }
++                sve_dump_preg_diff(f, vq, pm, pa);
++            }
++        }
+         return !ferror(f);
+     }
+ #endif
 -- 
 2.20.1
 
