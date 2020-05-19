@@ -2,85 +2,62 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6583DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E039C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30FE020709
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:28:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="I3+ZTPGa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30FE020709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 087422075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087422075F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jawgK-0003L5-Cx
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 03:28:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44980)
+	id 1jax5P-000073-55
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 03:54:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jawes-0001E8-UG
- for qemu-devel@nongnu.org; Tue, 19 May 2020 03:27:26 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14005)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jax4Y-000877-No
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 03:53:58 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55652)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jawer-0001Ex-Nx
- for qemu-devel@nongnu.org; Tue, 19 May 2020 03:27:26 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ec38a0d0000>; Tue, 19 May 2020 00:26:06 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Tue, 19 May 2020 00:27:24 -0700
-X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Tue, 19 May 2020 00:27:24 -0700
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 19 May
- 2020 07:27:23 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 19 May 2020 07:27:17 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH Kernel v22 6/8] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Date: Tue, 19 May 2020 12:24:13 +0530
-Message-ID: <1589871253-10650-1-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1589781397-28368-7-git-send-email-kwankhede@nvidia.com>
-References: <1589781397-28368-7-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jax4X-0007gz-FK
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 03:53:58 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id 5E0A8AD94;
+ Tue, 19 May 2020 07:53:58 +0000 (UTC)
+Subject: Re: sharing intention for developing per-target, dynamically loadable
+ accelerator modules
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <1b5c9fee-6574-ddf4-b2d0-aa12e6fc9c84@suse.de>
+ <87k119jeee.fsf@linaro.org>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <350b2ad7-b92d-659b-481a-e41fe7cfc738@suse.de>
+Date: Tue, 19 May 2020 09:53:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1589873166; bh=2+7PkbvZ8YCB29qZ4uA/VdTtCt2+fyfwBihc/07+xu0=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=I3+ZTPGam7OrX6KJ1uxt3VAg2ELEMqrTAnDnMDzEHJ4OUQtIwgcC9m4gXA0EcupcT
- KGoYxVjXpTO0qvUKCgBcUWXhF0D74LbD8DPPqhrOtcEmlY0Mhqw6hl6xs70eKWPGnL
- 0j4pY4BwLL3km/JfQJdOUDGKA8zAHKisMuI+dy1que2HaqYsOXujYRuyM8pARjeWI+
- H98RH9plCv9BzFsAnK9xxprd0NpbQKBxwFcC43P1x9jflQ6FUzRRreNigQMLPhAtEe
- S9EyWHBRTVLMvDg0MslVjD6GqDv2MafE9TylIDRhA0Lp+846Ut2R1jqeQQ0JPH+rN7
- cjJ4fyngkED2w==
-Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate25.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 03:11:45
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87k119jeee.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 01:02:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,184 +70,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DMA mapped pages, including those pinned by mdev vendor drivers, might
-get unpinned and unmapped while migration is active and device is still
-running. For example, in pre-copy phase while guest driver could access
-those pages, host device or vendor driver can dirty these mapped pages.
-Such pages should be marked dirty so as to maintain memory consistency
-for a user making use of dirty page tracking.
+On 5/18/20 8:18 PM, Alex Bennée wrote:
+> 
+> Claudio Fontana <cfontana@suse.de> writes:
+> 
+>> Hello all,
+>>
+>> my intention would be to develop per-target, dynamically loadable accelerator modules.
+>>
+>> This would allow to distribute a single QEMU base binary, and then provide accelerators as optional additional binary packages to install,
+>> with the first separate optional package being TCG.
+>>
+>> CONFIG_TCG would become 'm' as a result, but then also CONFIG_KVM, CONFIG_HAX, CONFIG_WHPX, CONFIG_HVF.
+>>
+>> Here are some elements that seem to be needed:
+>>
+>> 1 - The module CONFIG_MODULE part of the build system would need some extension to add per-target modules. I have some tentative results that shows that this is possible (but a bit clunky atm).
+>>     There is some existing instability in the existing Makefile infrastructure of modules that shows up when trying to extend it.
+>>
+>> 2 - new "accelerator drivers" seems to be needed, either in addition or as additional functionality inside the current AccelState.
+>>
+>> 3 - for target/i386 in particular, there is some refactoring work needed to split even more different unrelated bits and pieces.
+>>     dependencies of hw/i386 machine stuff with accelerator-specific
+>> stuff are also painful.
+> 
+> There are a couple of per-arch hacks in the main TCG cpu loops it would
+> be good to excise from the code.
+> 
+>>
+>> 4 - CPU Arch Classes could be extended with per-accelerator methods. Initial fooling around shows it should probably work.
+>>     One alternative would be trying to play with the dynamic linker (weak symbols, creative use of dlsym etc), but I have not sorted out the details of this option.
+>>
+>> 5 - cputlb, in particular tlb_flush and friends is a separate problem
+>> since it is not part of the cpuclass. Should it be?
+> 
+> tlb_flush and friends are TCG implementation details for softmmu that
+> ensure a lookup for any address will always return to a guest specific
+> tlb_fill to rebuild the cache. The behaviour is not guest-specific
+> per-se although we do partition the table entries based on the guest
+> size.
+> 
+> Perhaps we can make it more dynamic but it would have to ensure both the
+> slow path and the fast path are using the same mask and shifts when
+> walking the table.
+> 
+>> 6 - a painpoint is represented by the fact that in USER mode, the accel class is not applied, which causes a lot of uncleanliness all around
+>>     (tcg_allowed outside of the AccelClass).
+> 
+> The user-mode run loops are a whole separate chunk of code. I don't know
+> if it is worth trying to make them plugable as you will only ever have
+> one per linux-user binary.
+> 
+>> 7 - I have not really thought about the KConfig aspects because I am not super-familiar
+>>
+>> 8 - cpus.c needs some good splitting
+> 
+> Although there are several different run loops in there I think they
+> share a lot of commonality which is why they are bundled together. They
+> all share the same backend for dealing with ioevents and generic
+> pause/unpause machinery. But feel free to prove me wrong ;-)
 
-To get bitmap during unmap, user should allocate memory for bitmap, set
-it all zeros, set size of allocated memory, set page size to be
-considered for bitmap and set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+Hi Alex, I got my first compile, and it is currently in github, I still need to split the series though and there is still cleanup needed.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 62 +++++++++++++++++++++++++++++++++--------
- include/uapi/linux/vfio.h       | 10 +++++++
- 2 files changed, 61 insertions(+), 11 deletions(-)
+https://github.com/hw-claudio/qemu.git
+branch "cpus-refactoring"
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0a420594483a..963ae4348b3c 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1018,23 +1018,25 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
- }
- 
- static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
--			     struct vfio_iommu_type1_dma_unmap *unmap)
-+			     struct vfio_iommu_type1_dma_unmap *unmap,
-+			     struct vfio_bitmap *bitmap)
- {
--	uint64_t mask;
- 	struct vfio_dma *dma, *dma_last = NULL;
--	size_t unmapped = 0;
-+	size_t unmapped = 0, pgsize;
- 	int ret = 0, retries = 0;
-+	unsigned long pgshift;
- 
- 	mutex_lock(&iommu->lock);
- 
--	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
-+	pgshift = __ffs(iommu->pgsize_bitmap);
-+	pgsize = (size_t)1 << pgshift;
- 
--	if (unmap->iova & mask) {
-+	if (unmap->iova & (pgsize - 1)) {
- 		ret = -EINVAL;
- 		goto unlock;
- 	}
- 
--	if (!unmap->size || unmap->size & mask) {
-+	if (!unmap->size || unmap->size & (pgsize - 1)) {
- 		ret = -EINVAL;
- 		goto unlock;
- 	}
-@@ -1045,9 +1047,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 		goto unlock;
- 	}
- 
--	WARN_ON(mask & PAGE_MASK);
--again:
-+	/* When dirty tracking is enabled, allow only min supported pgsize */
-+	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-+	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
- 
-+	WARN_ON((pgsize - 1) & PAGE_MASK);
-+again:
- 	/*
- 	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
- 	 * avoid tracking individual mappings.  This means that the granularity
-@@ -1085,6 +1093,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 			ret = -EINVAL;
- 			goto unlock;
- 		}
-+
- 		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
- 		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
- 			ret = -EINVAL;
-@@ -1128,6 +1137,14 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 			mutex_lock(&iommu->lock);
- 			goto again;
- 		}
-+
-+		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-+			ret = update_user_bitmap(bitmap->data, dma,
-+						 unmap->iova, pgsize);
-+			if (ret)
-+				break;
-+		}
-+
- 		unmapped += dma->size;
- 		vfio_remove_dma(iommu, dma);
- 	}
-@@ -2466,17 +2483,40 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
- 		struct vfio_iommu_type1_dma_unmap unmap;
--		long ret;
-+		struct vfio_bitmap bitmap = { 0 };
-+		int ret;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
- 
- 		if (copy_from_user(&unmap, (void __user *)arg, minsz))
- 			return -EFAULT;
- 
--		if (unmap.argsz < minsz || unmap.flags)
-+		if (unmap.argsz < minsz ||
-+		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
- 			return -EINVAL;
- 
--		ret = vfio_dma_do_unmap(iommu, &unmap);
-+		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-+			unsigned long pgshift;
-+
-+			if (unmap.argsz < (minsz + sizeof(bitmap)))
-+				return -EINVAL;
-+
-+			if (copy_from_user(&bitmap,
-+					   (void __user *)(arg + minsz),
-+					   sizeof(bitmap)))
-+				return -EFAULT;
-+
-+			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-+				return -EINVAL;
-+
-+			pgshift = __ffs(bitmap.pgsize);
-+			ret = verify_bitmap_size(unmap.size >> pgshift,
-+						 bitmap.size);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
- 		if (ret)
- 			return ret;
- 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 4850c1fef1f8..a1dd2150971e 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1048,12 +1048,22 @@ struct vfio_bitmap {
-  * field.  No guarantee is made to the user that arbitrary unmaps of iova
-  * or size different from those used in the original mapping call will
-  * succeed.
-+ * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-+ * before unmapping IO virtual addresses. When this flag is set, user must
-+ * provide data[] as structure vfio_bitmap. User must allocate memory to get
-+ * bitmap, zero the bitmap memory and must set size of allocated memory in
-+ * vfio_bitmap.size field. A bit in bitmap represents one page of user provided
-+ * page size in 'pgsize', consecutively starting from iova offset. Bit set
-+ * indicates page at that offset from iova is dirty. Bitmap of pages in the
-+ * range of unmapped size is returned in vfio_bitmap.data
-  */
- struct vfio_iommu_type1_dma_unmap {
- 	__u32	argsz;
- 	__u32	flags;
-+#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
-+	__u8    data[];
- };
- 
- #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
--- 
-2.7.0
+just in case you are interested in a peek.
+
+The idea results currently in:
+
+ cpu-throttle.c                |  154 +++++++++
+ cpu-timers.c                  |  784 +++++++++++++++++++++++++++++++++++++++++++++
+ cpus-tcg.c                    |  515 ++++++++++++++++++++++++++++++
+ cpus.c                        | 1405 +++++----------------------------------------------------------------------------
+
+New interfaces are in:
+
+include/sysemu/cpu-throttle.h |   50 +++
+include/sysemu/cpu-timers.h   |   73 +++++
+include/sysemu/cpus.h         |   44 ++-
+
+cpu-throttle (new) is self-explanatory, contains the cpu-throttle in cpus.c
+cpu-timers (new) contains the icount, ticks, clock timers from cpus.c
+
+cpus.h adds an interface to per-accel vcpu threads:
+
+qemu_register_start_vcpu(void (*f)(CPUState *cpu));
+bool all_cpu_threads_idle(void);
+bool cpu_can_run(CPUState *cpu);
+void qemu_wait_io_event_common(CPUState *cpu);
+void qemu_wait_io_event(CPUState *cpu);
+void cpu_thread_signal_created(CPUState *cpu);
+void cpu_thread_signal_destroyed(CPUState *cpu);
+void cpu_handle_guest_debug(CPUState *cpu);
+
+Very much still all WIP...
+
+Ciao,
+
+C
+
+
+> 
+>> ... more things to find out and think about ...
+>>
+>> Overall, I think that the activity has the potential to provide benefits overall beyond the actual goal, in the form of cleanups, leaner configurations,
+>> minor fixes, maybe improving the CONFIG_MODULE instabilities if any
+>> etc.
+> 
+> There are certainly some ugly bits we could shave down in such an
+> exercise.
+> 
+>> As an example, the first activity I would plan to submit as RFC is point 8 above,
+>> there is the split between cpus.c and cpus-tcg.c that results in lots of TCG-specific code being removed from non-tcg builds (using CONFIG_TCG).
+>>
+>> One thing that should be kept in check is any performance impact of
+>> the changes, in particular for point 4, hot paths should probably
+>> avoid going through too many pointer indirections.
+> 
+> Maybe - certainly for TCG you have pretty much lost if you have exited
+> the main execution loop I doubt it would show up much. Not so sure about
+> the HW accelerators. Most of the performance sensitive stuff is dealt
+> with close to the ioctls IIRC.
+> 
+>> Does anybody share similar goals? Any major obstacle or blocker that would put the feasibility into question?
+>> Any suggestion on any of this? In particular point 4 and 5 come to
+>> mind, as well as some better understanding of the reasons behind 6, or
+>> even suggestions on how to best to 2.
+> 
+> For linux-user each CPU run loop is it's own special snowflake because
+> pretty much every architecture has it's own special set of EXCP_ exits
+> to deal with various bits. There are per-arch EXCP_ flags for system
+> emulation as well but not nearly as many.
+> 
+>>
+>> Anyway, I will continue to work on the first RFC for some smaller initial steps and hopefully have something to submit soon.
+>>
+>> Ciao ciao,
+>>
+>> Claudio
+> 
+> 
 
 
