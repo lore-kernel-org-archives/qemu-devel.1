@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE27CC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC212C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:22:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C52B12075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4CA62075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:22:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crVINwPc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52B12075F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9KaKeFA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CA62075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb6sd-00070B-V3
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41582)
+	id 1jb6sh-0007BM-UQ
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:22:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6r6-0005cu-Qm
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30840
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6rK-0005kp-7D
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54684
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6r5-0008Rv-VT
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:44 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jb6rJ-0008T4-0E
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:20:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589912443;
+ s=mimecast20190719; t=1589912456;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AXKHm9sEGpzJKmFxobEwS5Bkzi/fbuyVBY253GTU/xE=;
- b=crVINwPcV+drVuE0Iqgz6jyK9qNwtce7pr+0DMxnhzXCiVzPvdYzf8lmMqsrDdPv4dPeLU
- e3CGsMOJQVyHZzrOwDJAOhxACDnIyK23K4NnXRZXcGiInuqeiJi+4SBdJ1sHGrwWXElEKu
- Z+gD0KfTf0uRLa+iDd0n+S07npVkOiw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-Lqm4HskPM9mGERR6Qd2JZA-1; Tue, 19 May 2020 14:20:41 -0400
-X-MC-Unique: Lqm4HskPM9mGERR6Qd2JZA-1
-Received: by mail-wr1-f70.google.com with SMTP id u5so183061wrt.22
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:20:41 -0700 (PDT)
+ bh=G4M1Sk471/wpIRr2uPISQE7oxsTBasuxbJF2aNsWx5U=;
+ b=K9KaKeFA6rdwCgPgovi9w/sopaHItPBQKDx9kR23klJjlrMAyQ9qKrKdcYvTxvBVao4rOz
+ oDOYgBG+141fuxkQAB5mpbY4tXDZcuqxggxW2XJQWMtcraDYKGbuE8AJ26lRHJAQ3c6YDZ
+ SqwzFp87HSWzEBYJdVzBve5DQmqRZUE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-R6PWDmI2OzqBnFOBMJvlVg-1; Tue, 19 May 2020 14:20:54 -0400
+X-MC-Unique: R6PWDmI2OzqBnFOBMJvlVg-1
+Received: by mail-wr1-f72.google.com with SMTP id y7so194422wrd.12
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:20:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AXKHm9sEGpzJKmFxobEwS5Bkzi/fbuyVBY253GTU/xE=;
- b=XAGAwkchuVtCkDV6b6UgpkgysmEnkmqkgoJogEN0UCqjiDJwcG9Il/dNnv2wiRcuNl
- akYA6kv1KVUcbDCWN1E3YbJNjVWVN8DJU1FKHDHEBn1AmvQpGHYwO71O6cCxdcBPUW2U
- F/G8343Jq5lo1kSaXAqF1kFjdmVUQVMDwWHMPCq8ok1fDCIZxhOBI4HCWAR/3OU4k1je
- 8lplgaEGcfZC5KW0DJgUB30QhjmlnqAgI1MyFVv4bcmJzwLdRXPj8MFQQVUI0chEf4JX
- E1QsLsLMjmWNjJTG7Wkn8mrlvGU0dZplrcad82B5VBil9XoT0vQFxsh4sfUzi6ekdVum
- AHrg==
-X-Gm-Message-State: AOAM533KxWWZhwgmjEVlirhaB6Qsm456BeEBUXGqnEM8WmwoMcINYcvz
- ExdLh0NGPRdf5XFMW8LpO2BfZVpTjRT3kqimzwTNGCiFqheltPZki8D9BpTMH9p2R65+DXWRAGM
- lBuThOhVkEAQbRK8=
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr226338wrt.158.1589912439530;
- Tue, 19 May 2020 11:20:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwk4B8l3Ki5y6mp56jyDKGFOGMBcO9XVVp+fzi7K9ZMNWIFEf8jSQ1K1qE5TDyWsWVL9ba51g==
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr226320wrt.158.1589912439375;
- Tue, 19 May 2020 11:20:39 -0700 (PDT)
+ bh=G4M1Sk471/wpIRr2uPISQE7oxsTBasuxbJF2aNsWx5U=;
+ b=sr6pFF7KxqjrnOyzc69WHkIMISfpjDk2zL5KkpY+Z6XVECjBnnFxU7DjopQWp7oe0H
+ e9sfkfe6SqRx/1k2wZGTGYklra1AZJ1DXuS1/Ct6lH1D7H19JRNqyjKCv1nm+EgOd5Ij
+ CTPrXSg/AbWjQP3QPUVEkd0duIPj3SX+np3DOYg+blP4EqSvx0VnXuCKmo9KaTvuCKjZ
+ yjFnnC/zUqZz7LiGrNN7PppmEVLGOxSVs0yybpNGNUcIvL8HyogIdBbys22tDpgIaKQ9
+ 7Go/wWNZuz9OFvNqSsP+E0k6hHYTao3px7dGyTLhsGZE3KC4VYUu07KTTMoimMPHh3px
+ NyDQ==
+X-Gm-Message-State: AOAM5332dFvkdC7ksyaphMh5hI+lC9OrqExyh2yk6fsaS9ebVUBzQxvE
+ rpUl1AZOWn8pj+JRUzVyVUd3xPnYiTQuo+DaP/87F29jWlB2YmZq1qGjoz+Eqz0NjaHisosAyir
+ /zkHyj0Bzz8j2fYw=
+X-Received: by 2002:a7b:c4da:: with SMTP id g26mr669849wmk.3.1589912453406;
+ Tue, 19 May 2020 11:20:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCDUw75o4IQMRaKPxCeuqA75BeOP+5lHCao1PqwaGEZPGR24a4wgHmYR1RE27KrFwivzX0oA==
+X-Received: by 2002:a7b:c4da:: with SMTP id g26mr669828wmk.3.1589912453248;
+ Tue, 19 May 2020 11:20:53 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id q144sm581286wme.0.2020.05.19.11.20.38
+ by smtp.gmail.com with ESMTPSA id r9sm280010wra.52.2020.05.19.11.20.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 May 2020 11:20:38 -0700 (PDT)
+ Tue, 19 May 2020 11:20:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 2/5] softmmu/vl: Let -fw_cfg option take a 'blob_id'
- argument
-Date: Tue, 19 May 2020 20:20:21 +0200
-Message-Id: <20200519182024.14638-3-philmd@redhat.com>
+Subject: [PATCH v6 5/5] crypto/tls-cipher-suites: Product fw_cfg consumable
+ blob
+Date: Tue, 19 May 2020 20:20:24 +0200
+Message-Id: <20200519182024.14638-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200519182024.14638-1-philmd@redhat.com>
 References: <20200519182024.14638-1-philmd@redhat.com>
@@ -119,69 +119,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'blob_id' argument refers to a QOM object able to produce
-data consumable by the fw_cfg device. The producer object must
-implement the FW_CFG_DATA_GENERATOR interface.
+Since our format is consumable by the fw_cfg device,
+we can implement the FW_CFG_DATA_GENERATOR interface.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- softmmu/vl.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ crypto/tls-cipher-suites.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index ae5451bc23..f76c53ad2e 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -489,6 +489,10 @@ static QemuOptsList qemu_fw_cfg_opts = {
-             .name = "string",
-             .type = QEMU_OPT_STRING,
-             .help = "Sets content of the blob to be inserted from a string",
-+        }, {
-+            .name = "blob_id",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Sets id of the object generating fw_cfg blob to be used",
-         },
-         { /* end of list */ }
-     },
-@@ -2020,7 +2024,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+diff --git a/crypto/tls-cipher-suites.c b/crypto/tls-cipher-suites.c
+index c6c51359bd..11872783eb 100644
+--- a/crypto/tls-cipher-suites.c
++++ b/crypto/tls-cipher-suites.c
+@@ -14,6 +14,7 @@
+ #include "qemu/error-report.h"
+ #include "crypto/tlscreds.h"
+ #include "crypto/tls-cipher-suites.h"
++#include "hw/nvram/fw_cfg.h"
+ 
+ static void parse_cipher_suites(QCryptoTLSCipherSuites *s,
+                                 const char *priority_name, Error **errp)
+@@ -101,11 +102,28 @@ static void qcrypto_tls_cipher_suites_finalize(Object *obj)
+     g_free(s->cipher_list);
+ }
+ 
++static const void *qcrypto_tls_cipher_suites_get_data(Object *obj)
++{
++    QCryptoTLSCipherSuites *s = QCRYPTO_TLS_CIPHER_SUITES(obj);
++
++    return s->cipher_list;
++}
++
++static size_t qcrypto_tls_cipher_suites_get_length(Object *obj)
++{
++    QCryptoTLSCipherSuites *s = QCRYPTO_TLS_CIPHER_SUITES(obj);
++
++    return s->cipher_count * sizeof(IANA_TLS_CIPHER);
++}
++
+ static void qcrypto_tls_cipher_suites_class_init(ObjectClass *oc, void *data)
  {
-     gchar *buf;
-     size_t size;
--    const char *name, *file, *str;
-+    const char *name, *file, *str, *blob_id;
-     FWCfgState *fw_cfg = (FWCfgState *) opaque;
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    FWCfgDataGeneratorClass *fwgc = FW_CFG_DATA_GENERATOR_CLASS(oc);
  
-     if (fw_cfg == NULL) {
-@@ -2030,14 +2034,17 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
-     name = qemu_opt_get(opts, "name");
-     file = qemu_opt_get(opts, "file");
-     str = qemu_opt_get(opts, "string");
-+    blob_id = qemu_opt_get(opts, "blob_id");
+     ucc->complete = qcrypto_tls_cipher_suites_complete;
++    fwgc->get_data = qcrypto_tls_cipher_suites_get_data;
++    fwgc->get_length = qcrypto_tls_cipher_suites_get_length;
  
-     /* we need name and either a file or the content string */
--    if (!(nonempty_str(name) && (nonempty_str(file) || nonempty_str(str)))) {
-+    if (!(nonempty_str(name)
-+          && (nonempty_str(file) || nonempty_str(str) || nonempty_str(blob_id)))
-+         ) {
-         error_setg(errp, "invalid argument(s)");
-         return -1;
+     object_class_property_add_bool(oc, "verbose",
+                                    qcrypto_tls_cipher_suites_get_verbose,
+@@ -121,6 +139,7 @@ static const TypeInfo qcrypto_tls_cipher_suites_info = {
+     .class_init = qcrypto_tls_cipher_suites_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
++        { TYPE_FW_CFG_DATA_GENERATOR_INTERFACE },
+         { }
      }
--    if (nonempty_str(file) && nonempty_str(str)) {
--        error_setg(errp, "file and string are mutually exclusive");
-+    if (nonempty_str(file) && nonempty_str(str) && nonempty_str(blob_id)) {
-+        error_setg(errp, "file, string and blob_id are mutually exclusive");
-         return -1;
-     }
-     if (strlen(name) > FW_CFG_MAX_FILE_PATH - 1) {
-@@ -2052,6 +2059,8 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
-     if (nonempty_str(str)) {
-         size = strlen(str); /* NUL terminator NOT included in fw_cfg blob */
-         buf = g_memdup(str, size);
-+    } else if (nonempty_str(blob_id)) {
-+        return fw_cfg_add_from_generator(fw_cfg, name, blob_id, errp);
-     } else {
-         GError *err = NULL;
-         if (!g_file_get_contents(file, &buf, &size, &err)) {
+ };
 -- 
 2.21.3
 
