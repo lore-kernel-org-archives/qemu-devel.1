@@ -2,92 +2,85 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 599ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020F4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09AFD204EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC4C12075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:59:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="itfyHYab"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AFD204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TFQ5IEfs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4C12075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb5YK-0000LA-6f
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:57:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59740)
+	id 1jb5a7-0003aB-S1
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:59:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb5Rj-0005CC-Gy
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:50:28 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:37968)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb5RT-0006Fi-E4
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:50:27 -0400
-Received: by mail-pl1-x629.google.com with SMTP id m7so132977plt.5
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 09:50:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cC6AWG5XyAggAOPFHLJeHkmubl9dOS4YtOi8r0R/48A=;
- b=itfyHYab9iQHkBBPQnJcpg8yYY/2xhzgwFDPtoC6H8Pt4wnw9QA9IyPJadWQDf7PPZ
- PJ5LKEv7FF6zBNRf9kCMKiGsgo9RT2BXzUoX73gAAfj3OH1Lf1eN9Ugd/LBdrEvIRkf9
- mK3DsAS7AN9fgN4sj+yzCKG3Iv4GXavgN9ygUEauXTQMSO7azg4ynaTvosWEZnsn1Srb
- IgW4XzQjWptl3mcTxidDyItowI3gkwJ3bJ1wbUzI3a1Bo1G+sEC11jkwzoHi4IiLn5SS
- 9niI9HlXmz1dZGT7n+6GO9NMdRXZ/0LgliKb3WdICJnycvsBi+6TVcX/TFJLEjkFY2FE
- znbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cC6AWG5XyAggAOPFHLJeHkmubl9dOS4YtOi8r0R/48A=;
- b=cbJ9MLfJFVeudSHwZggQoaw1N0pcFKfystOR+7GgmqDQXHIutr48FixTV/7sZSUSbY
- 6Amx3K4b1UvMGhaLAfytIJ7tNkWFtxxCRPD7dBm8nFXwSUBi+wASJtVYt+XrIKprYHe3
- SkdD3muoH66IUYIRRpM3nGuPFUKrjTX1haU3xfWDZoy1bZwMmYEOhkF600ZLbYW8znlx
- 5Hjyn5lPlOa3qo3hCFVSh5myK7XaQ13vK8miGXz08RBXxHXKvWxbLoicRD727eYNTH6c
- VqaOl1wxKbkQHiv/Gr/CY7OmC4xfb/VFygrz6c9Z2dXx6hG54jwzQt5yjSRxiECmd0uV
- CmSQ==
-X-Gm-Message-State: AOAM533xBTn8mxxFvUTJsfFIvFHXyY6BzzSrx9yajR8rm2kCFhLWVYHe
- 7DuBLTwmBiJibqswvHIdTTd3B45Ybc0=
-X-Google-Smtp-Source: ABdhPJxi3PfIDnhlby7tk7GsTKpqBpB2QNnPgRnewWnHxqk1uAYnlhKr9Z0C8/xgupylHhsGqYlfOw==
-X-Received: by 2002:a17:90a:881:: with SMTP id v1mr435732pjc.227.1589907009332; 
- Tue, 19 May 2020 09:50:09 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id gx21sm96685pjb.47.2020.05.19.09.50.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 May 2020 09:50:08 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/10] softfloat: Inline float64 compare specializations
-Date: Tue, 19 May 2020 09:49:54 -0700
-Message-Id: <20200519164957.26920-8-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200519164957.26920-1-richard.henderson@linaro.org>
-References: <20200519164957.26920-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jb5ZL-0002ai-Li
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:58:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55236
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jb5ZJ-0008CA-NK
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:58:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589907495;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tQq0IknBCw/8RUO/la4jyQolojHPn4XGSA0+E/fLWtI=;
+ b=TFQ5IEfsSoUvKAqrr6d4Ea78UpLAnbJBVo8ShtYk1a+kdMlhMgKL3eDDm9qGMrrMtxYjET
+ mO4yPvT/0U8YYrvXfYosD+T7t6UNuwGegjk7QRmZgCqC4xiTs1RsyjH2ZwpdkINA1lPZvt
+ AB92rVIdoHcZx7tvnT2RQoE54p8HDOo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410--ngrjc2jMHqqF9VPkbG-aw-1; Tue, 19 May 2020 12:58:09 -0400
+X-MC-Unique: -ngrjc2jMHqqF9VPkbG-aw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29293A0BD9;
+ Tue, 19 May 2020 16:58:07 +0000 (UTC)
+Received: from x1.home (ovpn-112-50.phx2.redhat.com [10.3.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9D74062AEB;
+ Tue, 19 May 2020 16:58:04 +0000 (UTC)
+Date: Tue, 19 May 2020 10:58:04 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200519105804.02f3cae8@x1.home>
+In-Reply-To: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,336 +93,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace the float64 compare specializations with inline functions
-that call the standard float64_compare{,_quiet} functions.
-Use bool as the return type.
+Hi folks,
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/fpu/softfloat.h       |  49 ++++++--
- fpu/softfloat.c               | 220 ----------------------------------
- target/s390x/vec_fpu_helper.c |   2 +-
- 3 files changed, 42 insertions(+), 229 deletions(-)
+My impression is that we're getting pretty close to a workable
+implementation here with v22 plus respins of patches 5, 6, and 8.  We
+also have a matching QEMU series and a proposal for a new i40e
+consumer, as well as I assume GVT-g updates happening internally at
+Intel.  I expect all of the latter needs further review and discussion,
+but we should be at the point where we can validate these proposed
+kernel interfaces.  Therefore I'd like to make a call for reviews so
+that we can get this wrapped up for the v5.8 merge window.  I know
+Connie has some outstanding documentation comments and I'd like to make
+sure everyone has an opportunity to check that their comments have been
+addressed and we don't discover any new blocking issues.  Please send
+your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
+interface and implementation.  Thanks!
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 4d1af6ab45..281f0fd971 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -532,14 +532,6 @@ float64 float64_rem(float64, float64, float_status *status);
- float64 float64_muladd(float64, float64, float64, int, float_status *status);
- float64 float64_sqrt(float64, float_status *status);
- float64 float64_log2(float64, float_status *status);
--int float64_eq(float64, float64, float_status *status);
--int float64_le(float64, float64, float_status *status);
--int float64_lt(float64, float64, float_status *status);
--int float64_unordered(float64, float64, float_status *status);
--int float64_eq_quiet(float64, float64, float_status *status);
--int float64_le_quiet(float64, float64, float_status *status);
--int float64_lt_quiet(float64, float64, float_status *status);
--int float64_unordered_quiet(float64, float64, float_status *status);
- FloatRelation float64_compare(float64, float64, float_status *status);
- FloatRelation float64_compare_quiet(float64, float64, float_status *status);
- float64 float64_min(float64, float64, float_status *status);
-@@ -615,6 +607,47 @@ static inline float64 float64_set_sign(float64 a, int sign)
-                         | ((int64_t)sign << 63));
- }
- 
-+static inline bool float64_eq(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float64_le(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float64_lt(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float64_unordered(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare(a, b, s) == float_relation_unordered;
-+}
-+
-+static inline bool float64_eq_quiet(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare_quiet(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float64_le_quiet(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare_quiet(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float64_lt_quiet(float64 a, float64 b, float_status *s)
-+{
-+    return float64_compare_quiet(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float64_unordered_quiet(float64 a, float64 b,
-+                                           float_status *s)
-+{
-+    return float64_compare_quiet(a, b, s) == float_relation_unordered;
-+}
-+
- #define float64_zero make_float64(0)
- #define float64_half make_float64(0x3fe0000000000000LL)
- #define float64_one make_float64(0x3ff0000000000000LL)
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index f6bfc40c97..5d7fc2c17a 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -4941,226 +4941,6 @@ float64 float64_log2(float64 a, float_status *status)
-     return normalizeRoundAndPackFloat64(zSign, 0x408, zSig, status);
- }
- 
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is equal to the
--| corresponding value `b', and 0 otherwise.  The invalid exception is raised
--| if either operand is a NaN.  Otherwise, the comparison is performed
--| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_eq(float64 a, float64 b, float_status *status)
--{
--    uint64_t av, bv;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    av = float64_val(a);
--    bv = float64_val(b);
--    return ( av == bv ) || ( (uint64_t) ( ( av | bv )<<1 ) == 0 );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is less than or
--| equal to the corresponding value `b', and 0 otherwise.  The invalid
--| exception is raised if either operand is a NaN.  The comparison is performed
--| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_le(float64 a, float64 b, float_status *status)
--{
--    bool aSign, bSign;
--    uint64_t av, bv;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    av = float64_val(a);
--    bv = float64_val(b);
--    if ( aSign != bSign ) return aSign || ( (uint64_t) ( ( av | bv )<<1 ) == 0 );
--    return ( av == bv ) || ( aSign ^ ( av < bv ) );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is less than
--| the corresponding value `b', and 0 otherwise.  The invalid exception is
--| raised if either operand is a NaN.  The comparison is performed according
--| to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_lt(float64 a, float64 b, float_status *status)
--{
--    bool aSign, bSign;
--    uint64_t av, bv;
--
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    av = float64_val(a);
--    bv = float64_val(b);
--    if ( aSign != bSign ) return aSign && ( (uint64_t) ( ( av | bv )<<1 ) != 0 );
--    return ( av != bv ) && ( aSign ^ ( av < bv ) );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point values `a' and `b' cannot
--| be compared, and 0 otherwise.  The invalid exception is raised if either
--| operand is a NaN.  The comparison is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_unordered(float64 a, float64 b, float_status *status)
--{
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 1;
--    }
--    return 0;
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is equal to the
--| corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
--| exception.The comparison is performed according to the IEC/IEEE Standard
--| for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_eq_quiet(float64 a, float64 b, float_status *status)
--{
--    uint64_t av, bv;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        if (float64_is_signaling_nan(a, status)
--         || float64_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    av = float64_val(a);
--    bv = float64_val(b);
--    return ( av == bv ) || ( (uint64_t) ( ( av | bv )<<1 ) == 0 );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is less than or
--| equal to the corresponding value `b', and 0 otherwise.  Quiet NaNs do not
--| cause an exception.  Otherwise, the comparison is performed according to the
--| IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_le_quiet(float64 a, float64 b, float_status *status)
--{
--    bool aSign, bSign;
--    uint64_t av, bv;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        if (float64_is_signaling_nan(a, status)
--         || float64_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    av = float64_val(a);
--    bv = float64_val(b);
--    if ( aSign != bSign ) return aSign || ( (uint64_t) ( ( av | bv )<<1 ) == 0 );
--    return ( av == bv ) || ( aSign ^ ( av < bv ) );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point value `a' is less than
--| the corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
--| exception.  Otherwise, the comparison is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_lt_quiet(float64 a, float64 b, float_status *status)
--{
--    bool aSign, bSign;
--    uint64_t av, bv;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        if (float64_is_signaling_nan(a, status)
--         || float64_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    av = float64_val(a);
--    bv = float64_val(b);
--    if ( aSign != bSign ) return aSign && ( (uint64_t) ( ( av | bv )<<1 ) != 0 );
--    return ( av != bv ) && ( aSign ^ ( av < bv ) );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the double-precision floating-point values `a' and `b' cannot
--| be compared, and 0 otherwise.  Quiet NaNs do not cause an exception.  The
--| comparison is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float64_unordered_quiet(float64 a, float64 b, float_status *status)
--{
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
--         || ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
--       ) {
--        if (float64_is_signaling_nan(a, status)
--         || float64_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 1;
--    }
--    return 0;
--}
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the extended double-precision floating-
- | point value `a' to the 32-bit two's complement integer format.  The
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.c
-index a48bd704bc..c1564e819b 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -174,7 +174,7 @@ void HELPER(gvec_wfk64)(const void *v1, const void *v2, CPUS390XState *env,
-     env->cc_op = wfc64(v1, v2, env, true, GETPC());
- }
- 
--typedef int (*vfc64_fn)(float64 a, float64 b, float_status *status);
-+typedef bool (*vfc64_fn)(float64 a, float64 b, float_status *status);
- static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
-                  CPUS390XState *env, bool s, vfc64_fn fn, uintptr_t retaddr)
- {
--- 
-2.20.1
+Alex
+
+On Mon, 18 May 2020 11:26:29 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Hi,
+> 
+> This patch set adds:
+> * IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+>   respect to IOMMU container rather than per device. All pages pinned by
+>   vendor driver through vfio_pin_pages external API has to be marked as
+>   dirty during  migration. When IOMMU capable device is present in the
+>   container and all pages are pinned and mapped, then all pages are marked
+>   dirty.
+>   When there are CPU writes, CPU dirty page tracking can identify dirtied
+>   pages, but any page pinned by vendor driver can also be written by
+>   device. As of now there is no device which has hardware support for
+>   dirty page tracking. So all pages which are pinned should be considered
+>   as dirty.
+>   This ioctl is also used to start/stop dirty pages tracking for pinned and
+>   unpinned pages while migration is active.
+> 
+> * Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+>   unmapping IO virtual address range.
+>   With vIOMMU, during pre-copy phase of migration, while CPUs are still
+>   running, IO virtual address unmap can happen while device still keeping
+>   reference of guest pfns. Those pages should be reported as dirty before
+>   unmap, so that VFIO user space application can copy content of those
+>   pages from source to destination.
+> 
+> * Patch 8 detect if IOMMU capable device driver is smart to report pages
+>   to be marked dirty by pinning pages using vfio_pin_pages() API.
+> 
+> 
+> Yet TODO:
+> Since there is no device which has hardware support for system memmory
+> dirty bitmap tracking, right now there is no other API from vendor driver
+> to VFIO IOMMU module to report dirty pages. In future, when such hardware
+> support will be implemented, an API will be required such that vendor
+> driver could report dirty pages to VFIO module during migration phases.
+> 
+> Adding revision history from previous QEMU patch set to understand KABI
+> changes done till now
+> 
+> v21 -> v22
+> - Fixed issue raised by Alex :
+> https://lore.kernel.org/kvm/20200515163307.72951dd2@w520.home/
+> 
+> v20 -> v21
+> - Added checkin for GET_BITMAP ioctl for vfio_dma boundaries.
+> - Updated unmap ioctl function - as suggested by Alex.
+> - Updated comments in DIRTY_TRACKING ioctl definition - as suggested by
+>   Cornelia.
+> 
+> v19 -> v20
+> - Fixed ioctl to get dirty bitmap to get bitmap of multiple vfio_dmas
+> - Fixed unmap ioctl to get dirty bitmap of multiple vfio_dmas.
+> - Removed flag definition from migration capability.
+> 
+> v18 -> v19
+> - Updated migration capability with supported page sizes bitmap for dirty
+>   page tracking and  maximum bitmap size supported by kernel module.
+> - Added patch to calculate and cache pgsize_bitmap when iommu->domain_list
+>   is updated.
+> - Removed extra buffers added in previous version for bitmap manipulation
+>   and optimised the code.
+> 
+> v17 -> v18
+> - Add migration capability to the capability chain for VFIO_IOMMU_GET_INFO
+>   ioctl
+> - Updated UMAP_DMA ioctl to return bitmap of multiple vfio_dma
+> 
+> v16 -> v17
+> - Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
+> 
+> v15 -> v16
+> - Minor edits and nit picks (Auger Eric)
+> - On copying bitmap to user, re-populated bitmap only for pinned pages,
+>   excluding unmapped pages and CPU dirtied pages.
+> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+>   https://lkml.org/lkml/2020/3/12/1255
+> 
+> v14 -> v15
+> - Minor edits and nit picks.
+> - In the verification of user allocated bitmap memory, added check of
+>    maximum size.
+> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+>   https://lkml.org/lkml/2020/3/12/1255
+> 
+> v13 -> v14
+> - Added struct vfio_bitmap to kabi. updated structure
+>   vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
+> - All small changes suggested by Alex.
+> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+>   https://lkml.org/lkml/2020/3/12/1255
+> 
+> v12 -> v13
+> - Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+> - Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+> - Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+>   field.
+> 
+> v11 -> v12
+> - Changed bitmap allocation in vfio_iommu_type1.
+> - Remove atomicity of ref_count.
+> - Updated comments for migration device state structure about error
+>   reporting.
+> - Nit picks from v11 reviews
+> 
+> v10 -> v11
+> - Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+> - Added proposal to detect if IOMMU capable device calls external pin pages
+>   API to mark pages dirty.
+> - Nit picks from v10 reviews
+> 
+> v9 -> v10:
+> - Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+>   during unmap while migration is active
+> - Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+>   tracking.
+> - If iommu_mapped, mark all pages dirty.
+> - Added unpinned pages tracking while migration is active.
+> - Updated comments for migration device state structure with bit
+>   combination table and state transition details.
+> 
+> v8 -> v9:
+> - Split patch set in 2 sets, Kernel and QEMU.
+> - Dirty pages bitmap is queried from IOMMU container rather than from
+>   vendor driver for per device. Added 2 ioctls to achieve this.
+> 
+> v7 -> v8:
+> - Updated comments for KABI
+> - Added BAR address validation check during PCI device's config space load
+>   as suggested by Dr. David Alan Gilbert.
+> - Changed vfio_migration_set_state() to set or clear device state flags.
+> - Some nit fixes.
+> 
+> v6 -> v7:
+> - Fix build failures.
+> 
+> v5 -> v6:
+> - Fix build failure.
+> 
+> v4 -> v5:
+> - Added decriptive comment about the sequence of access of members of
+>   structure vfio_device_migration_info to be followed based on Alex's
+>   suggestion
+> - Updated get dirty pages sequence.
+> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+>   get_object, save_config and load_config.
+> - Fixed multiple nit picks.
+> - Tested live migration with multiple vfio device assigned to a VM.
+> 
+> v3 -> v4:
+> - Added one more bit for _RESUMING flag to be set explicitly.
+> - data_offset field is read-only for user space application.
+> - data_size is read for every iteration before reading data from migration,
+>   that is removed assumption that data will be till end of migration
+>   region.
+> - If vendor driver supports mappable sparsed region, map those region
+>   during setup state of save/load, similarly unmap those from cleanup
+>   routines.
+> - Handles race condition that causes data corruption in migration region
+>   during save device state by adding mutex and serialiaing save_buffer and
+>   get_dirty_pages routines.
+> - Skip called get_dirty_pages routine for mapped MMIO region of device.
+> - Added trace events.
+> - Split into multiple functional patches.
+> 
+> v2 -> v3:
+> - Removed enum of VFIO device states. Defined VFIO device state with 2
+>   bits.
+> - Re-structured vfio_device_migration_info to keep it minimal and defined
+>   action on read and write access on its members.
+> 
+> v1 -> v2:
+> - Defined MIGRATION region type and sub-type which should be used with
+>   region type capability.
+> - Re-structured vfio_device_migration_info. This structure will be placed
+>   at 0th offset of migration region.
+> - Replaced ioctl with read/write for trapped part of migration region.
+> - Added both type of access support, trapped or mmapped, for data section
+>   of the region.
+> - Moved PCI device functions to pci file.
+> - Added iteration to get dirty page bitmap until bitmap for all requested
+>   pages are copied.
+> 
+> Thanks,
+> Kirti
+> 
+> 
+> 
+> 
+> Kirti Wankhede (8):
+>   vfio: UAPI for migration interface for device state
+>   vfio iommu: Remove atomicity of ref_count of pinned pages
+>   vfio iommu: Cache pgsize_bitmap in struct vfio_iommu
+>   vfio iommu: Add ioctl definition for dirty pages tracking
+>   vfio iommu: Implementation of ioctl for dirty pages tracking
+>   vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+>   vfio iommu: Add migration capability to report supported features
+>   vfio: Selective dirty page tracking if IOMMU backed device pins pages
+> 
+>  drivers/vfio/vfio.c             |  13 +-
+>  drivers/vfio/vfio_iommu_type1.c | 576 ++++++++++++++++++++++++++++++++++++----
+>  include/linux/vfio.h            |   4 +-
+>  include/uapi/linux/vfio.h       | 315 ++++++++++++++++++++++
+>  4 files changed, 849 insertions(+), 59 deletions(-)
+> 
 
 
