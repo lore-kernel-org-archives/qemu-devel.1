@@ -2,87 +2,86 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6591FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10882C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:36:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34CF2207D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2295207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:36:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0PIDQXI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34CF2207D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Te9oupdf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2295207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4HA-0007VV-Ab
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:35:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46340)
+	id 1jb4IB-00014B-0L
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:36:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3nx-0004Hc-CF
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:05:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37280
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4HC-0007yi-58
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:35:30 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28699
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3nu-00058r-OG
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:05:16 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4HA-0004Rj-EX
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:35:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589900712;
+ s=mimecast20190719; t=1589902526;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+t2Q0tx5Gsh01Axo9sX5jfvhJDZwhD0ryD7YGKjXGTs=;
- b=M0PIDQXIgPb6ZvY0PA3/LKd2h5Sjvb+BVL6/vqHy2s6UKXHKLKl4+09QvbeHNTRllV4zv4
- iNECWe6Jhi4TU7OvTegew8eIdUu5jTvoz4mhqwdXFRfJX3X4V2xsUuv3FEpPE+ZTAV93BG
- 0wNmmbgxU7KHgfbTocneMZQlcoiRt0E=
+ bh=Tdh7I/F1KCzk31L6f8YhMKl++fAO0z5EMARL1BVk2HI=;
+ b=Te9oupdfxV24rZWDe4AotHajWaKQg1I8fgvwBD8gk/FlD39VzwUY5r5ga382NdyeZiA1s2
+ tmOmsdRaRanUEcYJvx3oZEb9BZjkgDbNnRXBBCTySmSP61LYfkO+DACMCge4/Fs6W3jg3S
+ NPE081BgSe3TBKn5FF0uuAXEQzOHRoU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-38PH_EwSP1G8_slmQtQrnw-1; Tue, 19 May 2020 11:05:11 -0400
-X-MC-Unique: 38PH_EwSP1G8_slmQtQrnw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-202-fbSBmljbN6OXLkWFYRCrSg-1; Tue, 19 May 2020 11:35:22 -0400
+X-MC-Unique: fbSBmljbN6OXLkWFYRCrSg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2D2A805724;
- Tue, 19 May 2020 15:05:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48E635D9E7;
- Tue, 19 May 2020 15:05:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6C1D41135230; Tue, 19 May 2020 16:55:52 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 50/55] s390x/event-facility: Simplify creation of SCLP event
- devices
-Date: Tue, 19 May 2020 16:55:46 +0200
-Message-Id: <20200519145551.22836-51-armbru@redhat.com>
-In-Reply-To: <20200519145551.22836-1-armbru@redhat.com>
-References: <20200519145551.22836-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD98B1B18BC0;
+ Tue, 19 May 2020 15:35:19 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C55586ACE6;
+ Tue, 19 May 2020 15:35:09 +0000 (UTC)
+Date: Tue, 19 May 2020 17:35:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v20 4/8] vfio iommu: Add ioctl definition for
+ dirty pages tracking
+Message-ID: <20200519173507.3cd131dd.cohuck@redhat.com>
+In-Reply-To: <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
+References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
+ <1589488667-9683-5-git-send-email-kwankhede@nvidia.com>
+ <20200515125916.78723321.cohuck@redhat.com>
+ <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,157 +94,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
+ kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-init_event_facility() creates the SCLP events bus with two SCLP event
-devices (sclpquiesce and sclp-cpu-hotplug).  It leaves the devices
-unrealized.  A comment explains they will be realized "via the bus".
+On Fri, 15 May 2020 23:05:24 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-The bus's realize method sclp_events_bus_realize() indeed realizes all
-unrealized devices on this bus.  It carries a TODO comment claiming
-this "has to be done in common code".  No other bus realize method
-realizes its devices.
+> On 5/15/2020 4:29 PM, Cornelia Huck wrote:
+> > On Fri, 15 May 2020 02:07:43 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+> >> All pages pinned by vendor driver through this API should be considered as
+> >> dirty during migration. When container consists of IOMMU capable device and
+> >> all pages are pinned and mapped, then all pages are marked dirty.
+> >> Added support to start/stop dirtied pages tracking and to get bitmap of all
+> >> dirtied pages for requested IO virtual address range.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+> >>   1 file changed, 55 insertions(+)
 
-The common code in question is bus_set_realized(), which has a TODO
-comment asking for recursive realization.  It's been asking for years.
+(...)
 
-The only devices sclp_events_bus_realize() will ever realize are the
-two init_event_facility() puts there.
+> >> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
+> >> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
+> >> + * given IOVA range.  
+> > 
+> > "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_GET_BITMAP returns the
+> > dirty pages bitmap for the IOMMU container for a given IOVA range." ?
+> > 
+> > Q: How does this interact with the two other operations? I imagine
+> > getting an empty bitmap before _START   
+> 
+> No, if dirty page tracking is not started, get_bitmap IOCTL will fail 
+> with -EINVAL.
+> 
+> > and a bitmap-in-progress between
+> > _START and _STOP. > After _STOP, will subsequent calls always give the
+> > same bitmap?
+> >  
+> 
+> No, return -EINVAL.
 
-Simplify as follows:
+Maybe add
 
-* Make the devices members of the event facility instance struct, just
-  like the bus.  object_initialize_child() is simpler than
-  object_property_add_child() and object_unref().
+"If the IOCTL has not yet been called with
+VFIO_IOMMU_DIRTY_PAGES_FLAG_START, or if it has been called with
+VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP, calling it with
+VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP will return -EINVAL." ?
 
-* Realize them in the event facility realize method.
+> 
+> 
+> >> User must provide data[] as the structure
+> >> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range and
+> >> + * pgsize.  
+> > 
+> > "The user must specify the IOVA range and the pgsize through the
+> > vfio_iommu_type1_dirty_bitmap_get structure in the data[] portion."
+> > 
+> > ?
+> >   
+> >> This interface supports to get bitmap of smallest supported pgsize
+> >> + * only and can be modified in future to get bitmap of specified pgsize.  
+> > 
+> > That's a current restriction? How can the user find out whether it has
+> > been lifted (or, more generally, find out which pgsize values are
+> > supported)?  
+> 
+> Migration capability is added to IOMMU info chain. That gives supported 
+> pgsize bitmap by IOMMU driver.
 
-This is in line with how such things are done elsewhere.
+Add that info?
 
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/s390x/event-facility.c | 59 ++++++++++++++++-----------------------
- 1 file changed, 24 insertions(+), 35 deletions(-)
+"The supported pgsize values for this interface are reported via the
+migration capability in the IOMMU info chain."
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 97a4f0b1f5..1ecaa20556 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -39,6 +39,7 @@ typedef struct SCLPEventsBus {
- struct SCLPEventFacility {
-     SysBusDevice parent_obj;
-     SCLPEventsBus sbus;
-+    SCLPEvent quiesce, cpu_hotplug;
-     /* guest's receive mask */
-     union {
-         uint32_t receive_mask_pieces[2];
-@@ -328,34 +329,9 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- 
- #define TYPE_SCLP_EVENTS_BUS "s390-sclp-events-bus"
- 
--static void sclp_events_bus_realize(BusState *bus, Error **errp)
--{
--    Error *err = NULL;
--    BusChild *kid;
--
--    /* TODO: recursive realization has to be done in common code */
--    QTAILQ_FOREACH(kid, &bus->children, sibling) {
--        DeviceState *dev = kid->child;
--
--        object_property_set_bool(OBJECT(dev), true, "realized", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
--    }
--}
--
--static void sclp_events_bus_class_init(ObjectClass *klass, void *data)
--{
--    BusClass *bc = BUS_CLASS(klass);
--
--    bc->realize = sclp_events_bus_realize;
--}
--
- static const TypeInfo sclp_events_bus_info = {
-     .name = TYPE_SCLP_EVENTS_BUS,
-     .parent = TYPE_BUS,
--    .class_init = sclp_events_bus_class_init,
- };
- 
- static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
-@@ -443,27 +419,39 @@ static void init_event_facility(Object *obj)
- {
-     SCLPEventFacility *event_facility = EVENT_FACILITY(obj);
-     DeviceState *sdev = DEVICE(obj);
--    Object *new;
- 
-     event_facility->mask_length = 4;
-     event_facility->allow_all_mask_sizes = true;
-     object_property_add_bool(obj, "allow_all_mask_sizes",
-                              sclp_event_get_allow_all_mask_sizes,
-                              sclp_event_set_allow_all_mask_sizes);
-+
-     /* Spawn a new bus for SCLP events */
-     qbus_create_inplace(&event_facility->sbus, sizeof(event_facility->sbus),
-                         TYPE_SCLP_EVENTS_BUS, sdev, NULL);
- 
--    new = object_new(TYPE_SCLP_QUIESCE);
--    object_property_add_child(obj, TYPE_SCLP_QUIESCE, new);
--    object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
-+    object_initialize_child(obj, TYPE_SCLP_QUIESCE,
-+                            &event_facility->quiesce,
-+                            TYPE_SCLP_QUIESCE);
- 
--    new = object_new(TYPE_SCLP_CPU_HOTPLUG);
--    object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new);
--    object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
--    /* the facility will automatically realize the devices via the bus */
-+    object_initialize_child(obj, TYPE_SCLP_CPU_HOTPLUG,
-+                            &event_facility->cpu_hotplug,
-+                            TYPE_SCLP_CPU_HOTPLUG);
-+}
-+
-+static void realize_event_facility(DeviceState *dev, Error **errp)
-+{
-+    SCLPEventFacility *event_facility = EVENT_FACILITY(dev);
-+    Error *local_err = NULL;
-+
-+    qdev_realize(DEVICE(&event_facility->quiesce),
-+                 BUS(&event_facility->sbus), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    qdev_realize(DEVICE(&event_facility->cpu_hotplug),
-+                 BUS(&event_facility->sbus), errp);
- }
- 
- static void reset_event_facility(DeviceState *dev)
-@@ -479,6 +467,7 @@ static void init_event_facility_class(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(sbdc);
-     SCLPEventFacilityClass *k = EVENT_FACILITY_CLASS(dc);
- 
-+    dc->realize = realize_event_facility;
-     dc->reset = reset_event_facility;
-     dc->vmsd = &vmstate_event_facility;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--- 
-2.21.1
+> 
+> >   
+> >> + * User must allocate memory for bitmap, zero the bitmap memory  and set size
+> >> + * of allocated memory in bitmap.size field.  
+> > 
+> > "The user must provide a zeroed memory area for the bitmap memory and
+> > specify its size in bitmap.size."
+> > 
+> > ?
+> >   
+> >> One bit is used to represent one
+> >> + * page consecutively starting from iova offset. User should provide page size
+> >> + * in bitmap.pgsize field.  
+> > 
+> > s/User/The user/
+> > 
+> > Is that the 'pgsize' the comment above talks about?
+> >   
+> 
+> By specifying pgsize here user can ask for bitmap of specific pgsize.
+
+"The user should provide the page size for the bitmap in the
+bitmap.pgsize field." ?
+
+> 
+> >> Bit set in bitmap indicates page at that offset from
+> >> + * iova is dirty.  
+> > 
+> > "A bit set in the bitmap indicates that the page at that offset from
+> > iova is dirty." ?
+> >   
+> >> Caller must set argsz including size of structure
+> >> + * vfio_iommu_type1_dirty_bitmap_get.  
+> > 
+> > s/Caller/The caller/
+> > 
+> > Does argz also include the size of the bitmap?  
+> 
+> No.
+
+"The caller must set argsz to a value including the size of stuct
+vfio_io_type1_dirty_bitmap_get, but excluding the size of the actual
+bitmap." ?
 
 
