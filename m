@@ -2,86 +2,89 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFDEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9ABC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 987122072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE29C2072C
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akcGOczX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 987122072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SdrBxQR5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE29C2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb9ir-00052O-Is
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37516)
+	id 1jb9kM-0007Ql-5A
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:25:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jb9hu-0004Ud-UZ
- for qemu-devel@nongnu.org; Tue, 19 May 2020 17:23:26 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:44079)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jb9jP-0006VO-16
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:24:59 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:35867)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jb9ht-0005af-Rx
- for qemu-devel@nongnu.org; Tue, 19 May 2020 17:23:26 -0400
-Received: by mail-il1-x143.google.com with SMTP id j3so899777ilk.11
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aAAl8bEWOUhhTxxVcNnLxWC56G7b9D3wm4pcfCNY9vI=;
- b=akcGOczXAH54ARoDTp8LhhDXVfrKrXQDK0RJzj2KiUtgdvv8q1+rsb2Xjh4YpIGv1Y
- ccUmYUJaAkAWVh6DfZPZhVLEEx07JhWjzkZKNhSlUHVV49riRQ6xqQ8dEepugWK93OXy
- wh+VguoywhCS/mQY+WqI9QLL3oYT/o6os99/aPQRe7N3qmNmL8DghKxZEmAcz9qaeF7I
- nfvId+c1In/2t5DOfdHFprU4FnjWSguCvDtGt6rXm/aSxepBoI2eyE2/0mhG6BUIV06l
- ANAABiOaVQctDoJm7EfvNZMR6ArNQeDNpvdrin8JQfZTJaZljFdZ97F9qrvcsVVFNrFD
- rFig==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jb9jN-0005xE-QF
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:24:58 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id q24so239684pjd.1
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ts0zlcysq7Z7LnCNZqOjSuw3X0uDuA6thMDLW6rqaBw=;
+ b=SdrBxQR5v7JC05npAx+IZqXYmNWFkhdhSgkIuWH40PcoR/InCbH1Ao7riPx28CyfT6
+ odC+eaxeNHrBagdVLz4KGykxRMFbFbh5UKTkzTxPvJvs+0yDRVI6k06V2kbXs8ccFUh2
+ TWzkez8nsLYaF+wnieyevA/UQ3qSWF2U+07nZuIxdDXDm3TF+FtKhi5GtgVeyh23msr+
+ rp16q05jA/3ohOZWjsovcM95NidVND9OWfQ3lURhaEPkwoxnv8lgiXautmoaNWmhPo6Q
+ s7FuqBUFrDPViflvFtQD4Lyd72OyUrHSQe8qe3IC+vTT86Ssu6BZTePWbmDEE44XKmP1
+ I4IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aAAl8bEWOUhhTxxVcNnLxWC56G7b9D3wm4pcfCNY9vI=;
- b=h5P3KGLgN3ALnLu9Vzw0E5WwuuZy/LF5oYo+D43FgkHluN98/2FGeo68563bDJ0Zcj
- oMy5RLTdIefD5z27IpiUL02suxj+83HZQKiIgmrLN+WK2jRa0PpW7AsqxD/UZF8/wyGp
- xsLpJFheeFYik4fOnAmFwXToqJcIzCEXcS3rfZ/ivLD6raDdgedGm4b1GnKmoLEAMsaL
- ARLHURxTv5zD1OeiEpPLo236KmPPAI7Lbc0GrhNFa07KeV+ytRkqw+wV9POL1suNqXe2
- 8FVW2c2dK2oSwwnMZ7LxnGTdkoieH5hFZT1FdN3vck8PthRILMvz+ZdPv7fl07UWbo4+
- /KyQ==
-X-Gm-Message-State: AOAM533agUvPSt0+BjJgO6+CxkPSffNt7Pg2U9vvXxmhnI0oy13JiTNZ
- 7OaigMxyL6BlR9nHkY+gr7pF3tmKnzX0cP1dW6s=
-X-Google-Smtp-Source: ABdhPJz7pKWz/lX3BGCxs8TaS8CLrtyj+2W5uWmyNtnpl6VequE5Tb49gWS3qK6hpXTub/l2+BnRtwLSpzmdI5ZkuNA=
-X-Received: by 2002:a92:de02:: with SMTP id x2mr1047462ilm.267.1589923404726; 
- Tue, 19 May 2020 14:23:24 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ts0zlcysq7Z7LnCNZqOjSuw3X0uDuA6thMDLW6rqaBw=;
+ b=epDNfBv8/Pp2Yf4JWOCf/x3N52pZFCUp5LjLe9yLnLDdOPC/IMlBq0psafMC8TsC3W
+ PNfgVIWu1KCT3FICpMZff6GZ1N2CsydgsKadza9N8MIgapQWQfOEIV4qFtliLnPmf9YY
+ q9EbuWf6UUN7B5DL+WQDehQtZq7how1osi8S2Ia47aZzl6rA/z+CIJxIzCLbaJba9l9H
+ d1oXJ9zn1dJjR7bLjUyHMlD5sthXkSIe+D1IA8x9EtYV/3NDvEDXkh42KnOZcmCMAm5T
+ lLycXEWdUe3tInc6uZcZVclAkQLGhp1AjeLY3K+nYCltBpPFRF5LTskZxtaC6Mq8MtgZ
+ vJig==
+X-Gm-Message-State: AOAM533Wx1HCLZcZndQxc0jDlDY+4bFyog2/S0CahAZKjwQ9ygvyiikl
+ laWLqiL8R2U0xtLcDKDurRHlV7m0xXE=
+X-Google-Smtp-Source: ABdhPJwy19FzBBJZl05NTFRsxCLtikgmf0LyYDQZ6uWNYC3PBegCZFSxmKxbM4B3YjBK5k6V/Zhb/w==
+X-Received: by 2002:a17:90a:264c:: with SMTP id
+ l70mr1636677pje.18.1589923495832; 
+ Tue, 19 May 2020 14:24:55 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id v5sm386134pjy.4.2020.05.19.14.24.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 May 2020 14:24:55 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/2] target/arm: vector tail cleanups
+Date: Tue, 19 May 2020 14:24:51 -0700
+Message-Id: <20200519212453.28494-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-34-armbru@redhat.com>
-In-Reply-To: <20200519145551.22836-34-armbru@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 19 May 2020 14:14:31 -0700
-Message-ID: <CAKmqyKO0Lymxmm5RvhhjFmqALmb6NAmtTR88O4yKM6C0L=77_g@mail.gmail.com>
-Subject: Re: [PATCH 33/55] qom: Tidy up a few object_initialize_child() calls
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -96,88 +99,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 19, 2020 at 8:04 AM Markus Armbruster <armbru@redhat.com> wrote:
->
-> The callers of object_initialize_child() commonly  pass either
-> &child, sizeof(child), or pchild, sizeof(*pchild).  Tidy up the few
-> that don't, mostly to keep the next commit simpler.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Version 3 fixes the reported bug in EXT.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I should make sure I have fixed the bug wherein RISU prints a
+mismatch and still exits with success, which hid this problem
+in the scrollback.
 
-Alistair
 
-> ---
->  hw/arm/aspeed.c                 | 2 +-
->  hw/microblaze/xlnx-zynqmp-pmu.c | 3 +--
->  hw/pci-host/pnv_phb4.c          | 2 +-
->  hw/riscv/riscv_hart.c           | 2 +-
->  4 files changed, 4 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index adbfbbd6b4..eaf50da8df 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -267,7 +267,7 @@ static void aspeed_machine_init(MachineState *machine)
->      memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
->
->      object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
-> -                            (sizeof(bmc->soc)), amc->soc_name, &error_abort,
-> +                            sizeof(bmc->soc), amc->soc_name, &error_abort,
->                              NULL);
->
->      sc = ASPEED_SOC_GET_CLASS(&bmc->soc);
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index 028f31894d..aa90b9d1be 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -174,8 +174,7 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
->                                  pmu_ram);
->
->      /* Create the PMU device */
-> -    object_initialize_child(OBJECT(machine), "pmu", pmu,
-> -                            sizeof(XlnxZynqMPPMUSoCState),
-> +    object_initialize_child(OBJECT(machine), "pmu", pmu, sizeof(*pmu),
->                              TYPE_XLNX_ZYNQMP_PMU_SOC, &error_abort, NULL);
->      object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
->
-> diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
-> index e30ae9ad5b..aba710fd1f 100644
-> --- a/hw/pci-host/pnv_phb4.c
-> +++ b/hw/pci-host/pnv_phb4.c
-> @@ -1155,7 +1155,7 @@ static void pnv_phb4_instance_init(Object *obj)
->      QLIST_INIT(&phb->dma_spaces);
->
->      /* XIVE interrupt source object */
-> -    object_initialize_child(obj, "source", &phb->xsrc, sizeof(XiveSource),
-> +    object_initialize_child(obj, "source", &phb->xsrc, sizeof(phb->xsrc),
->                              TYPE_XIVE_SOURCE, &error_abort, NULL);
->
->      /* Root Port */
-> diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-> index 276a9baca0..61e88e2e37 100644
-> --- a/hw/riscv/riscv_hart.c
-> +++ b/hw/riscv/riscv_hart.c
-> @@ -46,7 +46,7 @@ static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
->      Error *err = NULL;
->
->      object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx],
-> -                            sizeof(RISCVCPU), cpu_type,
-> +                            sizeof(s->harts[idx]), cpu_type,
->                              &error_abort, NULL);
->      s->harts[idx].env.mhartid = s->hartid_base + idx;
->      qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
-> --
-> 2.21.1
->
->
+r~
+
+
+Richard Henderson (2):
+  target/arm: Use tcg_gen_gvec_mov for clear_vec_high
+  target/arm: Use clear_vec_high more effectively
+
+ target/arm/translate-a64.c | 63 ++++++++++++++++++++------------------
+ 1 file changed, 34 insertions(+), 29 deletions(-)
+
+-- 
+2.20.1
+
 
