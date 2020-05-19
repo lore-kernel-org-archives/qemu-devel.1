@@ -2,67 +2,66 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93ACAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 23:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0728EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 23:10:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 465E620578
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 23:07:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CD3420578
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 23:10:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfLmuWc5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 465E620578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+OwZfTL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CD3420578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbBKi-0001AY-G8
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 19:07:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49924)
+	id 1jbBNF-0002Y8-S0
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 19:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbBK0-0008QX-QY
- for qemu-devel@nongnu.org; Tue, 19 May 2020 19:06:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51117
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbBMe-00023q-RZ
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 19:09:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41432
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbBJz-0002hV-4K
- for qemu-devel@nongnu.org; Tue, 19 May 2020 19:06:52 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbBMd-00032t-Tr
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 19:09:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589929609;
+ s=mimecast20190719; t=1589929775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=azk1ms+2/lbXdyJ3cAU6xZJ5+b8x6GrSkQs/jRjsctI=;
- b=PfLmuWc5KMi0b0G/Rhu5xmvFY79lgsjnVlQAMnDZh66qjjT46UB4YCMW4GM/Savz8VOuM5
- xTdnCgS1yOOG1vWrm068V4MtgwtsNrkaNwaHR4EtNpmfPdbYBnVyx2dM6AqFt5mm6+A0DG
- r3nid72ISmDuDs/WxHNKY1REaKLa7jQ=
+ bh=r7716m1Dc/EWKsBsDPfsY+Kgh9QMxYx78rWA2Yf8w7Y=;
+ b=R+OwZfTL9r616NfE+lo6LYJfai93pNZUfRdngu3l3bo+5H+xEhw8rY2Uq/NdhsPIL5A6Er
+ MZc7NWS6ylQPlPeQ82cfH9mimSwEEPJXCAOW7MpvzwfDyQv6Fcha/HNPkyNin3+6p4U1G+
+ jzx569sfQqmOaJ7IW3BAEIvtHwxnPKM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-AZ0ZguWjPM6hQ5uX41HBOg-1; Tue, 19 May 2020 19:06:47 -0400
-X-MC-Unique: AZ0ZguWjPM6hQ5uX41HBOg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-299-snxsUUE4OVu6WjDAV7j56g-1; Tue, 19 May 2020 19:09:33 -0400
+X-MC-Unique: snxsUUE4OVu6WjDAV7j56g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 759A51800D42;
- Tue, 19 May 2020 23:06:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9679A8005AA;
+ Tue, 19 May 2020 23:09:32 +0000 (UTC)
 Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76C765D9C5;
- Tue, 19 May 2020 23:06:41 +0000 (UTC)
-Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
- test?
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
- <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
- <20200515102321.GH1300305@redhat.com>
- <613f5cf5-7019-7447-6ba1-8050ab05303a@redhat.com>
- <20200519090441.GD2003821@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B55FA1001B07;
+ Tue, 19 May 2020 23:09:22 +0000 (UTC)
+Subject: Re: [PATCH v6 10/16] floppy: move cmos_get_fd_drive_type() from pc
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200515150421.25479-1-kraxel@redhat.com>
+ <20200515150421.25479-11-kraxel@redhat.com>
+ <0c3d5c81-fc38-e1c1-b83a-3c3d8f781dd8@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -138,14 +137,14 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
-Date: Tue, 19 May 2020 19:06:40 -0400
+Message-ID: <d38bd1a1-9318-0641-e418-7ad775e9a1be@redhat.com>
+Date: Tue, 19 May 2020 19:09:22 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200519090441.GD2003821@redhat.com>
+In-Reply-To: <0c3d5c81-fc38-e1c1-b83a-3c3d8f781dd8@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -173,139 +172,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-discuss@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/19/20 5:04 AM, Daniel P. Berrangé wrote:
-> On Mon, May 18, 2020 at 03:56:36PM -0400, John Snow wrote:
->>
->>
->> On 5/15/20 6:23 AM, Daniel P. Berrangé wrote:
->>> On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
->>>> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
->>>>> Hello,
->>>>>
->>>>> Following Markus thread on deprecating unmaintained (untested) code
->>>>> (machines) [1] and the effort done to gather the information shared in
->>>>> the replies [2], and the various acceptance tests added, is it
->>>>> feasible to require for the next release that each new device/machine
->>>>> is provided a test covering it?
->>>>>
->>>>> If no, what is missing?
->>>>
->>>> If a qtest is feasible, yes, I think we should require one for new
->>>> devices. But what about machines - you normally need a test image for
->>>> this. In that case, there is still the question where testing images
->>>> could be hosted. Not every developer has a web space where they could
->>>> put their test images onto. And what about images that contain non-free
->>>> code?
->>>
->>> Yep, it isn't feasible to make this a hard rule.
->>>
->>> IMHO this is where a support tier classification comes into play
->>>
->>>  - Tier 1: actively maintained, qtest coverage available. Expected
->>>            to work reliably at all times since every commit is CI
->>> 	   tested
->>>
->>>   - Tier 2: actively maintained, no qtest coverage. Should usually
->>>            work but regression may creep in due to reliance on the
->>> 	   maintainer to manually test on adhoc basis
->>>
->>>   - Tier 3: not actively maintained, unknown state but liable to
->>>             be broken indefinitely
->>>
->>> Tier 1 is obviously the most desirable state we would like everthing to
->>> be at. Contributors will have to fix problems their patches cause as
->>> they will be blocked by CI.
->>>
->>> Tier 2 is an admission that reality gets in the way. Ideally stuff in
->>> this tier will graduate to Tier 1 at some point. Even if it doesn't
->>> though, it is still valid to keep it in QEMU long term. Contributors
->>> shouldn't gratuitously break stuff in these board, but if they do,
->>> then the maintainer is ultimately responsible for fixing it, as the
->>> contributors don't have a test rig for it.
->>>
->>> Tier 3 is abandonware. If a maintainer doesn't appear, users should
->>> not expect it to continue to exist long term. Contributors are free
->>> to send patches which break this, and are under no obligation to
->>> fix problems in these boards. We may deprecate & delete it after a
->>> while
->>>
->>>
->>> Over time we'll likely add more criteria to stuff in Tier 1. This
->>> could lead to some things dropping from Tier 1 to Tier 2. This is
->>> OK, as it doesn't make those things worse than they already were.
->>> We're just saying that Tier 2 isn't as thoroughly tested as we
->>> would like it to be in an ideal world.
->>
->> I really like the idea of device support tiers codified directly in the
->> QEMU codebase, to give upstream users some idea of which devices we
->> expect to work and which we ... don't, really.
->>
->> Not every last device we offer is enterprise production ready, but we
->> don't necessarily do a good job of explaining which devices fall into
->> which categories, and we've got quite a few of them.
->>
->> I wonder if a 2.5th tier would be useful; something like a "hobbyist"
->> tier for pet project SoC boards and the like -- they're not abandoned,
->> but we also don't expect them to work, exactly.
->>
->> Mild semantic difference from Tier 3.
+On 5/19/20 10:51 AM, Philippe Mathieu-Daudé wrote:
+> Missing "Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>",
+> otherwise:
 > 
-> I guess I was thinking such hobbyist stuff would fall into tier 2  if the
-> hobbyist maintainer actually responds to fixing stuff, or tier 3 if they
-> largely aren't active on the mailing list responding to issues/questions.
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
-> We add have a 4 tier system overall and put hobbyist stuff at tier 3,
-> and abandonware at tier 4.
+> On 5/15/20 5:04 PM, Gerd Hoffmann wrote:
+
+If you add the S-O-B:
+
+Acked-by: John Snow <jsnow@redhat.com>
+
+>> ---
+>>   include/hw/block/fdc.h |  1 +
+>>   include/hw/i386/pc.h   |  1 -
+>>   hw/block/fdc.c         | 26 +++++++++++++++++++++++++-
+>>   hw/i386/pc.c           | 25 -------------------------
+>>   4 files changed, 26 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+>> index 5d71cf972268..479cebc0a330 100644
+>> --- a/include/hw/block/fdc.h
+>> +++ b/include/hw/block/fdc.h
+>> @@ -16,5 +16,6 @@ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
+>>                          DriveInfo **fds, qemu_irq *fdc_tc);
+>>     FloppyDriveType isa_fdc_get_drive_type(ISADevice *fdc, int i);
+>> +int cmos_get_fd_drive_type(FloppyDriveType fd0);
+>>     #endif
+>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>> index 8d764f965cd3..5e3b19ab78fc 100644
+>> --- a/include/hw/i386/pc.h
+>> +++ b/include/hw/i386/pc.h
+>> @@ -176,7 +176,6 @@ typedef void (*cpu_set_smm_t)(int smm, void *arg);
+>>   void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
+>>     ISADevice *pc_find_fdc0(void);
+>> -int cmos_get_fd_drive_type(FloppyDriveType fd0);
+>>     /* port92.c */
+>>   #define PORT92_A20_LINE "a20"
+>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+>> index 8024c822cea3..ea0fb8ee15b9 100644
+>> --- a/hw/block/fdc.c
+>> +++ b/hw/block/fdc.c
+>> @@ -32,7 +32,6 @@
+>>   #include "qapi/error.h"
+>>   #include "qemu/error-report.h"
+>>   #include "qemu/timer.h"
+>> -#include "hw/i386/pc.h"
+>>   #include "hw/acpi/aml-build.h"
+>>   #include "hw/irq.h"
+>>   #include "hw/isa/isa.h"
+>> @@ -2809,6 +2808,31 @@ static Aml *build_fdinfo_aml(int idx,
+>> FloppyDriveType type)
+>>       return dev;
+>>   }
+>>   +int cmos_get_fd_drive_type(FloppyDriveType fd0)
+>> +{
+>> +    int val;
+>> +
+>> +    switch (fd0) {
+>> +    case FLOPPY_DRIVE_TYPE_144:
+>> +        /* 1.44 Mb 3"5 drive */
+>> +        val = 4;
+>> +        break;
+>> +    case FLOPPY_DRIVE_TYPE_288:
+>> +        /* 2.88 Mb 3"5 drive */
+>> +        val = 5;
+>> +        break;
+>> +    case FLOPPY_DRIVE_TYPE_120:
+>> +        /* 1.2 Mb 5"5 drive */
+>> +        val = 2;
+>> +        break;
+>> +    case FLOPPY_DRIVE_TYPE_NONE:
+>> +    default:
+>> +        val = 0;
+>> +        break;
+>> +    }
+>> +    return val;
+>> +}
+>> +
+>>   static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
+>>   {
+>>       Aml *dev;
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 2128f3d6fe8b..c5db7be6d8b1 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -385,31 +385,6 @@ static uint64_t ioportF0_read(void *opaque,
+>> hwaddr addr, unsigned size)
+>>     #define REG_EQUIPMENT_BYTE          0x14
+>>   -int cmos_get_fd_drive_type(FloppyDriveType fd0)
+>> -{
+>> -    int val;
+>> -
+>> -    switch (fd0) {
+>> -    case FLOPPY_DRIVE_TYPE_144:
+>> -        /* 1.44 Mb 3"5 drive */
+>> -        val = 4;
+>> -        break;
+>> -    case FLOPPY_DRIVE_TYPE_288:
+>> -        /* 2.88 Mb 3"5 drive */
+>> -        val = 5;
+>> -        break;
+>> -    case FLOPPY_DRIVE_TYPE_120:
+>> -        /* 1.2 Mb 5"5 drive */
+>> -        val = 2;
+>> -        break;
+>> -    case FLOPPY_DRIVE_TYPE_NONE:
+>> -    default:
+>> -        val = 0;
+>> -        break;
+>> -    }
+>> -    return val;
+>> -}
+>> -
+>>   static void cmos_init_hd(ISADevice *s, int type_ofs, int info_ofs,
+>>                            int16_t cylinders, int8_t heads, int8_t
+>> sectors)
+>>   {
+>>
 > 
-> Probably shouldn't go beyond 4 tiers though, as the more criteria we add
-> the harder it is to clearly decide which tier something should go into.
-> 
-> The tier 1 vs 2 divison is clearly split based on CI which is a simple
-> classification to decide on.
-> 
-> The tier 2 vs 3 division is moderately clearly split based on whether
-> there is a frequently active maintainer.
-> 
-> We can probably squeeze in the 4th tier without too much ambiguity in
-> the classisfication if we think it is adding something worthwhile either
-> from our POV as maintainers, or for users consuming it.
 
-Yes, I didn't mean to start watering it down into a 1,380 tier system
-that we're never able to properly utilize.
-
-I was thinking more along the lines of:
-
-- Device works and is well loved
-- Device works and is well loved (but we have to test manually)
-- Device doesn't work, but is well loved
-  (Use at your own peril, please file a bug report)
-- Device doesn't work, and is unloved
-
-Perhaps it'd be clearer to name these Tier 1A, 1B, 2, and 3; where
-things can shift from 1A to 1B as their test coverage allows, but it's
-not meant to indicate general status otherwise.
-
-Mostly, I would just like some way for users to avoid accidentally
-running tier 2 or 3 devices /by accident/, or the ability to compile
-QEMU versions that only allow tier 1 devices to be used.
-
-It's all arbitrary -- but I think we agree more than not! I'd love to
-have a list of first-class boards and devices that we promise to test
-and have working.
-
---js
+-- 
+—js
 
 
