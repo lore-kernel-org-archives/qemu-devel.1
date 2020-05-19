@@ -2,96 +2,93 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D60C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 04:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 904C220674
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1F57206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 04:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ErQ98ehY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 904C220674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8MLLXhQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F57206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jat75-0006A2-Ml
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 23:40:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52472)
+	id 1jatyY-0005hm-4Y
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 00:35:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jat6X-0005kx-Rv
- for qemu-devel@nongnu.org; Mon, 18 May 2020 23:39:45 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37815)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jat6W-0006Wf-SA
- for qemu-devel@nongnu.org; Mon, 18 May 2020 23:39:45 -0400
-Received: by mail-pg1-x541.google.com with SMTP id f23so5777073pgj.4
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 20:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Q9wQN+n6nI42Ms+Oylu0REEMg41Z/3zN5OIZItTyQV4=;
- b=ErQ98ehYsdIjJ4ghEO4HjsEcDYYDnmHTwJYPygP7VhCxH36o6+v36OWqoWnHfg458c
- /n4HZ1lwTpHcfgXXpSvd/6KnAFg3ndmlrlxgwJiM3dIG7w+pZPmx6t4Q+rK7jacW3nn7
- 41Ob4tPvizheqZEvFx9IXl4SMFrKn4wEdC9+KmJMDgeyrMUtm0JavemNV8H0cEuuKo7b
- kzoFvM0ELG6YX7tn31lHpIQxDWvxLjMlC/xHadguIZYq/9OWxw3M9BlHSZEFm2t24D3y
- gB0gugUujIplwm4+crlHbMUXeN3yhGBmdEB7X5QmRWRhilDxPLbkI8S9UlTFPpzWUBXX
- 4wNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Q9wQN+n6nI42Ms+Oylu0REEMg41Z/3zN5OIZItTyQV4=;
- b=Wtk3H8sJTU01ryAKJvxLGWU2cUm2NHdY7TKMngkxPbQzC1jYbmqdO6ISkJWS0CnB3K
- 2ZS0IpkNfID4o4Al5DNk+GOQZz0Ku+5zTC6MowjwR5c/YDnBpgmXrkajIKuG2ajdI2zW
- 9fRIXL9E+NkSbRc5V9biMgrO4Im7BUyu1RSOnHqFwxVomQ9K/8/B9hi8OpQ3OA+A8MTi
- O2nh/rRgGKylI+j5O+U4hKOCcfRDwWBJpLFWtyVc50tEq3uVa71NiJdgS6i8BbyUKBTr
- XbEQQDGPRZxboBSqpyK82uLvR1X2O5NIv9DSxZkOwgtZXwz6UoESx0J+Ae8jtgIuYM92
- Nxfg==
-X-Gm-Message-State: AOAM531yb6iyCPNUoARBNvO7UGjLB15KqhPkTC4iOQgfRnrhurbWTZUH
- dAEKbBQWDhyXMtJrOTeZj+PT5A==
-X-Google-Smtp-Source: ABdhPJwsr0D2j0dDQgmZZ465jsGnoix6vm40IDwhHXEaFl2eQvOvSL9Cr+MgyZ0M82jzaisk5H712Q==
-X-Received: by 2002:a63:5c1d:: with SMTP id q29mr7053410pgb.105.1589859583049; 
- Mon, 18 May 2020 20:39:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id gv4sm807411pjb.6.2020.05.18.20.39.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 May 2020 20:39:42 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: Fix OUTL debug output
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200517110147.26026-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <234cbf5d-aed7-7b6c-e43d-ae47f8251916@linaro.org>
-Date: Mon, 18 May 2020 20:39:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jatxj-0004cp-OM
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 00:34:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45154
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jatxj-0002jY-1C
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 00:34:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589862882;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DfnN/w0SbYD3vSZtzIfW4lXKbb9M26zh5YzR9hzaFVI=;
+ b=L8MLLXhQkMrLbyq8ielh0e5Ls515T2WhfpAccUrMMN3yBZG14Ol8b7SBEL2K8XkXZlJOjL
+ JKMANNIRkfxsdxSjlUNZ/KgRP/OPV9g1rf0gybJmCnel8KYaFqAni/tfn+2RvaqYoKSBbR
+ FeHiF56IjFLyS+3l5yuns55Pumoi9mA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-m6FuIhfxMOmghIZJQdusCw-1; Tue, 19 May 2020 00:34:31 -0400
+X-MC-Unique: m6FuIhfxMOmghIZJQdusCw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B63A6A0BD7;
+ Tue, 19 May 2020 04:34:27 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0F5E19C4F;
+ Tue, 19 May 2020 04:34:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2FD6311358BC; Tue, 19 May 2020 06:34:19 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v3 0/3] various: Remove unnecessary casts
+References: <20200512070020.22782-1-f4bug@amsat.org>
+ <871rnlsps6.fsf@dusky.pond.sub.org>
+ <8791b385-8493-f81d-5ee3-cca5b8559c27@redhat.com>
+ <87imgt9ycp.fsf@dusky.pond.sub.org>
+ <2f4607cf-90a9-ca9a-4ef6-a8358631cdf0@kaod.org>
+Date: Tue, 19 May 2020 06:34:19 +0200
+In-Reply-To: <2f4607cf-90a9-ca9a-4ef6-a8358631cdf0@kaod.org>
+ (=?utf-8?Q?=22C=C3=A9dric?= Le
+ Goater"'s message of "Mon, 18 May 2020 15:21:52 +0200")
+Message-ID: <87k1187dbo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200517110147.26026-1-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,26 +101,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Riku Voipio <riku.voipio@iki.fi>, Eduardo Habkost <ehabkost@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
+ John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/17/20 4:01 AM, Philippe Mathieu-Daudé wrote:
-> Fix OUTL instructions incorrectly displayed as OUTW.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/i386/misc_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+C=C3=A9dric Le Goater <clg@kaod.org> writes:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> On 5/18/20 3:17 PM, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>=20
+>>> On 15/05/20 07:58, Markus Armbruster wrote:
+>>>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>>>
+>>>>> Remove unnecessary casts using coccinelle scripts.
+>>>>>
+>>>>> The CPU()/OBJECT() patches don't introduce logical change,
+>>>>> The DEVICE() one removes various OBJECT_CHECK() calls.
+>>>> Queued, thanks!
+>>>>
+>>>> Managing expecations: I'm not a QOM maintainer, I don't want to become
+>>>> one, and I don't normally queue QOM patches :)
+>>>>
+>>>
+>>> I want to be again a QOM maintainer, but it's not the best time for me
+>>> to be one.  So thanks for picking up my slack.
+>>=20
+>> You're welcome :)
+>
+> Could you help me getting this patch merged ? :)
+>
+> http://patchwork.ozlabs.org/project/qemu-devel/patch/20200404153340.16486=
+1-1-clg@kaod.org/
 
-as far as it goes.  We should of course never be printing to stderr, but
-logging or tracing.
+I have more QOM patches in the pipe, and I may well post another QOM
+pull request while Paolo is busy with other stuff.  I'll consider
+including other QOM patches then.  Non-trivial ones need an R-by from
+Paolo, Daniel or Eduardo.
 
-
-r~
 
