@@ -2,74 +2,92 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 909BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C395C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:14:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FE3B20674
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:12:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE3B20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F29F20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:14:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cd/U7bfn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F29F20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb6jY-0001lr-Gq
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:12:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40618)
+	id 1jb6ke-0002k0-Bg
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:14:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jb6j1-0001AO-KF
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:12:23 -0400
-Received: from esa1.mentor.iphmx.com ([68.232.129.153]:24610)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jb6iz-0006Mm-H9
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:12:22 -0400
-IronPort-SDR: ZQVkg2LtKIMs/ZrHu6H+5LGrgmasOOGamtCxqrznvILaFNq0C63G1QAJCfeFXN169mb5w+ZfMy
- GeHvd4zRBbMPZ4CgW5Q/gotwctY+z2h0bsfAKySGZnZteOkF3z6AvlQ3eE59mxXaBOdnFpp1lx
- fyZ1TtJOg34fS1fLjJPdyXSuo3BkC2me329dLkr6DGvo/x106EY6A9UpratcfnV3YZfI6PdcBd
- YZbl4p1EfcCy8X8mRib9Vum4BvbsYBWwUZf6FM0xDiB/PE32fixV3/tXiReJ5QUqXDAf8NBaFy
- bEU=
-X-IronPort-AV: E=Sophos;i="5.73,410,1583222400"; d="scan'208";a="51037230"
-Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa1.mentor.iphmx.com with ESMTP; 19 May 2020 10:12:16 -0800
-IronPort-SDR: md2OD808l7fNf6vhcQBJsxb5ys1fGKH0/ph0hG8LJHnz4rGzrfousXVKxZkwnkt8S4NAqOIXOc
- Cthan4yrkW3CgfPAWllfha4sFmseuba4GUABxsgkpCN5aFb1MTKf0TO0oly5tDvBQT4T/VrSzb
- 43fyVVdcRdHPHlqdQgkZiZw8tmecvGkOkXcQXRb1kByX0GyU4i9KnY27VSQB0NeGcck1frcRDN
- XeoCHdP39wEyut1QHHkKLGojSwnz8iUM4A+hTEnPqOaf9awaFrEbUa2mdoE2tKc9PS4tHBiR7i
- Bys=
-Date: Tue, 19 May 2020 18:12:10 +0000
-From: Joseph Myers <joseph@codesourcery.com>
-X-X-Sender: jsm28@digraph.polyomino.org.uk
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 2/2] target/i386: fix IEEE x87 floating-point exception
- raising
-In-Reply-To: <5dd2d81c-cedd-7835-6b3c-7e089254dc95@linaro.org>
-Message-ID: <alpine.DEB.2.21.2005191757210.10766@digraph.polyomino.org.uk>
-References: <alpine.DEB.2.21.2005152117400.3469@digraph.polyomino.org.uk>
- <alpine.DEB.2.21.2005152120280.3469@digraph.polyomino.org.uk>
- <5dd2d81c-cedd-7835-6b3c-7e089254dc95@linaro.org>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jb6jX-0001tH-0E; Tue, 19 May 2020 14:12:55 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:43041)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jb6jV-0006Yc-Tq; Tue, 19 May 2020 14:12:54 -0400
+Received: by mail-il1-x144.google.com with SMTP id l20so293367ilj.10;
+ Tue, 19 May 2020 11:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=kFBrO/aduvO08L5IUBv7D6z+S+KxKKSmqO9l2X1uVg0=;
+ b=Cd/U7bfne+pGeSwQFEMUXxwD/rE2yKRzCLm6D3JoER1dpMpCROQIlBF5ZrCSkj4JUf
+ +84XLNdhkmn4dHJXca/n76y6k1jRzWMmdveMcOLpHEF/vPUtchhLCwu7IitbcLDjxaXM
+ AEhdfc+yOBIC1hOnLhcsT1gxBuNgBdI6rTEHTGmCEtoMsgYkwnJtPlVQsmdknurai9w4
+ AvNsv9Aht86CJyNXA32mnWVRIMcHyLAbNHbAKbiDBMx3PPFs1PCY5pQASk76A0747gE6
+ W1x2LfwpRajdci3WQPF2ID/sJiTTXUU4y+yD/OAyiiVJs07poSrSep1f2b68rlPPN5LY
+ xu2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=kFBrO/aduvO08L5IUBv7D6z+S+KxKKSmqO9l2X1uVg0=;
+ b=FDHOKdl5mbbTgFCd9TUdJ38cP5DAUkl9JuCr1WyvtyqYSjKOAN4NAAOsNC4TIkEzPG
+ jFt/0TTzVHeulH9VfIMuS7zmFA9CJz+l9FXPYGKvyqdLVbhLARdxanPyXqLLYeMguRBT
+ c+ydRJgTKmvHhwARPuGYmhAqZpa1u87bcNQE/7CgACTGs3zWR6iwvuqsPCJ6VNnjlmv4
+ 2dW9onpIO24FyhflN61t2hB3hhLG4d04CtDEGyAn+zgLD25k9l0yhwMNKLqDDE+yTwAn
+ vIDMrSSxo/jMB8kqIp6/rw5Pi/sJHlRXSLEjme2Hif55+bv+MuaJE3hndeU9R0F22ytW
+ WT1A==
+X-Gm-Message-State: AOAM533fWV2GH7jG5NoKV1G2ILkdT/RUFZi3gI3/pzKER7/t3bFnEDn9
+ WEHa1xbgPsYCQg3QLQdzWETAtp85v9c5i1jcT+c=
+X-Google-Smtp-Source: ABdhPJzfrzPNp9h8Or495buceQ9D4QfFZcdkFMTC1Ym9L3GdHOEYO89cJJ4vcQAGEv1WILqMV2fEfJs/Dg5IlQ17TYk=
+X-Received: by 2002:a92:48d1:: with SMTP id j78mr250749ilg.131.1589911972040; 
+ Tue, 19 May 2020 11:12:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-03.mgc.mentorg.com (139.181.222.3) To
- svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-Received-SPF: pass client-ip=68.232.129.153;
- envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 14:12:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+References: <cover.1588878756.git.alistair.francis@wdc.com>
+ <44d0486b0fd156a756af544866dd7d19609b1aa6.1588878756.git.alistair.francis@wdc.com>
+ <01168f32-c21c-b9fd-cb9c-06511e28bd20@redhat.com>
+ <CAKmqyKMwdBmZ8kdi0xp0kJ1sPrWSGYZ304ZY8G+4xK9yYQ3VKg@mail.gmail.com>
+ <CAEUhbmWWdDQfj8XBkWzDXkNdvcvEic8K23NuCpNyQdfxM4TxOg@mail.gmail.com>
+ <CAKmqyKMOTnc9YX9adMyrQ5NnFZY5EZgyYYA_+23_ryWOtV92pQ@mail.gmail.com>
+ <CAEUhbmVu2=zCs8yOzH_wRMmtXDCA_b8pPFO4jQjnbh1iZvjUuQ@mail.gmail.com>
+In-Reply-To: <CAEUhbmVu2=zCs8yOzH_wRMmtXDCA_b8pPFO4jQjnbh1iZvjUuQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 19 May 2020 11:03:59 -0700
+Message-ID: <CAKmqyKMMiQES-60C8y4QSfeQk8Gg-8ixOTw=PrRVWrWQPxVufw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/9] target/riscv: Don't overwrite the reset vector
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,45 +101,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- rth@twiddle.net
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 May 2020, Richard Henderson wrote:
+On Sat, May 16, 2020 at 2:03 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> On Sat, May 16, 2020 at 3:51 AM Alistair Francis <alistair23@gmail.com> w=
+rote:
+> >
+> > On Thu, May 14, 2020 at 9:54 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >
+> > > On Fri, May 15, 2020 at 5:51 AM Alistair Francis <alistair23@gmail.co=
+m> wrote:
+> > > >
+> > > > On Thu, May 14, 2020 at 10:54 AM Philippe Mathieu-Daud=C3=A9
+> > > > <philmd@redhat.com> wrote:
+> > > > >
+> > > > > On 5/7/20 9:13 PM, Alistair Francis wrote:
+> > > > > > If the reset vector is set in the init function don't set it ag=
+ain in
+> > > > > > realise.
+> > > > >
+> > > > > typo "realize".
+> > > >
+> > > > It's not a typo, just correct English :)
+> > > >
+> > > > I have changed it.
+> > > >
+> > > > >
+> > > > > >
+> > > > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > > > > ---
+> > > > > >   target/riscv/cpu.c | 20 +++++++++++---------
+> > > > > >   1 file changed, 11 insertions(+), 9 deletions(-)
+> > > > > >
+> > > > > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > > > > > index 059d71f2c7..8f837edf8d 100644
+> > > > > > --- a/target/riscv/cpu.c
+> > > > > > +++ b/target/riscv/cpu.c
+> > > > > > @@ -111,6 +111,14 @@ static void set_feature(CPURISCVState *env=
+, int feature)
+> > > > > >       env->features |=3D (1ULL << feature);
+> > > > > >   }
+> > > > > >
+> > > > > > +static int get_resetvec(CPURISCVState *env)
+> > > > > > +{
+> > > > > > +#ifndef CONFIG_USER_ONLY
+> > > > > > +    return env->resetvec;
+> > > > > > +#endif
+> > > > > > +    return 0;
+> > > > >
+> > > > > Don't you get an error about double return? Maybe use #else?
+> > > >
+> > > > Apparently not, I have changed it though.
+> > > >
+> > > > Alistair
+> > > >
+> > > > >
+> > > > > > +}
+> > > > > > +
+> > > > > >   static void set_resetvec(CPURISCVState *env, int resetvec)
+> > > > > >   {
+> > > > > >   #ifndef CONFIG_USER_ONLY
+> > > > > > @@ -123,7 +131,6 @@ static void riscv_any_cpu_init(Object *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC =
+| RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_11_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >   }
+> > > > > >
+> > > > > >   #if defined(TARGET_RISCV32)
+> > > > > > @@ -140,7 +147,6 @@ static void rv32gcsu_priv1_09_1_cpu_init(Ob=
+ject *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | =
+RVS | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_09_1);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_MMU);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > > @@ -150,7 +156,6 @@ static void rv32gcsu_priv1_10_0_cpu_init(Ob=
+ject *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | =
+RVS | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_10_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_MMU);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > > @@ -160,7 +165,6 @@ static void rv32imacu_nommu_cpu_init(Object=
+ *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV32 | RVI | RVM | RVA | RVC | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_10_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > >
+> > > > > > @@ -169,7 +173,6 @@ static void rv32imafcu_nommu_cpu_init(Objec=
+t *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVC | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_10_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > >
+> > > > > > @@ -187,7 +190,6 @@ static void rv64gcsu_priv1_09_1_cpu_init(Ob=
+ject *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | =
+RVS | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_09_1);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_MMU);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > > @@ -197,7 +199,6 @@ static void rv64gcsu_priv1_10_0_cpu_init(Ob=
+ject *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | =
+RVS | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_10_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_MMU);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > > @@ -207,7 +208,6 @@ static void rv64imacu_nommu_cpu_init(Object=
+ *obj)
+> > > > > >       CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+> > > > > >       set_misa(env, RV64 | RVI | RVM | RVA | RVC | RVU);
+> > > > > >       set_priv_version(env, PRIV_VERSION_1_10_0);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > >       set_feature(env, RISCV_FEATURE_PMP);
+> > > > > >   }
+> > > > > >
+> > > > > > @@ -399,7 +399,9 @@ static void riscv_cpu_realize(DeviceState *=
+dev, Error **errp)
+> > > > > >       }
+> > > > > >
+> > > > > >       set_priv_version(env, priv_version);
+> > > > > > -    set_resetvec(env, DEFAULT_RSTVEC);
+> > > > > > +    if (!get_resetvec(env)) {
+> > >
+> > > What if we have a RISC-V CPU whose reset vector is at address 0?
+> >
+> > That won't work then. I think if that happens we could swap to a
+> > negative number.
+> >
+>
+> env->resetvec is declared as target_ulong so negative number does not wor=
+k here.
+>
+> How about just remove set_resetvec() in riscv_cpu_realize()? Or
+> introduce a new config parameter for the reset vector, and only
+> override it if the config parameter is given, like other properties?
 
-> To retain the hard float fast path, we need to leave float_flag_invalid set
-> when the accrued exception bit is set.  To me this suggests keep all of the
-> FPUS_* bits in fp_status and only convert to FPUS_* when we read the fp status
-> word.
+We need to set the default reset veector though. I can just set all of
+the values in the init function instead.
 
-There is no hard float fast path that I can see for floatx80.  The issue 
-of the fast path might be relevant for fixing SSE exception handling 
-(which has some similar issues to x87), but not for floatx80.
+Alistair
 
-Note that another bug in the x87 emulation is the lack of setting C1 for 
-most instructions with inexact results based on the direction of rounding 
-(which will require a new feature to be added to the softfloat code to 
-record that information so the x87 emulation can use it).
-
-> When it comes to raising unmasked exceptions... I have a couple of thoughts.
-
-I expect some code will be needed in each individual instruction 
-implementation, and probably extra softfloat code, to handle unmasked 
-exceptions.  Some exceptions, when unmasked, should result in instructions 
-not popping inputs from the stack and not updating destinations.  The 
-softfloat case needs to provide information about the exact underflow case 
-that targets can use when that exception is set to trap.  x87 overflow and 
-underflow, when unmasked and with a register destination, are supposed to 
-compute and store a result with a biased exponent for use by the trap 
-handler.  The code will also need to know exactly which instructions 
-should result in a trap handler being called rather than only doing it for 
-fwait.  Stack underflow and overflow need to be checked for, regardless of 
-exception masking.  (There are other issues relating to trapped exception 
-handling as well, but that's a summary of the main ones I've noticed.)
-
--- 
-Joseph S. Myers
-joseph@codesourcery.com
+>
+> Regards,
+> Bin
 
