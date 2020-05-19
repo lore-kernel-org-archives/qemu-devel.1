@@ -2,81 +2,78 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19857C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21750C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBEB620709
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:36:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA78020709
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRfpO2NQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEB620709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQDUCr6E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA78020709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1javre-0007kN-4B
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 02:36:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40786)
+	id 1javzf-0001MP-2b
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 02:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javql-0007Dh-TD
- for qemu-devel@nongnu.org; Tue, 19 May 2020 02:35:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57835
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javyr-0000hG-F7
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 02:44:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22576
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javql-0006BN-8A
- for qemu-devel@nongnu.org; Tue, 19 May 2020 02:35:39 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javyq-0008Qw-H5
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 02:44:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589870138;
+ s=mimecast20190719; t=1589870639;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r2O32gC9uA6066YhYwTw+WPF6Meohyj6ez/n0lmrs9g=;
- b=bRfpO2NQkoiAuGwimBFUtjX9Q+snVqyN+grjjpAuT8x7i52Y331QNV4cj9oNNXgQtGTOX8
- tryXhZS4FIKZIARL3UcIwfCPBXZ6SiCrRJQDx8tqopdt8ZToaH/dLj6SAxqAz97hhA2vhG
- 9ttAgwuRAPFmUwk7FreQg5kT6E2Pids=
+ bh=f4kTwuIzndn2N3YI+Exhx9v2mrxWVjydNu4qMM/np1I=;
+ b=TQDUCr6EzglTQGP9ywuW7tFV5FA80WfW1R3xfxAEhQvDfBYfB59s91YUVDBmJH5mytI6Bc
+ x/k7E5gpwvtMXZCxQk5pMa391hE5ZUc0Mq9wdIGusn2Q2gfpfmLaAnnOOsNpczdpSGrfYm
+ FekONhSiFtwhYgSyqPi6lFKdBSbykng=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-mDfaVhTVMSKxDgZD4T4mvg-1; Tue, 19 May 2020 02:35:34 -0400
-X-MC-Unique: mDfaVhTVMSKxDgZD4T4mvg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-177-9EHruyNTMzi3q6DkGsEK9A-1; Tue, 19 May 2020 02:43:47 -0400
+X-MC-Unique: 9EHruyNTMzi3q6DkGsEK9A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80F19A0BDC;
- Tue, 19 May 2020 06:35:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E9F81800D42
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 06:43:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3054A10013D9;
- Tue, 19 May 2020 06:35:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C0DA5C1BB;
+ Tue, 19 May 2020 06:43:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B405C11358BC; Tue, 19 May 2020 08:35:31 +0200 (CEST)
+ id 877F811358BC; Tue, 19 May 2020 08:43:44 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 18/24] display/sm501 display/ati: Fix to realize "i2c-ddc"
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-19-armbru@redhat.com>
- <alpine.BSF.2.22.395.2005181238010.5961@zero.eik.bme.hu>
- <43c11226-9bbd-103d-4f9c-4b94c5d95f99@redhat.com>
-Date: Tue, 19 May 2020 08:35:31 +0200
-In-Reply-To: <43c11226-9bbd-103d-4f9c-4b94c5d95f99@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 18 May 2020 12:45:57
- +0200")
-Message-ID: <87tv0c4eks.fsf@dusky.pond.sub.org>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH not-for-merge 2/5] qom: Make "info qom-tree" show children
+ sorted
+References: <20200518051945.8621-1-armbru@redhat.com>
+ <20200518051945.8621-3-armbru@redhat.com>
+ <c6eae4be-7d00-bc47-f5a0-4a5977136ac0@redhat.com>
+Date: Tue, 19 May 2020 08:43:44 +0200
+In-Reply-To: <c6eae4be-7d00-bc47-f5a0-4a5977136ac0@redhat.com> (Eric Blake's
+ message of "Mon, 18 May 2020 16:04:19 -0500")
+Message-ID: <87o8qk4e73.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
@@ -100,66 +97,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
- ehabkost@redhat.com, Magnus Damm <magnus.damm@gmail.com>,
- qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> On 5/18/20 12:39 PM, BALATON Zoltan wrote:
->> On Mon, 18 May 2020, Markus Armbruster wrote:
->>> sm501_init() and ati_vga_realize() create an "i2c-ddc" device, but
->>> neglect to realize it.=C2=A0 Affects machines sam460ex, shix, r2d, and
->>> fulong2e.
->>>
->>> I wonder how this ever worked.=C2=A0 If the "device becomes real only o=
-n
->>> realize" thing actually works, then we've always been missing the
->>> device, yet nobody noticed.
->>>
->>> Fix by realizing it right away.=C2=A0 Visible in "info qom-tree"; here'=
-s
->>> the change for sam460ex:
->>>
->>> =C2=A0=C2=A0=C2=A0 /machine (sam460ex-machine)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [...]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /unattached (container)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [...]
->>> =C2=A0=C2=A0 -=C2=A0=C2=A0=C2=A0 /device[14] (sii3112)
->>> =C2=A0=C2=A0 +=C2=A0=C2=A0=C2=A0 /device[14] (i2c-ddc)
->>> =C2=A0=C2=A0 +=C2=A0=C2=A0=C2=A0 /device[15] (sii3112)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [rest of device[*] renumbere=
-d...]
->>>
->>> Fixes: 4a1f253adb45ac6019971193d5077c4d5d55886a
->>> Fixes: 4a1f253adb45ac6019971193d5077c4d5d55886a
+> On 5/18/20 12:19 AM, Markus Armbruster wrote:
+>> "info qom-tree" prints children in unstable order.  This is a pain
+>> when diffing output for different versions to find change.  Print it
+>> sorted.
+>
+> Yes, this does seem reasonable to include even without the rest of the
+> series.
+
+Noted.
+
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   qom/qom-hmp-cmds.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 39 insertions(+), 1 deletion(-)
 >>
->> One of these is probably meant to be
->> c82c7336de58876862e6b4dccbda29e9240fd388
-
-Pasto, thanks!
-
-> :)
+>> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
+>> index 4a61ee1b8c..cf0af8f6b5 100644
+>> --- a/qom/qom-hmp-cmds.c
+>> +++ b/qom/qom-hmp-cmds.c
+>> @@ -78,6 +78,35 @@ static int print_qom_composition_child(Object *obj, void *opaque)
+>>       return 0;
+>>   }
+>>   +static int qom_composition_compare(const void *a, const void *b,
+>> void *ignore)
+>> +{
+>> +    Object *obja = (void *)a, *objb = (void *)b;
 >
->> although I'm not sure having a Fixes tag makes sense for this commit.
+> Casting away const...
 >
-> AFAIK the 'Fixes' tag is not well defined in QEMU.
+>> +    const char *namea, *nameb;
+>> +
+>> +    if (obja == object_get_root()) {
+>> +        namea = g_strdup("");
+>> +    } else {
+>> +        namea = object_get_canonical_path_component(obja);
+>
+> ...should we instead improve object_get_canonical_path_component to
+> work with 'const Object *'?
 
-True.
+Go right ahead :)
 
-> I personally find it handy to navigate between commits in gitk, not
-> having to go via unrelated commits, which is why I use it.
-> Linux kernel seems to have a stricter approach, only using it for
-> security bug fixes. For this QEMU uses 'Cc: qemu-stable'.
+I need to sit on my hands to have a chance getting my task queue back
+under control.
 
-We cc: qemu-stable for show-stoppers without security impact, too.
+>> +    }
+>> +
+>> +    if (objb == object_get_root()) {
+>> +        nameb = g_strdup("");
+>> +    } else {
+>> +        nameb = object_get_canonical_path_component(objb);
+>> +    }
+>> +
+>> +
+>> +    return strcmp(namea, nameb);
+>
+> Why the two blank lines?  This leaks namea and/or nameb if either
+> object is the object root.  Should you instead use g_strcmp0 here,
+> with namea/b set to NULL instead of g_strdup("") above?
 
-> Do we need to clarify its use on the wiki?
+My not-for-merge proves prudent ;)
 
-If we can build rough consensus on how we want it used, yes.
+>> @@ -105,7 +134,16 @@ static void print_qom_composition(Monitor *mon, Object *obj, int indent)
+>>       monitor_printf(mon, "%*s/%s (%s)\n", indent, "", name,
+>>                      object_get_typename(obj));
+>>       g_free(name);
+>> -    object_child_foreach(obj, print_qom_composition_child, &s);
+>> +
+>> +    GQueue children;
+>> +    Object *child;
+>
+> Mid-function declarations - I assume you'd clean this up if we want
+> this for real?
+
+Yes.  I prioritized diff over maintainability, because not-for-merge.
+
+>> +    g_queue_init(&children);
+>> +    object_child_foreach(obj, insert_qom_composition_child, &children);
+>> +    while ((child = g_queue_pop_head(&children))) {
+>> +        print_qom_composition(mon, child, indent + 2);
+>> +    }
+>> +    (void)s;
+>> +    (void)print_qom_composition_child;
+>
+> Also, this looks like leftover debugger aids?
+
+Shut up the compiler so I don't have to remove code.  Shorter diff,
+not-for-merge.
+
+>>   }
+>>     void hmp_info_qom_tree(Monitor *mon, const QDict *dict)
+>>
+
+Thanks!
 
 
