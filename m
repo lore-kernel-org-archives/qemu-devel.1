@@ -2,85 +2,126 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D5FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 10:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 149F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 10:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDC2F206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 10:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA4A920709
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 10:55:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBxce2wx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDC2F206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NzfJ4nIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA4A920709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jazsP-0006eD-5f
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 06:53:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41562)
+	id 1jazuB-0007i4-2k
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 06:55:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jazrr-00069E-RZ
- for qemu-devel@nongnu.org; Tue, 19 May 2020 06:53:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32576
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jazrq-00089V-3W
- for qemu-devel@nongnu.org; Tue, 19 May 2020 06:53:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589885580;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QnrzlGSK8fafG65CSerirzjRhrHsI+mOn9EVB1BmxJY=;
- b=WBxce2wxMBx58xjtCpsoXaHRB1m1hqSTLmnEPRkGQpiCl/e0gE8JxFo23QuxDJwiZQxfxh
- 3ggPAVCMCtoRKgvATAYrcbxFYVrCji/z2nDGryCvVuRFSxgTELll5ijhPEsPQYeRuMvOvK
- 5IuRiIRqRfvaW2n+ShmE2cuzehG95H0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-i-VNCyZTMtCr9rId2w2BTg-1; Tue, 19 May 2020 06:52:58 -0400
-X-MC-Unique: i-VNCyZTMtCr9rId2w2BTg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84D1180B738;
- Tue, 19 May 2020 10:52:48 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-199.ams2.redhat.com [10.36.113.199])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 66E072CE39;
- Tue, 19 May 2020 10:52:43 +0000 (UTC)
-Date: Tue, 19 May 2020 12:52:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v2 5/9] block/io: expand in_flight inc/dec section:
- simple cases
-Message-ID: <20200519105241.GH7652@linux.fritz.box>
-References: <20200427143907.5710-1-vsementsov@virtuozzo.com>
- <20200427143907.5710-6-vsementsov@virtuozzo.com>
- <efc8e783-0541-6b95-1356-71ccc823cad2@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jaztH-00078Y-OH; Tue, 19 May 2020 06:54:31 -0400
+Received: from mail-eopbgr140117.outbound.protection.outlook.com
+ ([40.107.14.117]:41206 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jaztF-0000Gn-Uq; Tue, 19 May 2020 06:54:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nmH03fMIFnkSJJjpGxnrzXM6r89NVO9c+Y7voqbnDRnRSiCuGLcKymcs/to5P3wKogg9VSoqWHuf/RULuW8JkKRuzyRAcHOyhqTPMk56Wkol9mpMYcA2tjI45Q0lKbHHQV74x2vustQFaituZOB4C0r/FIBXhQpObd2XTDuN/2SVmDPuGU8Uuu0H41YlH0Ny0dg+hW6gLbZriF2OYGFUiPNS7lcOSzv+1CbW19XWTU/hPbl6kT8xEsUbrXQ6BUiQeWRfWtXWNEMgq3RsV/objX1mvnAPnYhEos9QvKKW5qxVIpop3ViF/nS4CKT1/W6vLcgaQoQeMZ4AU3ONfbHnNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KS7dAWn0448ggTXSOBYo5Mwd80Df76S+1W9w4B02kVk=;
+ b=Nk21sypehMHSBUIX8djTyGhRYQVrP7tSJnZN0az8PoO0Pg5Uo5TpQmzzvM+eRQQTKipOQijFZiH3p6qHwQpJ6FVVa9bZUKmrdRamnhjPr84yF6cSgjaRVC5wZXRF1XBX4xaCSVXtm53vufwq96gYAIhq/29w6HgPhm8FC5H+fZOlMxk3rADGOHXue8SFFRwoHAIJ07rKPfJUGaxw5BMFH3yB/onrgs6JcQQGKWl7RpA3YyHFe4Or+YY3BYtNc+XGlAkn2e7PasBTGyLLhmIPQvnkitjNb4WJbQ2s7mJZCh3skGEWoh1y7725dxWL4kPDTSQSlH2DHbJcPV0c2wPvZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KS7dAWn0448ggTXSOBYo5Mwd80Df76S+1W9w4B02kVk=;
+ b=NzfJ4nIJxoo082AlWV4iDFuzkqIYsga+TaqjQcmcBoXzykBG4wIN7VQ93L+HLvfwW7No/zOLFjkzDQNdC8TLj2+Tupz/GhD9wfheh5zeLw334/cs52XCvifooE3kFOA5Y5ZersDYf2Px3Jc3vRe/+8NxehDIt4/Va3svqTuGP0o=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5429.eurprd08.prod.outlook.com (2603:10a6:20b:107::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Tue, 19 May
+ 2020 10:54:26 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.034; Tue, 19 May 2020
+ 10:54:26 +0000
+Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-2-jsnow@redhat.com>
+ <b4618eb0-5303-40ab-b5e2-5a08d5738a81@virtuozzo.com>
+ <20b3fb10-8028-eb12-49a9-a3cc9dd45ed0@redhat.com>
+ <07ff57d4-8348-4409-ca8a-ff4c5278b973@virtuozzo.com>
+ <45dc0bb0-6b22-1703-0435-9d49d3df9978@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e78d3f7a-162a-b08e-ff8a-63b1889b81d7@virtuozzo.com>
+Date: Tue, 19 May 2020 13:54:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <45dc0bb0-6b22-1703-0435-9d49d3df9978@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0P190CA0012.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <efc8e783-0541-6b95-1356-71ccc823cad2@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.178) by
+ AM0P190CA0012.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.26 via Frontend Transport; Tue, 19 May 2020 10:54:25 +0000
+X-Originating-IP: [185.215.60.178]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 91402d73-c99a-46af-8d4b-08d7fbe2ff94
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5429:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54293A6918421E516508686CC1B90@AM7PR08MB5429.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 040866B734
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oyi/QY0It4ket1OFwEU/jFVQLWdxJxLDeH3t3wa86bnDITvcQdlnTNZuIkWNxlcgLGkZ3vDHJo2BJEMtJJ4Z2Vi4e0QH/h/4PEWTYmAG1ZU3/QoN/QIxT+DfRkVfiAKpAM7jTxNKMbYw45BcHPJn8g738lnPNpitOk7kLBonQvHGIojxmXKfnX+c5lUQoRe+LiD7BWj1B/H9f+EBbuHmLKtEWaKs8/B15xlc2yWrSfr3MR8BL/jzVmEBx1opGJyvyDAeYdPepPf1dMInSKR0mMSdX4seUnrAPivM2NbZcHGoGWEnuJ7gWPPPlMN5XAVt4V7dIGw4RkAeD/zMYp09dZdIV5iyEZ1otSmA5jc+X/Vk4kHVn9XcAY9EwIUwPvEakNbqn7fvohyrI7TglVcN5TrMtSHK/mIDBQz6Fl7Bv24S8sNFO2p9raB3+CjZbOYoR7F36ZC61sjYDapHzcrjBOymJ1CV6pmW1UN9uyT++D/Z3Xo1e46nRbnlrtqSo1y/
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(376002)(39840400004)(346002)(366004)(136003)(54906003)(66946007)(31696002)(956004)(478600001)(7416002)(31686004)(8676002)(2616005)(4326008)(53546011)(8936002)(16576012)(6486002)(5660300002)(316002)(36756003)(26005)(52116002)(2906002)(66476007)(66556008)(86362001)(16526019)(186003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: YfGq8hVZmtfy6BIg2gbc648Xu0rUVfz4zf/HTvMa7VvC5LunWYCypan/aHhWPmbRfgbLQXoKlBsDLfHwjbsLpaaBD54jgolKIiYA7X5XXQ7ooUnz76ztEmDNlHMZZDabEosrQD7LjcyZIKxyQTNCJRhNZR3YOTNsuQbxXomg8TF8AcaHJnJA229YguvL4/N40Szm7PA9XBp8fiKODHRtOgA+r22QJLZG4G9othmIrY1Mz9n2yi51/IeSCSN6cxuY/edVsYlZtKOJ65L70Ixd8Zb0Wh8ik9G0V+Q/5SyQitmGc6r51j0TNR3lPzyATw3+BD9p3K6OSEruv7PVD+ZvXQCLkZL6nHaw0g0RuX5Sxc6197DUTTt2xqQopZ9oLuK0gRjw4RFS3Mhf8dXiwodwBL/LyMBaRtPzgBjtEL3RL0V0ykqSaA0QkTON2jPFvaCYuZkl0e4YpHjNgiAu7kHDmFQJAIc+KSK8rbTudZNslYwHzREU0AjT0JAw/qEuSgN+
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91402d73-c99a-46af-8d4b-08d7fbe2ff94
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2020 10:54:26.6177 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: awWgcCqyTyyeIfDtpE5fAQvVMhiQwZ+9gMYWRjKxsivP8u6fHB/KseiTjYiPc0toTtvGINqx5pspMqNXtp1Eev2pIZBlgnbIRQxELgLHrtU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5429
+Received-SPF: pass client-ip=40.107.14.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 06:54:27
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,128 +134,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.05.2020 um 09:02 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 27.04.2020 17:39, Vladimir Sementsov-Ogievskiy wrote:
-> > It's safer to expand in_flight request to start before enter to
-> > coroutine in synchronous wrappers, due to the following (theoretical)
-> > problem:
-> > 
-> > Consider write.
-> > It's possible, that qemu_coroutine_enter only schedules execution,
-> > assume such case.
-> > 
-> > Then we may possibly have the following:
-> > 
-> > 1. Somehow check that we are not in drained section in outer code.
-> > 
-> > 2. Call bdrv_pwritev(), assuming that it will increase in_flight, which
-> > will protect us from starting drained section.
-> > 
-> > 3. It calls bdrv_prwv_co() -> bdrv_coroutine_enter() (not yet increased
-> > in_flight).
-> > 
-> > 4. Assume coroutine not yet actually entered, only scheduled, and we go
-> > to some code, which starts drained section (as in_flight is zero).
-> > 
-> > 5. Scheduled coroutine starts, and blindly increases in_flight, and we
-> > are in drained section with in_flight request.
-> > 
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> Very interesting: this patch breaks test-replication. It hangs:
-> 
-> (gdb) thr a a bt
-> 
-> Thread 2 (Thread 0x7eff256cd700 (LWP 2843)):
-> #0  0x00007eff2f5fd1fd in syscall () from /lib64/libc.so.6
-> #1  0x000055af9a9a4f11 in qemu_futex_wait (f=0x55af9aa6f758 <rcu_call_ready_event>, val=4294967295) at /work/src/qemu/up-expand-bdrv-in_flight-bounds/include/qemu/futex.h:29
-> #2  0x000055af9a9a50d5 in qemu_event_wait (ev=0x55af9aa6f758 <rcu_call_ready_event>) at util/qemu-thread-posix.c:459
-> #3  0x000055af9a9bd20d in call_rcu_thread (opaque=0x0) at util/rcu.c:260
-> #4  0x000055af9a9a5288 in qemu_thread_start (args=0x55af9c4f1b80) at util/qemu-thread-posix.c:519
-> #5  0x00007eff2f6d44c0 in start_thread () from /lib64/libpthread.so.0
-> #6  0x00007eff2f602553 in clone () from /lib64/libc.so.6
-> 
-> Thread 1 (Thread 0x7eff25820a80 (LWP 2842)):
-> #0  0x00007eff2f5f7bd6 in ppoll () from /lib64/libc.so.6
-> #1  0x000055af9a99e405 in qemu_poll_ns (fds=0x55af9c52a830, nfds=1, timeout=-1) at util/qemu-timer.c:335
-> #2  0x000055af9a9a1cab in fdmon_poll_wait (ctx=0x55af9c526890, ready_list=0x7ffc73e8c5d0, timeout=-1) at util/fdmon-poll.c:79
-> #3  0x000055af9a9a160c in aio_poll (ctx=0x55af9c526890, blocking=true) at util/aio-posix.c:600
-> #4  0x000055af9a8f0bb0 in bdrv_do_drained_begin (bs=0x55af9c52a8d0, recursive=false, parent=0x0, ignore_bds_parents=false, poll=true) at block/io.c:429
-> #5  0x000055af9a8f0c95 in bdrv_drained_begin (bs=0x55af9c52a8d0) at block/io.c:435
-> #6  0x000055af9a8dc6a8 in blk_drain (blk=0x55af9c542c10) at block/block-backend.c:1681
-> #7  0x000055af9a8da0b6 in blk_unref (blk=0x55af9c542c10) at block/block-backend.c:473
-> #8  0x000055af9a8eb5e7 in mirror_exit_common (job=0x55af9c6c45c0) at block/mirror.c:667
-> #9  0x000055af9a8eb9c1 in mirror_prepare (job=0x55af9c6c45c0) at block/mirror.c:765
-> #10 0x000055af9a87cd65 in job_prepare (job=0x55af9c6c45c0) at job.c:781
-> #11 0x000055af9a87b62a in job_txn_apply (job=0x55af9c6c45c0, fn=0x55af9a87cd28 <job_prepare>) at job.c:158
-> #12 0x000055af9a87cdee in job_do_finalize (job=0x55af9c6c45c0) at job.c:798
-> #13 0x000055af9a87cfb5 in job_completed_txn_success (job=0x55af9c6c45c0) at job.c:852
-> #14 0x000055af9a87d055 in job_completed (job=0x55af9c6c45c0) at job.c:865
-> #15 0x000055af9a87d0a8 in job_exit (opaque=0x55af9c6c45c0) at job.c:885
-> #16 0x000055af9a99b981 in aio_bh_call (bh=0x55af9c547440) at util/async.c:136
-> #17 0x000055af9a99ba8b in aio_bh_poll (ctx=0x55af9c526890) at util/async.c:164
-> #18 0x000055af9a9a17ff in aio_poll (ctx=0x55af9c526890, blocking=true) at util/aio-posix.c:650
-> #19 0x000055af9a8f7011 in bdrv_flush (bs=0x55af9c53b900) at block/io.c:3019
-> #20 0x000055af9a874351 in bdrv_close (bs=0x55af9c53b900) at block.c:4252
-> #21 0x000055af9a874ca3 in bdrv_delete (bs=0x55af9c53b900) at block.c:4498
-> #22 0x000055af9a877862 in bdrv_unref (bs=0x55af9c53b900) at block.c:5866
-> #23 0x000055af9a870837 in bdrv_root_unref_child (child=0x55af9c6c4430) at block.c:2684
-> #24 0x000055af9a8da9a2 in blk_remove_bs (blk=0x55af9c547bd0) at block/block-backend.c:803
-> #25 0x000055af9a8d9e54 in blk_delete (blk=0x55af9c547bd0) at block/block-backend.c:422
-> #26 0x000055af9a8da0f8 in blk_unref (blk=0x55af9c547bd0) at block/block-backend.c:477
-> #27 0x000055af9a86a6f1 in teardown_secondary () at tests/test-replication.c:392
-> #28 0x000055af9a86aac1 in test_secondary_stop () at tests/test-replication.c:490
-> #29 0x00007eff2fd7df7e in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> #30 0x00007eff2fd7dd24 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> #31 0x00007eff2fd7dd24 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> #32 0x00007eff2fd7e46a in g_test_run_suite () from /lib64/libglib-2.0.so.0
-> #33 0x00007eff2fd7e485 in g_test_run () from /lib64/libglib-2.0.so.0
-> #34 0x000055af9a86b19c in main (argc=1, argv=0x7ffc73e8d088) at tests/test-replication.c:645
+19.05.2020 03:27, John Snow wrote:
 > 
 > 
-> (gdb) p ((BlockBackend *)0x55af9c547bd0)->in_flight
-> $5 = 0
-> (gdb) p ((BlockBackend *)0x55af9c542c10)->in_flight
-> $6 = 0
-> (gdb) p ((BlockDriverState *)0x55af9c53b900)->in_flight
-> $7 = 1
-> (gdb) p ((BlockDriverState *)0x55af9c52a8d0)->in_flight
-> $8 = 0
-> (gdb) fr 20
-> #20 0x000055af9a874351 in bdrv_close (bs=0x55af9c53b900) at block.c:4252
-> 4252        bdrv_flush(bs);
-> (gdb) p bs->node_name
-> $9 = "#block5317", '\000' <repeats 21 times>
-> (gdb) p bs->drv
-> $10 = (BlockDriver *) 0x55af9aa63c40 <bdrv_replication>
-> (gdb) p bs->in_flight
-> $11 = 1
-> (gdb) p bs->tracked_requests
-> $12 = {lh_first = 0x0}
+> On 5/18/20 3:33 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> 18.05.2020 21:23, John Snow wrote:
+>>>
+>>>
+>>> On 5/18/20 2:14 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 14.05.2020 08:53, John Snow wrote:
+>>>>> move python/qemu/*.py to python/qemu/lib/*.py.
+>>>>>
+>>>>> To create a namespace package, the 'qemu' directory itself shouldn't
+>>>>> have module files in it. Thus, these files will go under a 'lib'
+>>>>> package
+>>>>> directory instead.
+>>>>
+>>>> Hmm..
+>>>>
+>>>> On the first glance, it looks better to have
+>>>>
+>>>>     from qemu import QEMUMachine
+>>>>
+>>>> than
+>>>>       from qemu.lib import QEMUMachine
+>>>>
+>>>> why do we need this extra ".lib" part?
+>>>>
+>>>> Is it needed only for internal use?
+>>>>
+>>>> Assume we have installed qemu package. Can we write
+>>>>
+>>>>     from qemu import QEMUMachine
+>>>>
+>>>> ? Or we still need qemu.lib ?
+>>>>
+>>>> I don't remember any python package, which made me to write "import from
+>>>> package_name.lib ..."
+>>>>
+>>>>
+>>>
+>>> It's a strategy to create "qemu" as a PEP420 namespace package; i.e.
+>>> "qemu" forms a namespace, but you need a name for the actual package
+>>> underneath it.
+>>>
+>>> "qemu.lib" is one package, with qmp, qtest, and machine modules. "qemu"
+>>> isn't really a package in this system, it's just a namespace.
+>>>
+>>> The idea is that this allows us to create a more modular rollout of
+>>> various python scripts and services as desired instead of monolithically
+>>> bundling them all inside of a "qemu" package.
+>>>
+>>> It also allows us to fork or split out the sub-packages to separate
+>>> repos, if we wish. i.e., let's say we create a "qemu.sdk" subpackage, we
+>>> can eventually fork it off into its own repo with its own installer and
+>>> so forth. These subpackages can be installed and managed separately.
+>>>
+>>
+>> Okay, I understand.. No real objections than.
+>>
+>> Still, maybe, everything should not go into lib, maybe something like
+>>
+>> qemu/vm/  - qmp, QEMUMachine, etc
+>> qemu/qtest/  - qtest
+>>
+>> would be more user friendly? But I'm not sure. I just thought that "lib"
+>> is too generic.
+>>
 > 
+> lib is a very generic name, I agree.
 > 
-> So, we entered bdrv_flush at frame 19, and increased in_flight. Then
-> we go to aio_poll and to nested event loop, and we never return to
-> decrease in_flight field.
+> Splitting accel, qmp and QEMUMachine in one package and keeping qtest in
+> another is fine too. I'm not sure if I like "vm" for the name of that
+> core package, though.
 > 
-> Hmm. I'm afraid, I don't know what to do with that. Kevin, could you
-> take a look? And could similar thing happen with blk layer, because of
-> you recent similar patch?
+> I want to avoid using "qemu/sdk" because I have some plans for trying to
+> generate and package a "real" SDK using that namespace.
+> 
+> "devkit"? "testkit"? "core"? Naming things is always the worst part.
+> 
 
-Hmm... You mean blk_prw(), right? Looks like it could have the same
-problem, indeed.
+I think, "core" sounds good.
 
-Maybe we need to move the blk/bdrv_dec_in_flight to inside the coroutine
-(probably to the place where we currently have aio_wait_kick(), which
-would already be built in for bdrv_dec_in_flight). This is the last
-thing the coroutine does, so presumably it will still be late enough.
 
-Kevin
 
+-- 
+Best regards,
+Vladimir
 
