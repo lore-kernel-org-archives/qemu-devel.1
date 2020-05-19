@@ -2,74 +2,74 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C66AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 780BDC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:10:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DFC42070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 470182075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 06:10:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bu/YGQnM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DFC42070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1exQM/Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470182075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1javQN-0005Ws-AT
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 02:08:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38414)
+	id 1javSG-0006t0-Hv
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 02:10:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javPm-00057i-Oo
- for qemu-devel@nongnu.org; Tue, 19 May 2020 02:07:46 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22712
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javRi-0006G0-0K
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 02:09:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60678
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javPl-0008TC-VQ
- for qemu-devel@nongnu.org; Tue, 19 May 2020 02:07:46 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1javRh-0000Cn-4G
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 02:09:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589868465;
+ s=mimecast20190719; t=1589868584;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=2hND47Sv86D7IuBKDIXMwQhxQSoj9fX/OQTPqm9A/3w=;
- b=Bu/YGQnMRu+KDPmxXq3XX6GtzBaK/VvACQO7I3TeIPzdbxuH7FuM7V+SogKkXmj0pF6EWw
- Zp149HaIidQ4cZsWNoAtTd0Y1huuZPkKy6KfSlEI9nwcSfKCjr/wTay1HcAXYcpFzpbvG+
- ahi2l4KUQZM6UeJrH4vnig5gnicG3l8=
+ bh=WaeQ33yR9ty9A0LdSsX2OONbYwk7THfeORlNOcoTOdM=;
+ b=B1exQM/Q2NBV4Pu7G00mMs8Qt/NaYO0j4lEsKNGMo85l8BXfkFrNCESPbTds69FcBxnoeB
+ S4taFChbRKNcF1Xyo0GxuKNc5YJvd/7SYq+EgPcuSY71AAp0HDzHcE4uh0MsG0oxe6Ozq3
+ HD8QdNeBi30AOPBAcEGWpWPVxz14y8Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-TM7H7TT9OJ2vFHBwy8GWpQ-1; Tue, 19 May 2020 02:07:41 -0400
-X-MC-Unique: TM7H7TT9OJ2vFHBwy8GWpQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-232-gGaZ6HbJOuefSqnDumqV-Q-1; Tue, 19 May 2020 02:09:42 -0400
+X-MC-Unique: gGaZ6HbJOuefSqnDumqV-Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18589100CCC2;
- Tue, 19 May 2020 06:07:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46B518005AA;
+ Tue, 19 May 2020 06:09:41 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA21D60BE1;
- Tue, 19 May 2020 06:07:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BDDE10013D9;
+ Tue, 19 May 2020 06:09:40 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 46CA611358BC; Tue, 19 May 2020 08:07:38 +0200 (CEST)
+ id EE35011358BC; Tue, 19 May 2020 08:09:38 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH 13/24] ppc4xx: Drop redundant device realization
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH 15/24] macio: Fix macio-bus to be a subtype of System bus
 References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-14-armbru@redhat.com>
- <alpine.BSF.2.22.395.2005181226160.5961@zero.eik.bme.hu>
-Date: Tue, 19 May 2020 08:07:38 +0200
-In-Reply-To: <alpine.BSF.2.22.395.2005181226160.5961@zero.eik.bme.hu> (BALATON
- Zoltan's message of "Mon, 18 May 2020 12:27:58 +0200 (CEST)")
-Message-ID: <87h7wc5ufp.fsf@dusky.pond.sub.org>
+ <20200518050408.4579-16-armbru@redhat.com>
+ <8943ff5f-a52c-5cd7-e1e2-7ecc1c600e25@ilande.co.uk>
+Date: Tue, 19 May 2020 08:09:38 +0200
+In-Reply-To: <8943ff5f-a52c-5cd7-e1e2-7ecc1c600e25@ilande.co.uk> (Mark
+ Cave-Ayland's message of "Mon, 18 May 2020 21:39:59 +0100")
+Message-ID: <87d0705ucd.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
@@ -96,28 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-> On Mon, 18 May 2020, Markus Armbruster wrote:
->> object_property_set_bool(OBJECT(dev), true, "realized", ...) right
->> after qdev_init_nofail(dev) does nothing, because qdev_init_nofail()
->> already realizes.  Drop.
->>
->> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> On 18/05/2020 06:03, Markus Armbruster wrote:
 >
-> Shouldn't this Cc line come after the --- so it's not included in the
-> final commit? Thanks.
+>> The devices we plug into the macio-bus are all sysbus devices
+>> (DeviceClass member bus_type is TYPE_SYSTEM_BUS), but macio-bus does
+>> not derive from TYPE_SYSTEM_BUS.  Fix that.
+>> 
+>> "info qtree" now shows the devices' mmio ranges, as it should
+>> 
+>> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Cc: David Gibson <david@gibson.dropbear.id.au>
+>> Cc: qemu-ppc@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/misc/macio/macio.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+>> index ebc96cc8f6..53a9fd5696 100644
+>> --- a/hw/misc/macio/macio.c
+>> +++ b/hw/misc/macio/macio.c
+>> @@ -492,7 +492,7 @@ static void macio_class_init(ObjectClass *klass, void *data)
+>>  
+>>  static const TypeInfo macio_bus_info = {
+>>      .name = TYPE_MACIO_BUS,
+>> -    .parent = TYPE_BUS,
+>> +    .parent = TYPE_SYSTEM_BUS,
+>>      .instance_size = sizeof(MacIOBusState),
+>>  };
+>
+> Here I learned something new: a device that has a class TYPE_SYS_BUS_DEVICE should be
+> attached to a bus that derives from TYPE_SYSTEM_BUS. I have a feeling that there are
+> going to be quite a few instances of this around, particularly in places where
+> existing sysbus devices have been borrowed from the PC world and reused.
 
-We routinely include it in git history.
-
-> Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
-
-Thanks!
+Not that many.  I clean them up this series, and "[PATCH 22/24] qdev:
+Assert devices are plugged into a bus that can take them" should ensure
+we stay clean.
 
 
