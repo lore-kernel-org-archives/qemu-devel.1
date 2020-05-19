@@ -2,93 +2,90 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C17C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 19:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BE7C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 19:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E836B206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 19:46:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3050D2075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 19:48:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J6Mtf98z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E836B206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vp/x6MOJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3050D2075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb8CY-0004at-2u
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 15:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55244)
+	id 1jb8Da-0005X9-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 15:48:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb8Ae-0002CL-3c
- for qemu-devel@nongnu.org; Tue, 19 May 2020 15:45:00 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40039)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb8Ac-0002GG-AW
- for qemu-devel@nongnu.org; Tue, 19 May 2020 15:44:59 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id ci23so131110pjb.5
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 12:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qsO/9sXqwRSwBfPxHSybMyV+N/D8mtOlkRGqDKN7wNE=;
- b=J6Mtf98zDEByOuycBy49MnF6Nx9ObfUnlI/WGLchNZQPvVJ0flVJq8SQI5L7T3rZrB
- DZjytPrPkz/91b/rr5Ha7a4W5+N2dKOjDPfwOqH2Z8mCgRe5vGG4a5OuC5ilHYEDEYYm
- 382SiCt/u3ioWtJzcJGJHlTWb0hQI2hs9Deb3du6bGLmXnBBRc7Oqjrt27HzldbZkg6S
- 1ftfKhwWstfrQ4sbk+U7WQB+tabrtdHzZMr1P33M0vBSVUKXDkFhgAGhFZIObcAvyqTK
- qgW+cKDGB72ZmdCqv7zQwT2VHqyEERzzrFqET0cqVGWFGRf6YCj25dVNCJnBAA0BIQsX
- DHxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qsO/9sXqwRSwBfPxHSybMyV+N/D8mtOlkRGqDKN7wNE=;
- b=isIxB0MlDT8MEXVK09a18rlktk5YvuKAiB/Sc+M9vM01h5a1/8K+A7uecwKduEs0uc
- 50dNzfxNJ3f5SlsRuTm1RBV4eZ64bCjoPISrc+2axVvD/JNT3mBjBqIsQRhxSXSKxx7J
- aO82bCqZtD4yrxmsbysUJy7KqkbouLehGftcjnvXhJweUe4IhY//M5nr5jzXA8lS6IY6
- VmaElfP7iLfH1Z9LTPkWFoQ9i+7uXJSRAFIqFhNB6Y5uUDEDwHK/a0FrUvlkk6noHe4P
- Bqs1FlTvV4OQqFsJ9Ly1XypZwY+Lk9tg+TGIDnlVk9H7sKE3NWAqTLvozgBQ8VDtrekG
- eXTA==
-X-Gm-Message-State: AOAM530ppg6wuwYhOwGcCxWEQMI8OjYoXqBPCUyG2oQ9gusLpJc+Wubd
- bJN9BpsvEDmHbLFiwWhgY3xKoGDulVk=
-X-Google-Smtp-Source: ABdhPJxC47ADwnfPthg73793fbO6o9IK5XsU42LT2Bhs0lxAldo8Yj03a8OKeRmvSQJiI4yFau61xw==
-X-Received: by 2002:a17:902:bd09:: with SMTP id
- p9mr1085330pls.214.1589917496205; 
- Tue, 19 May 2020 12:44:56 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id i7sm285744pjj.33.2020.05.19.12.44.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 May 2020 12:44:55 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] linux-user: Build vdso for x64.
-Date: Tue, 19 May 2020 12:44:51 -0700
-Message-Id: <20200519194452.9009-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200519194452.9009-1-richard.henderson@linaro.org>
-References: <20200519194452.9009-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jb8Ct-000542-Fx
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 15:47:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54858
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jb8Cr-0002eb-Dm
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 15:47:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589917635;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ob56RoXS14bcK8oGI9uUV3tq3fhXMu/UzCvR9tEVGf4=;
+ b=Vp/x6MOJl9GC6bLnO3kxUdKUI2asEEt0cr1XklxQ0kPVNi/CEqrdKtVWD+XaWqVSe1izQc
+ K9ub0D0pY8VAN79lanShr2vJHHwmjRMBJkNeVMcmb8L1j3QYhBb/XacOaFSi0d0hpV0Fi5
+ 2ARWIbslIz+JFCX+EEYjyU8cicly6l0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-Aeaopg5wOeWPC_hBnjQyEg-1; Tue, 19 May 2020 15:47:10 -0400
+X-MC-Unique: Aeaopg5wOeWPC_hBnjQyEg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D91A107ACCA;
+ Tue, 19 May 2020 19:47:08 +0000 (UTC)
+Received: from x1.home (ovpn-112-50.phx2.redhat.com [10.3.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA5595D9C5;
+ Tue, 19 May 2020 19:47:00 +0000 (UTC)
+Date: Tue, 19 May 2020 13:47:00 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH QEMU v22 04/18] vfio: Add save and load functions for
+ VFIO PCI devices
+Message-ID: <20200519134700.7394bf84@x1.home>
+In-Reply-To: <20200519192813.GA2799@work-vm>
+References: <1589782398-24406-1-git-send-email-kwankhede@nvidia.com>
+ <1589782398-24406-5-git-send-email-kwankhede@nvidia.com>
+ <20200519191507.GM2798@work-vm> <20200519192813.GA2799@work-vm>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,299 +98,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, Richard Henderson <rth@twiddle.net>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <rth@twiddle.net>
+On Tue, 19 May 2020 20:28:13 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-... Well, sortof.  The Makefile bits are broken.
-Patch to load the vdso into the running program to follow.
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > * Kirti Wankhede (kwankhede@nvidia.com) wrote:  
+> > > These functions save and restore PCI device specific data - config
+> > > space of PCI device.
+> > > Tested save and restore with MSI and MSIX type.  
+> > 
+> > I don't think my comments from v16 on 26th March were addressed/replied
+> > to:  
+> 
+> 
+> Oops, I've just spotted your reply from earlier this month; so:
+> 
+> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > > ---
+> > >  hw/vfio/pci.c                 | 163 ++++++++++++++++++++++++++++++++++++++++++
+> > >  include/hw/vfio/vfio-common.h |   2 +
+> > >  2 files changed, 165 insertions(+)
+> > > 
+> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > index 6c77c12e44b9..36b1e08f84d8 100644
+> > > --- a/hw/vfio/pci.c
+> > > +++ b/hw/vfio/pci.c
+> > > @@ -41,6 +41,7 @@
+> > >  #include "trace.h"
+> > >  #include "qapi/error.h"
+> > >  #include "migration/blocker.h"
+> > > +#include "migration/qemu-file.h"
+> > >  
+> > >  #define TYPE_VFIO_PCI "vfio-pci"
+> > >  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+> > > @@ -1632,6 +1633,50 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
+> > >      }
+> > >  }
+> > >  
+> > > +static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
+> > > +{
+> > > +    PCIDevice *pdev = &vdev->pdev;
+> > > +    VFIOBAR *bar = &vdev->bars[nr];
+> > > +    uint64_t addr;
+> > > +    uint32_t addr_lo, addr_hi = 0;
+> > > +
+> > > +    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
+> > > +    if (!bar->size) {
+> > > +        return 0;
+> > > +    }
+> > > +
+> > > +    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
+> > > +
+> > > +    addr_lo &= (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
+> > > +                              PCI_BASE_ADDRESS_MEM_MASK);
+> > > +    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
+> > > +        addr_hi = pci_default_read_config(pdev,
+> > > +                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
+> > > +    }
+> > > +
+> > > +    addr = ((uint64_t)addr_hi << 32) | addr_lo;
+> > > +
+> > > +    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
+> > > +        return -EINVAL;
+> > > +    }
+> > > +
+> > > +    return 0;
+> > > +}
+> > > +
+> > > +static int vfio_bars_validate(VFIOPCIDevice *vdev)
+> > > +{
+> > > +    int i, ret;
+> > > +
+> > > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> > > +        ret = vfio_bar_validate(vdev, i);
+> > > +        if (ret) {
+> > > +            error_report("vfio: BAR address %d validation failed", i);
+> > > +            return ret;
+> > > +        }
+> > > +    }
+> > > +    return 0;
+> > > +}
+> > > +
+> > >  static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
+> > >  {
+> > >      VFIOBAR *bar = &vdev->bars[nr];
+> > > @@ -2414,11 +2459,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
+> > >      return OBJECT(vdev);
+> > >  }
+> > >  
+> > > +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> > > +{
+> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> > > +    PCIDevice *pdev = &vdev->pdev;
+> > > +    uint16_t pci_cmd;
+> > > +    int i;
+> > > +
+> > > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> > > +        uint32_t bar;
+> > > +
+> > > +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> > > +        qemu_put_be32(f, bar);
+> > > +    }
+> > > +
+> > > +    qemu_put_be32(f, vdev->interrupt);
+> > > +    if (vdev->interrupt == VFIO_INT_MSI) {
+> > > +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> > > +        bool msi_64bit;
+> > > +
+> > > +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> > > +                                            2);
+> > > +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> > > +
+> > > +        msi_addr_lo = pci_default_read_config(pdev,
+> > > +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> > > +        qemu_put_be32(f, msi_addr_lo);
+> > > +
+> > > +        if (msi_64bit) {
+> > > +            msi_addr_hi = pci_default_read_config(pdev,
+> > > +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> > > +                                             4);
+> > > +        }
+> > > +        qemu_put_be32(f, msi_addr_hi);
+> > > +
+> > > +        msi_data = pci_default_read_config(pdev,
+> > > +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> > > +                2);
+> > > +        qemu_put_be16(f, msi_data);
+> > > +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
+> > > +        uint16_t offset;
+> > > +
+> > > +        /* save enable bit and maskall bit */
+> > > +        offset = pci_default_read_config(pdev,
+> > > +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
+> > > +        qemu_put_be16(f, offset);
+> > > +        msix_save(pdev, f);
+> > > +    }
+> > > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > > +    qemu_put_be16(f, pci_cmd);
+> > > +}
+> > > +
+> > > +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> > > +{
+> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> > > +    PCIDevice *pdev = &vdev->pdev;
+> > > +    uint32_t interrupt_type;
+> > > +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> > > +    uint16_t pci_cmd;
+> > > +    bool msi_64bit;
+> > > +    int i, ret;
+> > > +
+> > > +    /* retore pci bar configuration */
+> > > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > > +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> > > +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> > > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> > > +        uint32_t bar = qemu_get_be32(f);
+> > > +
+> > > +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
+> > > +    }
+> > > +
+> > > +    ret = vfio_bars_validate(vdev);
+> > > +    if (ret) {
+> > > +        return ret;
+> > > +    }  
+> > 
+> > I wrote:
+> >   This isn't quite what I'd expected, since that validate is reading what
+> >   you read back; I'd have thought you'd validate the bar value before
+> >   writing it to the device.
+> >   (I'm also surprised you're only reading 32bit here?)  
+> 
+> OK, so you said actually there's not much to veriy; OK.
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- Makefile                  |   4 +-
- pc-bios/Makefile          |   5 ++
- pc-bios/vdso-linux-x64.S  | 115 ++++++++++++++++++++++++++++++++++++++
- pc-bios/vdso-linux-x64.ld |  81 +++++++++++++++++++++++++++
- pc-bios/vdso-linux-x64.so | Bin 0 -> 7500 bytes
- 5 files changed, 203 insertions(+), 2 deletions(-)
- create mode 100644 pc-bios/vdso-linux-x64.S
- create mode 100644 pc-bios/vdso-linux-x64.ld
- create mode 100755 pc-bios/vdso-linux-x64.so
+I still fail to see the value of the bar validation at all, my question
+relative to vfio_bar_validate()[1] was never actually addressed:
 
-diff --git a/Makefile b/Makefile
-index 40e4f7677b..73e380ac6a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -848,8 +848,8 @@ qemu_vga.ndrv \
- edk2-licenses.txt \
- hppa-firmware.img \
- opensbi-riscv32-sifive_u-fw_jump.bin opensbi-riscv32-virt-fw_jump.bin \
--opensbi-riscv64-sifive_u-fw_jump.bin opensbi-riscv64-virt-fw_jump.bin
--
-+opensbi-riscv64-sifive_u-fw_jump.bin opensbi-riscv64-virt-fw_jump.bin \
-+vdso-linux-x64.so
- 
- DESCS=50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
- 60-edk2-aarch64.json 60-edk2-arm.json 60-edk2-i386.json 60-edk2-x86_64.json
-diff --git a/pc-bios/Makefile b/pc-bios/Makefile
-index 315288df84..70e2485e2e 100644
---- a/pc-bios/Makefile
-+++ b/pc-bios/Makefile
-@@ -15,5 +15,10 @@ all: $(TARGETS)
- %.dtb: %.dts
- 	dtc -I dts -O dtb -o $@ $<
- 
-+vdso-linux-x64.so: vdso-linux-x64.o vdso-linux-x64.ld
-+	$(CC) -nostdlib -shared -Wl,-T,vdso-linux-x64.ld \
-+	  -Wl,-h,linux-vdso.so.1 -Wl,--hash-style=both \
-+	  vdso-linux-x64.o -o $@
-+
- clean:
- 	rm -f $(TARGETS) *.o *~
-diff --git a/pc-bios/vdso-linux-x64.S b/pc-bios/vdso-linux-x64.S
-new file mode 100644
-index 0000000000..090d82c26a
---- /dev/null
-+++ b/pc-bios/vdso-linux-x64.S
-@@ -0,0 +1,115 @@
-+/*
-+ *  x86-64 linux replacement vdso.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <asm/unistd.h>
-+
-+	.globl	__vdso_clock_gettime
-+	.type	__vdso_clock_gettime, @function
-+	.balign	16
-+	.cfi_startproc
-+__vdso_clock_gettime:
-+	mov	$__NR_clock_gettime, %eax
-+	syscall
-+	ret
-+	.cfi_endproc
-+	.size	__vdso_clock_gettime, . - __vdso_clock_gettime
-+
-+clock_gettime = __vdso_clock_gettime
-+	.weak	clock_gettime
-+
-+
-+	.globl	__vdso_gettimeofday
-+	.type	__vdso_gettimeofday, @function
-+	.balign	16
-+	.cfi_startproc
-+__vdso_gettimeofday:
-+	mov	$__NR_gettimeofday, %eax
-+	syscall
-+	ret
-+	.cfi_endproc
-+	.size	__vdso_gettimeofday, . - __vdso_gettimeofday
-+
-+gettimeofday = __vdso_gettimeofday
-+	.weak	gettimeofday
-+
-+
-+	.globl	__vdso_time
-+	.type	__vdso_time, @function
-+	.balign	16
-+	.cfi_startproc
-+__vdso_time:
-+	mov	$__NR_time, %eax
-+	syscall
-+	ret
-+	.cfi_endproc
-+	.size	__vdso_time, . - __vdso_time
-+
-+time = __vdso_time
-+	.weak	time
-+
-+
-+	.globl	__vdso_getcpu
-+	.type	__vdso_getcpu, @function
-+	.balign	16
-+	.cfi_startproc
-+__vdso_getcpu:
-+	/* ??? There is no syscall number for this allocated on x64.
-+	   We can handle this several ways:
-+
-+	   (1) Invent a syscall number for use within qemu.
-+               It should be easy enough to pick a number that
-+               is well out of the way of the kernel numbers.
-+
-+           (2) Force the emulated cpu to support the rdtscp insn,
-+	       and initialize the TSC_AUX value the appropriate value.
-+
-+	   (3) Pretend that we're always running on cpu 0.
-+
-+	   This last is the one that's implemented here, with the
-+	   tiny bit of extra code to support rdtscp in place.  */
-+
-+	xor	%ecx, %ecx		/* rdtscp w/ tsc_aux = 0 */
-+
-+	/* if (cpu != NULL) *cpu = (ecx & 0xfff); */
-+	test	%rdi, %rdi
-+	jz	1f
-+	mov	%ecx, %eax
-+	and	$0xfff, %eax
-+	mov	%eax, (%rdi)
-+
-+	/* if (node != NULL) *node = (ecx >> 12); */
-+1:	test	%rsi, %rsi
-+	jz	2f
-+	shr	$12, %ecx
-+	mov	%ecx, (%rsi)
-+
-+2:	xor	%eax, %eax
-+	ret
-+	.cfi_endproc
-+	.size	__vdso_getcpu, . - __vdso_getcpu
-+
-+getcpu = __vdso_getcpu
-+	.weak	getcpu
-+
-+/* ??? Perhaps add elf notes.  E.g.
-+
-+   #include <linux/elfnote.h>
-+   ELFNOTE_START(Linux, 0, "a")
-+	.long LINUX_VERSION_CODE
-+   ELFNOTE_END
-+
-+   but what version number would we set for QEMU?  */
-diff --git a/pc-bios/vdso-linux-x64.ld b/pc-bios/vdso-linux-x64.ld
-new file mode 100644
-index 0000000000..2ef21fbcab
---- /dev/null
-+++ b/pc-bios/vdso-linux-x64.ld
-@@ -0,0 +1,81 @@
-+/*
-+ * Linker script for linux x64 replacement vdso.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+VERSION {
-+	LINUX_2.6 {
-+	global:
-+		clock_gettime;
-+		__vdso_clock_gettime;
-+		gettimeofday;
-+		__vdso_gettimeofday;
-+		getcpu;
-+		__vdso_getcpu;
-+		time;
-+		__vdso_time;
-+	local: *;
-+	};
-+}
-+
-+PHDRS {
-+	phdr		PT_PHDR		FLAGS(4) PHDRS;
-+	data		PT_LOAD		FLAGS(6) FILEHDR PHDRS;
-+	text		PT_LOAD		FLAGS(5);
-+	dynamic		PT_DYNAMIC	FLAGS(4);
-+	note		PT_NOTE		FLAGS(4);
-+	/* ??? Various versions of ld don't know PT_GNU_EH_FRAME. */
-+	eh_frame_hdr	0x6474e550;
-+}
-+
-+SECTIONS {
-+	/* ??? We can't really prelink to any address without knowing
-+	   something about the virtual memory space of the host, since
-+	   that leaks over into the available memory space of the guest.  */
-+	. = SIZEOF_HEADERS;
-+
-+	/* The following, including the FILEHDRS and PHDRS, are modified
-+	   when we relocate the binary.  We want them to be initially
-+	   writable for the relocation; we'll force them read-only after.  */
-+	.dynamic	: { *(.dynamic) }	:data :dynamic
-+	.dynsym		: { *(.dynsym) }	:data
-+	.data		: {
-+		/* There ought not be any real read-write data.
-+		   But since we manipulated the segment layout,
-+		   we have to put these sections somewhere.  */
-+		*(.data*)
-+		*(.sdata*)
-+		*(.got.plt) *(.got)
-+		*(.gnu.linkonce.d.*)
-+		*(.bss*)
-+		*(.dynbss*)
-+		*(.gnu.linkonce.b.*)
-+	}
-+
-+	. += 4096;
-+	.hash		: { *(.hash) }		:text
-+	.gnu.hash	: { *(.gnu.hash) }
-+	.dynstr		: { *(.dynstr) }
-+	.gnu.version	: { *(.gnu.version) }
-+	.gnu.version_d	: { *(.gnu.version_d) }
-+	.gnu.version_r	: { *(.gnu.version_r) }
-+	.note		: { *(.note*) }		:text :note
-+	.eh_frame_hdr	: { *(.eh_frame_hdr) }	:text :eh_frame_hdr
-+	.eh_frame	: { *(.eh_frame) }	:text
-+	.rodata		: { *(.rodata) }
-+
-+	. = ALIGN(0x100);
-+	.text		: { *(.text*) }		:text	=0x90909090
-+}
-diff --git a/pc-bios/vdso-linux-x64.so b/pc-bios/vdso-linux-x64.so
-new file mode 100755
-index 0000000000000000000000000000000000000000..07cba76a4ab52b9bc5be22e2a6e2fe8295691717
-GIT binary patch
-literal 7500
-zcmeHMO=w(I6h4zlnxv*p>K|&V4$_uV>LZaN1%F7|CQa!iDVksv@pYP+W<rx0O<u}G
-zBvLVIR3wWof(t?1xGLEQS!tyxR$O%H#+^SXC<>aDI-c*n^G)a7Ok9bAyqnzl?)}a=
-z_uYHmeKU{mzBrH_Y)YksB`uFi*t<Pq`pj_M`snt_VcDjiozkHw(j0QIz!nwaDI1#D
-zW_Hks-KwmnBMVU^6B3AP(Yks|*xiI5G(|j-aiB5J6`PNX(W2GC?3^cJP_N&r9}RF%
-zL<<qVD5t&&@@W5RaV{PVy+nwN+iCnUL-JhjZ+}+HFnww3M=nq@b{*z)#qzK{GRrfD
-zHyPex_<J=PZ`I=eu)c-M&(>cwyM_HHke2pZJ~;v0r~5=#W&4x&4c(iS?{fIN&EMq@
-zn19Cc?=^py$2P(E?sdnM-zC3P6=LN<?ZLmt#>YHR9?^>VyL@O&K9US18AvjaWFW~v
-zl7S=xNd}S(BpFCDkYpgqK$3y~bp{}RL92nj0}ZHEYki^40euHr4Rs&HwQB`}hfV?8
-z#X~)*!Gc_*FX9)+zj{tS?_PW5<kGi0-n!?dOO<zCxbwZErPmL9x^Lgw*}}}}SF7Ut
-z7xHsue`2~kao(RS1i{oyfuwcI=kmD)a*loC*?F0sD$Q5!$1tA$_e%D}$oOgh0S}r8
-zX6gQcP1)bOAN{lg($j9O)Woo+Cbe(OUrtk&g6@KXT!F*-kB^MY+sl2U-gjTDoNwCu
-z<K<7@_@VN|hxt@@`l0>i+o6MD+}(;#D;`t~6dzW6Q<3ARo_|bIm9A8GM{66jL-3f>
-z6|KA%+6?(ait7#dta57&_`GuOYo#Wn&3~<|f3275Y`NNb@5|ve*UvcpYw>>XwV|bI
-z(7ycH-fE}Fa_i92M$q!{_Z`bSd#_v-Z*E~G$emRTW+N=Jm0u|3W~L^@(}sG9H(8qZ
-zin+OB#00YubD=OhH&rghI(}ZfQaLDyS19`DW^*$IznE8l_QVSc72LFcpmggPcwVr7
-zP`1*Esk`#tcSY`@4vgoP`YCl-Vw>(A6vV@a@zi5`>TKHFq;L0u)WY!@-yG4Qp1h%&
-zE$!5ai9_Z`JL8QOJd^zH0GF``fJhyg{<a);_4GibT6cZw#zd1pYxCzkh$l538Z`UV
-zrHO~_N^br*fv2>A?@GqIy8RwH8ZvLB&u9Z{V*FORJ^kJIk`te~E%GE*7-;C`A9h@y
-z-{;hqiNj7j_Z{h7+Th+L2OPG<FV>UVcJE*P+Us3c?uvT*EipK!K;`_ofBD-}AB*-n
-zzAUv|ilFxCUcY8&&`9fS`8?K}(|Wh~e8u^6?fHrG&9(EBINws+?{R*caR0{nR^h&k
-z^KG^BqBy_#`~vp0Y!~j2xc`mw1@g!jejD99;5{H!+qLu-$!N3D`G}`{qjL&8UyaU9
-z@Y~hs`~uG##&^$CCXIK`O{R@^&pYO9eC~7ZtJjQo#}WV7lOz4ZCyt7LJUe=%KkJVU
-r4n96G=8yFs$qx7ue_y%r#$m5Bjow_8!`n*C6u!-v;qTsrLchNN5$+*|
+  What specifically are we validating here?  This should be true no
+  matter what we wrote to the BAR or else BAR emulation is broken.  The
+  bits that could make this unaligned are not implemented in the BAR.
 
-literal 0
-HcmV?d00001
+Writing something into a BAR, reading it back, and verifying that the
+value is aligned to the BAR size is nothing more than a 'does this BAR
+behave like BARs are supposed to behave' test.  The logic within the
+BAR emulation would mask off the unaligned bits regardless of what was
+written to them.  Thanks,
 
--- 
-2.20.1
+Alex
+
+> > > +    interrupt_type = qemu_get_be32(f);
+> > > +
+> > > +    if (interrupt_type == VFIO_INT_MSI) {
+> > > +        /* restore msi configuration */
+> > > +        msi_flags = pci_default_read_config(pdev,
+> > > +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> > > +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> > > +
+> > > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> > > +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
+> > > +
+> > > +        msi_addr_lo = qemu_get_be32(f);
+> > > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
+> > > +                              msi_addr_lo, 4);
+> > > +
+> > > +        msi_addr_hi = qemu_get_be32(f);
+> > > +        if (msi_64bit) {
+> > > +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> > > +                                  msi_addr_hi, 4);
+> > > +        }
+> > > +        msi_data = qemu_get_be16(f);
+> > > +        vfio_pci_write_config(pdev,
+> > > +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> > > +                msi_data, 2);
+> > > +
+> > > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> > > +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
+> > > +    } else if (interrupt_type == VFIO_INT_MSIX) {
+> > > +        uint16_t offset = qemu_get_be16(f);
+> > > +
+> > > +        /* load enable bit and maskall bit */
+> > > +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
+> > > +                              offset, 2);
+> > > +        msix_load(pdev, f);
+> > > +    }
+> > > +    pci_cmd = qemu_get_be16(f);
+> > > +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
+> > > +    return 0;
+> > > +}
+> > > +  
+> > 
+> > I wrote:
+> >   While I don't know PCI as well as Alex, I share the worry about what
+> >   happens when you decide to want to save more information about the
+> >   device; you've not got any place holders where you can add anything; and
+> >   since it's all hand-coded (rather than using vmstate) it's only going to
+> >   get hairier.
+> >   
+> > >  static VFIODeviceOps vfio_pci_ops = {
+> > >      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
+> > >      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
+> > >      .vfio_eoi = vfio_intx_eoi,
+> > >      .vfio_get_object = vfio_pci_get_object,
+> > > +    .vfio_save_config = vfio_pci_save_config,
+> > > +    .vfio_load_config = vfio_pci_load_config,
+> > >  };
+> > >  
+> > >  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+> > > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > > index 74261feaeac9..d69a7f3ae31e 100644
+> > > --- a/include/hw/vfio/vfio-common.h
+> > > +++ b/include/hw/vfio/vfio-common.h
+> > > @@ -120,6 +120,8 @@ struct VFIODeviceOps {
+> > >      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
+> > >      void (*vfio_eoi)(VFIODevice *vdev);
+> > >      Object *(*vfio_get_object)(VFIODevice *vdev);
+> > > +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
+> > > +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
+> > >  };
+> > >  
+> > >  typedef struct VFIOGroup {
+> > > -- 
+> > > 2.7.0
+> > >   
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
