@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F71C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A4EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:57:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6DCC20657
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76E2F207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 02:57:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ROiaR31o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DCC20657
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tEbelyIS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E2F207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jasQp-000294-0k
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 22:56:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46854)
+	id 1jasRx-0005CX-Mf
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 22:57:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOU-0005Pb-Im
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:14 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:46370)
+ id 1jasOT-0005Me-I9
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:13 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:33039)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOS-0002Qa-Cx
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:14 -0400
-Received: by mail-pg1-x532.google.com with SMTP id p21so5721508pgm.13
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:10 -0700 (PDT)
+ id 1jasOS-0002QL-CZ
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:13 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id s10so3478902pgm.0
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=i6cN+V0oyKOXcFzwj12P4di1SZQuQTGDgSJO64rVCwQ=;
- b=ROiaR31orw2RW3U4tEeg/VJDeewODccnoD9B1iUPsw4wXgaO2J0YF5aIXil3ZTkYuX
- 3QA/vVU13JsLYPA9n+B5tVDPxB4cbXTqnEdh+qCbL2AmhIu1qZ6ooB60ACnJlFGQTzQE
- b3vFuyPX0JHu41y9ADcldb5YlytGwZpT3pz82lE4U+AYCb64u5Sb/VHplzipZnSezWed
- w1E8sxa12bg0Fg9Y4KIi1DPPIRLB+hGt6Ct0axhk8glOL4V/JB5HmO6BryoNTcAd/+rS
- lHVebDPnGZ2iNIKwO8G0ztjldVu7AnDNZCujS8eKpM5liJlgMsQJ3r0eDW8ecy4ntNUV
- P1NA==
+ bh=ZGQGSgIKAGAYHQLVIaGjpxZ5J/uu0s5INYdsdKfSe6k=;
+ b=tEbelyISa2Td5QL3ptJBzS69jUBLnvB3eTn4Nhmm/Cg6kcokuAL6Oi9Uvp0Au83sLo
+ +utu+E2t2EafnibCvaKO/zmfYywRkmE7t1wiaLimM6WzlQiaKPjubNDbebVv01Y67N20
+ jAsZ4fU5V8uGy8+aEThZ+d5oz6kIdpDj3l1P5BUSr1wwmse0GtWlOXgTrDjfr6u/s5US
+ zzAiuidp9REHIwMQKESCurq1rxTyMhsCZN2Kgvm4oLhNg/pso3xchwoLwR/eHQ8Qj/Qi
+ FeqnlSxqGqI38u4AWpjq6wIn6Hhj2mrhrUKe9wYx0NaEOyI31ctYAPsZLFCpmBPo57OU
+ mRYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=i6cN+V0oyKOXcFzwj12P4di1SZQuQTGDgSJO64rVCwQ=;
- b=jfOFLCo4f2VW4NYGXGZ0dx3uuly8QkLklF8YYu8+nO7ULP99U21Ug22ueb6v7Ki/Vo
- CMglNru9oocjOiGRnmGYghhxczSLJcAC8l7gchK+rdATqXbI0FafWukplgQJ3sJJNb0r
- 1CTa2CnAFB6OAdpow/qyL4uVGweqfVP/WhiY2u51EjQp1XvDisKWU4eTlx0ZGgHdEij8
- 1dCRkdjtraFBV4xCT35fz0Lnv0CFGZPIhJFDQZjICXLKVuNXyuQTgnKl74OnApDG6B97
- Ax9yoMgMSrgUpqlWhpz/2dZ7j2kADZnbvcobDW9JvqBY2DyAwAZ9NXNO5nM8B3m5sEUf
- Q54w==
-X-Gm-Message-State: AOAM533GXq6pqhAUqLFRG8X7UN8z236lMox1slHnOSuQC2BAaKoY34vS
- a5Wim8IcQOKbVHmis4J+seOcJfDuPDc=
-X-Google-Smtp-Source: ABdhPJwagflODUIfoYLsyWoyOIbyRbp3OAQ1BUCwDJx10gyzkHijKu9l6eyYavebln1LbOYJwehmRg==
-X-Received: by 2002:a62:fc52:: with SMTP id e79mr20575485pfh.297.1589856849122; 
- Mon, 18 May 2020 19:54:09 -0700 (PDT)
+ bh=ZGQGSgIKAGAYHQLVIaGjpxZ5J/uu0s5INYdsdKfSe6k=;
+ b=UbhFlBUOfpm6H+c0HHZqdc3NqLr0gP+pDfqbWcdGzUec+JBbAIXGpS3xxtReiwBQ+M
+ ooxuAIzwR7Jql+irrTu5NeYX3BBSxGQQZ77CUngmHzruSYBR62909c7eDoGGGPfx7dA/
+ WiN6ZJzPyazycPgb/PyuU9y0lJyfGCVJIz1gbVQRhgWYQjy6E2/dIt2bnDqh8Imasupn
+ 7PkMHir19OT2gcT87u6jkkBGwazml6EsudFuAMIqAgLXS/2QlqPKYHI/IIskdzinZMiD
+ Buzs0qbOvZLyP/trWr/CsHa/nCHa9qVWLeDT0y0VGO0Hg8vjr/UF+PSJIkI0xNtWBwnF
+ TgSQ==
+X-Gm-Message-State: AOAM531TqwXubnH9fDZ87DfGdtAAbb6EW/r8tYEyOUzw64aIBVptM5R4
+ F56zl/jODPYqBD08y8UDvXXzCKC4GeY=
+X-Google-Smtp-Source: ABdhPJxmngS5K9GLgj6eUqVRESljF6gReLcCln1U8oB5YT4t78eTUgKziI693+dRCNGps0TndO8eAw==
+X-Received: by 2002:a63:63c6:: with SMTP id x189mr6919598pgb.36.1589856846455; 
+ Mon, 18 May 2020 19:54:06 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.07
+ by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 19:54:08 -0700 (PDT)
+ Mon, 18 May 2020 19:54:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RISU v2 09/17] Unify i/o functions and use RisuResult
-Date: Mon, 18 May 2020 19:53:47 -0700
-Message-Id: <20200519025355.4420-10-richard.henderson@linaro.org>
+Subject: [RISU v2 07/17] Add enum RisuOp
+Date: Mon, 18 May 2020 19:53:45 -0700
+Message-Id: <20200519025355.4420-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200519025355.4420-1-richard.henderson@linaro.org>
 References: <20200519025355.4420-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x532.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,390 +105,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Push the trace check down from the function calling the reginfo
-function down into the i/o function.  This means we don't have
-to pass a function pointer.
-
-Return a RisuResult from the i/o functions.  This fixes a minor bug
-in send_register_info (even before the conversion to RisuResult),
-which returned the write_fn result directly.
+Formalize the set of defines, plus -1, into an enum.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h    | 25 ++++++++---------
- comms.c   |  8 +++---
- reginfo.c | 60 ++++++++++++++++++++--------------------
- risu.c    | 82 ++++++++++++++++++++++---------------------------------
- 4 files changed, 80 insertions(+), 95 deletions(-)
+ risu.h         | 23 +++++++++++++++--------
+ reginfo.c      | 32 +++++++++++++++++++-------------
+ risu_aarch64.c |  6 +++---
+ risu_arm.c     |  6 +++---
+ risu_i386.c    |  4 ++--
+ risu_m68k.c    |  4 ++--
+ risu_ppc64.c   |  4 ++--
+ 7 files changed, 46 insertions(+), 33 deletions(-)
 
 diff --git a/risu.h b/risu.h
-index e6d07eb..f44b781 100644
+index e2b4508..a7aa929 100644
 --- a/risu.h
 +++ b/risu.h
-@@ -34,13 +34,6 @@ void process_arch_opt(int opt, const char *arg);
- 
- #include REGINFO_HEADER(ARCH)
- 
--/* Socket related routines */
--int master_connect(int port);
--int apprentice_connect(const char *hostname, int port);
--int send_data_pkt(int sock, void *pkt, int pktlen);
--int recv_data_pkt(int sock, void *pkt, int pktlen);
--void send_response_byte(int sock, int resp);
--
- extern uintptr_t image_start_address;
+@@ -45,11 +45,17 @@ extern uintptr_t image_start_address;
  extern void *memblock;
  
-@@ -80,6 +73,13 @@ typedef struct {
-    uint32_t risu_op;
- } trace_header_t;
- 
-+/* Socket related routines */
-+int master_connect(int port);
-+int apprentice_connect(const char *hostname, int port);
-+RisuResult send_data_pkt(int sock, void *pkt, int pktlen);
-+RisuResult recv_data_pkt(int sock, void *pkt, int pktlen);
-+void send_response_byte(int sock, int resp);
+ /* Ops code under test can request from risu: */
+-#define OP_COMPARE 0
+-#define OP_TESTEND 1
+-#define OP_SETMEMBLOCK 2
+-#define OP_GETMEMBLOCK 3
+-#define OP_COMPAREMEM 4
++typedef enum {
++    /* Any other sigill besides the destignated undefined insn.  */
++    OP_SIGILL = -1,
 +
- /* Functions operating on reginfo */
++    /* These are generated by the designated undefined insn. */
++    OP_COMPARE = 0,
++    OP_TESTEND = 1,
++    OP_SETMEMBLOCK = 2,
++    OP_GETMEMBLOCK = 3,
++    OP_COMPAREMEM = 4,
++} RisuOp;
  
- /* Function prototypes for read/write helper functions.
-@@ -88,23 +88,22 @@ typedef struct {
-  * recv_and_compare_register_info which can either be backed by the
-  * traditional network socket or a trace file.
+ /* The memory block should be this long */
+ #define MEMBLOCKLEN 8192
+@@ -114,10 +120,11 @@ void set_ucontext_paramreg(void *vuc, uint64_t value);
+ /* Return the value of the parameter register from a reginfo. */
+ uint64_t get_reginfo_paramreg(struct reginfo *ri);
+ 
+-/* Return the risu operation number we have been asked to do,
+- * or -1 if this was a SIGILL for a non-risuop insn.
++/*
++ * Return the risu operation number we have been asked to do,
++ * or OP_SIGILL if this was a SIGILL for a non-risuop insn.
   */
--typedef int (*write_fn) (void *ptr, size_t bytes);
--typedef int (*read_fn) (void *ptr, size_t bytes);
--typedef void (*respond_fn) (RisuResult response);
-+RisuResult write_buffer(void *ptr, size_t bytes);
-+RisuResult read_buffer(void *ptr, size_t bytes);
-+void respond(RisuResult response);
+-int get_risuop(struct reginfo *ri);
++RisuOp get_risuop(struct reginfo *ri);
  
- /*
-  * Send the register information from the struct ucontext down the socket.
-  * NB: called from a signal handler.
-  */
--RisuResult send_register_info(write_fn write_fn, void *uc);
-+RisuResult send_register_info(void *uc);
- 
- /*
-  * Read register info from the socket and compare it with that from the
-  * ucontext.
-  * NB: called from a signal handler.
-  */
--RisuResult recv_and_compare_register_info(read_fn read_fn,
--                                          respond_fn respond, void *uc);
-+RisuResult recv_and_compare_register_info(void *uc);
- 
- /* Print a useful report on the status of the last comparison
-  * done in recv_and_compare_register_info(). This is called on
-diff --git a/comms.c b/comms.c
-index 861e845..21968da 100644
---- a/comms.c
-+++ b/comms.c
-@@ -168,7 +168,7 @@ ssize_t safe_writev(int fd, struct iovec *iov_in, int iovcnt)
-  * Note that both ends must agree on the length of the
-  * block of data.
-  */
--int send_data_pkt(int sock, void *pkt, int pktlen)
-+RisuResult send_data_pkt(int sock, void *pkt, int pktlen)
- {
-     unsigned char resp;
-     /* First we send the packet length as a network-order 32 bit value.
-@@ -196,7 +196,7 @@ int send_data_pkt(int sock, void *pkt, int pktlen)
-     return resp;
- }
- 
--int recv_data_pkt(int sock, void *pkt, int pktlen)
-+RisuResult recv_data_pkt(int sock, void *pkt, int pktlen)
- {
-     uint32_t net_pktlen;
-     recv_bytes(sock, &net_pktlen, sizeof(net_pktlen));
-@@ -206,10 +206,10 @@ int recv_data_pkt(int sock, void *pkt, int pktlen)
-          * a response back.
-          */
-         recv_and_discard_bytes(sock, net_pktlen);
--        return 1;
-+        return RES_BAD_IO;
-     }
-     recv_bytes(sock, pkt, pktlen);
--    return 0;
-+    return RES_OK;
- }
- 
- void send_response_byte(int sock, int resp)
+ /* Return the PC from a reginfo */
+ uintptr_t get_pc(struct reginfo *ri);
 diff --git a/reginfo.c b/reginfo.c
-index b909a1f..fee025e 100644
+index 1b2a821..2d67c93 100644
 --- a/reginfo.c
 +++ b/reginfo.c
-@@ -21,10 +21,11 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
- static int mem_used;
- static int packet_mismatch;
+@@ -11,7 +11,7 @@
  
--RisuResult send_register_info(write_fn write_fn, void *uc)
-+RisuResult send_register_info(void *uc)
+ #include <stdio.h>
+ #include <string.h>
+-
++#include <stdlib.h>
+ #include "risu.h"
+ 
+ struct reginfo master_ri, apprentice_ri;
+@@ -25,7 +25,7 @@ int send_register_info(write_fn write_fn, void *uc)
  {
      struct reginfo ri;
      trace_header_t header;
-+    RisuResult res;
-     RisuOp op;
+-    int op;
++    RisuOp op;
  
      reginfo_init(&ri, uc);
-@@ -33,8 +34,9 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
-     /* Write a header with PC/op to keep in sync */
-     header.pc = get_pc(&ri);
-     header.risu_op = op;
--    if (write_fn(&header, sizeof(header)) != 0) {
--        return RES_BAD_IO;
-+    res = write_buffer(&header, sizeof(header));
-+    if (res != RES_OK) {
-+        return res;
+     op = get_risuop(&ri);
+@@ -38,11 +38,18 @@ int send_register_info(write_fn write_fn, void *uc)
      }
  
      switch (op) {
-@@ -45,11 +47,12 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
-          * Do a simple register compare on (a) explicit request
-          * (b) end of test (c) a non-risuop UNDEF
-          */
--        if (write_fn(&ri, reginfo_size()) != 0) {
--            return RES_BAD_IO;
-+        res = write_buffer(&ri, reginfo_size());
-+        /* For OP_TEST_END, force exit. */
-+        if (res == RES_OK && op == OP_TESTEND) {
-+            res = RES_END;
-         }
--        /* For OP_TEST_END, force return 1 to exit. */
--        return op == OP_TESTEND ? RES_END : RES_OK;
-+        break;
++    case OP_COMPARE:
+     case OP_TESTEND:
+-        write_fn(&ri, reginfo_size());
+-        /* if we are tracing write_fn will return 0 unlike a remote
+-           end, hence we force return of 1 here */
+-        return 1;
++    case OP_SIGILL:
++        /*
++         * Do a simple register compare on (a) explicit request
++         * (b) end of test (c) a non-risuop UNDEF
++         */
++        if (write_fn(&ri, reginfo_size()) != 0) {
++            return -1;
++        }
++        /* For OP_TEST_END, force return 1 to exit. */
++        return op == OP_TESTEND;
      case OP_SETMEMBLOCK:
          memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
          break;
-@@ -58,12 +61,11 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
-                               get_reginfo_paramreg(&ri) + (uintptr_t)memblock);
-         break;
+@@ -53,12 +60,8 @@ int send_register_info(write_fn write_fn, void *uc)
      case OP_COMPAREMEM:
--        return write_fn(memblock, MEMBLOCKLEN);
--        break;
-+        return write_buffer(memblock, MEMBLOCKLEN);
+         return write_fn(memblock, MEMBLOCKLEN);
+         break;
+-    case OP_COMPARE:
      default:
-         abort();
+-        /* Do a simple register compare on (a) explicit request
+-         * (b) end of test (c) a non-risuop UNDEF
+-         */
+-        return write_fn(&ri, reginfo_size());
++        abort();
      }
--    return RES_OK;
-+    return res;
+     return 0;
  }
- 
- /* Read register info from the socket and compare it with that from the
-@@ -74,29 +76,29 @@ RisuResult send_register_info(write_fn write_fn, void *uc)
-  * that says whether it is register or memory data, so if the two
-  * sides get out of sync then we will fail obscurely.
-  */
--RisuResult recv_and_compare_register_info(read_fn read_fn,
--                                          respond_fn resp_fn, void *uc)
-+RisuResult recv_and_compare_register_info(void *uc)
+@@ -74,8 +77,9 @@ int send_register_info(write_fn write_fn, void *uc)
+ int recv_and_compare_register_info(read_fn read_fn,
+                                    respond_fn resp_fn, void *uc)
  {
--    RisuResult resp = RES_OK;
-+    RisuResult res;
+-    int resp = 0, op;
++    int resp = 0;
      trace_header_t header;
-     RisuOp op;
++    RisuOp op;
  
      reginfo_init(&master_ri, uc);
      op = get_risuop(&master_ri);
- 
--    if (read_fn(&header, sizeof(header)) != 0) {
--        return RES_BAD_IO;
-+    res = read_buffer(&header, sizeof(header));
-+    if (res != RES_OK) {
-+        return res;
-     }
- 
-     if (header.risu_op != op) {
-         /* We are out of sync */
--        resp = RES_BAD_IO;
--        resp_fn(resp);
--        return resp;
-+        res = RES_BAD_IO;
-+        respond(res);
-+        return res;
-     }
- 
-     /* send OK for the header */
--    resp_fn(RES_OK);
-+    respond(RES_OK);
- 
+@@ -97,7 +101,7 @@ int recv_and_compare_register_info(read_fn read_fn,
      switch (op) {
      case OP_COMPARE:
-@@ -105,16 +107,16 @@ RisuResult recv_and_compare_register_info(read_fn read_fn,
+     case OP_TESTEND:
+-    default:
++    case OP_SIGILL:
          /* Do a simple register compare on (a) explicit request
           * (b) end of test (c) a non-risuop UNDEF
           */
--        if (read_fn(&apprentice_ri, reginfo_size())) {
-+        res = read_buffer(&apprentice_ri, reginfo_size());
-+        if (res != RES_OK) {
-             packet_mismatch = 1;
--            resp = RES_BAD_IO;
-         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
-             /* register mismatch */
--            resp = RES_MISMATCH;
-+            res = RES_MISMATCH;
-         } else if (op == OP_TESTEND) {
--            resp = RES_END;
-+            res = RES_END;
+@@ -130,6 +134,8 @@ int recv_and_compare_register_info(read_fn read_fn,
          }
--        resp_fn(resp);
-+        respond(res);
+         resp_fn(resp);
          break;
-     case OP_SETMEMBLOCK:
-         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&master_ri);
-@@ -125,20 +127,20 @@ RisuResult recv_and_compare_register_info(read_fn read_fn,
-         break;
-     case OP_COMPAREMEM:
-         mem_used = 1;
--        if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
-+        res = read_buffer(apprentice_memblock, MEMBLOCKLEN);
-+        if (res != RES_OK) {
-             packet_mismatch = 1;
--            resp = RES_BAD_IO;
-         } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
-             /* memory mismatch */
--            resp = RES_MISMATCH;
-+            res = RES_MISMATCH;
-         }
--        resp_fn(resp);
-+        respond(res);
-         break;
-     default:
-         abort();
++    default:
++        abort();
      }
  
--    return resp;
-+    return res;
+     return resp;
+diff --git a/risu_aarch64.c b/risu_aarch64.c
+index 492d141..f8a8412 100644
+--- a/risu_aarch64.c
++++ b/risu_aarch64.c
+@@ -29,16 +29,16 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri)
+     return ri->regs[0];
  }
  
- /* Print a useful report on the status of the last comparison
-diff --git a/risu.c b/risu.c
-index 8796975..78c6b8f 100644
---- a/risu.c
-+++ b/risu.c
-@@ -46,44 +46,15 @@ static sigjmp_buf jmpbuf;
- 
- #define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
- 
--/* Master functions */
-+/* I/O functions */
- 
--int read_sock(void *ptr, size_t bytes)
--{
--    return recv_data_pkt(comm_fd, ptr, bytes);
--}
--
--int write_trace(void *ptr, size_t bytes)
-+RisuResult read_buffer(void *ptr, size_t bytes)
+-int get_risuop(struct reginfo *ri)
++RisuOp get_risuop(struct reginfo *ri)
  {
-     size_t res;
- 
--#ifdef HAVE_ZLIB
--    if (comm_fd == STDOUT_FILENO) {
--#endif
--        res = write(comm_fd, ptr, bytes);
--#ifdef HAVE_ZLIB
--    } else {
--        res = gzwrite(gz_trace_file, ptr, bytes);
-+    if (!trace) {
-+        return recv_data_pkt(comm_fd, ptr, bytes);
-     }
--#endif
--    return (res == bytes) ? 0 : 1;
--}
--
--void respond_sock(RisuResult r)
--{
--    send_response_byte(comm_fd, r);
--}
--
--/* Apprentice function */
--
--int write_sock(void *ptr, size_t bytes)
--{
--    return send_data_pkt(comm_fd, ptr, bytes);
--}
--
--int read_trace(void *ptr, size_t bytes)
--{
--    size_t res;
- 
- #ifdef HAVE_ZLIB
-     if (comm_fd == STDIN_FILENO) {
-@@ -95,21 +66,34 @@ int read_trace(void *ptr, size_t bytes)
-     }
- #endif
- 
--    return (res == bytes) ? 0 : 1;
-+    return res == bytes ? RES_OK : RES_BAD_IO;
+     /* Return the risuop we have been asked to do
+-     * (or -1 if this was a SIGILL for a non-risuop insn)
++     * (or OP_SIGILL if this was a SIGILL for a non-risuop insn)
+      */
+     uint32_t insn = ri->faulting_insn;
+     uint32_t op = insn & 0xf;
+     uint32_t key = insn & ~0xf;
+     uint32_t risukey = 0x00005af0;
+-    return (key != risukey) ? -1 : op;
++    return (key != risukey) ? OP_SIGILL : op;
  }
  
--void respond_trace(RisuResult r)
-+RisuResult write_buffer(void *ptr, size_t bytes)
+ uintptr_t get_pc(struct reginfo *ri)
+diff --git a/risu_arm.c b/risu_arm.c
+index 5fcb2a5..a20bf73 100644
+--- a/risu_arm.c
++++ b/risu_arm.c
+@@ -56,17 +56,17 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri)
+     return ri->gpreg[0];
+ }
+ 
+-int get_risuop(struct reginfo *ri)
++RisuOp get_risuop(struct reginfo *ri)
  {
--    switch (r) {
--    case RES_OK:
--    case RES_END:
--        break;
--    default:
--        /* mismatch - if tracing we need to report, otherwise barf */
--        if (!trace) {
--            abort();
--        }
--        break;
-+    size_t res;
-+
-+    if (!trace) {
-+        return send_data_pkt(comm_fd, ptr, bytes);
-+    }
-+
-+#ifdef HAVE_ZLIB
-+    if (comm_fd == STDOUT_FILENO) {
-+#endif
-+        res = write(comm_fd, ptr, bytes);
-+#ifdef HAVE_ZLIB
-+    } else {
-+        res = gzwrite(gz_trace_file, ptr, bytes);
-+    }
-+#endif
-+
-+    return res == bytes ? RES_OK : RES_BAD_IO;
-+}
-+
-+void respond(RisuResult r)
-+{
-+    if (!trace) {
-+        send_response_byte(comm_fd, r);
-     }
+     /* Return the risuop we have been asked to do
+-     * (or -1 if this was a SIGILL for a non-risuop insn)
++     * (or OP_SIGILL if this was a SIGILL for a non-risuop insn)
+      */
+     uint32_t insn = ri->faulting_insn;
+     int isz = ri->faulting_insn_size;
+     uint32_t op = insn & 0xf;
+     uint32_t key = insn & ~0xf;
+     uint32_t risukey = (isz == 2) ? 0xdee0 : 0xe7fe5af0;
+-    return (key != risukey) ? -1 : op;
++    return (key != risukey) ? OP_SIGILL : op;
  }
  
-@@ -119,9 +103,9 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
-     signal_count++;
+ uintptr_t get_pc(struct reginfo *ri)
+diff --git a/risu_i386.c b/risu_i386.c
+index 9962b8f..127e816 100644
+--- a/risu_i386.c
++++ b/risu_i386.c
+@@ -38,12 +38,12 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri)
+     return ri->gregs[REG_E(AX)];
+ }
  
-     if (trace) {
--        r = send_register_info(write_trace, uc);
-+        r = send_register_info(uc);
-     } else {
--        r = recv_and_compare_register_info(read_sock, respond_sock, uc);
-+        r = recv_and_compare_register_info(uc);
+-int get_risuop(struct reginfo *ri)
++RisuOp get_risuop(struct reginfo *ri)
+ {
+     if ((ri->faulting_insn & 0xf8ffff) == 0xc0b90f) { /* UD1 %xxx,%eax */
+         return (ri->faulting_insn >> 16) & 7;
      }
+-    return -1;
++    return OP_SIGILL;
+ }
  
-     switch (r) {
-@@ -141,9 +125,9 @@ static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
-     signal_count++;
+ uintptr_t get_pc(struct reginfo *ri)
+diff --git a/risu_m68k.c b/risu_m68k.c
+index 1056eef..acdd57a 100644
+--- a/risu_m68k.c
++++ b/risu_m68k.c
+@@ -25,13 +25,13 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri)
+     return ri->gregs[R_A0];
+ }
  
-     if (trace) {
--        r = recv_and_compare_register_info(read_trace, respond_trace, uc);
-+        r = recv_and_compare_register_info(uc);
-     } else {
--        r = send_register_info(write_sock, uc);
-+        r = send_register_info(uc);
-     }
+-int get_risuop(struct reginfo *ri)
++RisuOp get_risuop(struct reginfo *ri)
+ {
+     uint32_t insn = ri->faulting_insn;
+     uint32_t op = insn & 0xf;
+     uint32_t key = insn & ~0xf;
+     uint32_t risukey = 0x4afc7000;
+-    return (key != risukey) ? -1 : op;
++    return (key != risukey) ? OP_SIGILL : op;
+ }
  
-     switch (r) {
+ uintptr_t get_pc(struct reginfo *ri)
+diff --git a/risu_ppc64.c b/risu_ppc64.c
+index a3028f7..9df8d58 100644
+--- a/risu_ppc64.c
++++ b/risu_ppc64.c
+@@ -32,13 +32,13 @@ uint64_t get_reginfo_paramreg(struct reginfo *ri)
+     return ri->gregs[0];
+ }
+ 
+-int get_risuop(struct reginfo *ri)
++RisuOp get_risuop(struct reginfo *ri)
+ {
+     uint32_t insn = ri->faulting_insn;
+     uint32_t op = insn & 0xf;
+     uint32_t key = insn & ~0xf;
+     uint32_t risukey = 0x00005af0;
+-    return (key != risukey) ? -1 : op;
++    return (key != risukey) ? OP_SIGILL : op;
+ }
+ 
+ uintptr_t get_pc(struct reginfo *ri)
 -- 
 2.20.1
 
