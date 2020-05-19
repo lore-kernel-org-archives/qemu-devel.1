@@ -2,93 +2,90 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EB7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E08C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:22:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16EBF2070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4EF4206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:22:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URvptElp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16EBF2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoeNEyd+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4EF4206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb8ft-00041w-A1
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 16:17:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57894)
+	id 1jb8kd-0007qH-TR
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 16:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <msys.mizuma@gmail.com>)
- id 1jb8eo-0002qa-Cj; Tue, 19 May 2020 16:16:10 -0400
-Received: from mail-qt1-x836.google.com ([2607:f8b0:4864:20::836]:44687)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <msys.mizuma@gmail.com>)
- id 1jb8en-0000K4-EK; Tue, 19 May 2020 16:16:10 -0400
-Received: by mail-qt1-x836.google.com with SMTP id d7so697666qtn.11;
- Tue, 19 May 2020 13:16:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=ohRjIDaIbdm4P+k27fxUHbPnyTMLLeLbcg/2Kj481/s=;
- b=URvptElp3wDblAoX2OOzvLgR+zJqrolf9RNnhJCyMVK5gwJrul0gbZ+QcvA1XkFfG5
- QJlix4eTQTfs7pULWASKsstqzz41/7nsYIe3uoTFRM/K7p4zbA4Y0K/Ciz2B8ydNeN6D
- e73IsQQ+qTJLPgBHBrcrZXxAO1nQRRv7Jmp51ssxAUKyHvTi8FBTOsDKtJaR4JmmV4h5
- xgqAhlfr8x4A+ZxlU/vhkM47TXbIdVVrvwm+Dbhg7s4l/yx1dxQtGAneUnhT6chxR1di
- XvuhmnvXFT1QROxFiHS/Fzvs48BauQYoiPeHeSaKAhtO58K6tUEo88GTBSFOm2nklKTs
- U6mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ohRjIDaIbdm4P+k27fxUHbPnyTMLLeLbcg/2Kj481/s=;
- b=HkAfTTD3+MEcO4mA/LJ+w/WDhOzDb5MBsaCX5mAAJkAj+2GLQHaLhJU73fDwa16RSw
- BKWgI+FepjznjLr3FUfo6ZsS/odmAZNiLBcnwU/ib6nF7wW3g4njXUxOKx3V7NkBpP2Z
- giOcXVpl+31Nz4CGBsqMyuBQbV0ZgUmsPj908/6QZHi/Euwxa3xgq03uGbPD7rvFJKlj
- Slr7k0rK+44q/erKfyyYjISLz3kyh3QnX80bUuK7uZL+2EsfYeWW7oAt1UjhxcTrhl2j
- 7Csu0WGGOsIcKjsRnrYBpNzlqcekVUn44jIfMw8WWtkENpFX+K+XadnKr7CzOIKkHT0Q
- a4gA==
-X-Gm-Message-State: AOAM5300NxEQTiUN1D86YLTOjC0z52ixizuIZ7DEj/Vsu+OjgLvJoOs5
- fv6STrzfBdga6rDpYAT95g==
-X-Google-Smtp-Source: ABdhPJxn163fi/WhKHHbSRswoK5bmj8Yc4L4XA0PCLZClsCqL9MtOi3jghCWiTy1B+pY6JgmSx1zZw==
-X-Received: by 2002:ac8:4311:: with SMTP id z17mr1639400qtm.316.1589919367355; 
- Tue, 19 May 2020 13:16:07 -0700 (PDT)
-Received: from gabell
- (209-6-122-159.s2973.c3-0.arl-cbr1.sbo-arl.ma.cable.rcncustomer.com.
- [209.6.122.159])
- by smtp.gmail.com with ESMTPSA id c26sm450005qkm.98.2020.05.19.13.16.06
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 19 May 2020 13:16:06 -0700 (PDT)
-Date: Tue, 19 May 2020 16:16:05 -0400
-From: Masayoshi Mizuma <msys.mizuma@gmail.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: Question: How do I discard any changes for the device which is
- set by blockdev option?
-Message-ID: <20200519201605.7xlostisrjitesny@gabell>
-References: <20200519175659.4poxgjmp4xoufl7h@gabell>
- <efeb1594-589b-3f0a-9295-da55f92970b2@redhat.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jb8k5-0007Mi-9e
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 16:21:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47584
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jb8k3-000185-SG
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 16:21:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589919694;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tCStqeg/YykxJ8twekDulTTLNg5/SpTFMXo7X/mnHaM=;
+ b=HoeNEyd+b/SfW6Imbd9tWQ5WUfof3FZ3JOHjB60434JePzLUR7A7JD9BSJB/CqHGLlEIG6
+ +N7kKcXkWQtvAm2gpc4lf8Y4YsPeaNMmH9JHfxK2u+dVfoeXNVCJZrEy3UJaLGWCIfr4c4
+ s5D6U8UjETJwQWSZLeIowIhF6qzveu0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-750LFhDXM_Kq44uxDY1KHA-1; Tue, 19 May 2020 16:21:32 -0400
+X-MC-Unique: 750LFhDXM_Kq44uxDY1KHA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E39FF8018A7;
+ Tue, 19 May 2020 20:21:30 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 34B824038;
+ Tue, 19 May 2020 20:21:26 +0000 (UTC)
+Subject: Re: [PATCH v2 0/5] fix & merge block_status_above and
+ is_allocated_above
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200519195501.29071-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1cfe5274-b3f7-e02f-8257-9858fdd4bb94@redhat.com>
+Date: Tue, 19 May 2020 15:21:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <efeb1594-589b-3f0a-9295-da55f92970b2@redhat.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::836;
- envelope-from=msys.mizuma@gmail.com; helo=mail-qt1-x836.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200519195501.29071-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,64 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org,
- "libvirt-list@redhat.com" <libvirt-list@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 19, 2020 at 01:41:08PM -0500, Eric Blake wrote:
-> On 5/19/20 12:56 PM, Masayoshi Mizuma wrote:
-> > Hello,
-> > 
-> > I would like to discard any changes while the qemu guest OS is done.
-> > I can do that with snapshot and drive option.
-> > However, snapshot option doesn't work for the device which set by
-> > blockdev option like as:
-> > 
-> > $QEMU --enable-kvm \
-> >        -m 1024 \
-> >        -nographic \
-> >        -serial mon:stdio \
-> >        -blockdev driver=file,node-name=mydisk,filename=/mnt/fedora.qcow2 \
-> >        -blockdev driver=qcow2,node-name=vda,file=mydisk \
-> >        -device virtio-blk-pci,drive=vda,bootindex=1 \
-> >        -snapshot
-> > 
-> > I would like to use blockdev option to set the device because
-> > libvirt uses blockdev option for disk element.
-> > 
-> > If there's no way to do so, does that make sense to get available
-> > snapshot option to blockdev as well? If that makes sense, I'll try to
-> > implement that.
-> > 
-> > As for qcow2, I think we can do such things to use qemu-img snapshot
-> > command, for example save the original image and restore the image
-> > after the qemu guest OS is shutdowned. However, it may be complecated
-> > for user. I would like the simple way like as snapshot/drive option...
-> > 
-> > If I'm missing something, let me know.
-> > 
-> 
-> Sounds like a repeat of this thread:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg06144.html
-> 
-> where the consensus is yes, -blockdev and -snapshot are incompatible,
-> libvirt has plans to use the <transient/> tag to behave the same as what
-> -snapshot does (but no one has implemented it yet), and in the meantime, it
-> is possible to force libvirt to avoid -blockdev if you still need to supply
-> -snapshot behind libvirt's back.
+On 5/19/20 2:54 PM, Vladimir Sementsov-Ogievskiy wrote:
 
-Thank you for the info! I didn't notice the thread.
-I got we should implement that feature for libvirt side, not qemu.
-
-Thanks!
-Masa
-
+> This leads to the following effect:
 > 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
+> ./qemu-img create -f qcow2 base.qcow2 2M
+> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
 > 
+> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
+> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
+> 
+> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
+> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
+> 
+> But after commit guest visible state is changed, which seems wrong for me:
+> ./qemu-img commit top.qcow2 -b mid.qcow2
+> 
+> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
+> Pattern verification failed at offset 1048576, 1048576 bytes
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
+
+This no longer happens as of commit bf03dede47 and friends.  As such, 
+how much of this series is still needed for other reasons?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
