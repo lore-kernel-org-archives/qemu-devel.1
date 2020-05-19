@@ -2,85 +2,97 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10882C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04019C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2295207D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4320207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:39:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Te9oupdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2295207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ULk/fcTB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4320207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4IB-00014B-0L
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:36:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49956)
+	id 1jb4KZ-0006CA-UR
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:38:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4HC-0007yi-58
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:35:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28699
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4HA-0004Rj-EX
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:35:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589902526;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Tdh7I/F1KCzk31L6f8YhMKl++fAO0z5EMARL1BVk2HI=;
- b=Te9oupdfxV24rZWDe4AotHajWaKQg1I8fgvwBD8gk/FlD39VzwUY5r5ga382NdyeZiA1s2
- tmOmsdRaRanUEcYJvx3oZEb9BZjkgDbNnRXBBCTySmSP61LYfkO+DACMCge4/Fs6W3jg3S
- NPE081BgSe3TBKn5FF0uuAXEQzOHRoU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-fbSBmljbN6OXLkWFYRCrSg-1; Tue, 19 May 2020 11:35:22 -0400
-X-MC-Unique: fbSBmljbN6OXLkWFYRCrSg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD98B1B18BC0;
- Tue, 19 May 2020 15:35:19 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C55586ACE6;
- Tue, 19 May 2020 15:35:09 +0000 (UTC)
-Date: Tue, 19 May 2020 17:35:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH Kernel v20 4/8] vfio iommu: Add ioctl definition for
- dirty pages tracking
-Message-ID: <20200519173507.3cd131dd.cohuck@redhat.com>
-In-Reply-To: <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
-References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
- <1589488667-9683-5-git-send-email-kwankhede@nvidia.com>
- <20200515125916.78723321.cohuck@redhat.com>
- <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jb485-0003DK-2A
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:26:05 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43287)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jb483-0002JX-Um
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:26:04 -0400
+Received: by mail-pl1-x644.google.com with SMTP id k22so6308pls.10
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 08:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1yOKRJBrLMOqpYn7HveRFDPZudPhxWBTAMeOFnmFlyE=;
+ b=ULk/fcTBsT81MIJcEJ9Ddzsqsl0UuTpaNk2/bROU1Id7ePFtMU/jfEtl06iDb3dwBS
+ NYPJtSGYwYKK3NUg43rX2YaCMNyGYwrTlYac39EGaCrOvPcClSWKze0X3Ruror6IZplm
+ jFzL9Q1zCZN+G+RWQ50sjwB9BNZj9wQG1CcSAPlIY51My73iHmawhvmqLGLPeWrmKQMY
+ J5MqEGrWQbehDSJo8meD2VpRVair6z6OwaWtW/wcGMu9ZL2p+xKp26olo1hWwg90L6PA
+ ZMZQDrRS8WV/JlwcY2cQoXZGLNpmgstCTR3MCCZgM8j31+/GQiA7MOur2e62LtqXma3o
+ 3/Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1yOKRJBrLMOqpYn7HveRFDPZudPhxWBTAMeOFnmFlyE=;
+ b=oRWAwv635yjxNOxnBf8OCxQNHZKx8ARx+XDwbcsp/YhyPs7PIRUQGhkNwoJz2+YAUj
+ /R4ErCG49CoYzzSIAU9ZFF1K0XY/T1kR1tlu8Ef64Q7ko7XodNvgUfO8iXele2t8L4qI
+ GQSe9BGUOAeK0AgSuTesCeLHU8e7J/6JM05IkLY7kXBR/IjQ7jVKOVkOEKnq/oes9viH
+ j/6rJsiVp5kmfAyc5KGjo65tiyzCBuyaMJv9cY7GY8SqJTyFGmy9WrYe2jxcoCDa6rAC
+ Z++3g9feiPij78BX+J2Z4W2lXnO2+tBTIqZL3uHj9/DhdnmMTJL55FdJG0aEObbIdWqV
+ 7/dQ==
+X-Gm-Message-State: AOAM532qgDmxeD/qEd2W6IPDN0oAD39kgICz7WmfafKc5H0651rqjwYc
+ xXqYQyJch+Kr2OVOTE/0nSVbkQ==
+X-Google-Smtp-Source: ABdhPJxO9moHaODU8HfiQSlOLMw7FcQjTDdUHRaJYui5wy6CPhr1zG2fZdZszxSzkeDzxuY/xdYN1g==
+X-Received: by 2002:a17:902:8f8b:: with SMTP id
+ z11mr78549plo.208.1589901962381; 
+ Tue, 19 May 2020 08:26:02 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id r12sm10107011pgv.59.2020.05.19.08.26.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 May 2020 08:26:01 -0700 (PDT)
+Subject: Re: [PATCH v2] tests/tcg: fix invocation of the memory record/replay
+ tests
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200518162903.883-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9c82070d-8024-9d5e-82c9-5c81fa711e20@linaro.org>
+Date: Tue, 19 May 2020 08:25:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+In-Reply-To: <20200518162903.883-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,135 +106,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
- kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 23:05:24 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> On 5/15/2020 4:29 PM, Cornelia Huck wrote:
-> > On Fri, 15 May 2020 02:07:43 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
-> >> All pages pinned by vendor driver through this API should be considered as
-> >> dirty during migration. When container consists of IOMMU capable device and
-> >> all pages are pinned and mapped, then all pages are marked dirty.
-> >> Added support to start/stop dirtied pages tracking and to get bitmap of all
-> >> dirtied pages for requested IO virtual address range.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
-> >>   1 file changed, 55 insertions(+)
-
-(...)
-
-> >> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
-> >> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
-> >> + * given IOVA range.  
-> > 
-> > "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_GET_BITMAP returns the
-> > dirty pages bitmap for the IOMMU container for a given IOVA range." ?
-> > 
-> > Q: How does this interact with the two other operations? I imagine
-> > getting an empty bitmap before _START   
+On 5/18/20 9:29 AM, Alex Bennée wrote:
+> I'm not sure when this broke but we should use EXTRA_RUNS for
+> "virtual" tests which are not generated from the binary names.
 > 
-> No, if dirty page tracking is not started, get_bitmap IOCTL will fail 
-> with -EINVAL.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > 
-> > and a bitmap-in-progress between
-> > _START and _STOP. > After _STOP, will subsequent calls always give the
-> > same bitmap?
-> >  
-> 
-> No, return -EINVAL.
+> ---
+> v2
+>   - keep the PHONY's for the benefit of output
+> ---
+>  tests/tcg/aarch64/Makefile.softmmu-target | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Maybe add
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-"If the IOCTL has not yet been called with
-VFIO_IOMMU_DIRTY_PAGES_FLAG_START, or if it has been called with
-VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP, calling it with
-VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP will return -EINVAL." ?
 
-> 
-> 
-> >> User must provide data[] as the structure
-> >> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range and
-> >> + * pgsize.  
-> > 
-> > "The user must specify the IOVA range and the pgsize through the
-> > vfio_iommu_type1_dirty_bitmap_get structure in the data[] portion."
-> > 
-> > ?
-> >   
-> >> This interface supports to get bitmap of smallest supported pgsize
-> >> + * only and can be modified in future to get bitmap of specified pgsize.  
-> > 
-> > That's a current restriction? How can the user find out whether it has
-> > been lifted (or, more generally, find out which pgsize values are
-> > supported)?  
-> 
-> Migration capability is added to IOMMU info chain. That gives supported 
-> pgsize bitmap by IOMMU driver.
-
-Add that info?
-
-"The supported pgsize values for this interface are reported via the
-migration capability in the IOMMU info chain."
-
-> 
-> >   
-> >> + * User must allocate memory for bitmap, zero the bitmap memory  and set size
-> >> + * of allocated memory in bitmap.size field.  
-> > 
-> > "The user must provide a zeroed memory area for the bitmap memory and
-> > specify its size in bitmap.size."
-> > 
-> > ?
-> >   
-> >> One bit is used to represent one
-> >> + * page consecutively starting from iova offset. User should provide page size
-> >> + * in bitmap.pgsize field.  
-> > 
-> > s/User/The user/
-> > 
-> > Is that the 'pgsize' the comment above talks about?
-> >   
-> 
-> By specifying pgsize here user can ask for bitmap of specific pgsize.
-
-"The user should provide the page size for the bitmap in the
-bitmap.pgsize field." ?
-
-> 
-> >> Bit set in bitmap indicates page at that offset from
-> >> + * iova is dirty.  
-> > 
-> > "A bit set in the bitmap indicates that the page at that offset from
-> > iova is dirty." ?
-> >   
-> >> Caller must set argsz including size of structure
-> >> + * vfio_iommu_type1_dirty_bitmap_get.  
-> > 
-> > s/Caller/The caller/
-> > 
-> > Does argz also include the size of the bitmap?  
-> 
-> No.
-
-"The caller must set argsz to a value including the size of stuct
-vfio_io_type1_dirty_bitmap_get, but excluding the size of the actual
-bitmap." ?
-
+r~
 
