@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D75C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A99C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1EC3207D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E150420674
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 03:01:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="im9OAiLa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EC3207D4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPRpokFC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E150420674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jasV7-00025H-Ut
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 23:01:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46902)
+	id 1jasVQ-0002ZL-1K
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 23:01:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOZ-0005ap-9G
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:19 -0400
-Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:46372)
+ id 1jasOd-0005mh-Bh
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:23 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:46616)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jasOX-0002Ur-N1
- for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:18 -0400
-Received: by mail-pg1-x534.google.com with SMTP id p21so5721614pgm.13
- for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:17 -0700 (PDT)
+ id 1jasOc-0002XL-2Y
+ for qemu-devel@nongnu.org; Mon, 18 May 2020 22:54:23 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id 145so5851239pfw.13
+ for <qemu-devel@nongnu.org>; Mon, 18 May 2020 19:54:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ryftU8k2hkpE8SBKJnjLqyziikg8zbnLkzl+yDCUuSA=;
- b=im9OAiLamHIqOafI3tQsbysVXK8ot/8ZbuSUFqTn9R6Rb+StXyuOfV7yA+4Eu2x4lm
- mYeTJggiGdxC1GfX9Og90vqS4XXvwxpu3Q9rBP5yA5QKAup7/oLB6y8XSFweP+T4BF8f
- P0JckyFsavmmG0KbZWuTO8RmTH4uVg31dypak3+BEbtXbR4l33cKOemnLiA9G7BxrLKB
- bWVKQassqREJEzsF2J1T1keHfG1V7YxGwMdGJNayTc08P8+UI7Zrp3+7pOt9GvNonnBp
- FoqjzjDvrR9lPE3BR4lVzfp+fXcvgm31xjb+dk2bjE0gUYzAX+buYeMCynkTJYuG2Y80
- vG5g==
+ bh=7oeS1yq+JuN20j7v7YlPjXCqUmCXhfYGwbcqS/Ex0lQ=;
+ b=iPRpokFCK6wQcIorE/5znHNzBns5F8QhUi/eWDuUptzms0PHkODWyIbYVqxtwwktIm
+ PlNAN7WNt293oK9k1AuTMZfp4Hg/E3D6NqVUhQHm/ghahTFPO1CL+REgj3MTwRr+KDpn
+ u8yE1blINsgBpTdlbINjfATn7iIP4FJUuMbqK8erfqp4fN2e2plnv+4JmtfLBkDtgFOm
+ SSwBUWxI4CtWsoZBQ8FlLz50xt57rt4YbE/gFcCkuh4Ndy1RfIVKZjGgrneD5ttHLkEy
+ ZbD3rnGnaVUUtyphXOVTpV6OWpl1UpFAgzDL0orpiijBMFvfE/c9fl8Qmz9raAhI2TAB
+ KQgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ryftU8k2hkpE8SBKJnjLqyziikg8zbnLkzl+yDCUuSA=;
- b=FKUDOjn/G2EzLdMUj7HmSNak8XWjcJavSmvqQp+VG3rHHDG81ZX+4ltH3G4vmWOznE
- SVB/Jj7VUjtMR93UO6UjRtHZPyZkwMwg+It+VyOM7GZ97cjFUn67qVr/CtfHIGve5ere
- vbEoo970pNFfpbZx4sE0WXjCUOUoD1Fh2bkCYfwO7afHFUwCfi47+/5VJN+2rA/Ac7xW
- HZbUCgQTaz9OkZc7YS/aWgjAV0yNw6hWBd6niP+b5dTiCgwoCWZHTMfTpYorTBNs+uGf
- AvDMmx7kMuG2r5M2LL8Zd/8MJk4tZ60lGvGgwZyp9rweqlVygCi0M1gMMvwRDtLFivUn
- s9wA==
-X-Gm-Message-State: AOAM530Rgc7rlKerVFL0Aj2e4mMqOYtaGn/uWtgqRw56GhrpbItx4COq
- NZFIu2G7MCcZtzI3WWxUU4kHsEbBGNI=
-X-Google-Smtp-Source: ABdhPJyF49Z7/O/2cC18RRTPDQM6TUXj84tp3jGmn3gmHpEYYGMW6zWKcV+Tbxvu1kmIwsL5RAw8Ww==
-X-Received: by 2002:a63:f90a:: with SMTP id h10mr17788269pgi.57.1589856855815; 
- Mon, 18 May 2020 19:54:15 -0700 (PDT)
+ bh=7oeS1yq+JuN20j7v7YlPjXCqUmCXhfYGwbcqS/Ex0lQ=;
+ b=ktybrfxp4qz5i+3EcI9X9fGmqby7GmkFttdeITMXStfpJNMbeJjfiTEdaYCTvy+YHy
+ 2fuvYnKjhuFF7mrAXqkPPA+dNsFoz13RGkONXMMiU+Zcpby39BfGtsR4SL26A0A9BRJu
+ 5rCt0YNQA/fSbrZFT+loeNbOeoX4il1YtAgA93hsKWJgxUvuBHVa3nk9pLhBiCio0+TF
+ JHWoH5vg5iD2YtUQzxh2sO39/LjzF2/rKVyqzSQajpwq1bin2gph66us03mijsDr3Ulb
+ EGYUC4GQiVaWt5Ula1CZkGLwz0Y9wp/RJvVh+eN8r/7mxPkAQh3AH1s8PAi58O7Zj7zq
+ +oWQ==
+X-Gm-Message-State: AOAM5327z6X4sUyk3j5PxhMpF0vmYmJcR30/5YBurVMkwItLzZUy2eIL
+ ZisNuaN0P3pBkOvA+QsToyve1aVaPto=
+X-Google-Smtp-Source: ABdhPJytF1N+m1lqm7ajke1BaElmisfGDMoSrO7KgH4x4sfrdnVvBl+zuDoQn7tVHa8dB4Q/rb2FEQ==
+X-Received: by 2002:a63:c146:: with SMTP id p6mr11521519pgi.55.1589856860213; 
+ Mon, 18 May 2020 19:54:20 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.14
+ by smtp.gmail.com with ESMTPSA id a2sm8772418pgh.57.2020.05.18.19.54.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 19:54:15 -0700 (PDT)
+ Mon, 18 May 2020 19:54:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RISU v2 14/17] Add magic and size to the trace header
-Date: Mon, 18 May 2020 19:53:52 -0700
-Message-Id: <20200519025355.4420-15-richard.henderson@linaro.org>
+Subject: [RISU v2 17/17] Add --dump option to inspect trace files
+Date: Mon, 18 May 2020 19:53:55 -0700
+Message-Id: <20200519025355.4420-18-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200519025355.4420-1-richard.henderson@linaro.org>
 References: <20200519025355.4420-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::534;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x534.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,325 +105,373 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sanity check that we're not getting out of sync with
-the trace stream.  This will be especially bad with
-the change in size of the sve save data.
+Adjust some of the aarch64 code to look at the reginfo struct
+instead of looking at test_sve, so that we do not need to pass
+the --test-sve option in order to dump sve trace files.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h    |   8 ++-
- reginfo.c | 160 ++++++++++++++++++++++++++++++++++++++++++++----------
- risu.c    |   6 ++
- 3 files changed, 143 insertions(+), 31 deletions(-)
+ risu.h                 |   1 +
+ risu.c                 | 108 ++++++++++++++++++++++++++++++++++++++++-
+ risu_reginfo_aarch64.c |  55 +++++++++++++--------
+ risu_reginfo_arm.c     |   4 ++
+ risu_reginfo_i386.c    |   4 ++
+ risu_reginfo_m68k.c    |   4 ++
+ risu_reginfo_ppc64.c   |   4 ++
+ 7 files changed, 159 insertions(+), 21 deletions(-)
 
 diff --git a/risu.h b/risu.h
-index b234f93..eeb6775 100644
+index 054cef7..3bfe765 100644
 --- a/risu.h
 +++ b/risu.h
-@@ -56,6 +56,7 @@ typedef enum {
-     RES_END,
-     RES_MISMATCH_REG,
-     RES_MISMATCH_MEM,
-+    RES_MISMATCH_HEAD,
-     RES_BAD_IO,
- } RisuResult;
+@@ -23,6 +23,7 @@
+ extern const struct option * const arch_long_opts;
+ extern const char * const arch_extra_help;
+ void process_arch_opt(int opt, const char *arg);
++void arch_init(void);
+ #define FIRST_ARCH_OPT   0x100
  
-@@ -70,10 +71,14 @@ typedef enum {
- struct reginfo;
- 
- typedef struct {
--   uintptr_t pc;
-+   uint32_t magic;
-+   uint32_t size;
-    uint32_t risu_op;
-+   uintptr_t pc;
- } trace_header_t;
- 
-+#define RISU_MAGIC  (('R' << 24) | ('i' << 16) | ('S' << 8) | 'u')
-+
- /* Socket related routines */
- int master_connect(int port);
- int apprentice_connect(const char *hostname, int port);
-@@ -111,6 +116,7 @@ RisuResult recv_and_compare_register_info(void *uc);
-  * done in recv_and_compare_register_info().
-  */
- void report_mismatch_reg(void);
-+void report_mismatch_header(void);
- 
- /* Interface provided by CPU-specific code: */
- 
-diff --git a/reginfo.c b/reginfo.c
-index a007f16..f187d9c 100644
---- a/reginfo.c
-+++ b/reginfo.c
-@@ -16,6 +16,7 @@
- 
- static struct reginfo master_ri, apprentice_ri;
- static uint8_t master_memblock[MEMBLOCKLEN];
-+static trace_header_t master_header;
- 
- RisuResult send_register_info(void *uc)
- {
-@@ -23,32 +24,57 @@ RisuResult send_register_info(void *uc)
-     trace_header_t header;
-     RisuResult res;
-     RisuOp op;
-+    void *extra;
- 
-     reginfo_init(&ri, uc);
-     op = get_risuop(&ri);
- 
-     /* Write a header with PC/op to keep in sync */
-+    header.magic = RISU_MAGIC;
-     header.pc = get_pc(&ri);
-     header.risu_op = op;
-+
-+    switch (op) {
-+    case OP_TESTEND:
-+    case OP_COMPARE:
-+    case OP_SIGILL:
-+        header.size = reginfo_size();
-+        extra = &ri;
-+        break;
-+
-+    case OP_SETMEMBLOCK:
-+    case OP_GETMEMBLOCK:
-+        header.size = 0;
-+        extra = NULL;
-+        break;
-+
-+    case OP_COMPAREMEM:
-+        header.size = MEMBLOCKLEN;
-+        extra = memblock;
-+        break;
-+
-+    default:
-+        abort();
-+    }
-+
-     res = write_buffer(&header, sizeof(header));
-     if (res != RES_OK) {
-         return res;
+ /* GCC computed include to pull in the correct risu_reginfo_*.h for
+diff --git a/risu.c b/risu.c
+index 95b4674..d7c7556 100644
+--- a/risu.c
++++ b/risu.c
+@@ -249,6 +249,93 @@ static int apprentice(void)
      }
-+    if (extra) {
-+        res = write_buffer(extra, header.size);
-+        if (res != RES_OK) {
-+            return res;
+ }
+ 
++static int dump_trace(void)
++{
++    trace_header_t header;
++    union {
++        struct reginfo ri;
++        unsigned char memblock[MEMBLOCKLEN];
++    } u;
++    const char *op_name;
++
++    while (1) {
++        if (read_buffer(&header, sizeof(header))) {
++            fprintf(stderr, "Trace header read failed\n");
++            return EXIT_FAILURE;
++        }
++
++        if (header.magic != RISU_MAGIC) {
++            fprintf(stderr, "Unexpected header magic (%#x)\n", header.magic);
++            return EXIT_FAILURE;
++        }
++
++        switch (header.risu_op) {
++        case OP_COMPARE:
++           op_name = "COMPARE";
++           break;
++        case OP_TESTEND:
++           op_name = "TESTEND";
++           break;
++        case OP_SETMEMBLOCK:
++           op_name = "SETMEMBLOCK";
++           break;
++        case OP_GETMEMBLOCK:
++           op_name = "GETMEMBLOCK";
++           break;
++        case OP_COMPAREMEM:
++           op_name = "COMPAREMEM";
++           break;
++        case OP_SIGILL:
++           op_name = "SIGILL";
++           break;
++        default:
++           op_name = "<unknown>";
++           break;
++        }
++
++        switch (header.risu_op) {
++        case OP_COMPARE:
++        case OP_TESTEND:
++        case OP_SIGILL:
++            if (header.size > sizeof(u.ri)) {
++                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
++                return EXIT_FAILURE;
++            }
++            if (read_buffer(&u.ri, header.size)) {
++                fprintf(stderr, "Reginfo read failed\n");
++                return EXIT_FAILURE;
++            }
++            if (header.size != reginfo_size(&u.ri)) {
++                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
++                return EXIT_FAILURE;
++            }
++            printf("%s: (pc %#lx)\n", op_name, (unsigned long)header.pc);
++            reginfo_dump(&u.ri, stdout);
++            putchar('\n');
++            if (header.risu_op == OP_TESTEND) {
++                return EXIT_SUCCESS;
++            }
++            break;
++
++        case OP_COMPAREMEM:
++            if (header.size != MEMBLOCKLEN) {
++                fprintf(stderr, "Unexpected trace size (%u)\n", header.size);
++                return EXIT_FAILURE;
++            }
++            if (read_buffer(&u.memblock, MEMBLOCKLEN)) {
++                fprintf(stderr, "Memblock read failed\n");
++                return EXIT_FAILURE;
++            }
++            /* TODO: Dump 8k of data? */
++            /* fall through */
++
++        default:
++            printf("%s\n", op_name);
++            break;
 +        }
 +    }
++}
++
+ static int ismaster;
  
-     switch (op) {
-     case OP_COMPARE:
--    case OP_TESTEND:
-     case OP_SIGILL:
--        /*
--         * Do a simple register compare on (a) explicit request
--         * (b) end of test (c) a non-risuop UNDEF
--         */
--        res = write_buffer(&ri, reginfo_size());
--        /* For OP_TEST_END, force exit. */
--        if (res == RES_OK && op == OP_TESTEND) {
--            res = RES_END;
--        }
-+    case OP_COMPAREMEM:
-         break;
-+    case OP_TESTEND:
-+        return RES_END;
-     case OP_SETMEMBLOCK:
-         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
-         break;
-@@ -56,12 +82,10 @@ RisuResult send_register_info(void *uc)
-         set_ucontext_paramreg(uc,
-                               get_reginfo_paramreg(&ri) + (uintptr_t)memblock);
-         break;
--    case OP_COMPAREMEM:
--        return write_buffer(memblock, MEMBLOCKLEN);
-     default:
-         abort();
-     }
--    return res;
-+    return RES_OK;
- }
+ static void usage(void)
+@@ -261,6 +348,7 @@ static void usage(void)
+     fprintf(stderr, "between master and apprentice risu processes.\n\n");
+     fprintf(stderr, "Options:\n");
+     fprintf(stderr, "  --master          Be the master (server)\n");
++    fprintf(stderr, "  -d, --dump=FILE   Dump " TRACE_TYPE " trace file\n");
+     fprintf(stderr, "  -t, --trace=FILE  Record/playback " TRACE_TYPE " trace file\n");
+     fprintf(stderr,
+             "  -h, --host=HOST   Specify master host machine (apprentice only)"
+@@ -281,11 +369,12 @@ static struct option * setup_options(char **short_opts)
+         {"host", required_argument, 0, 'h'},
+         {"port", required_argument, 0, 'p'},
+         {"trace", required_argument, 0, 't'},
++        {"dump", required_argument, 0, 'd'},
+         {0, 0, 0, 0}
+     };
+     struct option *lopts = &default_longopts[0];
  
- /* Read register info from the socket and compare it with that from the
-@@ -75,34 +99,48 @@ RisuResult send_register_info(void *uc)
- RisuResult recv_and_compare_register_info(void *uc)
- {
-     RisuResult res;
--    trace_header_t header;
-+    size_t extra_size;
-     RisuOp op;
+-    *short_opts = "h:p:t:";
++    *short_opts = "d:h:p:t:";
  
-     reginfo_init(&apprentice_ri, uc);
-     op = get_risuop(&apprentice_ri);
+     if (arch_long_opts) {
+         const size_t osize = sizeof(struct option);
+@@ -316,6 +405,7 @@ int main(int argc, char **argv)
+     char *trace_fn = NULL;
+     struct option *longopts;
+     char *shortopts;
++    bool dump = false;
  
--    res = read_buffer(&header, sizeof(header));
--    if (res != RES_OK) {
--        return res;
-+    switch (op) {
-+    case OP_TESTEND:
-+    case OP_COMPARE:
-+    case OP_SIGILL:
-+        extra_size = reginfo_size();
-+        break;
-+    case OP_SETMEMBLOCK:
-+    case OP_GETMEMBLOCK:
-+        extra_size = 0;
-+        break;
-+    case OP_COMPAREMEM:
-+        extra_size = MEMBLOCKLEN;
-+        break;
-+    default:
-+        abort();
+     longopts = setup_options(&shortopts);
+ 
+@@ -330,6 +420,10 @@ int main(int argc, char **argv)
+         case 0:
+             /* flag set by getopt_long, do nothing */
+             break;
++        case 'd':
++            trace_fn = optarg;
++            trace = dump = true;
++            break;
+         case 't':
+             trace_fn = optarg;
+             trace = true;
+@@ -351,6 +445,11 @@ int main(int argc, char **argv)
+         }
      }
  
--    if (header.risu_op != op) {
--        /* We are out of sync.  Tell master to exit. */
--        respond(RES_END);
--        return RES_BAD_IO;
-+    res = read_buffer(&master_header, sizeof(master_header));
-+    if (res != RES_OK) {
-+        goto fail_header;
++    if (dump && ismaster) {
++        usage();
++        exit(1);
 +    }
-+    if (master_header.magic != RISU_MAGIC ||
-+        master_header.risu_op != op ||
-+        master_header.size != extra_size) {
-+        res = RES_MISMATCH_HEAD;
-+        goto fail_header;
++
+     if (trace) {
+         if (strcmp(trace_fn, "-") == 0) {
+             comm_fd = ismaster ? STDOUT_FILENO : STDIN_FILENO;
+@@ -366,6 +465,10 @@ int main(int argc, char **argv)
+         }
      }
  
-     /* send OK for the header */
-     respond(RES_OK);
++    if (dump) {
++        return dump_trace();
++    }
++
+     imgfile = argv[optind];
+     if (!imgfile) {
+         fprintf(stderr, "Error: must specify image file name\n\n");
+@@ -375,6 +478,9 @@ int main(int argc, char **argv)
  
-     switch (op) {
--    case OP_COMPARE:
-     case OP_TESTEND:
-+    case OP_COMPARE:
-     case OP_SIGILL:
--        /* Do a simple register compare on (a) explicit request
--         * (b) end of test (c) a non-risuop UNDEF
--         */
--        res = read_buffer(&master_ri, reginfo_size());
-+        res = read_buffer(&master_ri, extra_size);
-         if (res != RES_OK) {
-             /* fail */
-         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
-@@ -111,15 +149,17 @@ RisuResult recv_and_compare_register_info(void *uc)
-         } else if (op == OP_TESTEND) {
-             res = RES_END;
-         }
--        respond(res == RES_OK ? RES_OK : RES_END);
-         break;
+     load_image(imgfile);
+ 
++    /* Select requested SVE vector length. */
++    arch_init();
 +
-     case OP_SETMEMBLOCK:
-         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&apprentice_ri);
--        break;
-+        return RES_OK;
-+
-     case OP_GETMEMBLOCK:
-         set_ucontext_paramreg(uc, get_reginfo_paramreg(&apprentice_ri) +
-                               (uintptr_t)memblock);
--        break;
-+        return RES_OK;
-+
-     case OP_COMPAREMEM:
-         res = read_buffer(master_memblock, MEMBLOCKLEN);
-         if (res != RES_OK) {
-@@ -128,12 +168,14 @@ RisuResult recv_and_compare_register_info(void *uc)
-             /* memory mismatch */
-             res = RES_MISMATCH_MEM;
-         }
--        respond(res == RES_OK ? RES_OK : RES_END);
-         break;
-+
-     default:
-         abort();
+     if (ismaster) {
+         if (!trace) {
+             fprintf(stderr, "master port %d\n", port);
+diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
+index a1020ac..fb8e11a 100644
+--- a/risu_reginfo_aarch64.c
++++ b/risu_reginfo_aarch64.c
+@@ -44,8 +44,6 @@ const char * const arch_extra_help
+ void process_arch_opt(int opt, const char *arg)
+ {
+ #ifdef SVE_MAGIC
+-    long want, got;
+-
+     assert(opt == FIRST_ARCH_OPT);
+     test_sve = strtol(arg, 0, 10);
+ 
+@@ -53,22 +51,37 @@ void process_arch_opt(int opt, const char *arg)
+         fprintf(stderr, "Invalid value for VQ (1-%d)\n", SVE_VQ_MAX);
+         exit(EXIT_FAILURE);
      }
- 
-+ fail_header:
-+    respond(res == RES_OK ? RES_OK : RES_END);
-     return res;
+-    want = sve_vl_from_vq(test_sve);
+-    got = prctl(PR_SVE_SET_VL, want);
+-    if (want != got) {
+-        if (got < 0) {
+-            perror("prctl PR_SVE_SET_VL");
+-        } else {
+-            fprintf(stderr, "Unsupported value for VQ (%d != %d)\n",
+-                    test_sve, (int)sve_vq_from_vl(got));
+-        }
+-        exit(EXIT_FAILURE);
+-    }
+ #else
+     abort();
+ #endif
  }
  
-@@ -149,3 +191,61 @@ void report_mismatch_reg(void)
-     reginfo_dump(&apprentice_ri, stderr);
-     reginfo_dump_mismatch(&master_ri, &apprentice_ri, stderr);
- }
-+
-+void report_mismatch_header(void)
++void arch_init(void)
 +{
-+    fprintf(stderr, "header mismatch detail (master : apprentice):\n");
-+    if (master_header.magic != RISU_MAGIC) {
-+        fprintf(stderr, "  magic: %08x vs %08x\n",
-+                master_header.magic, RISU_MAGIC);
-+        /* If the magic number is wrong, everything else is garbage too. */
++#ifdef SVE_MAGIC
++    long want, got1, got2;
++
++    if (test_sve == 0) {
 +        return;
 +    }
 +
-+    RisuOp a_op = get_risuop(&apprentice_ri);
-+    RisuOp m_op = master_header.risu_op;
-+    if (a_op != m_op) {
-+        fprintf(stderr, "  op   : %d != %d\n", m_op, a_op);
-+        /* If the opcode is mismatched, we can't compute size. */
-+    } else {
-+        const char *kind;
-+        size_t m_sz = master_header.size;
-+        size_t a_sz;
-+
-+        switch (a_op) {
-+        case OP_TESTEND:
-+        case OP_COMPARE:
-+        case OP_SIGILL:
-+            kind = "reginfo";
-+            a_sz = reginfo_size();
-+            break;
-+        case OP_SETMEMBLOCK:
-+        case OP_GETMEMBLOCK:
-+            kind = "unexpected";
-+            a_sz = 0;
-+            break;
-+        case OP_COMPAREMEM:
-+            kind = "memblock";
-+            a_sz = MEMBLOCKLEN;
-+            break;
-+        default:
-+            abort();
-+        }
-+        if (a_sz != m_sz) {
-+            fprintf(stderr, " size : %zd != %zd (%s)\n",
-+                    m_sz, a_sz, kind);
-+        } else {
-+            /* If magic, op, and size are the same, how did we get here? */
-+            abort();
++    want = sve_vl_from_vq(test_sve);
++    asm(".arch_extension sve\n\trdvl %0, #1" : "=r"(got1));
++    if (want != got1) {
++        got2 = prctl(PR_SVE_SET_VL, want);
++        if (want != got2) {
++            if (got2 < 0) {
++                perror("prctl PR_SVE_SET_VL");
++                got2 = got1;
++            }
++            fprintf(stderr, "Unsupported value for VQ (%d != %d)\n",
++                    test_sve, (int)sve_vq_from_vl(got1));
++            exit(EXIT_FAILURE);
 +        }
 +    }
-+
-+    uint64_t a_pc = get_pc(&apprentice_ri);
-+    uint64_t m_pc = master_header.pc;
-+    if (a_pc != m_pc) {
-+        fprintf(stderr, "  pc   : %016" PRIx64 " vs %016" PRIx64 "\n",
-+                m_pc, a_pc);
-+    } else {
-+        fprintf(stderr, "  pc   : %016" PRIx64 "\n", a_pc);
-+    }
++#endif
 +}
-diff --git a/risu.c b/risu.c
-index 398faac..95b4674 100644
---- a/risu.c
-+++ b/risu.c
-@@ -233,6 +233,12 @@ static int apprentice(void)
-         fprintf(stderr, "mismatch mem after %zd checkpoints\n", signal_count);
-         return EXIT_FAILURE;
- 
-+    case RES_MISMATCH_HEAD:
-+        fprintf(stderr, "mismatch header after %zd checkpoints\n",
-+                signal_count);
-+        report_mismatch_header();
-+        return EXIT_FAILURE;
 +
-     case RES_BAD_IO:
-         fprintf(stderr, "i/o error after %zd checkpoints\n", signal_count);
-         return EXIT_FAILURE;
+ int reginfo_size(struct reginfo *ri)
+ {
+ #ifdef SVE_MAGIC
+@@ -170,6 +183,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+         if (sve->head.size < SVE_SIG_CONTEXT_SIZE(vq)) {
+             if (sve->head.size == sizeof(*sve)) {
+                 /* SVE state is empty -- not an error.  */
++                goto do_simd;
+             } else {
+                 fprintf(stderr, "risu_reginfo_aarch64: "
+                         "failed to get complete SVE state\n");
+@@ -182,6 +196,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+                SVE_SIG_CONTEXT_SIZE(vq) - SVE_SIG_REGS_OFFSET);
+         return;
+     }
++ do_simd:
+ #endif /* SVE_MAGIC */
+ 
+     for (i = 0; i < 32; i++) {
+@@ -260,8 +275,9 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
+     fprintf(f, "  fpcr   : %08x\n", ri->fpcr);
+ 
+ #ifdef SVE_MAGIC
+-    if (test_sve) {
+-        int q, vq = test_sve;
++    if (ri->sve_vl) {
++        int vq = sve_vq_from_vl(ri->sve_vl);
++        int q;
+ 
+         fprintf(f, "  vl     : %d\n", ri->sve_vl);
+ 
+@@ -339,13 +355,12 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+     }
+ 
+ #ifdef SVE_MAGIC
+-    if (test_sve) {
++    if (m->sve_vl != a->sve_vl) {
++        fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
++    }
++    if (m->sve_vl) {
+         int vq = sve_vq_from_vl(m->sve_vl);
+ 
+-        if (m->sve_vl != a->sve_vl) {
+-            fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
+-        }
+-
+         for (i = 0; i < SVE_NUM_ZREGS; i++) {
+             uint64_t *zm = reginfo_zreg(m, vq, i);
+             uint64_t *za = reginfo_zreg(a, vq, i);
+diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+index 3832e27..2982435 100644
+--- a/risu_reginfo_arm.c
++++ b/risu_reginfo_arm.c
+@@ -36,6 +36,10 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++void arch_init(void)
++{
++}
++
+ int reginfo_size(struct reginfo *ri)
+ {
+     return sizeof(struct reginfo);
+diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
+index 902d33e..68f2323 100644
+--- a/risu_reginfo_i386.c
++++ b/risu_reginfo_i386.c
+@@ -74,6 +74,10 @@ void process_arch_opt(int opt, const char *arg)
+     }
+ }
+ 
++void arch_init(void)
++{
++}
++
+ int reginfo_size(struct reginfo *ri)
+ {
+     return sizeof(struct reginfo);
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+index 361f172..499fdc4 100644
+--- a/risu_reginfo_m68k.c
++++ b/risu_reginfo_m68k.c
+@@ -23,6 +23,10 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++void arch_init(void)
++{
++}
++
+ int reginfo_size(struct reginfo *ri)
+ {
+     return sizeof(struct reginfo);
+diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
+index c86313c..3b04747 100644
+--- a/risu_reginfo_ppc64.c
++++ b/risu_reginfo_ppc64.c
+@@ -32,6 +32,10 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++void arch_init(void)
++{
++}
++
+ int reginfo_size(struct reginfo *ri)
+ {
+     return sizeof(struct reginfo);
 -- 
 2.20.1
 
