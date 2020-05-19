@@ -2,68 +2,94 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A40C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE70C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C03A207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:54:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C03A207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60FB8207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:54:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JH2339Bb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FB8207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4ZE-0006XZ-D9
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:54:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53246)
+	id 1jb4ZV-0006uo-Km
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:54:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jb4YH-000559-T6
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:53:11 -0400
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:11403)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jb4YG-0000lm-I3
- for qemu-devel@nongnu.org; Tue, 19 May 2020 11:53:09 -0400
-Authentication-Results: esa1.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: El7oOCcy1szBJ5zYjhYjThPqPzQODLg8uLNYfOHWUvO6Kb3R3YqEhEkxJkWmWZu7/B9Dmmdh9q
- GrymMtBPqIErwSlD4nIxYx7YidRjO4QcnRPw+jwHHBlMBV0c+roR0b/1UvaHr+pCE2Vl0Wml8t
- ASWDpvsj54Cb16cDC1gjtudozZkVsB31t9vWpeHYDfUcS6T2bsA00AnUwqRi/gHMORBFBkGgOy
- lsq6UaA/bSMbr7DqErUgz4vU/5Otv2jm06g8UtW9KNyXaHE7rr5cPxUJAsUC9F00uU07R2xbeA
- KJs=
-X-SBRS: 2.7
-X-MesageID: 18178493
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.73,410,1583211600"; d="scan'208";a="18178493"
-Date: Tue, 19 May 2020 16:52:58 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Roger Pau Monne <roger.pau@citrix.com>
-Subject: Re: [PATCH v2] xen: fix build without pci passthrough
-Message-ID: <20200519155258.GC2105@perard.uk.xensource.com>
-References: <20200519143101.75330-1-roger.pau@citrix.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jb4Xz-0004VG-1T
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:52:51 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34288)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jb4Xy-0000j8-7o
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 11:52:50 -0400
+Received: by mail-wr1-x431.google.com with SMTP id y3so16521182wrt.1
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 08:52:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=IIEAlVuq4xKznrR01okFk0MRJK7dXoCRNE3+9KQgSuM=;
+ b=JH2339BbEks6RI21mr6Z1Ttx48FcD1a5OJB2zH5MoGoGofwOcR/pk1RjOdLkEc6hI4
+ +l4it1WZ2HpSK/iO5P1mV/J/UDeGXCbBQgDxflEE5PQuxdycIK/HBjco9kf2JDIOFhcY
+ MzaeOnaW+RBNqgJfiB1J8vALW93bMEW4615R8HTtP80Nwcu5YcN05wZ6eJTzVJBtwSFI
+ Gws/SN0IzM6mqt+ZgNzSbtFk3xbkAiGq6DnGM8PUedBab35wXTuIP+OIC64WjaWr9x3q
+ nq0Lud9nzpbH2m+C1NcsDg6AxXyGn52jy1/66ZprdJvfcSNiLRLi+PA3N/PzMGqYZGkg
+ hcZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=IIEAlVuq4xKznrR01okFk0MRJK7dXoCRNE3+9KQgSuM=;
+ b=GuYAvugH2Vr81NPUtZPkjIo/+90A7B5a9pu0M3AUVCach5ydtufQmET7bGV0yeAszX
+ Yil9xoZU5wIhMBMIhi93YARVNmhc+r0DP6ia/Kcxw2BiN2zeftPeH1n7EYKnnwRUdOIh
+ fty9wlhS9Xv+MwRKMDMB+OC/vOeEwOX1KUxo+/ruDqlGNQO8PsvsmfgAi2LlGUyMsTPJ
+ MVTdPaT5Te+51KK45GvS7yv+TbdP1wsRGNOWfIvZrh0a55VRiVUyQQcohVufkq/kHRsF
+ odlvk8gLr+2qaPWAxV8c8YpK5x6rNdNKAj+3NyCG5pTYDZZTCnaAYQEhVhry0eht04fO
+ naYw==
+X-Gm-Message-State: AOAM532FQLPCJIKmoLO7NrWTmxo5ch26pUNRg7+WRi6TTmZzp5QNMDCp
+ joF/r7dY1sm/w3yF7V71fOUf6g==
+X-Google-Smtp-Source: ABdhPJz3fqNKkmPEwEr+ZQ9y/w56QZ9oY6SDbH1L2MssSHp9qcURv1EBpq4/nwr/1PxeWCYtPmw3ZA==
+X-Received: by 2002:a5d:4911:: with SMTP id x17mr26025128wrq.160.1589903566342; 
+ Tue, 19 May 2020 08:52:46 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y185sm135648wmy.11.2020.05.19.08.52.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 May 2020 08:52:45 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 45C461FF7E;
+ Tue, 19 May 2020 16:52:44 +0100 (BST)
+References: <20200519025355.4420-1-richard.henderson@linaro.org>
+ <20200519025355.4420-3-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [RISU v2 02/17] Unify master_fd and apprentice_fd to comm_fd
+In-reply-to: <20200519025355.4420-3-richard.henderson@linaro.org>
+Date: Tue, 19 May 2020 16:52:44 +0100
+Message-ID: <878shnj50z.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200519143101.75330-1-roger.pau@citrix.com>
-Received-SPF: pass client-ip=216.71.145.142;
- envelope-from=anthony.perard@citrix.com; helo=esa1.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 10:31:12
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,60 +103,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-devel@nongnu.org, Paul Durrant <paul@xen.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 19, 2020 at 04:31:01PM +0200, Roger Pau Monne wrote:
-> has_igd_gfx_passthru is only available when QEMU is built with
-> CONFIG_XEN_PCI_PASSTHROUGH, and hence shouldn't be used in common
-> code without checking if it's available.
-> 
-> Fixes: 46472d82322d0 ('xen: convert "-machine igd-passthru" to an accelerator property')
-> Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paul Durrant <paul@xen.org>
-> Cc: xen-devel@lists.xenproject.org
-> ---
-> Changes since v1:
->  - Do not include osdep in header file.
->  - Always add the setters/getters of igd-passthru, report an error
->    when attempting to set igd-passthru without built in
->    pci-passthrough support.
-> ---
->  hw/xen/xen-common.c | 4 ++++
->  hw/xen/xen_pt.h     | 6 ++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> index 70564cc952..d758770da0 100644
-> --- a/hw/xen/xen-common.c
-> +++ b/hw/xen/xen-common.c
-> @@ -134,7 +134,11 @@ static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
->  
->  static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
->  {
-> +#ifdef CONFIG_XEN_PCI_PASSTHROUGH
->      has_igd_gfx_passthru = value;
-> +#else
-> +    error_setg(errp, "Xen PCI passthrough support not built in");
-> +#endif
->  }
->  
 
-There's an issue that I haven't thought about before.
-CONFIG_XEN_PCI_PASSTHROUGH is never defined in xen-common.c. So
-xen_set_igd_gfx_passthru will always return an error.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-I'm not sure what to do about that yet, maybe change the way that
-CONFIG_ is defined, or maybe have have the setter/getter in xen_pt.c
-with a stub in stubs/ which would return an error. or maybe some other
-way.
+> Any one invocation cannot be both master and apprentice.
+> Let's use only one variable for the file descriptor.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
--- 
-Anthony PERARD
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
