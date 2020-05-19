@@ -2,76 +2,78 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29744C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63934C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D10B42072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:20:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E90A2072C
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:20:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TA7Br14l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10B42072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5WOO2td"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E90A2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb9ex-0002OJ-2x
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:20:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37158)
+	id 1jb9fP-00035b-CG
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:20:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jb9dy-0001V3-4f; Tue, 19 May 2020 17:19:22 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:42692)
+ id 1jb9eY-00028a-4k
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:19:58 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:36433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jb9dx-0004Rh-Bt; Tue, 19 May 2020 17:19:21 -0400
-Received: by mail-io1-xd44.google.com with SMTP id e18so781544iog.9;
- Tue, 19 May 2020 14:19:20 -0700 (PDT)
+ id 1jb9eX-0004U8-Aj
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:19:57 -0400
+Received: by mail-io1-xd42.google.com with SMTP id c16so825698iol.3
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:19:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AcDt0avYRKuROuwNNZTmEtdb+RjDSrmi1rZZuiHotNY=;
- b=TA7Br14lf7rbz05+XK85Q41JpgsCVyYEwncmR0nu+sBPtD8nkJe5MoggFiY7bLBLn9
- cqPe1gxvxqNmiya4qTyNgUR04asdHIu214sqK5AhcdgcBYSzYRwmKQCG5bnNaHVdkIqj
- iLKu580RriT/TmRaUfFpjLG2IYg5ovVbcx6eQGiMAivtpjum2/mHZ3OIAKP/dn/2WVv4
- jxAx1xLSElnsFnGQfUWavzEpWQ5NPtx/7A3mbTO+NE/xbR2y8VDp6slEC0/kpCR45KPi
- LhxRuFHrwY1S7WhSGYUzeTumdefck3y1b/+eaCv3l3HRIGcdX1Pa8Gl+RCAK7VT/f6yT
- TdeQ==
+ :cc; bh=635MI2UsXHJuzWzjh3AwSkAkPl4uiFsySNmohbmCuds=;
+ b=O5WOO2tdIKWc9Fgty0u5tu8viJYV226PPcCnC1w8pWLMZB5eITWT1b50N/Fukh/MOe
+ TuY5C5Gimc/UfzhZvcMsjnZUavp5BpA0ceJxK3AfHIXFWA/eZX33+lOdUJ8KpPlACOG/
+ Ut5KhgZ5gfA2JF6zxRHQfso1TkNFMLlV5XlQc8K0/Npo5Txi3AUminloEgprK3EN3TG1
+ P30aE5SLPuXeqrhOh6E7P1JchITbSNYx6Ym5CGKmq/HkVZziOima/rWiISE/NPc+mQhL
+ N+uoX5p4LuwkY2iCGiOMDGO3Q+3Vj8bqoZ1hLfcaCKdYIX8XLcXBNzFFtmozlTcGJWb5
+ Pvww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=AcDt0avYRKuROuwNNZTmEtdb+RjDSrmi1rZZuiHotNY=;
- b=ka+hmFI4pSCUOZHSk0fvt4G5rLcEUTrOhHrIjgsF/X78JHMe/dnWrikj+ahggSpHJc
- NVs83/LoZLBn5lh3Z7G6pYsg43PVHPsI1/ZXErXkFsYr2B+Ot344AR+lq3i6e5cjaEvu
- WJGFzaM9qhbqK2wYdwH2h7gvB4DbRZDGT9ARj1FtgkZZVV+aVZY4DFGlHG6tN4LavX7Y
- au6oZl5wnJsrlqXcb495ijCC4b/WtP9UztH4fkKFZwqrqZ80qo5CShijQ/dirtfiXz98
- p+6zZVk83oq42JMFiAkxblaiIli7DHhwYjUqm0MQviTjSDwJr2/dFWGlEKFAZAe2YZ0F
- 1KQQ==
-X-Gm-Message-State: AOAM532VTX8D8IA4q0EiuB/r61d8yzfjPVaz7iMN49UWb7GnUltINXhb
- ZQV5Z6FNYiNBivmPqXeh+7r/Tp1Oz5EHqwlS5vY=
-X-Google-Smtp-Source: ABdhPJwQ5qOwQRh7p8IcC2tfK3/QgGZXxFbI2Pbd92Gc118hJJVOotMkTAlfSDWa5DC9dnHuYRsuKQ4wxLtbUVxjPts=
-X-Received: by 2002:a05:6638:dd3:: with SMTP id
- m19mr1692492jaj.106.1589923160076; 
- Tue, 19 May 2020 14:19:20 -0700 (PDT)
+ bh=635MI2UsXHJuzWzjh3AwSkAkPl4uiFsySNmohbmCuds=;
+ b=fFiykx6KiQ05LigkvctiD/8WjWLtZkaJ3JwDNdEz7lppPmj3GGuYhi4v9i3YnRBOXf
+ yY3GcgN+toT7ip6B50cOqNrdxnN/XjlYESijb83DjyQ9MhvJ7M4vrEE5kGKJ4OFcM+ZB
+ vCOfCwxs4LrH4jCBWoI/A2xslolJiWucdCqznuEx5IrXtGCgXQWyQODuIHTlBLp2XAM8
+ MokAr0bq81frgOHxogdj47GTZB876NOV77WzIPu7NbI33HWn6yYcNaPigbU9V7+EuhZd
+ ktqn4+2smmO8A/Ejw6fXbjrGp/l8ugbURUXYpTfKPOeO9b8JRCv7zD3R9OWoHK9yjQwN
+ CKvA==
+X-Gm-Message-State: AOAM530dSod34Mp3rM3NfKdLesuaZJ4Mk3BsZNr30pEUhzwW9IseVftf
+ s0ZdDx24J2mhmsgUt0LHnSXhas2Rvb63XVjk6XSaEuLU
+X-Google-Smtp-Source: ABdhPJxFUc5v3zyQZpJu929zjnO5zzNQIwqS/OoNVsoveEvuzTjxPg42zf6gXPmahaftyNqP8g9JiQjT5k8k0Wyd2aI=
+X-Received: by 2002:a6b:dc11:: with SMTP id s17mr929388ioc.42.1589923196262;
+ Tue, 19 May 2020 14:19:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1588878640.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1588878640.git.alistair.francis@wdc.com>
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-25-armbru@redhat.com>
+In-Reply-To: <20200519145551.22836-25-armbru@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 19 May 2020 14:10:26 -0700
-Message-ID: <CAKmqyKNEXAV+-xBsHZn1fL30sbJ8XkKZ3Lrp6nkwyYptg6e3ng@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] RTISC-V: Remove deprecated ISA, CPUs and machines
-To: Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 19 May 2020 14:11:03 -0700
+Message-ID: <CAKmqyKPpNMdOGjmAdfyHBSYbNx3si35a_iqufCMm3EPzgw8CdA@mail.gmail.com>
+Subject: Re: [PATCH 24/55] ssi: ssi_create_slave_no_init() is now unused, drop
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -94,39 +96,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 7, 2020 at 12:19 PM Alistair Francis
-<alistair.francis@wdc.com> wrote:
+On Tue, May 19, 2020 at 8:06 AM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> v2:
->  - Remove the CPUs and ISA seperatley
->
-> Alistair Francis (3):
->   hw/riscv: spike: Remove deprecated ISA specific machines
->   target/riscv: Remove the deprecated CPUs
->   target/riscv: Drop support for ISA spec version 1.09.1
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Any more comments?
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  include/hw/ssi/ssi.h | 1 -
+>  hw/ssi/ssi.c         | 5 -----
+>  2 files changed, 6 deletions(-)
 >
->  hw/riscv/spike.c                              | 217 ------------------
->  include/hw/riscv/spike.h                      |   6 +-
->  target/riscv/cpu.c                            |  30 ---
->  target/riscv/cpu.h                            |   8 -
->  target/riscv/csr.c                            |  82 ++-----
->  .../riscv/insn_trans/trans_privileged.inc.c   |   6 -
->  tests/qtest/machine-none-test.c               |   4 +-
->  7 files changed, 21 insertions(+), 332 deletions(-)
+> diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
+> index 1725b13c32..93f2b8b0be 100644
+> --- a/include/hw/ssi/ssi.h
+> +++ b/include/hw/ssi/ssi.h
+> @@ -79,7 +79,6 @@ extern const VMStateDescription vmstate_ssi_slave;
+>  }
 >
+>  DeviceState *ssi_create_slave(SSIBus *bus, const char *name);
+> -DeviceState *ssi_create_slave_no_init(SSIBus *bus, const char *name);
+>
+>  /* Master interface.  */
+>  SSIBus *ssi_create_bus(DeviceState *parent, const char *name);
+> diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+> index 58e7d904db..67b48c31cd 100644
+> --- a/hw/ssi/ssi.c
+> +++ b/hw/ssi/ssi.c
+> @@ -90,11 +90,6 @@ static const TypeInfo ssi_slave_info = {
+>      .abstract = true,
+>  };
+>
+> -DeviceState *ssi_create_slave_no_init(SSIBus *bus, const char *name)
+> -{
+> -    return qdev_create(BUS(bus), name);
+> -}
+> -
+>  DeviceState *ssi_create_slave(SSIBus *bus, const char *name)
+>  {
+>      DeviceState *dev = qdev_new(name);
 > --
-> 2.26.2
+> 2.21.1
+>
 >
 
