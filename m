@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F19CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C104C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:49:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6847D2072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5657D2072C
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 00:49:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="lvLNfHNK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6847D2072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="DfkdIwDN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5657D2072C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jaqLf-0006qW-F9
-	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 20:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33612)
+	id 1jaqRR-0000r7-Me
+	for qemu-devel@archiver.kernel.org; Mon, 18 May 2020 20:49:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jaqHj-00058G-US; Mon, 18 May 2020 20:39:07 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:41638)
+ id 1jaqIo-00060Q-VP; Mon, 18 May 2020 20:40:14 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34926)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jaqHh-0004Lh-NR; Mon, 18 May 2020 20:39:07 -0400
-Received: by mail-ej1-x643.google.com with SMTP id x1so10341810ejd.8;
- Mon, 18 May 2020 17:39:04 -0700 (PDT)
+ id 1jaqIo-0004an-7K; Mon, 18 May 2020 20:40:14 -0400
+Received: by mail-ed1-x541.google.com with SMTP id be9so6014188edb.2;
+ Mon, 18 May 2020 17:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=XHr1u4Up0QpG/c/A3SDWCSoQmzZzYbzXevGQqA1OMKo=;
- b=lvLNfHNKiG8o0SqLjl2nCcZzw9vBV4OE+lBoxXHzK+MozzrdbUUCn2of2X8BJrR+KZ
- 5FEDgw36ldHQ/jtvF8FR2943+7l0EV/OARDlnPzJpti3x+tLtLh4wKUnF8d5dFMcmCfS
- 34jSvxo17Y9AgjuBPgHSbaK0ocLQz5AJTiYuM=
+ bh=k2Zs4uU66rBLlRwIdnw2zZdEU9sfm8kTZjMAiamRZOE=;
+ b=DfkdIwDNnrWa/zQZpySq44dejwikghiFrAN4dtd2FzmlKyfCRR4gUk4gMaros/NdWH
+ xon3l/fUHHzd1bxwXjtacbwnaUQ9J1VkDipru8W9RGzevcIJc1gjRp/zer7mhOXTLhjT
+ bNq27ErJCaQ3szGIwQubWMFxDnjyzaXz7cTu4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=XHr1u4Up0QpG/c/A3SDWCSoQmzZzYbzXevGQqA1OMKo=;
- b=QOY68aEe7pvIyZulGCmf1tOyzJ3Urao8I7VsSFmY7h66JXMnWB3SzM17wClwfUAnVQ
- 8h3+Pz+ivviXSGiVqZpvkMtNF7aeb36xyYcmxjFu4rRvNJQM1G8ENYt5ioigV469BrBd
- AyNBTBoXKQlKo6v2PEw/yhYyOER1Tckldh90XE4rfDod9Y3L/aThBtr41vN+9KhBRAtv
- /KC1XCCwzRMv7SZiZVBdN6C+jG2aWNcmlT//hI8I43+sUSYyGKF9zD9WM44sB5hFP6Id
- sSiwnS/eFOFwiHB7ocpH4/YP0Jrvxr5hL6wiMwveCaPX/R/XQTvKARJCiothG23O5TV+
- Pv3w==
-X-Gm-Message-State: AOAM532Rk9wtZTVqRSmHUTP1XWdarCRVBBtpg6Re9MhSUoh6S3o4zEKJ
- 4f6+fdcHJtZ8lUz0c8G8l/r/jH3NAE7SqfMxAxs=
-X-Google-Smtp-Source: ABdhPJwZChou1Bb5wOYcg8osKciwiWRWy8ZwA3j9RL67LklW2PsHGvu/TQ+glnPn7MeJrKoppZ9X7CplNDRfOakcIKw=
-X-Received: by 2002:a17:906:1f87:: with SMTP id
- t7mr13935251ejr.50.1589848743574; 
- Mon, 18 May 2020 17:39:03 -0700 (PDT)
+ bh=k2Zs4uU66rBLlRwIdnw2zZdEU9sfm8kTZjMAiamRZOE=;
+ b=ZusroeKQbhKKnSU7z79cYUT1qkyKgnaqr4NlSybJZ7xpP2ES/dY9XschrPMJZPzcFK
+ ++EYAQEP4LYuaFOU/zG5m1JN6Flh6deDw4j+ozDaUr3GFvzq/v1E81+cMVES1QVu46Em
+ i3LVHGG7U6fsoW+NVxDpECx4mhi7WCCGNcHeuE27lIaW4x30WX0Dg0PyOMbZWZfDujJR
+ MeKjU2/UtxqmyO7A/bJ7Bd3kiImEeljt8j16aAneUvpzAZ1wgZTJLFx/k0JVDmQoFxXL
+ TVGy11B8OUlxHRzNCGbg83/6rcA/n8N4AmTbkwfJJL/6NmLHGxxjXzSZPHHlS5smGw5F
+ MLSg==
+X-Gm-Message-State: AOAM533i/TmQThurpw4i5fyWQmGUQI3Ov7vm1m2KLsdZfXHsiZkhfNbW
+ iELQ0ZSaLqNExtCVMqoPaH2wHO/Vb2l+iiS5dKQ=
+X-Google-Smtp-Source: ABdhPJwQaEn3Qt5qIHrZyzM3JMdsoHngtjhhYAvWZBf8UhXYHyfU7hB4bmtPvcrvgbdbvBjj/UQxXw504WbqpIlgW4U=
+X-Received: by 2002:a50:e444:: with SMTP id e4mr15501058edm.191.1589848812480; 
+ Mon, 18 May 2020 17:40:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-5-armbru@redhat.com>
- <9fc4a6e2-fa90-ba62-91cf-e22eb3ef4cdc@kaod.org>
-In-Reply-To: <9fc4a6e2-fa90-ba62-91cf-e22eb3ef4cdc@kaod.org>
+ <20200518050408.4579-6-armbru@redhat.com>
+ <fbd7151f-159f-7568-77cb-7ce86f4948ba@kaod.org>
+In-Reply-To: <fbd7151f-159f-7568-77cb-7ce86f4948ba@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 19 May 2020 00:38:51 +0000
-Message-ID: <CACPK8XcxVrA3E-c=jkszXd2Z6PMLO=tWDF60DTu-E3cyUdXD2A@mail.gmail.com>
-Subject: Re: [PATCH 04/24] aspeed: Don't create unwanted "ftgmac100",
- "aspeed-mmi" devices
+Date: Tue, 19 May 2020 00:40:00 +0000
+Message-ID: <CACPK8Xf+Qf0BkOiDWj_wKXT-yF+2N0Ton01Nq7Xm5yie+fqqwA@mail.gmail.com>
+Subject: Re: [PATCH 05/24] aspeed: Don't create unwanted "cortex-a7-arm-cpu"
+ devices
 To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=joel.stan@gmail.com; helo=mail-ej1-x643.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -103,16 +102,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 12:19, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Mon, 18 May 2020 at 12:24, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
 > On 5/18/20 7:03 AM, Markus Armbruster wrote:
-> > These devices are optional, and controlled by @nb_nics.
-> > aspeed_soc_ast2600_init() and aspeed_soc_init() create the maximum
-> > supported number.  aspeed_soc_ast2600_realize() and
-> > aspeed_soc_realize() realize only the wanted number.  Works, although
-> > it can leave unrealized devices hanging around in the QOM composition
-> > tree.  Affects machines ast2500-evb, ast2600-evb, palmetto-bmc,
-> > romulus-bmc, swift-bmc, tacoma-bmc, and witherspoon-bmc.
+> > The number of CPUs is controlled by property "num-cpus".
+> > aspeed_soc_ast2600_init() creates the maximum supported number.
+> > aspeed_soc_ast2600_realize() realizes only the wanted number.  Works,
+> > although it leaves unrealized devices hanging around in the QOM
+> > composition tree.  Affects machines ast2600-evb and tacoma-bmc.
 > >
 > > Make the init functions create only the wanted ones.  Visible in "info
 > > qom-tree"; here's the change for ast2600-evb:
@@ -121,44 +118,17 @@ On Mon, 18 May 2020 at 12:19, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 > >        [...]
 > >        /soc (ast2600-a1)
 > >          [...]
-> >          /ftgmac100[0] (ftgmac100)
-> >            /ftgmac100[0] (qemu:memory-region)
-> >     -    /ftgmac100[1] (ftgmac100)
-> >     -    /ftgmac100[2] (ftgmac100)
-> >     -    /ftgmac100[3] (ftgmac100)
-> >          /gpio (aspeed.gpio-ast2600)
-> >          [...]
-> >          /mii[0] (aspeed-mmi)
-> >            /aspeed-mmi[0] (qemu:memory-region)
-> >     -    /mii[1] (aspeed-mmi)
-> >     -    /mii[2] (aspeed-mmi)
-> >     -    /mii[3] (aspeed-mmi)
-> >          /rtc (aspeed.rtc)
-> >
-> > I'm not sure creating @nb_nics devices makes sense.  How many does the
-> > physical chip provide?
->
-> The AST2400, AST2500 SoC have 2 macs and the AST2600 has 4. Each machine
-> define the one it uses, generally MAC0 but the tacoma board uses MAC3.
->
-> Shouldn't the model reflect the real address space independently from
-> the NIC backends defined on the command line ?
-
-Agreed, the MAC hardware is present in all instances of the AST2600,
-so they should be present in qemu. Only some boards wire up a network
-device to the other side.
-
-It would be advantageous for us to be able to specify which device is
-being connected to on the command line. Currently we do this by
-connecting all devices up to the one we care about which is an ugly
-workaround.
-
-> How should we proceed in such cases ?
->
-> Thanks,
->
-> C.
->
+> >          /cpu[0] (cortex-a7-arm-cpu)
+> >            /unnamed-gpio-in[0] (irq)
+> >            /unnamed-gpio-in[1] (irq)
+> >            /unnamed-gpio-in[2] (irq)
+> >            /unnamed-gpio-in[3] (irq)
+> >     -    /cpu[1] (cortex-a7-arm-cpu)
+> >     -      /unnamed-gpio-in[0] (irq)
+> >     -      /unnamed-gpio-in[1] (irq)
+> >     -      /unnamed-gpio-in[2] (irq)
+> >     -      /unnamed-gpio-in[3] (irq)
+> >          /ehci[0] (platform-ehci-usb)
 > >
 > > Cc: "C=C3=A9dric Le Goater" <clg@kaod.org>
 > > Cc: Peter Maydell <peter.maydell@linaro.org>
@@ -166,41 +136,44 @@ workaround.
 > > Cc: Joel Stanley <joel@jms.id.au>
 > > Cc: qemu-arm@nongnu.org
 > > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>
+> Joel, Andrew,
+>
+> Shouldn't we enforce a default/min/max number of CPUs of 2 for the AST260=
+0 ?
+> That's the SoC definition. The fact it is configurable in the Aspeed mode=
+l
+> was nice to have during bringup but we are now done.
+
+Agreed, we want there to always be two CPUs for the 2600.
+
+>
+> Thanks,
+>
+> C.
+>
 > > ---
-> >  hw/arm/aspeed_ast2600.c | 2 +-
-> >  hw/arm/aspeed_soc.c     | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >  hw/arm/aspeed_ast2600.c | 3 +++
+> >  1 file changed, 3 insertions(+)
 > >
 > > diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-> > index 71a0acfe26..0a6a77dd54 100644
+> > index 0a6a77dd54..6ffa587a7f 100644
 > > --- a/hw/arm/aspeed_ast2600.c
 > > +++ b/hw/arm/aspeed_ast2600.c
-> > @@ -188,7 +188,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
-> >                                sizeof(s->wdt[i]), typename);
+> > @@ -287,6 +287,9 @@ static void aspeed_soc_ast2600_realize(DeviceState =
+*dev, Error **errp)
+> >              return;
+> >          }
 > >      }
+> > +    for (; i < sc->num_cpus; i++) {
+> > +        object_unparent(OBJECT(&s->cpu[i]));
+> > +    }
 > >
-> > -    for (i =3D 0; i < sc->macs_num; i++) {
-> > +    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
-> >          sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac10=
-0[i]),
-> >                                sizeof(s->ftgmac100[i]), TYPE_FTGMAC100)=
-;
-> >
-> > diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> > index cf6b6dd116..7ca860392a 100644
-> > --- a/hw/arm/aspeed_soc.c
-> > +++ b/hw/arm/aspeed_soc.c
-> > @@ -203,7 +203,7 @@ static void aspeed_soc_init(Object *obj)
-> >                                sizeof(s->wdt[i]), typename);
-> >      }
-> >
-> > -    for (i =3D 0; i < sc->macs_num; i++) {
-> > +    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
-> >          sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac10=
-0[i]),
-> >                                sizeof(s->ftgmac100[i]), TYPE_FTGMAC100)=
-;
-> >      }
+> >      /* A7MPCORE */
+> >      object_property_set_int(OBJECT(&s->a7mpcore), s->num_cpus, "num-cp=
+u",
 > >
 >
 
