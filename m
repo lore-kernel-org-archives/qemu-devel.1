@@ -2,83 +2,129 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04339C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:28:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 030C5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B54B12075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:28:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5BA22075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbEqJ6KY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B54B12075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JocsIxoZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BA22075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4A0-0006Cj-Uk
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:28:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
+	id 1jb4AW-00070P-Sr
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3fO-0001zm-70
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43708
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3f4-0003Ye-Nl
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589900166;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=SSAJkj7Upw4+GjA3bthSuswUhlL6hNXBycRT3DeJxuI=;
- b=DbEqJ6KYdmnrGwyub4oeBiWPD6kL1uvp+aUSXoXjLmr2XE9BI1RSlWFXBbxeuJEDqlmbzX
- ZsGfxkilhTohFfJOvwt4BCckpIrSVF4K3ovFFDpY2MbFdYfWkIE9wFo4J2e4eK/sdDMTek
- XKrzt6sy9/01rQ0/kJrazz5Qz1TuSUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-Qax84jMuOjexOnFKpLoWLQ-1; Tue, 19 May 2020 10:56:01 -0400
-X-MC-Unique: Qax84jMuOjexOnFKpLoWLQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00084805726;
- Tue, 19 May 2020 14:55:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 384AD79B6;
- Tue, 19 May 2020 14:55:53 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AE31911358BC; Tue, 19 May 2020 16:55:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 00/55] qdev: Rework how we plug into the parent bus
-Date: Tue, 19 May 2020 16:54:56 +0200
-Message-Id: <20200519145551.22836-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jb3oD-0004kT-O7; Tue, 19 May 2020 11:05:33 -0400
+Received: from mail-vi1eur05on2100.outbound.protection.outlook.com
+ ([40.107.21.100]:63687 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jb3oB-0005Gc-JQ; Tue, 19 May 2020 11:05:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IYQDz2NThfgGjMUexjyeGOQScEwsEuiDxm7yBNU/yybdkmiqfmbiIjNhFtiXszNhAxjDO6cgzQ0kEF6bvweIA+MoJ9M/N92fwP+53TuVT7di1IJuVy2xCEAEFif+G4tT2hyJU4O2w/fXckMZBLTk1r+saTJGN8QmUWgzG7+cqujfq5x5od4gUEnzyfxEJ9q7rQAbdN4VJjmHjaNzVbKRikqbr3saoDRuXxoH+wfeSbRjMKgOtoG7FvzdlhECTAZqalXzaP//XYEafDnRoBgYKd0JUQ51EoJ0lF5xGavytoKkvse2g+LbQBVpVPki8/cNC2XQAX+DtdniDrtDQuImDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v5VwAbCdll0w44+kVod7U29Tg9alkH8r50XNwh45bMI=;
+ b=hkebZ830Iw59Qz4xGo9QLEMiqgN5fZz8e7AUfVPr6jCRygd02oTF5XE9gQ8c6L1IjK6dO4UMmBVPWjVR6IIaSyybDzH4FpWhgwfwkNa0iv+9om2cDiV7iKwDi4yS6OUXmOHUcp6X0XE+1OY4SY5CcVr5aBxKu26DNNIX2WyS2ZcNeEl51elKwSKuh1IKZgGmm5V7zzqBxS1eh6KHI/JvW0anbPjtLYjhwBz8gXxcDC13UppTeKkOkQIEPfmiV9ZN131kcFfxtFVk+qhSe5SrGqAT8G4UH/kJp81OSXrwB639UUfnU3SIFqIvPXrJRiN/UJ53MZw814KaaHkfbuY0mg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v5VwAbCdll0w44+kVod7U29Tg9alkH8r50XNwh45bMI=;
+ b=JocsIxoZfg28K+stzfAbLm4VgbSkkzkSGJv6NdWAJZELeVmjg5G6jqG6YQIjsVx7w+aqovinzIUyeczk9zAmhLFnJTqX8/ZWKdaFl6PBrB0RNrmrrhplBXMpstN24Uv8SBoy6TEP0o/dCK3vLAfvbWyMFTkHHw3zFfcyqWeppto=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB4563.eurprd08.prod.outlook.com (2603:10a6:208:131::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.27; Tue, 19 May
+ 2020 15:05:28 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.3000.034; Tue, 19 May 2020
+ 15:05:28 +0000
+Subject: Re: [RFC PATCH 0/3] block: Synchronous bdrv_*() from coroutine in
+ different AioContext
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200512144318.181049-1-kwolf@redhat.com>
+ <6d78bc78-0c44-d703-6f9f-e048ea34fdd9@proxmox.com>
+ <20200514142606.GH5518@linux.fritz.box>
+ <285ba39f-9ee6-e089-13f7-a98ea0a84866@virtuozzo.com>
+ <548700ea-78db-fabc-d1eb-6d89af39ece3@virtuozzo.com>
+ <20200519141858.GN7652@linux.fritz.box>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <dfed81f7-9806-9aaf-459f-13f786b67e0a@virtuozzo.com>
+Date: Tue, 19 May 2020 18:05:23 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200519141858.GN7652@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0PR04CA0030.eurprd04.prod.outlook.com
+ (2603:10a6:208:122::43) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:19:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (178.34.161.50) by
+ AM0PR04CA0030.eurprd04.prod.outlook.com (2603:10a6:208:122::43) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25 via Frontend
+ Transport; Tue, 19 May 2020 15:05:25 +0000
+X-Originating-IP: [178.34.161.50]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bb54c8e0-e94c-4a34-90ae-08d7fc0610f1
+X-MS-TrafficTypeDiagnostic: AM0PR08MB4563:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB45636EAB2C3F202E573AE73CCFB90@AM0PR08MB4563.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 040866B734
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Rjx1mGyhsfkqFSKW+yDnZhUPyiey3TYoaFQCxCni1K7BwrLzWDQrqiWTubDGhNrC7wDX7/Vz2/4DB3jBgmAyy95Teu3ntBZrfwPbdsSYNQFyRDluL3oYnvtwL+zejZ9iAFsJ+oLjTbYWdGiMn5DxoDCJzeKSombaWivcop/cUTHs/h/4GXieFaAjxM3z3YyXvJNyG4zLEw8NdxKD3h205X7wFwtJJfF6MNEgpuPO7HdJgDCoPq8bsR4BKwldFSpd42FhJ6nYizd+z+9F11Wy7BKNxLd+vLAoM7xADeMzVYwGchxTA4znbuQf1bDrnm6cs0VSNNLjiAMBa8D8WUJAXH31lWQIwNLzW/gT7UGKGSCtlnfBKhKNAbxnvtbx/KqK/y6P/cEaTIvZyERqC9odiOomgSG63JXuqLNVj5zZti0KGTrMpj3ERTg0i05A4km17eds0m/Emwy8M4jagaiWTkItaW6bY9Rc47FcXrUQ+fpzdnsZG/9QZvZkD5gGL5jEbX9C/nQEZ+7j153b6G27uAkY8CwF4sb7paXAsz/nPlXbfH6w8/kIPcLAVIwVjmjeyYOZ1FSy3bhPySwUP1ykTg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(376002)(136003)(39840400004)(346002)(366004)(8936002)(66946007)(86362001)(66476007)(66556008)(956004)(54906003)(16576012)(2616005)(31696002)(186003)(16526019)(316002)(5660300002)(26005)(8676002)(4326008)(6916009)(31686004)(2906002)(966005)(52116002)(478600001)(6486002)(36756003)(53546011)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 94MipXOxTfd7rKziO0S+nEhD5A+HVpnrJ0femtvU8qtGTgsbJdwq6Py4SncZU3nBroyDZEJsNWfB5yi/BPepuYjeOGrnhHL/RxnYL7VI5e2g2xCjwVddXttmGbsAcefO8+OmmAcyuQkwx+YbOsS81BqqgWTP3SieSNo3ErIOk2S8j99B2B6cl/iWoTyLTfJeirFSlA5tLOPQTW0ZPM6XoizyIGpfG9BmcfuBSd/ucWjsH9ZQ52qustB6FnxSVyvM20bHo8qnNqiMGhws9vIm1KUs1EKMgCN182qP+1VCyzB5a1Pr27YwP1HDZXC4OFl+vPWTMi3QgyWlcYA5QT6BDr7nd2JA1xGqf+pvkawGvlcMxUGqEFSiirnAtOpcHBgQRS0HZIKxTZF0nwOJ+VN54DKpUxO+biMjM5Xlv9cfz6V6cwCsJS43DlG6v6y+s1tZwOi6/aRxnjjl3GtJvUktEeu1oBc/DwpF4MKMZdCYCuU=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb54c8e0-e94c-4a34-90ae-08d7fc0610f1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2020 15:05:28.1933 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IILGmM85Gq92kTGft9Jshjkg0CHCArU7w5Tfb6vQOCOErdJ1JAsI9eHNFx1A3cmme6N8O4QQGjo0h6gf5SlPYVPEOnWPQe6aZPFitOmsRoI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4563
+Received-SPF: pass client-ip=40.107.21.100;
+ envelope-from=dplotnikov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 11:05:29
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,415 +137,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, s.reiter@proxmox.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ Thomas Lamprecht <t.lamprecht@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo recently suggested "to move the bus argument (and thus
-qdev_set_parent_bus) to qdev_init"[1], and that it "would be quite
-large but hopefully scriptable"[2].  Nerd sniped!
-
-The series is big, but at least the bigger patches are all mechanical.
-
-It is based on my "[PATCH 00/24] Fixes around device realization".
-
-I'm abstaining from cc'ing maintainers on mechanical conversions.  I
-still cc: for patches I deem interesting, with related patches thrown
-in for context.  Let me know if you think I should cc: more widely.
-
-PATCH 01-02  	Preliminary cleanup
-PATCH 03     	New qdev infrastructure
-      	     	Commit message explains why the current state is
-      	     	problematic, and how my work improves it.
-PATCH 04-11  	Convert direct users of qdev
-PATCH 12-16  	Convert PCI
-PATCH 17-20  	Convert ISA
-PATCH 21-24  	Convert SSI
-PATCH 25-28  	Convert USB
-PATCH 29     	Garbage collection
-PATCH 30-32  	Convert aux-bus
-PATCH 33-40  	Clean up around child device initialization
-PATCH 41-49  	Convert sysbus
-PATCH 50     	Stop pretending recursive realization is about to become
-      	     	real
-PATCH 51-53  	Convert bus-less devices
-PATCH 54	Garbage collection
-PATCH 55	Maintain MAINTAINERS
-
-Enjoy!
 
 
-[1]
-Subject: Re: Infinite loop in bus_unparent(), qdev bug or qdev misuse?
-Date: Mon, 4 May 2020 16:58:54 +0200
-Message-ID: <6fc8633a-6d91-b83a-e6cd-5f714ccaf9ea@redhat.com>
+On 19.05.2020 17:18, Kevin Wolf wrote:
+> Am 19.05.2020 um 15:54 hat Denis Plotnikov geschrieben:
+>>
+>> On 19.05.2020 15:32, Vladimir Sementsov-Ogievskiy wrote:
+>>> 14.05.2020 17:26, Kevin Wolf wrote:
+>>>> Am 14.05.2020 um 15:21 hat Thomas Lamprecht geschrieben:
+>>>>> On 5/12/20 4:43 PM, Kevin Wolf wrote:
+>>>>>> Stefan (Reiter), after looking a bit closer at this, I think
+>>>>>> there is no
+>>>>>> bug in QEMU, but the bug is in your coroutine code that calls block
+>>>>>> layer functions without moving into the right AioContext first. I've
+>>>>>> written this series anyway as it potentially makes the life of callers
+>>>>>> easier and would probably make your buggy code correct.
+>>>>>> However, it doesn't feel right to commit something like
+>>>>>> patch 2 without
+>>>>>> having a user for it. Is there a reason why you can't upstream your
+>>>>>> async snapshot code?
+>>>>> I mean I understand what you mean, but it would make the
+>>>>> interface IMO so
+>>>>> much easier to use, if one wants to explicit schedule it
+>>>>> beforehand they
+>>>>> can still do. But that would open the way for two styles doing
+>>>>> things, not
+>>>>> sure if this would seen as bad. The assert about from patch 3/3
+>>>>> would be
+>>>>> already really helping a lot, though.
+>>>> I think patches 1 and 3 are good to be committed either way if people
+>>>> think they are useful. They make sense without the async snapshot code.
+>>>>
+>>>> My concern with the interface in patch 2 is both that it could give
+>>>> people a false sense of security and that it would be tempting to write
+>>>> inefficient code.
+>>>>
+>>>> Usually, you won't have just a single call into the block layer for a
+>>>> given block node, but you'll perform multiple operations. Switching to
+>>>> the target context once rather than switching back and forth in every
+>>>> operation is obviously more efficient.
+>>>>
+>>>> But chances are that even if one of these function is bdrv_flush(),
+>>>> which now works correctly from a different thread, you might need
+>>>> another function that doesn't implement the same magic. So you always
+>>>> need to be aware which functions support cross-context calls which
+>>>> ones don't.
+>>>>
+>>>> I feel we'd see a few bugs related to this.
+>>>>
+>>>>> Regarding upstreaming, there was some historical attempt to upstream it
+>>>>> from Dietmar, but in the time frame of ~ 8 to 10 years ago or so.
+>>>>> I'm not quite sure why it didn't went through then, I see if I can get
+>>>>> some time searching the mailing list archive.
+>>>>>
+>>>>> We'd be naturally open and glad to upstream it, what it effectively
+>>>>> allow us to do is to not block the VM to much during snapshoting it
+>>>>> live.
+>>>> Yes, there is no doubt that this is useful functionality. There has been
+>>>> talk about this every now and then, but I don't think we ever got to a
+>>>> point where it actually could be implemented.
+>>>>
+>>>> Vladimir, I seem to remember you (or someone else from your team?) were
+>>>> interested in async snapshots as well a while ago?
+>>> Den is working on this (add him to CC)
+>> Yes, I was working on that.
+>>
+>> What I've done can be found here:
+>> https://github.com/denis-plotnikov/qemu/commits/bgs_uffd
+>>
+>> The idea was to save a snapshot (state+ram) asynchronously to a separate
+>> (raw) file using the existing infrastructure.
+>> The goal of that was to reduce the VM downtime on snapshot.
+>>
+>> We decided to postpone this work until "userfaultfd write protected mode"
+>> wasn't in the linux mainstream.
+>> Now, userfaultfd-wp is merged to linux. So we have plans to continue this
+>> work.
+>>
+>> According to the saving the "internal" snapshot to qcow2 I still have a
+>> question. May be this is the right place and time to ask.
+>>
+>> If I remember correctly, in qcow2 the snapshot is stored at the end of
+>> the address space of the current block-placement-table.
+> Yes. Basically the way snapshots with VM state work is that you write
+> the VM state to some offset after the end of the virtual disk, when the
+> VM state is completely written you snapshot the current state (including
+> both content of the virtual disk and VM state) and finally discard the
+> VM state again in the active L1 table.
+>
+>> We switch to the new block-placement-table after the snapshot storing
+>> is complete. In case of sync snapshot, we should switch the table
+>> before the snapshot is written, another words, we should be able to
+>> preallocate the the space for the snapshot and keep a link to the
+>> space until snapshot writing is completed.
+> I don't see a fundamental difference between sync and async in this
+> respect. Why can't you write the VM state to the current L1 table first
+> like we usually do?
 
-[2]
-Subject: Re: Infinite loop in bus_unparent(), qdev bug or qdev misuse?
-Date: Tue, 5 May 2020 18:26:57 +0200
-Message-ID: <a4df3ba3-4759-56ac-68f8-f75eea93e27e@redhat.com>
+I'm not quite sure I understand the point.
+Let's see all the picture of async snapshot: our goal is to minimize a 
+VM downtime during the snapshot.
+When we do async snapshot we save vmstate except RAM when a VM is stopped
+using the current L1 table (further initial L1 table). Then, we want the 
+VM start running
+and write RAM content. At this time all RAM is write-protected.
+We unprotect each RAM page once it has been written.
+All those RAM pages should go to the snapshot using the initial L1 table.
+Since the VM is running, it may want to write new disk blocks,
+so we need to use a NEW L1 table to provide this ability. (Am I correct 
+so far?)
+Thus, if I understand correctly, we need to use two L1 tables: the 
+initial one to store RAM pages
+to the vmstate and the new one to allow disk writings.
 
-Based-on: <20200518050408.4579-1-armbru@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Alistair Francis <alistair@alistair23.me>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: David Gibson <david@gibson.dropbear.id.au>
+May be I can't see a better way to achieve that. Please, correct me if 
+I'm wrong.
 
-Markus Armbruster (55):
-  qdev: Rename qbus_realize() to qbus_init()
-  qdev: Drop redundant bus realization
-  qdev: New qdev_new(), qdev_realize(), etc.
-  qdev: Put qdev_new() to use with Coccinelle
-  qdev: Convert to qbus_realize(), qbus_unrealize()
-  qdev: Convert to qdev_unrealize() with Coccinelle
-  qdev: Convert to qdev_unrealize() manually
-  qdev: Convert uses of qdev_create() with Coccinelle
-  qdev: Convert uses of qdev_create() manually
-  qdev: Convert uses of qdev_set_parent_bus() with Coccinelle
-  qdev: Convert uses of qdev_set_parent_bus() manually
-  pci: New pci_new(), pci_realize_and_unref() etc.
-  hw/ppc: Eliminate two superfluous QOM casts
-  pci: Convert uses of pci_create() etc. with Coccinelle
-  pci: Convert uses of pci_create() etc. manually
-  pci: pci_create(), pci_create_multifunction() are now unused, drop
-  isa: New isa_new(), isa_realize_and_unref() etc.
-  isa: Convert uses of isa_create() with Coccinelle
-  isa: Convert uses of isa_create(), isa_try_create() manually
-  isa: isa_create(), isa_try_create() are now unused, drop
-  ssi: ssi_auto_connect_slaves() never does anything, drop
-  ssi: Convert uses of ssi_create_slave_no_init() with Coccinelle
-  ssi: Convert last use of ssi_create_slave_no_init() manually
-  ssi: ssi_create_slave_no_init() is now unused, drop
-  usb: New usb_new(), usb_realize_and_unref()
-  usb: Convert uses of usb_create()
-  usb: usb_create() is now unused, drop
-  usb: Eliminate usb_try_create_simple()
-  qdev: qdev_create(), qdev_try_create() are now unused, drop
-  auxbus: New aux_realize_bus(), pairing with aux_init_bus()
-  auxbus: Convert a use of qdev_set_parent_bus()
-  auxbus: Eliminate aux_create_slave()
-  qom: Tidy up a few object_initialize_child() calls
-  qom: Less verbose object_initialize_child()
-  macio: Convert use of qdev_set_parent_bus()
-  macio: Eliminate macio_init_child_obj()
-  sysbus: Drop useless OBJECT() in sysbus_init_child_obj() calls
-  microbit: Tidy up sysbus_init_child_obj() @child argument
-  sysbus: Tidy up sysbus_init_child_obj()'s @childsize arg, part 1
-  hw/arm/armsse: Pass correct child size to sysbus_init_child_obj()
-  sysbus: Tidy up sysbus_init_child_obj()'s @childsize arg, part 2
-  sysbus: New sysbus_realize(), sysbus_realize_and_unref()
-  sysbus: Convert to sysbus_realize() etc. with Coccinelle
-  qdev: Drop qdev_realize() support for null bus
-  sysbus: Convert qdev_set_parent_bus() use with Coccinelle, part 1
-  sysbus: Convert qdev_set_parent_bus() use with Coccinelle, part 2
-  sysbus: Convert qdev_set_parent_bus() use with Coccinelle, part 3
-  sysbus: Convert qdev_set_parent_bus() use with Coccinelle, part 4
-  sysbus: sysbus_init_child_obj() is now unused, drop
-  s390x/event-facility: Simplify creation of SCLP event devices
-  qdev: Make qdev_realize() support bus-less devices
-  qdev: Use qdev_realize() in qdev_device_add()
-  qdev: Convert bus-less devices to qdev_realize() with Coccinelle
-  qdev: qdev_init_nofail() is now unused, drop
-  MAINTAINERS: Make section QOM cover hw/core/*bus.c as well
+Denis
+>
+> We always have only one active L1 table at a time, which simplifies
+> cluster allocation a bit, so it would be preferable to keep it this way.
+>
+> Kevin
+>
 
- hw/lm32/lm32.h                           |  13 +-
- hw/lm32/milkymist-hw.h                   |  37 ++---
- include/hw/audio/pcspk.h                 |   5 +-
- include/hw/char/cadence_uart.h           |   5 +-
- include/hw/char/cmsdk-apb-uart.h         |   4 +-
- include/hw/char/pl011.h                  |   9 +-
- include/hw/char/xilinx_uartlite.h        |   4 +-
- include/hw/cris/etraxfs.h                |   4 +-
- include/hw/isa/isa.h                     |   5 +-
- include/hw/misc/auxbus.h                 |  14 +-
- include/hw/misc/unimp.h                  |   5 +-
- include/hw/net/ne2000-isa.h              |   5 +-
- include/hw/pci/pci.h                     |   6 +-
- include/hw/qdev-core.h                   |  13 +-
- include/hw/ssi/ssi.h                     |   5 -
- include/hw/sysbus.h                      |  19 +--
- include/hw/timer/cmsdk-apb-timer.h       |   4 +-
- include/hw/timer/i8254.h                 |   9 +-
- include/hw/usb.h                         |   6 +-
- include/qom/object.h                     |  30 +++-
- hw/acpi/pcihp.c                          |   2 +-
- hw/acpi/piix4.c                          |   6 +-
- hw/alpha/typhoon.c                       |   4 +-
- hw/arm/allwinner-a10.c                   |  50 +++----
- hw/arm/allwinner-h3.c                    |  57 +++-----
- hw/arm/armsse.c                          | 174 +++++++++--------------
- hw/arm/armv7m.c                          |  12 +-
- hw/arm/aspeed.c                          |  18 ++-
- hw/arm/aspeed_ast2600.c                  | 110 ++++++--------
- hw/arm/aspeed_soc.c                      |  84 +++++------
- hw/arm/bcm2835_peripherals.c             |  71 ++++-----
- hw/arm/bcm2836.c                         |  17 +--
- hw/arm/cubieboard.c                      |   6 +-
- hw/arm/digic.c                           |  16 +--
- hw/arm/digic_boards.c                    |   2 +-
- hw/arm/exynos4210.c                      |  48 +++----
- hw/arm/exynos4_boards.c                  |  11 +-
- hw/arm/fsl-imx25.c                       |  60 ++++----
- hw/arm/fsl-imx31.c                       |  39 +++--
- hw/arm/fsl-imx6.c                        |  76 ++++------
- hw/arm/fsl-imx6ul.c                      | 105 +++++---------
- hw/arm/fsl-imx7.c                        | 100 +++++--------
- hw/arm/highbank.c                        |  28 ++--
- hw/arm/imx25_pdk.c                       |  10 +-
- hw/arm/integratorcp.c                    |   6 +-
- hw/arm/kzm.c                             |   5 +-
- hw/arm/mcimx6ul-evk.c                    |   7 +-
- hw/arm/mcimx7d-sabre.c                   |   7 +-
- hw/arm/microbit.c                        |  12 +-
- hw/arm/mps2-tz.c                         |  79 +++++-----
- hw/arm/mps2.c                            |  26 ++--
- hw/arm/msf2-soc.c                        |  25 ++--
- hw/arm/msf2-som.c                        |  12 +-
- hw/arm/musca.c                           |  60 ++++----
- hw/arm/musicpal.c                        |   8 +-
- hw/arm/netduino2.c                       |   4 +-
- hw/arm/netduinoplus2.c                   |   4 +-
- hw/arm/nrf51_soc.c                       |  30 ++--
- hw/arm/nseries.c                         |   8 +-
- hw/arm/omap1.c                           |  16 +--
- hw/arm/omap2.c                           |  16 +--
- hw/arm/orangepi.c                        |   6 +-
- hw/arm/pxa2xx.c                          |   8 +-
- hw/arm/pxa2xx_gpio.c                     |   5 +-
- hw/arm/pxa2xx_pic.c                      |   5 +-
- hw/arm/raspi.c                           |  10 +-
- hw/arm/realview.c                        |  22 +--
- hw/arm/sabrelite.c                       |   6 +-
- hw/arm/sbsa-ref.c                        |  26 ++--
- hw/arm/spitz.c                           |   4 +-
- hw/arm/stellaris.c                       |  12 +-
- hw/arm/stm32f205_soc.c                   |  34 ++---
- hw/arm/stm32f405_soc.c                   |  45 +++---
- hw/arm/strongarm.c                       |   9 +-
- hw/arm/versatilepb.c                     |  18 +--
- hw/arm/vexpress.c                        |  18 +--
- hw/arm/virt.c                            |  38 ++---
- hw/arm/xilinx_zynq.c                     |  44 +++---
- hw/arm/xlnx-versal-virt.c                |  15 +-
- hw/arm/xlnx-versal.c                     |  53 +++----
- hw/arm/xlnx-zcu102.c                     |  26 ++--
- hw/arm/xlnx-zynqmp.c                     |  92 +++++-------
- hw/audio/intel-hda.c                     |   4 +-
- hw/block/fdc.c                           |  16 +--
- hw/block/nand.c                          |   4 +-
- hw/block/pflash_cfi01.c                  |   4 +-
- hw/block/pflash_cfi02.c                  |   4 +-
- hw/block/xen-block.c                     |   4 +-
- hw/char/exynos4210_uart.c                |   5 +-
- hw/char/mcf_uart.c                       |   5 +-
- hw/char/parallel-isa.c                   |   5 +-
- hw/char/serial-isa.c                     |   9 +-
- hw/char/serial-pci-multi.c               |   8 +-
- hw/char/serial-pci.c                     |   7 +-
- hw/char/serial.c                         |  14 +-
- hw/char/spapr_vty.c                      |   4 +-
- hw/core/bus.c                            |  23 ++-
- hw/core/cpu.c                            |   2 +-
- hw/core/empty_slot.c                     |   5 +-
- hw/core/qdev.c                           | 132 +++++++++--------
- hw/core/sysbus.c                         |  27 ++--
- hw/cpu/a15mpcore.c                       |   5 +-
- hw/cpu/a9mpcore.c                        |  23 ++-
- hw/cpu/arm11mpcore.c                     |  18 ++-
- hw/cpu/realview_mpcore.c                 |  10 +-
- hw/cris/axis_dev88.c                     |   4 +-
- hw/display/ati.c                         |   4 +-
- hw/display/milkymist-tmu2.c              |   4 +-
- hw/display/sm501.c                       |  12 +-
- hw/display/virtio-gpu-pci.c              |   3 +-
- hw/display/virtio-vga.c                  |   3 +-
- hw/display/xlnx_dp.c                     |  11 +-
- hw/dma/i8257.c                           |   9 +-
- hw/dma/pxa2xx_dma.c                      |   8 +-
- hw/dma/rc4030.c                          |   5 +-
- hw/dma/sparc32_dma.c                     |  16 +--
- hw/dma/xilinx_axidma.c                   |   9 +-
- hw/hppa/dino.c                           |   4 +-
- hw/hppa/lasi.c                           |   4 +-
- hw/hppa/machine.c                        |   4 +-
- hw/hyperv/hyperv.c                       |   2 +-
- hw/i2c/core.c                            |   5 +-
- hw/i2c/smbus_eeprom.c                    |   4 +-
- hw/i386/amd_iommu.c                      |   3 +-
- hw/i386/pc.c                             |  12 +-
- hw/i386/pc_q35.c                         |  14 +-
- hw/i386/pc_sysfw.c                       |   4 +-
- hw/i386/x86.c                            |   8 +-
- hw/ide/isa.c                             |   5 +-
- hw/ide/microdrive.c                      |   3 +-
- hw/ide/qdev.c                            |   4 +-
- hw/intc/armv7m_nvic.c                    |  15 +-
- hw/intc/exynos4210_gic.c                 |   5 +-
- hw/intc/i8259_common.c                   |   5 +-
- hw/intc/pnv_xive.c                       |  10 +-
- hw/intc/realview_gic.c                   |   4 +-
- hw/intc/s390_flic.c                      |   6 +-
- hw/intc/spapr_xive.c                     |  10 +-
- hw/intc/xics.c                           |   2 +-
- hw/intc/xive.c                           |   2 +-
- hw/isa/isa-bus.c                         |  27 ++--
- hw/isa/isa-superio.c                     |  20 +--
- hw/isa/piix4.c                           |   3 +-
- hw/isa/vt82c686.c                        |  13 +-
- hw/m68k/mcf5208.c                        |   4 +-
- hw/m68k/mcf_intc.c                       |   5 +-
- hw/m68k/next-cube.c                      |  12 +-
- hw/m68k/q800.c                           |  36 ++---
- hw/microblaze/petalogix_ml605_mmu.c      |  26 ++--
- hw/microblaze/petalogix_s3adsp1800_mmu.c |  14 +-
- hw/microblaze/xlnx-zynqmp-pmu.c          |  21 ++-
- hw/mips/boston.c                         |  13 +-
- hw/mips/cps.c                            |  20 ++-
- hw/mips/gt64xxx_pci.c                    |   5 +-
- hw/mips/mips_fulong2e.c                  |   6 +-
- hw/mips/mips_jazz.c                      |  16 +--
- hw/mips/mips_malta.c                     |   9 +-
- hw/mips/mips_mipssim.c                   |   8 +-
- hw/misc/auxbus.c                         |  16 +--
- hw/misc/mac_via.c                        |  12 +-
- hw/misc/macio/cuda.c                     |   7 +-
- hw/misc/macio/macio.c                    |  56 +++-----
- hw/misc/macio/pmu.c                      |   7 +-
- hw/net/etraxfs_eth.c                     |   4 +-
- hw/net/fsl_etsec/etsec.c                 |   5 +-
- hw/net/lan9118.c                         |   5 +-
- hw/net/lasi_i82596.c                     |   5 +-
- hw/net/smc91c111.c                       |   5 +-
- hw/net/spapr_llan.c                      |   4 +-
- hw/net/xilinx_axienet.c                  |   9 +-
- hw/nios2/10m50_devboard.c                |  12 +-
- hw/nvram/fw_cfg.c                        |   8 +-
- hw/openrisc/openrisc_sim.c               |   8 +-
- hw/pci-bridge/dec.c                      |   6 +-
- hw/pci-bridge/pci_expander_bridge.c      |   8 +-
- hw/pci-host/bonito.c                     |   9 +-
- hw/pci-host/designware.c                 |   6 +-
- hw/pci-host/gpex.c                       |   6 +-
- hw/pci-host/i440fx.c                     |   4 +-
- hw/pci-host/pnv_phb3.c                   |  21 ++-
- hw/pci-host/pnv_phb4.c                   |  11 +-
- hw/pci-host/pnv_phb4_pec.c               |   8 +-
- hw/pci-host/prep.c                       |   7 +-
- hw/pci-host/q35.c                        |   6 +-
- hw/pci-host/sabre.c                      |  13 +-
- hw/pci-host/versatile.c                  |   4 +-
- hw/pci-host/xilinx-pcie.c                |   6 +-
- hw/pci/pci.c                             |  31 ++--
- hw/pci/pcie.c                            |   2 +-
- hw/pci/shpc.c                            |   2 +-
- hw/pcmcia/pxa2xx.c                       |   5 +-
- hw/ppc/e500.c                            |  32 ++---
- hw/ppc/mac_newworld.c                    |  46 +++---
- hw/ppc/mac_oldworld.c                    |  26 ++--
- hw/ppc/pnv.c                             | 103 ++++++--------
- hw/ppc/pnv_bmc.c                         |   2 +-
- hw/ppc/pnv_core.c                        |   2 +-
- hw/ppc/pnv_psi.c                         |  10 +-
- hw/ppc/ppc440_uc.c                       |   8 +-
- hw/ppc/prep.c                            |  35 +++--
- hw/ppc/sam460ex.c                        |   4 +-
- hw/ppc/spapr.c                           |  27 ++--
- hw/ppc/spapr_cpu_core.c                  |   2 +-
- hw/ppc/spapr_drc.c                       |   2 +-
- hw/ppc/spapr_iommu.c                     |   2 +-
- hw/ppc/spapr_irq.c                       |   6 +-
- hw/ppc/spapr_pci.c                       |   3 +-
- hw/ppc/spapr_vio.c                       |   4 +-
- hw/ppc/virtex_ml507.c                    |   9 +-
- hw/riscv/riscv_hart.c                    |   7 +-
- hw/riscv/sifive_clint.c                  |   5 +-
- hw/riscv/sifive_e.c                      |  20 +--
- hw/riscv/sifive_e_prci.c                 |   5 +-
- hw/riscv/sifive_plic.c                   |   5 +-
- hw/riscv/sifive_test.c                   |   5 +-
- hw/riscv/sifive_u.c                      |  52 +++----
- hw/riscv/spike.c                         |  21 ++-
- hw/riscv/virt.c                          |  15 +-
- hw/rtc/m48t59-isa.c                      |   7 +-
- hw/rtc/m48t59.c                          |   5 +-
- hw/rtc/mc146818rtc.c                     |   4 +-
- hw/rtc/sun4v-rtc.c                       |   5 +-
- hw/s390x/ap-bridge.c                     |   4 +-
- hw/s390x/css-bridge.c                    |   6 +-
- hw/s390x/event-facility.c                |  59 ++++----
- hw/s390x/s390-pci-bus.c                  |   8 +-
- hw/s390x/s390-skeys.c                    |   2 +-
- hw/s390x/s390-stattrib.c                 |   2 +-
- hw/s390x/s390-virtio-ccw.c               |  16 +--
- hw/s390x/sclp.c                          |  12 +-
- hw/s390x/tod.c                           |   2 +-
- hw/s390x/vhost-vsock-ccw.c               |   3 +-
- hw/s390x/virtio-ccw-9p.c                 |   3 +-
- hw/s390x/virtio-ccw-balloon.c            |   3 +-
- hw/s390x/virtio-ccw-blk.c                |   3 +-
- hw/s390x/virtio-ccw-crypto.c             |   3 +-
- hw/s390x/virtio-ccw-gpu.c                |   3 +-
- hw/s390x/virtio-ccw-input.c              |   3 +-
- hw/s390x/virtio-ccw-net.c                |   3 +-
- hw/s390x/virtio-ccw-rng.c                |   3 +-
- hw/s390x/virtio-ccw-scsi.c               |   6 +-
- hw/s390x/virtio-ccw-serial.c             |   3 +-
- hw/scsi/scsi-bus.c                       |   4 +-
- hw/scsi/spapr_vscsi.c                    |   4 +-
- hw/sd/aspeed_sdhci.c                     |   2 +-
- hw/sd/milkymist-memcard.c                |   4 +-
- hw/sd/pxa2xx_mmci.c                      |   8 +-
- hw/sd/ssi-sd.c                           |   4 +-
- hw/sh4/r2d.c                             |  12 +-
- hw/sparc/leon3.c                         |  20 +--
- hw/sparc/sun4m.c                         |  64 ++++-----
- hw/sparc64/sun4u.c                       |  50 ++++---
- hw/ssi/aspeed_smc.c                      |   1 -
- hw/ssi/imx_spi.c                         |   2 -
- hw/ssi/mss-spi.c                         |   1 -
- hw/ssi/ssi.c                             |  43 +-----
- hw/ssi/xilinx_spi.c                      |   1 -
- hw/ssi/xilinx_spips.c                    |   4 -
- hw/usb/bus.c                             |  52 +++----
- hw/usb/dev-serial.c                      |   4 +-
- hw/virtio/vhost-scsi-pci.c               |   3 +-
- hw/virtio/vhost-user-blk-pci.c           |   3 +-
- hw/virtio/vhost-user-fs-pci.c            |   3 +-
- hw/virtio/vhost-user-scsi-pci.c          |   3 +-
- hw/virtio/vhost-vsock-pci.c              |   3 +-
- hw/virtio/virtio-9p-pci.c                |   3 +-
- hw/virtio/virtio-balloon-pci.c           |   3 +-
- hw/virtio/virtio-blk-pci.c               |   3 +-
- hw/virtio/virtio-crypto-pci.c            |   3 +-
- hw/virtio/virtio-input-pci.c             |   3 +-
- hw/virtio/virtio-iommu-pci.c             |   3 +-
- hw/virtio/virtio-net-pci.c               |   3 +-
- hw/virtio/virtio-pmem-pci.c              |   3 +-
- hw/virtio/virtio-rng-pci.c               |   3 +-
- hw/virtio/virtio-scsi-pci.c              |   3 +-
- hw/virtio/virtio-serial-pci.c            |   3 +-
- hw/virtio/virtio.c                       |   5 +-
- hw/xen/xen-bus.c                         |   4 +-
- hw/xen/xen-legacy-backend.c              |   7 +-
- hw/xtensa/virt.c                         |   4 +-
- hw/xtensa/xtfpga.c                       |   8 +-
- migration/migration.c                    |   2 +-
- qdev-monitor.c                           |   8 +-
- qom/object.c                             |  19 ++-
- target/i386/cpu.c                        |   3 +-
- tests/test-qdev-global-props.c           |   8 +-
- MAINTAINERS                              |   2 +
- 287 files changed, 1942 insertions(+), 2348 deletions(-)
-
--- 
-2.21.1
 
 
