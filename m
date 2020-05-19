@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BC6C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:00:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA45207D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF476207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 15:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xwfd+cYp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA45207D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EpX2zC9k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF476207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb3hg-00079F-7N
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:58:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44930)
+	id 1jb3iq-0001F2-Us
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 11:00:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ez-00015B-3S
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32037
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ex-00011t-BB
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:55:59 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30690
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ew-0003Te-GW
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:00 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ew-0003Tc-FC
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:55:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1589900157;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nWUfenJYbydtW/rEPXb/0PKAQtkytf6V+ltrDXthMxI=;
- b=Xwfd+cYpTNjZ7w8NkU70IwdH/GaMpyfeCJiZcPwXYjrQwsyj5+nrT4cS3LtT+QVBjPu6yC
- flxBBdpQJqN3SBm3Lk7vP5fgcY8NX7VpHrCIqd55Z7ymerlyQEdVe2/VjWHiPy37W0jVnl
- Tw8zlWUe9p3CxaQhk2ZCfa1KjxZu+kc=
+ bh=EPdfzh9iPmGPapCS63eEK/WjS/+7d1SZUvn8eYLfk9k=;
+ b=EpX2zC9k+k3izeqa4x3dTP0IpJneHRlPShpojkGAzW8NN/2omUeEy0ZRoZlhCNOR+Z7tte
+ E3OsN1Lj67xawwWz+A9BrX4USAkzKDikgmX9KMj7h3nN4pLzMCW62mFQkEV2urPAqWczRw
+ vL+NrPn6HvwJskdSYMssyN2iIACqgq8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-EPl47gapPfu8AtSQ_aqTVA-1; Tue, 19 May 2020 10:55:55 -0400
-X-MC-Unique: EPl47gapPfu8AtSQ_aqTVA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-207-NwrjrGxvOAeY4T0ICcteBg-1; Tue, 19 May 2020 10:55:55 -0400
+X-MC-Unique: NwrjrGxvOAeY4T0ICcteBg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 051DD107ACF3
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D234F1800D42
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:54 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A19775C1D0;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A1EF56E71C;
  Tue, 19 May 2020 14:55:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C42E011358C2; Tue, 19 May 2020 16:55:51 +0200 (CEST)
+ id BFF6C11358C1; Tue, 19 May 2020 16:55:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/55] qdev: Convert to qdev_unrealize() with Coccinelle
-Date: Tue, 19 May 2020 16:55:02 +0200
-Message-Id: <20200519145551.22836-7-armbru@redhat.com>
+Subject: [PATCH 05/55] qdev: Convert to qbus_realize(), qbus_unrealize()
+Date: Tue, 19 May 2020 16:55:01 +0200
+Message-Id: <20200519145551.22836-6-armbru@redhat.com>
 In-Reply-To: <20200519145551.22836-1-armbru@redhat.com>
 References: <20200519145551.22836-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,230 +100,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For readability, and consistency with qbus_realize().
-
-Coccinelle script:
-
-    @ depends on !(file in "hw/core/qdev.c")@
-    typedef DeviceState;
-    DeviceState *dev;
-    symbol false, error_abort;
-    @@
-    -    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-    +    qdev_unrealize(dev);
-
-    @ depends on !(file in "hw/core/qdev.c")@
-    expression dev;
-    symbol false, error_abort;
-    @@
-    -    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-    +    qdev_unrealize(DEVICE(dev));
+I'm going to convert device realization to qdev_realize() with the
+help of Coccinelle.  Convert bus realization to qbus_realize() first,
+to get it out of Coccinelle's way.  Readability improves.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/acpi/pcihp.c            | 2 +-
- hw/char/serial-pci-multi.c | 2 +-
- hw/char/serial-pci.c       | 2 +-
- hw/core/bus.c              | 3 +--
- hw/i386/pc.c               | 4 ++--
- hw/pci/pcie.c              | 2 +-
- hw/pci/shpc.c              | 2 +-
- hw/ppc/spapr.c             | 8 ++++----
- hw/ppc/spapr_pci.c         | 3 +--
- hw/s390x/css-bridge.c      | 2 +-
- hw/s390x/s390-pci-bus.c    | 4 ++--
- 11 files changed, 16 insertions(+), 18 deletions(-)
+ hw/core/qdev.c | 10 +++-------
+ hw/pci/pci.c   |  2 +-
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index d42906ea19..33ea2b76ae 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -266,7 +266,7 @@ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
- {
-     trace_acpi_pci_unplug(PCI_SLOT(PCI_DEVICE(dev)->devfn),
-                           acpi_pcihp_get_bsel(pci_get_bus(PCI_DEVICE(dev))));
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- }
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 82deeb7841..0f4adac865 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -1028,9 +1028,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+         resettable_state_clear(&dev->reset);
  
- void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-diff --git a/hw/char/serial-pci-multi.c b/hw/char/serial-pci-multi.c
-index 5f9ccfcc93..23d0ebe2cd 100644
---- a/hw/char/serial-pci-multi.c
-+++ b/hw/char/serial-pci-multi.c
-@@ -56,7 +56,7 @@ static void multi_serial_pci_exit(PCIDevice *dev)
- 
-     for (i = 0; i < pci->ports; i++) {
-         s = pci->state + i;
--        object_property_set_bool(OBJECT(s), false, "realized", &error_abort);
-+        qdev_unrealize(DEVICE(s));
-         memory_region_del_subregion(&pci->iobar, &s->io);
-         g_free(pci->name[i]);
-     }
-diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
-index 37818db156..65eacfae0e 100644
---- a/hw/char/serial-pci.c
-+++ b/hw/char/serial-pci.c
-@@ -68,7 +68,7 @@ static void serial_pci_exit(PCIDevice *dev)
-     PCISerialState *pci = DO_UPCAST(PCISerialState, dev, dev);
-     SerialState *s = &pci->state;
- 
--    object_property_set_bool(OBJECT(s), false, "realized", &error_abort);
-+    qdev_unrealize(DEVICE(s));
-     qemu_free_irq(s->irq);
- }
- 
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index bf622604a3..cda5597556 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -205,8 +205,7 @@ static void bus_set_realized(Object *obj, bool value, Error **errp)
-     } else if (!value && bus->realized) {
-         QTAILQ_FOREACH(kid, &bus->children, sibling) {
-             DeviceState *dev = kid->child;
--            object_property_set_bool(OBJECT(dev), false, "realized",
--                                     &error_abort);
-+            qdev_unrealize(dev);
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-            object_property_set_bool(OBJECT(bus), true, "realized",
+-                                         &local_err);
+-            if (local_err != NULL) {
++            if (!qbus_realize(bus, errp)) {
+                 goto child_realize_fail;
+             }
          }
-         if (bc->unrealize) {
-             bc->unrealize(bus);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..f9d51479b1 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1385,7 +1385,7 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+@@ -1055,8 +1053,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ 
+     } else if (!value && dev->realized) {
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-            object_property_set_bool(OBJECT(bus), false, "realized",
+-                                     &error_abort);
++            qbus_unrealize(bus);
+         }
+         if (qdev_get_vmsd(dev)) {
+             vmstate_unregister(VMSTATE_IF(dev), qdev_get_vmsd(dev), dev);
+@@ -1074,8 +1071,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ 
+ child_realize_fail:
+     QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-        object_property_set_bool(OBJECT(bus), false, "realized",
+-                                 &error_abort);
++        qbus_unrealize(bus);
      }
  
-     pc_dimm_unplug(PC_DIMM(dev), MACHINE(pcms));
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
-  out:
-     error_propagate(errp, local_err);
- }
-@@ -1493,7 +1493,7 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
- 
-     found_cpu = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, NULL);
-     found_cpu->cpu = NULL;
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- 
-     /* decrement the number of CPUs */
-     x86ms->boot_cpus--;
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index f50e10b8fb..582f81fdff 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -457,7 +457,7 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
- void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                              Error **errp)
+     if (qdev_get_vmsd(dev)) {
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 70c66965f5..6947c741c3 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -456,7 +456,7 @@ void pci_root_bus_cleanup(PCIBus *bus)
  {
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
+     pci_bus_uninit(bus);
+     /* the caller of the unplug hotplug handler will delete this device */
+-    object_property_set_bool(OBJECT(bus), false, "realized", &error_abort);
++    qbus_unrealize(BUS(bus));
  }
  
- static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-index b76d3d2c9a..99d65d5c4c 100644
---- a/hw/pci/shpc.c
-+++ b/hw/pci/shpc.c
-@@ -547,7 +547,7 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
- void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                            Error **errp)
- {
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- }
- 
- void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9b358fcc60..a89748f3ac 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3670,7 +3670,7 @@ static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
-     SpaprDimmState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
- 
-     pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
-     spapr_pending_dimm_unplugs_remove(spapr, ds);
- }
- 
-@@ -3763,7 +3763,7 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
- 
-     assert(core_slot);
-     core_slot->cpu = NULL;
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- }
- 
- static
-@@ -4036,7 +4036,7 @@ void spapr_phb_release(DeviceState *dev)
- 
- static void spapr_phb_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
- {
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- }
- 
- static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
-@@ -4072,7 +4072,7 @@ static void spapr_tpm_proxy_unplug(HotplugHandler *hotplug_dev, DeviceState *dev
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
- 
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
-     object_unparent(OBJECT(dev));
-     spapr->tpm_proxy = NULL;
- }
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 83f1453096..329002ac04 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1587,8 +1587,7 @@ static void spapr_pci_unplug(HotplugHandler *plug_handler,
-         return;
-     }
- 
--    object_property_set_bool(OBJECT(plugged_dev), false, "realized",
--                             &error_abort);
-+    qdev_unrealize(plugged_dev);
- }
- 
- static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
-diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-index 3f6aec6b6a..813bfc768a 100644
---- a/hw/s390x/css-bridge.c
-+++ b/hw/s390x/css-bridge.c
-@@ -54,7 +54,7 @@ static void ccw_device_unplug(HotplugHandler *hotplug_dev,
- 
-     css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid, 1, 0);
- 
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
- }
- 
- static void virtual_css_bus_reset(BusState *qbus)
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index c4a4259f0c..7a4bfb7383 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -1003,7 +1003,7 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                      pbdev->fh, pbdev->fid);
-         bus = pci_get_bus(pci_dev);
-         devfn = pci_dev->devfn;
--        object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+        qdev_unrealize(dev);
- 
-         s390_pci_msix_free(pbdev);
-         s390_pci_iommu_free(s, bus, devfn);
-@@ -1014,7 +1014,7 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         pbdev->fid = 0;
-         QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
-         g_hash_table_remove(s->zpci_table, &pbdev->idx);
--        object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+        qdev_unrealize(dev);
-     }
- }
- 
+ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
 -- 
 2.21.1
 
