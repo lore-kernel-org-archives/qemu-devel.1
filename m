@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB9AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E406C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:06:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62E92206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:05:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E92206C3
+	by mail.kernel.org (Postfix) with ESMTPS id 67DC2206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:06:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67DC2206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb1wP-0004ER-Hf
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 09:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56884)
+	id 1jb1wv-0005BH-LY
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 09:06:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1vh-0003e5-Ff
- for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:09 -0400
-Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:34955)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1wB-00047W-69
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:39 -0400
+Received: from 8.mo7.mail-out.ovh.net ([46.105.77.114]:39218)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1vf-0003RO-Te
- for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:09 -0400
-Received: from player735.ha.ovh.net (unknown [10.108.57.50])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 866A420F892
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 15:05:01 +0200 (CEST)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jb1wA-0003Xx-5m
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 09:05:38 -0400
+Received: from player770.ha.ovh.net (unknown [10.108.54.52])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id CAE4716520E
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 15:05:35 +0200 (CEST)
 Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
  (Authenticated sender: clg@kaod.org)
- by player735.ha.ovh.net (Postfix) with ESMTPSA id 206E6124A3381;
- Tue, 19 May 2020 13:04:54 +0000 (UTC)
+ by player770.ha.ovh.net (Postfix) with ESMTPSA id ADED11299E16D;
+ Tue, 19 May 2020 13:05:28 +0000 (UTC)
 Authentication-Results: garm.ovh; auth=pass
- (GARM-96R001ee25d7a3-0f63-4c99-b5e2-df2b1ee809d4,3DCE2E61E2D7C1BA27EF92566E0C35A5904F621F)
+ (GARM-95G001b0574fb4-ff16-412f-b191-6c4689859cfc,3DCE2E61E2D7C1BA27EF92566E0C35A5904F621F)
  smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 17/24] pnv/psi: Correct the pnv-psi* devices not to be
- sysbus devices
+Subject: Re: [PATCH 16/24] ppc/pnv: Put "*-pnv-chip" and "pnv-xive" on the
+ main system bus
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-18-armbru@redhat.com>
+ <20200518050408.4579-17-armbru@redhat.com>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <84602e75-5a01-cbd5-b9e1-50a1b58f8849@kaod.org>
-Date: Tue, 19 May 2020 15:04:53 +0200
+Message-ID: <9569bf4c-9cfa-219e-cfaf-74eeae3a0504@kaod.org>
+Date: Tue, 19 May 2020 15:05:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200518050408.4579-18-armbru@redhat.com>
+In-Reply-To: <20200518050408.4579-17-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 15671682280782793555
+X-Ovh-Tracer-Id: 15681252429346016083
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgheelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=87.98.157.236; envelope-from=clg@kaod.org;
- helo=10.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:05:02
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgiedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.77.114; envelope-from=clg@kaod.org;
+ helo=8.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:05:36
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,12 +87,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/18/20 7:04 AM, Markus Armbruster wrote:
-> pnv_chip_power8_instance_init() creates a "pnv-psi-POWER8" sysbus
-> device in a way that leaves it unplugged.
-> pnv_chip_power9_instance_init() and pnv_chip_power10_instance_init()
-> do the same for "pnv-psi-POWER9" and "pnv-psi-POWER10", respectively.
+> pnv_init() creates "power10_v1.0-pnv-chip", "power8_v2.0-pnv-chip",
+> "power8e_v2.1-pnv-chip", "power8nvl_v1.0-pnv-chip", or
+> "power9_v2.0-pnv-chip" sysbus devices in a way that leaves them
+> unplugged.
 > 
-> These devices aren't actually sysbus devices.  Correct that.
+> pnv_chip_power9_instance_init() creates a "pnv-xive" sysbus device in
+> a way that leaves it unplugged.
+> 
+> Create them the common way that puts them into the main system bus.
+> Affects machines powernv8, powernv9, and powernv10.  Visible in "info
+> qtree".  Here's the change for powernv9:
+> 
+>      bus: main-system-bus
+>        type System
+>     +  dev: power9_v2.0-pnv-chip, id ""
+>     +    chip-id = 0 (0x0)
+>     +    ram-start = 0 (0x0)
+>     +    ram-size = 1879048192 (0x70000000)
+>     +    nr-cores = 1 (0x1)
+>     +    cores-mask = 72057594037927935 (0xffffffffffffff)
+>     +    nr-threads = 1 (0x1)
+>     +    num-phbs = 6 (0x6)
+>     +    mmio 000603fc00000000/0000000400000000
+>     [...]
+>     +  dev: pnv-xive, id ""
+>     +    ic-bar = 1692157036462080 (0x6030203100000)
+>     +    vc-bar = 1689949371891712 (0x6010000000000)
+>     +    pc-bar = 1690499127705600 (0x6018000000000)
+>     +    tm-bar = 1692157036986368 (0x6030203180000)
 > 
 > Cc: "Cédric Le Goater" <clg@kaod.org>
 > Cc: David Gibson <david@gibson.dropbear.id.au>
@@ -103,39 +126,36 @@ Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
 Thanks,
 
-C.
+C. 
 
 > ---
->  include/hw/ppc/pnv_psi.h | 2 +-
->  hw/ppc/pnv_psi.c         | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  hw/ppc/pnv.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
-> index f0f5b55197..979fc59f33 100644
-> --- a/include/hw/ppc/pnv_psi.h
-> +++ b/include/hw/ppc/pnv_psi.h
-> @@ -31,7 +31,7 @@
->  #define PSIHB_XSCOM_MAX         0x20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index da637822f9..8d4fc8109a 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
+>      pnv->chips = g_new0(PnvChip *, pnv->num_chips);
+>      for (i = 0; i < pnv->num_chips; i++) {
+>          char chip_name[32];
+> -        Object *chip = object_new(chip_typename);
+> +        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
 >  
->  typedef struct PnvPsi {
-> -    SysBusDevice parent;
-> +    DeviceState parent;
+>          pnv->chips[i] = PNV_CHIP(chip);
 >  
->      MemoryRegion regs_mr;
->      uint64_t bar;
-> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> index cfd5b7bc25..82f0769465 100644
-> --- a/hw/ppc/pnv_psi.c
-> +++ b/hw/ppc/pnv_psi.c
-> @@ -943,7 +943,7 @@ static void pnv_psi_class_init(ObjectClass *klass, void *data)
+> @@ -1317,8 +1317,8 @@ static void pnv_chip_power9_instance_init(Object *obj)
+>      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(obj);
+>      int i;
 >  
->  static const TypeInfo pnv_psi_info = {
->      .name          = TYPE_PNV_PSI,
-> -    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .parent        = TYPE_DEVICE,
->      .instance_size = sizeof(PnvPsi),
->      .class_init    = pnv_psi_class_init,
->      .class_size    = sizeof(PnvPsiClass),
+> -    object_initialize_child(obj, "xive", &chip9->xive, sizeof(chip9->xive),
+> -                            TYPE_PNV_XIVE, &error_abort, NULL);
+> +    sysbus_init_child_obj(obj, "xive", &chip9->xive, sizeof(chip9->xive),
+> +                          TYPE_PNV_XIVE);
+>      object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
+>                                "xive-fabric");
+>  
 > 
 
 
