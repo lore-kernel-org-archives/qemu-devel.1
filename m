@@ -2,88 +2,141 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE49C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F03D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:05:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72D30207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4D1820578
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 16:05:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ra8HI4Ol"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D30207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="r6xU0bWE";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="lvH2hH0W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4D1820578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb4ih-0000yG-Lt
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:03:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
+	id 1jb4kX-0003Sf-V2
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 12:05:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4gG-0006ZZ-KT
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:01:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27671
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jb4gE-0002dy-4P
- for qemu-devel@nongnu.org; Tue, 19 May 2020 12:01:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589904079;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KlpBq/BXBFnjMr/SkJtxdRR7h+flQXgDwrlXGBm938A=;
- b=Ra8HI4OlPDIPBhdPKpjA1lSr9lO4uBjh6rqfYGWvagMVZ6W/i6sUdiLH1gZe35CcWodrDG
- 6W25nyNwhvGanCGlMCnFoXpE6ZWxtdj4YH9uZPg+QVFjYn8BERQ7oxe4OdA/NOZAoJUUuB
- AJYxFTsdZ7M0KMDU8sLEwPcvt8eaaKA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-CV9ojqhYOeWSsFwg92gVFg-1; Tue, 19 May 2020 12:01:15 -0400
-X-MC-Unique: CV9ojqhYOeWSsFwg92gVFg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40BDE18FF663;
- Tue, 19 May 2020 16:01:10 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93B7C5C1C8;
- Tue, 19 May 2020 16:01:01 +0000 (UTC)
-Date: Tue, 19 May 2020 18:00:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH Kernel v20 4/8] vfio iommu: Add ioctl definition for
- dirty pages tracking
-Message-ID: <20200519180059.68f2c338.cohuck@redhat.com>
-In-Reply-To: <20200519095356.5d1f6ffa@x1.home>
-References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
- <1589488667-9683-5-git-send-email-kwankhede@nvidia.com>
- <20200515125916.78723321.cohuck@redhat.com>
- <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
- <20200519173507.3cd131dd.cohuck@redhat.com>
- <20200519095356.5d1f6ffa@x1.home>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jb4j2-0001SK-Vj
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:04:17 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:20816)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jb4j0-00036p-LD
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 12:04:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1589904254; x=1621440254;
+ h=from:to:cc:subject:date:message-id:
+ content-transfer-encoding:mime-version;
+ bh=cgfez65Avlhn8gnlEkJDzz8hQH8YmzD24OQqEqheTww=;
+ b=r6xU0bWEl7ZQFFhwBQfhDRJVgBcmDRlepk+NhkcVrgdnDb/de8Lr68MW
+ 5UOUbfABmVQRB2lXJxzm1bjMeo60LJZc3JB4m/6ontxTZy4xHOsPU8pZB
+ MrcH6X9E8qrdLiyTHRvL0Oc5el4DQKa7LAiMCe6ql21YhsaW5xBdy8wE+ w=;
+Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 19 May 2020 09:04:11 -0700
+Received: from nasanexm03h.na.qualcomm.com ([10.85.0.50])
+ by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 19 May 2020 09:04:11 -0700
+Received: from eusanexr01f.eu.qualcomm.com (10.85.0.101) by
+ nasanexm03h.na.qualcomm.com (10.85.0.50) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 19 May 2020 09:04:11 -0700
+Received: from NASANEXM01G.na.qualcomm.com (10.85.0.33) by
+ eusanexr01f.eu.qualcomm.com (10.85.0.101) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 19 May 2020 09:04:09 -0700
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (199.106.107.6)
+ by NASANEXM01G.na.qualcomm.com (10.85.0.33) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Tue, 19 May 2020 09:04:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WyMuepBA5vb9gGuDtD4D6mB7W0x+FX15HZ4fujmwMnkZVTRiCGUdOnhm0t58cUYN3qeatW37EPd6pY3vK5eeYuRs6EC6c10fGFSB35150Zrb0oISiS1Xlwz8ATOdnwzA6SmUo/pU5zeeiqY5CGITjQmj68Lje7l+V4ELeOQwNgj3qs0y7weQA2I70vqA2z8+LVRlOJv4ztkDlp2Io/YuF5g+Hs3aaWs9Ga4hX5KPY5rTRWywNLLd+uHU9mrUkK2vQI0zXMeb2HXUQAMmDp9XVGUzet4LBPbwR4YZGNg0iQFo7Epi3XaniM8qDftEKE3z1HwIJQpoMXjex27DWL68cw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fUQ1vLAiTfZhjWK34/9jPfM9GnHGg6u7QRneVQ2GFyU=;
+ b=cZJ6xlH5GwJwTmvMUtg4K54i/wZaKMeMV45q71tfsMj1m4hXqIQDZxP5P5MB3Exfl+XXy4RCxAH8jfD2v7gNhcloZUH1wPN7CU/j8UO03gtX2q3egT3VkJ6LL8CPjE9QiIZDF7jom2R+H9Z+ixZrD0y/ULKvSn5WqlRVVBSEu0iJX9/KDipLpSjsVNMfeoTe/ilfzWDTDlOB5MlkG+EbBerr19Zg2K2CfiE/ObvKLvtJ7rB7ZjoDTU58fDuOIDM0kn25UDoG1MkChp4B+QXBa3sUNtzvaUPXfV0NF3MVYwpP4aWoQ4QgvA6y5yeneI7iAsfB2MJloKzFx03LModckw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fUQ1vLAiTfZhjWK34/9jPfM9GnHGg6u7QRneVQ2GFyU=;
+ b=lvH2hH0WdbK6OAq2BC0/qtlilIs55yU97d9sYetF0Zh8M1sfimS2Q2wSAEtSYmaDNGhFyRdX7Vp1ZXHOnt77B6k3mhqjgOTmeLZDNgBxSkwg17mF5ISQOma63hs3dTApaPCDs2DJQNzY582a/AZiUQlMTlN8CdduT/sg8C3KWlk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3484.namprd02.prod.outlook.com
+ (2603:10b6:301:77::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Tue, 19 May
+ 2020 16:04:08 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.3000.034; Tue, 19 May 2020
+ 16:04:07 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH RISU 0/4] Add patterns for SVE2
+Date: Tue, 19 May 2020 09:03:50 -0700
+Message-ID: <20200519160354.4430-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR05CA0026.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::39) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:19:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.qualcomm.com (24.102.122.190) by
+ MN2PR05CA0026.namprd05.prod.outlook.com (2603:10b6:208:c0::39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.13 via Frontend Transport; Tue, 19 May 2020 16:04:06 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [24.102.122.190]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d890f237-334c-41ac-ef95-08d7fc0e428c
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3484:
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB3484907493EFE6E87CF59357C7B90@MWHPR0201MB3484.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 040866B734
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Sn5TAn45yzm+weVn7T5K8Y80DvSrYKAt4HSV7FX50GSLAFt6KA8rhPRbKn7nmhxLMAUaf8KOssM7E0HUtQP9cG+yfJvqysHjfrQgkoZvYNFp/2AnpZWaj5JaeCsq4q8A1Fpd/B0hnVFZfHTn4uAtteoc7jRgx0+I/JQswc4MCXdyzzBkw8HB6GV3YlrWYprMxTMI7Sc530St+UP3hOZMyeJyFDAZrrQMdjpm57/Ld7SGp9tnqsX5+etpZzVTifZdmx9S4k0cBd1l3Afug+arzHJQgMyipu+bT5DCX6RkJYaYqjS4MhA1Us3Qh/l8BGzs/D8rTJZnH5dsqNARKwlAWg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(376002)(346002)(366004)(136003)(396003)(39860400002)(4326008)(2616005)(956004)(66476007)(66556008)(66946007)(316002)(6506007)(52116002)(16526019)(186003)(5660300002)(86362001)(2906002)(26005)(8676002)(6486002)(1076003)(8936002)(6916009)(6512007)(6666004)(4744005)(36756003)(478600001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ha7mULzTN5mKIa+MgcTN8okf3rwQRUFE4CZg2BWDI6N9efvqOcGH9QbSuFfkeZNQJwqu11iuMxxp4DqjHhucn7qzsI7cpTba8Lgt8wAxlSlxwoufpZySA7s5a+kGMl4OhHn6g2rYHKfVA/hXHNB6x2UiBbsCiUTiu+qfFrNoRciadR1KFZSDVbwZyjB3KNyVkYGpt+4k1BR0RKBq0Wga6cRIWi7E1k1MWw96vPQhnBIwlw+Jivl9UvxVlNFLEx4/PRrelfy076byJlU0qHbpuZvgR35Sd46rxmgnuVs6q3VNv5yyFCpb7hcC8J8vtJNutRK3oNrBx/dnQ7eDSA5mpmVJXl1qTWCrZnMXMEfI9zZaeXUU/TIF9roc4OD/sbZEGbJ+yweqG8zF6jtAlt7dRBhR9SpY26kArVl176IN4IAC/MTl7A+03257znDIHkvy9AnaV/ZYZxD6OSSnVWJT7vSopZcCZrRtSff8uPnrj0sr+oMrOl6RtHqSzbQe04wJ
+X-MS-Exchange-CrossTenant-Network-Message-Id: d890f237-334c-41ac-ef95-08d7fc0e428c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2020 16:04:07.5147 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oIOYXgTSBbKgKcSVlZEXi1Hu8Zw7zP/hCWtJmtzmfwxpXNa53/Ilz2rfoavT4sByB6XSeeTE/V5QiZwyTGzmvg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3484
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 12:04:11
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,102 +149,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
- kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 May 2020 09:53:56 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+I'm working with Richard on SVE2 support for QEMU. I added some patterns
+to risu so we can start testing our implementation. I'm not sure I'm
+doing it correctly, so it would be great to get some eyes on it.
 
-> On Tue, 19 May 2020 17:35:07 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Fri, 15 May 2020 23:05:24 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> > > On 5/15/2020 4:29 PM, Cornelia Huck wrote:    
-> > > > On Fri, 15 May 2020 02:07:43 +0530
-> > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > >       
-> > > >> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
-> > > >> All pages pinned by vendor driver through this API should be considered as
-> > > >> dirty during migration. When container consists of IOMMU capable device and
-> > > >> all pages are pinned and mapped, then all pages are marked dirty.
-> > > >> Added support to start/stop dirtied pages tracking and to get bitmap of all
-> > > >> dirtied pages for requested IO virtual address range.
-> > > >>
-> > > >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > >> ---
-> > > >>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
-> > > >>   1 file changed, 55 insertions(+)    
-> > 
-> > (...)
-> >   
-> > > >> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
-> > > >> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
-> > > >> + * given IOVA range.      
-> > > > 
-> > > > "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_GET_BITMAP returns the
-> > > > dirty pages bitmap for the IOMMU container for a given IOVA range." ?
-> > > > 
-> > > > Q: How does this interact with the two other operations? I imagine
-> > > > getting an empty bitmap before _START       
-> > > 
-> > > No, if dirty page tracking is not started, get_bitmap IOCTL will fail 
-> > > with -EINVAL.
-> > >     
-> > > > and a bitmap-in-progress between
-> > > > _START and _STOP. > After _STOP, will subsequent calls always give the
-> > > > same bitmap?
-> > > >      
-> > > 
-> > > No, return -EINVAL.    
-> > 
-> > Maybe add
-> > 
-> > "If the IOCTL has not yet been called with
-> > VFIO_IOMMU_DIRTY_PAGES_FLAG_START, or if it has been called with
-> > VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP, calling it with
-> > VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP will return -EINVAL." ?  
-> 
-> Let's not specify ourselves into a corner, I think we can simply say
-> that the dirty bitmap is only available while dirty logging is enabled.
-> We certainly don't need to specify specific errno values that'll trip
-> us up later.
+I sent Peter and Richard v1 of this patch series, but I think I should be
+sending these to the mailing list. This version of the patch series
+includes one more patch.
 
-"If dirty logging is not enabled, an error will be returned." ?
+Stephen Long (4):
+  sve2.risu: Add patterns for floating-point pairwise ops
+  sve2.risu: Add patterns for integer multiply (unpredicated)
+  sve2.risu: Add patterns for integer (predicated) ops
+  sve2.risu: Add patterns for widening integer arithmetic
 
-(...)
+ sve2.risu | 142 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100755 sve2.risu
 
-> > > >> Caller must set argsz including size of structure
-> > > >> + * vfio_iommu_type1_dirty_bitmap_get.      
-> > > > 
-> > > > s/Caller/The caller/
-> > > > 
-> > > > Does argz also include the size of the bitmap?      
-> > > 
-> > > No.    
-> > 
-> > "The caller must set argsz to a value including the size of stuct
-> > vfio_io_type1_dirty_bitmap_get, but excluding the size of the actual
-> > bitmap." ?  
-> 
-> Yes, it wouldn't make sense for argsz to include the size of the bitmap
-> itself, that's accessed independently via a user provided pointer and
-> we have a separate size field for that.  Thanks,
-> 
-> Alex
-
-Yes, I just wanted to make it as obvious as possible to make it easier
-for folks trying to interact with this interface.
+-- 
+2.25.1
 
 
