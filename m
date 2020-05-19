@@ -2,119 +2,120 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B0EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFEFC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A167F2081A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 13:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC630207FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:02:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fScYmAJW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A167F2081A
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JGaXK61F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC630207FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb2hz-0007br-TM
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 09:55:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35932)
+	id 1jb2p6-0004RN-3B
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jb2hR-00078d-Gn; Tue, 19 May 2020 09:54:29 -0400
-Received: from mail-vi1eur05on2138.outbound.protection.outlook.com
- ([40.107.21.138]:56865 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jb2oF-0003rW-Qv; Tue, 19 May 2020 10:01:32 -0400
+Received: from mail-db8eur05on2117.outbound.protection.outlook.com
+ ([40.107.20.117]:51553 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jb2hN-0006MD-WF; Tue, 19 May 2020 09:54:28 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jb2oD-00084K-Ck; Tue, 19 May 2020 10:01:30 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A6Xz5LJpMJFzSujGj/egW98iD6NLIGtmN70SXQ409GcJ91QzsGHo39ZDbLWY5HsseWvnkTWr9gsw5Eir1ZgdwP0fSNp+k6YVV8MuLZfv1wiL0yRhj88axUSQv5fy9g3t2V+ODWax/Fnup+dw4E0cSe8xxaYv0bo0doaqn1ubyrbpjbRQcv0hCCD19eyx5S27o6UbUgp2Dnetj/Wwpp6ql6WGAk6VnMKfzZhQlDdbzNBs/FVgxXM7Xq47hwsSq6G8ahX53xYSKbeewIt/Lh02ijj6aSGGRLvWWX6t/p8PdbRpyl2I95oaW5tHeM4ioF0W+shZMhINIkVXAj7Esm13MQ==
+ b=OuRq7czj2hG3OtQuAYAggksmofvTrX8r4q7F7rxbN8Pmu/j1WPkk/y7joSM3BblHMqLg/rggi8ygu3LEKdPekWoPRqukYrIntW8+eP1ZggMwvOiX1BkAwdrV7+8ucHociON5doaJksByHz0l5ehsV+uiLb8GHJD8MgYd3MIA0g3DnZA5Nlc8JXAZao3hL5gwMp2D7tuWo7cP8KY8Fdbmw5wR3llxaNwn22VCQEfJRRQ1LNqxoP8ygk+4ukSlZ/hVHZLzwnPk18CS+UMufPwtf1o+2YLk6Idl4rRCr9VX3OwUZbjDJQdf2OOsOUqlmM9sLOYWgpQzWTwAFjQLJn8ctg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/JxQ27pguuiA+IvdhqeDsfOWlU3+z18UAh4Cz2auIho=;
- b=LvVobWlAaiv4H0c+ga8M6L0InwsQ3BcrunrLNoeip82quQI7rzNLWncffVnGQNMHMNrnKjLhD9K8ObUuxfW/TMupBrLh7SFKl2wl5jbsEMbq7SW95MXIEjM5xoHnO1iSlvwlx8md4Bxvsw6dyB1+NIK88bOs0w+x+uez2n3qxA7zPZZg0N20W/OI5QAZ6WDqAXTqil8P2swD+/b0nqbjRxOuU0pjUE39NNdn/6z0kv0UFJ6PUK0kYk5yWICl+oYQSpAfjD1odlArkgcnexOqgvirraafqT+Dv4Y6Y1aghUpsgfOO7EL7qXxX+Kz9O62nf+9zVjnctR3GixZ+iIhgHA==
+ bh=TJHqr/0V1/U4ZsJi9KuLWIE48MJFAz8FskmLUa2GMao=;
+ b=YEh5hKvlKpoUwGJtM4242i0sK9ghvJ47fzH/nHIQFWYru1/RMATszgJKBdNAF1rDwJzIXfqS5fm8PNp4abPVXJqW7HaGsSUnzOgP0kaGniUOVHVdGK759fgN2joac6zFiJPwJpyNcIXmAQUFgS+/vMVwOssjouwg5oKLKPHfNblcqJhkYAhdhel7is8W50ixbkWnbtA8v5bouZh2qrIOyOvzT5v6XJwI7B3B3miJAo8r1f0MaDTwsNRzBj7uJJ0X0ihIcrUXCC9jyxCGPw+mVOOnrDT3QXeEztatCV25zln6DtSbW2yhrGCOxPDViiC+5T8vBy0F9AYyGbAjVcgFcA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/JxQ27pguuiA+IvdhqeDsfOWlU3+z18UAh4Cz2auIho=;
- b=fScYmAJWBqRr8CQmJtY9Plnhn8tE1c9B4+rhwDIsJ1t6Sbf2kWvTo9EWqTfzuRHFbUdFeE8frCKueb8Nk/FxgujgnDGC2ad1jWzA5xLp5rgbLvb1j1kCWRxuLLEclxXzFq3oaGZ7iLainBh7cHmHb/Z2UybfaeE9+m9gGjPB9SE=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
- by AM0PR08MB5236.eurprd08.prod.outlook.com (2603:10a6:208:155::17)
+ bh=TJHqr/0V1/U4ZsJi9KuLWIE48MJFAz8FskmLUa2GMao=;
+ b=JGaXK61FsY18cNL+ndBUh2EwPgvTH8+WEUxTbEeWx3bwQ5kqcgzLhgkttF2tMiH/nKX41jzy4T9DfQoSaK2H9Dgs8jqlakMAoMM9XDi0itlRVR9dXRf6IxIKl/TKRUlFZu1U6F0tbfF4Mrm6FcT2r1/JHmkDpn7NDOWrEFBvROs=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5496.eurprd08.prod.outlook.com (2603:10a6:20b:de::20)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20; Tue, 19 May
- 2020 13:54:20 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.3000.034; Tue, 19 May 2020
- 13:54:20 +0000
-Subject: Re: [RFC PATCH 0/3] block: Synchronous bdrv_*() from coroutine in
- different AioContext
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>, Thomas Lamprecht <t.lamprecht@proxmox.com>
-References: <20200512144318.181049-1-kwolf@redhat.com>
- <6d78bc78-0c44-d703-6f9f-e048ea34fdd9@proxmox.com>
- <20200514142606.GH5518@linux.fritz.box>
- <285ba39f-9ee6-e089-13f7-a98ea0a84866@virtuozzo.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <548700ea-78db-fabc-d1eb-6d89af39ece3@virtuozzo.com>
-Date: Tue, 19 May 2020 16:54:18 +0300
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Tue, 19 May
+ 2020 14:01:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.034; Tue, 19 May 2020
+ 14:01:25 +0000
+Subject: Re: [PATCH v2 5/9] block/io: expand in_flight inc/dec section: simple
+ cases
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200427143907.5710-1-vsementsov@virtuozzo.com>
+ <20200427143907.5710-6-vsementsov@virtuozzo.com>
+ <efc8e783-0541-6b95-1356-71ccc823cad2@virtuozzo.com>
+ <20200519105241.GH7652@linux.fritz.box>
+ <d1908d96-4950-22be-45c0-86750f5780c6@virtuozzo.com>
+ <20200519111648.GK7652@linux.fritz.box>
+ <f3f34ee7-836e-c329-a1f3-65586faec85f@virtuozzo.com>
+Message-ID: <88c250c4-af4f-ef6a-3bf3-4e8f8643c32c@virtuozzo.com>
+Date: Tue, 19 May 2020 17:01:21 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <285ba39f-9ee6-e089-13f7-a98ea0a84866@virtuozzo.com>
+ Thunderbird/68.8.0
+In-Reply-To: <f3f34ee7-836e-c329-a1f3-65586faec85f@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-ClientProxiedBy: AM4PR0302CA0036.eurprd03.prod.outlook.com
- (2603:10a6:205:2::49) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0P190CA0022.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.64] (178.34.161.50) by
- AM4PR0302CA0036.eurprd03.prod.outlook.com (2603:10a6:205:2::49) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25 via Frontend
- Transport; Tue, 19 May 2020 13:54:19 +0000
-X-Originating-IP: [178.34.161.50]
+Received: from [192.168.100.2] (185.215.60.178) by
+ AM0P190CA0022.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.23 via Frontend Transport; Tue, 19 May 2020 14:01:24 +0000
+X-Originating-IP: [185.215.60.178]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c3162b81-3ab0-4382-b978-08d7fbfc2100
-X-MS-TrafficTypeDiagnostic: AM0PR08MB5236:
+X-MS-Office365-Filtering-Correlation-Id: 339b3993-ecc3-4d70-afc8-08d7fbfd1ebe
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5496:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR08MB5236F44A52C489D5BA679E6ACFB90@AM0PR08MB5236.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5496C8FE8FF0B59A99EEA5F2C1B90@AM7PR08MB5496.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-Forefront-PRVS: 040866B734
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tlPlS3ePR3ncHdnWRnz8s/Zk7qFn0xLdor77Agen0ejd3eUywRUyp07YkUjYCRTlJVQ8vWFPC5YT6VlIg/fay7BXSI3Ajop+ge4mujsWA/6VZelIByOLlXiIhSJwJvLHo5c0TN3wg5rZU6db0CNBEsZy6ut855IoXGNuBiDXngTysPoq5eYvWRJFjym0jYfEYoY2ozF1TpdMlqZ647Y6eUU9BSlja1m+9HCr6SpyfLODvtdhEWiLYxl15wlERy6S++OzFhuChIpMWip52TIC3SLGWPXcpyj3VqQTMrVBnMVqiyfadR8owFCUSUdnbDEZqGISiODeiDxdDJBzU9G6liRNt8JEjYkKLE1CrhwDSo60qyp/DtUEtkakxe2y91ezsSB6Tb0P3vAkEXLCTN1uz9YkQea+74EGEFd0ASzlYGWH9AmsrqEnD6x6tUUU8UrsAGMIz7VP0ABLkAm4XwFqrSd3NvPJaGhDZ/OkrDDaj1cffEfesQp/q5sNmXmwqB8cD1xuho/vlbcfYVNY2MwPU9EHbdun+9RWr3WHCZy93WNp1PRZPKHWpDoS0UEUhis7HQtE97Gi9ZCnkPKmyTTdng==
+X-Microsoft-Antispam-Message-Info: 2eqA/33vN+IhamtkxO6Tz6QN820HpUYsThlafCq2L90O1hihyuxGiEOVcMnC/hJ6TNvpHjrSyb/kEbqWn/VX/kkPqRG/8bY4vT4NY9rjNEuFIUEW8EsvNXWVOpn4vLvS81jy+XV5npV5aztP0hqZpTOELouCNVlo8jfNwHoYWRiUyZbeTxR/HL7i82WlzPALDxjTvU27wzuYXtDD9USc8QzO6HJzoQKUN6vvzWArVdFn7U8pm7T6LDdz3Pxef56ECi2WaniLoW1mpqN9C/YWcNr9syspUEz5gRdmTJLTMU/2XiOesUcUHo5yNkZAmgFAFYrX3p8jj6PqBaPpjpTVb+bw/hksJNtNhrg/qJ+QOoZsyjfed8yVJFQ3G9OL+WsMU+Zs9GpLfyK/UY2m61oCu1vhHRUFLhuwCoXA5csDLfJbYq2MmIAa/DXj92zFIhbOCDaDmvTbKuwB78nRx5o4hVZeMBKEvMQaqQ++aBtS4KEVMcQTfQgUwx2wme/YGSgl
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(376002)(39840400004)(346002)(136003)(366004)(396003)(26005)(36756003)(478600001)(316002)(31696002)(110136005)(31686004)(966005)(16576012)(2906002)(86362001)(2616005)(956004)(6486002)(52116002)(5660300002)(66476007)(4326008)(8676002)(186003)(66556008)(66946007)(16526019)(53546011)(8936002)(43740500002);
+ SFS:(4636009)(366004)(346002)(136003)(39850400004)(376002)(396003)(8676002)(66476007)(66946007)(66556008)(6486002)(2906002)(6666004)(478600001)(31696002)(52116002)(26005)(36756003)(86362001)(186003)(16526019)(107886003)(316002)(2616005)(956004)(5660300002)(4326008)(8936002)(31686004)(16576012)(6916009)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: kXebKQSFhdyC9Dsjr4Ug4hTwL/sHC+oy7AsER86uVlu4AH68COqH2iP/Nwju23J/sgg55WU6XStV5fFXFOwQwCD5oM1yqXWAByGD1WpyOnTOc6bBlNHHonX6gSOBxEtw0gHKT3CH2K11fOke3xBGPD9Z5JzO5K5YDaPjC/cg+9SKhY7CpHGGwhflcCVX10vJH7KULANkyUTLnAqF6Z6+Y+gwRip7w88JJbq+AMace9kNloiOaYhkmaHy0+8SHHt3OyA0kZ2tbIz2V+qU+eqp55Og8ftEUGI9+Ualy9VzN1KzAc92ew8uRmXeSly5fsyAAh1hpzyvli3qImWMUynUYOn0XASnRPiUSZwzMFMo0x7WmURn03TLGTg5DBNygMYmzYgDJpH/cA9FLa5CToF1X2ZlMzJd91K907NwqjgtyumLiCTXJJYhs922phyhOfkuBOGugeoISxniqozY/hCEpGs28k295Y3sNrVGW8dArpU=
+X-MS-Exchange-AntiSpam-MessageData: 9ldwp/XfvTPT5oa2PE57J0TNHvdZiws9KjNL3NBDGmNw7QpZ9d5ws/nW0Scux/DkHnfMEq6m6+syMmH5GUjsbSAk2SUh3C55ucN1aTlJbTvTCFtS5XMq0EAzKj+SQ6jSNXjG9BPBY0A/H8zIA/7ma1WK9wLdCqldHhx3aO3U2sukE7ow7iRurmvOxdnevrDKlJBPKCGbOPYidS33AfyeDLcvD7PwqpsnVCe96VS47y4S//Gv2NRcfuGpAAu3pmFrHL99E7eATyHMIbVium0bqHGYkIwhD/yyr7jGY83f4kdftZtM/qgXNutnin0ZrpWfUvHY/uxkA58ZY4rEhpQ1LD1x1tm+SV5ejrbgDJuGRPS8w16bCu5AbRp+hztVoIiAcJv9yjnoDx4c9X5muvOz/dfFsYDK96yaNFmsJBZh+7auYNed5jsJ03U3bQE35oN/Uww2h+KRll02aod6PdOyqFp2ZHMjexYPinU8JCh6OTWWUWaw71G0p9X+KEPhP1iy
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3162b81-3ab0-4382-b978-08d7fbfc2100
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2020 13:54:20.1899 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 339b3993-ecc3-4d70-afc8-08d7fbfd1ebe
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2020 14:01:25.8550 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H4oZlaVlJyOskUrklO5GiEQIrG07lT4yc7jYiLHeZgF2D3kTzTtZx3I+hMLN706vYummoBDWbEUV4ItfQ7eMsmeWYLKKPaPJmPggUQsxzJY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5236
-Received-SPF: pass client-ip=40.107.21.138;
- envelope-from=dplotnikov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 09:54:21
+X-MS-Exchange-CrossTenant-UserPrincipalName: lu7ncG5DJKToaDRNkNKEaNaQvNu14T8+CrTfSp5KX8f7P7m6igLxna03C9w0o0w0I4GznDz3/DbBJpGzr3HqKDK5Ovxr7rXQzxt3NFk9Mtk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5496
+Received-SPF: pass client-ip=40.107.20.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 10:01:26
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -136,136 +137,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, s.reiter@proxmox.com, qemu-devel@nongnu.org,
- armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 19.05.2020 15:32, Vladimir Sementsov-Ogievskiy wrote:
-> 14.05.2020 17:26, Kevin Wolf wrote:
->> Am 14.05.2020 um 15:21 hat Thomas Lamprecht geschrieben:
->>> On 5/12/20 4:43 PM, Kevin Wolf wrote:
->>>> Stefan (Reiter), after looking a bit closer at this, I think there 
->>>> is no
->>>> bug in QEMU, but the bug is in your coroutine code that calls block
->>>> layer functions without moving into the right AioContext first. I've
->>>> written this series anyway as it potentially makes the life of callers
->>>> easier and would probably make your buggy code correct.
+19.05.2020 14:25, Vladimir Sementsov-Ogievskiy wrote:
+> 19.05.2020 14:16, Kevin Wolf wrote:
+>> Am 19.05.2020 um 13:06 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>> 19.05.2020 13:52, Kevin Wolf wrote:
+>>>> Am 06.05.2020 um 09:02 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>> 27.04.2020 17:39, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> It's safer to expand in_flight request to start before enter to
+>>>>>> coroutine in synchronous wrappers, due to the following (theoretical)
+>>>>>> problem:
+>>>>>>
+>>>>>> Consider write.
+>>>>>> It's possible, that qemu_coroutine_enter only schedules execution,
+>>>>>> assume such case.
+>>>>>>
+>>>>>> Then we may possibly have the following:
+>>>>>>
+>>>>>> 1. Somehow check that we are not in drained section in outer code.
+>>>>>>
+>>>>>> 2. Call bdrv_pwritev(), assuming that it will increase in_flight, which
+>>>>>> will protect us from starting drained section.
+>>>>>>
+>>>>>> 3. It calls bdrv_prwv_co() -> bdrv_coroutine_enter() (not yet increased
+>>>>>> in_flight).
+>>>>>>
+>>>>>> 4. Assume coroutine not yet actually entered, only scheduled, and we go
+>>>>>> to some code, which starts drained section (as in_flight is zero).
+>>>>>>
+>>>>>> 5. Scheduled coroutine starts, and blindly increases in_flight, and we
+>>>>>> are in drained section with in_flight request.
+>>>>>>
+>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>
+>>>>> Very interesting: this patch breaks test-replication. It hangs:
+>>>>>
+>>>>> (gdb) thr a a bt
+>>>>>
+>>>>> Thread 2 (Thread 0x7eff256cd700 (LWP 2843)):
+>>>>> #0  0x00007eff2f5fd1fd in syscall () from /lib64/libc.so.6
+>>>>> #1  0x000055af9a9a4f11 in qemu_futex_wait (f=0x55af9aa6f758 <rcu_call_ready_event>, val=4294967295) at /work/src/qemu/up-expand-bdrv-in_flight-bounds/include/qemu/futex.h:29
+>>>>> #2  0x000055af9a9a50d5 in qemu_event_wait (ev=0x55af9aa6f758 <rcu_call_ready_event>) at util/qemu-thread-posix.c:459
+>>>>> #3  0x000055af9a9bd20d in call_rcu_thread (opaque=0x0) at util/rcu.c:260
+>>>>> #4  0x000055af9a9a5288 in qemu_thread_start (args=0x55af9c4f1b80) at util/qemu-thread-posix.c:519
+>>>>> #5  0x00007eff2f6d44c0 in start_thread () from /lib64/libpthread.so.0
+>>>>> #6  0x00007eff2f602553 in clone () from /lib64/libc.so.6
+>>>>>
+>>>>> Thread 1 (Thread 0x7eff25820a80 (LWP 2842)):
+>>>>> #0  0x00007eff2f5f7bd6 in ppoll () from /lib64/libc.so.6
+>>>>> #1  0x000055af9a99e405 in qemu_poll_ns (fds=0x55af9c52a830, nfds=1, timeout=-1) at util/qemu-timer.c:335
+>>>>> #2  0x000055af9a9a1cab in fdmon_poll_wait (ctx=0x55af9c526890, ready_list=0x7ffc73e8c5d0, timeout=-1) at util/fdmon-poll.c:79
+>>>>> #3  0x000055af9a9a160c in aio_poll (ctx=0x55af9c526890, blocking=true) at util/aio-posix.c:600
+>>>>> #4  0x000055af9a8f0bb0 in bdrv_do_drained_begin (bs=0x55af9c52a8d0, recursive=false, parent=0x0, ignore_bds_parents=false, poll=true) at block/io.c:429
+>>>>> #5  0x000055af9a8f0c95 in bdrv_drained_begin (bs=0x55af9c52a8d0) at block/io.c:435
+>>>>> #6  0x000055af9a8dc6a8 in blk_drain (blk=0x55af9c542c10) at block/block-backend.c:1681
+>>>>> #7  0x000055af9a8da0b6 in blk_unref (blk=0x55af9c542c10) at block/block-backend.c:473
+>>>>> #8  0x000055af9a8eb5e7 in mirror_exit_common (job=0x55af9c6c45c0) at block/mirror.c:667
+>>>>> #9  0x000055af9a8eb9c1 in mirror_prepare (job=0x55af9c6c45c0) at block/mirror.c:765
+>>>>> #10 0x000055af9a87cd65 in job_prepare (job=0x55af9c6c45c0) at job.c:781
+>>>>> #11 0x000055af9a87b62a in job_txn_apply (job=0x55af9c6c45c0, fn=0x55af9a87cd28 <job_prepare>) at job.c:158
+>>>>> #12 0x000055af9a87cdee in job_do_finalize (job=0x55af9c6c45c0) at job.c:798
+>>>>> #13 0x000055af9a87cfb5 in job_completed_txn_success (job=0x55af9c6c45c0) at job.c:852
+>>>>> #14 0x000055af9a87d055 in job_completed (job=0x55af9c6c45c0) at job.c:865
+>>>>> #15 0x000055af9a87d0a8 in job_exit (opaque=0x55af9c6c45c0) at job.c:885
+>>>>> #16 0x000055af9a99b981 in aio_bh_call (bh=0x55af9c547440) at util/async.c:136
+>>>>> #17 0x000055af9a99ba8b in aio_bh_poll (ctx=0x55af9c526890) at util/async.c:164
+>>>>> #18 0x000055af9a9a17ff in aio_poll (ctx=0x55af9c526890, blocking=true) at util/aio-posix.c:650
+>>>>> #19 0x000055af9a8f7011 in bdrv_flush (bs=0x55af9c53b900) at block/io.c:3019
+>>>>> #20 0x000055af9a874351 in bdrv_close (bs=0x55af9c53b900) at block.c:4252
+>>>>> #21 0x000055af9a874ca3 in bdrv_delete (bs=0x55af9c53b900) at block.c:4498
+>>>>> #22 0x000055af9a877862 in bdrv_unref (bs=0x55af9c53b900) at block.c:5866
+>>>>> #23 0x000055af9a870837 in bdrv_root_unref_child (child=0x55af9c6c4430) at block.c:2684
+>>>>> #24 0x000055af9a8da9a2 in blk_remove_bs (blk=0x55af9c547bd0) at block/block-backend.c:803
+>>>>> #25 0x000055af9a8d9e54 in blk_delete (blk=0x55af9c547bd0) at block/block-backend.c:422
+>>>>> #26 0x000055af9a8da0f8 in blk_unref (blk=0x55af9c547bd0) at block/block-backend.c:477
+>>>>> #27 0x000055af9a86a6f1 in teardown_secondary () at tests/test-replication.c:392
+>>>>> #28 0x000055af9a86aac1 in test_secondary_stop () at tests/test-replication.c:490
+>>>>> #29 0x00007eff2fd7df7e in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+>>>>> #30 0x00007eff2fd7dd24 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+>>>>> #31 0x00007eff2fd7dd24 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+>>>>> #32 0x00007eff2fd7e46a in g_test_run_suite () from /lib64/libglib-2.0.so.0
+>>>>> #33 0x00007eff2fd7e485 in g_test_run () from /lib64/libglib-2.0.so.0
+>>>>> #34 0x000055af9a86b19c in main (argc=1, argv=0x7ffc73e8d088) at tests/test-replication.c:645
+>>>>>
+>>>>>
+>>>>> (gdb) p ((BlockBackend *)0x55af9c547bd0)->in_flight
+>>>>> $5 = 0
+>>>>> (gdb) p ((BlockBackend *)0x55af9c542c10)->in_flight
+>>>>> $6 = 0
+>>>>> (gdb) p ((BlockDriverState *)0x55af9c53b900)->in_flight
+>>>>> $7 = 1
+>>>>> (gdb) p ((BlockDriverState *)0x55af9c52a8d0)->in_flight
+>>>>> $8 = 0
+>>>>> (gdb) fr 20
+>>>>> #20 0x000055af9a874351 in bdrv_close (bs=0x55af9c53b900) at block.c:4252
+>>>>> 4252        bdrv_flush(bs);
+>>>>> (gdb) p bs->node_name
+>>>>> $9 = "#block5317", '\000' <repeats 21 times>
+>>>>> (gdb) p bs->drv
+>>>>> $10 = (BlockDriver *) 0x55af9aa63c40 <bdrv_replication>
+>>>>> (gdb) p bs->in_flight
+>>>>> $11 = 1
+>>>>> (gdb) p bs->tracked_requests
+>>>>> $12 = {lh_first = 0x0}
+>>>>>
+>>>>>
+>>>>> So, we entered bdrv_flush at frame 19, and increased in_flight. Then
+>>>>> we go to aio_poll and to nested event loop, and we never return to
+>>>>> decrease in_flight field.
+>>>>>
+>>>>> Hmm. I'm afraid, I don't know what to do with that. Kevin, could you
+>>>>> take a look? And could similar thing happen with blk layer, because of
+>>>>> you recent similar patch?
+>>>>
+>>>> Hmm... You mean blk_prw(), right? Looks like it could have the same
+>>>> problem, indeed.
+>>>>
+>>>> Maybe we need to move the blk/bdrv_dec_in_flight to inside the coroutine
+>>>> (probably to the place where we currently have aio_wait_kick(), which
+>>>> would already be built in for bdrv_dec_in_flight). This is the last
+>>>> thing the coroutine does, so presumably it will still be late enough.
+>>>>
 >>>
->>>> However, it doesn't feel right to commit something like patch 2 
->>>> without
->>>> having a user for it. Is there a reason why you can't upstream your
->>>> async snapshot code?
->>>
->>> I mean I understand what you mean, but it would make the interface 
->>> IMO so
->>> much easier to use, if one wants to explicit schedule it beforehand 
->>> they
->>> can still do. But that would open the way for two styles doing 
->>> things, not
->>> sure if this would seen as bad. The assert about from patch 3/3 
->>> would be
->>> already really helping a lot, though.
+>>> But moving "inc" into coroutine is dangerous too, as we discussed that
+>>> coroutine_enter may only schedule the coroutine, and something may
+>>> call drain before actual "inc".
 >>
->> I think patches 1 and 3 are good to be committed either way if people
->> think they are useful. They make sense without the async snapshot code.
+>> No, I mean moving only the dec, not inc. So inc before entering the
+>> coroutine (outside of it), and dec at the end, but still inside the
+>> coroutine.
 >>
->> My concern with the interface in patch 2 is both that it could give
->> people a false sense of security and that it would be tempting to write
->> inefficient code.
->>
->> Usually, you won't have just a single call into the block layer for a
->> given block node, but you'll perform multiple operations. Switching to
->> the target context once rather than switching back and forth in every
->> operation is obviously more efficient.
->>
->> But chances are that even if one of these function is bdrv_flush(),
->> which now works correctly from a different thread, you might need
->> another function that doesn't implement the same magic. So you always
->> need to be aware which functions support cross-context calls which
->> ones don't.
->>
->> I feel we'd see a few bugs related to this.
->>
->>> Regarding upstreaming, there was some historical attempt to upstream it
->>> from Dietmar, but in the time frame of ~ 8 to 10 years ago or so.
->>> I'm not quite sure why it didn't went through then, I see if I can get
->>> some time searching the mailing list archive.
->>>
->>> We'd be naturally open and glad to upstream it, what it effectively
->>> allow us to do is to not block the VM to much during snapshoting it
->>> live.
->>
->> Yes, there is no doubt that this is useful functionality. There has been
->> talk about this every now and then, but I don't think we ever got to a
->> point where it actually could be implemented.
->>
->> Vladimir, I seem to remember you (or someone else from your team?) were
->> interested in async snapshots as well a while ago?
->
-> Den is working on this (add him to CC)
-Yes, I was working on that.
+> 
+> Hmm. it probably make sense. Ha, I hastened to answer on cover-letter that this all to be dropped. Ok, I'll give it a roll and check your idea, thanks!
+> 
+> 
 
-What I've done can be found here: 
-https://github.com/denis-plotnikov/qemu/commits/bgs_uffd
+Checked this helps. I think, I'd try to rebase it onto your "[RFC PATCH 1/3] block: Factor out bdrv_run_co()"
 
-The idea was to save a snapshot (state+ram) asynchronously to a separate 
-(raw) file using the existing infrastructure.
-The goal of that was to reduce the VM downtime on snapshot.
-
-We decided to postpone this work until "userfaultfd write protected 
-mode" wasn't in the linux mainstream.
-Now, userfaultfd-wp is merged to linux. So we have plans to continue 
-this work.
-
-According to the saving the "internal" snapshot to qcow2 I still have a 
-question. May be this is the right place and time to ask.
-
-If I remember correctly, in qcow2 the snapshot is stored at the end of 
-the address space of the current block-placement-table.
-We switch to the new block-placement-table after the snapshot storing is 
-complete. In case of sync snapshot, we should switch the
-table before the snapshot is written, another words, we should be able 
-to preallocate the the space for the snapshot and keep a link
-to the space until snapshot writing is completed.
-The question is whether it could be done without qcow2 modification and 
-if not, could you please give some ideas of how to implement that?
-
-Denis
->
->>
->>> I pushed a tree[0] with mostly just that specific code squashed 
->>> together (hope
->>> I did not break anything), most of the actual code is in commit [1].
->>> It'd be cleaned up a bit and checked for coding style issues, but 
->>> works good
->>> here.
->>>
->>> Anyway, thanks for your help and pointers!
->>>
->>> [0]: https://github.com/ThomasLamprecht/qemu/tree/savevm-async
->>> [1]: 
->>> https://github.com/ThomasLamprecht/qemu/commit/ffb9531f370ef0073e4b6f6021f4c47ccd702121
->>
->> It doesn't even look that bad in terms of patch size. I had imagined it
->> a bit larger.
->>
->> But it seems this is not really just an async 'savevm' (which would save
->> the VM state in a qcow2 file), but you store the state in a separate
->> raw file. What is the difference between this and regular migration into
->> a file?
->>
->> I remember people talking about how snapshotting can store things in a
->> way that a normal migration stream can't do, like overwriting outdated
->> RAM state instead of just appending the new state, but you don't seem to
->> implement something like this.
->>
->> Kevin
->>
->
->
-
+-- 
+Best regards,
+Vladimir
 
