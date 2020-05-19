@@ -2,62 +2,105 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E039C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D54CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 087422075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:54:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087422075F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 091492075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 07:59:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1nXF0l5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 091492075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jax5P-000073-55
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 03:54:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
+	id 1jax9k-00036J-GJ
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 03:59:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jax4Y-000877-No
- for qemu-devel@nongnu.org; Tue, 19 May 2020 03:53:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55652)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jax4X-0007gz-FK
- for qemu-devel@nongnu.org; Tue, 19 May 2020 03:53:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id 5E0A8AD94;
- Tue, 19 May 2020 07:53:58 +0000 (UTC)
-Subject: Re: sharing intention for developing per-target, dynamically loadable
- accelerator modules
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <1b5c9fee-6574-ddf4-b2d0-aa12e6fc9c84@suse.de>
- <87k119jeee.fsf@linaro.org>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <350b2ad7-b92d-659b-481a-e41fe7cfc738@suse.de>
-Date: Tue, 19 May 2020 09:53:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jax8g-0002YS-Ik
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 03:58:14 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57748
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jax8f-0000j8-A6
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 03:58:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589875091;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uTfCPjwos9E9Arm4ZTHKbf7WftHbOWMD5NuyobRUt6M=;
+ b=i1nXF0l5YqcdnwlK6APKA9gkXItbOWB6qHjBI5/rAQcQFH22gQldLyJoD3VQ67c5NBKg7x
+ H+RL3DLqZf8TSFcFiY7+KVCFs+XpZ3NLxuO54nZ4iU9bufPIv2tE6VnJIQ5f/3qyp1+8Nh
+ F4o8rlzpbeXgieFWMLV2UuXFkxXmqCk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-aemg936SMUScx9pgsJ_wMw-1; Tue, 19 May 2020 03:58:09 -0400
+X-MC-Unique: aemg936SMUScx9pgsJ_wMw-1
+Received: by mail-wm1-f72.google.com with SMTP id t82so637549wmf.4
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 00:58:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=a4VuYgpozh5k2UbrW8UQBTZQVsj6kKrTwTGf6FkRTGs=;
+ b=DxxgM/MH2YA69OwmJ3NXocsjqjzKb37gsyC21SineuGWbItktaqWtGwejhcA3ivHZD
+ pnzJ3s7GLyD8HitEv8EYKu/JGDEutc7LnynxfSITBWhSHW0cKpT5bmc0eevT2+WapmcF
+ bchbjOlDFaMIvBltag0Wm07Pqfd5MCh82obGQa0gHCR8tb6hW7fH9NLPrIZ7tpXhEUJr
+ kZCs3rg6nrP2dXVQDAdsPj4euFQA4ttmEVFTGF7htikP9oI7eV6PnT68mqGgxxFDWJRt
+ XQyZYtnRyM6HDptumOWUErtelERFXYm5xgDHM/O97F1TTXAgYRyZmY231A77LglkSi5o
+ mjaw==
+X-Gm-Message-State: AOAM5317uK+iJtKdnlw7uVyE0evL21gKGfxWmTBEwpBKsuf/OGEX8w3x
+ kUe+r7Fwt4I7W30XUBm6Y8DjMvUG1zTT4omTbev6khjTJUJPc30Cnn2Kcjm9L71L19opdP4GR+m
+ 70a6tWxBNeWAazz0=
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr3722634wmd.125.1589875088195; 
+ Tue, 19 May 2020 00:58:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4zUWIr5Vf/tlEhDR0rq0R/jTKJhRvXHGdvGcm88dpkx7Sw27ojPyqT3C/AlRhCE4+C7dpxA==
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr3722606wmd.125.1589875087928; 
+ Tue, 19 May 2020 00:58:07 -0700 (PDT)
+Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it.
+ [79.49.207.108])
+ by smtp.gmail.com with ESMTPSA id l19sm2876436wmj.14.2020.05.19.00.58.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 May 2020 00:58:07 -0700 (PDT)
+Date: Tue, 19 May 2020 09:58:05 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 4/7] hw/elf_ops: Do not ignore write failures when
+ loading ELF
+Message-ID: <20200519075805.tgrzbz2qscco5thh@steredhat>
+References: <20200518155308.15851-1-f4bug@amsat.org>
+ <20200518155308.15851-5-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <87k119jeee.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200518155308.15851-5-f4bug@amsat.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 01:02:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 00:34:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,153 +113,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 8:18 PM, Alex Bennée wrote:
+On Mon, May 18, 2020 at 05:53:05PM +0200, Philippe Mathieu-Daudé wrote:
+> Do not ignore the MemTxResult error type returned by
+> address_space_write().
 > 
-> Claudio Fontana <cfontana@suse.de> writes:
-> 
->> Hello all,
->>
->> my intention would be to develop per-target, dynamically loadable accelerator modules.
->>
->> This would allow to distribute a single QEMU base binary, and then provide accelerators as optional additional binary packages to install,
->> with the first separate optional package being TCG.
->>
->> CONFIG_TCG would become 'm' as a result, but then also CONFIG_KVM, CONFIG_HAX, CONFIG_WHPX, CONFIG_HVF.
->>
->> Here are some elements that seem to be needed:
->>
->> 1 - The module CONFIG_MODULE part of the build system would need some extension to add per-target modules. I have some tentative results that shows that this is possible (but a bit clunky atm).
->>     There is some existing instability in the existing Makefile infrastructure of modules that shows up when trying to extend it.
->>
->> 2 - new "accelerator drivers" seems to be needed, either in addition or as additional functionality inside the current AccelState.
->>
->> 3 - for target/i386 in particular, there is some refactoring work needed to split even more different unrelated bits and pieces.
->>     dependencies of hw/i386 machine stuff with accelerator-specific
->> stuff are also painful.
-> 
-> There are a couple of per-arch hacks in the main TCG cpu loops it would
-> be good to excise from the code.
-> 
->>
->> 4 - CPU Arch Classes could be extended with per-accelerator methods. Initial fooling around shows it should probably work.
->>     One alternative would be trying to play with the dynamic linker (weak symbols, creative use of dlsym etc), but I have not sorted out the details of this option.
->>
->> 5 - cputlb, in particular tlb_flush and friends is a separate problem
->> since it is not part of the cpuclass. Should it be?
-> 
-> tlb_flush and friends are TCG implementation details for softmmu that
-> ensure a lookup for any address will always return to a guest specific
-> tlb_fill to rebuild the cache. The behaviour is not guest-specific
-> per-se although we do partition the table entries based on the guest
-> size.
-> 
-> Perhaps we can make it more dynamic but it would have to ensure both the
-> slow path and the fast path are using the same mask and shifts when
-> walking the table.
-> 
->> 6 - a painpoint is represented by the fact that in USER mode, the accel class is not applied, which causes a lot of uncleanliness all around
->>     (tcg_allowed outside of the AccelClass).
-> 
-> The user-mode run loops are a whole separate chunk of code. I don't know
-> if it is worth trying to make them plugable as you will only ever have
-> one per linux-user binary.
-> 
->> 7 - I have not really thought about the KConfig aspects because I am not super-familiar
->>
->> 8 - cpus.c needs some good splitting
-> 
-> Although there are several different run loops in there I think they
-> share a lot of commonality which is why they are bundled together. They
-> all share the same backend for dealing with ioevents and generic
-> pause/unpause machinery. But feel free to prove me wrong ;-)
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/elf_ops.h | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 
-Hi Alex, I got my first compile, and it is currently in github, I still need to split the series though and there is still cleanup needed.
-
-https://github.com/hw-claudio/qemu.git
-branch "cpus-refactoring"
-
-just in case you are interested in a peek.
-
-The idea results currently in:
-
- cpu-throttle.c                |  154 +++++++++
- cpu-timers.c                  |  784 +++++++++++++++++++++++++++++++++++++++++++++
- cpus-tcg.c                    |  515 ++++++++++++++++++++++++++++++
- cpus.c                        | 1405 +++++----------------------------------------------------------------------------
-
-New interfaces are in:
-
-include/sysemu/cpu-throttle.h |   50 +++
-include/sysemu/cpu-timers.h   |   73 +++++
-include/sysemu/cpus.h         |   44 ++-
-
-cpu-throttle (new) is self-explanatory, contains the cpu-throttle in cpus.c
-cpu-timers (new) contains the icount, ticks, clock timers from cpus.c
-
-cpus.h adds an interface to per-accel vcpu threads:
-
-qemu_register_start_vcpu(void (*f)(CPUState *cpu));
-bool all_cpu_threads_idle(void);
-bool cpu_can_run(CPUState *cpu);
-void qemu_wait_io_event_common(CPUState *cpu);
-void qemu_wait_io_event(CPUState *cpu);
-void cpu_thread_signal_created(CPUState *cpu);
-void cpu_thread_signal_destroyed(CPUState *cpu);
-void cpu_handle_guest_debug(CPUState *cpu);
-
-Very much still all WIP...
-
-Ciao,
-
-C
-
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 > 
->> ... more things to find out and think about ...
->>
->> Overall, I think that the activity has the potential to provide benefits overall beyond the actual goal, in the form of cleanups, leaner configurations,
->> minor fixes, maybe improving the CONFIG_MODULE instabilities if any
->> etc.
-> 
-> There are certainly some ugly bits we could shave down in such an
-> exercise.
-> 
->> As an example, the first activity I would plan to submit as RFC is point 8 above,
->> there is the split between cpus.c and cpus-tcg.c that results in lots of TCG-specific code being removed from non-tcg builds (using CONFIG_TCG).
->>
->> One thing that should be kept in check is any performance impact of
->> the changes, in particular for point 4, hot paths should probably
->> avoid going through too many pointer indirections.
-> 
-> Maybe - certainly for TCG you have pretty much lost if you have exited
-> the main execution loop I doubt it would show up much. Not so sure about
-> the HW accelerators. Most of the performance sensitive stuff is dealt
-> with close to the ioctls IIRC.
-> 
->> Does anybody share similar goals? Any major obstacle or blocker that would put the feasibility into question?
->> Any suggestion on any of this? In particular point 4 and 5 come to
->> mind, as well as some better understanding of the reasons behind 6, or
->> even suggestions on how to best to 2.
-> 
-> For linux-user each CPU run loop is it's own special snowflake because
-> pretty much every architecture has it's own special set of EXCP_ exits
-> to deal with various bits. There are per-arch EXCP_ flags for system
-> emulation as well but not nearly as many.
-> 
->>
->> Anyway, I will continue to work on the first RFC for some smaller initial steps and hopefully have something to submit soon.
->>
->> Ciao ciao,
->>
->> Claudio
-> 
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index 398a4a2c85..6fdff3dced 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -553,9 +553,14 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                      rom_add_elf_program(label, mapped_file, data, file_size,
+>                                          mem_size, addr, as);
+>                  } else {
+> -                    address_space_write(as ? as : &address_space_memory,
+> -                                        addr, MEMTXATTRS_UNSPECIFIED,
+> -                                        data, file_size);
+> +                    MemTxResult res;
+> +
+> +                    res = address_space_write(as ? as : &address_space_memory,
+> +                                              addr, MEMTXATTRS_UNSPECIFIED,
+> +                                              data, file_size);
+> +                    if (res != MEMTX_OK) {
+> +                        goto fail;
+> +                    }
+>                  }
+>              }
+>  
+> -- 
+> 2.21.3
 > 
 
 
