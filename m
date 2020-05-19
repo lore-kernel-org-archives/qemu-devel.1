@@ -2,95 +2,84 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F7FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 316F0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0A9F206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E85D7206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:08:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WNP/9K0v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0A9F206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iYhqS1m1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85D7206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jayE3-0007n0-5d
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 05:07:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56580)
+	id 1jayEO-0008Mg-65
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 05:08:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jayD4-0007Dv-7Y
- for qemu-devel@nongnu.org; Tue, 19 May 2020 05:06:50 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55716)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jayD3-0000Tt-75
- for qemu-devel@nongnu.org; Tue, 19 May 2020 05:06:49 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f13so2217165wmc.5
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 02:06:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=68GdHJc5Ut0H5XO7fQQ+OP5ZG5QdGwnwdK0iXDGdOC8=;
- b=WNP/9K0vcXpO72yblX28+WAb8i2+OOYlMKpWkZmeN1cMuXQ7bfg3ZFFOgroLn+LT0R
- Tl9DRnjYnBW/GsukP/fTS7OgNFn25AKqLYEDve4a2xidD4YTZCy8s/LOdNo5mytn9ePa
- J4YyNHhREbzMPQ8tO2DqhPyITrEH/Xy82N1sFbeeo6z22PB/WJuheYqw4qA9GvZ5CJ6d
- HHxvltI+GcDFIdTM38rSbKqnEiwWaPDl8gANsNSzVM0cnNOZq5MMh9qkfkIHc3+LBY5R
- po/X5GkNusMc2jAwDzYJj2Tw9HZX7wphB4hccR6AfcwVEy3seBB4pn69gyVYOX2zCwi3
- lbBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=68GdHJc5Ut0H5XO7fQQ+OP5ZG5QdGwnwdK0iXDGdOC8=;
- b=B/R0XsZ4MgOt4hsxmF7M9qPP+UpYT5hbvIwzWXydTBtss6G8ejwhFQWqaw5iR0D9Bf
- 7yxYAC9A8zVBCV7uE0Wz4Ujk/jgQQH9VXF+Og/729HmRKOWTTPtVE6pAG6+2xpG30csF
- I0HjxLKz7Hyi3KpPXPBlEdV4Wd52i/DCn1KONnmgyIECsf3AKQZvDAu4siABm+moVFUn
- sOgHTLUHquHJ6lYOonCoO7drmOwAm3UrQTS6UDoycZduUNrIydpGtv9592H5lAveAm5X
- NuGbR/j/gHkQjGhQsM97uRJUbcihbECuWHaSmGjrF88dMxCeopZVp97q7Besw6orctg7
- F+CQ==
-X-Gm-Message-State: AOAM533wkVdMTm/tfnuoWxgHsv/2CrnJUxKs+RzNKMTL9BH+tvnAd4eP
- /utsH6UkgYTYHWUFJGZT5BxkPQ==
-X-Google-Smtp-Source: ABdhPJztMPiCut6fitK9FODLceBJuc2J3111dx9lNDOLLgnAjihJCHz38ZfYQev50UhJaT/BK4o3Dw==
-X-Received: by 2002:a1c:56c1:: with SMTP id k184mr4026781wmb.183.1589879207604; 
- Tue, 19 May 2020 02:06:47 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o24sm2843698wmm.33.2020.05.19.02.06.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 May 2020 02:06:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 444921FF7E;
- Tue, 19 May 2020 10:06:45 +0100 (BST)
-References: <20200515190153.6017-1-richard.henderson@linaro.org>
- <20200515190153.6017-5-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 04/10] softfloat: Name rounding mode enum
-In-reply-to: <20200515190153.6017-5-richard.henderson@linaro.org>
-Date: Tue, 19 May 2020 10:06:45 +0100
-Message-ID: <871rngjntm.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jayDX-0007Wd-Ny
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 05:07:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55130
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jayDT-0000kL-Rv
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 05:07:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589879234;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hFAqlV+MB66Ggf+GR7b9r0Ktlc8RNQmadSP/mjSmiQA=;
+ b=iYhqS1m1Dw86bvUjSFnhWbGx7LLtAwmeNwWkf1HR4CFM5+BpTVkDjzMfVMG6THlHHmoFQ/
+ J4IQRhN53Qnkv2tPqLkq5per92mS2LGluoS47L/3BtBIFW1LJXFt5xNs7LA2uljqnONLX4
+ YPrQmbMsNl1X/72GklDENsIjqetyiLQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-adALElBLMFWvGMoCcz9-NA-1; Tue, 19 May 2020 05:07:13 -0400
+X-MC-Unique: adALElBLMFWvGMoCcz9-NA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2897D106B242;
+ Tue, 19 May 2020 09:07:12 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-199.ams2.redhat.com [10.36.113.199])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C4A860BE1;
+ Tue, 19 May 2020 09:07:10 +0000 (UTC)
+Date: Tue, 19 May 2020 11:07:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v4 9/9] iotests: rename and move 169 and 199 tests
+Message-ID: <20200519090709.GC7652@linux.fritz.box>
+References: <20200515211505.3042-1-vsementsov@virtuozzo.com>
+ <20200515211505.3042-10-vsementsov@virtuozzo.com>
+ <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:56:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,24 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 18.05.2020 um 18:12 hat Thomas Huth geschrieben:
+> On 15/05/2020 23.15, Vladimir Sementsov-Ogievskiy wrote:
+> > Rename bitmaps migration tests and move them to tests subdirectory to
+> > demonstrate new human-friendly test naming.
+> > 
+> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> >  tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test}   | 0
+> >  .../{199.out => tests/migrate-bitmaps-postcopy-test.out}          | 0
+> >  tests/qemu-iotests/{169 => tests/migrate-bitmaps-test}            | 0
+> >  tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out}    | 0
+> >  4 files changed, 0 insertions(+), 0 deletions(-)
+> >  rename tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test} (100%)
+> >  rename tests/qemu-iotests/{199.out => tests/migrate-bitmaps-postcopy-test.out} (100%)
+> >  rename tests/qemu-iotests/{169 => tests/migrate-bitmaps-test} (100%)
+> >  rename tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out} (100%)
+> > 
+> > diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+> > similarity index 100%
+> > rename from tests/qemu-iotests/199
+> > rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+> > diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+> > similarity index 100%
+> > rename from tests/qemu-iotests/199.out
+> > rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+> > diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/tests/migrate-bitmaps-test
+> > similarity index 100%
+> > rename from tests/qemu-iotests/169
+> > rename to tests/qemu-iotests/tests/migrate-bitmaps-test
+> > diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/tests/migrate-bitmaps-test.out
+> > similarity index 100%
+> > rename from tests/qemu-iotests/169.out
+> > rename to tests/qemu-iotests/tests/migrate-bitmaps-test.out
+> 
+> I like the idea ... but the path name + file names get now quite long.
+> While you're at it, what about renaming the "qemu-iotests" directory to
+> just "iotests" or even just "io" now?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Renames are always kind of painful. Do we have a real reason for the
+rename except that the paths feel a bit long subjectively?
 
-> Give the previously unnamed enum a typedef name.  Use the packed
-> attribute so that we do not affect the layout of the float_status
-> struct.  Use it in the prototypes of relevant functions.
->
-> Adjust switch statements as necessary to avoid compiler warnings.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Of course, if we're renaming all files anyway, changing the directory
+name at the same time shouldn't give any additional pain, so it would be
+completely reasonable then. We're not renaming the test harness files,
+though, and even only two test cases in this patch.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Maybe this final patch should stay RFC until we have the infrastructure
+in and then we can have a single series that moves all tests and also
+renames the directory? Maybe a not strictly necessary rename of the
+tooling would be bearable in the context of a mass rename of tests.
 
---=20
-Alex Benn=C3=A9e
+Kevin
+
 
