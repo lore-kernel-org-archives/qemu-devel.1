@@ -4,89 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3BC5C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F168AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:52:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9D0720758
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:47:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B73B7206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 18:52:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DKPhPr2D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D0720758
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uzUP7PpB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73B7206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb7GV-0001dI-S0
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:46:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47202)
+	id 1jb7Li-000565-Tu
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 14:52:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb7Fk-0000v3-Lc
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:46:13 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:42307)
+ id 1jb7LA-0004da-L4
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:51:48 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42524)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jb7Fj-0006fq-Dx
- for qemu-devel@nongnu.org; Tue, 19 May 2020 14:46:12 -0400
-Received: by mail-pl1-x629.google.com with SMTP id k19so248270pll.9
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:46:11 -0700 (PDT)
+ id 1jb7L9-0007oO-FW
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 14:51:48 -0400
+Received: by mail-pl1-x643.google.com with SMTP id k19so253553pll.9
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:51:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=n38bPi+A72/fnn3D/m6XEyTKzrMIN/c0GVcCr1F+ruQ=;
- b=DKPhPr2Dqs9QW3jyUiVjtabtsPXzgxjvasOE+tC3vGUmBm4LY2oszBl8GHgIbpSVth
- tAYQ2bTbr4tetdpvS9AqIWB0kiWzjHfoi9xedPLFQgRV4TIJ2MJVwMXGJdoBQMTj9oA/
- z4B+6epGVhMCciJnxeetgRpH2onhrVBkJNGyJxtJMV/slhAZUAsHxKS+EBolmg3eqpFX
- 4VZk35tQ4fQcneWMhVK7J8PA//qUW+35tUt6r5flLWHH5JFTXMSRmLqA7yQzs34PA8OD
- 0ck5oTUi6ClCGIlfp9ugMj8on/LKQB35VjS7u/t9p39tYAYGhYd+K9yEEk4sBTTnskJd
- IFpg==
+ bh=nBBPffgVKLIkxJLraiw3rpKYl3hitk0dPuLLq1AlijI=;
+ b=uzUP7PpBTbqO9uKW5I9lMI1wWQcO+pM2PiYX0PGVOYVgtks66a+mTBNb8xQkN5NvQf
+ KJEJjy+SRWfldN1QMpMuE+tsl86PnTMR/w8SdgRiKW6eyrFM59UScf8bnQyGKUInlWwN
+ I64fWrHSfCqtaP+CcH/YUHsKyaB1b0zVxKhRtJ1QYSu+ie0WjY/SdoCU0H4IkUcFLhu3
+ xCYLgXOCa4jGzht7NWlpRZho7fGku9aceBQxlYGMQTzE9ePHQ8IaBZCs3vIvoVAfv38z
+ opHeVYLZT0cjLuhevLlcE4ZwoSyGUj1AMaRGWvChoVrN7kK1HYj4vo9geIrBcxPSFsy+
+ sG5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=n38bPi+A72/fnn3D/m6XEyTKzrMIN/c0GVcCr1F+ruQ=;
- b=aO/jUKE56wrTBTiYVXT3SiEAi3q4/+uVEuHEKuPTAmh7izoLvMQ50lI6G2XVgStWNF
- qwpEXl52zMLhx4IMKe7rx/ZBdqSdv75g4fGOlCPsYscLr6iF1+/mQqMN1nPhV6nXeJFW
- mP5t9dYWUPH9p1PZtzhNeaf9O0ct9KNMoXFmImAd4iZ0b1IcgsyrLI0ycnndHU3U201h
- nlNSKhMlFggzF42UvKSkcmEhgxmQ9j+14coo1jVvcG98Ah7k1HP8df7pZXBnvapSr2/w
- RfEJCID5v8WczYx13pNSYYLO6d2JovhrWVlZXpAzy/J1K8HJO9tTQL9d7mDutYLISlTL
- c1zA==
-X-Gm-Message-State: AOAM533W0Hboa5RjBr8tKl/bSXPJgsoU/OfzS4krLXjTgiPHZGtlq8ZL
- JZ0D4lNfKmWKFb97tucTOFiGkQ==
-X-Google-Smtp-Source: ABdhPJyeT3o7acx2NS1+VZTGCzVPPh3FLwd/CswUifYXfQYe2EHjmq0PBKLtjkia1apTh2LWDVDghw==
-X-Received: by 2002:a17:90a:4809:: with SMTP id
- a9mr963281pjh.196.1589913969814; 
- Tue, 19 May 2020 11:46:09 -0700 (PDT)
+ bh=nBBPffgVKLIkxJLraiw3rpKYl3hitk0dPuLLq1AlijI=;
+ b=tPe+i2G0pfdOpicgdSjbbSnC26NN1we2z6Y13l3x/vHF6281+/I98OPgZmRVUtMabB
+ 81u4FU6u724D3WGdQtY/bYlNz1sZ/0qtngnWWgfQzDawQXbQmAgpZA/xuEVqJoGL7vbS
+ 7Bn11kCWW1HtH5ETDX97x8MVRIPol/7OdKNhxew7cxvrP2spgXTZ0ZceQNh6pkcI0P8j
+ hLqOmwGqWYMT8TNgTcuX5RAKXMyhBDwIGwW2wMQOS/P51riQHwsICTMnt6MP8oOtIyDQ
+ lhH12C6wqYdZhxsQDKVmVCYrsDtjXqteg464cgYkKCy+6iLcW4FduGJqittG5STmpqZr
+ DoQQ==
+X-Gm-Message-State: AOAM532iUuzIJaSNLa2fV3KSe2F/8gSCJwqs6Wa23riRJoK+FbA+3+Jv
+ shlRwU7GzDAKeguqgCcBIQxzug==
+X-Google-Smtp-Source: ABdhPJxZKFwDQhw1Pxp9n7n6EHbuU0LSBUFHaeYWyku7Xkr+aKt+SF36lvnEnQBnuuH2UivVB3tzPg==
+X-Received: by 2002:a17:90a:6581:: with SMTP id
+ k1mr1049043pjj.118.1589914306078; 
+ Tue, 19 May 2020 11:51:46 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id j124sm179902pfd.116.2020.05.19.11.46.08
+ by smtp.gmail.com with ESMTPSA id l4sm156762pgo.92.2020.05.19.11.51.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 11:46:09 -0700 (PDT)
-Subject: Re: tst-arm-mte bug: PSTATE.TCO is cleared on exceptions
-To: Szabolcs Nagy <szabolcs.nagy@arm.com>
-References: <20200420102902.GE15401@arm.com>
- <a36c670a-5cef-f8c6-ce1d-4fbb28f9488d@linaro.org>
- <ec85fd40-229b-c965-1f58-d4cbe825419c@linaro.org>
- <20200506125709.GK23080@arm.com> <20200507095902.GA30635@arm.com>
- <5d0ae4c0-70a8-255c-9493-ca8b65e572fb@linaro.org>
- <20200518125901.GI27289@arm.com>
+ Tue, 19 May 2020 11:51:45 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
+ <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org> <87r1vfhisb.fsf@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <086d56cf-1aac-04b5-9e94-639c4bf005bd@linaro.org>
-Date: Tue, 19 May 2020 11:46:07 -0700
+Message-ID: <b02cee0d-3fb3-ee9c-90bb-4d9419249028@linaro.org>
+Date: Tue, 19 May 2020 11:51:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200518125901.GI27289@arm.com>
+In-Reply-To: <87r1vfhisb.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,15 +104,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nd@arm.com, qemu-devel@nongnu.org
+Cc: ysato@users.sourceforge.jp, qemu-devel@nongnu.org,
+ Ahmed Karaman <ahmedkhaledkaraman@gmail.com>, aleksandar.qemu.devel@gmail.com,
+ stefanha@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 5:59 AM, Szabolcs Nagy wrote:
-> i got some time to create a reproducer (with public code),
+On 5/19/20 11:38 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> On 5/19/20 9:21 AM, Ahmed Karaman wrote:
+>>> The issue arose because the page crossings check in use_goto_tb()
+>>> function is required only in the system mode. Checking it in both modes
+>>> causes an unnecessary overhead in the user mode.
+>>
+>> It is not only required in system mode.
+>>
+>> You can see failures in user-mode if you modify executable pages, or change
+>> their permissions with mmap.  Such as if the guest program contains a
+>> JIT.
+> 
+> If we kept better track couldn't we just tb_flush() if a new +x region
+> gets mmaped? I guess that would be sub-optimal compared to having a
+> translation cache per mmap region.
+> 
 
-Thanks.  I've grabbed it.  I'll try it out soon.
+Yes, this could definitely be improved.  Noticing changes to PROT_EXEC via
+mprotect, for one.
 
 
 r~
