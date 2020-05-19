@@ -2,89 +2,88 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED7CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFB9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C96520578
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 20:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52FE420758
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 21:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WdKjk0gx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C96520578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQxXx7R/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52FE420758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb980-0000vr-Jx
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 16:46:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60728)
+	id 1jb9TF-0001tN-HD
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 17:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jb97M-0000Rq-HL
- for qemu-devel@nongnu.org; Tue, 19 May 2020 16:45:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51932
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jb97L-0005Sn-Ki
- for qemu-devel@nongnu.org; Tue, 19 May 2020 16:45:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589921138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=t0APeD0JoVATSqfAv/mo9MEQfSanBX3Yj2m298Hy06Q=;
- b=WdKjk0gxRDqkMg+bSMBjduojAX2vlkUY3tFpIUAJRVGWaEGHr/YDHQxVH8Z2ObFjpRx5oB
- p4+Gla3lQWIT+/aL690LpH6nOB2dHrzD+cf4p6IIzyvnG/CteOIqeKfuYQ4tc+r9+leGmr
- 9EIKwaqOon2wyfR4qu+reTpW2Q74DxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-PLBRFfv3Ne2NJCdAIyynsQ-1; Tue, 19 May 2020 16:45:36 -0400
-X-MC-Unique: PLBRFfv3Ne2NJCdAIyynsQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53E26464;
- Tue, 19 May 2020 20:45:35 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 055C210013D9;
- Tue, 19 May 2020 20:45:31 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] block/io: fix bdrv_is_allocated_above
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200519195501.29071-1-vsementsov@virtuozzo.com>
- <20200519195501.29071-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <89da53bc-6e5f-1af4-d1f1-f44da39dc98e@redhat.com>
-Date: Tue, 19 May 2020 15:45:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jb9SL-0000x3-O9
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:07:21 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:36905)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jb9SK-0001r8-LM
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 17:07:21 -0400
+Received: by mail-io1-xd41.google.com with SMTP id t15so787614ios.4
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yoOxZj/HdBPnPjUa1p2NrUO9AmXeNtoE6mRa+A805Rg=;
+ b=TQxXx7R/k2ymMXYiGtJgJevxKYDQF6s7HoFD/8amrWZtXv0+Wp6OsLnCe7tTYvNvBh
+ SdFVUvueuQ9pRJxu2CWbpjBqmxEebup6ONEJPKDF28TInqxnzo24Qzf90XRW5u7bmQDy
+ qYtiTvtiT//zJiIqXu+gqUIvZ48DYceJGNK0FT/kq1e5CTfqSyU1nj3z9rjCh2qUm72e
+ s07tHBvEGA5ZijbVSicIwPR2koV840FLpow88ER4rV7Il2eVU92sqRpE2++PiyikLd42
+ 0EUFSs149p+1Vtl//oYwU0AhYV5XAdB96/yiVBYrkBvodZDJ0jU9YHOnq7Id7BQJCOJN
+ 55aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yoOxZj/HdBPnPjUa1p2NrUO9AmXeNtoE6mRa+A805Rg=;
+ b=E2ZzeD+O328kieb3TjoBwHOVSwOuUQla6dGMZ5Z17V0iMsnD0Iev+LGjm7MvdWqKTC
+ 4bdj+dNQ6NspBsTRZbWle2nUDz32DHGG3EqjhA9Og79Yzm3M3VVwuov89yahAM77+wnk
+ TGyxjp2tePq5ym6yWsu6E4DykbHHo+vVk3elSBfB1tgXtJJo+fzVNHWzgj/ve2J1du2F
+ YcHONRu32FCQiYIREBI/PE6AMvBk5Hf5eYKbDfJSQFlXB2JbQGefVk4/0y7q/03GXn5r
+ sMlBNHWbT/NXQxN88EgP2Aayk0YFB/ZMfEDsvDykldVTuYDrfp/i6KkX/uaUhdYj5P44
+ 1psw==
+X-Gm-Message-State: AOAM533tmmXJNi9pUdF/8AZ9DvafhhgUQt1vUMy6Au5eETBZ+UQV7VUE
+ H7Yi5sTf0UYPvSKs3uAvviFtLFRrwV/5BwFNMrg=
+X-Google-Smtp-Source: ABdhPJwOSUrcgTjBw61c4FCfPvWJgqejSHQXpHTiKbfy3l79erK0fg4wSbBLP1zxfQOoQWY3HDO2dpTI9LjJGRNWhP4=
+X-Received: by 2002:a6b:bf83:: with SMTP id p125mr853812iof.118.1589922439288; 
+ Tue, 19 May 2020 14:07:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200519195501.29071-5-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/18 23:19:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-24-armbru@redhat.com>
+In-Reply-To: <20200519145551.22836-24-armbru@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 19 May 2020 13:58:26 -0700
+Message-ID: <CAKmqyKPt4wN2jX5pyHQumu1Er9Ao-ndEyGbT3qHbBQMWuqekAA@mail.gmail.com>
+Subject: Re: [PATCH 23/55] ssi: Convert last use of ssi_create_slave_no_init()
+ manually
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,37 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/20 2:55 PM, Vladimir Sementsov-Ogievskiy wrote:
-> bdrv_is_allocated_above wrongly handles short backing files: it reports
-> after-EOF space as UNALLOCATED which is wrong,
+On Tue, May 19, 2020 at 8:03 AM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Same transformation as in the previous commit.  Manual, because
+> convincing Coccinelle to transform this case is not worthwhile.
+>
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-You haven't convinced me of that claim.
+Looks sane.
 
-> as on read the data is
-> generated on the level of short backing file (if all overlays has
-> unallocated area at that place).
-> 
-> Reusing bdrv_common_block_status_above fixes the issue and unifies code
-> path.
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
-Unifying the code path is admirable, but I'm not sure we have the 
-semantics right, yet.
+Alistair
 
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->   block/io.c | 43 +++++--------------------------------------
->   1 file changed, 5 insertions(+), 38 deletions(-)
-> 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>  hw/ssi/ssi.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+> index 54106f5ef8..58e7d904db 100644
+> --- a/hw/ssi/ssi.c
+> +++ b/hw/ssi/ssi.c
+> @@ -16,6 +16,7 @@
+>  #include "hw/ssi/ssi.h"
+>  #include "migration/vmstate.h"
+>  #include "qemu/module.h"
+> +#include "qapi/error.h"
+>
+>  struct SSIBus {
+>      BusState parent_obj;
+> @@ -96,9 +97,9 @@ DeviceState *ssi_create_slave_no_init(SSIBus *bus, const char *name)
+>
+>  DeviceState *ssi_create_slave(SSIBus *bus, const char *name)
+>  {
+> -    DeviceState *dev = ssi_create_slave_no_init(bus, name);
+> +    DeviceState *dev = qdev_new(name);
+>
+> -    qdev_init_nofail(dev);
+> +    qdev_realize_and_unref(dev, &bus->parent_obj, &error_fatal);
+>      return dev;
+>  }
+>
+> --
+> 2.21.1
+>
+>
 
