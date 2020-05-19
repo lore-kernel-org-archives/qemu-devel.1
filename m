@@ -2,62 +2,68 @@ Return-Path: <SRS0=GK8b=7B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2323AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A3FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBA1206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:19:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBA1206D4
+	by mail.kernel.org (Postfix) with ESMTPS id CEE30207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 09:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE30207D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jayP0-000854-84
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 05:19:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58320)
+	id 1jayfd-0005oz-Vs
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 05:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jayON-0007YW-BV
- for qemu-devel@nongnu.org; Tue, 19 May 2020 05:18:31 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:43470)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jayf8-0005Pt-1f
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 05:35:50 -0400
+Received: from 10.mo7.mail-out.ovh.net ([178.33.250.56]:53303)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jayOM-0003HM-Bo
- for qemu-devel@nongnu.org; Tue, 19 May 2020 05:18:31 -0400
-Received: from player738.ha.ovh.net (unknown [10.110.208.220])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 2AAB98D102
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:18:20 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player738.ha.ovh.net (Postfix) with ESMTPSA id D58E1129DB05E;
- Tue, 19 May 2020 09:18:16 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jayf6-0007gU-UB
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 05:35:49 -0400
+Received: from player789.ha.ovh.net (unknown [10.110.208.131])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 412A91654DE
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 11:35:46 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player789.ha.ovh.net (Postfix) with ESMTPSA id 1825F1289D8FE;
+ Tue, 19 May 2020 09:35:35 +0000 (UTC)
 Authentication-Results: garm.ovh; auth=pass
- (GARM-98R002b4001553-1dd6-4e3f-80e3-f3e556ea751f,70C5C5024F1CAF4ABF6ABE2DC9B39611306C745C)
- smtp.auth=groug@kaod.org
-Date: Tue, 19 May 2020 11:18:15 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/9] ppc/xive: Export xive_presenter_notify()
-Message-ID: <20200519111815.67b3a5b7@bahia.lan>
-In-Reply-To: <20200513151109.453530-3-clg@kaod.org>
-References: <20200513151109.453530-1-clg@kaod.org>
- <20200513151109.453530-3-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (GARM-103G0056ebaf816-57fe-41d9-80f3-70ed41fbb63f,3DCE2E61E2D7C1BA27EF92566E0C35A5904F621F)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 05/24] aspeed: Don't create unwanted "cortex-a7-arm-cpu"
+ devices
+To: Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>
+References: <20200518050408.4579-1-armbru@redhat.com>
+ <20200518050408.4579-6-armbru@redhat.com>
+ <fbd7151f-159f-7568-77cb-7ce86f4948ba@kaod.org>
+ <CACPK8Xf+Qf0BkOiDWj_wKXT-yF+2N0Ton01Nq7Xm5yie+fqqwA@mail.gmail.com>
+ <87r1vg5vep.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <802f4237-8e2b-e322-a7ba-24ec33d7b99d@kaod.org>
+Date: Tue, 19 May 2020 11:35:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 11843341123563919755
+In-Reply-To: <87r1vg5vep.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 12137482472405240782
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepueekjeekiefffedtveeukedvteejgeeivefhgfejgfdtleduvdfgfeelkeeuveeunecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.73.241; envelope-from=groug@kaod.org;
- helo=10.mo69.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 05:18:21
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtjedgudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.33.250.56; envelope-from=clg@kaod.org;
+ helo=10.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 05:35:46
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -77,62 +83,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 13 May 2020 17:11:02 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 5/19/20 7:46 AM, Markus Armbruster wrote:
+> Joel Stanley <joel@jms.id.au> writes:
+> 
+>> On Mon, 18 May 2020 at 12:24, Cédric Le Goater <clg@kaod.org> wrote:
+>>>
+>>> On 5/18/20 7:03 AM, Markus Armbruster wrote:
+>>>> The number of CPUs is controlled by property "num-cpus".
+>>>> aspeed_soc_ast2600_init() creates the maximum supported number.
+>>>> aspeed_soc_ast2600_realize() realizes only the wanted number.  Works,
+>>>> although it leaves unrealized devices hanging around in the QOM
+>>>> composition tree.  Affects machines ast2600-evb and tacoma-bmc.
+>>>>
+>>>> Make the init functions create only the wanted ones.  Visible in "info
+>>>> qom-tree"; here's the change for ast2600-evb:
+>>>>
+>>>>      /machine (ast2600-evb-machine)
+>>>>        [...]
+>>>>        /soc (ast2600-a1)
+>>>>          [...]
+>>>>          /cpu[0] (cortex-a7-arm-cpu)
+>>>>            /unnamed-gpio-in[0] (irq)
+>>>>            /unnamed-gpio-in[1] (irq)
+>>>>            /unnamed-gpio-in[2] (irq)
+>>>>            /unnamed-gpio-in[3] (irq)
+>>>>     -    /cpu[1] (cortex-a7-arm-cpu)
+>>>>     -      /unnamed-gpio-in[0] (irq)
+>>>>     -      /unnamed-gpio-in[1] (irq)
+>>>>     -      /unnamed-gpio-in[2] (irq)
+>>>>     -      /unnamed-gpio-in[3] (irq)
+>>>>          /ehci[0] (platform-ehci-usb)
+>>>>
+>>>> Cc: "Cédric Le Goater" <clg@kaod.org>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: Andrew Jeffery <andrew@aj.id.au>
+>>>> Cc: Joel Stanley <joel@jms.id.au>
+>>>> Cc: qemu-arm@nongnu.org
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>
+>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>>
+>>> Joel, Andrew,
+>>>
+>>> Shouldn't we enforce a default/min/max number of CPUs of 2 for the AST2600 ?
+>>> That's the SoC definition. The fact it is configurable in the Aspeed model
+>>> was nice to have during bringup but we are now done.
+>>
+>> Agreed, we want there to always be two CPUs for the 2600.
+> 
+> Follow-up patch welcome!
 
-> It's generic enough to be used from the XIVE2 router and avoid more
-> duplication.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+I just sent a patch on this topic.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  include/hw/ppc/xive.h | 4 ++++
->  hw/intc/xive.c        | 8 ++++----
->  2 files changed, 8 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 112fb6fb6dbe..88b0a2a3811f 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -406,6 +406,10 @@ int xive_presenter_tctx_match(XivePresenter *xptr, X=
-iveTCTX *tctx,
->                                uint8_t format,
->                                uint8_t nvt_blk, uint32_t nvt_idx,
->                                bool cam_ignore, uint32_t logic_serv);
-> +bool xive_presenter_notify(XiveFabric *xfb, uint8_t format,
-> +                           uint8_t nvt_blk, uint32_t nvt_idx,
-> +                           bool cam_ignore, uint8_t priority,
-> +                           uint32_t logic_serv);
-> =20
->  /*
->   * XIVE Fabric (Interface between Interrupt Controller and Machine)
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index b8825577f719..f08fcec1c039 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1481,10 +1481,10 @@ int xive_presenter_tctx_match(XivePresenter *xptr=
-, XiveTCTX *tctx,
->   *
->   * The parameters represent what is sent on the PowerBus
->   */
-> -static bool xive_presenter_notify(XiveFabric *xfb, uint8_t format,
-> -                                  uint8_t nvt_blk, uint32_t nvt_idx,
-> -                                  bool cam_ignore, uint8_t priority,
-> -                                  uint32_t logic_serv)
-> +bool xive_presenter_notify(XiveFabric *xfb, uint8_t format,
-> +                           uint8_t nvt_blk, uint32_t nvt_idx,
-> +                           bool cam_ignore, uint8_t priority,
-> +                           uint32_t logic_serv)
->  {
->      XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
->      XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
+C.
+ 
 
 
