@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA13EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF65C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:58:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79F9C204EF
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:57:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDFE4207D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 May 2020 14:58:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRm46zoT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79F9C204EF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PllOkZRg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDFE4207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jb3gA-0003E5-Kl
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:57:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44926)
+	id 1jb3hH-0006Nx-1Z
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 10:58:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ey-00014N-P1
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34479
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ew-000104-Oa
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:55:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57889
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ex-0003UH-UU
- for qemu-devel@nongnu.org; Tue, 19 May 2020 10:56:00 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jb3ev-0003SO-DG
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 10:55:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589900159;
+ s=mimecast20190719; t=1589900156;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QCeH/hmkxsokmaHazw7A+6o6yNAW9ja1aQ4L78m0VT8=;
- b=DRm46zoT0R5PQ8nIco3tXOkIAY6LEWrmrMBisy/r/gLc83Ii4N14zRiB/ryl3i1xpgaRNi
- VzrU45n2k+wUr1qcJ+Smpz2VsJi10jGEKYloDvlCkMKUuL1FMYSkCSuiTao2MTdEFunxuf
- OQ2XugSueaRtLv5MpAUM3HK+HysJZzw=
+ bh=eb3bZUZFgKmx2gSFK3X0cieHjQHEpVHVGIh21MX00QI=;
+ b=PllOkZRgYaBDq2GL7+8649aouMCxlNXpZGnVqToL2plG8dvV6h/dHEuWl3MRjNkADtcdKx
+ iFIpMX/eE1mhfhqMYOU7/h0QD4a83z0TUPptV24i+zQb+/CFqJyLRkcBxHm1ai6049zXeH
+ 0w9eQv7G6GwL99du4m1zRLX23ByYVnY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-wxXE3_hiNf6Yzvje2JrBpA-1; Tue, 19 May 2020 10:55:57 -0400
-X-MC-Unique: wxXE3_hiNf6Yzvje2JrBpA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-505-cp8Y9gTwMau3uI4YEZljfQ-1; Tue, 19 May 2020 10:55:54 -0400
+X-MC-Unique: cp8Y9gTwMau3uI4YEZljfQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D3808010FA
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62FC48018A2
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 14:55:53 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B6E560BEC;
- Tue, 19 May 2020 14:55:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 324E76155F;
+ Tue, 19 May 2020 14:55:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DE52E11358CA; Tue, 19 May 2020 16:55:51 +0200 (CEST)
+ id B217111358BD; Tue, 19 May 2020 16:55:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 13/55] hw/ppc: Eliminate two superfluous QOM casts
-Date: Tue, 19 May 2020 16:55:09 +0200
-Message-Id: <20200519145551.22836-14-armbru@redhat.com>
+Subject: [PATCH 01/55] qdev: Rename qbus_realize() to qbus_init()
+Date: Tue, 19 May 2020 16:54:57 +0200
+Message-Id: <20200519145551.22836-2-armbru@redhat.com>
 In-Reply-To: <20200519145551.22836-1-armbru@redhat.com>
 References: <20200519145551.22836-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -100,56 +100,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+qbus_realize() does not actually realize.  Rename it to qbus_init().
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/ppc/mac_newworld.c | 4 ++--
- hw/ppc/mac_oldworld.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ hw/core/bus.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 69281d7834..2d069dcc59 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -122,7 +122,7 @@ static void ppc_core99_init(MachineState *machine)
-     long kernel_size, initrd_size;
-     UNINHostState *uninorth_pci;
-     PCIBus *pci_bus;
--    NewWorldMacIOState *macio;
-+    PCIDevice *macio;
-     bool has_pmu, has_adb;
-     MACIOIDEState *macio_ide;
-     BusState *adb_bus;
-@@ -375,7 +375,7 @@ static void ppc_core99_init(MachineState *machine)
-     pci_bus = PCI_HOST_BRIDGE(uninorth_pci)->bus;
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index f42d64f34a..08c5eab24a 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -95,7 +95,7 @@ static void bus_reset_child_foreach(Object *obj, ResettableChildCallback cb,
+     }
+ }
  
-     /* MacIO */
--    macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
-+    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     qdev_prop_set_bit(dev, "has-pmu", has_pmu);
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index cfc2eae1d9..f73ec5f3a9 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -94,7 +94,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     uint32_t kernel_base, initrd_base, cmdline_base = 0;
-     int32_t kernel_size, initrd_size;
-     PCIBus *pci_bus;
--    OldWorldMacIOState *macio;
-+    PCIDevice *macio;
-     MACIOIDEState *macio_ide;
-     SysBusDevice *s;
-     DeviceState *dev, *pic_dev;
-@@ -278,7 +278,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
+-static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
++static void qbus_init(BusState *bus, DeviceState *parent, const char *name)
+ {
+     const char *typename = object_get_typename(OBJECT(bus));
+     BusClass *bc;
+@@ -156,7 +156,7 @@ void qbus_create_inplace(void *bus, size_t size, const char *typename,
+                          DeviceState *parent, const char *name)
+ {
+     object_initialize(bus, size, typename);
+-    qbus_realize(bus, parent, name);
++    qbus_init(bus, parent, name);
+ }
  
-     /* MacIO */
--    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
-+    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+ BusState *qbus_create(const char *typename, DeviceState *parent, const char *name)
+@@ -164,7 +164,7 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
+     BusState *bus;
+ 
+     bus = BUS(object_new(typename));
+-    qbus_realize(bus, parent, name);
++    qbus_init(bus, parent, name);
+ 
+     return bus;
+ }
 -- 
 2.21.1
 
