@@ -2,81 +2,75 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=unavailable
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8959DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F99C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:44:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C7A420758
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:43:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGdiGmPe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C7A420758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99C8D20758
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:44:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99C8D20758
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbO4C-0001W1-HC
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:43:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40458)
+	id 1jbO55-0002dG-TH
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:44:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNue-0007Q2-Qd
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:33:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55086
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNuc-0007dA-M1
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:33:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589978009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cP0lsWezPxtotLvHfeqEt/U+gfIXto0JaGKHL4YU9vc=;
- b=JGdiGmPeAr9smrl6HC1KAsgBVkZKqMRI9ACBQOH+ucY5nBrgEKtlgVFlYoLhr/jwNv5PAa
- vGe769jw/J6kOfRJOdXGgM999ET7vGD0OENr3z+m6Wd5x3WOGYYLxy/Q5cIgrgpKPGWT/p
- hmqrhoxWJ3FE8Ha2AtksZah48gRw8MU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-zfbSSGieMeaWIg5VlXbHUg-1; Wed, 20 May 2020 08:33:24 -0400
-X-MC-Unique: zfbSSGieMeaWIg5VlXbHUg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFC301005510;
- Wed, 20 May 2020 12:33:23 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-76.ams2.redhat.com [10.36.113.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F085E6246F;
- Wed, 20 May 2020 12:33:21 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 19/19] virtio-mem: Add trace events
-Date: Wed, 20 May 2020 14:31:52 +0200
-Message-Id: <20200520123152.60527-20-david@redhat.com>
-In-Reply-To: <20200520123152.60527-1-david@redhat.com>
-References: <20200520123152.60527-1-david@redhat.com>
+ (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1jbNw4-0002Ah-Uf
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:35:00 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:33927)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1jbNw3-0007rB-Jx
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:35:00 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w4so2781790oia.1
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 05:34:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=F/u+6tnly2BFfAMjAK8M1DKWCRzqZwn5wyDMJLDJi3s=;
+ b=AMZ4mY15GuUxsRkP7ia3LDGKQQIawd19+43xsVeQgJabNqpWinlsygxLXB3K5yqk+6
+ Kn8zXDj9Vi8zwzZP1WklE8dCZjAjIwBEb97Os68WK6FJOw33APWk2zMiodhl6bkAg7SE
+ 5EGxP+kCHZOQFYVCND6phyoIKZNvwApK+Vmt4JtkuJmqG6plWlIyE4lKLynWbBcjQ68C
+ rTWW2gjseRISY94V1b8P8Mw53lstzDCvlMcOgLI8DAvRrhw6IDkyuvBqTpZ+NAPzbk4G
+ eAwjzYCxj4VcX8aeaV7Hld+nIkNQRSRGwj+UCqWsdS86fIvQJ7DtiEcgvSiBtWjGtevg
+ 1MWQ==
+X-Gm-Message-State: AOAM533j9Gqbi2yy+s4+iSROmQ8/1nlQIjvnd9VvzMkyVCnuv3srqDrd
+ Nud+vEEFxnrYXJ8ZVQ7rMVWWcyTvHRGH9B6k+x8=
+X-Google-Smtp-Source: ABdhPJwOCOKGJWDMvkrJ0xNeetJajHrD/IP3CJbDZJ76726JW+VglbUl0g5pNhwQURwdBQbNda+mABt+2A5T1kia3c0=
+X-Received: by 2002:aca:210a:: with SMTP id 10mr1526706oiz.153.1589978097806; 
+ Wed, 20 May 2020 05:34:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
+References: <20200511145257.22970-1-geert+renesas@glider.be>
+ <20200520121420.GA1867563@smile.fi.intel.com>
+In-Reply-To: <20200520121420.GA1867563@smile.fi.intel.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 20 May 2020 14:34:46 +0200
+Message-ID: <CAMuHMdW9EsRLYYTL0pd-PqqZs5WcUfK8i2uceNwJnSvAQKuVgw@mail.gmail.com>
+Subject: Re: [PATCH v7 0/6] gpio: Add GPIO Aggregator
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=209.85.167.194;
+ envelope-from=geert.uytterhoeven@gmail.com; helo=mail-oi1-f194.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 08:34:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
+ FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,120 +83,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's add some trace events that might come in handy later.
+Hi Andy,
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/virtio/trace-events | 10 ++++++++++
- hw/virtio/virtio-mem.c | 10 +++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+On Wed, May 20, 2020 at 2:14 PM Andy Shevchenko
+<andriy.shevchenko@intel.com> wrote:
+> On Mon, May 11, 2020 at 04:52:51PM +0200, Geert Uytterhoeven wrote:
+> > GPIO controllers are exported to userspace using /dev/gpiochip*
+> > character devices.  Access control to these devices is provided by
+> > standard UNIX file system permissions, on an all-or-nothing basis:
+> > either a GPIO controller is accessible for a user, or it is not.
+> > Currently no mechanism exists to control access to individual GPIOs.
+> >
+> > Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
+> > them as a new gpiochip.  This is useful for implementing access control,
+> > and assigning a set of GPIOs to a specific user.  Furthermore, this
+> > simplifies and hardens exporting GPIOs to a virtual machine, as the VM
+> > can just grab the full GPIO controller, and no longer needs to care
+> > about which GPIOs to grab and which not, reducing the attack surface.
+> > This has been implemented for ARM virt in QEMU[1].
+> >
+> > Recently, other use cases have been discovered[2], like describing
+> > simple GPIO-operated devices in DT, and using the GPIO Aggregator as a
+> > generic GPIO driver for userspace, which is useful for industrial
+> > control.
+> >
+> > Note that the first patch of this series ("i2c: i801: Use GPIO_LOOKUP()
+> > helper macro") has been applied to i2c/for-next.
+>
+> Sorry for late reply, recently noticed this nice idea.
+> The comment I have is, please, can we reuse bitmap parse algorithm and syntax?
+> We have too many different formats and parsers in the kernel and bitmap's one
+> seems suitable here.
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index e83500bee9..c40ad5ea27 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -73,3 +73,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-+
-+# virtio-mem.c
-+virtio_mem_send_response(uint16_t type) "type=%" PRIu16
-+virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_unplugged_all(void) ""
-+virtio_mem_unplug_all_request(void) ""
-+virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
-+virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_state_response(uint16_t state) "state=%" PRIu16
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index d863f336e8..87502b9989 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -30,6 +30,7 @@
- #include "hw/boards.h"
- #include "hw/qdev-properties.h"
- #include "config-devices.h"
-+#include "trace.h"
- 
- /*
-  * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
-@@ -94,6 +95,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
-     VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
-     VirtQueue *vq = vmem->vq;
- 
-+    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
-     iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
- 
-     virtqueue_push(vq, elem, sizeof(*resp));
-@@ -188,6 +190,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
-     uint16_t type;
- 
-+    trace_virtio_mem_plug_request(gpa, nb_blocks);
-     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
-     virtio_mem_send_response_simple(vmem, elem, type);
- }
-@@ -199,6 +202,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
-     uint16_t type;
- 
-+    trace_virtio_mem_unplug_request(gpa, nb_blocks);
-     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
-     virtio_mem_send_response_simple(vmem, elem, type);
- }
-@@ -215,6 +219,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
-         return;
-     }
- 
-+    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
-     vmem->usable_region_size = newsize;
- }
- 
-@@ -237,7 +242,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
-         vmem->size = 0;
-         notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-     }
--
-+    trace_virtio_mem_unplugged_all();
-     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
-     return 0;
- }
-@@ -245,6 +250,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
- static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
-                                           VirtQueueElement *elem)
- {
-+    trace_virtio_mem_unplug_all_request();
-     if (virtio_mem_unplug_all(vmem)) {
-         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
-     } else {
-@@ -262,6 +268,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-         .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
-     };
- 
-+    trace_virtio_mem_state_request(gpa, nb_blocks);
-     if (!virtio_mem_valid_range(vmem, gpa, size)) {
-         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
-         return;
-@@ -274,6 +281,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     } else {
-         resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
-     }
-+    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
-     virtio_mem_send_response(vmem, elem, &resp);
- }
- 
+Thank you, I wasn't aware of that.
+
+Which one do you mean? The documentation seems to be confusing,
+and incomplete.
+My first guess was bitmap_parse(), but that one assumes hex values?
+And given it processes the unsigned long bitmap in u32 chunks, I guess
+it doesn't work as expected on big-endian 64-bit?
+
+bitmap_parselist() looks more suitable, and the format seems to be
+compatible with what's currently used, so it won't change ABI.
+Is that the one you propose?
+
+> (Despite other small clean ups, like strstrip() use)
+
+Aka strim()? There are too many of them, to know all of them by heart ;-)
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.25.4
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
