@@ -7,81 +7,78 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5451DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21CCE20823
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFC6A20756
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="svZbFryD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21CCE20823
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Icnfj42E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC6A20756
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbVe1-0001Qv-5M
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 16:48:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44664)
+	id 1jbVgt-0003Tp-P5
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 16:51:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVaI-000836-NA
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:45:02 -0400
-Received: from mout.web.de ([212.227.17.11]:43013)
+ id 1jbVXp-0005mO-QN
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:29 -0400
+Received: from mout.web.de ([212.227.17.11]:46605)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVaH-0007Q2-Bi
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:45:02 -0400
+ id 1jbVXo-00076d-SV
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590007491;
- bh=Z0ZIAPTS2ZPeT3zKUS7gJIPNgM4iQ1Q2zmo8H2josts=;
+ s=dbaedf251592; t=1590007341;
+ bh=nBz36uKLAVET+svpvOg5XAEq13IOV9YVmFR9/mOLz4w=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=svZbFryDDTGhlw2oTohy/+vmqpdwrBebr8qsH2dzi4Si6kv7sJQgp+TJ8h5okZqxy
- StoXD2rIjprvOhesypqBIbfNweMmf1i0TWM8BBuAUCwqr/5MOJpe5IhimGibYsE6zt
- WfdVzABKjSTI5KwJjO1i9yumIwOrwnHuEBVQ/YKQ=
+ b=Icnfj42EK4XLxK3Hmpl0O/cZPwrSq8FNGXWw3P38gY8rC28tKiAtAbGvAR+BkTQ1o
+ GOAqQtsPM/EgZY+m5iyOn7BOz3P9nnj0myxEZTWQ7+qtIRvHCUFZAplFGSW6yBzaCk
+ iL8Pzzjz3HWDvJlzh+Zeqg+oaxeHiQgbwq4zhaqo=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MZB07-1jWv8k399t-00VJ4p; Wed, 20
- May 2020 22:44:51 +0200
-Date: Wed, 20 May 2020 22:44:50 +0200
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N7gbY-1iyPJX19Fq-014duS; Wed, 20
+ May 2020 22:42:21 +0200
+Date: Wed, 20 May 2020 22:42:20 +0200
 From: Lukas Straub <lukasstraub2@web.de>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 5/6] migration/qemu-file.c: Don't ratelimit a shutdown fd
-Message-ID: <20200520224450.5a0bf201@luklap>
-In-Reply-To: <20200519145020.GG2798@work-vm>
-References: <cover.1589193382.git.lukasstraub2@web.de>
- <f3ea4250e6982598ffffc73924a6917dbc823c87.1589193382.git.lukasstraub2@web.de>
- <1dc261c8dce6421b80071c0eb3528afd@huawei.com>
- <20200518115534.GD2786@work-vm> <20200519150846.2b0aa66f@luklap>
- <20200519145020.GG2798@work-vm>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v2 3/6] migration/colo.c: Flush ram cache only after
+ receiving device state
+Message-ID: <38382499f40a1288d7e7f0fd59173b23660b69d9.1590007004.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1590007004.git.lukasstraub2@web.de>
+References: <cover.1590007004.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Zzml95DMGhwnLGBBuF3NK=A";
+Content-Type: multipart/signed; boundary="Sig_/l8AuOZVOaV9W4.w.EKwRSFx";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:h80tkpZ2qjF27poV1anwByM0hO2bfN5p+1NpW+nNb9qRpdSxK4n
- po+bQcAEmSG3qT+MQhLMHppfcPNc01dLl+vCXVakElTHN2z4S/9qp+RBmH02Eom3rk3gCrr
- d87w0tggqWrxlU1reHWJ9yvOaKYjXY+9wmBQNl6+IGgjjVsQz40VqCMSC8Us68VNDuJdjA1
- Ba3TbONxKX9XAMwMz7vdA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WgQr+B4GyQo=:32RvOt8ZNOcIbnKs3DHh/A
- x1EWh9z8r0nfWwlW/CAJM/f8gaxAxide0/QXBx1vcUK1ysLJ39V8ZuVHLwUgSTtF67ZXCVOmq
- 4X5r7flH7Xv9+YvfrdwVSNm9AwpyC/AYYISoz+coH4HsiMN+Pdq0GVYgePp9YqZb8nStJzA5z
- a9MAe5whkXe1b4z7ST5TvQLC4Xb6cKlQpRuvkq4FYJY9TnboVb+W3stTwsqhbSbLGDWPiajeb
- uz0WLyM/pKnTebE5J8XWc1KW92VhYdbmoMqnjySCX33wlIYV8FzgeUlgwwuh5G3YdixDtG489
- LaFBxnwP5LKFOgkwngz0VxW+EWiRf0mX2UpP2g0CW5jm3PBsXE8Et6J4WgebSbEK+hzHsrLFS
- 50b2Gh2fpx8QIFfHmdwvoO6Pb1B/DV7UdOMuKgxy4zmQgjmqA9O/6HGwyc54TzyNRZLQrUOnt
- kJWHnB7+ED/5OtIb2lrdDSdmmiffFE58o3ikcngRk9qxEbyuwIBhxP3r/dxWrQoUSr6C//5Am
- ANfQJZeUwXPbU/dHMj8wY0BlrhBAkRo//+66NLepciFTlD+eax7nZjBIMdlHAqXvG7LQRIEFP
- IOc8w33eq8bjilaywNlX/97VvlJJM3n5YmuZ8QJSAlLp27DUXpPIqyO1UiLokLdobcwVUizU8
- uo5yy56glghXJnY1GvRPHxh120Oc0v2uzydeFA8idZFHw1FBlfbRcbNHZF7EavzC4I4Dh8MfH
- gPe64zck3jNnKHWUPO+ifZogThOeo+qcM0uQE10M5qPccJ6pjgWzW/pbO8uy7duK+cirq0tEb
- y7MgonYW6V+4det17LpSfb7V0w5AcHiwOv+bV8EBZDMmTeHRKqlkM/gca/h/P/3u+uOmQMp7b
- cjUFNEJVpyKhptEWivdttsekjMU6DcrvBZoV3K6kHnSe0T8JyJ2RUprGbupfNz67/ubs2zno3
- 4jaWONXiDnBYSQz5Kz3S6Qvq6xP7RT1h1oeRZEhocZ1dMBXRmT8HULjmQMq+y0YWgJAP9K1kT
- 7R/HCNzXgJ0BHNQa7mXTax6vGmO0lySRQ4DZlGV9ifOSN+QOEWbmZXdY6AQ7nTzd3a9Uuk8c0
- c4Cs2STS6WP7yU96Km8GkpLwtxB78DYL6RaxgZwWV88Syf6qcbut++eXZDEE2MLSO1dCZAxmh
- PGKyqEqL0KNz6BS4+/cWZdrTC2rmMwqjuTAsMdBFlXbVK+pjNLYAT1jQ+OjxOsH2nfxF3Fw1S
- J82QHY6415HUllJ31
+X-Provags-ID: V03:K1:70VK6yf9zPvIdnGLOJ8M2cKJqRj4iOoKXJcVIcnOFJZzPSoVYNj
+ /W4B8o6JwdveFklqYkTqR5b8DX2Jmd/q6TZ6zpnb49g/KyBLNyZ/RdZvES+XubtBOqcOBYA
+ xU+U/iYWVUM+vGBZyVvH0/63RdogoaPExXThRppJodpg46vA8LJPv7WvLMNHB1RB/GAdNcp
+ JCPWaHeq/us8AMnwM9X6g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hJ/Iah1VeIk=:If04k/IPK1QczH/dN7wyaY
+ 4/g133qSADLa6JuXzXuVIYO9syoAQ3Hp67u8JwDZ6BPbGi+nqICGebFUZorBlVOCpIhxVwoRV
+ tVysWrKXE9zpNgPqFLPFvCkbLMdSB7i9e/JYXyd8gy87OO8Qkc/KLK0KegU9NMYFHEVk7uIOC
+ IsjBRk+qVTZlxScoQvKhbEjT2ggCambHqtAn30yK5ARH+KSIkCZsT3fPHyFOyw/8lC9z+j3jw
+ 7X2UBEZJ0L0w9BUCSlkBwoD4BC/Et32lYfcHwf+tYH0ablUAAC9Z0bk91Ust7N1dLf/fgLRBe
+ opOhXUsGlb7bRBlzzV6y6tz1n9j4UugIvWxtr0f3ksdXjcjA0xHDulM9335394ji+DRsSYDBu
+ hTL+P2ONiTWENM6hCRgg5zaWC1ita8nG2YzOFLHvhLMqEWEeOl2XsCiA9AbnPzFHerub43btI
+ EwV7m6H4ir5c17bW7DwQouT+AMobuIu+1zuiVXTdUBb9F4MLkdsGnxCEJvtp3QfX34w6BczDE
+ 9vxeKDLUIwr2EGkKg03G2iPHZCixo6GNEPSH05m3EoPqFPDVzmRN1gyyZvIFDV57yw8Wn2wvq
+ HrbmNw2rUhuemR5l+PK1t7IbNLvI228IaighnD6Anwil+wpWUey0eWLumP7RepNxw72YauecW
+ aJJGwwQwSMoCEi9dhqcIh578o8wK9qN8e+Kif6N4aHUKRtXX/f7hoVwvY93b/OZIJdue0HrqP
+ LKyHVljomOZ9Ltcnuy0153aLgksKX5jdTSO+iiiSUxUoDPlc5D5Gcuhq3SUssoevvEfTHeACM
+ JvQr6N5ZGlNS+NPzY5St+0pq6gUOYRgfcQJDwfiEZf7LndD8K41KSOBYE28stwhB1geHgvpJq
+ gqmA+knl+SkhBGxXGTq3rBrc3U6+9yiRRZQ3zW+ba/sK1s8PO/7vh/Wumd3xKQVIfLyGKO3P4
+ R1AyMuX7prKHP6VvNv12/2kFGOIl30HUj2TsSSVMhUl2Q/Hcqm1K0CgLArkTC1vc0LGRqpzdH
+ HeUo2yfZKixNMmpQ1iHJIJNaVco7nmK35nm74AVhAiao/PARmvdF49U/YtF/dnK//srgMlbi0
+ X3eKdXmEIYNQnpi1XiDyR6cYCSn+fApSpvF1UpFxxzknk9O8C+6w2HzIIeArf8Ikg0+NRhPbI
+ BHKnpDn7JaIwqkwW2ku9A0L1RaJUT2JcZYveXGADiizGHVyGEoBs67+9vv/c6GAowp+FcVnox
+ NZQtkTyB1TbiJWEaU
 Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:25
@@ -106,197 +103,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/Zzml95DMGhwnLGBBuF3NK=A
+--Sig_/l8AuOZVOaV9W4.w.EKwRSFx
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 19 May 2020 15:50:20 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+If we suceed in receiving ram state, but fail receiving the device
+state, there will be a mismatch between the two.
 
-> * Lukas Straub (lukasstraub2@web.de) wrote:
-> > On Mon, 18 May 2020 12:55:34 +0100
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >  =20
-> > > * Zhanghailiang (zhang.zhanghailiang@huawei.com) wrote: =20
-> > > > > This causes the migration thread to hang if we failover during ch=
-eckpoint. A
-> > > > > shutdown fd won't cause network traffic anyway.
-> > > > >    =20
-> > > >=20
-> > > > I'm not quite sure if this modification can take side effect on nor=
-mal migration process or not,
-> > > > There are several places calling it.
-> > > >=20
-> > > > Maybe Juan and Dave can help ;)
-> > > >    =20
-> > > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > > > > ---
-> > > > >  migration/qemu-file.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >=20
-> > > > > diff --git a/migration/qemu-file.c b/migration/qemu-file.c index
-> > > > > 1c3a358a14..0748b5810f 100644
-> > > > > --- a/migration/qemu-file.c
-> > > > > +++ b/migration/qemu-file.c
-> > > > > @@ -660,7 +660,7 @@ int64_t qemu_ftell(QEMUFile *f)  int
-> > > > > qemu_file_rate_limit(QEMUFile *f)  {
-> > > > >      if (f->shutdown) {
-> > > > > -        return 1;
-> > > > > +        return 0;
-> > > > >      }   =20
-> > >=20
-> > > This looks wrong to me; I'd be curious to understand how it's hanging
-> > > for you.
-> > > '1' means 'stop what you're doing', 0 means carry on; carrying on wit=
-h a
-> > > shutdown fd sounds wrong.
-> > >=20
-> > > If we look at ram.c we have:
-> > >=20
-> > >         while ((ret =3D qemu_file_rate_limit(f)) =3D=3D 0 ||
-> > >                 !QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
-> > >             int pages;
-> > >         ....
-> > >=20
-> > > so if it returns '1', as it does at the moment it should cause it to
-> > > exit the ram_save_iterate loop - which is what we want if it's failin=
-g.
-> > > Thus I think you need to find the actual place it's stuck in this cas=
-e -
-> > > I suspect it's repeatedly calling ram_save_iterate and then exiting i=
-t,
-> > > but if that's happening perhaps we're missing a qemu_file_get_error
-> > > check somewhere. =20
-> >=20
-> > Hi,
-> > the problem is in ram_save_host_page and migration_rate_limit, here is =
-a backtrace: =20
->=20
-> Ah...
->=20
-> > #0  0x00007f7b502921a8 in futex_abstimed_wait_cancelable (private=3D0, =
-abstime=3D0x7f7ada7fb3f0, clockid=3D0, expected=3D0, futex_word=3D0x55bc358=
-b9908) at ../sysdeps/unix/sysv/linux/futex-internal.h:208
-> > #1  do_futex_wait (sem=3Dsem@entry=3D0x55bc358b9908, abstime=3Dabstime@=
-entry=3D0x7f7ada7fb3f0, clockid=3D0) at sem_waitcommon.c:112
-> > #2  0x00007f7b502922d3 in __new_sem_wait_slow (sem=3D0x55bc358b9908, ab=
-stime=3D0x7f7ada7fb3f0, clockid=3D0) at sem_waitcommon.c:184
-> > #3  0x000055bc3382b6c1 in qemu_sem_timedwait (sem=3D0x55bc358b9908, ms=
-=3D100) at util/qemu-thread-posix.c:306
-> > #4  0x000055bc3363950b in migration_rate_limit () at migration/migratio=
-n.c:3365 =20
->=20
-> OK, so how about:
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index b6b662e016..4e885385a8 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -3356,6 +3356,10 @@ bool migration_rate_limit(void)
->      bool urgent =3D false;
->      migration_update_counters(s, now);
->      if (qemu_file_rate_limit(s->to_dst_file)) {
-> +
-> +        if (qemu_file_get_error(mis->from_src_file)) {
-> +            return false;
-> +        }
->          /*
->           * Wait for a delay to do rate limiting OR
->           * something urgent to post the semaphore.
->=20
-> Does that work?
+Fix this by flushing the ram cache only after the vmstate has been
+received.
 
-Yes, this works well using s->to_dst_file instead of mis->from_src_file.
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+---
+ migration/colo.c | 1 +
+ migration/ram.c  | 5 +----
+ migration/ram.h  | 1 +
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-Regards,
-Lukas Straub
+diff --git a/migration/colo.c b/migration/colo.c
+index 6b2ad35aa4..2947363ae5 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -739,6 +739,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
 
-> I wonder if we also need to kick the rate_limit_sem when we yank the
-> socket.
->=20
-> Dave
->=20
-> > #5  0x000055bc332b70d3 in ram_save_host_page (rs=3D0x7f7acc001a70, pss=
-=3D0x7f7ada7fb4b0, last_stage=3Dtrue) at /home/lukas/qemu/migration/ram.c:1=
-696
-> > #6  0x000055bc332b71fa in ram_find_and_save_block (rs=3D0x7f7acc001a70,=
- last_stage=3Dtrue) at /home/lukas/qemu/migration/ram.c:1750
-> > #7  0x000055bc332b8bbd in ram_save_complete (f=3D0x55bc36661330, opaque=
-=3D0x55bc33fbc678 <ram_state>) at /home/lukas/qemu/migration/ram.c:2606
-> > #8  0x000055bc3364112c in qemu_savevm_state_complete_precopy_iterable (=
-f=3D0x55bc36661330, in_postcopy=3Dfalse) at migration/savevm.c:1344
-> > #9  0x000055bc33641556 in qemu_savevm_state_complete_precopy (f=3D0x55b=
-c36661330, iterable_only=3Dtrue, inactivate_disks=3Dfalse) at migration/sav=
-evm.c:1442
-> > #10 0x000055bc33641982 in qemu_savevm_live_state (f=3D0x55bc36661330) a=
-t migration/savevm.c:1569
-> > #11 0x000055bc33645407 in colo_do_checkpoint_transaction (s=3D0x55bc358=
-b9840, bioc=3D0x7f7acc059990, fb=3D0x7f7acc4627b0) at migration/colo.c:464
-> > #12 0x000055bc336457ca in colo_process_checkpoint (s=3D0x55bc358b9840) =
-at migration/colo.c:589
-> > #13 0x000055bc336459e4 in migrate_start_colo_process (s=3D0x55bc358b984=
-0) at migration/colo.c:666
-> > #14 0x000055bc336393d7 in migration_iteration_finish (s=3D0x55bc358b984=
-0) at migration/migration.c:3312
-> > #15 0x000055bc33639753 in migration_thread (opaque=3D0x55bc358b9840) at=
- migration/migration.c:3477
-> > #16 0x000055bc3382bbb5 in qemu_thread_start (args=3D0x55bc357c27c0) at =
-util/qemu-thread-posix.c:519
-> > #17 0x00007f7b50288f27 in start_thread (arg=3D<optimized out>) at pthre=
-ad_create.c:479
-> > #18 0x00007f7b501ba31f in clone () at ../sysdeps/unix/sysv/linux/x86_64=
-/clone.S:95
-> >=20
-> > It hangs in ram_save_host_page for at least 10 Minutes.
-> >=20
-> > Regards,
-> > Lukas Straub
-> >  =20
-> > > Dave
-> > >  =20
-> > > > >      if (qemu_file_get_error(f)) {
-> > > > >          return 1;
-> > > > > --
-> > > > > 2.20.1   =20
-> > > >    =20
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > >  =20
-> >  =20
->=20
->=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
+     qemu_mutex_lock_iothread();
+     vmstate_loading =3D true;
++    colo_flush_ram_cache();
+     ret =3D qemu_load_device_state(fb);
+     if (ret < 0) {
+         error_setg(errp, "COLO: load device state failed");
+diff --git a/migration/ram.c b/migration/ram.c
+index 04f13feb2e..5baec5fce9 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3313,7 +3313,7 @@ static bool postcopy_is_running(void)
+  * Flush content of RAM cache into SVM's memory.
+  * Only flush the pages that be dirtied by PVM or SVM or both.
+  */
+-static void colo_flush_ram_cache(void)
++void colo_flush_ram_cache(void)
+ {
+     RAMBlock *block =3D NULL;
+     void *dst_host;
+@@ -3585,9 +3585,6 @@ static int ram_load(QEMUFile *f, void *opaque, int ve=
+rsion_id)
+     }
+     trace_ram_load_complete(ret, seq_iter);
+
+-    if (!ret  && migration_incoming_in_colo_state()) {
+-        colo_flush_ram_cache();
+-    }
+     return ret;
+ }
+
+diff --git a/migration/ram.h b/migration/ram.h
+index 5ceaff7cb4..2eeaacfa13 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -65,6 +65,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *=
+rb);
+
+ /* ram cache */
+ int colo_init_ram_cache(void);
++void colo_flush_ram_cache(void);
+ void colo_release_ram_cache(void);
+ void colo_incoming_start_dirty_log(void);
+
+--
+2.20.1
 
 
---Sig_/Zzml95DMGhwnLGBBuF3NK=A
+--Sig_/l8AuOZVOaV9W4.w.EKwRSFx
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7FlsIACgkQNasLKJxd
-sljI9Q//SZIY+NEhG82yDYy89YffPmm/1ZZkX4ftz9dGRlm2i/iJIGmK5nPu/dlP
-gGiG8WyYWrkFBmmvHB4jf8s2di/+5lq7etV7peA3SRBx91rDj5xLVDT+UTw5vE+U
-sNnehRDGDGuCJ6V5eMoAOnlJx9T2QcxNea97Ca0cMtVeOG4W5wmm4Yi3WxtdyEdS
-WiHgfsdt6XOx2m8NQRyjzp+6x0+fEq9pHeUBbHJ5H4l5tq7fAVfNkrWLUYTBlvTN
-a2iZ8q6P04DLqj1AcrnpxQy/y6KNg4KWGybhTB6qOyhp48TDvZ/EB8a7RQWIqULd
-fzzLuEOOTxXfUfz2EykA3zxTBWEHXaGJsrd4WeMr3sQ3q7vI2K/H+LZReOrkviiC
-qW9OxUr9a3+wDlKuWV88fLOBu2CC/pl5ZHrti+DtVIenmk3KyOBtDFPoFzGPAsfw
-AniasIrz9SgGzYTx1EvTzGvKIMyDofq+pNjnZ4m06csVsCJ25PPdq/7QOX4msT+B
-rvKtEs29x9Yw0ov3dZf0sY7matksP6AFYsBxOmqPll5Z2K6liYkHMRcyRo3vNIZH
-JbkwEjefUqCEB76puHu9oN0sxvFzYrt3Ox8Nxw3Bb1QkLqlb+qP1BhVAuybETfay
-/LkTVbINAsH6jhPNEsJ5RkiidtZmDcpjE46iE6Enybd9yMJVCN0=
-=SzKp
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7FliwACgkQNasLKJxd
+slik1g//VQWDDRp+gzSUWmtOGpo0jPKP7A515wv8WvivTEIeVaFpkyQBxdv1QQJ8
+iVtAoH4Wga36y1j2nEqwM5dTAxHjX8O/NxBdio8wiiCsy/SBg1KRXwiK5hE/eIQj
+s6a5SpMwGz3OasdPwcKmJL4xpJ1ljUnMw0UYhEh6+7KtnIhzNBoinMykKIbgg0VI
+cDEOncdsDOYIzC2sHzTnCwEgjcK0aUYH3GP397alOdnIqRbyA/xtdYtAXx2CO2ZA
+lMVoEJAC3XEx6Ua291DPfCFrx92VMzgWfdU87eRZcMXro0YJH/GIOMKJNBPDT4Vm
+K1PdSZrpRP2MdVZ2xUg6L2t8LBTYGWhqwJwzzyNcU0dBXgRU3krXjtb0eePgFgsY
+5n7STaDJFbjXroAgYPJrL7/Vy1r5bu7HGsDVnn3S+N7G2Bf30HZc/g25gZWUQZ/J
+ka4fK56ChSBrgkHZZw+O9gJJ0R7C5qnwZ6p3Q9zqf4g1Yw5HOO7wHyiAMeTJXA/e
+zWrmNwYoq0cIcX8AL/UfiDZw4vYuEQnqCS3vmOmtZCQ7sJ93hYF73daOPoNJ5wLj
+9BUEZ2LPoGNEJhD56eklse8QzYWjKnvn3C+VzaQLGP0lu3NXKe67VWMY2m3DEcFv
+Gswu2sLFhKO2uOtXfyGkNvfzJkyWCFLr2iGHNSrAcn7RTglHjXU=
+=jLej
 -----END PGP SIGNATURE-----
 
---Sig_/Zzml95DMGhwnLGBBuF3NK=A--
+--Sig_/l8AuOZVOaV9W4.w.EKwRSFx--
 
