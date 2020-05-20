@@ -2,88 +2,87 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81810C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A21AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6642053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A4FA2053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZIVSQ/i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6642053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECc+kTBv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4FA2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbHpq-0004HT-AK
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:04:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54772)
+	id 1jbHqg-0005JN-7Z
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jbHp0-0003gI-7t; Wed, 20 May 2020 02:03:18 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54360)
+ id 1jbHpj-0004Nj-F3; Wed, 20 May 2020 02:04:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34951)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jbHoy-0001xv-T1; Wed, 20 May 2020 02:03:17 -0400
-Received: by mail-wm1-x341.google.com with SMTP id h4so1392193wmb.4;
- Tue, 19 May 2020 23:03:16 -0700 (PDT)
+ id 1jbHpi-00021N-M0; Wed, 20 May 2020 02:04:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j5so1865870wrq.2;
+ Tue, 19 May 2020 23:04:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HyOt4PhZvXd4Q5bYxIrSo3XkYLjcB1+iP2V6k0j/7Ss=;
- b=PZIVSQ/i7K9kJVZk/BFJjQQuTdrbc0u42/fE2FKSdwN0ICbn4dRuihXSUxMG7LimsQ
- 7Ef0w4A7/h9V3RyR8pV6XwIlLgWBvayYdH/Z6Px/W+YxYROocLylDQOsfnl80Q3NiQ5R
- SctUf55wfwlGIVDZ0wJT298d0wQgxxUUqhFCQA0gk1bKr1fM4INDHzAyZdzFnXXaKsO8
- SuZlQvQDiug/nojDsGubqVgS+f6k8DiasaWQNn3X0HhBhpgnqZ0WOzasyRI5LU+sxftu
- yD7e8VhkRukGDZA4HIGo43JQbL6zJ9/zaawTl+BEQpUUWGCkh8l1fut1Og0y0A/MdMkS
- tTaQ==
+ bh=7vKBNr6qqiUPzvsUDA/Kg/96d5JxxrR5dwrnToNSbP8=;
+ b=ECc+kTBv5hwtA95kzU5zyr0hZE5pq6+/sFrZQAT18cl6d0pej0x7ozg+HkWCxmp06e
+ ZbNl/1jnvf2c5j2dYNcx72UrYLJ5u+UzyvzE9+SPjzA6x5FJjt/5lHfiSLXY5k18bwha
+ ngpYgWVrbSK7Db5UTuMJJyLSvq4x8BYVnTL/bHv+JxpBgFVdglhLqEqYWPeLP8XeA5f9
+ eyM+fAbUYgS4LnLznM/MNKtfiNdW0ZOCi70nv0HobDKsTlluyhtYNJtUfMaFKnNzBTVD
+ vb2kniqmZGVP5btnSLQRBfjSRUugichSI1JdBJxT8P1XlWHyxr1my9tGfLprpxc8qbTT
+ /jpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=HyOt4PhZvXd4Q5bYxIrSo3XkYLjcB1+iP2V6k0j/7Ss=;
- b=s1xtxZtZyTMKd9XmMnNh2a0H1irlNmRedn+CkKZ1ivJYZaIW25aulEqBS9v+2/0yPc
- 834y20a5mLOL/v0QPP+lnLk6vcyJbUkVznK4skgdfKAg2usomQQ/nNdpjA7Uui8R/xAs
- T+Amb4ccdVTnAAbN5h1Zhxq1iRWOfTsNREX4AiR3i2Qe+7/9CuwLJTlye+8FU8XhXd88
- DFlTfxlj+RsbUiFF/zgALA3i86+WFOlK2+C9+p6omguLE84V0gnPTyUH1WLd5ShEMW0Y
- /FhzZqh6ctVSL9nMI3iZwLNJ7xuc7PMY8vkOEUHOvseRQXktUovpx7NrlJpiBQrF5AaJ
- taDQ==
-X-Gm-Message-State: AOAM530tsOD4RROfQK6GYkH1gUo6zSaW5Ga327+uPGQsitAz3xazgrrz
- vcTx+JmqoQ3yfVWLt71zjeo=
-X-Google-Smtp-Source: ABdhPJxcUdf06pWBgEUN4mov+Y3hRDm3INsxsMr+AcLkwcVr4wJImCqg0R4q8J/pl0Ku7Ixjb2XlHA==
-X-Received: by 2002:a05:600c:1403:: with SMTP id
- g3mr3140887wmi.51.1589954595044; 
- Tue, 19 May 2020 23:03:15 -0700 (PDT)
+ bh=7vKBNr6qqiUPzvsUDA/Kg/96d5JxxrR5dwrnToNSbP8=;
+ b=CogdbXMMsfgNgi2gpfOKeq0xRSeNDEGjqTDy+944skvxY0A+cn1nvKsYR/4HPedKDI
+ zPshU9FWoxG52u9FpK1Tk/oKzpoeVg3wMnFfLpKe2v0/fmJB4KQcgbhMxxnTBThmZRht
+ BH2GGTdKvTCFGZkX54mueSFaxoWKas6ie4sg8/ZRLWlbdLcsSjoEH0LPpgt9MHXCf6TG
+ 1curk2ks5OXYKCYo89NO7YeuOUATzXL+ks5Gdf7RAbWrBd4InpXRajUlQ46sfalK8ZjB
+ hr8gHQekNrMx3glbXOS8fPsvXaOHy0K38Uu13kEcFUSf76zrBn127Tf5aW9IbkIThwfn
+ QJqw==
+X-Gm-Message-State: AOAM531KLK2nwSI00gXBYmv8Gw7M2yVcxKz96sgzQ/d2rSxStfEaGEIl
+ NzvQaIYYEFxVOZ73DWQZmQGhChWMI0E=
+X-Google-Smtp-Source: ABdhPJzb62JbNd3K9Uek/VHmeZdttRGfXd5UMcHJVrZjVAfbgwdvpSjQlatAtsTlFeEqPsOID5pWCg==
+X-Received: by 2002:a5d:5492:: with SMTP id h18mr190725wrv.330.1589954641121; 
+ Tue, 19 May 2020 23:04:01 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id l1sm1771697wrc.24.2020.05.19.23.03.13
+ by smtp.gmail.com with ESMTPSA id p4sm1721035wrq.31.2020.05.19.23.04.00
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 23:03:14 -0700 (PDT)
-Subject: Re: [PATCH v3 7/9] riscv/opentitan: Connect the PLIC device
+ Tue, 19 May 2020 23:04:00 -0700 (PDT)
+Subject: Re: [PATCH v3 8/9] riscv/opentitan: Connect the UART device
 To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
 References: <cover.1589923785.git.alistair.francis@wdc.com>
- <9151811027d175a261f68f17a1cd13963d47abcd.1589923785.git.alistair.francis@wdc.com>
+ <eb6069a05d18f4a1c9c7dbc97a0c521ae4b3674f.1589923785.git.alistair.francis@wdc.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <16c378ff-4e36-4c5c-5298-7aad84a6f3d1@amsat.org>
-Date: Wed, 20 May 2020 08:03:13 +0200
+Message-ID: <47d26423-bf54-c0af-5043-5e6a93ead552@amsat.org>
+Date: Wed, 20 May 2020 08:03:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <9151811027d175a261f68f17a1cd13963d47abcd.1589923785.git.alistair.francis@wdc.com>
+In-Reply-To: <eb6069a05d18f4a1c9c7dbc97a0c521ae4b3674f.1589923785.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -115,90 +114,90 @@ On 5/19/20 11:31 PM, Alistair Francis wrote:
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > Reviewed-by: Bin Meng <bin.meng@windriver.com>
 > ---
->   include/hw/riscv/opentitan.h |  3 +++
->   hw/riscv/opentitan.c         | 19 +++++++++++++++++--
->   2 files changed, 20 insertions(+), 2 deletions(-)
+>   include/hw/riscv/opentitan.h | 13 +++++++++++++
+>   hw/riscv/opentitan.c         | 24 ++++++++++++++++++++++--
+>   2 files changed, 35 insertions(+), 2 deletions(-)
 > 
 > diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
-> index 15a3d87ed0..8d6a09b696 100644
+> index 8d6a09b696..825a3610bc 100644
 > --- a/include/hw/riscv/opentitan.h
 > +++ b/include/hw/riscv/opentitan.h
-> @@ -20,6 +20,7 @@
->   #define HW_OPENTITAN_H
+> @@ -21,6 +21,7 @@
 >   
 >   #include "hw/riscv/riscv_hart.h"
-> +#include "hw/intc/ibex_plic.h"
+>   #include "hw/intc/ibex_plic.h"
+> +#include "hw/char/ibex_uart.h"
 >   
 >   #define TYPE_RISCV_IBEX_SOC "riscv.lowrisc.ibex.soc"
 >   #define RISCV_IBEX_SOC(obj) \
-> @@ -31,6 +32,8 @@ typedef struct LowRISCIbexSoCState {
->   
+> @@ -33,6 +34,7 @@ typedef struct LowRISCIbexSoCState {
 >       /*< public >*/
 >       RISCVHartArrayState cpus;
-> +    IbexPlicState plic;
-> +
+>       IbexPlicState plic;
+> +    IbexUartState uart;
+>   
 >       MemoryRegion flash_mem;
 >       MemoryRegion rom;
->   } LowRISCIbexSoCState;
+> @@ -63,4 +65,15 @@ enum {
+>       IBEX_USBDEV,
+>   };
+>   
+> +enum {
+> +    IBEX_UART_RX_PARITY_ERR_IRQ = 0x28,
+> +    IBEX_UART_RX_TIMEOUT_IRQ = 0x27,
+> +    IBEX_UART_RX_BREAK_ERR_IRQ = 0x26,
+> +    IBEX_UART_RX_FRAME_ERR_IRQ = 0x25,
+> +    IBEX_UART_RX_OVERFLOW_IRQ = 0x24,
+> +    IBEX_UART_TX_EMPTY_IRQ = 0x23,
+> +    IBEX_UART_RX_WATERMARK_IRQ = 0x22,
+> +    IBEX_UART_TX_WATERMARK_IRQ = 0x21
+> +};
+> +
+>   #endif
 > diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-> index c00f0720ab..3926321d8c 100644
+> index 3926321d8c..a6c0b949ca 100644
 > --- a/hw/riscv/opentitan.c
 > +++ b/hw/riscv/opentitan.c
-> @@ -25,6 +25,7 @@
->   #include "hw/misc/unimp.h"
->   #include "hw/riscv/boot.h"
->   #include "exec/address-spaces.h"
-> +#include "sysemu/sysemu.h"
+> @@ -96,6 +96,9 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
 >   
->   static const struct MemmapEntry {
->       hwaddr base;
-> @@ -92,6 +93,9 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
->       object_initialize_child(obj, "cpus", &s->cpus,
->                               sizeof(s->cpus), TYPE_RISCV_HART_ARRAY,
->                               &error_abort, NULL);
+>       sysbus_init_child_obj(obj, "plic", &s->plic,
+>                             sizeof(s->plic), TYPE_IBEX_PLIC);
 > +
-> +    sysbus_init_child_obj(obj, "plic", &s->plic,
-> +                          sizeof(s->plic), TYPE_IBEX_PLIC);
+> +    sysbus_init_child_obj(obj, "uart", &s->uart,
+> +                          sizeof(s->uart), TYPE_IBEX_UART);
 >   }
 >   
 >   static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-> @@ -100,6 +104,9 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
->       MachineState *ms = MACHINE(qdev_get_machine());
->       LowRISCIbexSoCState *s = RISCV_IBEX_SOC(dev_soc);
->       MemoryRegion *sys_mem = get_system_memory();
-> +    DeviceState *dev;
-> +    SysBusDevice *busdev;
-> +    Error *err = NULL;
+> @@ -137,8 +140,25 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+>       busdev = SYS_BUS_DEVICE(dev);
+>       sysbus_mmio_map(busdev, 0, memmap[IBEX_PLIC].base);
 >   
->       object_property_set_str(OBJECT(&s->cpus), ms->cpu_type, "cpu-type",
->                               &error_abort);
-> @@ -120,6 +127,16 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
->       memory_region_add_subregion(sys_mem, memmap[IBEX_FLASH].base,
->                                   &s->flash_mem);
->   
-> +    /* PLIC */
-> +    dev = DEVICE(&s->plic);
-> +    object_property_set_bool(OBJECT(&s->plic), true, "realized", &err);
+> -    create_unimplemented_device("riscv.lowrisc.ibex.uart",
+> -        memmap[IBEX_UART].base, memmap[IBEX_UART].size);
+> +    /* UART */
+> +    dev = DEVICE(&(s->uart));
+> +    qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+> +    object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
 > +    if (err != NULL) {
 > +        error_propagate(errp, err);
 > +        return;
 > +    }
 > +    busdev = SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, memmap[IBEX_PLIC].base);
+> +    sysbus_mmio_map(busdev, 0, memmap[IBEX_UART].base);
+> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(&s->plic),
+> +                       IBEX_UART_TX_WATERMARK_IRQ));
+> +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(&s->plic),
+> +                       IBEX_UART_RX_WATERMARK_IRQ));
+> +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(&s->plic),
+> +                       IBEX_UART_TX_EMPTY_IRQ));
+> +    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(DEVICE(&s->plic),
+> +                       IBEX_UART_RX_OVERFLOW_IRQ));
 > +
->       create_unimplemented_device("riscv.lowrisc.ibex.uart",
->           memmap[IBEX_UART].base, memmap[IBEX_UART].size);
 >       create_unimplemented_device("riscv.lowrisc.ibex.gpio",
-> @@ -134,8 +151,6 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
->           memmap[IBEX_AES].base, memmap[IBEX_AES].size);
->       create_unimplemented_device("riscv.lowrisc.ibex.hmac",
->           memmap[IBEX_HMAC].base, memmap[IBEX_HMAC].size);
-> -    create_unimplemented_device("riscv.lowrisc.ibex.plic",
-> -        memmap[IBEX_PLIC].base, memmap[IBEX_PLIC].size);
->       create_unimplemented_device("riscv.lowrisc.ibex.pinmux",
->           memmap[IBEX_PINMUX].base, memmap[IBEX_PINMUX].size);
->       create_unimplemented_device("riscv.lowrisc.ibex.alert_handler",
+>           memmap[IBEX_GPIO].base, memmap[IBEX_GPIO].size);
+>       create_unimplemented_device("riscv.lowrisc.ibex.spi",
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 
