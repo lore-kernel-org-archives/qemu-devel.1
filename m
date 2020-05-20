@@ -7,83 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:09:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46392207D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:08:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 481A3207D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:09:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X5HHixyO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46392207D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lMZSqeIQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481A3207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPOm-0004Ym-Fu
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:08:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55238)
+	id 1jbPPc-000660-EY
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:09:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM6-0000C0-71
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:58 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:32869)
+ id 1jbPM4-00007M-2O
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:56 -0400
+Received: from mail-ed1-x529.google.com ([2a00:1450:4864:20::529]:34584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM5-0001za-7E
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:57 -0400
-Received: by mail-ej1-x644.google.com with SMTP id n24so3987990ejd.0
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:56 -0700 (PDT)
+ id 1jbPM3-0001yf-5r
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:55 -0400
+Received: by mail-ed1-x529.google.com with SMTP id i16so3198885edv.1
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dnix+tfq2fdfws6TsVzkTHLlR4M0EwyavqIhHiXG7vU=;
- b=X5HHixyOI99g+WiUaQD8pYhavhfEXVgxEeZlenYNgBDtrxHOoAkneZTL2JLiStsqV8
- /MiErkGxdpVR9/uOl7lZzeugFLuhkdppf8Jwgd5J7Xn0ts+m9ufm2Nzq2XP18PpejV7D
- uPLeZOWCX5b0ISiaiI1pmKtwYdbPwypNC2e9HkhYO/3v14WjyEcMfig2X/46Ad5JD7Tk
- i5ljhwGtM+UenXpnox5vExj+gaeHlYCeB3xR9oWodpvsXtpPXZ3dWCmECO8fZDZVdDoJ
- iWQHHOI9NbtIVxhVXkAvtJuDu5zdkCNQf6X0Alk+ytco7n4R/628WTyUyhp2z4/1UxcH
- yQeQ==
+ bh=dnU7gW5Cd1Qobc/cZXPkaWez6sVKYdN9N3HtZBS9Vzk=;
+ b=lMZSqeIQ/8aqCxdKE0tDiEXCjyjlt2AmIIYUTS+gS/OaBpPKPQBrofZFjAg1YpOI0H
+ 94t2R8Ic2009Vq72J6LoGtbAK3EmqQCyyOOpfEunhO9g2NyYNcJB7sJdTHVM2hdTPA4p
+ 7zhVT64UV30AhYpDedx0klZY7S+HCyH7seH4NhaHIQVM3H31fynRNLUD7IQjIxijDhRZ
+ uMNBzb6Xbjmp1g2msluyul46+/htzzoV8CrPMiHEwjFsxGliGW/btq/QflCaeD1rwE8v
+ kEKmsiru8ALFcOG4Jqp8NuZfCi2en3e5vINzKwnXFkzVM665Dbf4CTuWexVSYCQf0Z/I
+ WTNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dnix+tfq2fdfws6TsVzkTHLlR4M0EwyavqIhHiXG7vU=;
- b=MPtBW+nwapC2aRNG/K2XujXV9XdBL733LVwpM0SiCV+bMFxVdYpmZL9srOUyEpr1Q1
- 09JWhafmwZ4RU4DK2AA/TZmE4DCMWeSO8X7nKVlf40VI7J3QMv4TpIZpGX3NgilpuiEc
- E2RtdH+ALa2G8XiVz3TgzFfhdbuDUkjifOpH67u8E+NAZ3Cb/JUeDXRNQj4N9twQp0IN
- /vqL3rBhislpCc3P977KGaM6/7PSgw9YN64wkGrzQ8dhOp9WUsidVqmnovSI9fUiR+7y
- nmpHaKm2DjwSpH0m22t94jGqCpY5SDlkPuONc7P95eI54P054s//VGRA92l++OGsNnog
- gbKg==
-X-Gm-Message-State: AOAM532bl723x3/w13qc8C6WMflNps9HwOr4tHzzvmLkCosQXinO+O4/
- jLIUwZErRk8hoSYz/Q4a3bozcg==
-X-Google-Smtp-Source: ABdhPJziS0vsQ9V6nSw+MJ8upl6US/GKPHLklkathteVBc9JHY16G8x70fdVXqClqOU5e+vrIDnkAQ==
-X-Received: by 2002:a17:906:a417:: with SMTP id
- l23mr3753999ejz.213.1589983555832; 
- Wed, 20 May 2020 07:05:55 -0700 (PDT)
+ bh=dnU7gW5Cd1Qobc/cZXPkaWez6sVKYdN9N3HtZBS9Vzk=;
+ b=RpE+EggQnQ4KmPmZPatWUdVwv2LCYm1zBgtf6mtPuNiB/QT/BLRcOoMewdTSmTmMc3
+ 6MkNIednE9g6VVJTYH5OhA8j1UjqryLp05vQqx5VYNJzLI43qthmJlNWNTDABvo14NTa
+ LXJYD9F5e7eLPEUYiDeTDL+cAQ8eNCKF3HhaGP3sStF4cnAQkgPZHWZzqg7SDGSWcou7
+ vcHv1UlghjnxlJ+3tW7DItE723sHYhqgmp1B5NYQNO627fm01PwR51eSexAGlITjlThZ
+ N4/9LJ0C3Fvs1qnJd22zk/Xsv65GkFL3SVw5H+DvAsmXkFhgWqcWX9cei7ofFmuBV3K+
+ skuw==
+X-Gm-Message-State: AOAM533+7DWnsfwhGmk2lcxTJE/BzK5ebE71eILZlrJO+vybAdBnupjW
+ fyAyJYWX+Kl6yaG/j8z5CfCnsQ==
+X-Google-Smtp-Source: ABdhPJy4R0eEg+FO1yCyKoQ5NnitpJiP7mdg5Y9cXDQ9L2bMHaNXzCe9baY6SJ8A0lW4Tr6oyZVlsA==
+X-Received: by 2002:aa7:c6c6:: with SMTP id b6mr3481695eds.53.1589983553667;
+ Wed, 20 May 2020 07:05:53 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b23sm1985096ejz.121.2020.05.20.07.05.47
+ by smtp.gmail.com with ESMTPSA id h18sm2054301eji.86.2020.05.20.07.05.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 20 May 2020 07:05:49 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 19D701FF99;
- Wed, 20 May 2020 15:05:42 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id DEF971FF96;
+ Wed, 20 May 2020 15:05:41 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 10/15] tests/docker: use a gcc-10 based image for arm64
- tests
-Date: Wed, 20 May 2020 15:05:36 +0100
-Message-Id: <20200520140541.30256-11-alex.bennee@linaro.org>
+Subject: [PATCH  v1 08/15] tests/docker: bump fedora to 32
+Date: Wed, 20 May 2020 15:05:34 +0100
+Message-Id: <20200520140541.30256-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200520140541.30256-1-alex.bennee@linaro.org>
 References: <20200520140541.30256-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::529;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ed1-x529.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,68 +110,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we enable newer features that we want to test on arm64 targets we
-need newer compilers. Split off a new debian-arm64-test-cross image
-which we can use to build these new tests.
+We should be keeping this up to date as Fedora goes out of support
+quite quickly.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                       |  2 ++
- .../dockerfiles/debian-arm64-test-cross.docker      | 13 +++++++++++++
- tests/tcg/configure.sh                              |  4 ++--
- 3 files changed, 17 insertions(+), 2 deletions(-)
- create mode 100644 tests/docker/dockerfiles/debian-arm64-test-cross.docker
+ tests/docker/dockerfiles/fedora.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 3596b589307..ed46bd98eb5 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -131,9 +131,11 @@ docker-image-travis: NOUSER=1
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 179575ecaaa..92204dc79eb 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,4 +1,4 @@
+-FROM fedora:30
++FROM fedora:32
  
- # Specialist build images, sometimes very limited tools
- docker-image-tricore-cross: docker-image-debian9
-+docker-image-debian-arm64-test-cross: docker-image-debian11
- 
- # These images may be good enough for building tests but not for test builds
- DOCKER_PARTIAL_IMAGES += debian-alpha-cross
-+DOCKER_PARTIAL_IMAGES += debian-arm64-test-cross
- DOCKER_PARTIAL_IMAGES += debian-hppa-cross
- DOCKER_PARTIAL_IMAGES += debian-m68k-cross debian-mips64-cross
- DOCKER_PARTIAL_IMAGES += debian-powerpc-cross debian-ppc64-cross
-diff --git a/tests/docker/dockerfiles/debian-arm64-test-cross.docker b/tests/docker/dockerfiles/debian-arm64-test-cross.docker
-new file mode 100644
-index 00000000000..a44e76d9421
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-arm64-test-cross.docker
-@@ -0,0 +1,13 @@
-+#
-+# Docker arm64 cross-compiler target (tests only)
-+#
-+# This docker target builds on the debian Bullseye base image.
-+#
-+FROM qemu:debian11
-+
-+# Add the foreign architecture we want and install dependencies
-+RUN dpkg --add-architecture arm64
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+        apt install -y --no-install-recommends \
-+        crossbuild-essential-arm64 gcc-10-aarch64-linux-gnu
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index eaaaff6233a..2326f978562 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -97,8 +97,8 @@ for target in $target_list; do
-   case $target in
-     aarch64-*)
-       # We don't have any bigendian build tools so we only use this for AArch64
--      container_image=debian-arm64-cross
--      container_cross_cc=aarch64-linux-gnu-gcc
-+      container_image=debian-arm64-test-cross
-+      container_cross_cc=aarch64-linux-gnu-gcc-10
-       ;;
-     alpha-*)
-       container_image=debian-alpha-cross
+ # Please keep this list sorted alphabetically
+ ENV PACKAGES \
 -- 
 2.20.1
 
