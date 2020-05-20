@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5DDC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FA7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C018207E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22236207E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="RWPpcALT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C018207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Ms1jlobG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22236207E8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbVy6-0004Va-EJ
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46182)
+	id 1jbVyu-0005oX-3j
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:10:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVuV-0002Lp-6R; Wed, 20 May 2020 17:05:55 -0400
-Received: from mout.web.de ([212.227.17.11]:44687)
+ id 1jbVuP-0002Gi-CX; Wed, 20 May 2020 17:05:49 -0400
+Received: from mout.web.de ([212.227.17.11]:51459)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVuU-0002Se-7K; Wed, 20 May 2020 17:05:54 -0400
+ id 1jbVuO-0002S2-4a; Wed, 20 May 2020 17:05:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590008748;
- bh=sDjR+yB4Sa8Fjus9eFBoA6y68LMtxEpQOMPCGsUwKO4=;
+ s=dbaedf251592; t=1590008742;
+ bh=tqkhTpmFcfXP/udx2L1FFDKOb54iXy6N2msQCYMji5Y=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=RWPpcALTQ2rbUoui3GrM5Vtt2XrhGw6OC0cKUSRIA1IWgsHntBOQPQxRcRhN4anOS
- +KbeLr7Ul8ntS3AX0X2QI/KaQEhe84YMQdk3sV6c4mlyhATrhFX+ubHC3c7OUU5UgH
- 3PGXJBnhVXXeDdV7BoXkMrbP8bmFmPuswHx19rf4=
+ b=Ms1jlobGBOHIjoUuD2sCRdDMWkdz8UtsEP0LOKhBoIOACAquLgkDK9db3HmFj/8Kw
+ 1wCY9xYbQ/5V++/D40iyesHJAa4eUiX+JOMAhz3lao9d2jIEGXNm5FHkzpo/7vy4fa
+ 94F7z4kfd3NlSn2K3dr2I0E6WTARwkev1YtQDALA=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MDdyH-1jjWW31eIp-00ArTE; Wed, 20
- May 2020 23:05:48 +0200
-Date: Wed, 20 May 2020 23:05:47 +0200
+Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MRCnT-1jUBWV3meN-00UWX2; Wed, 20
+ May 2020 23:05:41 +0200
+Date: Wed, 20 May 2020 23:05:39 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v2 3/4] chardev/char-socket.c: Add yank feature
-Message-ID: <ff403c057f94c1c12b4bb1eb2bca6f8fa960a07c.1590008051.git.lukasstraub2@web.de>
+Subject: [PATCH v2 1/4] Introduce yank feature
+Message-ID: <20005a15c708fbda983f9be602c55fc0b1979a18.1590008051.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1590008051.git.lukasstraub2@web.de>
 References: <cover.1590008051.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/.DRYzL7/KAOmkFE.quhPpyn";
+Content-Type: multipart/signed; boundary="Sig_/Uq9WSy+EEtHGcXwwYRvj6V3";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:DHrEwcV8UvTN1AYvO9yej2jPOHHiEVQkm8UNKmXMdX5YpBuOyxC
- QEIJ4rDBv0mxmXqIFn3REfGFX0owMfYrJ4PwwY7wcouz2xubB0QK4gNOe2uovnkWiXYHZej
- FWmcq2uE75wNo5BNcOlBo2Rlmu/ggTo3AhWV90VScaaxvY7AvO5b9/kMhILmzhde3FlB7KM
- /uXRCpwPnHOYn/kt/drNg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:O1KCSz03cNA=:xZpjl4gq2AkDVxZ3/Go0Li
- czSRpZhhwSBOp4c+8Zd5rw3wSasn5q8eQ+DJlD3X+baWOwncUts8dSCaHZILSQG1HHDG5lBus
- lPAR0XQDT+2x2Pv6hqkN1ogrH39zlLmArDTPieehn7/MZhlLgBntnAN6WWxwn7Zjh1f4StKM4
- 0dHF5R8oI7tl/ehq5oqf8hpFDudeQukgoFgY4qr64atizx4m722WgGfvetaX9bDgpSUNWZqDS
- mgJffGS0js+hCf3TwuEn9Cx0lriEIXbhgJnNHtAIU88/npUoB4pryNcabkX+8eIejA9vvQvu9
- KTsHTSYN/oXCU/+C+fYWCNtjuk7cHYs+FYNr3Cc9IfAAOk4Gvj+H5Xpi3tPL0qTJnaB1YfIwZ
- DLf8PvzugqoSSu2HACHd71Wt3/BkyB9vdAJgn69JwHpSNio4KF+k3k0tLb+HHVcvaUXtcGXmh
- UEKBufLUhytgYjMTQoQo89vyEOKfqf8IKps8U4+HDg2kJqI7co3U+AkK7gImdjVylNC6IcvDw
- D/g4R4KislMc/DFLHKuo13YivcpBEkt2nrnacpJhobAQntvwzjSW4/O3cFc8Y8fK5ZPcG1HPi
- WXmCZvQLrxu8C9VZp72z8hnVhMosYKEsPM+iyumz7kxc0tsZmCIu7Nu63dzwAqZeK1QVJjDo1
- /5DIwyhMwgjd86zPQn8V1Ewi+ZXs/lJw5meIfwMMKdFnCLIlHeu4ffLPTrwxdfSm17Q5xZELK
- hN5cO6ZvpRFaw0htjx0QFVDDgJwiK9olke2bNXe3riJ4FFPew5W1Wd7KCqq147+Si3Wj8AhFm
- UDYRejWK+AP0j6vlZNpzyrLA5Qgubk+Yu4Pe25bPXAuuM1FhwKilpM9WEcvJOfjsaiz9mm2Nv
- fqU665foznaz3LH6T4fhCDz3JrxhPm8gC2SVSVYJIABM+YIaT1yMCKeGfkRLJ9VNAWua9GGnf
- 2zn7WUUWCsze6o6G8yLh5ajiHgJ2nBDng1AvmBI2CrKybl5NwqrJUaNAm2snrxoiaAcA/aC5g
- ahgm5z3c/5W6rQY2YBWobz4pcj2VOIzYa9ntLRWHxWa8qBcVoF31w/OP51KrD8kDvnPYucsO2
- wjFATZjZqE0THhJbaWqORiMfKborIPu/xDXucsF5l3n7Tiuw4y/ryGzwCSb1pgQP4vdqsEnDZ
- 5CviqN+5KmR31DvogRybENn3ap9GaAB46hr0X2uIVj1uYvSUolL0A6uYr45K0t51zqnVxTFFQ
- 9xcGNB/ej+UpzEvJL
+X-Provags-ID: V03:K1:YGPfmkpSDnW8lNP4O/ZXcylaYIeQqOBkBTY+EERF6pj/7GGo5d3
+ zAD8nu/K4eSW4U3p+aMYi2AKxhbY9BgTk98SSAVdR2tqbgilxoLKx77fGQUQO3ZiNgYzI33
+ mPOAUzp48e6z1xmaVbqPz8qdzsQD/ztzwFlvhwXLm+d7ByBnldL02cvDzhUslawoQLCFa0Q
+ roEkQxL/0Oi/as0xRpVXA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ShOSo1su23Q=:LTyuxCXuKUHicytMKr1HX7
+ xOlBkbhjLRW3GjscR0nLUV6X2Ag5HWQ6xYu/TDsnEsJCyiU3nSQ+RmWuCNL0EJIhWennvlfuA
+ 4adD3FwgU1YDWencb559v+WFJKAo7ac+Uvv4BXwPP03+kmiJu44YIW5GsNjn25M/hqXIRGjXH
+ 3ZOzOVD8HJTK93j0T1nKWSNdv9+FYzLtZk7rUQ044S37Jk3JAeyibOGqhDH28CxGML5aDmWCI
+ 5vWjJM0XESKNdHxusQdBwKrTmScuzttrkNQWfEjFIWq/Ij5vRPfB+7qbACFIfQNp/rbwMbE9R
+ V1KFKTSNzJZynZQTCdE7bHI4qEc/1+Sb2L5dWVreXDBsdrZplbNiE8x9+Ysv/Qm5fCuF+N4aj
+ RsPPPwcVwTaiyEZ3agoK/04MxVEVsjZQHwfzRwcWQZ6kLnlCmBxqCtMOJfVo0a20/6UyxOQLT
+ V6J3wJcN/duR8532XzuGE0Jqq/RLzk29BhIJyig3bHsrGVL+OZjkeX1FKKP5FzA3fuIXIAF2D
+ Tv+Xc8ZtMBFO+DGYm10341DX3QJokPvKm9sFp5BzCeD2Ij+IznBl2J2GQ9P9VLy5vxLN0A3Il
+ 6yAKi903+/G/ZsqbAgXZZhlSVAmr57mo8Bs7v+cs43hmlALosHN75l7tWmA6/P9Gi0cyKZmEl
+ BvK3nGc9tMGm6uWCrRrM/YA7vOEQ8sEFNZSQNPW9QmFyWDO3I2qRHni3Z/CFnuwjertX2oBmT
+ q1FwQWu/M5GB8S3zxvFWb2R4NkjLgYfk6XOLgSvAywa9Y69M2vD4B0c6xreMW+Y0Qe3rWbx6f
+ v0CTWzeaA4uz4xtEZUlVP5bnDwpBsNx7kQJewtN/SsKifO7l2mbvLluJtBcOQJ0TgPTmPulGn
+ AHEeUprC8+LhX34HtrXhyilFJRRUmTj3I2ZrV5Hww1S3uXrYDh8GTNiXhvsTKQgjN9QfOVaio
+ sYtlr7GPl6+e0+58fBs6J44ploRQjJhvr0xwKdYd5i35L1ilDZBi2OgcrgUsmyfkJ3qTT5p7Z
+ itAK3rpULjccKoB7j3NiA7onJSPubRoVUAk2NKUNOXIUuwiDZoPumELmZCFR5+Fysycspbn2x
+ kdNS34dbYNgG0RtELlstkyUvl7t61/6yWfvhLsBIy6/oINYNPOT5fSmMGrhXM6IF8bB8GRJjc
+ 8CtI64pmeZyTJ8CjzhpNI4y8Vkre+1wTu1b24+biEJYEM2VQdj/aKOP9TIijobAWumrZXdapn
+ H/sMGL++pvG/qpTAp
 Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:25
@@ -111,148 +111,387 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/.DRYzL7/KAOmkFE.quhPpyn
+--Sig_/Uq9WSy+EEtHGcXwwYRvj6V3
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Register a yank function to shutdown the socket on yank.
+The yank feature allows to recover from hanging qemu by "yanking"
+at various parts. Other qemu systems can register themselves and
+multiple yank functions. Then all yank functions for selected
+instances can be called by the 'yank' out-of-band qmp command.
+Available instances can be queried by a 'query-yank' oob command.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 ---
- chardev/char-socket.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ qapi/misc.json |  45 +++++++++++++
+ softmmu/vl.c   |   2 +
+ yank.c         | 174 +++++++++++++++++++++++++++++++++++++++++++++++++
+ yank.h         |  69 ++++++++++++++++++++
+ 4 files changed, 290 insertions(+)
+ create mode 100644 yank.c
+ create mode 100644 yank.h
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 185fe38dda..d5c6cd2153 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -34,6 +34,7 @@
- #include "qapi/error.h"
- #include "qapi/clone-visitor.h"
- #include "qapi/qapi-visit-sockets.h"
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 99b90ac80b..f5228b2502 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1550,3 +1550,48 @@
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+
++##
++# @YankInstances:
++#
++# @instances: List of yank instances.
++#
++# Yank instances are named after the following schema:
++# "blockdev:<node-name>", "chardev:<chardev-name>" and "migration"
++#
++# Since: 5.1
++##
++{ 'struct': 'YankInstances', 'data': {'instances': ['str'] } }
++
++##
++# @yank:
++#
++# Recover from hanging qemu by yanking the specified instances.
++#
++# Takes @YankInstances as argument.
++#
++# Returns: nothing.
++#
++# Example:
++#
++# -> { "execute": "yank", "arguments": { "instances": ["blockdev:nbd0"] } }
++# <- { "return": {} }
++#
++# Since: 5.1
++##
++{ 'command': 'yank', 'data': 'YankInstances', 'allow-oob': true }
++
++##
++# @query-yank:
++#
++# Query yank instances.
++#
++# Returns: @YankInstances
++#
++# Example:
++#
++# -> { "execute": "query-yank" }
++# <- { "return": { "instances": ["blockdev:nbd0"] } }
++#
++# Since: 5.1
++##
++{ 'command': 'query-yank', 'returns': 'YankInstances', 'allow-oob': true }
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 32c0047889..5d99749d29 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -112,6 +112,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/iothread.h"
+ #include "qemu/guest-random.h"
 +#include "yank.h"
 
- #include "chardev/char-io.h"
+ #define MAX_VIRTIO_CONSOLES 1
 
-@@ -69,6 +70,7 @@ typedef struct {
-     size_t read_msgfds_num;
-     int *write_msgfds;
-     size_t write_msgfds_num;
-+    char *yank_name;
+@@ -2906,6 +2907,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     precopy_infrastructure_init();
+     postcopy_infrastructure_init();
+     monitor_init_globals();
++    yank_init();
 
-     SocketAddress *addr;
-     bool is_listen;
-@@ -409,6 +411,11 @@ static void tcp_chr_free_connection(Chardev *chr)
-
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-+    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING
-+        || s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(s->sioc));
-+    }
-     object_unref(OBJECT(s->sioc));
-     s->sioc =3D NULL;
-     object_unref(OBJECT(s->ioc));
-@@ -912,6 +919,8 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
-     }
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     ret =3D tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return ret;
-@@ -926,6 +935,8 @@ static void tcp_chr_accept(QIONetListener *listener,
-
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, cioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(cioc));
-     tcp_chr_new_client(chr, cioc);
- }
-
-@@ -941,6 +952,8 @@ static int tcp_chr_connect_client_sync(Chardev *chr, Er=
-ror **errp)
-         object_unref(OBJECT(sioc));
-         return -1;
-     }
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return 0;
-@@ -956,6 +969,8 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_net_listener_wait_client(s->listener);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
- }
-@@ -1066,6 +1081,8 @@ static void char_socket_finalize(Object *obj)
-         object_unref(OBJECT(s->tls_creds));
-     }
-     g_free(s->tls_authz);
-+    yank_unregister_instance(s->yank_name);
-+    g_free(s->yank_name);
-
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
-@@ -1081,6 +1098,8 @@ static void qemu_chr_socket_connected(QIOTask *task, =
-void *opaque)
-
-     if (qio_task_propagate_error(task, &err)) {
-         tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(sioc));
-         check_report_connect_error(chr, err);
-         error_free(err);
-         goto cleanup;
-@@ -1115,6 +1134,8 @@ static void tcp_chr_connect_client_async(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_channel_socket_new();
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     /*
-      * Normally code would use the qio_channel_socket_connect_async
-      * method which uses a QIOTask + qio_task_set_error internally
-@@ -1356,6 +1377,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
-     }
-
-+    s->yank_name =3D g_strconcat("chardev:", chr->label, NULL);
-+    yank_register_instance(s->yank_name);
+     if (qcrypto_init(&err) < 0) {
+         error_reportf_err(err, "cannot initialize crypto: ");
+diff --git a/yank.c b/yank.c
+new file mode 100644
+index 0000000000..bfce19185e
+--- /dev/null
++++ b/yank.c
+@@ -0,0 +1,174 @@
++/*
++ * QEMU yank feature
++ *
++ * Copyright (c) Lukas Straub <lukasstraub2@web.de>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ */
 +
-     /* be isn't opened until we get a connection */
-     *be_opened =3D false;
-
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/thread.h"
++#include "qemu/queue.h"
++#include "qapi/qapi-commands-misc.h"
++#include "io/channel.h"
++#include "yank.h"
++
++struct YankFuncAndParam {
++    YankFn *func;
++    void *opaque;
++    QLIST_ENTRY(YankFuncAndParam) next;
++};
++
++struct YankInstance {
++    char *name;
++    QLIST_HEAD(, YankFuncAndParam) yankfns;
++    QLIST_ENTRY(YankInstance) next;
++};
++
++static QemuMutex lock;
++static QLIST_HEAD(yankinst_list, YankInstance) head
++    =3D QLIST_HEAD_INITIALIZER(head);
++
++static struct YankInstance *yank_find_instance(char *name)
++{
++    struct YankInstance *tmp, *instance;
++    instance =3D NULL;
++    QLIST_FOREACH(tmp, &head, next) {
++        if (!strcmp(tmp->name, name)) {
++            instance =3D tmp;
++        }
++    }
++    return instance;
++}
++
++void yank_register_instance(char *instance_name)
++{
++    struct YankInstance *instance;
++
++    qemu_mutex_lock(&lock);
++    assert(!yank_find_instance(instance_name));
++
++    instance =3D g_slice_new(struct YankInstance);
++    instance->name =3D g_strdup(instance_name);
++    QLIST_INIT(&instance->yankfns);
++    QLIST_INSERT_HEAD(&head, instance, next);
++
++    qemu_mutex_unlock(&lock);
++}
++
++void yank_unregister_instance(char *instance_name)
++{
++    struct YankInstance *instance;
++
++    qemu_mutex_lock(&lock);
++    instance =3D yank_find_instance(instance_name);
++    assert(instance);
++
++    assert(QLIST_EMPTY(&instance->yankfns));
++    QLIST_REMOVE(instance, next);
++    g_free(instance->name);
++    g_slice_free(struct YankInstance, instance);
++
++    qemu_mutex_unlock(&lock);
++}
++
++void yank_register_function(char *instance_name, YankFn *func, void *opaqu=
+e)
++{
++    struct YankInstance *instance;
++    struct YankFuncAndParam *entry;
++
++    qemu_mutex_lock(&lock);
++    instance =3D yank_find_instance(instance_name);
++    assert(instance);
++
++    entry =3D g_slice_new(struct YankFuncAndParam);
++    entry->func =3D func;
++    entry->opaque =3D opaque;
++
++    QLIST_INSERT_HEAD(&instance->yankfns, entry, next);
++    qemu_mutex_unlock(&lock);
++}
++
++void yank_unregister_function(char *instance_name, YankFn *func, void *opa=
+que)
++{
++    struct YankInstance *instance;
++    struct YankFuncAndParam *entry;
++
++    qemu_mutex_lock(&lock);
++    instance =3D yank_find_instance(instance_name);
++    assert(instance);
++
++    QLIST_FOREACH(entry, &instance->yankfns, next) {
++        if (entry->func =3D=3D func && entry->opaque =3D=3D opaque) {
++            QLIST_REMOVE(entry, next);
++            g_slice_free(struct YankFuncAndParam, entry);
++            qemu_mutex_unlock(&lock);
++            return;
++        }
++    }
++
++    abort();
++}
++
++void yank_generic_iochannel(void *opaque)
++{
++    QIOChannel *ioc =3D QIO_CHANNEL(opaque);
++
++    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
++}
++
++void qmp_yank(strList *instances, Error **errp)
++{
++    strList *tmp;
++    struct YankInstance *instance;
++    struct YankFuncAndParam *entry;
++
++    qemu_mutex_lock(&lock);
++    tmp =3D instances;
++    for (; tmp; tmp =3D tmp->next) {
++        instance =3D yank_find_instance(tmp->value);
++        if (!instance) {
++            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                      "Instance '%s' not found", tmp->value);
++            qemu_mutex_unlock(&lock);
++            return;
++        }
++    }
++    tmp =3D instances;
++    for (; tmp; tmp =3D tmp->next) {
++        instance =3D yank_find_instance(tmp->value);
++        assert(instance);
++        QLIST_FOREACH(entry, &instance->yankfns, next) {
++            entry->func(entry->opaque);
++        }
++    }
++    qemu_mutex_unlock(&lock);
++}
++
++YankInstances *qmp_query_yank(Error **errp)
++{
++    struct YankInstance *instance;
++    YankInstances *ret;
++
++    ret =3D g_new0(YankInstances, 1);
++    ret->instances =3D NULL;
++
++    qemu_mutex_lock(&lock);
++    QLIST_FOREACH(instance, &head, next) {
++        strList *entry;
++        entry =3D g_new0(strList, 1);
++        entry->value =3D g_strdup(instance->name);
++        entry->next =3D ret->instances;
++        ret->instances =3D entry;
++    }
++    qemu_mutex_unlock(&lock);
++
++    return ret;
++}
++
++void yank_init(void)
++{
++    qemu_mutex_init(&lock);
++}
+diff --git a/yank.h b/yank.h
+new file mode 100644
+index 0000000000..f01b370999
+--- /dev/null
++++ b/yank.h
+@@ -0,0 +1,69 @@
++
++#ifndef YANK_H
++#define YANK_H
++
++typedef void (YankFn) (void *opaque);
++
++/**
++ * yank_register_instance: Register a new instance.
++ *
++ * This registers a new instance for yanking. Must be called before any ya=
+nk
++ * function is registered for this instance.
++ *
++ * This function is thread-safe.
++ *
++ * @instance_name: The globally unique name of the instance.
++ */
++void yank_register_instance(char *instance_name);
++
++/**
++ * yank_unregister_instance: Unregister a instance.
++ *
++ * This unregisters a instance. Must be called only after every yank funct=
+ion
++ * of the instance has been unregistered.
++ *
++ * This function is thread-safe.
++ *
++ * @instance_name: The name of the instance.
++ */
++void yank_unregister_instance(char *instance_name);
++
++/**
++ * yank_register_function: Register a yank function
++ *
++ * This registers a yank function. All limitations of qmp oob commands app=
+ly
++ * to the yank function as well.
++ *
++ * This function is thread-safe.
++ *
++ * @instance_name: The name of the instance
++ * @func: The yank function
++ * @opaque: Will be passed to the yank function
++ */
++void yank_register_function(char *instance_name, YankFn *func, void *opaqu=
+e);
++
++/**
++ * yank_unregister_function: Unregister a yank function
++ *
++ * This unregisters a yank function.
++ *
++ * This function is thread-safe.
++ *
++ * @instance_name: The name of the instance
++ * @func: func that was passed to yank_register_function
++ * @opaque: opaque that was passed to yank_register_function
++ */
++void yank_unregister_function(char *instance_name, YankFn *func, void *opa=
+que);
++
++/**
++ * yank_unregister_function: Generic yank function for iochannel
++ *
++ * This is a generic yank function which will call qio_channel_shutdown on=
+ the
++ * provided QIOChannel.
++ *
++ * @opaque: QIOChannel to shutdown
++ */
++void yank_generic_iochannel(void *opaque);
++
++void yank_init(void);
++#endif
 --
 2.20.1
 
 
---Sig_/.DRYzL7/KAOmkFE.quhPpyn
+--Sig_/Uq9WSy+EEtHGcXwwYRvj6V3
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7Fm6sACgkQNasLKJxd
-slhpOA//R1ENpCDrMNJcXxuAiDWCREdRVzeAVEC9SgZWIE7Je3gwluHnnLWI4tRX
-u7ogSuwR8daQlBFg2G/SPuqkUluH5Vax5lpKopmWOMyTBWHiB7Q9GprmwG8rXZQv
-zRlJVLiucxlsuVVFUB6vCGH92Ubgx2jJFuneTxqY9gqamZ2CdkJKTZEum2KKlZdC
-O58Wwp5mRx1XQeJXeVTJb5+DQafuLA0va+9rYIOpkz7b86mdUJDME9MtjCvYhOnk
-t45eXsZunzlgc+7gbps7iYZFMz3tnSm3UzW32K4yC87UnidRoffzoPEFCHdOFSfR
-XI4e9QztMSy7oum9Ep2XrmfyE7t1bFGH8gkzLvPjcjJKGc5bFJzq60+J+lcJZ1ER
-TrzgLzt8K8mn3jfDwXbIXozdCsQOljdCF/JMOhYHqtnYwt8Ms8jYzXUYUrVDps+g
-NEhrLE3zGPi54kPcCkJ45cRpVIsUN8ZLVoQoL6Z1Q3T9BpH/gIEZziT+WA0lKTEK
-c0p+f9LCWlmS5ZPY59WNuGxAgs8CHEz3ajaXP6opGDVyMYNEFdwL7+HJ/tNsy3G9
-brkPOV83l+Rir5joDchhJiGEZMTDKzDuT0c4l4/n89sFHSfQQ8tZVDH/OwOXGWO+
-0TdwZRoGxBeq9pfBotdtacb8dTMXspKdGmWCEd4DDNLVd3OwHGw=
-=+kCK
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7Fm6MACgkQNasLKJxd
+slhK5A//QHB0Uhth4ZlChlBTMDRBFz3uyGYOAaK1mnB+hKuFkMx/j88c497nQe5M
+X6GN+SFnwvIrFvLERGwnwNlwGheVFabqjBWj3SXHJFQSciuAfV7T3U3oPL8v2uyg
+ZOvatLR41pW2WetVko0JiRvyOfxmf10eBwk7I8jnODCCDpD+yQ59L/lTVB/MoHK3
+Fb+05KWh/AlXtClqvI0x0Swf8ihRPto5pddPRZ3Qke4yggQw4v3O78uJsxzZbFXn
+JGaR3FtBkDVBTJ4q0I+6x5AjzDNbcRokJnyaTzVkjPMKYPsWi2ULRvbpssTw3w6L
+TQI42cq9CKTM+j1mm0vMpXjemR5WIN3pdC4k4q9TAksgVvmjqDpbXbhdguk6j3gp
+DJ+Nbv1/ietTpBBLYo5BbPIRN18yuniDdhhJYz3qMrBkUv7NrHqZaoJ54HJd3Q6X
+4AyvI4fBEP2uO9KhQt9hT179uMkOx1KP+lFDzZUZ9Gp6lvC1fT4bnSO+9NhsaHOp
+SK9rCQVCGJOLJVoYkdcBPKWia+fxjMu5jrH58pZgPPf+kIXkWg3zVVMlRDf9EfIt
+65tr9M4oyakdx6CMpSNJqcML18gZLqJ9M4N0LapDxRZKDacm/yvDv8UcJH326LPe
+/1NkRctGw2m3T0EWuKsojHmff5tpvEOJhwSP+NM/jWa8PW66X7Y=
+=PyAF
 -----END PGP SIGNATURE-----
 
---Sig_/.DRYzL7/KAOmkFE.quhPpyn--
+--Sig_/Uq9WSy+EEtHGcXwwYRvj6V3--
 
