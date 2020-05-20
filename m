@@ -2,105 +2,96 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4398FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B10AC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06D7A2070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:17:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D7A2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3834A20756
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:21:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkQ0nk1L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3834A20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbNf6-0003by-8C
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:17:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38388)
+	id 1jbNik-0006rj-DR
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jbNeO-00039t-Qx; Wed, 20 May 2020 08:16:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31574
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jbNeN-0004PL-Nb; Wed, 20 May 2020 08:16:44 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04KC4x6V172589; Wed, 20 May 2020 08:16:40 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 312aasy7mr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 May 2020 08:16:40 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04KC5YAL179132;
- Wed, 20 May 2020 08:16:40 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 312aasy7m2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 May 2020 08:16:39 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04KCGSkX026308;
- Wed, 20 May 2020 12:16:38 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma03ams.nl.ibm.com with ESMTP id 313xas3kjf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 May 2020 12:16:38 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04KCGZCQ60227668
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 20 May 2020 12:16:35 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4BC6511C04A;
- Wed, 20 May 2020 12:16:35 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9EB5111C04C;
- Wed, 20 May 2020 12:16:34 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.44.243])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 20 May 2020 12:16:34 +0000 (GMT)
-Date: Wed, 20 May 2020 14:16:33 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger
- <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200520141633.49e91a43.pasic@linux.ibm.com>
-In-Reply-To: <20200514221155.32079-1-pasic@linux.ibm.com>
-References: <20200514221155.32079-1-pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbNi1-0005pR-NJ
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:20:29 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36118
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbNhz-0005JI-Sx
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:20:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589977226;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VatffWUMXi0xWPmi6HCEA1F5UnnDl7N4I+lZSZSGXsg=;
+ b=OkQ0nk1LjxEXIJwv2UYWUk31wEPzN/7aGRNTn+cQmlBD+nwrGq//faVXLqh4HRP92XUh5k
+ M8rUR5HFVDOoJrvp90AwcpPD/EASSNsnlIVjpSOBWjyZyD3FC5DU0CFOTiH+0o2zBbkCeF
+ B9I3/XMThRHhvZxof6QSOl4wZMNECmI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-80-E6YmiqQzM5ywAjuR_PaxkA-1; Wed, 20 May 2020 08:20:24 -0400
+X-MC-Unique: E6YmiqQzM5ywAjuR_PaxkA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 990B18014D7;
+ Wed, 20 May 2020 12:20:23 +0000 (UTC)
+Received: from nas.mammed.net (unknown [10.40.193.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8AA7B6F7F9;
+ Wed, 20 May 2020 12:20:15 +0000 (UTC)
+Date: Wed, 20 May 2020 14:20:12 +0200
+From: Igor Mammedow <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Message-ID: <20200520142012.5394b2f6@nas.mammed.net>
+In-Reply-To: <20200520072055-mutt-send-email-mst@kernel.org>
+References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
+ <20200511205352.05ff541a@redhat.com>
+ <9941B800-BBEF-4DF8-BEE0-EC39D2A20D98@nutanix.com>
+ <20200513214312.0dfa4752@redhat.com>
+ <7FF83CE8-F25A-4458-80A7-EAA6296EF175@nutanix.com>
+ <20200520114354.1982cb63@nas.mammed.net>
+ <20200520054714-mutt-send-email-mst@kernel.org>
+ <20200520115626.6a2a2355@nas.mammed.net>
+ <20200520060645-mutt-send-email-mst@kernel.org>
+ <20200520130547.7ac568b8@nas.mammed.net>
+ <20200520072055-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-20_07:2020-05-19,
- 2020-05-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 mlxscore=0
- lowpriorityscore=0 mlxlogscore=999 spamscore=0 clxscore=1015
- impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501 bulkscore=0
- suspectscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005200101
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 08:16:40
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,67 +105,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Julia Suvorova <jusual@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 00:11:55 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Wed, 20 May 2020 07:23:21 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> The virtio specification tells that the device is to present
-> VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
-> device "can only access certain memory addresses with said access
-> specified and/or granted by the platform". This is the case for a
-> protected VMs, as the device can access only memory addresses that are
-> in pages that are currently shared (only the guest can share/unsare its
-> pages).
-> 
-> No VM, however, starts out as a protected VM, but some VMs may be
-> converted to protected VMs if the guest decides so.
-> 
-> Making the end user explicitly manage the VIRTIO_F_ACCESS_PLATFORM via
-> the property iommu_on is a minor disaster. Since the correctness of the
-> paravirtualized virtio devices depends (and thus in a sense the
-> correctness of the hypervisor) it, then the hypervisor should have the
-> last word about whether VIRTIO_F_ACCESS_PLATFORM is to be presented or
-> not.
-> 
-> Currently presenting a PV guest with a (paravirtualized) virtio-ccw
-> device has catastrophic consequences for the VM (after the hypervisors
-> access to protected memory). This is especially grave in case of device
-> hotplug (because in this case the guest is more likely to be in the
-> middle of something important).
-> 
-> Let us manage the VIRTIO_F_ACCESS_PLATFORM virtio feature automatically
-> for virtio-ccw devices, i.e. force it before we start the protected VM.
-> If the VM should cease to be protected, the original value is restored.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
-> 
-> NOTES:
-> 
-> * Doing more system_resets() is a big hack.  We should look into this.
-> * The user interface implications of this patch are also an ugly can of
-> worms. We need to discuss them.
-> 
-> 
-> v1 --> v2:
-> * Use the default or user supplied iommu_on flag when when !PV
-> * Use virtio functions for feature manipulation
-> 
-> Link to v1:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg683775.html
-> 
-> Unfortunately the v1 did not see much discussion because we had more
-> pressing issues.
-> 
->
+> On Wed, May 20, 2020 at 01:05:47PM +0200, Igor Mammedow wrote:
+> > On Wed, 20 May 2020 06:28:37 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >  =20
+> > > On Wed, May 20, 2020 at 11:56:26AM +0200, Igor Mammedow wrote: =20
+> > > > On Wed, 20 May 2020 05:47:53 -0400
+> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >    =20
+> > > > > On Wed, May 20, 2020 at 11:43:54AM +0200, Igor Mammedow
+> > > > > wrote:   =20
+> > > > > > On Fri, 15 May 2020 12:13:53 +0000
+> > > > > > Ani Sinha <ani.sinha@nutanix.com> wrote:
+> > > > > >      =20
+> > > > > > > > On May 14, 2020, at 1:13 AM, Igor Mammedov
+> > > > > > > > <imammedo@redhat.com> wrote:      =20
+> > > > > > > >>=20
+> > > > > > > >>        =20
+> > > > > > > >>> Will following hack work for you?
+> > > > > > > >>> possible permutations
+> > > > > > > >>> 1) ACPI hotplug everywhere
+> > > > > > > >>> -global PIIX4_PM.acpi-pci-hotplug=3Don -global
+> > > > > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Don
+> > > > > > > >>> -device pci-bridge,chassis_nr=3D1,shpc=3Ddoesnt_matter
+> > > > > > > >>> -device e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1=20
+> > > > > > > >>>=20
+> > > > > > > >>> 2) No hotplug at all
+> > > > > > > >>> -global PIIX4_PM.acpi-pci-hotplug=3Doff -global
+> > > > > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Don
+> > > > > > > >>> -device pci-bridge,chassis_nr=3D1,shpc=3Doff -device
+> > > > > > > >>> e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1
+> > > > > > > >>>=20
+> > > > > > > >>> -global PIIX4_PM.acpi-pci-hotplug=3Doff -global
+> > > > > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Doff
+> > > > > > > >>> -device pci-bridge,chassis_nr=3D1,shpc=3Ddoesnt_matter
+> > > > > > > >>> -device e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1         =
+=20
+> > > > > > > >>=20
+> > > > > > > >> Given that my patch is not acceptable, I=E2=80=99d prefer =
+the
+> > > > > > > >> following in the order of preference:
+> > > > > > > >>=20
+> > > > > > > >> (a) Have an option to disable hot ejection of PCI-PCI
+> > > > > > > >> bridge so that Windows does not even show this HW in
+> > > > > > > >> the =E2=80=9Csafely remove HW=E2=80=9D option. If we can d=
+o this then
+> > > > > > > >> from OS perspective the GUI options will be same as
+> > > > > > > >> what is available with PCIE/q35 - none of the devices
+> > > > > > > >> will be hot ejectable if the hot plug option is turned
+> > > > > > > >> off from the PCIE slots where devices are plugged
+> > > > > > > >> into. I looked at the code. It seems to manipulate
+> > > > > > > >> ACPI tables of the empty slots of the root bus where
+> > > > > > > >> no devices are attached (see comment "/* add hotplug
+> > > > > > > >> slots for non present devices */ =E2=80=9C). For cold plug=
+ged
+> > > > > > > >> bridges, it recurses down to scan the slots of the
+> > > > > > > >> bridge. Is it possible to disable hot plug for the
+> > > > > > > >> slot to which the bridge is attached?       =20
+> > > > > > > >=20
+> > > > > > > > I don't think it's possible to have per slot hotplug on
+> > > > > > > > conventional PCI hardware. it's per bridge property.
+> > > > > > > >    =20
+> > > > > > >=20
+> > > > > > > We add the AMLs per empty slot though. When the pic
+> > > > > > > bridge is attached, we do nothing, just recurse into the
+> > > > > > > bridge slots. That is what I was asking, if it was
+> > > > > > > possible to just disable the AMLs or use some tricks to
+> > > > > > > say that this particular slot is not hotpluggable. I am
+> > > > > > > not sure why Windows is trying to eject the PCI bridge
+> > > > > > > and failing. Maybe something related to this comment?
+> > > > > > >=20
+> > > > > > >=20
+> > > > > > > /* When hotplug for bridges is enabled, bridges are
+> > > > > > >                              =20
+> > > > > > >          * described in ACPI separately (see
+> > > > > > > build_pci_bus_end).=20
+> > > > > > >          * In this case they aren't themselves
+> > > > > > > hot-pluggable.=20
+> > > > > > >          * Hotplugged bridges *are* hot-pluggable.
+> > > > > > > */     =20
+> > > > > >=20
+> > > > > > thinking some more on this topic, it seems that with ACPI
+> > > > > > hotplug we already have implicit non-hotpluggble slot (slot
+> > > > > > with bridge) while the rest are staying hotpluggable.
+> > > > > >=20
+> > > > > > So my question is: if it's acceptable to add
+> > > > > > 'PCIDevice::hotpluggable" property to all PCI devices so
+> > > > > > that user / libvirt could set it to false in case they do
+> > > > > > not want coldplugged device be considered as hotpluggable?
+> > > > > > (this way other devices could be treated the same way as
+> > > > > > bridges)
+> > > > > >=20
+> > > > > > [...]     =20
+> > > > >=20
+> > > > >=20
+> > > > > I think Julia already posted a patch adding this to downstream
+> > > > > pcie bridges. Adding this to pci slots sounds like a
+> > > > > reasonable thing.   =20
+> > > > Question was more about external interface, were we do not have
+> > > > ports as separate devices with conventional PCI. The only knob
+> > > > we have is a a PCI device, where we have a property to turn
+> > > > on/off hotplug. ex: -device e1000,hotpluggable=3Doff
+> > > > and if libvirt would be able to use it   =20
+> > >=20
+> > > It would make sense but is it practical to add the capability is
+> > > added in a generic way to all bridges and hosts?
+> > > If not how do users probe for presence of the capability? =20
+> > it probably won't work with native SHPC hotplug (which looks to be
+> > incomplete in QEMU anyway), but it should work with ACPI and per
+> > port PCIE hotplugs.
+> > In case of SHPC, we probably should be able to cleanly error out
+> > with 'unsupported' reason if  "hotpluggable" conflicts with bridge
+> > policy. =20
+>=20
+> "Try it and see if it works" is somewhat problematic from management
+> POV since there's a never ending stream of new things they would have
+> to try. If this approach is taken, we'd have to try to loop in some
+> people from libvirt and see what's their take.
+to clarify, we are talking here about bridges to conventional
+PCI with native SHPC hotplug semantics wrt mgmt and
+potential pcidevice.hotpluggable property.
+(the later should work fine in ACPI and PCIE hoptlug cases).
 
-polite ping
+currently by default pci bridges have property shpc=3Doff, so mgmt
+should know that deals with PCI bridge and has to enable SHPC
+on bridge explicitly, in which case it could probably be taught that
+using conflicting hotpluggable for device attached to bridge and shpc
+values is wrong thing.
+If that's not it, then I'm not sure what kind of discovery you are
+talking about.
+
 
