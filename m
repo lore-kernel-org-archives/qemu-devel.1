@@ -2,84 +2,168 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D7DFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84937C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BE0F2072C
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43C5E2072C
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1N+mWex"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BE0F2072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W91m+c5m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C5E2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbQ4m-0007so-GL
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:52:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33608)
+	id 1jbQ7a-0001ao-En
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbQ2O-0003u1-8Y
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:49:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27908
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbQ6t-0000lz-D3
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:54:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48402
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbQ2M-0003FY-V7
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:49:39 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbQ6r-00042l-SI
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:54:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589986177;
+ s=mimecast20190719; t=1589986456;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tFfaF4cdAmLHdNpjzjWuUnIrxNi3+JP/HgQpXG1wINc=;
- b=Y1N+mWexH6Lfu3DMzXW2QKtMuUyPBnY9OReQZpC96ZCpsYwxWGsjh/vh3wAFYZQOq09yq3
- tLO9L7Gc9/3bOirzK7lk7NYlzaGCPqLsHAq/IxjcbRyVPjVew0U46maX9Bo56gOhSbrL0U
- BHMvRzlG+VxKOUTQoUa1ZhV+F5+6Lb8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=7GAAUqM/R8cgY372i/Ojlt8ozcLezZ0lXRuTzROkjVU=;
+ b=W91m+c5mBgNWcZ8MsF9npi3lnHs/FCP794SkoADT8VTlOgnOz3jTA8uTQF75FlLiyjImxE
+ ivQOj3CgkAVKK19fAyDyfNCtDpKEFYIbzu+QYpD8/ck0i884S2X9CfhJpDR1nCm0fCu7fQ
+ wO08Pi2uH5CiiaxSrFt5vl8fp9EP+H0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-03c1PbZ_PPirPKehGYORjQ-1; Wed, 20 May 2020 10:49:35 -0400
-X-MC-Unique: 03c1PbZ_PPirPKehGYORjQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-26-JJCg2zlmNcOPscZuXj9dDQ-1; Wed, 20 May 2020 10:54:10 -0400
+X-MC-Unique: JJCg2zlmNcOPscZuXj9dDQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55019835B40;
- Wed, 20 May 2020 14:49:34 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-115-47.ams2.redhat.com [10.36.115.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 13DC570461;
- Wed, 20 May 2020 14:49:29 +0000 (UTC)
-Date: Wed, 20 May 2020 16:49:28 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v2] block: Factor out bdrv_run_co()
-Message-ID: <20200520144928.GC5192@linux.fritz.box>
-References: <20200519175650.31506-1-vsementsov@virtuozzo.com>
- <20200520140500.GB5192@linux.fritz.box>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C95E819200DB;
+ Wed, 20 May 2020 14:54:08 +0000 (UTC)
+Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0317E5D9CC;
+ Wed, 20 May 2020 14:53:58 +0000 (UTC)
+Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
+ test?
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
+ <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
+ <20200515102321.GH1300305@redhat.com>
+ <613f5cf5-7019-7447-6ba1-8050ab05303a@redhat.com>
+ <20200519090441.GD2003821@redhat.com>
+ <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
+ <a2ea3cf1-fbc0-2525-742d-11d6633160ad@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d7ba9f99-16c9-9c46-c63f-98575810ed29@redhat.com>
+Date: Wed, 20 May 2020 10:53:58 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200520140500.GB5192@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <a2ea3cf1-fbc0-2525-742d-11d6633160ad@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,44 +176,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-discuss@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.05.2020 um 16:05 hat Kevin Wolf geschrieben:
-> Am 19.05.2020 um 19:56 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > We have a few bdrv_*() functions that can either spawn a new coroutine
-> > and wait for it with BDRV_POLL_WHILE() or use a fastpath if they are
-> > alreeady running in a coroutine. All of them duplicate basically the
-> > same code.
-> > 
-> > Factor the common code into a new function bdrv_run_co().
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >    [Factor out bdrv_run_co_entry too]
-> > ---
-> > 
-> > Hi!
-> > 
-> > I'm a bit lost on rebasing "block/io: safer inc/dec in_flight sections"
-> > (is it needed or not?), so, I decided to send just this one patch:
-> > 
-> > I suggest to go a bit further, and refactor that bdrv_run_co don't need
-> > additional *ret argument neither NOT_DONE logic.
+
+
+On 5/20/20 2:13 AM, Thomas Huth wrote:
+> On 20/05/2020 01.06, John Snow wrote:
+>>
+>>
+>> On 5/19/20 5:04 AM, Daniel P. Berrangé wrote:
+>>> On Mon, May 18, 2020 at 03:56:36PM -0400, John Snow wrote:
+>>>>
+>>>>
+>>>> On 5/15/20 6:23 AM, Daniel P. Berrangé wrote:
+>>>>> On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
+>>>>>> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
+>>>>>>> Hello,
+>>>>>>>
+>>>>>>> Following Markus thread on deprecating unmaintained (untested) code
+>>>>>>> (machines) [1] and the effort done to gather the information shared in
+>>>>>>> the replies [2], and the various acceptance tests added, is it
+>>>>>>> feasible to require for the next release that each new device/machine
+>>>>>>> is provided a test covering it?
+>>>>>>>
+>>>>>>> If no, what is missing?
+>>>>>>
+>>>>>> If a qtest is feasible, yes, I think we should require one for new
+>>>>>> devices. But what about machines - you normally need a test image for
+>>>>>> this. In that case, there is still the question where testing images
+>>>>>> could be hosted. Not every developer has a web space where they could
+>>>>>> put their test images onto. And what about images that contain non-free
+>>>>>> code?
+>>>>>
+>>>>> Yep, it isn't feasible to make this a hard rule.
+>>>>>
+>>>>> IMHO this is where a support tier classification comes into play
+>>>>>
+>>>>>  - Tier 1: actively maintained, qtest coverage available. Expected
+>>>>>            to work reliably at all times since every commit is CI
+>>>>> 	   tested
+>>>>>
+>>>>>   - Tier 2: actively maintained, no qtest coverage. Should usually
+>>>>>            work but regression may creep in due to reliance on the
+>>>>> 	   maintainer to manually test on adhoc basis
+>>>>>
+>>>>>   - Tier 3: not actively maintained, unknown state but liable to
+>>>>>             be broken indefinitely
+>>>>>
+>>>>> Tier 1 is obviously the most desirable state we would like everthing to
+>>>>> be at. Contributors will have to fix problems their patches cause as
+>>>>> they will be blocked by CI.
+>>>>>
+>>>>> Tier 2 is an admission that reality gets in the way. Ideally stuff in
+>>>>> this tier will graduate to Tier 1 at some point. Even if it doesn't
+>>>>> though, it is still valid to keep it in QEMU long term. Contributors
+>>>>> shouldn't gratuitously break stuff in these board, but if they do,
+>>>>> then the maintainer is ultimately responsible for fixing it, as the
+>>>>> contributors don't have a test rig for it.
+>>>>>
+>>>>> Tier 3 is abandonware. If a maintainer doesn't appear, users should
+>>>>> not expect it to continue to exist long term. Contributors are free
+>>>>> to send patches which break this, and are under no obligation to
+>>>>> fix problems in these boards. We may deprecate & delete it after a
+>>>>> while
+>>>>>
+>>>>>
+>>>>> Over time we'll likely add more criteria to stuff in Tier 1. This
+>>>>> could lead to some things dropping from Tier 1 to Tier 2. This is
+>>>>> OK, as it doesn't make those things worse than they already were.
+>>>>> We're just saying that Tier 2 isn't as thoroughly tested as we
+>>>>> would like it to be in an ideal world.
+>>>>
+>>>> I really like the idea of device support tiers codified directly in the
+>>>> QEMU codebase, to give upstream users some idea of which devices we
+>>>> expect to work and which we ... don't, really.
+>>>>
+>>>> Not every last device we offer is enterprise production ready, but we
+>>>> don't necessarily do a good job of explaining which devices fall into
+>>>> which categories, and we've got quite a few of them.
+>>>>
+>>>> I wonder if a 2.5th tier would be useful; something like a "hobbyist"
+>>>> tier for pet project SoC boards and the like -- they're not abandoned,
+>>>> but we also don't expect them to work, exactly.
+>>>>
+>>>> Mild semantic difference from Tier 3.
+>>>
+>>> I guess I was thinking such hobbyist stuff would fall into tier 2  if the
+>>> hobbyist maintainer actually responds to fixing stuff, or tier 3 if they
+>>> largely aren't active on the mailing list responding to issues/questions.
+>>>
+>>> We add have a 4 tier system overall and put hobbyist stuff at tier 3,
+>>> and abandonware at tier 4.
+>>>
+>>> Probably shouldn't go beyond 4 tiers though, as the more criteria we add
+>>> the harder it is to clearly decide which tier something should go into.
+>>>
+>>> The tier 1 vs 2 divison is clearly split based on CI which is a simple
+>>> classification to decide on.
+>>>
+>>> The tier 2 vs 3 division is moderately clearly split based on whether
+>>> there is a frequently active maintainer.
+>>>
+>>> We can probably squeeze in the 4th tier without too much ambiguity in
+>>> the classisfication if we think it is adding something worthwhile either
+>>> from our POV as maintainers, or for users consuming it.
+>>
+>> Yes, I didn't mean to start watering it down into a 1,380 tier system
+>> that we're never able to properly utilize.
+>>
+>> I was thinking more along the lines of:
+>>
+>> - Device works and is well loved
+>> - Device works and is well loved (but we have to test manually)
+>> - Device doesn't work, but is well loved
+>>   (Use at your own peril, please file a bug report)
+>> - Device doesn't work, and is unloved
+>>
+>> Perhaps it'd be clearer to name these Tier 1A, 1B, 2, and 3; where
+>> things can shift from 1A to 1B as their test coverage allows, but it's
+>> not meant to indicate general status otherwise.
 > 
-> Hm, this approach adds another indirection and bdrv_pread/pwrite still
-> seems to be on some hot paths. But maybe this is just the right
-> motivation to clean up qcow2 a bit and use explicit bdrv_co_*() where it
-> is possible. I might take a look later.
+> All that sounds somewhat similar to the classification that we already
+> use in our MAINTAINERS file - Supported, Maintained, Odd-Fixes, Orphan,
+> Obsolete ... maybe we can avoid to introduce yet another classification
+> system and merge the two (e.g. by also changing the classification
+> system in MAINTAINERS a little bit?).
+> 
 
-Still not easily possible it seems. We can add a few coroutine_fn
-markers here and there (and probably should do that), but the
-interesting I/O is in the Qcow2Cache, which is used from basically
-everywhere.
+Yeah, it's similar, but the granularity is per-device instead of
+per-file, and it would be metadata that is introspectible.
 
-Kevin
+(As part of the help files and the CLI, when you look at a list of
+devices, I'd like to show which devices are in which support tiers.)
+
+The scope of each system is meant to be just a little different --
+describing source files for git management vs describing logistical
+in-application API constructs.
+
+Still, you're right -- there's a lot of overlap. I'm not sure how to
+best bridge them.
+
+Though I would like to re-engage on the idea that we should be
+mechanically consuming and testing our MAINTAINERS file to ensure 100%
+coverage as a CI check. IIRC there was some pushback to this idea
+because we weren't sure who should own basic/generic files like
+"LICENSE" or "README" and so on.
+
+For files that SHOULD go "maintainerless", for which we would like
+checkpatch.pl to simply show you "who touched it last", maybe we should
+create a "Community Managed" section in MAINTAINERS that explicitly
+lists these files; and get_maintainer amended to understand this section.
+
+Maybe if we get the maintainers file getting checked regularly as a
+first step it will help us bridge the gap into device metadata without
+worrying about info desync.
+
+Just brainstorming.
+
+--js
+
+(Slightly OT: I am working on an email that contains a quick code-tour
+overview of what every file in the root of the document is, including
+which are maintained and unmaintained. Might be a good jumping off point
+for more MAINTAINER file discussions?)
 
 
