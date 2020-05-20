@@ -2,108 +2,95 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3637C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37356C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:23:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CA702065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:18:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA74C2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:23:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Su+h6lLV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA702065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="PFALF9Yl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA74C2065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbJvZ-0007qU-SM
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:18:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41304)
+	id 1jbK0J-00018v-4i
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbJux-0007Qt-OK
- for qemu-devel@nongnu.org; Wed, 20 May 2020 04:17:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23562
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbJux-0001ys-13
- for qemu-devel@nongnu.org; Wed, 20 May 2020 04:17:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589962653;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BWiUdBfvnxMbEYh/pkGKmvvgVggmo7ESA+YK4mCP3OQ=;
- b=Su+h6lLVadmlcX+HOW5FpNvU1t0rwUrQroY6ttqN86/B8Jeokkad7JLNdhFDCQvI4haDlj
- IzR4S/iV6a5tglLMO1CvgLuSKg2Am+/b370GsvbGXYF/uGaznciqzae7V/sgc4zE9zYIFS
- zmyE947OZhF2MardhLyVLPjV51UIreg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-5GiKvu2PM5C4XQWYgK0shQ-1; Wed, 20 May 2020 04:17:30 -0400
-X-MC-Unique: 5GiKvu2PM5C4XQWYgK0shQ-1
-Received: by mail-wr1-f70.google.com with SMTP id y7so1069306wrd.12
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:17:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbJzY-0000fI-Qw
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:22:20 -0400
+Received: from mail-ua1-x935.google.com ([2607:f8b0:4864:20::935]:37399)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbJzW-0002ue-BP
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:22:20 -0400
+Received: by mail-ua1-x935.google.com with SMTP id g34so167499uah.4
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:22:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=smartx-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=80N3308sjW1G8UGwZUINucuf9nwtMNEE/5owF0yLVsE=;
+ b=PFALF9YlQgNxvmPjAYCGqRff9VlrNMMxhq2HvGLVKlBasqaWiQcFlShyi5gsd+BzVD
+ uOahoLKeZl49YTqo9p2UXuloE2DSBZZqFcubzKctQkTt6w/jMdXUQn4nMJ1b9SqgSvn8
+ NFtjl5kGFXzwNBH053cT7v0tW6BWCKqL1uSomMmVXKb0VARgz0Uh9hAoTqw1SZxnKCCx
+ gQ1vSj4t0/mWvN0iT13qVosV0TkVJB3Jp6v8GPkf6S5MBAOLGoyoBsbsxMURQsqZls59
+ 5dxTIEby7za2/P0oprfOtVcSd1XoJPZLRd6jL4CKsgmb33jKmm1aFqCKrA4ivjzEVA+P
+ iy6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BWiUdBfvnxMbEYh/pkGKmvvgVggmo7ESA+YK4mCP3OQ=;
- b=JqueFUSzRTPzQ2KUb125TKYHo/FcSfSikIItrQi1/0iYqgD6ULU+mu+xF97yuimMBE
- t/WIBgIbLjMCeqYjJef4sE6OydOTx93+LPnA5yxxpUqStg9QfW5ATmr5+w4xW8oIDHNs
- EluzCPfwH3BQrvWVoz1jau5wop/kBoCBymHOqyvRtrQy7BdRg2iAQgtBXNYWEl9Psp3d
- aIiRnkW6lVGVQQQlM98XD12ybJ02u6DBuj9tOoX0JfWhi0WhRuN2L+XmTMq7u2kfXpIf
- llPqIV4xdRaHs3mBNf4O+H/ItZbJ2oBSdnltpo+HuWAS+j+4+1M8ndFaYXxMVzdRbDKs
- mB/A==
-X-Gm-Message-State: AOAM532vCB9S8uLiW6k38uZN2z6nftGGvKf5cKrzjt1aW7wZIqr7TOgK
- Fqdi+uzntou7xfy3P8wx+QfYOC7sPoWt/FS4SOfQM/CBIIW9cB7J6hBaco7Nh5bUpdPjZYHnVDz
- K6ItKoTuiJZ62+9E=
-X-Received: by 2002:a5d:5404:: with SMTP id g4mr3013933wrv.310.1589962648819; 
- Wed, 20 May 2020 01:17:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz+xU+5cUr8voPDRq4j/MqbHYE7QZ0UGzqBhWQcwXFrGUu2c9UxnZmq2A9w7mZzKwqsIcR4GQ==
-X-Received: by 2002:a5d:5404:: with SMTP id g4mr3013910wrv.310.1589962648600; 
- Wed, 20 May 2020 01:17:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:60b0:79b4:e56:bfb5?
- ([2001:b07:6468:f312:60b0:79b4:e56:bfb5])
- by smtp.gmail.com with ESMTPSA id r11sm227480wre.25.2020.05.20.01.17.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 01:17:28 -0700 (PDT)
-Subject: Re: [PATCH 03/55] qdev: New qdev_new(), qdev_realize(), etc.
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-4-armbru@redhat.com>
- <9b329adc-8110-c108-996a-3b7d8463d042@redhat.com>
- <871rnft498.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c3c59472-9f2a-f30a-deed-36192840a892@redhat.com>
-Date: Wed, 20 May 2020 10:17:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=80N3308sjW1G8UGwZUINucuf9nwtMNEE/5owF0yLVsE=;
+ b=MWEJNfCLkpOM/wmvzW9PRGWWkHm3ujwHfM8jcgc5u8b/00LJqphqNt0NClQ6t84Uv0
+ m93veg6UkYWHULFp6uCkGnkECwET4pCZDStNqtQxCcGGRQu16l1HzEn2NeP3ifZvc4Jt
+ HClrbID+YN1DPjHFXEwmV1VwKTfTBJZqsXUPcLJGOd8e4IxOxsOHwjvb7nFb0WL4cr1P
+ O9pA/qCMcTiVuygQt9P+ABxVOxkwLjgLmkaKO296kBFcW0H15EoV5eW44aG7UnLlgmuM
+ qU871RLRzzvFWbHkrY9m3LAQ1sIYg0Mc6uCljrIhJQNP27dzscp61gUYEPh1XVAX/u56
+ qUbA==
+X-Gm-Message-State: AOAM531cSbCqcqrPHYlJh4ody45Kn2oTZ+hCA4pLXJd38GvxQAlW0aCs
+ Whqno2knMGIG47Yc0o0QCqGcdel7OIPTicDRDANGxw==
+X-Google-Smtp-Source: ABdhPJy5to2SMB1Sl6PsyvEBFI26oy8edNWf903Ey2i+SL0+zkcrdzLPS23I+o/hnyBrJ3H9Q5tYMiK1Gu4kE/54mTM=
+X-Received: by 2002:ab0:2f5:: with SMTP id 108mr2576949uah.122.1589962936518; 
+ Wed, 20 May 2020 01:22:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <871rnft498.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
+ <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
+ <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
+ <20200514125220.GJ2787@work-vm>
+ <CAHckoCyegWG9yH_y6VjHhnghfHJD-Wq+EmOyRZE3EYguTOHfPw@mail.gmail.com>
+ <20200514151600.GO2787@work-vm>
+ <CAHckoCxc2XTA3ckU0sq-BmbZZFtfAY_GaEOW46XFzfZ2qXjeMQ@mail.gmail.com>
+ <20200514153129.GP2787@work-vm>
+ <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
+ <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
+ <986fbf33-8127-870b-9163-4aa8d332553f@redhat.com>
+In-Reply-To: <986fbf33-8127-870b-9163-4aa8d332553f@redhat.com>
+From: Li Feng <fengli@smartx.com>
+Date: Wed, 20 May 2020 16:22:05 +0800
+Message-ID: <CAHckoCxw=j8+uXHD3tzQc4vGkRu-_xhcHn8sSeiKaSHw=Bt6mA@mail.gmail.com>
+Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
+ failed.
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: none client-ip=2607:f8b0:4864:20::935;
+ envelope-from=fengli@smartx.com; helo=mail-ua1-x935.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,33 +103,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: vkuznets@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/05/20 10:11, Markus Armbruster wrote:
->> On 19/05/20 16:54, Markus Armbruster wrote:
->>> +
->>> +    object_ref(OBJECT(dev));
->>> +    object_property_set_bool(OBJECT(dev), true, "realized", &err);
->>> +    if (err) {
->>> +        error_propagate_prepend(errp, err,
->>> +                                "Initialization of device %s failed: ",
->>> +                                object_get_typename(OBJECT(dev)));
->>> +    }
->>> +    object_unref(OBJECT(dev));
->> Why is the ref/unref pair needed?  Should it be done in the realized
->> setter instead?
-> Copied from qdev_init_nofail(), where it is necessary (I figured out why
-> the hard way).  It doesn't seem to be necessary here, though.  Thanks!
+Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2020=E5=B9=B45=E6=9C=8820=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=883:28=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 20/05/20 05:50, Li Feng wrote:
+> >>>>>>>>> qemu-system-x86_64: error: failed to set MSR 0x48f to 0x7fefff0=
+0036dfb
+>
+> The high 32 bits are 0111 1111 1110 1111 1111 1111.
+>
+> The low 32 bits are  0000 0011 0110 1101 1111 1011.
+>
+> The features that are set are the xor, so 0111 1100 1000 0010 0000 0100:
+>
+> - bit 2, vmx-exit-nosave-debugctl
+> - bit 9, host address space size, is handled automatically by QEMU
+> - bit 15, vmx-exit-ack-intr
+> - bit 17, vmx-exit-save-pat
+> - bit 18, vmx-exit-load-pat
+> - bit 19, vmx-exit-save-efer
+> - bit 20, vmx-exit-load-efer
+> - bit 21, vmx-exit-save-preemption-timer
+>
+> Try removing all of these and see if QEMU starts:
+>
+> qemu-kvm ... -cpu
+> host,-vmx-exit-nosave-debugctl,-vmx-exit-ack-intr,-vmx-exit-save-pat,-vmx=
+-exit-load-pat,-vmx-exit-save-efer,-vmx-exit-load-efer,-vmx-exit-save-preem=
+ption-timer
+>
+> And then add them back one at a time.
 
-Why is it necessary there?  It seems a bit iffy.
+Hi, Paolo.
+Thanks, the crash is still here when removing the above features:
+qemu-system-x86_64: error: failed to set MSR 0x48f to 0x36fff00036dff
 
-Paolo
+After computing xor, the result is 0b1000000000.
+The bit 9 is set.
 
+>
+> Paolo
+>
 
