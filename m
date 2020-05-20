@@ -2,107 +2,77 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 11:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171BCC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 11:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B931207C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 11:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB36F2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 11:55:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFBMgCIr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B931207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="rdIBDmxk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB36F2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbNI8-0001t5-Lu
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 07:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35560)
+	id 1jbNJs-0003WO-00
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 07:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbNHV-00018A-RZ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 07:53:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47330
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbNHV-0008Jc-3A
- for qemu-devel@nongnu.org; Wed, 20 May 2020 07:53:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589975584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qri14Msi9BU2BD1z+Ox+m9OIiWj1DJPijAw5aya/39Y=;
- b=MFBMgCIrGIHgewnYjxdAhzR5N4UH5NpHx/qp+2N1a62EL71lnE4J5C/3O2sCvoux7dymi7
- lYTl0BXngj9S6rPGj88qKQ6YlXTd6XSP/y5drV+DxXTfT0YmsiqodpODCtA4VJbi4Z78JT
- irtXKDkxRRvehs4zUWpkd2olTQKPiRs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-9oIA7ysgNICbIbeHri2dEw-1; Wed, 20 May 2020 07:53:02 -0400
-X-MC-Unique: 9oIA7ysgNICbIbeHri2dEw-1
-Received: by mail-wr1-f69.google.com with SMTP id p2so1310182wrm.6
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 04:53:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qri14Msi9BU2BD1z+Ox+m9OIiWj1DJPijAw5aya/39Y=;
- b=kuJn6b5XwhJ59ux5DqI4hBZd5KNUPZzeijMpmoNwbbDY0O1Gwr13WJ4DqppZp9KjtX
- qRE6qNm5dL5O/9eVAo+e2ZVNKl3GxQyVH12m7P4Ewfi8/bZ9iU7QTHKVascj/LjMUvh3
- R9vTclZSCtiVY8gogK3I03OEYklCOYScekdH5TCBvCNphKnikke/SuH/Xb0gGBF97du6
- PQ6ykCYzQFjXZz+bt5SgBFF0f13YuRK5oYqmahPJwF8kW0pTYyVM1lbJHIdACYsYLnUW
- 4yNO7Juv0LHdwBLE+GFUc72QKYU09NTk20rjpptg3xW6xw5q+dv4ZDfZlgVtVzDSs+5p
- wpvg==
-X-Gm-Message-State: AOAM532AD2MJpMZYKqYtG+bK9BxxAbSzQeZD2cGy6TujzTIOrnQLV8SU
- FMi1zWm7pg7kp23/5f4KXKhYXQAjG6nZg/EhW3EZNbda36r+wIiVm3MjclvecOmRZAJTKGlAI31
- 02UE99cGhamVUx0E=
-X-Received: by 2002:a05:6000:1107:: with SMTP id
- z7mr3721654wrw.93.1589975581026; 
- Wed, 20 May 2020 04:53:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIOz+W/uf/IHltLCXl7P44X20WzmmHC98WJKWupQaxnO1KLl8e3g/ZWyEc4UlyBBNywYjOhA==
-X-Received: by 2002:a05:6000:1107:: with SMTP id
- z7mr3721638wrw.93.1589975580801; 
- Wed, 20 May 2020 04:53:00 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id 10sm2918480wmw.26.2020.05.20.04.52.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 04:53:00 -0700 (PDT)
-Subject: Re: [PATCH 32/55] auxbus: Eliminate aux_create_slave()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-33-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6285e11e-7e46-7241-c199-857a745d24fc@redhat.com>
-Date: Wed, 20 May 2020 13:52:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jbNJB-000373-0t
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 07:54:49 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:54935)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jbNJ9-000082-6R
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 07:54:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=rnWX03BHLF392dwQU+ParX+v1Pe5URzj+DFBIS40txA=; b=rdIBDmxkoHNcoi2aXjef0PSBOP
+ 4AXVDTJsfhmvajjK4m1v3PQ/vxtVBTscCg/ySw1znG0n2x1/WsppqbQoO8ETnwQzZb8JX/8xnoF4X
+ jGLzwLBmYk02yXI5d4oXubilmKsg2Er9mHS8rz3tw3aVk6xs+Dz89UxjRxte8FGOYfx24tLBUluqz
+ obIVh1Tdjy5qKsTs/7Pi4UZSlTvT9CDvT8KHkJZ3jDB8uMmCVmFoXQGq3SFr0dNv5TCIbTLXOlusa
+ i+7gs3cQXslyFuIgW4wuxf5S88iKqB2/LCqJuRQ9EW9BFkfzqzP/CVgh9fqc1eAgAiGvAdnS+3G+h
+ 1XCm3OWtJ/7AwlOQbR8mgEKuOMWE3uJ2psmhJwaAA90+diyCRvxdJcvebFi4ezwIK+OomRgEv+Abh
+ VXGe80nBOgfwl9RHwINVFsII869JfRISqy3Ngi+FsvPUEewwLW0YYzJeoowAgCo06IGsPiGAr5vkv
+ QbU9RJDm7wtBiuxqWcNNKdC8qz9Jr7tkWAxLzPqk/r1S9FiORhZ1T1PHB1ignilg4+J7JDUP99onH
+ XZ7tZaU9jsizQ2p9ecKWpW86rQroyTJgGEsDN/6c3kvII7DdI9kZCAFJJnG5esAq3bpbfIIk0SM7+
+ L7HCrJHDFMl+w3om2EUTDpzvEjqp9I58t2dLqwFcI=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, groug@kaod.org,
+ anthony.perard@citrix.com, Stefano Stabellini <stefano.stabellini@xilinx.com>,
+ paul@xen.org
+Subject: Re: [PATCH 1/2] Revert "9p: init_in_iov_from_pdu can truncate the
+ size"
+Date: Wed, 20 May 2020 13:54:13 +0200
+Message-ID: <1727767.QC7mgPDRgF@silver>
+In-Reply-To: <20200520014712.24213-1-sstabellini@kernel.org>
+References: <alpine.DEB.2.21.2005191651130.27502@sstabellini-ThinkPad-T480s>
+ <20200520014712.24213-1-sstabellini@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200519145551.22836-33-armbru@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=5.189.157.229;
+ envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 07:23:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,75 +85,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/20 4:55 PM, Markus Armbruster wrote:
-> aux_create_slave() has become a trivial wrapper around qdev_new().
-> There's just one user.  Eliminate.
+On Mittwoch, 20. Mai 2020 03:47:11 CEST Stefano Stabellini wrote:
+> From: Stefano Stabellini <stefano.stabellini@xilinx.com>
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> This reverts commit 16724a173049ac29c7b5ade741da93a0f46edff7.
+> It causes https://bugs.launchpad.net/bugs/1877688.
+> 
+> Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
 > ---
->   include/hw/misc/auxbus.h | 7 -------
->   hw/display/xlnx_dp.c     | 2 +-
->   hw/misc/auxbus.c         | 9 ---------
->   3 files changed, 1 insertion(+), 17 deletions(-)
-> 
-> diff --git a/include/hw/misc/auxbus.h b/include/hw/misc/auxbus.h
-> index 6ab6cf5bb6..60b6311eb7 100644
-> --- a/include/hw/misc/auxbus.h
-> +++ b/include/hw/misc/auxbus.h
-> @@ -131,13 +131,6 @@ I2CBus *aux_get_i2c_bus(AUXBus *bus);
->    */
->   void aux_init_mmio(AUXSlave *aux_slave, MemoryRegion *mmio);
->   
-> -/* aux_create_slave: Create a new device on an AUX bus
-> - *
-> - * @bus The AUX bus for the new device.
-> - * @name The type of the device to be created.
-> - */
-> -DeviceState *aux_create_slave(AUXBus *bus, const char *name);
-> -
->   /* aux_map_slave: Map the mmio for an AUX slave on the bus.
->    *
->    * @dev The AUX slave.
-> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-> index 75de65ec96..77636db893 100644
-> --- a/hw/display/xlnx_dp.c
-> +++ b/hw/display/xlnx_dp.c
-> @@ -1247,7 +1247,7 @@ static void xlnx_dp_init(Object *obj)
->       /*
->        * Initialize DPCD and EDID..
->        */
-> -    s->dpcd = DPCD(aux_create_slave(s->aux_bus, "dpcd"));
-> +    s->dpcd = DPCD(qdev_new("dpcd"));
->       object_property_add_child(OBJECT(s), "dpcd", OBJECT(s->dpcd));
->   
->       s->edid = I2CDDC(qdev_new("i2c-ddc"));
-> diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-> index 682c35ece8..1e9316ff73 100644
-> --- a/hw/misc/auxbus.c
-> +++ b/hw/misc/auxbus.c
-> @@ -273,15 +273,6 @@ static void aux_slave_dev_print(Monitor *mon, DeviceState *dev, int indent)
->                      memory_region_size(s->mmio));
->   }
->   
-> -DeviceState *aux_create_slave(AUXBus *bus, const char *type)
-> -{
-> -    DeviceState *dev;
-> -
-> -    dev = qdev_new(type);
-> -    assert(dev);
-> -    return dev;
-> -}
-> -
->   void aux_init_mmio(AUXSlave *aux_slave, MemoryRegion *mmio)
->   {
->       assert(!aux_slave->mmio);
-> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+
+>  hw/9pfs/9p.c               | 33 +++++++++++----------------------
+>  hw/9pfs/9p.h               |  2 +-
+>  hw/9pfs/virtio-9p-device.c | 11 ++++-------
+>  hw/9pfs/xen-9p-backend.c   | 15 ++++++---------
+>  4 files changed, 22 insertions(+), 39 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index a2a14b5979..d39bfee462 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -2102,29 +2102,22 @@ out_nofid:
+>   * with qemu_iovec_destroy().
+>   */
+>  static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
+> -                                    size_t skip, size_t *size,
+> +                                    size_t skip, size_t size,
+>                                      bool is_write)
+>  {
+>      QEMUIOVector elem;
+>      struct iovec *iov;
+>      unsigned int niov;
+> -    size_t alloc_size = *size + skip;
+> 
+>      if (is_write) {
+> -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov,
+> alloc_size); +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov,
+> &niov, size + skip); } else {
+> -        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov,
+> &alloc_size); -    }
+> -
+> -    if (alloc_size < skip) {
+> -        *size = 0;
+> -    } else {
+> -        *size = alloc_size - skip;
+> +        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size +
+> skip); }
+> 
+>      qemu_iovec_init_external(&elem, iov, niov);
+>      qemu_iovec_init(qiov, niov);
+> -    qemu_iovec_concat(qiov, &elem, skip, *size);
+> +    qemu_iovec_concat(qiov, &elem, skip, size);
+>  }
+> 
+>  static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
+> @@ -2132,14 +2125,15 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU
+> *pdu, V9fsFidState *fidp, {
+>      ssize_t err;
+>      size_t offset = 7;
+> -    size_t read_count;
+> +    uint64_t read_count;
+>      QEMUIOVector qiov_full;
+> 
+>      if (fidp->fs.xattr.len < off) {
+>          read_count = 0;
+> -    } else if (fidp->fs.xattr.len - off < max_count) {
+> -        read_count = fidp->fs.xattr.len - off;
+>      } else {
+> +        read_count = fidp->fs.xattr.len - off;
+> +    }
+> +    if (read_count > max_count) {
+>          read_count = max_count;
+>      }
+>      err = pdu_marshal(pdu, offset, "d", read_count);
+> @@ -2148,7 +2142,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu,
+> V9fsFidState *fidp, }
+>      offset += err;
+> 
+> -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
+> +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
+>      err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
+>                      ((char *)fidp->fs.xattr.value) + off,
+>                      read_count);
+> @@ -2277,11 +2271,9 @@ static void coroutine_fn v9fs_read(void *opaque)
+>          QEMUIOVector qiov_full;
+>          QEMUIOVector qiov;
+>          int32_t len;
+> -        size_t size = max_count;
+> 
+> -        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, &size, false);
+> +        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count,
+> false); qemu_iovec_init(&qiov, qiov_full.niov);
+> -        max_count = size;
+>          do {
+>              qemu_iovec_reset(&qiov);
+>              qemu_iovec_concat(&qiov, &qiov_full, count, qiov_full.size -
+> count); @@ -2532,7 +2524,6 @@ static void coroutine_fn v9fs_write(void
+> *opaque) int32_t len = 0;
+>      int32_t total = 0;
+>      size_t offset = 7;
+> -    size_t size;
+>      V9fsFidState *fidp;
+>      V9fsPDU *pdu = opaque;
+>      V9fsState *s = pdu->s;
+> @@ -2545,9 +2536,7 @@ static void coroutine_fn v9fs_write(void *opaque)
+>          return;
+>      }
+>      offset += err;
+> -    size = count;
+> -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &size, true);
+> -    count = size;
+> +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
+>      trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
+> 
+>      fidp = get_fid(pdu, fid);
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index dd1c6cb8d2..1b9e110605 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -436,7 +436,7 @@ struct V9fsTransport {
+>      ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char
+> *fmt, va_list ap);
+>      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> -                                        unsigned int *pniov, size_t *size);
+> +                                        unsigned int *pniov, size_t size);
+> void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> unsigned int *pniov, size_t size); void        (*push_and_notify)(V9fsPDU
+> *pdu);
+> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> index e5b44977c7..36f3aa9352 100644
+> --- a/hw/9pfs/virtio-9p-device.c
+> +++ b/hw/9pfs/virtio-9p-device.c
+> @@ -147,22 +147,19 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
+> size_t offset, }
+> 
+>  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
+> -                                        unsigned int *pniov, size_t *size)
+> +                                        unsigned int *pniov, size_t size)
+>  {
+>      V9fsState *s = pdu->s;
+>      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+>      VirtQueueElement *elem = v->elems[pdu->idx];
+>      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
+> 
+> -    if (buf_size < P9_IOHDRSZ) {
+> +    if (buf_size < size) {
+>          VirtIODevice *vdev = VIRTIO_DEVICE(v);
+> 
+>          virtio_error(vdev,
+> -                     "VirtFS reply type %d needs %zu bytes, buffer has %zu,
+> less than minimum", -                     pdu->id + 1, *size, buf_size);
+> -    }
+> -    if (buf_size < *size) {
+> -        *size = buf_size;
+> +                     "VirtFS reply type %d needs %zu bytes, buffer has
+> %zu", +                     pdu->id + 1, size, buf_size);
+>      }
+> 
+>      *piov = elem->in_sg;
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index f04caabfe5..fc197f6c8a 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -188,7 +188,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+>                                            struct iovec **piov,
+>                                            unsigned int *pniov,
+> -                                          size_t *size)
+> +                                          size_t size)
+>  {
+>      Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
+>      Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
+> @@ -198,19 +198,16 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
+> *pdu, g_free(ring->sg);
+> 
+>      ring->sg = g_new0(struct iovec, 2);
+> -    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
+> +    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+> 
+>      buf_size = iov_size(ring->sg, num);
+> -    if (buf_size  < P9_IOHDRSZ) {
+> -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs "
+> -                      "%zu bytes, buffer has %zu, less than minimum\n", - 
+>                     pdu->id + 1, *size, buf_size);
+> +    if (buf_size  < size) {
+> +        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+> +                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
+> +                buf_size);
+>          xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+>          xen_9pfs_disconnect(&xen_9pfs->xendev);
+>      }
+> -    if (buf_size  < *size) {
+> -        *size = buf_size;
+> -    }
+> 
+>      *piov = ring->sg;
+>      *pniov = num;
+
+Best regards,
+Christian Schoenebeck
+
 
 
