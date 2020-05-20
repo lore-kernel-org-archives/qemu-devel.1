@@ -1,93 +1,91 @@
 Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F32C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C2EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:40:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4EE2065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:39:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 120E62065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:40:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="im184+b3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4EE2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pw9u4cvo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120E62065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbWQZ-00045J-RK
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:39:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55452)
+	id 1jbWRy-0005LO-4r
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:40:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <greatquux@gmail.com>)
- id 1jbSlh-00033Q-Pf
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:44:37 -0400
-Received: from mail-qk1-x72a.google.com ([2607:f8b0:4864:20::72a]:45723)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <greatquux@gmail.com>)
- id 1jbSlg-0007Ig-UJ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:44:37 -0400
-Received: by mail-qk1-x72a.google.com with SMTP id i5so4372370qkl.12
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:user-agent
- :mime-version; bh=yGRgLX8KyBUfh1dKkQe6460Rwdc7PLR+dor60P3m2PM=;
- b=im184+b3OeTiV6x3mH/mQIx1XZvDTTRn7pllj9rvvY0LdALMG876mFOpeidLghgZxP
- YE7SYVil6l5H48WVOe6dETa14n5pveAfQ0dYDQhSCDnf42YgPbrnN3FKrQTHe5aeuE6o
- DTS5fWBwQ3zqh4Y4CIRszfXEYEbps4chix8wJbLo0mOjAbUoytWYhsWLcmhJJLEyhtVJ
- q+3S3xB9vthVjC5oB+s4cEmAAz664vG2bxVm42Shevx0KngDfWTrFelN16LHk0yawLiz
- lXt8ktGUy8XJUmUblfIPwMUWulbK6zVOeJtonAqNgqUb+Ik5jaMB9CmbqnwWPFPkVgRa
- Rgig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :user-agent:mime-version;
- bh=yGRgLX8KyBUfh1dKkQe6460Rwdc7PLR+dor60P3m2PM=;
- b=sU6jPTnP5zG6b92mYIGqICLAFNb+/b1NjBFNsxFJFj4XkdHxrzNU6r5+PKOQ34b867
- +/0hMRq2GMkbV5JULd/cqT9NNvGhZIuHZ6TucK0eIW8pmc0DV5ooZFgWBUsGgfI5rpBE
- OjhxWH6HLXgrwxAHxb1j3lZpIgc7HCpcjDQoAANx9TIlTEd5LexuMMUf0oxLN8kkg99A
- 95TX09yS15SBfOeaSdiljlUBaHD8dtIYp1OJcqqPRxnrKRyvUtO+V4TjFMKEgBd68vk0
- PAZtkPnAmNN3kjWwbrVb1SgDx9yhjqeBEhL6f94MPBPNXwCN2C3LdW6fX8p/n6CBLniO
- qfqA==
-X-Gm-Message-State: AOAM5315dpa8J8m5p/DN5MrHGD2TsRBmrws22c4AyEfzmTY9gaeDpzzZ
- 3mP6BC3awOjOPa28TqbOjU4=
-X-Google-Smtp-Source: ABdhPJxdRoiMpIbxsc1Xv047hRJF85nlUPN+podXKuHQ2u02ctvSECJO8l4rwlRKem9JIa+rX7k5fA==
-X-Received: by 2002:a37:4e4e:: with SMTP id c75mr5999682qkb.143.1589996675269; 
- Wed, 20 May 2020 10:44:35 -0700 (PDT)
-Received: from ossy (pool-108-27-241-12.nycmny.fios.verizon.net.
- [108.27.241.12])
- by smtp.gmail.com with ESMTPSA id 23sm2683595qkf.68.2020.05.20.10.44.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 10:44:34 -0700 (PDT)
-Message-ID: <b7b2d3921fa6d2274c63b8b58f655bf293139598.camel@gmail.com>
-Subject: Re: Emulating Solaris 10 on SPARC64 sun4u
-From: Mike Russo <greatquux@gmail.com>
-To: jasper.lowell@bt.com
-Date: Wed, 20 May 2020 13:44:33 -0400
-In-Reply-To: <be68b7ad559ec17c69439217c1378c23e30745c9.camel@bt.com>
-Content-Type: multipart/alternative; boundary="=-z0p+ktn1hEPHibtMFiqQ"
-User-Agent: Evolution 3.36.1-2 
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbWRD-0004ax-2w
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 17:39:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43471
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbWRB-0001CK-DP
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 17:39:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590010780;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JogmCHLicPIRsLyeDXvVfpaRDW4HLICqSj+xGkc+4xY=;
+ b=Pw9u4cvo5q2G1MvfaurjInrx+0co9XrNzTChh15tGIC5gmIU5CizdumIXjghW3zJ82dIVA
+ rKD6Yjm5swm3IcsX6LwEr+jYYORc40M+vy9u/7trHGnt1OVNViqcOfUt9EXgCwZDAe/XWW
+ nnXOLWtcX99MMxrnkEq9OaraSXfK+q4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-udJg0nVOPnqUlM2aqLqTfA-1; Wed, 20 May 2020 17:39:34 -0400
+X-MC-Unique: udJg0nVOPnqUlM2aqLqTfA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45E47107ACCD;
+ Wed, 20 May 2020 21:39:33 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF0DC6EA19;
+ Wed, 20 May 2020 21:39:32 +0000 (UTC)
+Subject: Re: [PULL 2/6] qemu_img: add cvtnum_full to print error reports
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+References: <20200518163218.649412-1-eblake@redhat.com>
+ <20200518163218.649412-3-eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3a03c86e-94af-317a-09d1-30ae6abc640d@redhat.com>
+Date: Wed, 20 May 2020 16:39:32 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72a;
- envelope-from=greatquux@gmail.com; helo=mail-qk1-x72a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200518163218.649412-3-eblake@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 17:39:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Wed, 20 May 2020 17:38:13 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,51 +97,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tony.nguyen@bt.com, mark.cave-ayland@ilande.co.uk, dgilbert@redhat.com,
- qemu-devel@nongnu.org, peter.tribble@gmail.com, atar4qemu@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Eyal Moscovici <eyal.moscovici@oracle.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---=-z0p+ktn1hEPHibtMFiqQ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-> Using the proprietary firmware for this would be ideal. It would also
-> provide reliable access to the kernel debugger which would be
-> extremely
-> helpful for diagnosing what's going wrong with the console. I'm not
-> sure how I would go about making progress on this though. I know there
-> are binaries of the BIOS for Sun4m machines floating around but I'm
-> not
-> aware of any for Sun4u machines.
+On 5/18/20 11:32 AM, Eric Blake wrote:
+> From: Eyal Moscovici <eyal.moscovici@oracle.com>
 > 
+> All calls to cvtnum check the return value and print the same error
+> message more or less. And so error reporting moved to cvtnum_full to
+> reduce code duplication and provide a single error
+> message. Additionally, cvtnum now wraps cvtnum_full with the existing
+> default range of 0 to MAX_INT64.
+> 
+> Acked-by: Mark Kanda <mark.kanda@oracle.com>
+> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+> Message-Id: <20200513133629.18508-2-eyal.moscovici@oracle.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> [eblake: fix printf formatting, avoid trailing space, change error wording,
+> reformat commit message]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
 
-I haven't been able to find any of this firmware either. Not sure if
-this helps but someone says they've got the Ultra 1 firmware (along with
-cgsix and cgthree) available here:
-https://people.csail.mit.edu/fredette/tme/sun-u1-nbsd.html
+> @@ -572,16 +584,8 @@ static int img_create(int argc, char **argv)
+>       if (optind < argc) {
+>           int64_t sval;
+> 
+> -        sval = cvtnum(argv[optind++]);
+> +        sval = cvtnum("image size", argv[optind++]);
+>           if (sval < 0) {
+> -            if (sval == -ERANGE) {
+> -                error_report("Image size must be less than 8 EiB!");
 
---=-z0p+ktn1hEPHibtMFiqQ
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+This change broke iotest 178:
 
-<html dir=3D"ltr"><head></head><body style=3D"text-align:left; direction:lt=
-r;"><blockquote type=3D"cite" style=3D"margin:0 0 0 .8ex; border-left:2px #=
-729fcf solid;padding-left:1ex"><div>Using the proprietary firmware for this=
- would be ideal. It would also</div><div>provide reliable access to the ker=
-nel debugger which would be extremely</div><div>helpful for diagnosing what=
-'s going wrong with the console. I'm not</div><div>sure how I would go abou=
-t making progress on this though. I know there</div><div>are binaries of th=
-e BIOS for Sun4m machines floating around but I'm not</div><div>aware of an=
-y for Sun4u machines.</div><div><br></div></blockquote><div><br></div><div>=
-I haven't been able to find any of this firmware either. Not sure if this h=
-elps but someone says they've got the Ultra 1 firmware (along with cgsix an=
-d cgthree) available here:</div><div><a href=3D"https://people.csail.mit.ed=
-u/fredette/tme/sun-u1-nbsd.html">https://people.csail.mit.edu/fredette/tme/=
-sun-u1-nbsd.html</a></div></body></html>
+--- /home/eblake/qemu/tests/qemu-iotests/178.out.qcow2	2020-05-20 
+16:33:20.065710365 -0500
++++ /home/eblake/qemu/build/tests/qemu-iotests/178.out.bad	2020-05-20 
+16:35:28.924512423 -0500
+@@ -13,7 +13,7 @@
+  qemu-img: Invalid parameter 'snapshot.foo'
+  qemu-img: Failed in parsing snapshot param 'snapshot.foo'
+  qemu-img: --output must be used with human or json as argument.
+-qemu-img: Image size must be less than 8 EiB!
++qemu-img: Invalid image size specified. Must be between 0 and 
+9223372036854775807.
+  qemu-img: Unknown file format 'foo'
 
---=-z0p+ktn1hEPHibtMFiqQ--
+  == Size calculation for a new file (human) ==
+
+I'll post a followup patch shortly.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
