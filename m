@@ -2,90 +2,98 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E90C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E35FEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:37:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 059672065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A58DE2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="lNiUXw3s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059672065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="1Xi+z+zu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A58DE2065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbL8h-0001RT-9c
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:35:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50588)
+	id 1jbLA6-0002Rb-U5
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:37:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jbL8A-0000xx-64
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:35:18 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:38580)
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbL9Y-0001z7-B7
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:36:44 -0400
+Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:39834)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jbL87-00081p-Tp
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:35:17 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id t40so985327pjb.3
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 02:35:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NFfMFa59sz+TRSGpADnwfickCseCTbbjHsqIzOciITY=;
- b=lNiUXw3syZ1HCe7+btDfrWA5/n1VyFwWcBUXWM0ggiXXz83ykBWOg6MGQUW8QwO8Zy
- NVjphYuwlPh5cAdv/ZdCTHWkD7V+qu261g+4wvfO+9nqsEqNTQeP4e+fkL4L1E0DT04p
- 8Ts9aVDqIUaDB59CwTrHjCdZqaot0/zU/e35Q=
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbL9W-0008MU-P2
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:36:43 -0400
+Received: by mail-vk1-xa44.google.com with SMTP id 21so599129vkq.6
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 02:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=smartx-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NMpHlr/YZp6uGKYxaWVXg+ZVGUld5nQNp7/jWhT+QmQ=;
+ b=1Xi+z+zuxyW3vkhnorAWhewweOyhVMcQayWAx0+0ePe4WSZIfK1fdsNeAewrC5F6nv
+ r20bAi4mAsMSzI2TUghC0qGV3TfvxUKet0dQKx2JItVBPWneK1FZVCmfSdAGBAhfdwMO
+ zoBUtROFf+dbucxK9J4oI1lyRx8m0xuTP4QKzIYp3CbK5xxikajdedQEAoUt9eT+/3Vo
+ U8rTwRPxN11Hp2cejISwPdsDcAE8pIb101sWSEVh9te/tck9rpn7PBz5DUV90/cMN6SQ
+ RAruHGO+LtyUCv5G/LR+yxciO57WzKPR1UpU00eSqxGa0bcoMyZqV6ediBEqZ6WDvSrl
+ CEGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NFfMFa59sz+TRSGpADnwfickCseCTbbjHsqIzOciITY=;
- b=HHmFa2sHE5/TNhECsbpPJhVZHrYL3OyT8LFyc7OOgNdhIxkcKvxl8xiOA5TWJUI0FE
- AnyKVMVmFc8sVChiZB+tpBfbri0ksyCTJ2Bl3nfUU7nzHcwRtemScWF/HvrBuIB2iaej
- 9ZWj7OV+00+Pmie3PaKkWUiu7hPQQcOYjdVWoxUxhGMt83hOhBVZl36lQxEMp3pLcBmc
- XtfVCBt9KnpZ5yQxbGovZzD7Ew7e0AyoUOhgpLNLhJFSFYY2VTOlEr3fDcJxVOPiPh6q
- nRQb9aAx6LF0yJzRUitFgsz+BOMEkuC+MSAFvPGeN0Rl6FoS9V1D0QobVLuYxZS81fdN
- BnMQ==
-X-Gm-Message-State: AOAM531c6GZtenoK0eoQkdE3IJtBrIifIU4v/eTfzxUfXsbKzuk1brQ4
- wdLyjn8/PTxRKkikJtgj3TUIcw==
-X-Google-Smtp-Source: ABdhPJzD16MoSmZcBeIQ+WCMkc2/9RYuf8MfJQ2mZH7JJCk8Cbu8wRBEoKVMzz3dTJ7zdzppM07TEg==
-X-Received: by 2002:a17:902:9043:: with SMTP id
- w3mr3548066plz.250.1589967313812; 
- Wed, 20 May 2020 02:35:13 -0700 (PDT)
-Received: from Jing-Weide-MacBook-Pro-3.local
- (202-39-79-13.HINET-IP.hinet.net. [202.39.79.13])
- by smtp.gmail.com with ESMTPSA id 1sm1714375pff.151.2020.05.20.02.35.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 02:35:13 -0700 (PDT)
-Subject: Re: [PATCH v5 00/31] Add subcluster allocation to qcow2
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1588699789.git.berto@igalia.com>
-From: Derek Su <dereksu@qnap.com>
-Message-ID: <896bdfbc-8651-9bff-32ac-975b58beee0d@qnap.com>
-Date: Wed, 20 May 2020 17:35:09 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NMpHlr/YZp6uGKYxaWVXg+ZVGUld5nQNp7/jWhT+QmQ=;
+ b=qs0/TYGAwmjlN4CO1tqHD7VCCNcJVWZ22fewYqK8m+3Y6JMbQFMPJeHSsXDkMiyzHR
+ SHBj5iXGQ9LLxo44HZebkGcC0Jyt8O7NExWS+VNRsxrPOkkJhXJ0pGTJSQ7sltEwknjp
+ Ps6BB1Fd0DSdHveOtZSPYOYgGIrd/BHauIepPJYH5H9XHqgj2wHAc2Ar86dTOWtziT0r
+ w9QQhCUhFY0ZIHvsQFVByBWJ87cwJsxCG3mDCyPIfULz/Lz814cOPgBiesQYPW8zpb5x
+ bt0fsYZjEL4w5EgPNu/a6fDNA515+6yCKLthgK/klzdd0z7avEFgW3X3RouKAy3bzkrG
+ vVSw==
+X-Gm-Message-State: AOAM5320uUVnExCs7ARfv48WNphHdG2ePk2lCkXScoOvnRD2EH/Ubuc2
+ G6vYe5cfQ1Ftpvo/O/rCNQVValHt0po1EL9SYqGBWQ==
+X-Google-Smtp-Source: ABdhPJwdGlcwa11XuLqIkr9JwX3wjYwMHRHEualklQnoZJao46tSys3ELT1EJexlhUiT0y8r8jCtycTMRbwpDXrIFac=
+X-Received: by 2002:a1f:1386:: with SMTP id 128mr3084625vkt.46.1589967401057; 
+ Wed, 20 May 2020 02:36:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cover.1588699789.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=dereksu@qnap.com; helo=mail-pj1-x1044.google.com
+References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
+ <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
+ <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
+ <20200514125220.GJ2787@work-vm>
+ <CAHckoCyegWG9yH_y6VjHhnghfHJD-Wq+EmOyRZE3EYguTOHfPw@mail.gmail.com>
+ <20200514151600.GO2787@work-vm>
+ <CAHckoCxc2XTA3ckU0sq-BmbZZFtfAY_GaEOW46XFzfZ2qXjeMQ@mail.gmail.com>
+ <20200514153129.GP2787@work-vm>
+ <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
+ <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
+ <986fbf33-8127-870b-9163-4aa8d332553f@redhat.com>
+ <CAHckoCxw=j8+uXHD3tzQc4vGkRu-_xhcHn8sSeiKaSHw=Bt6mA@mail.gmail.com>
+ <7ecfb762-0359-92a4-d8b3-1a9e081ace92@redhat.com>
+ <CAHckoCwEt+citc5pQkJxhsWkLuqJa47A98YUYtMHd7epmx0esQ@mail.gmail.com>
+ <5902006b-655a-9208-796d-1af7b36da52c@redhat.com>
+In-Reply-To: <5902006b-655a-9208-796d-1af7b36da52c@redhat.com>
+From: Li Feng <fengli@smartx.com>
+Date: Wed, 20 May 2020 17:36:29 +0800
+Message-ID: <CAHckoCyZmYXU8bz-3UAVXGi1MpdNdb20no1-kB09MoWOGPz_VA@mail.gmail.com>
+Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
+ failed.
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: none client-ip=2607:f8b0:4864:20::a44;
+ envelope-from=fengli@smartx.com; helo=mail-vk1-xa44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,197 +107,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: vkuznets@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Berto
+Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2020=E5=B9=B45=E6=9C=8820=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=885:34=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 20/05/20 10:55, Li Feng wrote:
+> >>> After computing xor, the result is 0b1000000000.
+> >>> The bit 9 is set.
+> >> Are you running KVM with a 32-bit kernel.
+> >>
+> > No, I'm running 64 bit.
+> >
+> > $ uname -a
+> > Linux 31_216 5.6.7-1.el7.centos.x86_64 #1 SMP Mon Apr 27 15:26:08 CST
+> > 2020 x86_64 x86_64 x86_64 GNU/Linux
+>
+> Can you do "rdmsr 0x48f" (as root)?  On my machine for example I get
+> 1ffffff00036dfb.
+>
+$ rdmsr 0x48f
+3fffff00036dfb
 
-Excuse me, I'd like to test v5, but I failed to apply the series to 
-master branch. Which commit can I use?
-
-Thanks.
-
-Regards,
-Derek
-
-On 2020/5/6 上午1:38, Alberto Garcia wrote:
-> Hi,
-> 
-> here's the new version of the patches to add subcluster allocation
-> support to qcow2.
-> 
-> Please refer to the cover letter of the first version for a full
-> description of the patches:
-> 
->     https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
-> 
-> Important changes here:
-> 
-> - I fixed hopefully all of the issues mentioned in the previous
->    review. Thanks to everyone who contributed.
-> 
-> - There's now support for partial zeroing of clusters (i.e. at the
->    subcluster level).
-> 
-> - Many more tests.
-> 
-> - QCOW_OFLAG_ZERO is simply ignored now and not considered a sign of a
->    corrupt image anymore. I hesitated about this, but we could still
->    add that check later. I think there's a case for adding a new
->    QCOW2_CLUSTER_INVALID type and include this and other scenarios that
->    we already consider corrupt (for example: clusters with unaligned
->    offsets). We would need to see if for 'qemu-img check' adding
->    QCOW2_CLUSTER_INVALID complicates things or not. But I think that
->    all is material for its own series.
-> 
-> And I think that's all. See below for the detailed list of changes,
-> and thanks again for the feedback.
-> 
-> Berto
-> 
-> v5:
-> - Patch 01: Fix indentation [Max], add trace event [Vladimir]
-> - Patch 02: Add host_cluster_offset variable [Vladirmir]
-> - Patch 05: Have separate l2_entry and cluster_offset variables [Vladimir]
-> - Patch 06: Only context changes due to patch 05
-> - Patch 11: New patch
-> - Patch 13: Change documentation of get_l2_entry()
-> - Patch 14: Add QCOW_OFLAG_SUB_{ALLOC,ZERO}_RANGE [Eric] and rewrite
->              the other macros.
->              Ignore QCOW_OFLAG_ZERO on images with subclusters
->              (i.e. don't treat them as corrupted).
-> - Patch 15: New patch
-> - Patch 19: Optimize cow by skipping all leading and trailing zero and
->              unallocated subclusters [Vladimir]
->              Return 0 on success [Vladimir]
->              Squash patch that updated handle_dependencies() [Vladirmir]
-> - Patch 20: Call count_contiguous_subclusters() after the main switch
->              in qcow2_get_host_offset() [Vladimir]
->              Add assertion and remove goto statement [Vladimir]
-> - Patch 21: Rewrite algorithm.
-> - Patch 22: Rewrite algorithm.
-> - Patch 24: Replace loop with the _RANGE macros from patch 14 [Eric]
-> - Patch 27: New patch
-> - Patch 28: Update version number and expected output from tests.
-> - Patch 31: Add many more new tests
-> 
-> v4: https://lists.gnu.org/archive/html/qemu-block/2020-03/msg00966.html
-> v3: https://lists.gnu.org/archive/html/qemu-block/2019-12/msg00587.html
-> v2: https://lists.gnu.org/archive/html/qemu-block/2019-10/msg01642.html
-> v1: https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
-> 
-> Output of git backport-diff against v4:
-> 
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/31:[0005] [FC] 'qcow2: Make Qcow2AioTask store the full host offset'
-> 002/31:[0018] [FC] 'qcow2: Convert qcow2_get_cluster_offset() into qcow2_get_host_offset()'
-> 003/31:[----] [--] 'qcow2: Add calculate_l2_meta()'
-> 004/31:[----] [--] 'qcow2: Split cluster_needs_cow() out of count_cow_clusters()'
-> 005/31:[0038] [FC] 'qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()'
-> 006/31:[0004] [FC] 'qcow2: Add get_l2_entry() and set_l2_entry()'
-> 007/31:[----] [--] 'qcow2: Document the Extended L2 Entries feature'
-> 008/31:[----] [--] 'qcow2: Add dummy has_subclusters() function'
-> 009/31:[----] [--] 'qcow2: Add subcluster-related fields to BDRVQcow2State'
-> 010/31:[----] [--] 'qcow2: Add offset_to_sc_index()'
-> 011/31:[down] 'qcow2: Add offset_into_subcluster() and size_to_subclusters()'
-> 012/31:[----] [--] 'qcow2: Add l2_entry_size()'
-> 013/31:[0003] [FC] 'qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()'
-> 014/31:[0023] [FC] 'qcow2: Add QCow2SubclusterType and qcow2_get_subcluster_type()'
-> 015/31:[down] 'qcow2: Add qcow2_cluster_is_allocated()'
-> 016/31:[----] [--] 'qcow2: Add cluster type parameter to qcow2_get_host_offset()'
-> 017/31:[----] [--] 'qcow2: Replace QCOW2_CLUSTER_* with QCOW2_SUBCLUSTER_*'
-> 018/31:[----] [--] 'qcow2: Handle QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC'
-> 019/31:[0066] [FC] 'qcow2: Add subcluster support to calculate_l2_meta()'
-> 020/31:[0022] [FC] 'qcow2: Add subcluster support to qcow2_get_host_offset()'
-> 021/31:[0040] [FC] 'qcow2: Add subcluster support to zero_in_l2_slice()'
-> 022/31:[0061] [FC] 'qcow2: Add subcluster support to discard_in_l2_slice()'
-> 023/31:[----] [--] 'qcow2: Add subcluster support to check_refcounts_l2()'
-> 024/31:[0019] [FC] 'qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()'
-> 025/31:[----] [--] 'qcow2: Clear the L2 bitmap when allocating a compressed cluster'
-> 026/31:[----] [--] 'qcow2: Add subcluster support to handle_alloc_space()'
-> 027/31:[down] 'qcow2: Add subcluster support to qcow2_co_pwrite_zeroes()'
-> 028/31:[0105] [FC] 'qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit'
-> 029/31:[----] [-C] 'qcow2: Assert that expand_zero_clusters_in_l1() does not support subclusters'
-> 030/31:[----] [--] 'qcow2: Add subcluster support to qcow2_measure()'
-> 031/31:[0694] [FC] 'iotests: Add tests for qcow2 images with extended L2 entries'
-> 
-> Alberto Garcia (31):
->    qcow2: Make Qcow2AioTask store the full host offset
->    qcow2: Convert qcow2_get_cluster_offset() into qcow2_get_host_offset()
->    qcow2: Add calculate_l2_meta()
->    qcow2: Split cluster_needs_cow() out of count_cow_clusters()
->    qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()
->    qcow2: Add get_l2_entry() and set_l2_entry()
->    qcow2: Document the Extended L2 Entries feature
->    qcow2: Add dummy has_subclusters() function
->    qcow2: Add subcluster-related fields to BDRVQcow2State
->    qcow2: Add offset_to_sc_index()
->    qcow2: Add offset_into_subcluster() and size_to_subclusters()
->    qcow2: Add l2_entry_size()
->    qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()
->    qcow2: Add QCow2SubclusterType and qcow2_get_subcluster_type()
->    qcow2: Add qcow2_cluster_is_allocated()
->    qcow2: Add cluster type parameter to qcow2_get_host_offset()
->    qcow2: Replace QCOW2_CLUSTER_* with QCOW2_SUBCLUSTER_*
->    qcow2: Handle QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
->    qcow2: Add subcluster support to calculate_l2_meta()
->    qcow2: Add subcluster support to qcow2_get_host_offset()
->    qcow2: Add subcluster support to zero_in_l2_slice()
->    qcow2: Add subcluster support to discard_in_l2_slice()
->    qcow2: Add subcluster support to check_refcounts_l2()
->    qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()
->    qcow2: Clear the L2 bitmap when allocating a compressed cluster
->    qcow2: Add subcluster support to handle_alloc_space()
->    qcow2: Add subcluster support to qcow2_co_pwrite_zeroes()
->    qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit
->    qcow2: Assert that expand_zero_clusters_in_l1() does not support
->      subclusters
->    qcow2: Add subcluster support to qcow2_measure()
->    iotests: Add tests for qcow2 images with extended L2 entries
-> 
->   docs/interop/qcow2.txt           |  68 ++-
->   docs/qcow2-cache.txt             |  19 +-
->   qapi/block-core.json             |   7 +
->   block/qcow2.h                    | 204 ++++++-
->   include/block/block_int.h        |   1 +
->   block/qcow2-cluster.c            | 892 ++++++++++++++++++++-----------
->   block/qcow2-refcount.c           |  38 +-
->   block/qcow2.c                    | 283 ++++++----
->   block/trace-events               |   2 +-
->   tests/qemu-iotests/031.out       |   8 +-
->   tests/qemu-iotests/036.out       |   4 +-
->   tests/qemu-iotests/049.out       | 102 ++--
->   tests/qemu-iotests/060.out       |   1 +
->   tests/qemu-iotests/061           |   6 +
->   tests/qemu-iotests/061.out       |  25 +-
->   tests/qemu-iotests/065           |  18 +-
->   tests/qemu-iotests/082.out       |  48 +-
->   tests/qemu-iotests/085.out       |  38 +-
->   tests/qemu-iotests/144.out       |   4 +-
->   tests/qemu-iotests/182.out       |   2 +-
->   tests/qemu-iotests/185.out       |   8 +-
->   tests/qemu-iotests/198.out       |   2 +
->   tests/qemu-iotests/206.out       |   4 +
->   tests/qemu-iotests/242.out       |   5 +
->   tests/qemu-iotests/255.out       |   8 +-
->   tests/qemu-iotests/271           | 664 +++++++++++++++++++++++
->   tests/qemu-iotests/271.out       | 519 ++++++++++++++++++
->   tests/qemu-iotests/274.out       |  49 +-
->   tests/qemu-iotests/280.out       |   2 +-
->   tests/qemu-iotests/common.filter |   1 +
->   tests/qemu-iotests/group         |   1 +
->   31 files changed, 2459 insertions(+), 574 deletions(-)
->   create mode 100755 tests/qemu-iotests/271
->   create mode 100644 tests/qemu-iotests/271.out
-> 
-
+> Thanks,
+>
+> Paolo
+>
 
