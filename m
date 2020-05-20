@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98353C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 13:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED8FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 13:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671B120748
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 13:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAB8A20748
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 13:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HT0WOBc9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671B120748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KjMMBQnR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB8A20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbOpZ-0000ZN-If
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 09:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47862)
+	id 1jbOqC-0002IY-4w
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 09:33:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jbOeN-0002TZ-72
- for qemu-devel@nongnu.org; Wed, 20 May 2020 09:20:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37686
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jbOeD-0002EW-KS
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 09:20:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37124
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jbOeF-0000Ks-A7
- for qemu-devel@nongnu.org; Wed, 20 May 2020 09:20:46 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jbOeC-0000J0-AY
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 09:20:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589980838;
+ s=mimecast20190719; t=1589980835;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=yL+6hHgQ5mwgkDZlEEeB9fTkTZmIC02loIxG6Wm0FRc=;
- b=HT0WOBc9qBgZKok1GJp8OVNwCVWDnyBU490xm84EFJhOJfm29uFWDe88dMRs9iGAMpJxpC
- u1zPw/N8fTeKDRWEnIQQCCEKaymBAvN4wbgnpkYnEE8TV5zJ2q7GdR9Id9kioVmO7hMvKa
- NH2Woa9Q0jCSdls5KsScZQCqkvSM78A=
+ references:references; bh=i1JF1/s5d2KxdED5roCcOah1am+4MqlOUBOB584bBVA=;
+ b=KjMMBQnReK6o3MAORWATidajBw8VRyTCCCOZVMn/Z98Z1fLw7I4Mwndg+HPrfH24Bqb+Pp
+ B4JVe3pw9ZpmwytNI0SqaiiNI4JJw2E/7zOMAWaPSFR7cRHMmOo//E1nTqixtRL1g/UcDj
+ B/QVh8nfORzuuy38vUgwDpj/jw5NScY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-sJeM_RbmM_W2-MXB1-1Nlw-1; Wed, 20 May 2020 09:20:36 -0400
-X-MC-Unique: sJeM_RbmM_W2-MXB1-1Nlw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-279-70bRxdEOPKenfAXzdrTccQ-1; Wed, 20 May 2020 09:20:33 -0400
+X-MC-Unique: 70bRxdEOPKenfAXzdrTccQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20D5C8015D1;
- Wed, 20 May 2020 13:20:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A647D835B42;
+ Wed, 20 May 2020 13:20:31 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
  [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E20B960BEC;
- Wed, 20 May 2020 13:20:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CAA0782A1D;
+ Wed, 20 May 2020 13:20:21 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 11F6F9D5A; Wed, 20 May 2020 15:20:04 +0200 (CEST)
+ id EFB3D9D58; Wed, 20 May 2020 15:20:03 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/22] acpi: ged: add x86 device variant.
-Date: Wed, 20 May 2020 15:19:52 +0200
-Message-Id: <20200520132003.9492-12-kraxel@redhat.com>
+Subject: [PATCH v3 09/22] acpi: ged: rename event memory region
+Date: Wed, 20 May 2020 15:19:50 +0200
+Message-Id: <20200520132003.9492-10-kraxel@redhat.com>
 In-Reply-To: <20200520132003.9492-1-kraxel@redhat.com>
 References: <20200520132003.9492-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,84 +100,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Set AcpiDeviceIfClass->madt_cpu,
-otherwise identical to TYPE_ACPI_GED.
+Rename memory region and callbacks and ops to carry "evt" in the name
+because a second region will be added shortly.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/acpi/generic_event_device.h |  4 +++
- hw/i386/generic_event_device_x86.c     | 36 ++++++++++++++++++++++++++
- hw/i386/Makefile.objs                  |  1 +
- 3 files changed, 41 insertions(+)
- create mode 100644 hw/i386/generic_event_device_x86.c
+ include/hw/acpi/generic_event_device.h |  2 +-
+ hw/acpi/generic_event_device.c         | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index 474c92198080..9687cb524258 100644
+index 83917de02425..90a9180db572 100644
 --- a/include/hw/acpi/generic_event_device.h
 +++ b/include/hw/acpi/generic_event_device.h
-@@ -69,6 +69,10 @@
- #define ACPI_GED(obj) \
-     OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
+@@ -86,7 +86,7 @@
+ #define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
  
-+#define TYPE_ACPI_GED_X86 "acpi-ged-x86"
-+#define ACPI_GED_X86(obj) \
-+    OBJECT_CHECK(AcpiGedX86State, (obj), TYPE_ACPI_GED_X86)
-+
- #define ACPI_GED_EVT_SEL_OFFSET    0x0
- #define ACPI_GED_EVT_SEL_LEN       0x4
+ typedef struct GEDState {
+-    MemoryRegion io;
++    MemoryRegion evt;
+     uint32_t     sel;
+ } GEDState;
  
-diff --git a/hw/i386/generic_event_device_x86.c b/hw/i386/generic_event_device_x86.c
-new file mode 100644
-index 000000000000..e26fb02a2ef6
---- /dev/null
-+++ b/hw/i386/generic_event_device_x86.c
-@@ -0,0 +1,36 @@
-+/*
-+ * x86 variant of the generic event device for hw reduced acpi
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/generic_event_device.h"
-+#include "hw/i386/pc.h"
-+
-+static void acpi_ged_x86_class_init(ObjectClass *class, void *data)
-+{
-+    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-+
-+    adevc->madt_cpu = pc_madt_cpu_entry;
-+}
-+
-+static const TypeInfo acpi_ged_x86_info = {
-+    .name          = TYPE_ACPI_GED_X86,
-+    .parent        = TYPE_ACPI_GED,
-+    .class_init    = acpi_ged_x86_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { TYPE_ACPI_DEVICE_IF },
-+        { }
-+    }
-+};
-+
-+static void acpi_ged_x86_register_types(void)
-+{
-+    type_register_static(&acpi_ged_x86_info);
-+}
-+
-+type_init(acpi_ged_x86_register_types)
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 6abc74551a72..622739305882 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -17,4 +17,5 @@ obj-$(CONFIG_PC) += port92.o
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+index b1cbdd86b66c..1cb34111e59a 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -142,7 +142,7 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+ }
  
- obj-y += kvmvapic.o
- obj-$(CONFIG_ACPI) += acpi-common.o
-+obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device_x86.o
- obj-$(CONFIG_PC) += acpi-build.o
+ /* Memory read by the GED _EVT AML dynamic method */
+-static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t ged_evt_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     uint64_t val = 0;
+     GEDState *ged_st = opaque;
+@@ -161,14 +161,14 @@ static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
+ }
+ 
+ /* Nothing is expected to be written to the GED memory region */
+-static void ged_write(void *opaque, hwaddr addr, uint64_t data,
+-                      unsigned int size)
++static void ged_evt_write(void *opaque, hwaddr addr, uint64_t data,
++                          unsigned int size)
+ {
+ }
+ 
+-static const MemoryRegionOps ged_ops = {
+-    .read = ged_read,
+-    .write = ged_write,
++static const MemoryRegionOps ged_evt_ops = {
++    .read = ged_evt_read,
++    .write = ged_evt_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 4,
+@@ -287,9 +287,9 @@ static void acpi_ged_initfn(Object *obj)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     GEDState *ged_st = &s->ged_state;
+ 
+-    memory_region_init_io(&ged_st->io, obj, &ged_ops, ged_st,
++    memory_region_init_io(&ged_st->evt, obj, &ged_evt_ops, ged_st,
+                           TYPE_ACPI_GED, ACPI_GED_EVT_SEL_LEN);
+-    sysbus_init_mmio(sbd, &ged_st->io);
++    sysbus_init_mmio(sbd, &ged_st->evt);
+ 
+     sysbus_init_irq(sbd, &s->irq);
+ 
 -- 
 2.18.4
 
