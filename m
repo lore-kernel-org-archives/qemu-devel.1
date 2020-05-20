@@ -2,81 +2,133 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B00DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D98FAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:10:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E40452065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CD30204EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:10:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="upPQ5Czt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40452065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNHIE+kH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD30204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbJna-0008T2-3L
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40422)
+	id 1jbJo8-0000fn-PE
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:10:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jbJkt-0004PO-Jl; Wed, 20 May 2020 04:07:11 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:48624)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jbJks-00009E-1e; Wed, 20 May 2020 04:07:11 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 1A0F92E0AFB;
- Wed, 20 May 2020 11:07:07 +0300 (MSK)
-Received: from vla5-58875c36c028.qloud-c.yandex.net
- (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- V3OVv32V9W-73dm0siV; Wed, 20 May 2020 11:07:07 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1589962027; bh=DWrIhskjaoO5eZGksQebh6hVKl0oO8pML//kRAFbyLw=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=upPQ5CztHs+A0OxzPbT/WoOP+bbhXEI2+yEHboRSkxgkhnneC8vVuDViTms2mv24h
- eRrBoVjb3jCZzB8klHrpT58YWsbJtTfGNMrFld97eCCut6btF5j2OQDJUsWIvCXb/r
- ZicwRb5HnK72u8hOFpME/AF4Hg7LwHW16906YRNQ=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:1519::1:a])
- by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- HRdUjo6D3m-73XmaV8Z; Wed, 20 May 2020 11:07:03 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/3] block: consolidate blocksize properties consistency
- checks
-Date: Wed, 20 May 2020 11:06:56 +0300
-Message-Id: <20200520080657.29080-3-rvkagan@yandex-team.ru>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200520080657.29080-1-rvkagan@yandex-team.ru>
-References: <20200520080657.29080-1-rvkagan@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbJnH-0008GC-Oc
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:09:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37537
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbJnF-0000Uw-M6
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:09:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589962176;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=QavAPc+FlmO/fw42DDTQbMbSCvSHVle+UxxMjQPyh+w=;
+ b=TNHIE+kH5orNsu0wwTds35Jaio8+tcPdBy2hMZhyFSOKb0aCKMwh0qp4ADfH2gvx/OSu3A
+ uF+dEe4Y8i4PR1X0SRwxKayHXOeQGKQvw6SuX7GAgSIxLLZ58rZiv8sHbweyAoxUOQEUrB
+ 3dtBjlTHf8GKRUBLQasfDAErRhnkd/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-XtfKrp8EOze9wC-tUfb9FQ-1; Wed, 20 May 2020 04:09:33 -0400
+X-MC-Unique: XtfKrp8EOze9wC-tUfb9FQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F182800688;
+ Wed, 20 May 2020 08:09:32 +0000 (UTC)
+Received: from [10.36.113.76] (ovpn-113-76.ams2.redhat.com [10.36.113.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02176100164D;
+ Wed, 20 May 2020 08:09:29 +0000 (UTC)
+Subject: Re: [PATCH 50/55] s390x/event-facility: Simplify creation of SCLP
+ event devices
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-51-armbru@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <5c6028bd-0bab-6c78-90fe-f00e23ab71b9@redhat.com>
+Date: Wed, 20 May 2020 10:09:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=77.88.29.217; envelope-from=rvkagan@yandex-team.ru;
- helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:07:07
+In-Reply-To: <20200519145551.22836-51-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,226 +141,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: berrange@redhat.com, ehabkost@redhat.com, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several block device properties related to blocksize configuration must
-be in certain relationship WRT each other: physical block must be no
-smaller than logical block; min_io_size, opt_io_size, and
-discard_granularity must be a multiple of a logical block.
+[...]
+> The common code in question is bus_set_realized(), which has a TODO
+> comment asking for recursive realization.  It's been asking for years.
+> 
+> The only devices sclp_events_bus_realize() will ever realize are the
+> two init_event_facility() puts there.
+> 
+> Simplify as follows:
+> 
+> * Make the devices members of the event facility instance struct, just
+>   like the bus.  object_initialize_child() is simpler than
+>   object_property_add_child() and object_unref().
+> 
+> * Realize them in the event facility realize method.
+> 
+> This is in line with how such things are done elsewhere.
 
-To ensure these requirements are met, add corresponding consistency
-checks to blkconf_blocksizes, adjusting its signature to communicate
-possible error to the caller.  Also remove the now redundant consistency
-checks from the specific devices.
+Makes sense, now that we've been waiting for recursive bus realization
+for years.
 
-Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
----
-v4: new patch
+> 
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/s390x/event-facility.c | 59 ++++++++++++++++-----------------------
+>  1 file changed, 24 insertions(+), 35 deletions(-)
+> 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 97a4f0b1f5..1ecaa20556 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -39,6 +39,7 @@ typedef struct SCLPEventsBus {
+>  struct SCLPEventFacility {
+>      SysBusDevice parent_obj;
+>      SCLPEventsBus sbus;
+> +    SCLPEvent quiesce, cpu_hotplug;
+>      /* guest's receive mask */
+>      union {
+>          uint32_t receive_mask_pieces[2];
+> @@ -328,34 +329,9 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>  
+>  #define TYPE_SCLP_EVENTS_BUS "s390-sclp-events-bus"
+>  
+> -static void sclp_events_bus_realize(BusState *bus, Error **errp)
+> -{
+> -    Error *err = NULL;
+> -    BusChild *kid;
+> -
+> -    /* TODO: recursive realization has to be done in common code */
+> -    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+> -        DeviceState *dev = kid->child;
+> -
+> -        object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> -        if (err) {
+> -            error_propagate(errp, err);
+> -            return;
+> -        }
+> -    }
+> -}
+> -
+> -static void sclp_events_bus_class_init(ObjectClass *klass, void *data)
+> -{
+> -    BusClass *bc = BUS_CLASS(klass);
+> -
+> -    bc->realize = sclp_events_bus_realize;
+> -}
+> -
+>  static const TypeInfo sclp_events_bus_info = {
+>      .name = TYPE_SCLP_EVENTS_BUS,
+>      .parent = TYPE_BUS,
+> -    .class_init = sclp_events_bus_class_init,
+>  };
+>  
+>  static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+> @@ -443,27 +419,39 @@ static void init_event_facility(Object *obj)
+>  {
+>      SCLPEventFacility *event_facility = EVENT_FACILITY(obj);
+>      DeviceState *sdev = DEVICE(obj);
+> -    Object *new;
+>  
+>      event_facility->mask_length = 4;
+>      event_facility->allow_all_mask_sizes = true;
+>      object_property_add_bool(obj, "allow_all_mask_sizes",
+>                               sclp_event_get_allow_all_mask_sizes,
+>                               sclp_event_set_allow_all_mask_sizes);
+> +
+>      /* Spawn a new bus for SCLP events */
+>      qbus_create_inplace(&event_facility->sbus, sizeof(event_facility->sbus),
+>                          TYPE_SCLP_EVENTS_BUS, sdev, NULL);
+>  
+> -    new = object_new(TYPE_SCLP_QUIESCE);
+> -    object_property_add_child(obj, TYPE_SCLP_QUIESCE, new);
+> -    object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+> +    object_initialize_child(obj, TYPE_SCLP_QUIESCE,
+> +                            &event_facility->quiesce,
+> +                            TYPE_SCLP_QUIESCE);
+>  
+> -    new = object_new(TYPE_SCLP_CPU_HOTPLUG);
+> -    object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new);
+> -    object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+> -    /* the facility will automatically realize the devices via the bus */
+> +    object_initialize_child(obj, TYPE_SCLP_CPU_HOTPLUG,
+> +                            &event_facility->cpu_hotplug,
+> +                            TYPE_SCLP_CPU_HOTPLUG);
+> +}
+> +
+> +static void realize_event_facility(DeviceState *dev, Error **errp)
+> +{
+> +    SCLPEventFacility *event_facility = EVENT_FACILITY(dev);
+> +    Error *local_err = NULL;
+> +
+> +    qdev_realize(DEVICE(&event_facility->quiesce),
+> +                 BUS(&event_facility->sbus), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    qdev_realize(DEVICE(&event_facility->cpu_hotplug),
+> +                 BUS(&event_facility->sbus), errp);
 
- include/hw/block/block.h   |  2 +-
- hw/block/block.c           | 29 ++++++++++++++++++++++++++++-
- hw/block/fdc.c             |  5 ++++-
- hw/block/nvme.c            |  5 ++++-
- hw/block/virtio-blk.c      |  7 +------
- hw/ide/qdev.c              |  5 ++++-
- hw/scsi/scsi-disk.c        | 10 +++-------
- hw/usb/dev-storage.c       |  5 ++++-
- tests/qemu-iotests/172.out |  2 +-
- 9 files changed, 50 insertions(+), 20 deletions(-)
+Just wondering, do we have to care about un-realizing quiesce in case
+this fails?
 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d7246f3862..784953a237 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -87,7 +87,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
- bool blkconf_geometry(BlockConf *conf, int *trans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp);
--void blkconf_blocksizes(BlockConf *conf);
-+bool blkconf_blocksizes(BlockConf *conf, Error **errp);
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp);
- 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index bf56c7612b..5f8ebff59c 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -61,7 +61,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
-     return true;
- }
- 
--void blkconf_blocksizes(BlockConf *conf)
-+bool blkconf_blocksizes(BlockConf *conf, Error **errp)
- {
-     BlockBackend *blk = conf->blk;
-     BlockSizes blocksizes;
-@@ -83,6 +83,33 @@ void blkconf_blocksizes(BlockConf *conf)
-             conf->logical_block_size = BDRV_SECTOR_SIZE;
-         }
-     }
-+
-+    if (conf->logical_block_size > conf->physical_block_size) {
-+        error_setg(errp,
-+                   "logical_block_size > physical_block_size not supported");
-+        return false;
-+    }
-+
-+    if (conf->min_io_size % conf->logical_block_size) {
-+        error_setg(errp,
-+                   "min_io_size must be a multple of logical_block_size");
-+        return false;
-+    }
-+
-+    if (conf->opt_io_size % conf->logical_block_size) {
-+        error_setg(errp,
-+                   "opt_io_size must be a multple of logical_block_size");
-+        return false;
-+    }
-+
-+    if (conf->discard_granularity != -1 &&
-+        conf->discard_granularity % conf->logical_block_size) {
-+        error_setg(errp, "discard_granularity must be "
-+                   "a multple of logical_block_size");
-+        return false;
-+    }
-+
-+    return true;
- }
- 
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index c5fb9d6ece..8eda572ef4 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -554,7 +554,10 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-         read_only = !blk_bs(dev->conf.blk) || blk_is_read_only(dev->conf.blk);
-     }
- 
--    blkconf_blocksizes(&dev->conf);
-+    if (!blkconf_blocksizes(&dev->conf, errp)) {
-+        return;
-+    }
-+
-     if (dev->conf.logical_block_size != 512 ||
-         dev->conf.physical_block_size != 512)
-     {
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 2f3100e56c..672650e162 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1390,7 +1390,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         host_memory_backend_set_mapped(n->pmrdev, true);
-     }
- 
--    blkconf_blocksizes(&n->conf);
-+    if (!blkconf_blocksizes(&n->conf, errp)) {
-+        return;
-+    }
-+
-     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-                                        false, errp)) {
-         return;
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 413083e62f..4ffdb130be 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1162,12 +1162,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&conf->conf);
--
--    if (conf->conf.logical_block_size >
--        conf->conf.physical_block_size) {
--        error_setg(errp,
--                   "logical_block_size > physical_block_size not supported");
-+    if (!blkconf_blocksizes(&conf->conf, errp)) {
-         return;
-     }
- 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 06b11583f5..b4821b2403 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -187,7 +187,10 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&dev->conf);
-+    if (!blkconf_blocksizes(&dev->conf, errp)) {
-+        return;
-+    }
-+
-     if (dev->conf.logical_block_size != 512) {
-         error_setg(errp, "logical_block_size must be 512 for IDE");
-         return;
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 387503e11b..06c8f1ba92 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2346,12 +2346,7 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&s->qdev.conf);
--
--    if (s->qdev.conf.logical_block_size >
--        s->qdev.conf.physical_block_size) {
--        error_setg(errp,
--                   "logical_block_size > physical_block_size not supported");
-+    if (!blkconf_blocksizes(&s->qdev.conf, errp)) {
-         return;
-     }
- 
-@@ -2436,7 +2431,8 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-     if (s->qdev.conf.blk) {
-         ctx = blk_get_aio_context(s->qdev.conf.blk);
-         aio_context_acquire(ctx);
--        blkconf_blocksizes(&s->qdev.conf);
-+        /* ignore errors, blocksizes will be revalidated in scsi_realize */
-+        blkconf_blocksizes(&s->qdev.conf, NULL);
-     }
-     s->qdev.blocksize = s->qdev.conf.logical_block_size;
-     s->qdev.type = TYPE_DISK;
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 4eba47538d..de461f37bd 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -599,7 +599,10 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&s->conf);
-+    if (!blkconf_blocksizes(&s->conf, errp)) {
-+        return;
-+    }
-+
-     if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
-                                        errp)) {
-         return;
-diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-index 7abbe82427..59cc70aebb 100644
---- a/tests/qemu-iotests/172.out
-+++ b/tests/qemu-iotests/172.out
-@@ -1204,7 +1204,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physica
-                 drive-type = "144"
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,logical_block_size=4096
--QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: Physical and logical block size must be 512 for floppy
-+QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: logical_block_size > physical_block_size not supported
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physical_block_size=1024
- QEMU_PROG: -device floppy,drive=none0,physical_block_size=1024: Physical and logical block size must be 512 for floppy
+>  }
+>  
+>  static void reset_event_facility(DeviceState *dev)
+> @@ -479,6 +467,7 @@ static void init_event_facility_class(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(sbdc);
+>      SCLPEventFacilityClass *k = EVENT_FACILITY_CLASS(dc);
+>  
+> +    dc->realize = realize_event_facility;
+>      dc->reset = reset_event_facility;
+>      dc->vmsd = &vmstate_event_facility;
+>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> 
+
+LGTM
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
 -- 
-2.26.2
+Thanks,
+
+David / dhildenb
 
 
