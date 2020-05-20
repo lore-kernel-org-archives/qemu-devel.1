@@ -2,94 +2,127 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF64C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89184C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 318F720748
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:14:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 399C120748
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:17:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5cKuz/6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 318F720748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LFmGZw9d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399C120748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbHzz-0000T6-BH
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55504)
+	id 1jbI34-0002td-72
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbHyn-00082z-UR
- for qemu-devel@nongnu.org; Wed, 20 May 2020 02:13:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57393
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbHym-0003eB-89
- for qemu-devel@nongnu.org; Wed, 20 May 2020 02:13:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589955200;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=r83td15sC0ga/UCcxcWpsKHlDwmvxbTByAY9HXv8oh8=;
- b=K5cKuz/6x6bnOjKRO3+lN55hL9YIjAFjeUlvWDHTxFU8Qk+hVXyvzpjSa+A6+t+YkhlxuB
- iscEznNAiXrn9z/bZ7aMMZd1QEu7QLKT0YZGuGM5PdFpdRAmEIq7j6SIdCqIBbtj4usUIQ
- WfeDp4iHosNcryUZ22+S4Z3nn5T5EzM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-mZCTI-J8Nkez9Nh7puBqXQ-1; Wed, 20 May 2020 02:13:17 -0400
-X-MC-Unique: mZCTI-J8Nkez9Nh7puBqXQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DC098005AA;
- Wed, 20 May 2020 06:13:16 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-114.ams2.redhat.com [10.36.112.114])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 104BB1001920;
- Wed, 20 May 2020 06:13:08 +0000 (UTC)
-Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
- test?
-To: John Snow <jsnow@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
- <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
- <20200515102321.GH1300305@redhat.com>
- <613f5cf5-7019-7447-6ba1-8050ab05303a@redhat.com>
- <20200519090441.GD2003821@redhat.com>
- <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <a2ea3cf1-fbc0-2525-742d-11d6633160ad@redhat.com>
-Date: Wed, 20 May 2020 08:13:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbI24-0001Zk-IK; Wed, 20 May 2020 02:16:49 -0400
+Received: from mail-eopbgr60121.outbound.protection.outlook.com
+ ([40.107.6.121]:54326 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbI21-00046m-Bf; Wed, 20 May 2020 02:16:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EqCdmNm6hd3lRMYzOi/eylXX7V6fnk3dYa4Jha/c2gNb795AsTDrVEACG3FrLhhPG+t8NoSaZZv3CVhCdgI0vdQfJbjxQ1t0oy1e6xURMDZvOrTcnW1zqej1ycU6MBmk6teHuUV4GLkYYDl7BaxRDbRtR29nFwTDU49TqIc2Oilre7mhsJ6OpmIA/SUMMd1sXyZwC4ORXKkQQqK0VWOu/Y2FvwS5V16r58ZwAziI/ZNYwUsBrBeO2VbFywBHScfnxpzptlZa0XICALuDHtQ5tDtM5ptNDc/nhtp8AXF9mj/1rZ+uTVTGd0MEuFCYvu0pHTw0w8Rw6WILgaT0eUMmfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UTPrpXa5M1ap9lKKwm33oSN/TaNI/z1HIe2QVM9Usr4=;
+ b=Uh9I5wzRHkXxbox1SrB2V8/HIFLnIZAeD8zlYc+Sl24fQKinWFIXtQKIspr0mevJ94V0vYlpbjymIQAp0abcepX4UjOZOo5XZ1OR35p6h0PfWXuhvT/DB0WaiAOY38Q2CJ1jPEGai4JoJIHidPaVXH1Wumf8pW3wM8bCrvqG0ZoxTh87ntFPp2/BRVTAWbaW3+UTUKuPUJiBvvn4w4GtE8D+5MZSZ1124QfLT8BYy/s02Q0yaKafKy1I2CTRixhn8T2j1N82T8hZtXmyOuuFjdMzMO6EHnp4zfS7KEK9Ljp2IyDngQ5FeC6+I2QJwZiA8VNlY012kZx+nSIJ82FJfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UTPrpXa5M1ap9lKKwm33oSN/TaNI/z1HIe2QVM9Usr4=;
+ b=LFmGZw9dU5ogAbl5QA2SUb5wiuvwAwZtOsn6e6wANV989iGtCAtvAQhgOtof/qOa3bzbTBs0WKzyKk7KCHmOtHVqQ2dD874knx18Oetn4D88dDdJc8FcdKM4jk9zAsXOJdVrPQuiGYU3zS1UALZSdAHkOR/Z9Z+R5U8c+Wg9Bx8=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5511.eurprd08.prod.outlook.com (2603:10a6:20b:10d::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.24; Wed, 20 May
+ 2020 06:16:41 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.020; Wed, 20 May 2020
+ 06:16:41 +0000
+Subject: Re: [PATCH v2 1/5] block/io: fix bdrv_co_block_status_above
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200519195501.29071-1-vsementsov@virtuozzo.com>
+ <20200519195501.29071-2-vsementsov@virtuozzo.com>
+ <cd4c3996-703a-13c5-aa9c-664d2de0ca26@redhat.com>
+ <3a66bacf-3462-a82c-c758-730107e75898@virtuozzo.com>
+ <711cc70d-bc12-9fda-b24c-7b3acdd5cb08@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2de6a724-a149-0601-24f5-2c2cfa1cd052@virtuozzo.com>
+Date: Wed, 20 May 2020 09:16:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <711cc70d-bc12-9fda-b24c-7b3acdd5cb08@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM4PR0701CA0012.eurprd07.prod.outlook.com
+ (2603:10a6:200:42::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.147) by
+ AM4PR0701CA0012.eurprd07.prod.outlook.com (2603:10a6:200:42::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.12 via Frontend
+ Transport; Wed, 20 May 2020 06:16:40 +0000
+X-Originating-IP: [185.215.60.147]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 45e7ef25-167b-483d-c4d3-08d7fc855c79
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5511:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5511335F467EA718C108159DC1B60@AM7PR08MB5511.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 04097B7F7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5KAVTjPogfTBt+J8u74w6ZwsBXPNai5KHS2OSN0BcfoDdHHApQ3vOLyuyq9Pdtuy7hJEzDucF7pqOdjyaVAIge54RWOJ5sY7agLvB8R23O1mu53XcAZ5LNAzeErr5lP0Y1CdEtnUeyimfceIiH2J7zExBIDQXWxNlNNdqzinoS5APPLXUSZdpA4+RfZxrXz+K6bGxuKQAyelUAfkimC9UrOkThOLbmwqPyO5a2YYUsw0A8VgtXfk91nAKWHbybsh9GvPpyBHTDssBsbtvAlNZDEyMpC+I//fPKvrbrrMBlCbWH77YtgCm9zb6n8HY/6vBX/bo8wo/Lk15lfRjezt92vgm5uBi1sYMtem2aFpNUZmysbn+lNeY4YaZCFZvaoQIX9dF+VOL1AByYLz3vHPYw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(366004)(346002)(376002)(39840400004)(396003)(66556008)(66946007)(66476007)(6486002)(8676002)(86362001)(52116002)(107886003)(16576012)(31686004)(316002)(186003)(16526019)(4326008)(8936002)(26005)(2906002)(36756003)(2616005)(5660300002)(53546011)(956004)(31696002)(478600001)(21314003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: o7KkjLY9xU/nm7uEc+UC7lQ3PHNAYO2xU2V4IX+KspjOAf0cHRFN1TmqeN6/O+umqUyOD2oxyhVyc8bveIvBxiwKFX14/+W/0cEZgIX6KJdRTEkG+waxNcmubejach/2Nf1mHfqfK/NYAg+imtur00PLHJkXYtPKOX6XCftCf6ZAB87gmnrBmSXyAPtwxOXY2O/np2AhjYkLrJpkcf+LNyAksnQoK75vdTMNUCfy4kLF/AaYE4w3sQFrefud4oC5tiqEhoF1FQLg/m2fbjTSjt7bIJmEZ6ybeuoFyJ0Vk+urkpV2I52wcU67w4LB247xKmHaP4cgf6JV86l5tn/QFBnIgCzkpcl2kGcqqUZdrrN8az8zMT3GIU0dSoHhPPpw8OVV+Kl57T8v9PB4cU+AlJtMdEA/PaIc3SUVNji+hfPn/6CyKSbZ+AaVJFzR/F1C1svSs0GBHidHA2lHOEvvrOwJ0I19SdPdoPOvTLwzJgsDePERn+7HFLYn3JumNdPN
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45e7ef25-167b-483d-c4d3-08d7fc855c79
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2020 06:16:41.0071 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x1yyWivFg3XSh5Qoh5fDNitXIVoFQP5eapCgYPb6UdPZmormbGK5FNnu3w99pVgLOyLoPL3VqCaIipcHdbkVcwnHWnyOzb1oPcSELdittm8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5511
+Received-SPF: pass client-ip=40.107.6.121;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:16:42
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,138 +135,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-discuss@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/05/2020 01.06, John Snow wrote:
-> 
-> 
-> On 5/19/20 5:04 AM, Daniel P. Berrangé wrote:
->> On Mon, May 18, 2020 at 03:56:36PM -0400, John Snow wrote:
+20.05.2020 00:48, Eric Blake wrote:
+> On 5/19/20 4:13 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> 19.05.2020 23:41, Eric Blake wrote:
+>>> On 5/19/20 2:54 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> bdrv_co_block_status_above has several problems with handling short
+>>>> backing files:
+>>>>
+>>>> 1. With want_zeros=true, it may return ret with BDRV_BLOCK_ZERO but
+>>>> without BDRV_BLOCK_ALLOCATED flag, when actually short backing file
+>>>> which produces these after-EOF zeros is inside requested backing
+>>>> sequence.
 >>>
->>>
->>> On 5/15/20 6:23 AM, Daniel P. Berrangé wrote:
->>>> On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
->>>>> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
->>>>>> Hello,
->>>>>>
->>>>>> Following Markus thread on deprecating unmaintained (untested) code
->>>>>> (machines) [1] and the effort done to gather the information shared in
->>>>>> the replies [2], and the various acceptance tests added, is it
->>>>>> feasible to require for the next release that each new device/machine
->>>>>> is provided a test covering it?
->>>>>>
->>>>>> If no, what is missing?
->>>>>
->>>>> If a qtest is feasible, yes, I think we should require one for new
->>>>> devices. But what about machines - you normally need a test image for
->>>>> this. In that case, there is still the question where testing images
->>>>> could be hosted. Not every developer has a web space where they could
->>>>> put their test images onto. And what about images that contain non-free
->>>>> code?
->>>>
->>>> Yep, it isn't feasible to make this a hard rule.
->>>>
->>>> IMHO this is where a support tier classification comes into play
->>>>
->>>>  - Tier 1: actively maintained, qtest coverage available. Expected
->>>>            to work reliably at all times since every commit is CI
->>>> 	   tested
->>>>
->>>>   - Tier 2: actively maintained, no qtest coverage. Should usually
->>>>            work but regression may creep in due to reliance on the
->>>> 	   maintainer to manually test on adhoc basis
->>>>
->>>>   - Tier 3: not actively maintained, unknown state but liable to
->>>>             be broken indefinitely
->>>>
->>>> Tier 1 is obviously the most desirable state we would like everthing to
->>>> be at. Contributors will have to fix problems their patches cause as
->>>> they will be blocked by CI.
->>>>
->>>> Tier 2 is an admission that reality gets in the way. Ideally stuff in
->>>> this tier will graduate to Tier 1 at some point. Even if it doesn't
->>>> though, it is still valid to keep it in QEMU long term. Contributors
->>>> shouldn't gratuitously break stuff in these board, but if they do,
->>>> then the maintainer is ultimately responsible for fixing it, as the
->>>> contributors don't have a test rig for it.
->>>>
->>>> Tier 3 is abandonware. If a maintainer doesn't appear, users should
->>>> not expect it to continue to exist long term. Contributors are free
->>>> to send patches which break this, and are under no obligation to
->>>> fix problems in these boards. We may deprecate & delete it after a
->>>> while
->>>>
->>>>
->>>> Over time we'll likely add more criteria to stuff in Tier 1. This
->>>> could lead to some things dropping from Tier 1 to Tier 2. This is
->>>> OK, as it doesn't make those things worse than they already were.
->>>> We're just saying that Tier 2 isn't as thoroughly tested as we
->>>> would like it to be in an ideal world.
->>>
->>> I really like the idea of device support tiers codified directly in the
->>> QEMU codebase, to give upstream users some idea of which devices we
->>> expect to work and which we ... don't, really.
->>>
->>> Not every last device we offer is enterprise production ready, but we
->>> don't necessarily do a good job of explaining which devices fall into
->>> which categories, and we've got quite a few of them.
->>>
->>> I wonder if a 2.5th tier would be useful; something like a "hobbyist"
->>> tier for pet project SoC boards and the like -- they're not abandoned,
->>> but we also don't expect them to work, exactly.
->>>
->>> Mild semantic difference from Tier 3.
+>>> That's intentional.  That portion of the guest-visible data reads as zero (BDRV_BLOCK_ZERO set) but was NOT read from the top layer, but rather synthesized by the block layer because it derived from the backing file but was beyond EOF of that backing layer (BDRV_BLOCK_ALLOCATED is clear).
 >>
->> I guess I was thinking such hobbyist stuff would fall into tier 2  if the
->> hobbyist maintainer actually responds to fixing stuff, or tier 3 if they
->> largely aren't active on the mailing list responding to issues/questions.
->>
->> We add have a 4 tier system overall and put hobbyist stuff at tier 3,
->> and abandonware at tier 4.
->>
->> Probably shouldn't go beyond 4 tiers though, as the more criteria we add
->> the harder it is to clearly decide which tier something should go into.
->>
->> The tier 1 vs 2 divison is clearly split based on CI which is a simple
->> classification to decide on.
->>
->> The tier 2 vs 3 division is moderately clearly split based on whether
->> there is a frequently active maintainer.
->>
->> We can probably squeeze in the 4th tier without too much ambiguity in
->> the classisfication if we think it is adding something worthwhile either
->> from our POV as maintainers, or for users consuming it.
+>> Not in top yes. But _inside_ the requested base..top backing-chain-part. So it should be considered ALLOCATED, as we should not go to further backing.
 > 
-> Yes, I didn't mean to start watering it down into a 1,380 tier system
-> that we're never able to properly utilize.
+> Yes, I think I figured that out by patch 5.
 > 
-> I was thinking more along the lines of:
+>>
+>> Assume the following chain:
+>>
+>> top    aa--
+>> middle bb
+>> base   xxxx
+>>
+>> (so, middle is short)
+>>
+>> block_status(top, 2) should return ZERO without ALLOCATED, as yes it's ZERO and yes, it's from another layer
+>>
+>> block_status_above(top, base, 2) should return ZERO with ALLOCATED, as it's ZERO, and it's produced inside requested backing-chain-region, actually, it's produced because of short middle node. We must report ALLOCATED to show that we are not going to read from base.
 > 
-> - Device works and is well loved
-> - Device works and is well loved (but we have to test manually)
-> - Device doesn't work, but is well loved
->   (Use at your own peril, please file a bug report)
-> - Device doesn't work, and is unloved
+> Yes, that matches my intuition.  allocated_above says "where in the chain did we get the data, since it did not come from top", and the correct answer is "we got it from middle, due to synthesizing zero beyond EOF".  Okay, with that understanding in place, maybe this patch is right.  But I'll have to revisit it tomorrow on a fresh mind (it's too late in the day for me to be sure that I'm getting it all straight right now).
 > 
-> Perhaps it'd be clearer to name these Tier 1A, 1B, 2, and 3; where
-> things can shift from 1A to 1B as their test coverage allows, but it's
-> not meant to indicate general status otherwise.
+>>
+>>>
+>>>>
+>>>> 2. With want_zero=false, it may return pnum=0 prior to actual EOF,
+>>>> because of EOF of short backing file.
+>>>
+>>> Do you have a reproducer for this?
+>>
+>> No, I don't have one, but it seems possible at least with want_zero=false. I'll think of it tomorrow, too tired now.
+>>
+>>> In my experience, this is not possible.  Generally, if you request status that overlaps EOF of the backing, you get a response truncated to the end of the backing, and you are then likely to follow up with a subsequent status request starting from the underlying EOF which then sees the desired unallocated zeroes:
+>>>
+>>> back     xxxx
+>>> top      yy------
+>>> request    ^^^^^^
+>>> response   ^^
+>>> request      ^^^^
+>>> response     ^^^^
+> 
+> If we can come up with a reproducer where allocated_above returns pnum=0, that would indeed prove my initial hesitation wrong (perhaps by:
+> 
+> back    xxxxxxxx
+> mid1    xxxxxx
+> mid2    xxxx
+> mid3    xxxxxx
+> top     xxxxxxxx
+> 
+> for various different start and base points within the chain?)
 
-All that sounds somewhat similar to the classification that we already
-use in our MAINTAINERS file - Supported, Maintained, Odd-Fixes, Orphan,
-Obsolete ... maybe we can avoid to introduce yet another classification
-system and merge the two (e.g. by also changing the classification
-system in MAINTAINERS a little bit?).
+Seems, we just don't have users of bdrv_co_block_status_above with base points within the chain, base is always NULL or backing of top. So, I don't think we have a reproducer.
 
- Thomas
+> 
+>>>
+>>>>
+>>>> Fix these things, making logic about short backing files clearer.
+>>>>
+>>>> Note that 154 output changed, because now bdrv_block_status_above don't
+>>>
+>>> doesn't
+>>>
+>>>> merge unallocated zeros with zeros after EOF (which are actually
+>>>> "allocated" in POV of read from backing-chain top) and is_zero() just
+>>>> don't understand that the whole head or tail is zero. We may update
+>>>> is_zero to call bdrv_block_status_above several times, or add flag to
+>>>> bdrv_block_status_above that we are not interested in ALLOCATED flag,
+>>>> so ranges with different ALLOCATED status may be merged, but actually,
+>>>> it seems that we'd better don't care about this corner case.
+>>>
+>>> This actually sounds like an avoidable regression.  :(
+>>
+>> I don't see real problem in it. But it seems not hard to avoid it, so I will try to.
+> 
+> I guess my real reasoning is: "I spent a lot of time trying to tweak that test to not lose the fact that the tail of the image reads as zero", because it looks weird if we later resize the image but still have a glitch in the middle reporting one non-zero cluster out of a larger range all because of the shenanigans that occurred around the tail prior to resizing.
+> 
+>>>> +++ b/block/io.c
+>>>> @@ -2461,25 +2461,45 @@ static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
+>>>>           ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
+>>>>                                      file);
+>>>>           if (ret < 0) {
+>>>> -            break;
+>>>> +            return ret;
+>>>>           }
+>>>> -        if (ret & BDRV_BLOCK_ZERO && ret & BDRV_BLOCK_EOF && !first) {
+>>>> +        if (*pnum == 0) {
+>>>> +            if (first) {
+>>>> +                return ret;
+>>>> +            }
+>>>> +
+>>>>               /*
+>>>> -             * Reading beyond the end of the file continues to read
+>>>> -             * zeroes, but we can only widen the result to the
+>>>> -             * unallocated length we learned from an earlier
+>>>> -             * iteration.
+>>>> +             * Reads from bs for the selected region will return zeroes,
+>>>> +             * produced because the current level is short. We should consider
+>>>> +             * it as allocated.
+>>>
+>>> Why?  If we replaced the backing file to something longer (qemu-img rebase -u), we would WANT to read from the backing file.  The only reason we read zero is because the block layer synthesized it _while_ deferring to the backing layer, not because it was directly allocated in the top layer.
+>>
+>> No, if we replace backing file of the current layer, nothing will change, as _this_ layer is short, not the backing. Or which backing file do you mean? If you mean current bs, than replacing it doesn't make sense in the context, as block_status_above requested the current bs (as part of base..top range), not the other one.
+> 
+> Maybe it's just the comment wording that needs help.  After reading through patch 5, it looks like my problem is now coming up with a comment to the effect of "the top layer deferred to this layer, and because this layer is short, any zeroes that we synthesize beyond EOF behave as if they were allocated at this layer".
+> 
+>>
+>>>
+>>>> +             *
+>>>> +             * TODO: Should we report p as file here?
+>>>
+>>> No. Reporting 'file' only makes sense if you can point to an offset within that file that would read the guest-visible data in question - but when the data is synthesized, there is no such offset.
+>>
+>> I don't know. It still adds some information about which level is responsible for these ZEROES. Kevin argued that it make sense.
+> 
+> It took me a while, but I'm coming around to it: my initial read was assuming that you were reporting that the tail was being claimed as allocated by top; but in reality, you are fixing things to claim it as being allocated by mid.  The former is wrong (top did not allocate, it deferred to mid); but the latter does indeed make sense (reading from mid ended up synthesizing, which means that our hunt for the data ends at mid and we never traverse deeper, regardless of whether base may also have data).  But now it's a question of whether the code matches that textual description, and I'm a bit too fried to answer that question properly today :)
+> 
+>>>> +++ b/tests/qemu-iotests/154.out
+>>>> @@ -310,13 +310,13 @@ wrote 512/512 bytes at offset 134217728
+>>>>   512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>>   2048/2048 bytes allocated at offset 128 MiB
+>>>>   [{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
+>>>> -{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
+>>>> +{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
+>>>
+>>> The fact that we no longer see zeroes in the tail of the file makes me think this patch is wrong.
+> 
+> So, if we can avoid that minor regression, and still otherwise report zeroes as allocated from mid, then I think we'll be on the right track.
+> 
 
+
+-- 
+Best regards,
+Vladimir
 
