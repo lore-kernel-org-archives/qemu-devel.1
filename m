@@ -2,111 +2,130 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D207C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E896820708
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:19:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C98D205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h3hnLWnb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E896820708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IcHEq/uD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C98D205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbJ0V-0008TU-6K
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 03:19:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60412)
+	id 1jbJ4v-0002D3-Id
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 03:23:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbIzx-000844-VH
- for qemu-devel@nongnu.org; Wed, 20 May 2020 03:18:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42288
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbIzw-0006gD-9A
- for qemu-devel@nongnu.org; Wed, 20 May 2020 03:18:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589959118;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CLiBqAkvoKajpMSo8T10kLLVUi/8ENaPFs2c5TfVKwk=;
- b=h3hnLWnb0jnOe0znJm1zU30hzWAAO3QLjA/M/aWUfHeyHMvAOb6ZD3T/jJ2b/2kByWFCwX
- oZMQrIHebdoO1ikBk8b6YAFNHdfsmS0Ai/tu1oRSCVvfYGISqb5ZEgGILwo9zARDzuPEQF
- FBzdCelTUM8zuWSAZSaUeSdTaM4j02o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-hrBuDAFcM6mK1zFFGRnYuQ-1; Wed, 20 May 2020 03:18:34 -0400
-X-MC-Unique: hrBuDAFcM6mK1zFFGRnYuQ-1
-Received: by mail-wm1-f70.google.com with SMTP id p24so844628wmc.5
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:18:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CLiBqAkvoKajpMSo8T10kLLVUi/8ENaPFs2c5TfVKwk=;
- b=UL+hs771BCVk2Wuzp2uM6ANBiGdi3ezTHv+E13RM4WMlkiqpfirV7zI8qCu04bzYT+
- //79l+oAIrnWcXT45EtbckjMU5icxS+LQSwnbcDKqAUVE1v+99fA9Q/YIIgIYSz8nDME
- NRp3e3FhmCPFIb0UPJHM5RGxQ6DJmiQhTmSviGDGVMGq2cxfR1+CqupC1/0aXhD0x7wg
- t78/ON4C6/ozuEQT2zOoiBfYgjpBdZdFTeKThEgauQwr309L1s2QpnWmGWmNJ9vO63F2
- Jk1a0M0haO7eZcm87X1rx//Wt9/JvRWTQgmZIw1jKhdgojLhPjMrsHFQiI3Dt36ByoQa
- wiaA==
-X-Gm-Message-State: AOAM530X/aan9q7QOaP+Ab6baoLbGwu387033tpfSdICiOiUvc46oWVQ
- 5Qq67lurEWdS3SvQ8kN9qgRvGCHcu0MUQPiuABanMu9z97J807b6AEVeWM296d5VWhKv+4U7eII
- hjjSYcf0sgRLxs1Q=
-X-Received: by 2002:a7b:c146:: with SMTP id z6mr3494955wmi.156.1589959113716; 
- Wed, 20 May 2020 00:18:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyBFpgJhowIux9JJJvYcKin2e7r4cqwQHGmI1C76SZ6QpacvXrEXc0nPSFkYgseYTklqy8geQ==
-X-Received: by 2002:a7b:c146:: with SMTP id z6mr3494919wmi.156.1589959113396; 
- Wed, 20 May 2020 00:18:33 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id y10sm1912517wrd.95.2020.05.20.00.18.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 00:18:32 -0700 (PDT)
-Subject: Re: [PATCH] replay: synchronize on every virtual timer callback
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <158875304273.3986.105601155554744438.stgit@pasha-ThinkPad-X280>
- <c74e9498-75b4-d80c-e380-3d448497cfd0@redhat.com> <87wo59jky3.fsf@linaro.org>
- <b4da7577-8f42-3308-a4d6-05ff6451e944@ispras.ru> <87eergjqe5.fsf@linaro.org>
- <093880f8-72d4-f404-6792-d11c177aaedc@ispras.ru> <87h7wci5av.fsf@linaro.org>
- <934b3292-bc41-0d00-2a61-9ecbd3217454@ispras.ru>
- <a52b7038-35d4-74e0-b106-67138f8cef10@redhat.com>
- <a3ea327d-f24f-71b6-42ca-fd55379ac34e@ispras.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <037727db-6500-33bb-2302-4186638c0baf@redhat.com>
-Date: Wed, 20 May 2020 09:18:31 +0200
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jbJ4L-0001hc-U8; Wed, 20 May 2020 03:23:13 -0400
+Received: from mail-eopbgr60137.outbound.protection.outlook.com
+ ([40.107.6.137]:13006 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jbJ4J-0007eI-82; Wed, 20 May 2020 03:23:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kUYdYkLa3TsDxFKaO718xB3MD3ZN4YXmq/RGwbLWj/Tkp8JEkZ4/k+EjaG9FKx6og14BzuAhDyStntB6KW8k8bdZwHiDtRcr4drZ1PuUaouvVVjbBvWxG1UVl8q3B4QUWAatDRgK0LsACrlC+2io+RTzrgL4Rgg7QFqOtkuVdrQjp3p16cPV4/rheW4E9Y3BtuPCDE2Lp0x1d+skRIdvUZcVj73w4M3eiez6ka27YZY9rsP5rxH3BElpLsh2s3UQMExe3zh70YIxZsO7mj5Odne2vWMH8TyEQ/XXLM1q2yzAKTLevKYT420Q2SjtWRItcRkR/CagKlN05kNqOoJreQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZFFALVEIPAJVzq5LPJkPeB6ebHW15J7WyZtaTmsDLIY=;
+ b=B3P/MRuKmORcVxsc5+WV2xSIg8XURKTZuk5Ha4YjupedcHsculJw/qb37+/PEqbcLvgFywD5knhiE1Ngpq0CEBHjvDFzrlhKhEDmm6n+4Fw/mfSoI+SfW49QI5k4JIInq/RDoOKJAwqsPqjl7K7KZjdtb1PtzcuKLu8vynqbZEiIn7Zw7MSFWA6MsTHywFxICPZQ1U8f6EKihhcv/bdeLcjSnK/wRhhJyvKGO9lveF0Cn3o65rp/iVK2qu1/TGaNehia+udFW8xdrvBBmHKw7d5jhDB+kWrs+aACxKjP76IR+hWp7jDXEMMwi9VP6/KxkHgQOpHAVGfEcYq/qb3qrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZFFALVEIPAJVzq5LPJkPeB6ebHW15J7WyZtaTmsDLIY=;
+ b=IcHEq/uDZRzHkzPfdNpw/RCd1tQLpByYDd56xUfx241/HKQaJAitY43Rn47Ggfq1iUXpxm78spDV6fQO8uHno19c2fJXeSe6q27vgVEmvnLU8l/zjKrTckQ3rTyOSq9BfTSsHdundui322UaFj1UPR3dr2/62yXsbIvvXxh6FWc=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB3796.eurprd08.prod.outlook.com (2603:10a6:208:100::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Wed, 20 May
+ 2020 07:23:07 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.3021.020; Wed, 20 May 2020
+ 07:23:07 +0000
+Subject: Re: [RFC PATCH 0/3] block: Synchronous bdrv_*() from coroutine in
+ different AioContext
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200512144318.181049-1-kwolf@redhat.com>
+ <6d78bc78-0c44-d703-6f9f-e048ea34fdd9@proxmox.com>
+ <20200514142606.GH5518@linux.fritz.box>
+ <285ba39f-9ee6-e089-13f7-a98ea0a84866@virtuozzo.com>
+ <548700ea-78db-fabc-d1eb-6d89af39ece3@virtuozzo.com>
+ <20200519141858.GN7652@linux.fritz.box>
+ <dfed81f7-9806-9aaf-459f-13f786b67e0a@virtuozzo.com>
+ <20200519152959.GP7652@linux.fritz.box>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <ea9f2813-9b39-88d2-faaf-748b6c8a4a83@virtuozzo.com>
+Date: Wed, 20 May 2020 10:23:05 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <a3ea327d-f24f-71b6-42ca-fd55379ac34e@ispras.ru>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ Thunderbird/68.4.1
+In-Reply-To: <20200519152959.GP7652@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0P190CA0007.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::17) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (178.34.161.50) by
+ AM0P190CA0007.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.23 via Frontend Transport; Wed, 20 May 2020 07:23:06 +0000
+X-Originating-IP: [178.34.161.50]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7151deb5-52ca-4f8a-c70e-08d7fc8ea485
+X-MS-TrafficTypeDiagnostic: AM0PR08MB3796:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB3796C8DC3DB0C6A8A6327029CFB60@AM0PR08MB3796.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 04097B7F7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mrTpVcy4o2yRqj2Lfga/sLv24URnyOImvKeKW0d6eaK6NEByfbQGRQH6omUX9KLbL++4gjm8LcjhsflW5qXYQMm+T79crEGKrrjpyRwc6b7xDT5Za0qVj9czVvOQzO5BuIEt3HnNreRuba9KbS3xLY7iaU4kbZGULpZjOQgfLciIuXmEVoMN++LafZH/foP+bBvaBr3zymh17khA7hoznXGyeUCMqrq6bLTx9Dpj8ALN9WowwOeWSBsV5D63RkjKQLtWJWklR7yLmbl3ffVc4gsFRM4PFhL9QDkcB4SJso6j/qjNWTwpaL/kidE8T1S9k2yoylkssliIynJrZuuzMz7Zi25v+FMXM+dLcm7cGiTsKDtQ9v8Lhz0Rz/u6k4wZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(396003)(366004)(39840400004)(376002)(956004)(31696002)(5660300002)(6916009)(86362001)(52116002)(26005)(16526019)(2616005)(478600001)(4326008)(186003)(316002)(16576012)(6486002)(54906003)(8936002)(36756003)(31686004)(66556008)(66946007)(66476007)(2906002)(8676002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: hnOPP86FyN4aLqO5SHN65L5E1AJ+x0Zd2+irGRN6KW1kg/Y045Eg/FBYteNIX0OutRgt12nJvf5WM1GyanVEbJN+P07qf/GGVyDbOVgFR1p8AIRSZDGxDCF+rTgUDyiXsmnw3fROOPH7rvPSLniVebUqIVKVgTDc5BNkl1ygAPvtftxvTeGa27W9srfA4EtVlF68KYae+33KxnxopN994cgWCf4gZDUQQgiZ1eWtTk6jScvJcikQj1cbPWDTXdl/Qf8SAuYzElw5O1WK6p2DqgvgJt9OHQ90LPmJCmOO1LNzdraoIGUO8t/xrew8ssWUILJ32MN3gF5lzZld7akoOfrHN0/WYQfoAbASVc0jUicmvcXaq6uIjylksHREHYEipKbMfAcQNqgGn0T2dR/RoIyV3hju4/T4K5fnDFuzySqVdFblUD524o35HD7tcsAlyJJv9DywTRWw76ZFJ55PjlFXWE3fWYPm97J/kkE1i6k=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7151deb5-52ca-4f8a-c70e-08d7fc8ea485
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2020 07:23:07.3919 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zs6S/kYwwjXM6pEiTgP34NpngQ0dtR+yGBYwtZAIxhDY5GCVC5Tx1yzPStA3rElwAToiJ95/lFVd4CrLJKMCWILT/Mks9dmSoyyB4brpZ0E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3796
+Received-SPF: pass client-ip=40.107.6.137;
+ envelope-from=dplotnikov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 03:23:08
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,133 +138,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>,
- qemu-devel@nongnu.org, pavel.dovgaluk@ispras.ru,
- Cleber Rosa <crosa@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, s.reiter@proxmox.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ Thomas Lamprecht <t.lamprecht@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Cleber
 
-On 5/20/20 8:54 AM, Pavel Dovgalyuk wrote:
-> On 19.05.2020 18:42, Philippe Mathieu-Daudé wrote:
->> On 5/19/20 12:38 PM, Pavel Dovgalyuk wrote:
->>>
->>> On 19.05.2020 13:32, Alex Bennée wrote:
->>>> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->>>>
->>>>> On 19.05.2020 11:11, Alex Bennée wrote:
->>>>>> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->>>>>>
->>>>>>> On 18.05.2020 18:56, Alex Bennée wrote:
->>>>>>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->>>>>>>>
->>>>>>>>> + Alex
->>>>>>>>>
->>>>>>>>> On 5/6/20 10:17 AM, Pavel Dovgalyuk wrote:
->>>>>>>>>> Sometimes virtual timer callbacks depend on order
->>>>>>>>>> of virtual timer processing and warping of virtual clock.
->>>>>>>>>> Therefore every callback should be logged to make replay 
->>>>>>>>>> deterministic.
->>>>>>>>>> This patch creates a checkpoint before every virtual timer 
->>>>>>>>>> callback.
->>>>>>>>>> With these checkpoints virtual timers processing and clock 
->>>>>>>>>> warping
->>>>>>>>>> events order is completely deterministic.
->>>>>>>>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->>>>>>>>>> ---
->>>>>>>>>>      util/qemu-timer.c |    5 +++++
->>>>>>>>>>      1 file changed, 5 insertions(+)
->>>>>>>>>> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
->>>>>>>>>> index d548d3c1ad..47833f338f 100644
->>>>>>>>>> --- a/util/qemu-timer.c
->>>>>>>>>> +++ b/util/qemu-timer.c
->>>>>>>>>> @@ -588,6 +588,11 @@ bool timerlist_run_timers(QEMUTimerList 
->>>>>>>>>> *timer_list)
->>>>>>>>>> qemu_mutex_lock(&timer_list->active_timers_lock);
->>>>>>>>>>                progress = true;
->>>>>>>>>> +        /*
->>>>>>>>>> +         * Callback may insert new checkpoints, therefore add 
->>>>>>>>>> new checkpoint
->>>>>>>>>> +         * for the virtual timers.
->>>>>>>>>> +         */
->>>>>>>>>> +        need_replay_checkpoint = timer_list->clock->type == 
->>>>>>>>>> QEMU_CLOCK_VIRTUAL;
->>>>>>>>>>          }
->>>>>>>>>> qemu_mutex_unlock(&timer_list->active_timers_lock);
->>>>>>>> So the problem I have with this as with all the record/replay 
->>>>>>>> stuff I
->>>>>>>> need want to review is it's very hard to see things in action. I 
->>>>>>>> added a
->>>>>>>> *very* basic record/replay test to the aarch64 softmmu tests but 
->>>>>>>> they
->>>>>>>> won't exercise any of this code because no timers get fired. I'm
->>>>>>>> assuming the sort of tests that is really needed is something 
->>>>>>>> that not
->>>>>>>> only causes QEMU_CLOCK_VIRTUAL timers to fire and trigger logged HW
->>>>>>>> events and ensure that things don't get confused in the process.
->>>>>>> I encounter most of the bugs in different OS boot scenarios.
->>>>>>>
->>>>>>> We also have internal tests that include some computational, 
->>>>>>> disk, and
->>>>>>> network interaction tasks.
->>>>>>>
->>>>>>> Is it possible to add a test like booting a "real" OS and replaying
->>>>>>> it?
->>>>>> Yes - for these bigger more complex setups we should use the 
->>>>>> acceptance
->>>>>> tests that run under Avocado. See "make check-acceptance".
->>>>> I've installed avocado and avocado-framework, but got the following 
->>>>> error:
->>>>>
->>>>> venv/bin/python: No module named avocado
->>>> Hmm make check-acceptance should automatically setup local copies of
->>>> avocado using virtualenv. You shouldn't need to install the system
->>>> version.
->>>>
->>>
->>> What should I try then?
+>> I'm not quite sure I understand the point.
+>> Let's see all the picture of async snapshot: our goal is to minimize a VM
+>> downtime during the snapshot.
+>> When we do async snapshot we save vmstate except RAM when a VM is stopped
+>> using the current L1 table (further initial L1 table). Then, we want the VM
+>> start running
+>> and write RAM content. At this time all RAM is write-protected.
+>> We unprotect each RAM page once it has been written.
+> Oh, I see, you're basically doing something like postcopy migration. I
+> was assuming it was more like regular live migration, except that you
+> would overwrite updated RAM blocks instead of appending them.
+>
+> I can see your requirement then.
+>
+>> All those RAM pages should go to the snapshot using the initial L1 table.
+>> Since the VM is running, it may want to write new disk blocks,
+>> so we need to use a NEW L1 table to provide this ability. (Am I correct so
+>> far?)
+>> Thus, if I understand correctly, we need to use two L1 tables: the initial
+>> one to store RAM pages
+>> to the vmstate and the new one to allow disk writings.
 >>
->> My workflow running selected tests is:
->>
->> $ git clone qemu
->> $ mkdir qemu/build
->> $ cd qemu/build
->> qemu/build$ ../configure
->> qemu/build$ make arm-softmmu/all
->> qemu/build$ make check-venv
->> qemu/build$ tests/venv/bin/python -m avocado \
->>             --show=app,console -t machine:virt \
->>             run tests/acceptance/
->>
->> 'make check-acceptance' runs all the tests for the available QEMU 
->> targets built. It should call check-venv automatically.
-> 
-> Thanks. Download has started with these command lines.
+>> May be I can't see a better way to achieve that. Please, correct me if I'm
+>> wrong.
+> I guess I could imagine a different, though probably not better way: We
+> could internally have a separate low-level operation that moves the VM
+> state from the active layer to an already existing disk snapshot. Then
+> you would snapshot the disk and start writing the VM to the active
+> layer, and when the VM state write has completed you move it into the
+> snapshot.
+>
+> The other options is doing what you suggested. There is nothing in the
+> qcow2 on-disk format that would prevent this, but we would have to
+> extend the qcow2 driver to allow I/O to inactive L1 tables. This sounds
+> like a non-trivial amount of code changes, though it would potentially
+> enable more use cases we never implemented ((read-only) access to
+> internal snapshots as block nodes, so you could e.g. use block jobs to
+> export a snapshot).
+>
+> Kevin
 
-Good news!
+Ok, thanks for validating the possibilities and more ideas of 
+implementation.
+I think I should start from trying to post my background snapshot 
+version storing the vmstate to an external file
+because write-protected-userfaultfd is now available on linux.
+And If it's accepted I'll try to come up with an internal version for 
+qcow2 (It seems this is the only format supporting this).
 
-> 
-> But usually I run configure directly from the source directory. Could it 
-> be the cause of the failure?
-
-To be honest last time I ran ./configure from source directory was more 
-than 2 years ago. The acceptance CI testing use out-of-tree build.
-
-I'm surprised it didn't worked as expected for you, because when Cleber 
-implemented it, he was using in-tree builds. Maybe it bit-rotten since.
-
-I'm not interested in trying/debugging/maintaining it, but if you think 
-it is worthwhile, I'll first simply add a job testing in-tree 
-acceptance, shot it to Travis and see.
-
-> 
-> 
-> Pavel Dovgalyuk
-> 
-> 
-> 
-> 
-
+Denis
 
