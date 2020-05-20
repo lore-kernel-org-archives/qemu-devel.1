@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85657C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E56C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40AAE20756
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1226F205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="imZ/76FX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AAE20756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ngKMFjy9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1226F205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPZ3-0006cM-Dv
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:19:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55212)
+	id 1jbPaT-0001lu-7s
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM3-00005X-KW
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:55 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35290)
+ id 1jbPMF-0000N5-13
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:07 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:32870)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM0-0001r9-M7
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:55 -0400
-Received: by mail-ej1-x641.google.com with SMTP id s21so3982450ejd.2
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:48 -0700 (PDT)
+ id 1jbPME-00022V-18
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:06 -0400
+Received: by mail-ej1-x643.google.com with SMTP id n24so3988681ejd.0
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:06:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=m1zXruZIXUvjwU/PTNcJ1tB+FSG/kUrku9mORQV4WDg=;
- b=imZ/76FXo4Z2H8/YMebPsY+A0NMizgUxrPiOhyiNbD9fBYI8jii/L0REdHqGRLU6Hf
- nq6p3ILZ2kHqkIXt/tE+Z0ShrhxwfXMJrdWSRNAvJK5JHFZYu0vMR+4s8hZSnwiNAKfG
- vRQKev+segCqVigpQEk0ZkVseSJyb8oKveNnRhUa/YJ2WrUhFBJJEjB3zqw6aN7Lq5Jr
- 8JXfNdJgjkm1JQKTqPN8PjSCJ4T1CdzXk0q8wzVtEf36jUzN7PEmVYv+mSt59EgH48Nt
- 8vhugxz171mKrKRf3b677s5YoEwp4AigMChit8eOho7SFn5aoqwFg5WHg6piMSFPDRSD
- FXGA==
+ bh=Z8jXpAxep38NH+tQtqiVR0PvMkfpz3aIN7XElkKMn28=;
+ b=ngKMFjy9TO80XtZGn7uw142jNG5nWlbLPqGX4DdQkMMcM7q7jNMvyYpTGezLwpMKgJ
+ PwjEyr4Trv1+fWaVw7Dlq0z2FJOmAUh6Qi9EN2ljfPHhBwcMwMLKR2YUN+l1HrhIYMVA
+ NRQvcQdwE7WPgNTcLVjmjsTnuU5q5oXstqAoHYCczWtei3dOZOd5CyTgDGTu1IeqJoQC
+ KhzpefSQ5WelDOtLP1ezZaa35zST+Fi6+KkVfSx8C5EUY5UCvFDneyvVR2TX2fG3ULOd
+ aVOYFRNduRMTbG8Lgofmn2auhkZpBZdeCU9QnQdPH7f4AbXMZ8xnh1bQF6XEgDrO7LSL
+ +PZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=m1zXruZIXUvjwU/PTNcJ1tB+FSG/kUrku9mORQV4WDg=;
- b=iMDlu1EINDZ49Rxy0z+CPcIwVxIx5+qZm4Q6XQjdFC3XgkTJH28P771k6IBe+kBo53
- P+EVVaE6+aw13+2+tFKkBXZBtgcMtAt/Mnf50RtAWnsELqozmyMhtUiz0OGgJxcuQYzb
- aZVPrVEZW6veXyPu/KYj+VRp/+AFP/y+gCIsD1qtSH+7OqiKUIQqBTR2ii9bN0MOm3Ze
- 5sX0NYV8tQRT2qssw25WQja+8+aRRxQKH46qatf0Q9hCKjMyDJMXt3UalN2b7dNjjCOH
- CRRLMKhi2LOv/VU6/5/A0BtkQuA32PqaoLjTnBpprEtMcusyrgCFhgekTotUm/fN9XkJ
- 1Ocg==
-X-Gm-Message-State: AOAM531EJtOxy2nLG5WEcsABM/c+S6FjKjUD27fJ7KBDHbdw+9LKR8RN
- oX4+hqDDsyfWdPfMbvKpYlpP5A==
-X-Google-Smtp-Source: ABdhPJyOdFI+XiTPAElhc7UlbLNCcw0vH+mtjxAGfUQW5MqVSQpy/3zeUrbio5v1cnDPYnRWPSMNMA==
-X-Received: by 2002:a17:906:aad8:: with SMTP id
- kt24mr4127743ejb.54.1589983547251; 
- Wed, 20 May 2020 07:05:47 -0700 (PDT)
+ bh=Z8jXpAxep38NH+tQtqiVR0PvMkfpz3aIN7XElkKMn28=;
+ b=rGd4BDcdKSB3wpFU+KDDkjWgp6YC5bL8g8tKqExWj3Ui63qtreKlHHY9HHeMgiyoO4
+ BaJ9tjGuMVDpxsJxdNeoqw359WAqwU2YyWIaLVBjp9dKDYNLZbUkBzQdZtGeLhIZV1BF
+ hWUWbArb8wpScbShNSMLnng+tUZVj1kgLuLYB1oXnKJdnVBX5B9o2FB63Oz5N4v3Pq+s
+ HubGbPJ1CwxHJB+iEr5LweTICtQx9NP7vTXXTcfPP+kGcDzkyUk5fgHdo04r+vkzxcMJ
+ tNjKs/IeKXk72smutEOVj1wZVaEpAj4sO/yr9/fJliEki0B+mUe4g9ZmWPA2swCWJNyG
+ E6cg==
+X-Gm-Message-State: AOAM532FN2vY77ziXAuecH09+vnghKjGDyQx/o8r5tkIJPPMchbjEVdt
+ 4t9FAqNdVXvVS9Xs5I8v8decyQ==
+X-Google-Smtp-Source: ABdhPJxTFGWlThngj7dQBp306RPHEuVe+eJcBB5lKFJPiS1Fv3EX/GFQbr0VXvCE/TgpQn4utf9OAw==
+X-Received: by 2002:a17:906:ce39:: with SMTP id
+ sd25mr3749331ejb.482.1589983564722; 
+ Wed, 20 May 2020 07:06:04 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t16sm1927404edy.20.2020.05.20.07.05.41
+ by smtp.gmail.com with ESMTPSA id m5sm1965236ejk.27.2020.05.20.07.05.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 07:05:42 -0700 (PDT)
+ Wed, 20 May 2020 07:05:54 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7C61D1FF8F;
- Wed, 20 May 2020 15:05:41 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 5E95E1FF9C;
+ Wed, 20 May 2020 15:05:42 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 03/15] travis.yml: Use clang++ in the Clang tests
-Date: Wed, 20 May 2020 15:05:29 +0100
-Message-Id: <20200520140541.30256-4-alex.bennee@linaro.org>
+Subject: [PATCH  v1 13/15] linux-user: properly "unrealize" vCPU object
+Date: Wed, 20 May 2020 15:05:39 +0100
+Message-Id: <20200520140541.30256-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200520140541.30256-1-alex.bennee@linaro.org>
 References: <20200520140541.30256-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x641.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,61 +104,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Nikolay Igotti <igotti@gmail.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Markus Armbruster <armbru@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+We shouldn't be messing around with the CPU list in linux-user save
+for the very special case of do_fork(). When threads end we need to
+properly follow QOM object lifetime handling and allow the eventual
+cpu_common_unrealizefn to both remove the CPU and ensure any clean-up
+actions are taken place, for example calling plugin exit hooks.
 
-Our configure script does not look for clang++ automatically, so we
-should use --cxx=clang++ to make sure that we test our C++ code with
-Clang, too. And while we're at it, also use --host-cc=clang here
-to avoid that we use the normal "cc" as host C compiler.
+There is still a race condition to avoid so use the linux-user
+specific clone_lock instead of the cpu_list_lock to avoid it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200518083316.25065-1-thuth@redhat.com>
----
- .travis.yml | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Cc: Nikolay Igotti <igotti@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 
-diff --git a/.travis.yml b/.travis.yml
-index 1ec8a7b4657..564be50a3c1 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -205,14 +205,15 @@ jobs:
-     # Test with Clang for compile portability (Travis uses clang-5.0)
-     - name: "Clang (user)"
-       env:
--        - CONFIG="--disable-system"
-+        - CONFIG="--disable-system --host-cc=clang --cxx=clang++"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
+---
+v2
+  - expand Cc list to QOM/QMP object lifetime experts
+---
+ linux-user/syscall.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 05f03919ff0..7f6700c54e3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7635,30 +7635,33 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             return -TARGET_ERESTARTSYS;
+         }
  
+-        cpu_list_lock();
++        pthread_mutex_lock(&clone_lock);
  
-     - name: "Clang (main-softmmu)"
-       env:
--        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
-+        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS}
-+                  --host-cc=clang --cxx=clang++"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
-       compiler: clang
-       before_script:
-@@ -222,7 +223,8 @@ jobs:
+         if (CPU_NEXT(first_cpu)) {
+-            TaskState *ts;
++            TaskState *ts = cpu->opaque;
  
-     - name: "Clang (other-softmmu)"
-       env:
--        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-+        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}
-+                  --host-cc=clang --cxx=clang++"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
+-            /* Remove the CPU from the list.  */
+-            QTAILQ_REMOVE_RCU(&cpus, cpu, node);
++            object_property_set_bool(OBJECT(cpu), false, "realized", NULL);
++            object_unref(OBJECT(cpu));
++            /*
++             * At this point the CPU should be unrealized and removed
++             * from cpu lists. We can clean-up the rest of the thread
++             * data without the lock held.
++             */
  
+-            cpu_list_unlock();
++            pthread_mutex_unlock(&clone_lock);
+ 
+-            ts = cpu->opaque;
+             if (ts->child_tidptr) {
+                 put_user_u32(0, ts->child_tidptr);
+                 do_sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+                           NULL, NULL, 0);
+             }
+             thread_cpu = NULL;
+-            object_unref(OBJECT(cpu));
+             g_free(ts);
+             rcu_unregister_thread();
+             pthread_exit(NULL);
+         }
+ 
+-        cpu_list_unlock();
++        pthread_mutex_unlock(&clone_lock);
+         preexit_cleanup(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
 -- 
 2.20.1
 
