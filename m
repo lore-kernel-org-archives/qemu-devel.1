@@ -2,90 +2,91 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC60CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1DFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:26:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A3792075F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:23:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A57C7207C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 06:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wzr+2Qfb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A3792075F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKqJ3zYp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57C7207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbI8l-0005i2-R4
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:23:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56276)
+	id 1jbIBI-0007GT-Pu
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 02:26:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbI7p-0005Gx-JA
- for qemu-devel@nongnu.org; Wed, 20 May 2020 02:22:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24450
+ id 1jbIAU-0006rf-SL
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 02:25:30 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25982
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbI7n-0004xR-DJ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 02:22:44 -0400
+ id 1jbIAT-0005Ot-Mu
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 02:25:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589955761;
+ s=mimecast20190719; t=1589955928;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1HAVuHuK8J+ceFtD+NRtFdbyXmgDMYg1eHdQx/RTaaI=;
- b=Wzr+2Qfb1eXbcrbt7HVWh/nu8awsG8ShyxSWO6kxrUTsOkeLw2YRtWYoSqv7iuy4DqbIHu
- h/Pd0gwi5quzUkmCglWICz+gHF41uAIO4mP5jL01tc/AEAoJW4/ss0CH5xGRdDUVnF4jsr
- YnUDdqmsM8j4jn2pqFJKAxLxlqswERI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-guASwyBTOVC0wBYrDJnDCg-1; Wed, 20 May 2020 02:22:37 -0400
-X-MC-Unique: guASwyBTOVC0wBYrDJnDCg-1
-Received: by mail-wm1-f69.google.com with SMTP id o8so1637639wmd.0
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 23:22:37 -0700 (PDT)
+ bh=dDIQOF2dIqAJomq5b0gaztEmHQ8zohKEjMhNzxrhzec=;
+ b=aKqJ3zYphJjqC5JdTcMcssYwnK1kTigDVrH2mW764AK9lQnoICFHtd/HYZjeYJ95VIqrgD
+ Lff+YWMj18GIOToXQRaaba+w/xRlmdejITvnRzkUu1ZFJi5Zr5NLxvei/Mva44RhnFiPVB
+ qcRP386IGwCjk62G3d8/KvYL8lk8xHE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-2H-omJjNOlyEJv31bIu_qw-1; Wed, 20 May 2020 02:25:26 -0400
+X-MC-Unique: 2H-omJjNOlyEJv31bIu_qw-1
+Received: by mail-wr1-f72.google.com with SMTP id z16so936350wrq.21
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 23:25:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=1HAVuHuK8J+ceFtD+NRtFdbyXmgDMYg1eHdQx/RTaaI=;
- b=NvCKhxJt3CrHGjrh5pqzJ1tWD5pj9Cfb6atq3K17q8fgcPZiVVMkGw3QIo2Txbl8q7
- StCGS82RxrnqJYKF8NNTEGs+rXXRsXYOYVPGPDfz2jKee4hLV2tg0YiffCeh0DyD74MU
- 2hV3lFk8jsxvPjcbGOmPF7PzykKFmRSxv3HuxnnxIxRvprZmSJbqdk7fvqNxWBV3TKen
- a6+iZEGGusRkONpJOalyHocA0Zhry7XUozSqIpCVEd/cyqS1EMmu24lNUkGJ4C4Z8iie
- xjk2jNUcsmX0sS8BLpJsp1u1pqEP+QOX8cHMRFxdI02VLLBn5ismcAYYECbvWCjpXGOL
- O9jg==
-X-Gm-Message-State: AOAM532vm45ehhBKDSKkuL1MoNDcz1KmaVn1viJbOgDy2PfAb+oGnlky
- OELF++hK2cnVHgIhkavknm6sjYiLmoqED6td1xHNbAm4Xi4GQXd+zBym2MXMcytFWjZXi8Q5HVH
- r6GV3KK9RQytCkZc=
-X-Received: by 2002:a1c:ab45:: with SMTP id u66mr2992392wme.152.1589955756624; 
- Tue, 19 May 2020 23:22:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhYxur3vY1e1hpzn2uTpMQX0FxIGzyt4q8x3VkywTdALubbHRSvX++fJPWlaCyLefYcAY5kw==
-X-Received: by 2002:a1c:ab45:: with SMTP id u66mr2992378wme.152.1589955756407; 
- Tue, 19 May 2020 23:22:36 -0700 (PDT)
+ bh=dDIQOF2dIqAJomq5b0gaztEmHQ8zohKEjMhNzxrhzec=;
+ b=UDfAUi8oulUMpa44XlWxSGLhiHzkqqoCJZTb8nj0+BsXgpKqR/Ye4cAEZSpF27Fv51
+ 0EkR3BMGJIkR5kbxwnU20B8WS4vUx5xEmjit9W8p4JWu/ayPtTfSLq0OgV+Grc5YzrC7
+ jI7+hXX8ZPV2EgVotVcFPt3YXoLp44xztJ6F4pBOZrgxwF5Rg0rLsOJpsDweBATjuysY
+ saawNVa1qq9Cn+y3KZDZ8PqBso4fSUbUZHkY3W6potr4/TzItYWuX5wg1r6sbxrc23pK
+ soGGZvhdPL4WOAmwf9mHJeTDKZ8mIraeCDX7T5Rh2KzcQN8Ni0cqYDgmyadhE3JhdkQb
+ Zohw==
+X-Gm-Message-State: AOAM531i7E3QQn54Wco4Tu8dQjrm+DVL4ediZEGvBXGqHh6CtoqX24wk
+ qGYQSDed4VyJi6j24pYnvKtlzDILdD/T3f5HkMB/qIVSadSALlzFn7t/vI05dGmwRtm8czh5INC
+ fN9za14KJFGELDsI=
+X-Received: by 2002:a7b:c754:: with SMTP id w20mr2996805wmk.17.1589955925545; 
+ Tue, 19 May 2020 23:25:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwyjnAvBJUF9alluH6j5uK7NK+UFHuW9bx7aixU/P7uTq+AY9i/eTaVau5oaf+lcQ72Q5UZSw==
+X-Received: by 2002:a7b:c754:: with SMTP id w20mr2996776wmk.17.1589955925232; 
+ Tue, 19 May 2020 23:25:25 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:591e:368f:1f3f:27d2?
  ([2001:b07:6468:f312:591e:368f:1f3f:27d2])
- by smtp.gmail.com with ESMTPSA id z12sm2137944wmc.6.2020.05.19.23.22.35
+ by smtp.gmail.com with ESMTPSA id h20sm2001896wma.6.2020.05.19.23.25.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 23:22:35 -0700 (PDT)
-Subject: Re: [PATCH 03/55] qdev: New qdev_new(), qdev_realize(), etc.
+ Tue, 19 May 2020 23:25:24 -0700 (PDT)
+Subject: Re: [PATCH 07/55] qdev: Convert to qdev_unrealize() manually
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-4-armbru@redhat.com>
+ <20200519145551.22836-8-armbru@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9b329adc-8110-c108-996a-3b7d8463d042@redhat.com>
-Date: Wed, 20 May 2020 08:22:35 +0200
+Message-ID: <446dad72-8600-3c16-fc8b-d4f16609c2af@redhat.com>
+Date: Wed, 20 May 2020 08:25:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200519145551.22836-4-armbru@redhat.com>
+In-Reply-To: <20200519145551.22836-8-armbru@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -114,28 +115,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/05/20 16:54, Markus Armbruster wrote:
+On 19/05/20 16:55, Markus Armbruster wrote:
+> @@ -493,6 +493,11 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+>      return !err;
+>  }
+>  
+> +void qdev_unrealize(DeviceState *dev)
+> +{
+> +    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
+> +}
 > +
-> +    object_ref(OBJECT(dev));
-> +    object_property_set_bool(OBJECT(dev), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate_prepend(errp, err,
-> +                                "Initialization of device %s failed: ",
-> +                                object_get_typename(OBJECT(dev)));
-> +    }
-> +    object_unref(OBJECT(dev));
+>  /*
+>   * Realize @dev and drop a reference.
+>   * This is like qdev_realize(), except it steals a reference rather
+> @@ -512,11 +517,6 @@ bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp)
+>      return ret;
+>  }
+>  
+> -void qdev_unrealize(DeviceState *dev)
+> -{
+> -    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
+> -}
+> -
+>  static int qdev_assert_realized_properly(Object *obj, void *opaque)
+>  {
+>      DeviceState *dev = DEVICE(object_dynamic_cast(obj, TYPE_DEVICE));
 
-Why is the ref/unref pair needed?  Should it be done in the realized
-setter instead?
+Stray change (to squash in patch 3)?
 
 Paolo
 
