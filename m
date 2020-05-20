@@ -2,96 +2,68 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE5EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B14FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:18:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EE4E206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:01:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wuh+8Mzq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE4E206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 549002070A
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549002070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbS5Z-0003tO-DH
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:01:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50546)
+	id 1jbSM3-0003tk-HC
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:18:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbS4a-0002tG-3s
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:00:04 -0400
-Received: from mail-ej1-x62b.google.com ([2a00:1450:4864:20::62b]:34721)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbS4Y-0007vt-MW
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:00:03 -0400
-Received: by mail-ej1-x62b.google.com with SMTP id j21so4864211ejy.1
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=dWUQ3BprChLjhkvCeE+yi/Pe8ndEBtn//oMnHkXYygE=;
- b=wuh+8MzqQErNiYDLuM0a+aUXkQalXYRcWwkMuyPjB0pkco2/y3d6QUUHCnNJl/eVzC
- A93O6bFTVeavpj8HzAKqP9iEiRkMJ22n9Eo4o69whgfC1xzrJbWQ8zH+k3nOOtVi6XO+
- 0357BxW85B2H79QAjzzA4vBm8EyFRq4SuTH/Jl0fCTbKUOuaokkG603nesI6UN/5ZCml
- rbxd9szekz7YIhwGfRuSLhmkD/X+Xt0E48vA8d29kevaoAi4H16RmfRhRJdoCdtsiuNN
- 5xLG2wPrOWflAjyaX1aq+lyclCYWu8Icfkl/iqXnYBGlgwuw3bmeoITgYyahKkGbRoYR
- MR5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=dWUQ3BprChLjhkvCeE+yi/Pe8ndEBtn//oMnHkXYygE=;
- b=l0DYrI9t2GzmZ33jXxtK+s3NbLgO6+fLoJhuk8FjqwQmKRgaK8VgpPiOhGuBzwI1sP
- ZcUftJgyQ/WgKbnRFU47FjZHnBSvkyFFurSJBMqV++2e39YOsXKxwS1tzvgagp/ylySm
- JF5P1CylDrtfLFzTqEiKekSyJbvAxc8nzG/4v5OMH9ez/egaqsDckX2YsNOQiRF6Ep1e
- AYIkUBu7OESfPMHcMdqbaOL4uwATWkftBYE2eWGERHhm/ocwtx3YdPynCXP0rW5d8Amb
- jYVQZtsvCNqTD5WLg1mIbYZg6NpTyu6xuLa59M6WpUzAwszhdywAq+YpF0vJl/wkx+bB
- RcKw==
-X-Gm-Message-State: AOAM531jB3FiFknP1XtdIcywhgBb5d2a7YoYiNZcEtwtK4BI5oXFn4cC
- YL3/YzbTPM6EIf/DODdHJCyXjQ==
-X-Google-Smtp-Source: ABdhPJziJduHR8WNbGT81befY1V2Oi2KMHJAFhWXkjP+FzAZzWjeikWb53e7H2GSfhyF6IS3A8Ik6A==
-X-Received: by 2002:a17:906:63c9:: with SMTP id
- u9mr4654046ejk.439.1589994000665; 
- Wed, 20 May 2020 10:00:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y10sm2292929ejw.25.2020.05.20.09.59.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 09:59:59 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 66C301FF7E;
- Wed, 20 May 2020 17:59:57 +0100 (BST)
-References: <20200519025355.4420-1-richard.henderson@linaro.org>
- <20200519025355.4420-15-richard.henderson@linaro.org>
- <0cba90b4-e1c3-8cb9-a405-c5447a1aa17f@linaro.org>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [RISU v2 14/17] Add magic and size to the trace header
-In-reply-to: <0cba90b4-e1c3-8cb9-a405-c5447a1aa17f@linaro.org>
-Date: Wed, 20 May 2020 17:59:57 +0100
-Message-ID: <87v9kqfsoi.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbSLD-0003Mq-F9
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:17:15 -0400
+Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:50587)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbSLB-000238-JY
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:17:15 -0400
+Received: from player796.ha.ovh.net (unknown [10.110.103.168])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id EA88D12FE39
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 19:17:09 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player796.ha.ovh.net (Postfix) with ESMTPSA id 75D301283884D;
+ Wed, 20 May 2020 17:17:05 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R0063b10b42b-339d-42de-afc7-e1167dbdb67f,D4AE9CB3A4750E3488E7135F1D4D455A9A9A4933)
+ smtp.auth=groug@kaod.org
+Date: Wed, 20 May 2020 19:17:01 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 4/9] ppc/xive2: Introduce a presenter matching routine
+Message-ID: <20200520191701.21dd0525@bahia.lan>
+In-Reply-To: <20200513151109.453530-5-clg@kaod.org>
+References: <20200513151109.453530-1-clg@kaod.org>
+ <20200513151109.453530-5-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::62b;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x62b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Ovh-Tracer-Id: 7355785568399563147
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddtledguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeukeejkeeiffeftdevueekvdetjeegieevhffgjefgtdeluddvgfefleekueevueenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.39.154; envelope-from=groug@kaod.org;
+ helo=5.mo177.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 13:17:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,73 +77,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 13 May 2020 17:11:04 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> The VP space is larger in XIVE2 (P10), 24 bits instead of 19bits on
+> XIVE (P9), and the CAM line can use a 7bits or 8bits thread id.
+>=20
+> For now, we only use 7bits thread ids, same as P9, but because of the
+> change of the size of the VP space, the CAM matching routine is
+> different between P9 and P10. It is easier to duplicate the whole
+> routine than to add extra handlers in xive_presenter_tctx_match() used
+> for P9.
+>=20
 
-> On 5/18/20 7:53 PM, Richard Henderson wrote:
->> +    if (master_header.magic !=3D RISU_MAGIC ||
->> +        master_header.risu_op !=3D op ||
->> +        master_header.size !=3D extra_size) {
->> +        res =3D RES_MISMATCH_HEAD;
->> +        goto fail_header;
->>      }
->
-> Hmm.  This isn't ideal.
->
-> Consider e.g. an insn being tested that should pass, so master steps past=
- the
-> insn to the UDF and sends OP_COMPARE.  But there's a bug in the emulator =
-being
-> tested so the apprentice gets SIGILL on the insn and so op =3D=3D
-> OP_SIGILL.
+It's a bit of a pity to duplicate this routine. What about turning it
+into a helper with some extra arguments and come up with dedicated
+users for P9 and P10 ?
 
-In my experience this is one of the major failure modes as usually it's
-a decode error or a -cpu version error that leads you to go astray.
+> We might come with a better solution later on, after we have added
+> some more support for the XIVE2 controller.
+>=20
 
-That said most useful additional piece of information to dump would be
-the insn word of the failing PC. We even know if one is on a RISU_OP and
-one isn't so we can be a bit more expressive.
+Of course if you envision substantial changes that would prevent to share
+enough logic, you can ignore the previous comment. The duplicated routine
+looks fine.
 
-> So risu_op !=3D op, but we only report the header difference.
->
-> Perhaps that's good enough to understand the this particular problem, wit=
-hout
-> the clutter of printing the rest of the reginfo frame -- at least if
-> report_mismatch_header is improved to print risu_op names instead of numb=
-ers.
->
-> Consider if master and apprentice are run with different --test-sve=3D<vq>
-> values.  That will produce a mismatch in size.
->
-> Which could be a serious problem, if master_header.size > sizeof(master_r=
-i) --
-> we can't even receive the data.  In that case, what I'm doing here printi=
-ng the
-> size mismatch is all that's possible.
->
-> But suppose master_header.size <=3D sizeof(master_ri), so we can receive =
-the
-> data.  So long as master_header.size =3D=3D reginfo_size(&master_ri), the=
-n at least
-> the data is self-consistent, and we *can* print out the difference in
-> report_mismatch_reg().  Which in this case is going to be the difference =
-in the
-> two ri->sve_vl values.  That difference is likely to be easiest to unders=
-tand
-> for the end user.
->
-> I should probably split out this receive logic from
-> recv_and_compare_register_info so that it can be reused by dump.
->
->
-> r~
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  include/hw/ppc/xive2.h |  9 +++++
+>  hw/intc/xive2.c        | 87 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 96 insertions(+)
+>=20
+> diff --git a/include/hw/ppc/xive2.h b/include/hw/ppc/xive2.h
+> index cb15487efdb6..4aefca4d96f1 100644
+> --- a/include/hw/ppc/xive2.h
+> +++ b/include/hw/ppc/xive2.h
+> @@ -60,6 +60,15 @@ int xive2_router_write_nvp(Xive2Router *xrtr, uint8_t =
+nvt_blk, uint32_t nvt_idx,
+> =20
+>  void xive2_router_notify(XiveNotifier *xn, uint32_t lisn);
+> =20
+> +/*
+> + * XIVE2 Presenter (POWER10)
+> + */
+> +
+> +int xive2_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
+> +                                uint8_t format,
+> +                                uint8_t nvt_blk, uint32_t nvt_idx,
+> +                                bool cam_ignore, uint32_t logic_serv);
+> +
+>  /*
+>   * XIVE2 END ESBs  (POWER10)
+>   */
+> diff --git a/hw/intc/xive2.c b/hw/intc/xive2.c
+> index 15ea04cf1822..1ce9d995e990 100644
+> --- a/hw/intc/xive2.c
+> +++ b/hw/intc/xive2.c
+> @@ -20,6 +20,11 @@
+>  #include "hw/ppc/xive2.h"
+>  #include "hw/ppc/xive2_regs.h"
+> =20
+> +static inline uint32_t xive_tctx_word2(uint8_t *ring)
+> +{
+> +    return *((uint32_t *) &ring[TM_WORD2]);
+> +}
+> +
+>  static uint8_t priority_to_ipb(uint8_t priority)
+>  {
+>      return priority > XIVE_PRIORITY_MAX ?
+> @@ -212,6 +217,88 @@ static int xive2_router_get_block_id(Xive2Router *xr=
+tr)
+>     return xrc->get_block_id(xrtr);
+>  }
+> =20
+> +/*
+> + * Encode the HW CAM line with 7bit or 8bit thread id. The thread id
+> + * width and block id width is configurable at the IC level.
+> + *
+> + *    chipid << 19 | 0000000 0 0001 threadid (7Bit)
+> + *    chipid << 24 | 0000 0000 0000 0001 threadid (8Bit)
+> + */
 
+What about introducing:
 
---=20
-Alex Benn=C3=A9e
+#define XIVE2_PIR_TO_NVP_IDX(pir, width) \
+    (1 << (width) | ((pir) & ((1 << (width)) - 1))
+
+or any better name you can think of and...
+
+> +static uint32_t xive2_tctx_hw_cam_line(XivePresenter *xptr, XiveTCTX *tc=
+tx)
+> +{
+> +    Xive2Router *xrtr =3D XIVE2_ROUTER(xptr);
+> +    CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
+> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+> +    uint8_t blk =3D xive2_router_get_block_id(xrtr);
+> +    uint8_t tid_shift =3D 7;
+> +    uint8_t tid_mask =3D (1 << tid_shift) - 1;
+> +
+> +    return xive2_nvp_cam_line(blk, 1 << tid_shift | (pir & tid_mask));
+
+... turn this into:
+
+    /* We only use 7bit thread ids for now */
+    return xive2_nvp_cam_line(blk, XIVE2_PIR_TO_NVP_IDX(pir, 7));
+
+> +}
+> +
+> +/*
+> + * The thread context register words are in big-endian format.
+> + */
+> +int xive2_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
+> +                                uint8_t format,
+> +                                uint8_t nvt_blk, uint32_t nvt_idx,
+> +                                bool cam_ignore, uint32_t logic_serv)
+> +{
+> +    uint32_t cam =3D   xive2_nvp_cam_line(nvt_blk, nvt_idx);
+> +    uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
+> +    uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
+> +    uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
+> +    uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
+> +
+> +    /*
+> +     * TODO (PowerNV): ignore mode. The low order bits of the NVT
+> +     * identifier are ignored in the "CAM" match.
+> +     */
+> +
+> +    if (format =3D=3D 0) {
+> +        if (cam_ignore =3D=3D true) {
+> +            /*
+> +             * F=3D0 & i=3D1: Logical server notification (bits ignored =
+at
+> +             * the end of the NVT identifier)
+> +             */
+> +            qemu_log_mask(LOG_UNIMP, "XIVE: no support for LS NVT %x/%x\=
+n",
+> +                          nvt_blk, nvt_idx);
+> +             return -1;
+> +        }
+> +
+> +        /* F=3D0 & i=3D0: Specific NVT notification */
+> +
+> +        /* PHYS ring */
+> +        if ((be32_to_cpu(qw3w2) & TM2_QW3W2_VT) &&
+> +            cam =3D=3D xive2_tctx_hw_cam_line(xptr, tctx)) {
+> +            return TM_QW3_HV_PHYS;
+> +        }
+> +
+> +        /* HV POOL ring */
+> +        if ((be32_to_cpu(qw2w2) & TM2_QW2W2_VP) &&
+> +            cam =3D=3D xive_get_field32(TM2_QW2W2_POOL_CAM, qw2w2)) {
+> +            return TM_QW2_HV_POOL;
+> +        }
+> +
+> +        /* OS ring */
+> +        if ((be32_to_cpu(qw1w2) & TM2_QW1W2_VO) &&
+> +            cam =3D=3D xive_get_field32(TM2_QW1W2_OS_CAM, qw1w2)) {
+> +            return TM_QW1_OS;
+> +        }
+> +    } else {
+> +        /* F=3D1 : User level Event-Based Branch (EBB) notification */
+> +
+> +        /* USER ring */
+> +        if  ((be32_to_cpu(qw1w2) & TM2_QW1W2_VO) &&
+> +             (cam =3D=3D xive_get_field32(TM2_QW1W2_OS_CAM, qw1w2)) &&
+> +             (be32_to_cpu(qw0w2) & TM2_QW0W2_VU) &&
+> +             (logic_serv =3D=3D xive_get_field32(TM2_QW0W2_LOGIC_SERV, q=
+w0w2))) {
+> +            return TM_QW0_USER;
+> +        }
+> +    }
+> +    return -1;
+> +}
+> +
+>  static void xive2_router_realize(DeviceState *dev, Error **errp)
+>  {
+>      Xive2Router *xrtr =3D XIVE2_ROUTER(dev);
+
 
