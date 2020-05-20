@@ -2,87 +2,87 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A43C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:11:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAB25207D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B17FB207F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:11:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Px0ECHj9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB25207D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H7wnbwfj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B17FB207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPRM-0000Ts-Op
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:11:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55234)
+	id 1jbPRr-0001MR-Re
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:11:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM5-0000Aw-Mh
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:57 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:43045)
+ id 1jbPMP-0000r6-AS
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:17 -0400
+Received: from mail-ej1-x62b.google.com ([2a00:1450:4864:20::62b]:46742)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM4-0001z9-0o
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:57 -0400
-Received: by mail-ed1-x544.google.com with SMTP id g9so3163979edw.10
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:55 -0700 (PDT)
+ id 1jbPM9-00021v-SE
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:17 -0400
+Received: by mail-ej1-x62b.google.com with SMTP id e2so3891187eje.13
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sKR6q5Rw9VEFb3A0dJqchg5Eh5EneIbh7z8JPrBYd9A=;
- b=Px0ECHj9eowUQxmO4+i+eHa76wcPHGUG4sI98PHR+lxiuyvOlZPwizeOIZZlSdQ69u
- TmXOTKm+Ajw/NZ0zzXagykvbQ1gryE35h17wsKCbXal7Zy7U8ttt3NlNS5HphgGaSvqb
- CYYwsQo3skGaqF62R6VBu3NREu7EGCznLoj3J5GxGozx1ZRMWwsslp4eYkzQRaUb+6kz
- V5NBJCjE992qvhFjW9Te8W6N1EXU8qb3OgowVOijudUCkPofIwrclH9E6/NPDlSXu6Vs
- VyQRXZI/OOR+SiEK2ZsiyhnR6Hi7QwyAcTUFWehBwaf++O1CyMszL4hTpVlELN+THMfb
- a0Aw==
+ bh=YNz4cR2RJqYNSGkM/23ZopCXsChGl4cQuLehMB9w6UY=;
+ b=H7wnbwfjnT17W6xqZy4tx6t9DcaNBGCIWgmexo/FTYMhPT+wzOE1RXtqfKBfS0vI5I
+ xzohZPu7KU6v45Iue0kAlTzlhhp82SEHq0S8tn8Yxs8HM4ByfCE/0K1f7NcuLNurDlbn
+ oWdQgtgC5/ZrWAY+ha8Oe+EHl/Tp6tks4icRXQvMCoTiSpCkoR0g12JBLcUc5JAw1zhx
+ Oq7CmcAGXGts9WZSv9ud3L9nW7g+QLti7Oknlr9sdrYFWfoVcjjxuwzW5DqMe99U7qXD
+ qxnI72rqrbu+KApPCp2yl/dwdGYeHF9VSj/tVXLRAHznO8TY4l9fWB8O5e/rJJ3NbnLc
+ 5Lww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sKR6q5Rw9VEFb3A0dJqchg5Eh5EneIbh7z8JPrBYd9A=;
- b=JzntNJLN6J/ehHV6QBeSbZw74xxWC2O/olNAVpwHGwofep05JtnSIu7NqgBIZxKxuI
- FUTW3TAJ3LRIcrfQY6EKPGRAtzDSm16Jt/po/kET2QLvQYS/6p2T896sQPFHG8IIcNJO
- bhF+IUb+R02lOn9g9aJPynmVbk7sozy3KKtM/7mFSwb4UCuiO52cNj7Cqdi2Wg5sFFfl
- OXZs+AX9jT9EgznMSxbQvjyK8YNHEEY6vXh4Stf8DVSMeB7JhwkCDStxFs5dgE5qxJ0q
- i++5f7Jd+p1l2zEYW8ZOIdEBdGSo7NnSrHvn6RMr26thLB6wAenHqzV1hIqBFRqMu6gG
- jq+g==
-X-Gm-Message-State: AOAM531KQhb584ihNGr/wx8PO7BV0UtVOtkcC/GSWj7ImxEVIQ7Qa6rZ
- DH1ykJrGuXCC9LW74JODYlufPNx4PaI=
-X-Google-Smtp-Source: ABdhPJzqCOOwTHtihwy1xlG3olT6s4pUOVeL/3LWrKYmqbmWYKGPLhVsZ8tysPjwzY61BLyNrq9q2Q==
-X-Received: by 2002:aa7:d590:: with SMTP id r16mr1627020edq.304.1589983554663; 
- Wed, 20 May 2020 07:05:54 -0700 (PDT)
+ bh=YNz4cR2RJqYNSGkM/23ZopCXsChGl4cQuLehMB9w6UY=;
+ b=E2DI4aWMxDhz8kagqn0WpdVTza/ZGAPEQTmIUC9mfziFPVi9pckW7XlDB5fSWXWaPR
+ yqew9iq7bvkhBHp9Dv7c01vRMhhU8pXz3WYeWBXAIjup+ImN8Jb9B9y8KwY2tbJ8kdJg
+ ofkQ0I8UKIvPbcz8jyy7bEyrfO0Lgvi5w9kqA0fpvr803UQWd9+IOGHg1hLm6I86Xep5
+ z5kmeRxbG3KXJTL+nw+2OLTmIvN2TSLyOnGVIel+GrR9g6+ed0LaGEytLgE9A8KMl4rG
+ 1fjRl+T2AjuWxWgHdU07971QWXdXctsiBqbqWQvNwRp/2PMX6Q8mMgyRefvsgiu9WzRN
+ qBwQ==
+X-Gm-Message-State: AOAM533a9ao4nhbBfGRCAIup3sxIb9MBX14zxY47Kz285rZACsJ/ZYz4
+ kndWj1cRRbgWz7gS8BIb7GZSxkui2rI=
+X-Google-Smtp-Source: ABdhPJz0p+aJTIQHXOaCmDA0aHnJkk8QuyxyU8NciYfCv1Tc9ExJNjBUTOqYgH2A5Mj91g4Xqi6+OQ==
+X-Received: by 2002:a17:906:2dc8:: with SMTP id
+ h8mr4080737eji.108.1589983560483; 
+ Wed, 20 May 2020 07:06:00 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x8sm1998151edj.53.2020.05.20.07.05.46
+ by smtp.gmail.com with ESMTPSA id g20sm2001782ejx.85.2020.05.20.07.05.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 20 May 2020 07:05:49 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CBB751FF93;
- Wed, 20 May 2020 15:05:41 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 001721FF98;
+ Wed, 20 May 2020 15:05:42 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 07/15] tests/tcg: better detect confused gdb which can't
- connect
-Date: Wed, 20 May 2020 15:05:33 +0100
-Message-Id: <20200520140541.30256-8-alex.bennee@linaro.org>
+Subject: [PATCH  v1 09/15] tests/docker: add debian11 base image
+Date: Wed, 20 May 2020 15:05:35 +0100
+Message-Id: <20200520140541.30256-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200520140541.30256-1-alex.bennee@linaro.org>
 References: <20200520140541.30256-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=alex.bennee@linaro.org; helo=mail-ed1-x544.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::62b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x62b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -90,8 +90,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,43 +103,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While we may gamely give the right information it can still confuse
-the wide range of GDBs out there. For example ppc64abi32-linux-user
-reports:
-
-  warning: Selected architecture powerpc:common is not compatible with reported target architecture powerpc:common64
-  warning: Architecture rejected target-supplied description
-
-but still connects. Add a test for a 0 pc and exit early if that is
-the case. This may actually be a bug we need to fix?
+We won't use this for building QEMU but we do need newer GCC's and
+binutils for building some of our test cases.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>
 ---
- tests/tcg/multiarch/gdbstub/sha1.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/docker/Makefile.include            |  2 +-
+ tests/docker/dockerfiles/debian11.docker | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+ create mode 100644 tests/docker/dockerfiles/debian11.docker
 
-diff --git a/tests/tcg/multiarch/gdbstub/sha1.py b/tests/tcg/multiarch/gdbstub/sha1.py
-index 734553b98bb..2bfde49633c 100644
---- a/tests/tcg/multiarch/gdbstub/sha1.py
-+++ b/tests/tcg/multiarch/gdbstub/sha1.py
-@@ -65,6 +65,10 @@ except (gdb.error, AttributeError):
-     print("SKIPPING (not connected)", file=sys.stderr)
-     exit(0)
- 
-+if gdb.parse_and_eval('$pc') == 0:
-+    print("SKIP: PC not set")
-+    exit(0)
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 43a86786882..3596b589307 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -7,7 +7,7 @@ HOST_ARCH = $(if $(ARCH),$(ARCH),$(shell uname -m))
+ DOCKER_SUFFIX := .docker
+ DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+ # we don't run tests on intermediate images (used as base by another image)
+-DOCKER_PARTIAL_IMAGES := debian9 debian10
++DOCKER_PARTIAL_IMAGES := debian9 debian10 debian11
+ DOCKER_PARTIAL_IMAGES += debian9-mxe debian-bootstrap
+ DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+diff --git a/tests/docker/dockerfiles/debian11.docker b/tests/docker/dockerfiles/debian11.docker
+new file mode 100644
+index 00000000000..5adfd62d553
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian11.docker
+@@ -0,0 +1,18 @@
++#
++# Docker multiarch cross-compiler target
++#
++# This docker target uses the current development version of Debian as
++# a base for cross compilers for building test binaries. We won't
++# attempt to build QEMU on it yet given it is still in development.
++#
++# On its own you can't build much but the docker-foo-cross targets
++# build on top of the base debian image.
++#
++FROM debian:bullseye-slim
 +
- try:
-     # These are not very useful in scripts
-     gdb.execute("set pagination off")
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++
++# Install common build utilities
++RUN apt update && \
++    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
 -- 
 2.20.1
 
