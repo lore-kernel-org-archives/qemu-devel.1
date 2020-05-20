@@ -2,73 +2,106 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E49C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8100C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D24C207C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D24C207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84FB0207C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:03:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/eY+37n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84FB0207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbNQL-0008Ki-Rv
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36448)
+	id 1jbNR9-0001DL-Mk
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:03:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbNPX-00078V-2m
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:01:23 -0400
-Resent-Date: Wed, 20 May 2020 08:01:23 -0400
-Resent-Message-Id: <E1jbNPX-00078V-2m@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21353)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbNQO-0000BX-5U
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:02:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33639
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbNPV-0001dP-5t
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:01:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589976069; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=lmAZKyvIQz7rANXeg+EFOIfRyWw5oSslIC+kLyxvCXD5wGWL5KUig4+YG59eP4r5S3x72wciUtO9iS6YWX9OKhWvumrcJK8aAxkqQnvYqU1DZmIYIOsz1yyS77uW6usmgZ3Ei8A6tE8z2HbIt/EKxKqWDyjY29u0CNBG8tzsYcA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589976069;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=peCcVn7MlwoWpI2FnmaAXZjhGHgqUofFjRmRokDnETc=; 
- b=F0PqZhnEOeQJwK+xL6qYjxRB+ypX4ERtzm43+Hpa13E9CdqJcIAPpQrNxi+Zk/zePT+t4QyhZTTgfA3vLkHRXSJg6lRsXpUUXq5P0uG8SIc9jk1TDZfoPHqHeAEYvWZmmLS4vGg+Xivwi9X2WiA3vCt9zVRXaGLuPNb0MPr1dvI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589976066502981.5695969117479;
- Wed, 20 May 2020 05:01:06 -0700 (PDT)
-Message-ID: <158997606501.25482.2234594767902255254@45ef0f9c86ae>
-In-Reply-To: <20200520093629.1495-1-miaoyubo@huawei.com>
-Subject: Re: [PATCH v7 0/8] pci_expander_brdige:acpi: Support pxb-pcie for ARM
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbNQN-0001jc-Dp
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:02:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589976134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mwBtcn924wQ25kRgO0xP9s5Kc1Yqu1KL4tR1NnbJeiY=;
+ b=K/eY+37nuSr2+V9QgGhSs6uz7++5hi7Zj7SjKvjaHKPz+WggTHSmYKDiNPyaQFg4yYx923
+ DM65rYdSayPr0b/WMWMcJ/RvYUFocYb0NNOmHh1GxhgDnXjBKTO0Zwmxs8XmdNmBZ3yUgZ
+ LL2PPDG1t3yYo+3kDZPHi7ID6b3MXGU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-UFKBAYfPO9CxemB2y33vfA-1; Wed, 20 May 2020 08:02:12 -0400
+X-MC-Unique: UFKBAYfPO9CxemB2y33vfA-1
+Received: by mail-wm1-f70.google.com with SMTP id n66so1154222wme.4
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 05:02:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mwBtcn924wQ25kRgO0xP9s5Kc1Yqu1KL4tR1NnbJeiY=;
+ b=jEH3lbIzbEpwxPQZyNX5snxudGEDSSJXXflGDqy9nup/+d2BHgcBxzfVxaOyhU8LJQ
+ PVyk1ntEjd5Qi508qR7JIny5TKxLcdJZurHnmWr7bYm+ECJp2auc5zadBE75ozt6MJQ7
+ 98EqE7bxnYKHU8X6u9hrLj7RzFgxRakD1y9ASFOUlCuVgmKqdZInUl4IpFWQqq4B5CSB
+ Z1MJjK2Wth2nA97WIzza6NP4V+1/99LGEanK362dtvSIWo8G3dGc7k7q5YxNRFf7FOUT
+ XBp0OzauV8nxGkGZM3+mofql6ES3xZSCHToAtA6AfEPD7kSraHR1YAC6ezBslPvxvp3m
+ wKvw==
+X-Gm-Message-State: AOAM533cdHtG6BACNNbI4HKcclIT1rj/IVd9IaUF9jHelBCDHZV82WPw
+ 7dujuERUPtXOwDulGfSgF43eFujjETxmVciqirlt6miO88gKsZkAO1uKIW39dVzuDOPfHpenwX7
+ ctFP7yo3mio3V214=
+X-Received: by 2002:a5d:6584:: with SMTP id q4mr4170455wru.12.1589976131439;
+ Wed, 20 May 2020 05:02:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypEwOxlIXtnok90IPiLKbVwAAnOqmsDhUPkY+PR7rcTNZT7o5FUu/3c+uJhJoaqZGA1LyBWQ==
+X-Received: by 2002:a5d:6584:: with SMTP id q4mr4170361wru.12.1589976130294;
+ Wed, 20 May 2020 05:02:10 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id r11sm898403wre.25.2020.05.20.05.02.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 20 May 2020 05:02:09 -0700 (PDT)
+Subject: Re: [PATCH 37/55] sysbus: Drop useless OBJECT() in
+ sysbus_init_child_obj() calls
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-38-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a7115fd6-27de-8702-0890-731c5e17c380@redhat.com>
+Date: Wed, 20 May 2020 14:02:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: miaoyubo@huawei.com
-Date: Wed, 20 May 2020 05:01:06 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 07:01:44
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200519145551.22836-38-armbru@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,64 +114,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, shannon.zhaosl@gmail.com,
- miaoyubo@huawei.com, imammedo@redhat.com, lersek@redhat.com
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyMDA5MzYyOS4xNDk1
-LTEtbWlhb3l1Ym9AaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MjAwOTM2MjkuMTQ5NS0xLW1pYW95dWJvQGh1
-YXdlaS5jb20KU3ViamVjdDogW1BBVENIIHY3IDAvOF0gcGNpX2V4cGFuZGVyX2JyZGlnZTphY3Bp
-OiBTdXBwb3J0IHB4Yi1wY2llIGZvciBBUk0KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3L2FscGluZS5ERUIuMi4yMS4yMDA1MTkxNjUx
-MTMwLjI3NTAyQHNzdGFiZWxsaW5pLVRoaW5rUGFkLVQ0ODBzIC0+IHBhdGNoZXcvYWxwaW5lLkRF
-Qi4yLjIxLjIwMDUxOTE2NTExMzAuMjc1MDJAc3N0YWJlbGxpbmktVGhpbmtQYWQtVDQ4MHMKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NDM5N2VhIHVuaXQtdGVzdDogQWRkIHRoZSBi
-aW5hcnkgZmlsZSBhbmQgY2xlYXIgZGlmZi5oCmVmOWIyOTEgdW5pdC10ZXN0OiBBZGQgdGVzdGNh
-c2UgZm9yIHB4Ygo4MDViYmY5IHVuaXQtdGVzdDogVGhlIGZpbGVzIGNoYW5nZWQuCjU0MDIyZmEg
-YWNwaTogQWxpZ24gdGhlIHNpemUgdG8gMTI4awo3ZTg4NGQ1IGFjcGk6IFJlZmFjdG9yIHRoZSBz
-b3VyY2Ugb2YgaG9zdCBicmlkZ2UgYW5kIGJ1aWxkIHRhYmxlcyBmb3IgcHhiCjcxZDcxMDggYWNw
-aTogRXh0cmFjdCBjcnMgYnVpbGQgZm9ybSBhY3BpX2J1aWxkLmMKOWIxOGNjOCBmd19jZmc6IFdy
-aXRlIHRoZSBleHRyYSByb290cyBpbnRvIHRoZSBmd19jZmcKZjllODUzYyBhY3BpOiBFeHRyYWN0
-IHR3byBBUElzIGZyb20gYWNwaV9kc2R0X2FkZF9wY2kKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
-OCBDaGVja2luZyBjb21taXQgZjllODUzYzFhMzExIChhY3BpOiBFeHRyYWN0IHR3byBBUElzIGZy
-b20gYWNwaV9kc2R0X2FkZF9wY2kpCjIvOCBDaGVja2luZyBjb21taXQgOWIxOGNjODZkYjUyIChm
-d19jZmc6IFdyaXRlIHRoZSBleHRyYSByb290cyBpbnRvIHRoZSBmd19jZmcpCjMvOCBDaGVja2lu
-ZyBjb21taXQgNzFkNzEwOGY3OWE3IChhY3BpOiBFeHRyYWN0IGNycyBidWlsZCBmb3JtIGFjcGlf
-YnVpbGQuYykKNC84IENoZWNraW5nIGNvbW1pdCA3ZTg4NGQ1ZTlmMmIgKGFjcGk6IFJlZmFjdG9y
-IHRoZSBzb3VyY2Ugb2YgaG9zdCBicmlkZ2UgYW5kIGJ1aWxkIHRhYmxlcyBmb3IgcHhiKQo1Lzgg
-Q2hlY2tpbmcgY29tbWl0IDU0MDIyZmFkMTVlMiAoYWNwaTogQWxpZ24gdGhlIHNpemUgdG8gMTI4
-aykKNi84IENoZWNraW5nIGNvbW1pdCA4MDViYmY5Y2ExMmEgKHVuaXQtdGVzdDogVGhlIGZpbGVz
-IGNoYW5nZWQuKQo3LzggQ2hlY2tpbmcgY29tbWl0IGVmOWIyOTE3YjcxMiAodW5pdC10ZXN0OiBB
-ZGQgdGVzdGNhc2UgZm9yIHB4YikKOC84IENoZWNraW5nIGNvbW1pdCA4NDM5N2VhNjRlZGMgKHVu
-aXQtdGVzdDogQWRkIHRoZSBiaW5hcnkgZmlsZSBhbmQgY2xlYXIgZGlmZi5oKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMxMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogRG8gbm90IGFkZCBleHBl
-Y3RlZCBmaWxlcyB0b2dldGhlciB3aXRoIHRlc3RzLCBmb2xsb3cgaW5zdHJ1Y3Rpb25zIGluIHRl
-c3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzogYm90aCB0ZXN0cy9kYXRhL2FjcGkvdmlydC9E
-U0RULnB4YiBhbmQgdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVzdC1hbGxvd2VkLWRpZmYuaCBm
-b3VuZAoKRVJST1I6IERvIG5vdCBhZGQgZXhwZWN0ZWQgZmlsZXMgdG9nZXRoZXIgd2l0aCB0ZXN0
-cywgZm9sbG93IGluc3RydWN0aW9ucyBpbiB0ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6
-IGJvdGggdGVzdHMvZGF0YS9hY3BpL3ZpcnQvRFNEVC5weGIgYW5kIHRlc3RzL3F0ZXN0L2Jpb3Mt
-dGFibGVzLXRlc3QtYWxsb3dlZC1kaWZmLmggZm91bmQKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJu
-aW5ncywgMSBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MjAwNTIwMDkzNjI5LjE0OTUtMS1taWFveXVib0BodWF3ZWkuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 5/19/20 4:55 PM, Markus Armbruster wrote:
+> OBJECT(child) expands to ((Object *)(child)).  sysbus_init_child_obj()
+> parameter @child is void *.  Pass child instead of OBJECT(child).
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   hw/arm/allwinner-a10.c  |  4 ++--
+>   hw/arm/aspeed_ast2600.c | 40 +++++++++++++++++-----------------------
+>   hw/arm/aspeed_soc.c     | 35 +++++++++++++++--------------------
+>   hw/arm/nrf51_soc.c      |  2 +-
+>   hw/mips/boston.c        |  4 ++--
+>   hw/mips/mips_malta.c    |  2 +-
+>   6 files changed, 38 insertions(+), 49 deletions(-)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 
