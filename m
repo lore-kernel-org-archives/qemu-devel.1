@@ -2,78 +2,84 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 536F0C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:40:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B582920758
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:40:41 +0000 (UTC)
-Authentication-Results:mail.kernel.org; dkim=permerror (bad message/signature format)
-Received: from localhost ([::1]:55906 helo=lists1p.gnu.org)
+	by mail.kernel.org (Postfix) with ESMTPS id 1536220758
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:40:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FfT6U1vw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1536220758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
+Received: from localhost ([::1]:55872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbO1Y-00043o-UQ
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:40:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40790)
+	id 1jbO1Z-000432-82
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:40:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbNwn-0003yc-8w
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:35:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38794)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbNwl-00083v-Oz
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:35:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jbNwi-0000EJ-CH
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 12:35:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5ABBB2E8080
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 12:35:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 May 2020 12:28:28 -0000
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNu2-0005aI-3V
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:32:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27287
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNu0-0007WD-U1
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:32:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589977972;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4XAQd68lH/kqUWnHDmWOmNRHOw2XcqmcgUY9vF0Auws=;
+ b=FfT6U1vwJIHmUHdU60KyjzrRlZsglkpDvj7zSnRhtqmGYbUa/8WV3T1CZoGweu9fVEm2zz
+ 9j7uT2hQkhKHkXr7DRY2DTh7v9cYESbphy045/wb7tBVdDZYLlMyt+TeNVrMKdjq5kV0A1
+ /BSWY77Rlq1wGd9YQ8jtnfK0NjCg5yg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-z6IyJeDLP2mHW5T4h6jLeQ-1; Wed, 20 May 2020 08:32:50 -0400
+X-MC-Unique: z6IyJeDLP2mHW5T4h6jLeQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E351107ACCD;
+ Wed, 20 May 2020 12:32:49 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-76.ams2.redhat.com [10.36.113.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBC486AD00;
+ Wed, 20 May 2020 12:32:46 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: chrisp99 mike-papersolve
-X-Launchpad-Bug-Reporter: chris pugmire (chrisp99)
-X-Launchpad-Bug-Modifier: mike@papersolve.com (mike-papersolve)
-References: <158993637415.31242.3259652866813380059.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158997770855.17123.16887459838759519163.malone@soybean.canonical.com>
-Subject: [Bug 1879590] Re: Using qemu-system-sparc64 no network interface
- seems to exist
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0da65c8855f81ea1a52ee55179555cc85b0a8019
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 06:20:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PATCH v2 11/19] virtio-pci: Proxy for virtio-mem
+Date: Wed, 20 May 2020 14:31:44 +0200
+Message-Id: <20200520123152.60527-12-david@redhat.com>
+In-Reply-To: <20200520123152.60527-1-david@redhat.com>
+References: <20200520123152.60527-1-david@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,73 +88,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Bug 1879590 <1879590@bugs.launchpad.net>, "mike@papersolve.com" <mike@papersolve.com>
-From: "mike--- via <qemu-devel@nongnu.org>
 
-Unfortunately it's been a while and no one has added the proper support to =
-qemu yet, see comments at:
-http://tyom.blogspot.com/2016/10/qemu-sun4vniagara-target-went-public.html
-Apparently the niagara PCI adapter has to be implemented and the firmware r=
-ecompiled to enable it.
+Let's add a proxy for virtio-mem, make it a memory device, and
+pass-through the properties.
 
--- =
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/virtio/Makefile.objs    |   1 +
+ hw/virtio/virtio-mem-pci.c | 129 +++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-mem-pci.h |  33 ++++++++++
+ include/hw/pci/pci.h       |   1 +
+ 4 files changed, 164 insertions(+)
+ create mode 100644 hw/virtio/virtio-mem-pci.c
+ create mode 100644 hw/virtio/virtio-mem-pci.h
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879590
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 7df70e977e..b9661f9c01 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -19,6 +19,7 @@ obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-p
+ obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ obj-$(CONFIG_VIRTIO_MEM) += virtio-mem.o
++common-obj-$(call land,$(CONFIG_VIRTIO_MEM),$(CONFIG_VIRTIO_PCI)) += virtio-mem-pci.o
+ 
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
+new file mode 100644
+index 0000000000..b325303b32
+--- /dev/null
++++ b/hw/virtio/virtio-mem-pci.c
+@@ -0,0 +1,129 @@
++/*
++ * Virtio MEM PCI device
++ *
++ * Copyright (C) 2020 Red Hat, Inc.
++ *
++ * Authors:
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "virtio-mem-pci.h"
++#include "hw/mem/memory-device.h"
++#include "qapi/error.h"
++
++static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VirtIOMEMPCI *mem_pci = VIRTIO_MEM_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&mem_pci->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void virtio_mem_pci_set_addr(MemoryDeviceState *md, uint64_t addr,
++                                    Error **errp)
++{
++    object_property_set_uint(OBJECT(md), addr, VIRTIO_MEM_ADDR_PROP, errp);
++}
++
++static uint64_t virtio_mem_pci_get_addr(const MemoryDeviceState *md)
++{
++    return object_property_get_uint(OBJECT(md), VIRTIO_MEM_ADDR_PROP,
++                                    &error_abort);
++}
++
++static MemoryRegion *virtio_mem_pci_get_memory_region(MemoryDeviceState *md,
++                                                      Error **errp)
++{
++    VirtIOMEMPCI *pci_mem = VIRTIO_MEM_PCI(md);
++    VirtIOMEM *vmem = VIRTIO_MEM(&pci_mem->vdev);
++    VirtIOMEMClass *vmc = VIRTIO_MEM_GET_CLASS(vmem);
++
++    return vmc->get_memory_region(vmem, errp);
++}
++
++static uint64_t virtio_mem_pci_get_plugged_size(const MemoryDeviceState *md,
++                                                Error **errp)
++{
++    return object_property_get_uint(OBJECT(md), VIRTIO_MEM_SIZE_PROP,
++                                    errp);
++}
++
++static void virtio_mem_pci_fill_device_info(const MemoryDeviceState *md,
++                                            MemoryDeviceInfo *info)
++{
++    VirtioMEMDeviceInfo *vi = g_new0(VirtioMEMDeviceInfo, 1);
++    VirtIOMEMPCI *pci_mem = VIRTIO_MEM_PCI(md);
++    VirtIOMEM *vmem = VIRTIO_MEM(&pci_mem->vdev);
++    VirtIOMEMClass *vpc = VIRTIO_MEM_GET_CLASS(vmem);
++    DeviceState *dev = DEVICE(md);
++
++    if (dev->id) {
++        vi->has_id = true;
++        vi->id = g_strdup(dev->id);
++    }
++
++    /* let the real device handle everything else */
++    vpc->fill_device_info(vmem, vi);
++
++    info->u.virtio_mem.data = vi;
++    info->type = MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM;
++}
++
++static void virtio_mem_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(klass);
++
++    k->realize = virtio_mem_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_MEM;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_OTHERS;
++
++    mdc->get_addr = virtio_mem_pci_get_addr;
++    mdc->set_addr = virtio_mem_pci_set_addr;
++    mdc->get_plugged_size = virtio_mem_pci_get_plugged_size;
++    mdc->get_memory_region = virtio_mem_pci_get_memory_region;
++    mdc->fill_device_info = virtio_mem_pci_fill_device_info;
++}
++
++static void virtio_mem_pci_instance_init(Object *obj)
++{
++    VirtIOMEMPCI *dev = VIRTIO_MEM_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_MEM);
++    object_property_add_alias(obj, VIRTIO_MEM_BLOCK_SIZE_PROP,
++                              OBJECT(&dev->vdev), VIRTIO_MEM_BLOCK_SIZE_PROP);
++    object_property_add_alias(obj, VIRTIO_MEM_SIZE_PROP, OBJECT(&dev->vdev),
++                              VIRTIO_MEM_SIZE_PROP);
++    object_property_add_alias(obj, VIRTIO_MEM_REQUESTED_SIZE_PROP,
++                              OBJECT(&dev->vdev),
++                              VIRTIO_MEM_REQUESTED_SIZE_PROP);
++}
++
++static const VirtioPCIDeviceTypeInfo virtio_mem_pci_info = {
++    .base_name = TYPE_VIRTIO_MEM_PCI,
++    .generic_name = "virtio-mem-pci",
++    .instance_size = sizeof(VirtIOMEMPCI),
++    .instance_init = virtio_mem_pci_instance_init,
++    .class_init = virtio_mem_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_MEMORY_DEVICE },
++        { }
++    },
++};
++
++static void virtio_mem_pci_register_types(void)
++{
++    virtio_pci_types_register(&virtio_mem_pci_info);
++}
++type_init(virtio_mem_pci_register_types)
+diff --git a/hw/virtio/virtio-mem-pci.h b/hw/virtio/virtio-mem-pci.h
+new file mode 100644
+index 0000000000..8820cd6628
+--- /dev/null
++++ b/hw/virtio/virtio-mem-pci.h
+@@ -0,0 +1,33 @@
++/*
++ * Virtio MEM PCI device
++ *
++ * Copyright (C) 2020 Red Hat, Inc.
++ *
++ * Authors:
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_VIRTIO_MEM_PCI_H
++#define QEMU_VIRTIO_MEM_PCI_H
++
++#include "hw/virtio/virtio-pci.h"
++#include "hw/virtio/virtio-mem.h"
++
++typedef struct VirtIOMEMPCI VirtIOMEMPCI;
++
++/*
++ * virtio-mem-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VIRTIO_MEM_PCI "virtio-mem-pci-base"
++#define VIRTIO_MEM_PCI(obj) \
++        OBJECT_CHECK(VirtIOMEMPCI, (obj), TYPE_VIRTIO_MEM_PCI)
++
++struct VirtIOMEMPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOMEM vdev;
++};
++
++#endif /* QEMU_VIRTIO_MEM_PCI_H */
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index cfedf5a995..fec72d5a31 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -87,6 +87,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
+ #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
+ #define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
++#define PCI_DEVICE_ID_VIRTIO_MEM         0x1015
+ 
+ #define PCI_VENDOR_ID_REDHAT             0x1b36
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+-- 
+2.25.4
 
-Title:
-  Using qemu-system-sparc64 no network interface seems to exist
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using boot command:
-
-  qemu-system-sparc64 -M niagara -L /home/chrisp/sparc/S10image/
-  -nographic -m 256 -drive
-  if=3Dpflash,readonly=3Don,file=3D/home/chrisp/sparc/S10image/disk.s10hw2
-
-  After I log into solaris system I see no network devices other than the l=
-oopback device.
-  All the docs I can see suggest it should come up with a default network d=
-evice that allows communication via the hosts network. Host is ubuntu 64bit=
-.  =
-
-
-  root@giant:/home/chrisp/sparc# qemu-system-sparc64 -version
-  QEMU emulator version 5.0.0
-  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-
-  =
-
-  dladm show-link
-  ifconfig -a
-
-
-  ok boot
-  Loading ufs-file-system package 1.4 04 Aug 1995 13:02:54.
-  FCode UFS Reader 1.12 00/07/17 15:48:16.
-  Loading: /platform/SUNW,Sun-Fire-T2000/ufsboot
-  Loading: /platform/sun4v/ufsboot
-  SunOS Release 5.10 Version Generic_118822-23 64-bit
-  Copyright 1983-2005 Sun Microsystems, Inc.  All rights reserved.
-  Use is subject to license terms.
-  Hostname: unknown
-
-  unknown console login: root
-  Last login: Wed Feb  8 09:01:28 on console
-  Sun Microsystems Inc.   SunOS 5.10      Generic January 2005
-  # dladm show-link
-  # ifconfig -a
-  lo0: flags=3D2001000849<UP,LOOPBACK,RUNNING,MULTICAST,IPv4,VIRTUAL> mtu 8=
-232 index 1
-          inet 127.0.0.1 netmask ff000000
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879590/+subscriptions
 
