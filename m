@@ -2,91 +2,89 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F703C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 04:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E01AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:01:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1056D207C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 04:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C625E2075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:01:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="wQIHe8xC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1056D207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQ6Sb62U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C625E2075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbGdS-0001lt-2v
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 00:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49626)
+	id 1jbGr9-0006Fw-W0
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 01:01:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jbGcU-0000tl-LU
- for qemu-devel@nongnu.org; Wed, 20 May 2020 00:46:18 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:45892)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbGq8-0005AZ-DX
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 01:00:24 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:34190)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jbGcT-0004lA-37
- for qemu-devel@nongnu.org; Wed, 20 May 2020 00:46:18 -0400
-Received: by mail-qt1-x842.google.com with SMTP id n22so1571940qtv.12
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 21:46:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Zf7wnHGkJRcNplEvQx4ImRvBuF07SVlXLZq7AJ/XlYM=;
- b=wQIHe8xCKhtW/3f9guI6eF2iHjE2HAhMyzvLFQJHGJyZ+LEiwv5igiICZU88plINDh
- RZEFWQZRF+IJTje8aN+1ewmMnWlax3jjrv/vv5e1aWywd+diRqDQOw0SclFM6lEfIbZ4
- 8Z72i7i5XtQVLvjS1dvbad8P6Xx23y6cpcKA+l/RoNMXV6H+ZcHUsP51nAoX3NiyUV0+
- y7jn0jT4MpY1d5bm71aWUCKU924kzZUZ2c99kNZQBa1EiPoQf7Oes+S+vm6vMAnPIPCx
- BedIHyYeCd7fW6+296D+o5KRMgqUw9M1cMgtxf0flnJQsCynZS0aeRQSMVuVIWK3QCHM
- hYzQ==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbGq6-0007Oz-Qg
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 01:00:24 -0400
+Received: by mail-il1-x141.google.com with SMTP id 4so1866987ilg.1
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 22:00:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=26rAJ3zOwtqsXZKadiDLVMpKG1jn7bJyu8Xi8Ka+tUQ=;
+ b=SQ6Sb62U/pEU35WMQx88bYnjPBpgf2Xw9/0RKAs00CSbgfl5OBofYOQLfeqprwZhj0
+ hdjfY0OKYulHjmYeE22e1IGcRqjljS/BKfDfpMgapkmEMutcPAX2F3GqXNQziMnr6vtb
+ WQNg+SpZfB5/n/NPU5XJm7v3YpWeBuQsEgNPljEMKUr0j5Rpy7UUEMRfxTLvNxAILvHp
+ 422hve+7BtzqZi34/xkqQGxZZ3tObmrz51INSfAT1JbMq1KwG3M8Zh4xT23J8KjZ120v
+ tmVSUgv/wPQC73WxvWyKrTsteJ4lO7W+C43+/hXfTBZEUJ3hSVQE8hOf0D6U7bVX/0DK
+ jKmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Zf7wnHGkJRcNplEvQx4ImRvBuF07SVlXLZq7AJ/XlYM=;
- b=bubnKwsFXmPQmB/Wev7u7eNhUx84uMwX56B/pSjBDVsm/eGouDq1SwBxPcnDs6ZTEi
- VjG9DIDgTRyDaiybUzta1cCYBlL1mqL1Ep5nr3S9IjSmn8nLFOuzpgIkkJxV1spw111m
- wib6qBrPJvYStOyFXnwm9CpobtaR+Arota/Y5djQQKVZVLVlekItbtw+E/3KjrCMn0io
- d3/dHnmsYcRU1szBq6qfu7Jok3U4eRfzmO5uqm94MeHR33Hwd52ITfNqVIMTI6SUS5cm
- CrXvr9w7Lu7S+uGi4PIYC8t9DTYiVNsKI/lpZgtILiFrOfF+o8Q773fqBU3sv4FvMYeD
- DDew==
-X-Gm-Message-State: AOAM5317EUDYdtp4Njj89ofu9T379S/taRbXDU61R/4U2G8DgnUPrVop
- Ootlg3Wc4CxB0Hvzf6eosl6xTQ==
-X-Google-Smtp-Source: ABdhPJyOaMdJ51ftLQriiV4bpvQluWUE9PVOwsrOgTiTqL5gymrpfnO67Uxs0CAXNQyq4BI+cSnnIg==
-X-Received: by 2002:ac8:36a3:: with SMTP id a32mr3589882qtc.196.1589949974551; 
- Tue, 19 May 2020 21:46:14 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id i59sm1443798qtb.58.2020.05.19.21.46.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 May 2020 21:46:13 -0700 (PDT)
-Date: Wed, 20 May 2020 00:46:13 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v8 74/74] cputlb: queue async flush jobs without the BQL
-Message-ID: <20200520044613.GA359481@sff>
-References: <20200326193156.4322-1-robert.foley@linaro.org>
- <20200326193156.4322-75-robert.foley@linaro.org>
- <87imh1f79b.fsf@linaro.org>
- <CAEyhzFt1=xDMN5KdQvVx8QyS5n35THa2vY9D3rV8S9emyTYpSw@mail.gmail.com>
- <CAEyhzFuiDWYvu3FZNYy5M0FQ91Cs=-4=kV80xQZHEWX+ejhyTw@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=26rAJ3zOwtqsXZKadiDLVMpKG1jn7bJyu8Xi8Ka+tUQ=;
+ b=ZwzIOMLmjc4XRVmKsqZ8o1ejwpzEu+HJJqIYucjjUlPRfdxf+tq8P4w7XInhVsGd0Y
+ xlhIRvG2OphcZWwWeXy4sABxnj85fYYzHAuPaSEaF3l2K/46rQyXhX4rO//b7LZEd652
+ ZgvdhkQNb0HPmpPAt4XRqswXRqI/HqPhEv7yDYH2DGJzTACujt15PSyyxIO2uZHaICpD
+ 8c+L1kZUJaXQyHTNkaUTAfqhICalqE64OlRuyokJFbYBJY4auI508fP15mnP6gt8xFkV
+ 77G1KXf5eIsnfYh2U5y51F0AWMuEMFp0oAGH56p6NqOSDeOyyaZIHuxGZ9ls/aexFKfE
+ C2bQ==
+X-Gm-Message-State: AOAM530wKVq1T8ZvH+CrjiVcme0p1gepiRWD0Q/zJXeTY0lfhMZ3zpLM
+ UInXBQC8SqJSJJtkUTSj3Zn899ew+hFcnRIxwo4=
+X-Google-Smtp-Source: ABdhPJwJqiQln8S7h1tnYipJawccJaYx5VXFg1N33YTakbCFVci5RM6rwvqHPHFK6tQnWnaXP4nqfumRwDwx3Vjp7yI=
+X-Received: by 2002:a05:6e02:52e:: with SMTP id
+ h14mr2379243ils.177.1589950821282; 
+ Tue, 19 May 2020 22:00:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEyhzFuiDWYvu3FZNYy5M0FQ91Cs=-4=kV80xQZHEWX+ejhyTw@mail.gmail.com>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::842;
- envelope-from=cota@braap.org; helo=mail-qt1-x842.google.com
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-4-armbru@redhat.com>
+ <CAKmqyKP6ccwxc+6DoxJ3kH1uA-PLL47OMxw9RjBzcMXHo3S9Fw@mail.gmail.com>
+ <87mu63ut96.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mu63ut96.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 19 May 2020 21:51:27 -0700
+Message-ID: <CAKmqyKPMRdD=NptG0UrboaJnArR3F0kScdcZ-inARuQJW_X5xw@mail.gmail.com>
+Subject: Re: [PATCH 03/55] qdev: New qdev_new(), qdev_realize(), etc.
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,160 +98,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Peter Puhov <peter.puhov@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 18, 2020 at 09:46:36 -0400, Robert Foley wrote:
-> We re-ran the numbers with the latest re-based series.
-> 
-> We used an aarch64 ubuntu VM image with a host CPU:
-> Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz, 2 CPUs, 10 cores/CPU,
-> 20 Threads/CPU.  40 cores total.
-> 
-> For the bare hardware and kvm tests (first chart) the host CPU was:
-> HiSilicon 1620 CPU 2600 Mhz,  2 CPUs, 64 Cores per CPU, 128 CPUs total.
-> 
-> First, we ran a test of building the kernel in the VM.
-> We did not see any major improvements nor major regressions.
-> We show the results of the Speedup of building the kernel
-> on bare hardware compared with kvm and QEMU (both the baseline and cpu locks).
-> 
-> 
->                    Speedup vs a single thread for kernel build
-> 
->   40 +----------------------------------------------------------------------+
->      |         +         +         +          +         +         +  **     |
->      |                                                bare hardwar********* |
->      |                                                          kvm ####### |
->   35 |-+                                                   baseline $$$$$$$-|
->      |                                                    *cpu lock %%%%%%% |
->      |                                                 ***                  |
->      |                                               **                     |
->   30 |-+                                          ***                     +-|
->      |                                         ***                          |
->      |                                      ***                             |
->      |                                    **                                |
->   25 |-+                               ***                                +-|
->      |                              ***                                     |
->      |                            **                                        |
->      |                          **                                          |
->   20 |-+                      **                                          +-|
->      |                      **                                #########     |
->      |                    **                  ################              |
->      |                  **          ##########                              |
->      |                **         ###                                        |
->   15 |-+             *       ####                                         +-|
->      |             **     ###                                               |
->      |            *    ###                                                  |
->      |           *  ###                                                     |
->   10 |-+       **###                                                      +-|
->      |        *##                                                           |
->      |       ##  $$$$$$$$$$$$$$$$                                           |
->      |     #$$$$$%%%%%%%%%%%%%%%%%%%%                                       |
->    5 |-+  $%%%%%%                    %%%$%$%$%$%$%$%$%$%$%$%$%$%$%$%$%    +-|
->      |   %%                                                           %     |
->      | %%                                                                   |
->      |%        +         +         +          +         +         +         |
->    0 +----------------------------------------------------------------------+
->      0         10        20        30         40        50        60        70
->                                    Guest vCPUs
-> 
-> 
-> After seeing these results and the scaling limits inherent in the build itself,
-> we decided to run a test which might show the scaling improvements clearer.
+On Tue, May 19, 2020 at 9:26 PM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Alistair Francis <alistair23@gmail.com> writes:
+>
+> > On Tue, May 19, 2020 at 8:11 AM Markus Armbruster <armbru@redhat.com> wrote:
+> >>
+> >> We commonly plug devices into their bus right when we create them,
+> >> like this:
+> >>
+> >>     dev = qdev_create(bus, type_name);
+> >>
+> >> Note that @dev is a weak reference.  The reference from @bus to @dev
+> >> is the only strong one.
+> >>
+> >> We realize at some later time, either with
+> >>
+> >>     object_property_set_bool(OBJECT(dev), true, "realized", errp);
+> >>
+> >> or its convenience wrapper
+> >>
+> >>     qdev_init_nofail(dev);
+> >>
+> >> If @dev still has no QOM parent then, realizing makes the
+> >> /machine/unattached/ orphanage its QOM parent.
+> >>
+> >> Note that the device returned by qdev_create() is plugged into a bus,
+> >> but doesn't have a QOM parent, yet.  Until it acquires one,
+> >> unrealizing the bus will hang in bus_unparent():
+> >>
+> >>     while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
+> >>         DeviceState *dev = kid->child;
+> >>         object_unparent(OBJECT(dev));
+> >>     }
+> >>
+> >> object_unparent() does nothing when its argument has no QOM parent,
+> >> and the loop spins forever.
+> >>
+> >> Device state "no QOM parent, but plugged into bus" is dangerous.
+> >>
+> >> Paolo suggested to delay plugging into the bus until realize.  We need
+> >> to plug into the parent bus before we call the device's realize
+> >> method, in case it uses the parent bus.  So the dangerous state still
+> >> exists, but only within realization, where we can manage it safely.
+> >>
+> >> This commit creates infrastructure to do this:
+> >>
+> >>     dev = qdev_new(type_name);
+> >>     ...
+> >>     qdev_realize_and_unref(dev, bus, errp)
+> >>
+> >> Note that @dev becomes a strong reference here.
+> >> qdev_realize_and_unref() drops it.  There is also plain
+> >> qdev_realize(), which doesn't drop it.
+> >>
+> >> The remainder of this series will convert all users to this new
+> >> interface.
+> >>
+> >> Cc: Michael S. Tsirkin <mst@redhat.com>
+> >> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> >> Cc: Alistair Francis <alistair@alistair23.me>
+> >> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> >> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> >> Cc: David Gibson <david@gibson.dropbear.id.au>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>  include/hw/qdev-core.h | 11 ++++-
+> >>  hw/core/bus.c          | 14 +++++++
+> >>  hw/core/qdev.c         | 94 ++++++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 118 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> >> index b870b27966..fba29308f7 100644
+> >> --- a/include/hw/qdev-core.h
+> >> +++ b/include/hw/qdev-core.h
+> >> @@ -57,7 +57,7 @@ typedef void (*BusUnrealize)(BusState *bus);
+> >>   * After successful realization, setting static properties will fail.
+> >>   *
+> >>   * As an interim step, the #DeviceState:realized property can also be
+> >> - * set with qdev_init_nofail().
+> >> + * set with qdev_realize() or qdev_init_nofail().
+> >>   * In the future, devices will propagate this state change to their children
+> >>   * and along busses they expose.
+> >>   * The point in time will be deferred to machine creation, so that values
+> >> @@ -322,7 +322,13 @@ compat_props_add(GPtrArray *arr,
+> >>
+> >>  DeviceState *qdev_create(BusState *bus, const char *name);
+> >>  DeviceState *qdev_try_create(BusState *bus, const char *name);
+> >> +DeviceState *qdev_new(const char *name);
+> >> +DeviceState *qdev_try_new(const char *name);
+> >>  void qdev_init_nofail(DeviceState *dev);
+> >> +bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
+> >> +bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
+> >> +void qdev_unrealize(DeviceState *dev);
+> >> +
+> >>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+> >>                                   int required_for_version);
+> >>  HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+> >> @@ -411,6 +417,9 @@ typedef int (qdev_walkerfn)(DeviceState *dev, void *opaque);
+> >>  void qbus_create_inplace(void *bus, size_t size, const char *typename,
+> >>                           DeviceState *parent, const char *name);
+> >>  BusState *qbus_create(const char *typename, DeviceState *parent, const char *name);
+> >> +bool qbus_realize(BusState *bus, Error **errp);
+> >> +void qbus_unrealize(BusState *bus);
+> >> +
+> >>  /* Returns > 0 if either devfn or busfn skip walk somewhere in cursion,
+> >>   *         < 0 if either devfn or busfn terminate walk somewhere in cursion,
+> >>   *           0 otherwise. */
+> >> diff --git a/hw/core/bus.c b/hw/core/bus.c
+> >> index 08c5eab24a..bf622604a3 100644
+> >> --- a/hw/core/bus.c
+> >> +++ b/hw/core/bus.c
+> >> @@ -169,6 +169,20 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
+> >>      return bus;
+> >>  }
+> >>
+> >> +bool qbus_realize(BusState *bus, Error **errp)
+> >> +{
+> >> +    Error *err = NULL;
+> >> +
+> >> +    object_property_set_bool(OBJECT(bus), true, "realized", &err);
+> >> +    error_propagate(errp, err);
+> >> +    return !err;
+> >> +}
+> >> +
+> >> +void qbus_unrealize(BusState *bus)
+> >> +{
+> >> +    object_property_set_bool(OBJECT(bus), true, "realized", &error_abort);
+> >
+> > Not false?
+> >
+> > Alistair
+>
+> Reasons it's &error_abort:
 
-Thanks for doing these tests. I know from experience that benchmarking
-is hard and incredibly time consuming, so please do not be discouraged by
-my comments below.
+I meant why is this not setting the bool to false instead of true?
 
-A couple of points:
+>
+> 1. PATCH 06 and 07 transform variations of
+>
+>       object_property_set_bool(..., false, "realized", &error_abort);
+>
+>    to
+>
+>       qdev_unrealize(...);
+>
+>    No untransformed unrealization remain.  Thus, we always abort on
+>    unrealization error before this series.
+>
+> 2. If unrealize could fail, we'd be in deep trouble.  Recent commit
+>    b69c3c21a5 "qdev: Unrealize must not fail" explains:
+>
+>    Devices may have component devices and buses.
+>
+>    Device realization may fail.  Realization is recursive: a device's
+>    realize() method realizes its components, and device_set_realized()
+>    realizes its buses (which should in turn realize the devices on that
+>    bus, except bus_set_realized() doesn't implement that, yet).
+>
+>    When realization of a component or bus fails, we need to roll back:
+>    unrealize everything we realized so far.  If any of these unrealizes
+>    failed, the device would be left in an inconsistent state.  Must not
+>    happen.
 
-1. I am not familiar with aarch64 KVM but I'd expect it to scale almost
-like the native run. Are you assigning enough RAM to the guest? Also,
-it can help to run the kernel build in a ramfs in the guest.
+Makes sense. Maybe worth putting this in a comment here?
 
-2. The build itself does not seem to impose a scaling limit, since
-it scales very well when run natively (per-thread I presume aarch64 TCG is
-still slower than native, even if TCG is run on a faster x86 machine).
-The limit here is probably aarch64 TCG. In particular, last time I
-checked aarch64 TCG has room for improvement scalability-wise handling
-interrupts and some TLB operations; this is likely to explain why we
-see no benefit with per-CPU locks, i.e. the bottleneck is elsewhere.
-This can be confirmed with the sync profiler.
+>
+>    device_set_realized() lets it happen: it ignores errors in the roll
+>    back code starting at label child_realize_fail.
+>
+>    Since realization is recursive, unrealization must be recursive, too.
+>    But how could a partly failed unrealize be rolled back?  We'd have to
+>    re-realize, which can fail.  This design is fundamentally broken.
+>
+>    device_set_realized() does not roll back at all.  Instead, it keeps
+>    unrealizing, ignoring further errors.
+>
+>    It can screw up even for a device with no buses: if the lone
+>    dc->unrealize() fails, it still unregisters vmstate, and calls
+>    listeners' unrealize() callback.
+>
+>    bus_set_realized() does not roll back either.  Instead, it stops
+>    unrealizing.
+>
+>    Fortunately, no unrealize method can fail, as we'll see below.
+>
+> Clearer now?
 
-IIRC I originally used ppc64 for this test because ppc64 TCG does not
-have any other big bottlenecks scalability-wise. I just checked but
-unfortunately I can't find the ppc64 image I used :( What I can offer
-is the script I used to run these benchmarks; see the appended.
+Clear on the error_abort.
 
-Thanks,
-		Emilio
+>
+> With any luck, people will use the simpler qdev_unrealize() and
+> qbus_unrealize(), which is the form that doesn't let them get the error
+> handling wrong.  I like it when interfaces make misuse hard :)
 
----
-#!/bin/bash
+Sounds good :)
 
-set -eu
+Alistair
 
-# path to host files
-MYHOME=/local/home/cota/src
-
-# guest image
-QEMU_INST_PATH=$MYHOME/qemu-inst
-IMG=$MYHOME/qemu/img/ppc64/ubuntu.qcow2
-
-ARCH=ppc64
-COMMON_ARGS="-M pseries -nodefaults \
-		-hda $IMG -nographic -serial stdio \
-		-net nic -net user,hostfwd=tcp::2222-:22 \
-		-m 48G"
-
-# path to this script's directory, where .txt output will be copied
-# from the guest.
-QELT=$MYHOME/qelt
-HOST_PATH=$QELT/fig/kcomp
-
-# The guest must be able to SSH to the HOST without entering a password.
-# The way I set this up is to have a passwordless SSH key in the guest's
-# root user, and then copy that key's public key to the host.
-# I used the root user because the guest runs on bootup (as root) a
-# script that scp's run-guest.sh (see below) from the host, then executes it.
-# This is done via a tiny script in the guest invoked from systemd once
-# boot-up has completed.
-HOST=foo@bar.edu
-
-# This is a script in the host to use an appropriate cpumask to
-# use cores in the same socket if possible.
-# See https://github.com/cota/cputopology-perl
-CPUTOPO=$MYHOME/cputopology-perl
-
-# For each run we create this file that then the guest will SCP
-# and execute. It is a quick and dirty way of passing arguments to the guest.
-create_file () {
-    TAG=$1
-    CORES=$2
-    NAME=$ARCH.$TAG-$CORES.txt
-
-    echo '#!/bin/bash' > run-guest.sh
-    echo 'cp -r /home/cota/linux-4.18-rc7 /tmp2/linux' >> run-guest.sh
-    echo "cd /tmp2/linux" >> run-guest.sh
-    echo "{ time make -j $CORES vmlinux >/dev/null; } 2>>/home/cota/$NAME" >> run-guest.sh
-    # Output with execution time is then scp'ed to the host.
-    echo "ssh $HOST 'cat >> $HOST_PATH/$NAME' < /home/cota/$NAME" >> run-guest.sh
-    echo "poweroff" >> run-guest.sh
-}
-
-# Change here THREADS and also the TAGS that point to different QEMU installations.
-for THREADS in 64 32 16; do
-    for TAG in cpu-exclusive-work cputlb-no-bql per-cpu-lock cpu-has-work baseline; do
-	QEMU=$QEMU_INST_PATH/$TAG/bin/qemu-system-$ARCH
-	CPUMASK=$($CPUTOPO/list.pl --policy=compact-smt $THREADS)
-
-	create_file $TAG $THREADS
-	time taskset -c $CPUMASK $QEMU $COMMON_ARGS -smp $THREADS
-    done
-done
+>
 
