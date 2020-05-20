@@ -2,80 +2,68 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9131C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 02:09:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD07420708
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD07420708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EAEBF2081A
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 02:09:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAEBF2081A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbDtK-0001ti-Sh
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 21:51:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34368)
+	id 1jbEBC-0000Mq-4c
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 22:09:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbDsY-0001Bu-Fy
- for qemu-devel@nongnu.org; Tue, 19 May 2020 21:50:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40598)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbDsW-0000xx-TV
- for qemu-devel@nongnu.org; Tue, 19 May 2020 21:50:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jbDsU-0005Hg-Rl
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:50:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CFF702E806D
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:50:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 May 2020 01:41:07 -0000
-From: cliff chen <1879425@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cliffchen
-X-Launchpad-Bug-Reporter: cliff chen (cliffchen)
-X-Launchpad-Bug-Modifier: cliff chen (cliffchen)
-References: <158985197617.30924.14122012304587735670.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158993886758.31351.13131516430257538828.malone@chaenomeles.canonical.com>
-Subject: [Bug 1879425] Re: The thread of "CPU 0 /KVM" keeping 99.9%CPU
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 420ea351ed718eb7ae8f587eb38abe090fd73f6b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 20:30:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jbEA7-0007Do-D9
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 22:08:51 -0400
+Received: from mga18.intel.com ([134.134.136.126]:42314)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jbEA6-0004XI-1S
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 22:08:50 -0400
+IronPort-SDR: njbWavw613ACPc1r59FW5pt69jr4RwJkYVNAI27q4WSxnI7hSNOAVLy+ikeU+EMhErZaehzHv5
+ LM9T557HOLIQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 May 2020 19:08:40 -0700
+IronPort-SDR: vmn+I/g0YITCvsZY61p1HX1/vxEqarR1hfHH4wQS2ik0oLc+xgs7zcNG8IXrg+zfIxGo5+viZL
+ /HN34l8/DWDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,412,1583222400"; d="scan'208";a="300299746"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+ by orsmga008.jf.intel.com with ESMTP; 19 May 2020 19:08:38 -0700
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH v4 0/5] modify CPU model info
+Date: Wed, 20 May 2020 10:10:02 +0800
+Message-Id: <20200520021007.30649-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=134.134.136.126;
+ envelope-from=chenyi.qiang@intel.com; helo=mga18.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:08:40
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,76 +72,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879425 <1879425@bugs.launchpad.net>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+ Robert Hoo <robert.hu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-one changes:
-Guest VM is Red Hat Enterprise Linux 8.1 (Ootpa).
-there is no issue once guest VM is RHEL7.6.
+Add the missing VMX features in Skylake-Server, Cascadelake-Server and
+Icelake-Server CPU models. In Icelake-Server CPU model, it lacks sha_ni,
+avx512ifma, rdpid and fsrm. The model number of Icelake-Server also needs
+to be fixed.
+Remove the Icelake-Client CPU model due to no Icelake Desktop products
+in the market.
 
--- =
+Changes in v4:
+	- remove the Icelake-Client CPU model
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879425
+Changes in v3:
+	- change the missing features of Icelake-Server from v3 to v4
 
-Title:
-  The thread of "CPU 0 /KVM" keeping 99.9%CPU
+Changes in v2:
+	- add missing features as a new version of CPU model
+	- add the support of FSRM
+	- add New CPUID of FSRM and RDPID in Icelake-Server CPU model
 
-Status in QEMU:
-  New
+Chenyi Qiang (5):
+  target/i386: add missing vmx features for several CPU models
+  target/i386: add fast short REP MOV support
+  target/i386: add the missing features for Icelake-Server CPU model
+  target/i386: modify Icelake-Server CPU model number
+  target/i386: remove Icelake-Client CPU model
 
-Bug description:
-  Hi Expert:
+ hw/i386/pc.c      |   1 -
+ target/i386/cpu.c | 133 ++++++----------------------------------------
+ target/i386/cpu.h |   2 +
+ 3 files changed, 19 insertions(+), 117 deletions(-)
 
-  The VM is hung here after (2, or 3, or 5 and the longest time is 10 hours=
-) by qemu-kvm.
-  Notes: =
+-- 
+2.17.1
 
-  for VM:
-    OS: RHEL 7.6
-    CPU: 1
-    MEM:4G
-  For qemu-kvm:
-    1) version:
-       /usr/libexec/qemu-kvm -version
-       QEMU emulator version 2.10.0(qemu-kvm-ev-2.10.0-21.el7_5.4.1)
-    2) once the issue is occurred, the CPU of "CPU0 /KVM" is more than 99% =
-by com "top -p VM_pro_ID"
-      PID  UDER   PR NI RES   S  % CPU %MEM  TIME+    COMMAND
-  872067   qemu   20 0  1.6g  R   99.9  0.6  37:08.87 CPU 0/KVM
-    3) use "pstack 493307" and below is function trace
-  Thread 1 (Thread 0x7f2572e73040 (LWP 872067)):
-  #0  0x00007f256cad8fcf in ppoll () from /lib64/libc.so.6
-  #1  0x000055ff34bdf4a9 in qemu_poll_ns ()
-  #2  0x000055ff34be02a8 in main_loop_wait ()
-  #3  0x000055ff348bfb1a in main ()
-    4) use strace "strace -tt -ff -p 872067 -o cfx" and below log keep prin=
-ting
-  21:24:02.977833 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
-N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
-=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
-15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
- 0 (Timeout)
-  21:24:02.977918 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
-N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
-=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
-15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 911447}, NULL, 8=
-) =3D 0 (Timeout)
-  21:24:02.978945 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
-N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
-=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
-15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
- 0 (Timeout)
-  Therefore, I think the thread "CPU 0/KVM" is in tight loop.
-    5) use reset can recover this issue. however, it will reoccurred again.
-  Current work around is increase one CPU for this VM, then issue is gone.
-
-  thanks
-  Cliff
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879425/+subscriptions
 
