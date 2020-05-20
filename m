@@ -2,93 +2,89 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E162C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 03:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E736BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 04:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01737204EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 03:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85A1E20756
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 04:27:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="B1xWxps4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01737204EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrYeFKLd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85A1E20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbFlR-0002jL-3A
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 23:51:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44326)
+	id 1jbGK4-0003D2-Lt
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 00:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbFkb-0001xD-DI
- for qemu-devel@nongnu.org; Tue, 19 May 2020 23:50:37 -0400
-Received: from mail-vk1-xa2f.google.com ([2607:f8b0:4864:20::a2f]:42672)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbFkZ-00027T-E7
- for qemu-devel@nongnu.org; Tue, 19 May 2020 23:50:36 -0400
-Received: by mail-vk1-xa2f.google.com with SMTP id m18so425712vkk.9
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 20:50:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=WZ2Cx1qDlKPn8s2JGOAqSUZcAd9EcK3TmrDTrm6cmMk=;
- b=B1xWxps4ILOfDTqkllsAaU1bnp8apdgnS7ncMwvi53N2HVjY3xSlMetri7GE2qMdSY
- sbd6rK3Mz7ZxYPsUuSITRBwAGlRGOlZ/jlWx+t6CyuBN3c2B4ICmADyR3MOg5mgF+bcA
- qIsgFD6hcx5tlQ4hOKw9qCqYRaXG/qJBzbSh73OksmSalNQWHaRZyazitXufVGgdCGCh
- Tw9r629/LpzuFkg2yodwzhSZX9ewLQwH0VBd2SbsC1Zi+oLiojB5mksNieOvBUvuUba4
- ipthV8LD8zybGTmQYRTCcDWpv6IMni0qPShk0Dpqj+3xnKtf+Oo7z0J1mqzsH+udLMwD
- 4nkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=WZ2Cx1qDlKPn8s2JGOAqSUZcAd9EcK3TmrDTrm6cmMk=;
- b=nyfl33xa/N2nKqOShxv9pyV/aAmfqRTSmRHbCKRiNdgOdWRZ2C58vuaTnBTyJUJMr+
- h3D0EmaHgq8eXWHvstvFWxBKYtWGdMK3+vZxQWbr0MwPokA3+Gugx8DhzFMCAwdBeAb7
- rJRP90RPQI00TACUI4UlTJdksQJR23mN639wGkN2ttTk7+S7KKQppxGg4GaIw32OCeU8
- p5UzaK4VYOCvnmFnLMf0hroUqLXdqLV9HuwoMnHFYpAd+iTVzwChumb8dXgAdH1vBrwV
- nNmjKr6B1A6CM5J9C/MVki9rTYK1I1EXl4Pcyxv7rQgcpo4dpvmODVA/qcz1ZTg33mgl
- t5UQ==
-X-Gm-Message-State: AOAM533sWYgGzWmHc7ygo3U6LLWzypZQKLNJ+zrC5eDt7eknmLjsHh92
- NHIy6mVYYiuwz9Fpj6qlRg5gMa1tXEvqjiCGzCG3SA==
-X-Google-Smtp-Source: ABdhPJwbnHo+ueVxRdqpAEyfWqfNZMUY3Tm4POtULpJDP4ljN67iwx2tsP6SpHM1EnX2tOSYz6YBaSkrIuEmhi/7mDc=
-X-Received: by 2002:a1f:ab4f:: with SMTP id u76mr2444850vke.62.1589946632379; 
- Tue, 19 May 2020 20:50:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbGJJ-0002GU-FC
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 00:26:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37701
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbGJH-0001T6-KA
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 00:26:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589948785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=keeP0g4+7CfMOY7JCHcbFjV/j3Ckov2deZH8doyD188=;
+ b=MrYeFKLdv0QGyeDpnTvGdBRTP29wY7LNYwzwOgBKRQOEgjv3L7kNnnNfWfI9w4n3dOGXqw
+ GG92t8XcuKR8cgzjEcreHQ6n7et6fgv9M31H+Cnnzc537qz+6GAhdgsQbSA0I0Mb8+eMvK
+ 1rTDSX6EJmD8PC1FcqPcEjp089MQKPk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-LUBi6E1WPJSqJadGUpQvZQ-1; Wed, 20 May 2020 00:26:22 -0400
+X-MC-Unique: LUBi6E1WPJSqJadGUpQvZQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBD61800053;
+ Wed, 20 May 2020 04:26:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FC3F10013D9;
+ Wed, 20 May 2020 04:26:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1112C11358BC; Wed, 20 May 2020 06:26:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Subject: Re: [PATCH 03/55] qdev: New qdev_new(), qdev_realize(), etc.
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-4-armbru@redhat.com>
+ <CAKmqyKP6ccwxc+6DoxJ3kH1uA-PLL47OMxw9RjBzcMXHo3S9Fw@mail.gmail.com>
+Date: Wed, 20 May 2020 06:26:13 +0200
+In-Reply-To: <CAKmqyKP6ccwxc+6DoxJ3kH1uA-PLL47OMxw9RjBzcMXHo3S9Fw@mail.gmail.com>
+ (Alistair Francis's message of "Tue, 19 May 2020 14:02:47 -0700")
+Message-ID: <87mu63ut96.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
- <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
- <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
- <20200514125220.GJ2787@work-vm>
- <CAHckoCyegWG9yH_y6VjHhnghfHJD-Wq+EmOyRZE3EYguTOHfPw@mail.gmail.com>
- <20200514151600.GO2787@work-vm>
- <CAHckoCxc2XTA3ckU0sq-BmbZZFtfAY_GaEOW46XFzfZ2qXjeMQ@mail.gmail.com>
- <20200514153129.GP2787@work-vm>
- <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
-In-Reply-To: <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
-From: Li Feng <fengli@smartx.com>
-Date: Wed, 20 May 2020 11:50:21 +0800
-Message-ID: <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
-Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
- failed.
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: none client-ip=2607:f8b0:4864:20::a2f;
- envelope-from=fengli@smartx.com; helo=mail-vk1-xa2f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,192 +97,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vkuznets@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Any update about this issue?
+Alistair Francis <alistair23@gmail.com> writes:
 
-Thanks,
-Feng Li
+> On Tue, May 19, 2020 at 8:11 AM Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> We commonly plug devices into their bus right when we create them,
+>> like this:
+>>
+>>     dev = qdev_create(bus, type_name);
+>>
+>> Note that @dev is a weak reference.  The reference from @bus to @dev
+>> is the only strong one.
+>>
+>> We realize at some later time, either with
+>>
+>>     object_property_set_bool(OBJECT(dev), true, "realized", errp);
+>>
+>> or its convenience wrapper
+>>
+>>     qdev_init_nofail(dev);
+>>
+>> If @dev still has no QOM parent then, realizing makes the
+>> /machine/unattached/ orphanage its QOM parent.
+>>
+>> Note that the device returned by qdev_create() is plugged into a bus,
+>> but doesn't have a QOM parent, yet.  Until it acquires one,
+>> unrealizing the bus will hang in bus_unparent():
+>>
+>>     while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
+>>         DeviceState *dev = kid->child;
+>>         object_unparent(OBJECT(dev));
+>>     }
+>>
+>> object_unparent() does nothing when its argument has no QOM parent,
+>> and the loop spins forever.
+>>
+>> Device state "no QOM parent, but plugged into bus" is dangerous.
+>>
+>> Paolo suggested to delay plugging into the bus until realize.  We need
+>> to plug into the parent bus before we call the device's realize
+>> method, in case it uses the parent bus.  So the dangerous state still
+>> exists, but only within realization, where we can manage it safely.
+>>
+>> This commit creates infrastructure to do this:
+>>
+>>     dev = qdev_new(type_name);
+>>     ...
+>>     qdev_realize_and_unref(dev, bus, errp)
+>>
+>> Note that @dev becomes a strong reference here.
+>> qdev_realize_and_unref() drops it.  There is also plain
+>> qdev_realize(), which doesn't drop it.
+>>
+>> The remainder of this series will convert all users to this new
+>> interface.
+>>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>> Cc: Alistair Francis <alistair@alistair23.me>
+>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Cc: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  include/hw/qdev-core.h | 11 ++++-
+>>  hw/core/bus.c          | 14 +++++++
+>>  hw/core/qdev.c         | 94 ++++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 118 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+>> index b870b27966..fba29308f7 100644
+>> --- a/include/hw/qdev-core.h
+>> +++ b/include/hw/qdev-core.h
+>> @@ -57,7 +57,7 @@ typedef void (*BusUnrealize)(BusState *bus);
+>>   * After successful realization, setting static properties will fail.
+>>   *
+>>   * As an interim step, the #DeviceState:realized property can also be
+>> - * set with qdev_init_nofail().
+>> + * set with qdev_realize() or qdev_init_nofail().
+>>   * In the future, devices will propagate this state change to their children
+>>   * and along busses they expose.
+>>   * The point in time will be deferred to machine creation, so that values
+>> @@ -322,7 +322,13 @@ compat_props_add(GPtrArray *arr,
+>>
+>>  DeviceState *qdev_create(BusState *bus, const char *name);
+>>  DeviceState *qdev_try_create(BusState *bus, const char *name);
+>> +DeviceState *qdev_new(const char *name);
+>> +DeviceState *qdev_try_new(const char *name);
+>>  void qdev_init_nofail(DeviceState *dev);
+>> +bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
+>> +bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
+>> +void qdev_unrealize(DeviceState *dev);
+>> +
+>>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>>                                   int required_for_version);
+>>  HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+>> @@ -411,6 +417,9 @@ typedef int (qdev_walkerfn)(DeviceState *dev, void *opaque);
+>>  void qbus_create_inplace(void *bus, size_t size, const char *typename,
+>>                           DeviceState *parent, const char *name);
+>>  BusState *qbus_create(const char *typename, DeviceState *parent, const char *name);
+>> +bool qbus_realize(BusState *bus, Error **errp);
+>> +void qbus_unrealize(BusState *bus);
+>> +
+>>  /* Returns > 0 if either devfn or busfn skip walk somewhere in cursion,
+>>   *         < 0 if either devfn or busfn terminate walk somewhere in cursion,
+>>   *           0 otherwise. */
+>> diff --git a/hw/core/bus.c b/hw/core/bus.c
+>> index 08c5eab24a..bf622604a3 100644
+>> --- a/hw/core/bus.c
+>> +++ b/hw/core/bus.c
+>> @@ -169,6 +169,20 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
+>>      return bus;
+>>  }
+>>
+>> +bool qbus_realize(BusState *bus, Error **errp)
+>> +{
+>> +    Error *err = NULL;
+>> +
+>> +    object_property_set_bool(OBJECT(bus), true, "realized", &err);
+>> +    error_propagate(errp, err);
+>> +    return !err;
+>> +}
+>> +
+>> +void qbus_unrealize(BusState *bus)
+>> +{
+>> +    object_property_set_bool(OBJECT(bus), true, "realized", &error_abort);
+>
+> Not false?
+>
+> Alistair
 
-Li Feng <fengli@smartx.com> =E4=BA=8E2020=E5=B9=B45=E6=9C=8814=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8811:49=E5=86=99=E9=81=93=EF=BC=9A
->
-> Dr. David Alan Gilbert <dgilbert@redhat.com> =E4=BA=8E2020=E5=B9=B45=E6=
-=9C=8814=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8811:31=E5=86=99=E9=81=
-=93=EF=BC=9A
-> >
-> > * Li Feng (fengli@smartx.com) wrote:
-> > > Dr. David Alan Gilbert <dgilbert@redhat.com> =E4=BA=8E2020=E5=B9=B45=
-=E6=9C=8814=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8811:16=E5=86=99=E9=
-=81=93=EF=BC=9A
-> > > >
-> > > > * Li Feng (fengli@smartx.com) wrote:
-> > > > > EXSi CPU is : Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz
-> > > > > This is my vm, I run qemu in it.
-> > > >
-> > > > Do you know what the real hardware is?
-> > > What information do you need? I could send it out.
-> > > The EXSi version: VMware ESXi, 6.5.0, 5969303
-> >
-> > VMWare is saying to the guest it's an E5-2640 v3; is that what
-> > your real CPU is?
->
-> Yes, I confirm that the real CPU is indeed this version and VMWare is rig=
-ht.
->
-> >
-> > Dave
-> >
-> > > >
-> > > > Dave
-> > > >
-> > > > > (base) 20-05-14 15:32:50 root@31_216:~  lscpu
-> > > > > Architecture:          x86_64
-> > > > > CPU op-mode(s):        32-bit, 64-bit
-> > > > > Byte Order:            Little Endian
-> > > > > CPU(s):                16
-> > > > > On-line CPU(s) list:   0-15
-> > > > > Thread(s) per core:    1
-> > > > > Core(s) per socket:    1
-> > > > > Socket(s):             16
-> > > > > NUMA node(s):          1
-> > > > > Vendor ID:             GenuineIntel
-> > > > > CPU family:            6
-> > > > > Model:                 63
-> > > > > Model name:            Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz
-> > > > > Stepping:              2
-> > > > > CPU MHz:               2599.998
-> > > > > BogoMIPS:              5199.99
-> > > > > Virtualization:        VT-x
-> > > > > Hypervisor vendor:     VMware
-> > > > > Virtualization type:   full
-> > > > > L1d cache:             32K
-> > > > > L1i cache:             32K
-> > > > > L2 cache:              256K
-> > > > > L3 cache:              20480K
-> > > > > NUMA node0 CPU(s):     0-15
-> > > > > Flags:                 fpu vme de pse tsc msr pae mce cx8 apic se=
-p
-> > > > > mtrr pge mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss sysc=
-all
-> > > > > nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts nopl xtop=
-ology
-> > > > > tsc_reliable nonstop_tsc cpuid pni pclmulqdq vmx ssse3 fma cx16 p=
-cid
-> > > > > sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave av=
-x
-> > > > > f16c rdrand hypervisor lahf_lm abm cpuid_fault invpcid_single
-> > > > > tpr_shadow vnmi ept vpid fsgsbase tsc_adjust bmi1 avx2 smep bmi2
-> > > > > invpcid xsaveopt arat
-> > > > >
-> > > > > Thanks,
-> > > > >
-> > > > > Feng Li
-> > > > >
-> > > > > Dr. David Alan Gilbert <dgilbert@redhat.com> =E4=BA=8E2020=E5=B9=
-=B45=E6=9C=8814=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:52=E5=86=99=
-=E9=81=93=EF=BC=9A
-> > > > > >
-> > > > > > * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> > > > > > > Cc'ing David/Paolo in case they have a clue...
-> > > > > > >
-> > > > > > > On 5/14/20 1:27 PM, Li Feng wrote:
-> > > > > > > > Dear all,
-> > > > > > > >
-> > > > > > > > I have encountered a weird crash.
-> > > > > > > > I remember before a few days it works well and I rebase my =
-code from upstream.
-> > > > > > > >
-> > > > > > > > This is the command:
-> > > > > > > > /root/qemu-master/x86_64-softmmu/qemu-system-x86_64 -enable=
--kvm
-> > > > > > > > -device virtio-balloon -cpu host -smp 4 -m 2G -drive
-> > > > > > > > file=3D/root/html/fedora-10g.img,format=3Draw,cache=3Dnone,=
-aio=3Dnative,if=3Dnone,id=3Ddrive-virtio-disk1
-> > > > > > > > -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk=
-1,id=3Dvirtio-disk1,bootindex=3D1
-> > > > > > > > -device virtio-net,netdev=3Dnw1,mac=3D00:11:22:EE:EE:10 -ne=
-tdev
-> > > > > > > > tap,id=3Dnw1,script=3Dno,downscript=3Dno,ifname=3Dtap0 -ser=
-ial mon:stdio
-> > > > > > > > -nographic -object
-> > > > > > > > memory-backend-file,id=3Dmem0,size=3D2G,mem-path=3D/dev/hug=
-epages,share=3Don
-> > > > > > > > -numa node,memdev=3Dmem0 -vnc 0.0.0.0:100 -machine usb=3Don=
-,nvdimm -device
-> > > > > > > > usb-tablet -monitor unix:///tmp/a.socket,server,nowait -dev=
-ice
-> > > > > > > > virtio-serial-pci,id=3Dvirtio-serial0,max_ports=3D16 -chard=
-ev
-> > > > > > > > socket,id=3Dchannel1,path=3D/tmp/helloworld1,server,nowait =
--device
-> > > > > > > > virtserialport,chardev=3Dchannel1,name=3Dcom.redhat.rhevm.v=
-dsm1,bus=3Dvirtio-serial0.0,id=3Dport1
-> > > > > > > > -qmp tcp:0.0.0.0:2234,server,nowait
-> > > > > > > > qemu-system-x86_64: error: failed to set MSR 0x48f to 0x7fe=
-fff00036dfb
-> > > > > > > > qemu-system-x86_64: /root/qemu-master/target/i386/kvm.c:269=
-5:
-> > > > > > > > kvm_buf_set_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->n=
-msrs' failed.
-> > > > > >
-> > > > > > 48f is MSR_IA32_VMX_TRUE_EXIT_CTLS
-> > > > > > I've not got a note of seeing that one before.
-> > > > > >
-> > > > > > > > This is the commit record:
-> > > > > > > > *   c88f1ffc19 - (origin/master, origin/HEAD) Merge remote-=
-tracking
-> > > > > > > > branch 'remotes/kevin/tags/for-upstream' into staging (3 da=
-ys ago)
-> > > > > > > > <Peter Maydell>
-> > > > > > > > |\
-> > > > > > > > | * 47e0b38a13 - block: Drop unused .bdrv_has_zero_init_tru=
-ncate (3
-> > > > > > > > days ago) <Eric Blake>
-> > > > > > > > | * dbc636e791 - vhdx: Rework truncation logic (3 days ago)=
- <Eric Blake>
-> > > > > > > > | * bda4cdcbb9 - parallels: Rework truncation logic (3 days=
- ago) <Eric Blake>
-> > > > > > > > | * be9c9404db - ssh: Support BDRV_REQ_ZERO_WRITE for trunc=
-ate (3 days
-> > > > > > > > ago) <Eric Blake>
-> > > > > > > > | * fec00559e7 - sheepdog: Support BDRV_REQ_ZERO_WRITE for =
-truncate (3
-> > > > > > > > days ago) <Eric Blake>
-> > > > > > > > | * 2f98910d5b - rbd: Support BDRV_REQ_ZERO_WRITE for trunc=
-ate (3 days
-> > > > > > > > ago) <Eric Blake>
-> > > > > > > >
-> > > > > > > > I run this qemu in a VM base on EXSi.
-> > > > > > > >
-> > > > > > > > Does anyone have the same issue?
-> > > > > >
-> > > > > > cc'ing in Vitaly since he knows VMWare stuff.
-> > > > > >
-> > > > > > What's your host CPU?
-> > > > > >
-> > > > > > Dave
-> > > > > >
-> > > > > > > >
-> > > > > > > > Thanks,
-> > > > > > > >
-> > > > > > > > Feng Li
-> > > > > > > >
-> > > > > > >
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > >
-> > > > >
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > >
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
+Reasons it's &error_abort:
+
+1. PATCH 06 and 07 transform variations of
+
+      object_property_set_bool(..., false, "realized", &error_abort);
+
+   to
+
+      qdev_unrealize(...);
+
+   No untransformed unrealization remain.  Thus, we always abort on
+   unrealization error before this series.
+
+2. If unrealize could fail, we'd be in deep trouble.  Recent commit
+   b69c3c21a5 "qdev: Unrealize must not fail" explains:
+
+   Devices may have component devices and buses.
+
+   Device realization may fail.  Realization is recursive: a device's
+   realize() method realizes its components, and device_set_realized()
+   realizes its buses (which should in turn realize the devices on that
+   bus, except bus_set_realized() doesn't implement that, yet).
+
+   When realization of a component or bus fails, we need to roll back:
+   unrealize everything we realized so far.  If any of these unrealizes
+   failed, the device would be left in an inconsistent state.  Must not
+   happen.
+
+   device_set_realized() lets it happen: it ignores errors in the roll
+   back code starting at label child_realize_fail.
+
+   Since realization is recursive, unrealization must be recursive, too.
+   But how could a partly failed unrealize be rolled back?  We'd have to
+   re-realize, which can fail.  This design is fundamentally broken.
+
+   device_set_realized() does not roll back at all.  Instead, it keeps
+   unrealizing, ignoring further errors.
+
+   It can screw up even for a device with no buses: if the lone
+   dc->unrealize() fails, it still unregisters vmstate, and calls
+   listeners' unrealize() callback.
+
+   bus_set_realized() does not roll back either.  Instead, it stops
+   unrealizing.
+
+   Fortunately, no unrealize method can fail, as we'll see below.
+
+Clearer now?
+
+With any luck, people will use the simpler qdev_unrealize() and
+qbus_unrealize(), which is the form that doesn't let them get the error
+handling wrong.  I like it when interfaces make misuse hard :)
+
 
