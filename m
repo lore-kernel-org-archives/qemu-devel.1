@@ -2,69 +2,91 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D46C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8225EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C484C2070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C484C2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9D4206F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:54:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOYCBv4E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9D4206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbYGo-0003Wt-UA
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:37:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33984)
+	id 1jbYY5-0002IL-Cf
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:54:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbYGB-0002bx-IE
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:36:27 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:60237)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbYGA-0005pQ-GJ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:36:27 -0400
-Received: from player718.ha.ovh.net (unknown [10.108.35.119])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 3BED41D691F
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 01:36:24 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id 13B99127B0EF9;
- Wed, 20 May 2020 23:36:17 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G00101d72718-cae4-42ca-b24e-787e81efcdcc,0C88E457D5774F601C3A42E7BE1517355FE6C707)
- smtp.auth=groug@kaod.org
-Date: Thu, 21 May 2020 01:36:16 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Reza Arbab <arbab@linux.ibm.com>
-Subject: Re: [PATCH v2 2/2] spapr: Add a new level of NUMA for GPUs
-Message-ID: <20200521013616.15664254@bahia.lan>
-In-Reply-To: <20200518214418.18248-2-arbab@linux.ibm.com>
-References: <20200518214418.18248-1-arbab@linux.ibm.com>
- <20200518214418.18248-2-arbab@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jbYXS-0001TK-V8
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:54:18 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:50507)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jbYXR-0008T8-HY
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:54:18 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id nu7so2086249pjb.0
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 16:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vpWHo8G/b8BTIu+utqk6m5alRRBCTaBVKFKH63T3sXE=;
+ b=mOYCBv4EgOMqwqyt6ry8/dS6u3v+0bbcfSSw9aPFfAU9/eT8uAUBs/stPaLeYwkuOA
+ KDnJFYecaz+CWMsh3oDF9sBV8CyjoCw8rcRJoa6E7D1zjuiqlDOU9JRyB8VlmW1fTyhY
+ 2Qt2sxsBpKXO0Yvi8W39SsqpO8OOfDwH+wzaCV72QoJQicF5VFJcCvORcL2LYiHibTxM
+ 3jW4QAKkF4zjbKGxw6Z/4mEB6gS/rvLIUtrS37zZyQdjDu/0FWF9m1fzRNLM/yILYfuf
+ XY6o+Afvu1BII8UqQCagXO6LPn3zavarxatKgXJe7j4uOnbpHdLOSc09rNYLoSPxUeDk
+ RvPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vpWHo8G/b8BTIu+utqk6m5alRRBCTaBVKFKH63T3sXE=;
+ b=tvhopjcUT6XDvrhyhwM0jwQUisa6ppLXbjEihnOInR4x0/Kh9+scTfYncHbyAX18U5
+ gwdmW++rsC0+v2c1ekXNYCWOxZTCpeQcbW/J/DIPBjw6prLB2AO6zh90hQ1w0NlLzUnH
+ puApFEv4fpXPOw01oAC+GnChfUJ9jtZDBEPosveON7kkq0jWjVa6zE/ObmZP2SJlMUno
+ pZjLf50Nl0AE/NCpBw8zJu2ZI4ptYVUpTpDonS9dVbocvsE4LRVk9KgECPmecMX22FNJ
+ xPs6XrtBZt5OXY3c1UafOKckJGRKpNYxy4EXx50EiYIu+bJVfwXYEmPPesNqM8VbW0M3
+ 1xPA==
+X-Gm-Message-State: AOAM533Q23zjpQ8G7f3mKlrgHrt+8MTN5G9V4tU+iQKNDlmQ0RS4sNKj
+ PB4iP9HBjLLo1p4MjJCwa8o=
+X-Google-Smtp-Source: ABdhPJz5kq2yEzt1zAMliz3iOKMdFMsjNhKzkJ+tJhtpjojan8J5AGnuD2Kb+ZTxzpK60bxKyLflbw==
+X-Received: by 2002:a17:90a:d598:: with SMTP id
+ v24mr7344552pju.167.1590018855484; 
+ Wed, 20 May 2020 16:54:15 -0700 (PDT)
+Received: from localhost.localdomain ([75.167.104.59])
+ by smtp.gmail.com with ESMTPSA id d20sm2761882pjs.12.2020.05.20.16.54.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 May 2020 16:54:14 -0700 (PDT)
+From: Paul Zimmerman <pauldzim@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: [PATCH v6 0/7] dwc-hsotg (aka dwc2) USB host controller emulation
+Date: Wed, 20 May 2020 16:53:42 -0700
+Message-Id: <20200520235349.21215-1-pauldzim@gmail.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13760467188827330875
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddutddgvdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejfedtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepueefheevtdelleevgeejieffieeutefhgfevjeefvdegkeetledtgeejudegtdeknecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=87.98.165.38; envelope-from=groug@kaod.org;
- helo=6.mo2.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 19:36:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=pauldzim@gmail.com; helo=mail-pj1-x1042.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,114 +99,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Paul Zimmerman <pauldzim@gmail.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 16:44:18 -0500
-Reza Arbab <arbab@linux.ibm.com> wrote:
+This verion fixes a few things pointed out by Peter, and one by
+Felippe.
 
-> NUMA nodes corresponding to GPU memory currently have the same
-> affinity/distance as normal memory nodes. Add a third NUMA associativity
-> reference point enabling us to give GPU nodes more distance.
-> 
-> This is guest visible information, which shouldn't change under a
-> running guest across migration between different qemu versions, so make
-> the change effective only in new (pseries > 5.0) machine types.
-> 
-> Before, `numactl -H` output in a guest with 4 GPUs (nodes 2-5):
-> 
-> node distances:
-> node   0   1   2   3   4   5
->   0:  10  40  40  40  40  40
->   1:  40  10  40  40  40  40
->   2:  40  40  10  40  40  40
->   3:  40  40  40  10  40  40
->   4:  40  40  40  40  10  40
->   5:  40  40  40  40  40  10
-> 
-> After:
-> 
-> node distances:
-> node   0   1   2   3   4   5
->   0:  10  40  80  80  80  80
->   1:  40  10  80  80  80  80
->   2:  80  80  10  80  80  80
->   3:  80  80  80  10  80  80
->   4:  80  80  80  80  10  80
->   5:  80  80  80  80  80  10
-> 
-> These are the same distances as on the host, mirroring the change made
-> to host firmware in skiboot commit f845a648b8cb ("numa/associativity:
-> Add a new level of NUMA for GPU's").
-> 
-> Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
-> ---
->  hw/ppc/spapr.c             | 11 +++++++++--
->  hw/ppc/spapr_pci_nvlink2.c |  2 +-
->  2 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 88b4a1f17716..1d9193d5ee49 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -893,7 +893,11 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->      int rtas;
->      GString *hypertas = g_string_sized_new(256);
->      GString *qemu_hypertas = g_string_sized_new(256);
-> -    uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
-> +    uint32_t refpoints[] = {
-> +        cpu_to_be32(0x4),
-> +        cpu_to_be32(0x4),
-> +        cpu_to_be32(0x2),
-> +    };
->      uint32_t nr_refpoints;
->      uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
->          memory_region_size(&MACHINE(spapr)->device_memory->mr);
-> @@ -4544,7 +4548,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      smc->linux_pci_probe = true;
->      smc->smp_threads_vsmt = true;
->      smc->nr_xirqs = SPAPR_NR_XIRQS;
-> -    smc->nr_assoc_refpoints = 2;
-> +    smc->nr_assoc_refpoints = 3;
->      xfc->match_nvt = spapr_match_nvt;
->  }
->  
-> @@ -4611,8 +4615,11 @@ DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
->   */
->  static void spapr_machine_5_0_class_options(MachineClass *mc)
->  {
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> +
->      spapr_machine_5_1_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-> +    smc->nr_assoc_refpoints = 2;
->  }
->  
->  DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
-> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-> index 8332d5694e46..247fd48731e2 100644
-> --- a/hw/ppc/spapr_pci_nvlink2.c
-> +++ b/hw/ppc/spapr_pci_nvlink2.c
-> @@ -362,7 +362,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
->          uint32_t associativity[] = {
->              cpu_to_be32(0x4),
->              SPAPR_GPU_NUMA_ID,
-> -            SPAPR_GPU_NUMA_ID,
-> +            cpu_to_be32(nvslot->numa_id),
+This patch series adds emulation for the dwc-hsotg USB controller,
+which is used on the Raspberry Pi 3 and earlier, as well as a number
+of other development boards. The main benefit for Raspberry Pi is that
+this enables networking on these boards, since the network adapter is
+attached via USB.
 
-This is a guest visible change. It should theoretically be controlled
-with a compat property of the PHB (look for "static GlobalProperty" in
-spapr.c). But since this code is only used for GPU passthrough and we
-don't support migration of such devices, I guess it's okay. Maybe just
-mention it in the changelog.
+The emulation is working quite well, I have tested with USB network,
+mass storage, mouse, keyboard, and tablet. I have tested with the dwc2
+driver in the upstream Linux kernel, and with the dwc-otg driver in the
+Raspbian kernel.
 
->              SPAPR_GPU_NUMA_ID,
->              cpu_to_be32(nvslot->numa_id)
->          };
+One remaining issue is that USB host passthrough does not work. I tried
+connecting to a USB stick on the host, but the device generates babble
+errors and does not work. This is because the dwc-hsotg controller only
+has one root port, so a full-speed dev-hub device is always connected
+to it, and high-speed USB devices on the host do not work at full-speed
+on the guest. (I have WIP code to add high-speed support to dev-hub to
+fix this.)
 
+The patch series also includes a very basic emulation of the MPHI
+device on the Raspberry Pi SOC, which provides the FIQ interrupt that
+is used by the dwc-otg driver in the Raspbian kernel. But that driver
+still does not work in full FIQ mode, so it is necessary to add a
+parameter to the kernel command line ("dwc_otg.fiq_fsm_enable=0") to
+make it work.
+
+I have used some online sources of information while developing this
+emulation, including:
+
+http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
+which has a pretty complete description of the controller starting
+on page 370.
+
+https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
+which has a description of the controller registers starting on
+page 130.
+
+Changes v5-v6:
+  - In bcm2835_mphi.c, make mphi_reset() do initialization of the device
+    state, per Peter M.
+
+  - In hcd-dwc2.c, replace fprintf() with qemu_log_mask(LOG_GUEST_ERROR),
+    and add qemu_log_mask(LOG_UNIMP) for the TODO functionality, per
+    Peter M.
+
+  - In hcd-dwc2.c, switch to using 3-phase reset, per Peter M.
+
+  - In dwc2-regs.h, change comment style of first line to Qemu style,
+    and add a note about which Linux commit the file is from, per
+    Felippe M.
+
+Changes v4-v5:
+  - Changed MemoryRegionOps to use '.impl.[min/max]_access_size' and
+    removed ANDing of memory values with 0xffffffff, per Felippe M.
+
+  - hcd-dwc2.c: Changed NULL check of return from
+    object_property_get_link() call to an assertion, per Felippe.
+
+  - bcm2835_mphi.c/h:
+    * Changed swirq_set/swirq_clr registers into a single register,
+      per Felippe.
+    * Simplified memory region code, per Felippe.
+
+Changes v3-v4:
+  - Reworked the memory region / register access code according to
+    an example patch from Felippe Mathieu-Daudé.
+
+  - Moved the Makefile/Kconfig changes for this file into this
+    patch, per Felipe.
+
+  - Fixed a missing DEFINE_PROP_END_OF_LIST() in dwc2_usb_properties.
+
+Changes v2-v3:
+  - Fixed the high-speed frame time emulation so that high-speed
+    mouse/tablet will work correctly once we have high-speed hub
+    support.
+
+  - Added a "usb_version" property to the dwc-hsotg controller, to
+    allow choosing whether the controller emulates a USB 1 full-speed
+    host or a USB 2 high-speed host.
+
+  - Added a test for a working dwc-hsotg controller to the raspi2
+    acceptance test, requested by Philippe M.
+
+  - Added #defines for the register array sizes, instead of hard-
+    coding them in multiple places.
+
+  - Removed the NB_PORTS #define and the associated iteration code,
+    since the controller only supports a single root port.
+
+  - Removed some unused fields from the controller state struct.
+
+  - Added pointers to some online documentation to the top of
+    hcd-dwc2.c, requested by Peter M.
+
+  - Reworked the init/realize code to remove some confusing function
+    names, requested by Peter M.
+
+  - Added VMStateDescription structs for the controller and MPHI
+    state, requested by Peter M (untested).
+
+Changes v1-v2:
+  - Fixed checkpatch errors/warnings, except for dwc2-regs.h since
+    that is a direct import from the Linux kernel.
+
+  - Switched from debug printfs to tracepoints in hcd-dwc2.c, on the
+    advice of Gerd. I just dropped the debug prints in bcm2835_mphi.c,
+    since I didn't consider them very useful.
+
+  - Updated a couple of the commit messages with more info.
+
+Thanks for your time,
+Paul
+
+---
+
+Paul Zimmerman (7):
+  raspi: add BCM2835 SOC MPHI emulation
+  dwc-hsotg (dwc2) USB host controller register definitions
+  dwc-hsotg (dwc2) USB host controller state definitions
+  dwc-hsotg (dwc2) USB host controller emulation
+  usb: add short-packet handling to usb-storage driver
+  wire in the dwc-hsotg (dwc2) USB host controller emulation
+  raspi2 acceptance test: add test for dwc-hsotg (dwc2) USB host
+
+ hw/arm/bcm2835_peripherals.c           |   38 +-
+ hw/misc/Makefile.objs                  |    1 +
+ hw/misc/bcm2835_mphi.c                 |  191 ++++
+ hw/usb/Kconfig                         |    5 +
+ hw/usb/Makefile.objs                   |    1 +
+ hw/usb/dev-storage.c                   |   15 +-
+ hw/usb/hcd-dwc2.c                      | 1417 ++++++++++++++++++++++++
+ hw/usb/hcd-dwc2.h                      |  190 ++++
+ hw/usb/trace-events                    |   50 +
+ include/hw/arm/bcm2835_peripherals.h   |    5 +-
+ include/hw/misc/bcm2835_mphi.h         |   44 +
+ include/hw/usb/dwc2-regs.h             |  899 +++++++++++++++
+ tests/acceptance/boot_linux_console.py |    9 +-
+ 13 files changed, 2856 insertions(+), 5 deletions(-)
+ create mode 100644 hw/misc/bcm2835_mphi.c
+ create mode 100644 hw/usb/hcd-dwc2.c
+ create mode 100644 hw/usb/hcd-dwc2.h
+ create mode 100644 include/hw/misc/bcm2835_mphi.h
+ create mode 100644 include/hw/usb/dwc2-regs.h
+
+-- 
+2.17.1
 
