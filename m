@@ -2,89 +2,88 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C337EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB51C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:57:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F97120671
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AE0F20671
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:57:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="wWYalFkD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F97120671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSg63DBt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE0F20671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbR5u-0005Nw-PH
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:57:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42206)
+	id 1jbR69-0005nL-8e
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:57:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jbR2h-00081f-QJ; Wed, 20 May 2020 11:54:03 -0400
-Received: from forwardcorp1p.mail.yandex.net
- ([2a02:6b8:0:1472:2741:0:8b6:217]:46292)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jbR2g-0001HB-3F; Wed, 20 May 2020 11:54:03 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 019122E15A0;
- Wed, 20 May 2020 18:53:57 +0300 (MSK)
-Received: from vla5-58875c36c028.qloud-c.yandex.net
- (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- MrD3iOv6lW-rsdmkE4h; Wed, 20 May 2020 18:53:56 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1589990036; bh=SEun7ESiWH3czDdIa+sUhnBLSFJMVA81918bgD9tv/k=;
- h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
- Subject:To:From:Cc;
- b=wWYalFkDnGKFSNHDbV0koQbtahnLTPDzIrNAwSkY+nS7DPh7xkAFOmk4S0BrpTd1Z
- U7KF28kZaZL/oAyt1LaR/pR6rzUHds+qfEvtDPeDNZRkCw/HPMxz/uKI1x8cFkT1SH
- lQzM1jX/OMcsXQB4/95Mexgl8nUpTwiXOfqos3t8=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:1221::1:11])
- by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- wLIWnjIOwO-rsXeYWgN; Wed, 20 May 2020 18:53:54 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/2] char-socket: return -1 in case of disconnect during
- tcp_chr_write
-Date: Wed, 20 May 2020 18:53:12 +0300
-Message-Id: <aeb7806bfc945faadf09f64dcfa30f59de3ac053.1589989075.git.dimastep@yandex-team.ru>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <cover.1589989075.git.dimastep@yandex-team.ru>
-References: <cover.1589989075.git.dimastep@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbR3f-0001e6-10
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:55:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34786
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbR3c-0001TE-Kf
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:55:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589990099;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=CJe+u57zQRdIUkqebUb4BFsVY2OqQOKjc9iEgUL9Z+Q=;
+ b=fSg63DBtOjkqesJ8PeypC7L8JT3QqftuuFm8kNNKu/oKy9+vpDXCN9+pBHnWAwe4VAKqOB
+ 4TWqj3SZXbOAQfuaE9a2dBESVnAo/tyJ3luAfvvv6A4Weloqgeuxsys4sPMgvOFaFM0jkf
+ q9o6P+eqxx9Tv8+6YxXb2PvVEK1L2O4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-bkxYScz4NziaZJ9RnJ3Neg-1; Wed, 20 May 2020 11:54:58 -0400
+X-MC-Unique: bkxYScz4NziaZJ9RnJ3Neg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA895A0BDE;
+ Wed, 20 May 2020 15:54:56 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-115-47.ams2.redhat.com [10.36.115.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 23CE4341FE;
+ Wed, 20 May 2020 15:54:45 +0000 (UTC)
+Date: Wed, 20 May 2020 17:54:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Roman Kagan <rvkagan@yandex-team.ru>
+Subject: Re: [PATCH v4 3/3] block: make BlockConf.*_size properties 32-bit
+Message-ID: <20200520155444.GG5192@linux.fritz.box>
+References: <20200520080657.29080-1-rvkagan@yandex-team.ru>
+ <20200520080657.29080-4-rvkagan@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <cover.1589989075.git.dimastep@yandex-team.ru>
-References: <cover.1589989075.git.dimastep@yandex-team.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 11:53:57
-X-ACL-Warn: Detected OS   = ???
+In-Reply-To: <20200520080657.29080-4-rvkagan@yandex-team.ru>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,84 +92,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
- jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
- yc-core@yandex-team.ru, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- raphael.norwitz@nutanix.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-During testing of the vhost-user-blk reconnect functionality the qemu
-SIGSEGV was triggered:
- start qemu as:
- x86_64-softmmu/qemu-system-x86_64 -m 1024M -M q35 \
-   -object memory-backend-file,id=ram-node0,size=1024M,mem-path=/dev/shm/qemu,share=on \
-   -numa node,cpus=0,memdev=ram-node0 \
-   -chardev socket,id=chardev0,path=./vhost.sock,noserver,reconnect=1 \
-   -device vhost-user-blk-pci,chardev=chardev0,num-queues=4 --enable-kvm
- start vhost-user-blk daemon:
- ./vhost-user-blk -s ./vhost.sock -b test-img.raw
+Am 20.05.2020 um 10:06 hat Roman Kagan geschrieben:
+> Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
+> 32-bit for logical_block_size, physical_block_size, and min_io_size.
+> However, the properties in BlockConf are defined as uint16_t limiting
+> the values to 32768.
+> 
+> This appears unnecessary tight, and we've seen bigger block sizes handy
+> at times.
+> 
+> Make them 32 bit instead and lift the limitation up to 2 MiB which
+> appears to be good enough for everybody, and matches the qcow2 cluster
+> size limit.
+> 
+> As the values can now be fairly big and awkward to type, make the
+> property setter accept common size suffixes (k, m).
+> 
+> Also as the devices which use min_io_size (virtio-blk and scsi) pass its
+> value to the guest in units of logical blocks in a 16bit field, to
+> prevent its silent truncation add a corresponding check to
+> blkconf_blocksizes.
+> 
+> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+> ---
+> v3 -> v4:
+> - check min_io_size against truncation [Kevin]
+> 
+> v2 -> v3:
+> - mention qcow2 cluster size limit in the log and comment [Eric]
+> 
+> v1 -> v2:
+> - cap the property at 2 MiB [Eric]
+> - accept size suffixes
+> 
+>  include/hw/block/block.h     |  8 ++++----
+>  include/hw/qdev-properties.h |  2 +-
+>  hw/block/block.c             | 11 +++++++++++
+>  hw/core/qdev-properties.c    | 34 ++++++++++++++++++++++++----------
+>  4 files changed, 40 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+> index 784953a237..2fa09aa0b1 100644
+> --- a/include/hw/block/block.h
+> +++ b/include/hw/block/block.h
+> @@ -18,9 +18,9 @@
+>  
+>  typedef struct BlockConf {
+>      BlockBackend *blk;
+> -    uint16_t physical_block_size;
+> -    uint16_t logical_block_size;
+> -    uint16_t min_io_size;
+> +    uint32_t physical_block_size;
+> +    uint32_t logical_block_size;
+> +    uint32_t min_io_size;
+>      uint32_t opt_io_size;
+>      int32_t bootindex;
+>      uint32_t discard_granularity;
+> @@ -51,7 +51,7 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+>                            _conf.logical_block_size),                    \
+>      DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                \
+>                            _conf.physical_block_size),                   \
+> -    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+> +    DEFINE_PROP_UINT32("min_io_size", _state, _conf.min_io_size, 0),    \
+>      DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+>      DEFINE_PROP_UINT32("discard_granularity", _state,                   \
+>                         _conf.discard_granularity, -1),                  \
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index f161604fb6..f9e0f8c041 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -197,7 +197,7 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>  #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+>  #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+> -    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+> +    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
+>  #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+>      DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
+>  #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
+> diff --git a/hw/block/block.c b/hw/block/block.c
+> index 5f8ebff59c..cd95e7e38f 100644
+> --- a/hw/block/block.c
+> +++ b/hw/block/block.c
+> @@ -96,6 +96,17 @@ bool blkconf_blocksizes(BlockConf *conf, Error **errp)
+>          return false;
+>      }
+>  
+> +    /*
+> +     * all devices which support min_io_size (scsi and virtio-blk) expose it to
+> +     * the guest as a uint16_t in units of logical blocks
+> +     */
+> +    if ((conf->min_io_size / conf->logical_block_size) > UINT16_MAX) {
+> +        error_setg(errp,
+> +                   "min_io_size must be no more than " stringify(UINT16_MAX)
+> +                   " of logical_block_size");
 
-If vhost-user-blk will be killed during the vhost initialization
-process, for instance after getting VHOST_SET_VRING_CALL command, then
-QEMU will fail with the following backtrace:
+I'm not a native speaker, but "no more than 65536 of logical_block_size"
+sounds odd to me. Maybe "65536 times the logical_block_size"?
 
-Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-0x00005555559272bb in vhost_user_read (dev=0x7fffef2d53e0, msg=0x7fffffffd5b0)
-    at ./hw/virtio/vhost-user.c:260
-260         CharBackend *chr = u->user->chr;
+> +        return false;
+> +    }
+> +
+>      if (conf->opt_io_size % conf->logical_block_size) {
+>          error_setg(errp,
+>                     "opt_io_size must be a multple of logical_block_size");
 
- #0  0x00005555559272bb in vhost_user_read (dev=0x7fffef2d53e0, msg=0x7fffffffd5b0)
-    at ./hw/virtio/vhost-user.c:260
- #1  0x000055555592acb8 in vhost_user_get_config (dev=0x7fffef2d53e0, config=0x7fffef2d5394 "", config_len=60)
-    at ./hw/virtio/vhost-user.c:1645
- #2  0x0000555555925525 in vhost_dev_get_config (hdev=0x7fffef2d53e0, config=0x7fffef2d5394 "", config_len=60)
-    at ./hw/virtio/vhost.c:1490
- #3  0x00005555558cc46b in vhost_user_blk_device_realize (dev=0x7fffef2d51a0, errp=0x7fffffffd8f0)
-    at ./hw/block/vhost-user-blk.c:429
- #4  0x0000555555920090 in virtio_device_realize (dev=0x7fffef2d51a0, errp=0x7fffffffd948)
-    at ./hw/virtio/virtio.c:3615
- #5  0x0000555555a9779c in device_set_realized (obj=0x7fffef2d51a0, value=true, errp=0x7fffffffdb88)
-    at ./hw/core/qdev.c:891
- ...
-
-The problem is that vhost_user_write doesn't get an error after
-disconnect and try to call vhost_user_read(). The tcp_chr_write()
-routine should return -1 in case of disconnect. Indicate the EIO error
-if this routine is called in the disconnected state.
-
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- chardev/char-socket.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 232e0a8..c2462e0 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -174,15 +174,16 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
- 
-         if (ret < 0 && errno != EAGAIN) {
-             if (tcp_chr_read_poll(chr) <= 0) {
-+                /* Perform disconnect and return error. */
-                 tcp_chr_disconnect_locked(chr);
--                return len;
-             } /* else let the read handler finish it properly */
-         }
- 
-         return ret;
-     } else {
--        /* XXX: indicate an error ? */
--        return len;
-+        /* Indicate an error. */
-+        errno = EIO;
-+        return -1;
-     }
- }
- 
--- 
-2.7.4
+Kevin
 
 
