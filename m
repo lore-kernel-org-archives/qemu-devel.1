@@ -2,90 +2,91 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4035BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 19:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 541B6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:35:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC5D8207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 19:58:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16751204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:35:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUtIZ5S5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC5D8207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="MfcK7nHL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16751204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbUr7-0008AP-7O
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 15:58:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40182)
+	id 1jbVQz-0001jH-7e
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 16:35:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbUqV-0007jw-7E
- for qemu-devel@nongnu.org; Wed, 20 May 2020 15:57:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29922
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbUqU-0006mw-6r
- for qemu-devel@nongnu.org; Wed, 20 May 2020 15:57:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590004661;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=w8haSdB3G2m9IhCWxxToOA/ZRKBwY2f73+Odt2UeGXM=;
- b=BUtIZ5S5jPeTWVmatWJ1wWvn43uU3Z+cS2bnNd4jwXh51DM7AG7UIB4y6Bu0vA3OLhce/b
- S9yIW5Lb4A1GdLaQpd9keC+2iKjamwilU+nAt8PrvuzqVBrCwPKGfVLezw4O2HJWkryILH
- s2TLVtDQOe6/1Crn/pR+6EON7MlgUBg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-Uz2kmO3YMdaLjyENaFg0yA-1; Wed, 20 May 2020 15:57:39 -0400
-X-MC-Unique: Uz2kmO3YMdaLjyENaFg0yA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74D168005AA;
- Wed, 20 May 2020 19:57:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-114.ams2.redhat.com [10.36.112.114])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 021824739F;
- Wed, 20 May 2020 19:57:34 +0000 (UTC)
-Subject: Re: [PATCH v2 3/9] pc-bios: s390x: Get rid of magic offsets into the
- lowcore
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200514123729.156283-1-frankja@linux.ibm.com>
- <20200514123729.156283-4-frankja@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <5bc1c8d7-71dd-2172-5194-d33d47fd829e@redhat.com>
-Date: Wed, 20 May 2020 21:57:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jbVQ4-000101-HL; Wed, 20 May 2020 16:34:28 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:49706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jbVQ0-0005GC-97; Wed, 20 May 2020 16:34:26 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 32A0C2E1611;
+ Wed, 20 May 2020 23:34:17 +0300 (MSK)
+Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net
+ (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ sxdwlYouWJ-YET8Y5kp; Wed, 20 May 2020 23:34:17 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1590006857; bh=cJFepITFgv6/qbGwXmtuM5z07EQszl6YMb073OIWKSk=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=MfcK7nHLME+23MjzVMWCaHFoINjaAKWt72ChgH9ahR/7kru2V24mOE4C4a8ECtm3R
+ Ge7FFv8d2T+94U4NoLCNQ5E+UgwY9va4VF/8tD/xDUiFa+E0/TVVXmtGu7pP4MKo9Y
+ ibkaJKXnap/e0fFbTiD6vzvZhTe8O95fieVcJ2d4=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:407::1:16])
+ by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ D8iynLIZMi-YDXa4lIc; Wed, 20 May 2020 23:34:14 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Wed, 20 May 2020 23:34:12 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v4 1/3] virtio-blk: store opt_io_size with correct size
+Message-ID: <20200520203412.GA104207@rvkaganb.lan>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Keith Busch <kbusch@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+References: <20200520080657.29080-1-rvkagan@yandex-team.ru>
+ <20200520080657.29080-2-rvkagan@yandex-team.ru>
+ <20200520153658.GD5192@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200514123729.156283-4-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 15:03:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200520153658.GD5192@linux.fritz.box>
+Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,53 +99,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/05/2020 14.37, Janosch Frank wrote:
-> If we have a lowcore struct that has members for offsets that we want
-> to touch, why not use it?
+On Wed, May 20, 2020 at 05:36:58PM +0200, Kevin Wolf wrote:
+> Am 20.05.2020 um 10:06 hat Roman Kagan geschrieben:
+> > The width of opt_io_size in virtio_blk_topology is 32bit.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/cio.h  | 17 +++++++++++------
->  pc-bios/s390-ccw/main.c |  8 +++-----
->  2 files changed, 14 insertions(+), 11 deletions(-)
+> I think you mean virtio_blk_config?
+
+I consulted virtio-v1.1 spec where the topology-related fields are
+grouped in struct virtio_blk_topology; I didn't realize in Linux (and
+therefore in QEMU) these fields lay directly on virtio_blk_config.  So
+yes, the log should read "virtio_blk_config", thanks for spotting!
+
+> > Use the appropriate accessor to store it.
+> > 
+> > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
 > 
-> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-> index aaa432dedd..1ce5344b85 100644
-> --- a/pc-bios/s390-ccw/cio.h
-> +++ b/pc-bios/s390-ccw/cio.h
-> @@ -122,12 +122,17 @@ typedef struct schib {
->  } __attribute__ ((packed, aligned(4))) Schib;
->  
->  typedef struct subchannel_id {
-> -        __u32 cssid:8;
-> -        __u32:4;
-> -        __u32 m:1;
-> -        __u32 ssid:2;
-> -        __u32 one:1;
-> -        __u32 sch_no:16;
-> +    union {
-> +        struct {
-> +            __u16 cssid:8;
-> +            __u16 reserved:4;
-> +            __u16 m:1;
-> +            __u16 ssid:2;
-> +            __u16 one:1;
-> +        };
-> +        __u16 sch_id;
-> +    };
-> +        __u16 sch_no;
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> 
 
-Wrong indentation for that sch_no line? Should only be 4 spaces,
-shouldn't it?
-
->  } __attribute__ ((packed, aligned(4))) SubChannelId;
-
- Thomas
-
+Thanks,
+Roman.
 
