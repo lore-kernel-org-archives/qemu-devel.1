@@ -2,124 +2,88 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C615C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C60BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:04:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DCD62072C
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:03:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 516E12072C
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="beoVVINu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DCD62072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ms62q3oW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 516E12072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbQFY-0001S6-9K
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:03:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35002)
+	id 1jbQGt-0003eL-Gf
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:04:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jbQEB-0008TN-DN; Wed, 20 May 2020 11:01:51 -0400
-Received: from mail-db8eur05on2123.outbound.protection.outlook.com
- ([40.107.20.123]:55356 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jbQE8-0005f0-HO; Wed, 20 May 2020 11:01:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kqFMSzvBoUeznyijyIxrbRgOFOrAxOsEo6XIMemoOcNKzEOoo3JyryVAohohldHn9Vpj1hiJ1pweHJm1+f01Izvel73k9yA3W+vFkCS069oEgss0OrueCFuPjy7lSU9EObKoPeV9P7Hmc9nCkV4Z0r2rrjrR8FgbSeqkb95xn2jQvROZdoZfOl8BkrT+XX7Jwr6d1ZJMEXxuDdr6dKfBvxGlYB4hcd9mbXeS+9/TvVO3E3e6VrJ2ZWvZAyBQXfXD10RdCfUG+Vqc96/cFRVmu2vY970x3JcGErp14MIOpiOXI0x4qVeH0F3mbsK2kCQri9mUGlIN2tMh0iD+DA6W3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KYTU6qB30VEQGaTYWE929FGLWHvF0+z3V5YNcEmuMO0=;
- b=Y3wqoiBgtosZDRKEuZBZDTurOHsDTCuKfHuHE4Hk3NSp2erPPTwOaAKc5k8Pt8mmbVhwv3wdtzS2cGKJaW2tz6+blE0qc6NK5Sjnp6qM1aCVANJl9BoKgVEWSq//MRBBXytWOO/qzdpc3VS9AbiGMNX589lBk8WbQ05N3m63thvnSw7IJ6hW8wfBwSs13SW9TLvlNPliooGohcD6VAsaoJVt56gLIVwPYNvnxGdtQ41v/AAfaaeRxovhyEpA4lklg5qwdeEjInkSVzKfKnx0LEKnQc6BBCtHT/klMXmgBr6+19txrgDTAA1mNdSJ5T2nzKfhVZaIyyFihTYab2lzWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KYTU6qB30VEQGaTYWE929FGLWHvF0+z3V5YNcEmuMO0=;
- b=beoVVINurU7Ao6LIuRvfIS9Z97tMArvxd4VO4YVuoYl1GX3AB7uFBksbWax7w4CrSKkHceBCALP5jCOt8Otcwq/FpWN/8WdXIvMJdra3r5lZ6wDOkW4D3pgskPNX90Duqkvntq4Y6mBI+TtDOXNk+OgukPcVvzSk1G8DEciQeTg=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5496.eurprd08.prod.outlook.com (2603:10a6:20b:de::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Wed, 20 May
- 2020 15:01:45 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.020; Wed, 20 May 2020
- 15:01:45 +0000
-Subject: Re: [PATCH v2] block: Factor out bdrv_run_co()
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200519175650.31506-1-vsementsov@virtuozzo.com>
- <20200520140500.GB5192@linux.fritz.box>
- <20200520144928.GC5192@linux.fritz.box>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <972c3c74-4128-18ff-28b8-00d10232988f@virtuozzo.com>
-Date: Wed, 20 May 2020 18:01:43 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200520144928.GC5192@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR03CA0008.eurprd03.prod.outlook.com
- (2603:10a6:208:14::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbQFF-0001VG-GI
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:02:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30951
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbQFD-0005zM-Um
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:02:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589986973;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ENzz94L/o8ytsVx12JNcM7t1M7UTcH+sYxTluDO0kqE=;
+ b=Ms62q3oWG23RGUUuVGnbPdBWuBF/TaDDtRuJwwH8MJ9V6xgbz3msjYwqwsqgDtm+118XgJ
+ vRuWafFG+q3yEB6mQRukIpH6GBo8s5hEknYHvgo98l87uiAct5nOJa45eiU0atEw1ZKND2
+ hErlqG6v+2ra8Fm++bfiVL0jNSs9bt0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-KLkzjSnXMveDn1WMP2GbKQ-1; Wed, 20 May 2020 11:02:50 -0400
+X-MC-Unique: KLkzjSnXMveDn1WMP2GbKQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56A4A1800738
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 15:02:49 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F36E2E17D;
+ Wed, 20 May 2020 15:02:49 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 82D9211358BC; Wed, 20 May 2020 17:02:47 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 51/55] qdev: Make qdev_realize() support bus-less devices
+References: <20200519145551.22836-1-armbru@redhat.com>
+ <20200519145551.22836-52-armbru@redhat.com>
+ <b0188311-e138-cf55-c0e9-52313b5aa906@redhat.com>
+Date: Wed, 20 May 2020 17:02:47 +0200
+In-Reply-To: <b0188311-e138-cf55-c0e9-52313b5aa906@redhat.com> (Paolo
+ Bonzini's message of "Wed, 20 May 2020 08:43:14 +0200")
+Message-ID: <87lflmps2w.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.147) by
- AM0PR03CA0008.eurprd03.prod.outlook.com (2603:10a6:208:14::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.23 via Frontend Transport; Wed, 20 May 2020 15:01:44 +0000
-X-Originating-IP: [185.215.60.147]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 00deec8b-31d3-4b9a-a976-08d7fcceb6a5
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5496:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5496F52DF15A94B6502291EDC1B60@AM7PR08MB5496.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 04097B7F7F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dYPSnSvcOyJUiFYCzZq8XkXY/hF4BHPxRNYyRwPSIKJjuynInYVOLahohfvdMIU1h94WlGqJNeyxIb4El5mLsUXx28JA6fbcFBiobdrdFe/KAY1RPUACZ2SytsjSEM5f4UYz23e2gPRdvl1cRS4bziOK1Z286I1Ay71BiqxkqJrZkHL0CgPEnX0KstOXG342wADUbL+LMkqjEgQ7g+FH6UAneTlR+hOZyPAn79IQd7LleI5XQzev2i78nbpUA/0OKOg95EUAE25wH+zJcb8l/KRdwkF1AJj6tjjn3A3ogz4GGqxpiJAco9ry2WnuYgnRrsyMeTGonVVqaYjTG1U4KbJuAl/RFEFiMkumuLAD89KnbKN9wiiLjTU8yseryFuFUayYaE3Ct6SgtzQhR7SBfPxfCFzoA4rUgUqOGPCnuPutVaL03JaONGkVvFr7y0PPIxs+tapnBUtDpOOBlwf9vA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(39850400004)(346002)(396003)(366004)(136003)(6486002)(956004)(2616005)(4326008)(6916009)(8936002)(36756003)(8676002)(2906002)(31686004)(66946007)(66556008)(186003)(31696002)(16526019)(107886003)(86362001)(26005)(316002)(966005)(16576012)(66476007)(478600001)(5660300002)(52116002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eZPBwDio8BWXUW+ZXpehQiPVSR/S7m/b0IutZuh/qQ7Efqmm7QnMud7PM/qP2CT3XPSmlk7RTbviTgDtAtiCuGqibd4oMJ+myIyaPHHXdf1Nc7kUVp4JgOz/w4hy7xtM5JOqPKSJyA29nEQNTYgO5o0W3nUpbm5QwjYeT0ziT54SGczSVqCzoMNMVoI2MX/kPw0iLtzXAGY9AXx3+JFco7BUurY8ONUt/jiR60s3l1xozy2SQqLB9Pg1z8UB9LJCs1DZ8QKOLFYSGPlR2mn+tAJ7KKUSSbuuCpThM8zeYeHtuzRLd4G+DD3M4/9X7QBQbz2ikxKPkrg+mbG+quPIi4zVaJFFe32nOluIo+N9/ZRIRp/laZpbZTOJRRrBREPZ4TbikIW+RsVEzTjho9312vgri8x8cIHVQvpydR6OChXRA0luaOslnpAXNKgzFfxTTPvsGjrpGOTf3fLo9YZcJdjg/dDKpNFRCJSsB6iEfda0+pe6jn4C0DurKyZ0foUG
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00deec8b-31d3-4b9a-a976-08d7fcceb6a5
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2020 15:01:45.5172 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5fqqA2aLTJ3PoLJIfA8WU8QUolKbioKCLYdCTy6z1LQbLmNWNeNwASl0JZ64qzqKf5VrnVLIitd0pUHJOvXBAKw+tepIio9zXzsE59VRH0s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5496
-Received-SPF: pass client-ip=40.107.20.123;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 11:01:46
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,55 +96,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.05.2020 17:49, Kevin Wolf wrote:
-> Am 20.05.2020 um 16:05 hat Kevin Wolf geschrieben:
->> Am 19.05.2020 um 19:56 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>> We have a few bdrv_*() functions that can either spawn a new coroutine
->>> and wait for it with BDRV_POLL_WHILE() or use a fastpath if they are
->>> alreeady running in a coroutine. All of them duplicate basically the
->>> same code.
->>>
->>> Factor the common code into a new function bdrv_run_co().
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>     [Factor out bdrv_run_co_entry too]
->>> ---
->>>
->>> Hi!
->>>
->>> I'm a bit lost on rebasing "block/io: safer inc/dec in_flight sections"
->>> (is it needed or not?), so, I decided to send just this one patch:
->>>
->>> I suggest to go a bit further, and refactor that bdrv_run_co don't need
->>> additional *ret argument neither NOT_DONE logic.
->>
->> Hm, this approach adds another indirection and bdrv_pread/pwrite still
->> seems to be on some hot paths. But maybe this is just the right
->> motivation to clean up qcow2 a bit and use explicit bdrv_co_*() where it
->> is possible. I might take a look later.
-> 
-> Still not easily possible it seems. We can add a few coroutine_fn
-> markers here and there (and probably should do that), but the
-> interesting I/O is in the Qcow2Cache, which is used from basically
-> everywhere.
-> 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Hmm. Calling *_entry on in-coroutine path is also an extra inderection.
+> On 19/05/20 16:55, Markus Armbruster wrote:
+>> So far, qdev_realize() supports only devices that plug into a bus:
+>> argument @bus cannot be null.  Extend it to support bus-less devices,
+>> too.
+>> 
+>> qdev_realize_and_unref() remains restricted, because its reference
+>> counting would become rather confusing for bus-less devices.
+>
+> I think it would be fine, you would just rely on the reference held by
+> the QOM parent (via the child property).
 
-I've posted another solution for this think: auto generation of coroutine wrappers code, which produce no extra inderection.
+I took one look at the contract I wrote for it, and balked :)
 
-RFC was here, a year ago: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05322.html
+qdev_realize()'s contract before this patch:
 
-May be, it's time to resend it, as your point gives it a point.
+    /*
+     * Realize @dev.
+     * @dev must not be plugged into a bus.
+     * Plug @dev into @bus.  This takes a reference to @dev.
+     * If @dev has no QOM parent, make one up, taking another reference.
+     * On success, return true.
+     * On failure, store an error through @errp and return false.
+     */
+    bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
 
--- 
-Best regards,
-Vladimir
+Simple enough.
+
+This patch merely adds "If @bus, " before "plug".  Still simple enough.
+
+qdev_realize_and_unref()'s contract:
+
+    /*
+     * Realize @dev and drop a reference.
+     * This is like qdev_realize(), except it steals a reference rather
+     * than take one to plug @dev into @bus.  On failure, it drops that
+     * reference instead.  @bus must not be null.  Intended use:
+     *     dev = qdev_new();
+     *     [...]
+     *     qdev_realize_and_unref(dev, bus, errp);
+     * Now @dev can go away without further ado.
+     */
+    bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp)
+
+If @bus is null, who gets to hold the stolen reference?
+
+You seem to suggest the QOM parent.  What if @dev already has a parent?
+
+Oh, sod it, let's go shopping.
+
 
