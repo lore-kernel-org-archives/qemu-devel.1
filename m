@@ -2,80 +2,81 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99507C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6B36C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660D2207C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55F3020756
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 12:35:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWdWly7S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660D2207C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hU6FK8OT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F3020756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbNw6-0001gA-IW
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:35:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40388)
+	id 1jbNw8-0001je-EI
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 08:35:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNuK-0006WP-PW
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:33:12 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22629
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNti-0004Yt-FB
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:32:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56734
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNuJ-0007ZX-2P
- for qemu-devel@nongnu.org; Wed, 20 May 2020 08:33:12 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jbNth-0007TK-HV
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 08:32:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589977990;
+ s=mimecast20190719; t=1589977952;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sdpjenewQz/H4V5/mqin3G1PK9j+2PZi+WLSTA5b8QE=;
- b=VWdWly7S2z6gKLaWm8WBjiLrixD7QKhlqIEVUy/P14h57uXHbE9RjSMEsCwxG3EuKAeRsB
- Hxqij/Mei2eOXXU7lzuKmeC1D6UcmN9gSq174w1VCzFjISDfUfJOHVxcB9xt1egvFg67+P
- zFk9W2vbnpIrjfBtBln9TFkyC7WZ+Lg=
+ bh=e0h5mfzq+A62RyhkwKLGooNpTnN8J0fXCpseWp13+GE=;
+ b=hU6FK8OTg90SVCctSr7oPx/6lqdxnAy2KTn9Ma0zp7m7vVIgtrKMvZ7Sou65hF3kZ3JYlB
+ InUOXhizgU39I3oEyJnEI1LySYfXpuu2O9OWpdYZk8gaFoaCZ8viNSgNQTk/VVJz2ssDWI
+ vdWQB0iEoxoXM9TN9PUJpqzIP1CSyGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-5gXcNDydMGi75JluHA8qeg-1; Wed, 20 May 2020 08:33:08 -0400
-X-MC-Unique: 5gXcNDydMGi75JluHA8qeg-1
+ us-mta-439-ry7lJIbwMVuu5JFod3zDWw-1; Wed, 20 May 2020 08:32:31 -0400
+X-MC-Unique: ry7lJIbwMVuu5JFod3zDWw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82B0D18FE860;
- Wed, 20 May 2020 12:33:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38075107ACCD;
+ Wed, 20 May 2020 12:32:30 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-76.ams2.redhat.com [10.36.113.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 747F46E9EA;
- Wed, 20 May 2020 12:33:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 59CCC61547;
+ Wed, 20 May 2020 12:32:28 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/19] virtio-mem: Allow notifiers for size changes
-Date: Wed, 20 May 2020 14:31:49 +0200
-Message-Id: <20200520123152.60527-17-david@redhat.com>
+Subject: [PATCH v2 06/19] target/i386: sev: Use ram_block_discard_disable()
+Date: Wed, 20 May 2020 14:31:39 +0200
+Message-Id: <20200520123152.60527-7-david@redhat.com>
 In-Reply-To: <20200520123152.60527-1-david@redhat.com>
 References: <20200520123152.60527-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,114 +92,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to send qapi events in case the size of a virtio-mem device
-changes. This allows upper layers to always know how much memory is
-actually currently consumed via a virtio-mem device.
-
-Unfortuantely, we have to report the id of our proxy device. Let's provide
-an easy way for our proxy device to register, so it can send the qapi
-events. Piggy-backing on the notifier infrastructure (although we'll
-only ever have one notifier registered) seems to be an easy way.
+AMD SEV will pin all guest memory, mark discarding of RAM broken. At the
+time this is called, we cannot have anyone active that relies on discards
+to work properly.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-mem.c         | 21 ++++++++++++++++++++-
- include/hw/virtio/virtio-mem.h |  5 +++++
- 2 files changed, 25 insertions(+), 1 deletion(-)
+ target/i386/sev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index a7b5a02dac..11c500960c 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -177,6 +177,7 @@ static int virtio_mem_state_change_request(VirtIOMEM *vmem, uint64_t gpa,
-     } else {
-         vmem->size -= size;
-     }
-+    notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-     return VIRTIO_MEM_RESP_ACK;
- }
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 51cdbe5496..cadaefc08d 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -719,6 +719,7 @@ sev_guest_init(const char *id)
+     ram_block_notifier_add(&sev_ram_notifier);
+     qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
+     qemu_add_vm_change_state_handler(sev_vm_state_change, s);
++    g_assert(!ram_block_discard_disable(true));
  
-@@ -232,7 +233,10 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
-         return -EBUSY;
-     }
-     bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
--    vmem->size = 0;
-+    if (vmem->size) {
-+        vmem->size = 0;
-+        notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-+    }
- 
-     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
-     return 0;
-@@ -553,6 +557,18 @@ static MemoryRegion *virtio_mem_get_memory_region(VirtIOMEM *vmem, Error **errp)
-     return &vmem->memdev->mr;
- }
- 
-+static void virtio_mem_add_size_change_notifier(VirtIOMEM *vmem,
-+                                                Notifier *notifier)
-+{
-+    notifier_list_add(&vmem->size_change_notifiers, notifier);
-+}
-+
-+static void virtio_mem_remove_size_change_notifier(VirtIOMEM *vmem,
-+                                                   Notifier *notifier)
-+{
-+    notifier_remove(notifier);
-+}
-+
- static void virtio_mem_get_size(Object *obj, Visitor *v, const char *name,
-                                 void *opaque, Error **errp)
- {
-@@ -664,6 +680,7 @@ static void virtio_mem_instance_init(Object *obj)
-     VirtIOMEM *vmem = VIRTIO_MEM(obj);
- 
-     vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
-+    notifier_list_init(&vmem->size_change_notifiers);
- 
-     object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
-                         NULL, NULL, NULL);
-@@ -701,6 +718,8 @@ static void virtio_mem_class_init(ObjectClass *klass, void *data)
- 
-     vmc->fill_device_info = virtio_mem_fill_device_info;
-     vmc->get_memory_region = virtio_mem_get_memory_region;
-+    vmc->add_size_change_notifier = virtio_mem_add_size_change_notifier;
-+    vmc->remove_size_change_notifier = virtio_mem_remove_size_change_notifier;
- }
- 
- static const TypeInfo virtio_mem_info = {
-diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
-index 26b90e8f3e..408a6ede50 100644
---- a/include/hw/virtio/virtio-mem.h
-+++ b/include/hw/virtio/virtio-mem.h
-@@ -64,6 +64,9 @@ typedef struct VirtIOMEM {
- 
-     /* block size and alignment */
-     uint32_t block_size;
-+
-+    /* notifiers to notify when "size" changes */
-+    NotifierList size_change_notifiers;
- } VirtIOMEM;
- 
- typedef struct VirtIOMEMClass {
-@@ -73,6 +76,8 @@ typedef struct VirtIOMEMClass {
-     /* public */
-     void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
-     MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
-+    void (*add_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
-+    void (*remove_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
- } VirtIOMEMClass;
- 
- #endif
+     return s;
+ err:
 -- 
 2.25.4
 
