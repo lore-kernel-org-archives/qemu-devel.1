@@ -2,109 +2,85 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27154C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6734FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:30:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4160207ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:29:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 208FC204EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:30:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HI1b1JZw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4160207ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etXrbDj9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 208FC204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbLyt-0002RW-3l
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 06:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55632)
+	id 1jbLzi-0003Zv-Au
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 06:30:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jbLxw-0001ZE-Bx
- for qemu-devel@nongnu.org; Wed, 20 May 2020 06:28:48 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33354
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jbLyQ-0002H6-Bn
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 06:29:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59080
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jbLxu-0000YF-9T
- for qemu-devel@nongnu.org; Wed, 20 May 2020 06:28:48 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jbLyP-0000cd-Dm
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 06:29:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589970524;
+ s=mimecast20190719; t=1589970556;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vt8rXZC5HzxKtvxdS8o24FqMNV3ejlzzDCbmFdRoygE=;
- b=HI1b1JZwu8c69gVE+eaNKN77CorQFqpvH4Y0ycq2BlSiItwkpkXWEFrF4qVWsjLoI+TPl8
- xErWrQKdL4sybZE14gtvAfU1npkhDDH8ChZgz3FlgWUXJUZn5QRgMEfh4EzYBC3jNbRod7
- Sf2vpyZp66lq8fchtLro/7owSpPum/I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-lkM5CSyuP5KvENo3NnhOfA-1; Wed, 20 May 2020 06:28:42 -0400
-X-MC-Unique: lkM5CSyuP5KvENo3NnhOfA-1
-Received: by mail-wm1-f72.google.com with SMTP id f9so1047022wml.9
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 03:28:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=vt8rXZC5HzxKtvxdS8o24FqMNV3ejlzzDCbmFdRoygE=;
- b=Kk4exbw/gwddwpJ7fo9WVnIaIlFUkEkqhfsWTVDkgC3jLqU7xJ7nP96pSSYgd8cNqp
- bHqxMsbecKkoLy70qawgX3p8X7U/5wVPYlI097dEcOnaLur7djIKITtsa19UoVsN4+3r
- sD7I19Ws2BYaTxuDRWnMax6GnXbioLKgwz0bxfbsiQTXCcCi2HYkYnYQ7KhC756Lnn9V
- qClfJTZhALNHkqFvDlFizVH1WG0dBtpEeaI93aS/36ANuRr8+T+7S0crbeydffqmce32
- NQDqzX2J5b0hFm0oN/8s51OEy3TZ3a09lcTz4FTxV91ZraQ8sPj2SP7uH7I5SRz36VEw
- Zafw==
-X-Gm-Message-State: AOAM533c2n9/wY3/hiQxLtY7tE5NZ9kspU+AP5EjsW+S/IbVLUkilLLA
- wqP0Hq8yW7OhsOUsw5kbpLpE8JxwdKq8QK+XPIwGqY42bvl+CQDgxyw6jGpZqQj2TygvMnfV+lA
- cQGA0DymmiMWGQDI=
-X-Received: by 2002:a7b:c201:: with SMTP id x1mr3962029wmi.14.1589970521215;
- Wed, 20 May 2020 03:28:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxrFGqe/i6YKfFDbEECwrG6VWF/epv0PkQyYUnFk5Fj0T4ARX30pKQRP8bQ12LBqlVvE7xzhw==
-X-Received: by 2002:a7b:c201:: with SMTP id x1mr3962014wmi.14.1589970520925;
- Wed, 20 May 2020 03:28:40 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
- by smtp.gmail.com with ESMTPSA id
- t129sm3043661wmg.27.2020.05.20.03.28.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 03:28:40 -0700 (PDT)
-Date: Wed, 20 May 2020 06:28:37 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedow <imammedo@redhat.com>
-Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
- of devices on non-root buses
-Message-ID: <20200520060645-mutt-send-email-mst@kernel.org>
-References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
- <20200511205352.05ff541a@redhat.com>
- <9941B800-BBEF-4DF8-BEE0-EC39D2A20D98@nutanix.com>
- <20200513214312.0dfa4752@redhat.com>
- <7FF83CE8-F25A-4458-80A7-EAA6296EF175@nutanix.com>
- <20200520114354.1982cb63@nas.mammed.net>
- <20200520054714-mutt-send-email-mst@kernel.org>
- <20200520115626.6a2a2355@nas.mammed.net>
+ bh=j7Qa636nr77ozit91n4CLVmdB0iFZ+gh72rScJACoHw=;
+ b=etXrbDj9JKS4k3dVEj0qJcwOso63JFiLOx88bSoVyX/A9PoAut1ZUXdsiipVIFG5wK9t3i
+ 4ckoTOKjnbCAXudL3uEMbTQvL8lm2ph+/FxA0IpFaU1L4Nv8u7KAXdYAGCj8fOhRN3cKPv
+ d41tVjE+4em1vPsNZJzBG/jvVFJh7l0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-sewPRTkzPD2PrbfB3t4NVg-1; Wed, 20 May 2020 06:29:12 -0400
+X-MC-Unique: sewPRTkzPD2PrbfB3t4NVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 246C81005510;
+ Wed, 20 May 2020 10:29:10 +0000 (UTC)
+Received: from gondolin (ovpn-113-5.ams2.redhat.com [10.36.113.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9049F1943D;
+ Wed, 20 May 2020 10:29:02 +0000 (UTC)
+Date: Wed, 20 May 2020 12:27:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v22 6/8] vfio iommu: Update UNMAP_DMA ioctl to
+ get dirty bitmap before unmap
+Message-ID: <20200520122738.351985a3.cohuck@redhat.com>
+In-Reply-To: <1589871253-10650-1-git-send-email-kwankhede@nvidia.com>
+References: <1589781397-28368-7-git-send-email-kwankhede@nvidia.com>
+ <1589871253-10650-1-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200520115626.6a2a2355@nas.mammed.net>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,111 +93,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Julia Suvorova <jusual@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
+ kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 20, 2020 at 11:56:26AM +0200, Igor Mammedow wrote:
-> On Wed, 20 May 2020 05:47:53 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Tue, 19 May 2020 12:24:13 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> DMA mapped pages, including those pinned by mdev vendor drivers, might
+> get unpinned and unmapped while migration is active and device is still
+> running. For example, in pre-copy phase while guest driver could access
+> those pages, host device or vendor driver can dirty these mapped pages.
+> Such pages should be marked dirty so as to maintain memory consistency
+> for a user making use of dirty page tracking.
 > 
-> > On Wed, May 20, 2020 at 11:43:54AM +0200, Igor Mammedow wrote:
-> > > On Fri, 15 May 2020 12:13:53 +0000
-> > > Ani Sinha <ani.sinha@nutanix.com> wrote:
-> > >   
-> > > > > On May 14, 2020, at 1:13 AM, Igor Mammedov <imammedo@redhat.com>
-> > > > > wrote:   
-> > > > >> 
-> > > > >>     
-> > > > >>> Will following hack work for you?
-> > > > >>> possible permutations
-> > > > >>> 1) ACPI hotplug everywhere
-> > > > >>> -global PIIX4_PM.acpi-pci-hotplug=on -global
-> > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on -device
-> > > > >>> pci-bridge,chassis_nr=1,shpc=doesnt_matter -device
-> > > > >>> e1000,bus=pci.1,addr=01,id=netdev1 
-> > > > >>> 
-> > > > >>> 2) No hotplug at all
-> > > > >>> -global PIIX4_PM.acpi-pci-hotplug=off -global
-> > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on -device
-> > > > >>> pci-bridge,chassis_nr=1,shpc=off -device
-> > > > >>> e1000,bus=pci.1,addr=01,id=netdev1
-> > > > >>> 
-> > > > >>> -global PIIX4_PM.acpi-pci-hotplug=off -global
-> > > > >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off -device
-> > > > >>> pci-bridge,chassis_nr=1,shpc=doesnt_matter  -device
-> > > > >>> e1000,bus=pci.1,addr=01,id=netdev1      
-> > > > >> 
-> > > > >> Given that my patch is not acceptable, I’d prefer the
-> > > > >> following in the order of preference:
-> > > > >> 
-> > > > >> (a) Have an option to disable hot ejection of PCI-PCI bridge so
-> > > > >> that Windows does not even show this HW in the “safely remove
-> > > > >> HW” option. If we can do this then from OS perspective the GUI
-> > > > >> options will be same as what is available with PCIE/q35 - none
-> > > > >> of the devices will be hot ejectable if the hot plug option is
-> > > > >> turned off from the PCIE slots where devices are plugged into.
-> > > > >> I looked at the code. It seems to manipulate ACPI tables of
-> > > > >> the empty slots of the root bus where no devices are attached
-> > > > >> (see comment "/* add hotplug slots for non present devices */
-> > > > >> “). For cold plugged bridges, it recurses down to scan the
-> > > > >> slots of the bridge. Is it possible to disable hot plug for
-> > > > >> the slot to which the bridge is attached?    
-> > > > > 
-> > > > > I don't think it's possible to have per slot hotplug on
-> > > > > conventional PCI hardware. it's per bridge property.    
-> > > > 
-> > > > We add the AMLs per empty slot though. When the pic bridge is
-> > > > attached, we do nothing, just recurse into the bridge slots. That
-> > > > is what I was asking, if it was possible to just disable the AMLs
-> > > > or use some tricks to say that this particular slot is not
-> > > > hotpluggable. I am not sure why Windows is trying to eject the
-> > > > PCI bridge and failing. Maybe something related to this comment?
-> > > > 
-> > > > 
-> > > > /* When hotplug for bridges is enabled, bridges are
-> > > >                               
-> > > >          * described in ACPI separately (see build_pci_bus_end).
-> > > >                                       
-> > > >          * In this case they aren't themselves hot-pluggable.
-> > > >                                       
-> > > >          * Hotplugged bridges *are* hot-pluggable.
-> > > > */  
-> > > 
-> > > thinking some more on this topic, it seems that with ACPI hotplug we
-> > > already have implicit non-hotpluggble slot (slot with bridge) while
-> > > the rest are staying hotpluggable.
-> > > 
-> > > So my question is: if it's acceptable to add
-> > > 'PCIDevice::hotpluggable" property to all PCI devices so that user
-> > > / libvirt could set it to false in case they do not want
-> > > coldplugged device be considered as hotpluggable? (this way other
-> > > devices could be treated the same way as bridges)
-> > > 
-> > > [...]  
-> > 
-> > 
-> > I think Julia already posted a patch adding this to downstream pcie
-> > bridges. Adding this to pci slots sounds like a reasonable thing.
-> Question was more about external interface, were we do not have ports
-> as separate devices with conventional PCI. The only knob we have is a
-> a PCI device, where we have a property to turn on/off hotplug. ex:
->   -device e1000,hotpluggable=off
-> and if libvirt would be able to use it
+> To get bitmap during unmap, user should allocate memory for bitmap, set
+> it all zeros, set size of allocated memory, set page size to be
+> considered for bitmap and set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 62 +++++++++++++++++++++++++++++++++--------
+>  include/uapi/linux/vfio.h       | 10 +++++++
+>  2 files changed, 61 insertions(+), 11 deletions(-)
 
-It would make sense but is it practical to add the capability is added
-in a generic way to all bridges and hosts?
-If not how do users probe for presence of the capability?
+(...)
+
+> @@ -1085,6 +1093,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>  			ret = -EINVAL;
+>  			goto unlock;
+>  		}
+> +
+
+Nit: unrelated whitespace change.
+
+>  		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+>  		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+>  			ret = -EINVAL;
+
+(...)
+
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 4850c1fef1f8..a1dd2150971e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1048,12 +1048,22 @@ struct vfio_bitmap {
+>   * field.  No guarantee is made to the user that arbitrary unmaps of iova
+>   * or size different from those used in the original mapping call will
+>   * succeed.
+> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
+
+s/dirty bitmap/the dirty bitmap/
+
+> + * before unmapping IO virtual addresses. When this flag is set, user must
+
+s/user/the user/
+
+> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
+
+"provide a struct vfio_bitmap in data[]" ?
 
 
--- 
-MST
+> + * bitmap, zero the bitmap memory and must set size of allocated memory in
+> + * vfio_bitmap.size field.
+
+"The user must provide zero-allocated memory via vfio_bitmap.data and
+its size in the vfio_bitmap.size field." ?
+
+
+> A bit in bitmap represents one page of user provided
+
+s/bitmap/the bitmap/
+
+> + * page size in 'pgsize', consecutively starting from iova offset. Bit set
+
+s/Bit set/A set bit/
+
+> + * indicates page at that offset from iova is dirty. Bitmap of pages in the
+
+s/indicates page/indicates that the page/
+
+> + * range of unmapped size is returned in vfio_bitmap.data
+
+"A bitmap of the pages in the range of the unmapped size is returned in
+the user-provided vfio_bitmap.data." ?
+
+>   */
+>  struct vfio_iommu_type1_dma_unmap {
+>  	__u32	argsz;
+>  	__u32	flags;
+> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+>  	__u64	iova;				/* IO virtual address */
+>  	__u64	size;				/* Size of mapping (bytes) */
+> +	__u8    data[];
+>  };
+>  
+>  #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
+
+With the nits addressed,
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
