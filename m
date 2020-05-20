@@ -2,130 +2,115 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D207C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE50C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:29:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C98D205CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:23:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F447205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 07:29:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IcHEq/uD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C98D205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFRDdQQW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F447205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbJ4v-0002D3-Id
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 03:23:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60666)
+	id 1jbJAY-0005t3-Jf
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 03:29:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jbJ4L-0001hc-U8; Wed, 20 May 2020 03:23:13 -0400
-Received: from mail-eopbgr60137.outbound.protection.outlook.com
- ([40.107.6.137]:13006 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jbJ4J-0007eI-82; Wed, 20 May 2020 03:23:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kUYdYkLa3TsDxFKaO718xB3MD3ZN4YXmq/RGwbLWj/Tkp8JEkZ4/k+EjaG9FKx6og14BzuAhDyStntB6KW8k8bdZwHiDtRcr4drZ1PuUaouvVVjbBvWxG1UVl8q3B4QUWAatDRgK0LsACrlC+2io+RTzrgL4Rgg7QFqOtkuVdrQjp3p16cPV4/rheW4E9Y3BtuPCDE2Lp0x1d+skRIdvUZcVj73w4M3eiez6ka27YZY9rsP5rxH3BElpLsh2s3UQMExe3zh70YIxZsO7mj5Odne2vWMH8TyEQ/XXLM1q2yzAKTLevKYT420Q2SjtWRItcRkR/CagKlN05kNqOoJreQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZFFALVEIPAJVzq5LPJkPeB6ebHW15J7WyZtaTmsDLIY=;
- b=B3P/MRuKmORcVxsc5+WV2xSIg8XURKTZuk5Ha4YjupedcHsculJw/qb37+/PEqbcLvgFywD5knhiE1Ngpq0CEBHjvDFzrlhKhEDmm6n+4Fw/mfSoI+SfW49QI5k4JIInq/RDoOKJAwqsPqjl7K7KZjdtb1PtzcuKLu8vynqbZEiIn7Zw7MSFWA6MsTHywFxICPZQ1U8f6EKihhcv/bdeLcjSnK/wRhhJyvKGO9lveF0Cn3o65rp/iVK2qu1/TGaNehia+udFW8xdrvBBmHKw7d5jhDB+kWrs+aACxKjP76IR+hWp7jDXEMMwi9VP6/KxkHgQOpHAVGfEcYq/qb3qrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZFFALVEIPAJVzq5LPJkPeB6ebHW15J7WyZtaTmsDLIY=;
- b=IcHEq/uDZRzHkzPfdNpw/RCd1tQLpByYDd56xUfx241/HKQaJAitY43Rn47Ggfq1iUXpxm78spDV6fQO8uHno19c2fJXeSe6q27vgVEmvnLU8l/zjKrTckQ3rTyOSq9BfTSsHdundui322UaFj1UPR3dr2/62yXsbIvvXxh6FWc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
- by AM0PR08MB3796.eurprd08.prod.outlook.com (2603:10a6:208:100::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Wed, 20 May
- 2020 07:23:07 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.3021.020; Wed, 20 May 2020
- 07:23:07 +0000
-Subject: Re: [RFC PATCH 0/3] block: Synchronous bdrv_*() from coroutine in
- different AioContext
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200512144318.181049-1-kwolf@redhat.com>
- <6d78bc78-0c44-d703-6f9f-e048ea34fdd9@proxmox.com>
- <20200514142606.GH5518@linux.fritz.box>
- <285ba39f-9ee6-e089-13f7-a98ea0a84866@virtuozzo.com>
- <548700ea-78db-fabc-d1eb-6d89af39ece3@virtuozzo.com>
- <20200519141858.GN7652@linux.fritz.box>
- <dfed81f7-9806-9aaf-459f-13f786b67e0a@virtuozzo.com>
- <20200519152959.GP7652@linux.fritz.box>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <ea9f2813-9b39-88d2-faaf-748b6c8a4a83@virtuozzo.com>
-Date: Wed, 20 May 2020 10:23:05 +0300
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbJ9t-0005Mk-H9
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 03:28:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42500
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbJ9r-0000jd-DU
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 03:28:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589959733;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=x1dETefqmN9rGmc4gC19ENkZgGC6ZAxVQC3ZVSsOR+Y=;
+ b=DFRDdQQWSpLF+dPQ0OZgnaWy1lO3/++efyl+T1fuu1j3fXoqTa8kAQDKWy9zhmvRbXdLmo
+ iPr7lvFiN8jlkNXK5xIgJZc98XNbe66aJ/Ecad4ZvFVZLYT60iYwR0zk8SMFPNRI1QLXPG
+ PEafefHqXcpK0edxmKtdjV2IztZ4sz0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-5xFD8HaYOsKlotdQKG_MKQ-1; Wed, 20 May 2020 03:28:51 -0400
+X-MC-Unique: 5xFD8HaYOsKlotdQKG_MKQ-1
+Received: by mail-wm1-f71.google.com with SMTP id f9so848046wml.9
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:28:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=x1dETefqmN9rGmc4gC19ENkZgGC6ZAxVQC3ZVSsOR+Y=;
+ b=EHPaz1KKt+ErnZsRnflk+8LS8gBaVOEmwTbPfeFtbPTGk53k8CXCzrsg2IrgFYD9Tb
+ 9pEwAb9Lq5oTinE9y2oKWB4DzArYgWNdAo69lHW0kOAVCxynvcpZpwTm6q7dULj6dWZv
+ bvChER3/83SHrd06v+pd4aYsZ21oduIXbY7s+SqKLmbgM8ZlboV/zmahbRcWXW8afvqC
+ +T9bvtaDL5ULVwXmwzYQJrSsfVDfr4QaZPkT2eGC8HVe5axOsIdXzEI4WeNHOuYoh7Lj
+ coRcBGCK3JIuGpIVQSFtFuj/Knc+QBZs/xu16eXTVfoqPSxkhcX3uR+pPAtScXt0ivga
+ JOvw==
+X-Gm-Message-State: AOAM531DhKnqVeFcniwqPTFluc5DhuczS4/RpTDlCN4vaefl6LlCZnHL
+ pQ/TH7QpNYEu7Fj1XpzvS2uxrzP0Tgqs3soy3q5nigt60nN5QE4COqm+Cw8X2kNBfonFh6okAaR
+ WBWc6+JE62zKmwHM=
+X-Received: by 2002:a7b:cc0e:: with SMTP id f14mr3305433wmh.39.1589959730394; 
+ Wed, 20 May 2020 00:28:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwjiRt1CSNU9ryvQBXWXDb65IeTm7rX4yV1IfKvucMQH/OhX4SP+8mEMxwrxiUZcgZsWrIm7A==
+X-Received: by 2002:a7b:cc0e:: with SMTP id f14mr3305418wmh.39.1589959730170; 
+ Wed, 20 May 2020 00:28:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:591e:368f:1f3f:27d2?
+ ([2001:b07:6468:f312:591e:368f:1f3f:27d2])
+ by smtp.gmail.com with ESMTPSA id d6sm2089495wra.63.2020.05.20.00.28.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 20 May 2020 00:28:49 -0700 (PDT)
+Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
+ failed.
+To: Li Feng <fengli@smartx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
+ <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
+ <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
+ <20200514125220.GJ2787@work-vm>
+ <CAHckoCyegWG9yH_y6VjHhnghfHJD-Wq+EmOyRZE3EYguTOHfPw@mail.gmail.com>
+ <20200514151600.GO2787@work-vm>
+ <CAHckoCxc2XTA3ckU0sq-BmbZZFtfAY_GaEOW46XFzfZ2qXjeMQ@mail.gmail.com>
+ <20200514153129.GP2787@work-vm>
+ <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
+ <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <986fbf33-8127-870b-9163-4aa8d332553f@redhat.com>
+Date: Wed, 20 May 2020 09:28:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200519152959.GP7652@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0P190CA0007.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::17) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.64] (178.34.161.50) by
- AM0P190CA0007.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.23 via Frontend Transport; Wed, 20 May 2020 07:23:06 +0000
-X-Originating-IP: [178.34.161.50]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7151deb5-52ca-4f8a-c70e-08d7fc8ea485
-X-MS-TrafficTypeDiagnostic: AM0PR08MB3796:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR08MB3796C8DC3DB0C6A8A6327029CFB60@AM0PR08MB3796.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 04097B7F7F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mrTpVcy4o2yRqj2Lfga/sLv24URnyOImvKeKW0d6eaK6NEByfbQGRQH6omUX9KLbL++4gjm8LcjhsflW5qXYQMm+T79crEGKrrjpyRwc6b7xDT5Za0qVj9czVvOQzO5BuIEt3HnNreRuba9KbS3xLY7iaU4kbZGULpZjOQgfLciIuXmEVoMN++LafZH/foP+bBvaBr3zymh17khA7hoznXGyeUCMqrq6bLTx9Dpj8ALN9WowwOeWSBsV5D63RkjKQLtWJWklR7yLmbl3ffVc4gsFRM4PFhL9QDkcB4SJso6j/qjNWTwpaL/kidE8T1S9k2yoylkssliIynJrZuuzMz7Zi25v+FMXM+dLcm7cGiTsKDtQ9v8Lhz0Rz/u6k4wZ
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(346002)(396003)(366004)(39840400004)(376002)(956004)(31696002)(5660300002)(6916009)(86362001)(52116002)(26005)(16526019)(2616005)(478600001)(4326008)(186003)(316002)(16576012)(6486002)(54906003)(8936002)(36756003)(31686004)(66556008)(66946007)(66476007)(2906002)(8676002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: hnOPP86FyN4aLqO5SHN65L5E1AJ+x0Zd2+irGRN6KW1kg/Y045Eg/FBYteNIX0OutRgt12nJvf5WM1GyanVEbJN+P07qf/GGVyDbOVgFR1p8AIRSZDGxDCF+rTgUDyiXsmnw3fROOPH7rvPSLniVebUqIVKVgTDc5BNkl1ygAPvtftxvTeGa27W9srfA4EtVlF68KYae+33KxnxopN994cgWCf4gZDUQQgiZ1eWtTk6jScvJcikQj1cbPWDTXdl/Qf8SAuYzElw5O1WK6p2DqgvgJt9OHQ90LPmJCmOO1LNzdraoIGUO8t/xrew8ssWUILJ32MN3gF5lzZld7akoOfrHN0/WYQfoAbASVc0jUicmvcXaq6uIjylksHREHYEipKbMfAcQNqgGn0T2dR/RoIyV3hju4/T4K5fnDFuzySqVdFblUD524o35HD7tcsAlyJJv9DywTRWw76ZFJ55PjlFXWE3fWYPm97J/kkE1i6k=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7151deb5-52ca-4f8a-c70e-08d7fc8ea485
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2020 07:23:07.3919 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zs6S/kYwwjXM6pEiTgP34NpngQ0dtR+yGBYwtZAIxhDY5GCVC5Tx1yzPStA3rElwAToiJ95/lFVd4CrLJKMCWILT/Mks9dmSoyyB4brpZ0E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3796
-Received-SPF: pass client-ip=40.107.6.137;
- envelope-from=dplotnikov@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 03:23:08
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,63 +123,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, s.reiter@proxmox.com,
- armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
- Thomas Lamprecht <t.lamprecht@proxmox.com>
+Cc: vkuznets@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 20/05/20 05:50, Li Feng wrote:
+>>>>>>>>> qemu-system-x86_64: error: failed to set MSR 0x48f to 0x7fefff00036dfb
 
->> I'm not quite sure I understand the point.
->> Let's see all the picture of async snapshot: our goal is to minimize a VM
->> downtime during the snapshot.
->> When we do async snapshot we save vmstate except RAM when a VM is stopped
->> using the current L1 table (further initial L1 table). Then, we want the VM
->> start running
->> and write RAM content. At this time all RAM is write-protected.
->> We unprotect each RAM page once it has been written.
-> Oh, I see, you're basically doing something like postcopy migration. I
-> was assuming it was more like regular live migration, except that you
-> would overwrite updated RAM blocks instead of appending them.
->
-> I can see your requirement then.
->
->> All those RAM pages should go to the snapshot using the initial L1 table.
->> Since the VM is running, it may want to write new disk blocks,
->> so we need to use a NEW L1 table to provide this ability. (Am I correct so
->> far?)
->> Thus, if I understand correctly, we need to use two L1 tables: the initial
->> one to store RAM pages
->> to the vmstate and the new one to allow disk writings.
->>
->> May be I can't see a better way to achieve that. Please, correct me if I'm
->> wrong.
-> I guess I could imagine a different, though probably not better way: We
-> could internally have a separate low-level operation that moves the VM
-> state from the active layer to an already existing disk snapshot. Then
-> you would snapshot the disk and start writing the VM to the active
-> layer, and when the VM state write has completed you move it into the
-> snapshot.
->
-> The other options is doing what you suggested. There is nothing in the
-> qcow2 on-disk format that would prevent this, but we would have to
-> extend the qcow2 driver to allow I/O to inactive L1 tables. This sounds
-> like a non-trivial amount of code changes, though it would potentially
-> enable more use cases we never implemented ((read-only) access to
-> internal snapshots as block nodes, so you could e.g. use block jobs to
-> export a snapshot).
->
-> Kevin
+The high 32 bits are 0111 1111 1110 1111 1111 1111.
 
-Ok, thanks for validating the possibilities and more ideas of 
-implementation.
-I think I should start from trying to post my background snapshot 
-version storing the vmstate to an external file
-because write-protected-userfaultfd is now available on linux.
-And If it's accepted I'll try to come up with an internal version for 
-qcow2 (It seems this is the only format supporting this).
+The low 32 bits are  0000 0011 0110 1101 1111 1011.
 
-Denis
+The features that are set are the xor, so 0111 1100 1000 0010 0000 0100:
+
+- bit 2, vmx-exit-nosave-debugctl
+- bit 9, host address space size, is handled automatically by QEMU
+- bit 15, vmx-exit-ack-intr
+- bit 17, vmx-exit-save-pat
+- bit 18, vmx-exit-load-pat
+- bit 19, vmx-exit-save-efer
+- bit 20, vmx-exit-load-efer
+- bit 21, vmx-exit-save-preemption-timer
+
+Try removing all of these and see if QEMU starts:
+
+qemu-kvm ... -cpu
+host,-vmx-exit-nosave-debugctl,-vmx-exit-ack-intr,-vmx-exit-save-pat,-vmx-exit-load-pat,-vmx-exit-save-efer,-vmx-exit-load-efer,-vmx-exit-save-preemption-timer
+
+And then add them back one at a time.
+
+Paolo
+
 
