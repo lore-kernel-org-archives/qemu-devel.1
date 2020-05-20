@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276A2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA38C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC6A20756
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1622C20758
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 20:56:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Icnfj42E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC6A20756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="fp/IYFg1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1622C20758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbVgt-0003Tp-P5
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 16:51:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44410)
+	id 1jbVlm-0005Y2-2l
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 16:56:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVXp-0005mO-QN
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:29 -0400
-Received: from mout.web.de ([212.227.17.11]:46605)
+ id 1jbVXt-0005ou-ID
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:33 -0400
+Received: from mout.web.de ([212.227.15.3]:34685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVXo-00076d-SV
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:29 -0400
+ id 1jbVXs-00079F-JK
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590007341;
- bh=nBz36uKLAVET+svpvOg5XAEq13IOV9YVmFR9/mOLz4w=;
+ s=dbaedf251592; t=1590007345;
+ bh=rI0siZjB1fnXQBtvS0qkV9XKqMdAQZHTmQcm9q2ms80=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=Icnfj42EK4XLxK3Hmpl0O/cZPwrSq8FNGXWw3P38gY8rC28tKiAtAbGvAR+BkTQ1o
- GOAqQtsPM/EgZY+m5iyOn7BOz3P9nnj0myxEZTWQ7+qtIRvHCUFZAplFGSW6yBzaCk
- iL8Pzzjz3HWDvJlzh+Zeqg+oaxeHiQgbwq4zhaqo=
+ b=fp/IYFg1mY9KYSufwivykFYkZ3B2aZ/fxAJNGFe69WDcp2D7YR1uaALHs6HSU48rI
+ ezq3UHtb0TVep4SIAkwcN3n822UhpgKfS8r806lo+BF110I8pSWp5r1jR05n4jrMy2
+ mrja6sRfVapra7W85h/0nkczFoJRoSy8/ogk3blo=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N7gbY-1iyPJX19Fq-014duS; Wed, 20
- May 2020 22:42:21 +0200
-Date: Wed, 20 May 2020 22:42:20 +0200
+Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LshGz-1ivPZY1Ygz-012Foq; Wed, 20
+ May 2020 22:42:25 +0200
+Date: Wed, 20 May 2020 22:42:23 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v2 3/6] migration/colo.c: Flush ram cache only after
- receiving device state
-Message-ID: <38382499f40a1288d7e7f0fd59173b23660b69d9.1590007004.git.lukasstraub2@web.de>
+Subject: [PATCH v2 4/6] migration/colo.c: Relaunch failover even if there
+ was an error
+Message-ID: <85df331bfe69661072d9f29b616f065ca261f471.1590007004.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1590007004.git.lukasstraub2@web.de>
 References: <cover.1590007004.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/l8AuOZVOaV9W4.w.EKwRSFx";
+Content-Type: multipart/signed; boundary="Sig_/5kTYTU/5IwxYSoMwMX_qhmS";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:70VK6yf9zPvIdnGLOJ8M2cKJqRj4iOoKXJcVIcnOFJZzPSoVYNj
- /W4B8o6JwdveFklqYkTqR5b8DX2Jmd/q6TZ6zpnb49g/KyBLNyZ/RdZvES+XubtBOqcOBYA
- xU+U/iYWVUM+vGBZyVvH0/63RdogoaPExXThRppJodpg46vA8LJPv7WvLMNHB1RB/GAdNcp
- JCPWaHeq/us8AMnwM9X6g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hJ/Iah1VeIk=:If04k/IPK1QczH/dN7wyaY
- 4/g133qSADLa6JuXzXuVIYO9syoAQ3Hp67u8JwDZ6BPbGi+nqICGebFUZorBlVOCpIhxVwoRV
- tVysWrKXE9zpNgPqFLPFvCkbLMdSB7i9e/JYXyd8gy87OO8Qkc/KLK0KegU9NMYFHEVk7uIOC
- IsjBRk+qVTZlxScoQvKhbEjT2ggCambHqtAn30yK5ARH+KSIkCZsT3fPHyFOyw/8lC9z+j3jw
- 7X2UBEZJ0L0w9BUCSlkBwoD4BC/Et32lYfcHwf+tYH0ablUAAC9Z0bk91Ust7N1dLf/fgLRBe
- opOhXUsGlb7bRBlzzV6y6tz1n9j4UugIvWxtr0f3ksdXjcjA0xHDulM9335394ji+DRsSYDBu
- hTL+P2ONiTWENM6hCRgg5zaWC1ita8nG2YzOFLHvhLMqEWEeOl2XsCiA9AbnPzFHerub43btI
- EwV7m6H4ir5c17bW7DwQouT+AMobuIu+1zuiVXTdUBb9F4MLkdsGnxCEJvtp3QfX34w6BczDE
- 9vxeKDLUIwr2EGkKg03G2iPHZCixo6GNEPSH05m3EoPqFPDVzmRN1gyyZvIFDV57yw8Wn2wvq
- HrbmNw2rUhuemR5l+PK1t7IbNLvI228IaighnD6Anwil+wpWUey0eWLumP7RepNxw72YauecW
- aJJGwwQwSMoCEi9dhqcIh578o8wK9qN8e+Kif6N4aHUKRtXX/f7hoVwvY93b/OZIJdue0HrqP
- LKyHVljomOZ9Ltcnuy0153aLgksKX5jdTSO+iiiSUxUoDPlc5D5Gcuhq3SUssoevvEfTHeACM
- JvQr6N5ZGlNS+NPzY5St+0pq6gUOYRgfcQJDwfiEZf7LndD8K41KSOBYE28stwhB1geHgvpJq
- gqmA+knl+SkhBGxXGTq3rBrc3U6+9yiRRZQ3zW+ba/sK1s8PO/7vh/Wumd3xKQVIfLyGKO3P4
- R1AyMuX7prKHP6VvNv12/2kFGOIl30HUj2TsSSVMhUl2Q/Hcqm1K0CgLArkTC1vc0LGRqpzdH
- HeUo2yfZKixNMmpQ1iHJIJNaVco7nmK35nm74AVhAiao/PARmvdF49U/YtF/dnK//srgMlbi0
- X3eKdXmEIYNQnpi1XiDyR6cYCSn+fApSpvF1UpFxxzknk9O8C+6w2HzIIeArf8Ikg0+NRhPbI
- BHKnpDn7JaIwqkwW2ku9A0L1RaJUT2JcZYveXGADiizGHVyGEoBs67+9vv/c6GAowp+FcVnox
- NZQtkTyB1TbiJWEaU
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:L3cYkJcfcO04JSDwvaPz2lFaFK2ur+1NvpQsnqJLp6zlV6L0/mq
+ JL2MeDqtaOUEPGh389v5NTKzCUr/A9421cqcAETznYwfIZrpRIhdiMZAjlKnTZSDuWD8hAt
+ 4no/Y1BGx5dwFHW+3ZhduK5WDX0lY3B3/TZ5B5hrG9ORdp/V3yyD6qqgDJuXEI6G1CMc8SN
+ OmLxzUDnOhXZWjMARVkAg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:H45V3UIycU0=:MhMKrNBUt9EbNQipKzwj2k
+ qpmONqDPhBGkvRM7ts+m6UUPWKeB+0SW+Y5tPSaVDtZDsf7Gr14KqdCt8QP5NhHynvt9cqdVm
+ 7kGRROzIUvj6DbgT1VHUdBR214kWvHge01FMZhCoM4GF7AHrDKtFRWNUpmOlJa03tAq6uMuen
+ ujSsN8lNH/qiQsx9yWtfqkEhds37z67MdjRKp9fJ0KFO26SvUJd7MxEMj1pn3AbqAVDNAYQNj
+ fFvM9Vl9vIZJSg8PtJkzHK/stPZEPHc252NN9lLcO8lWYggUlLilR60IjmxEH3I+gYSpl9BaS
+ DpS+m/VLbJrHnutoXWMoV5BXRQuZCHcyPOlpXQXDTcvak1wrXyST0D96Mr7/N+N6lSpyBLlgl
+ sZ+V4Aw+H0ZGw6uCFXi7vlIiaJf97oPg2UmROVMYZruOBC6q3Zhaz6vQurvlekDzYAXJhj9Uz
+ ByHXtilUJ69hABaTs4BwKaqf9Grd+DnnRDxpC+fY4A1p6xTVUJGS9eKbpbAhboItoLRCEnobE
+ KWP6elnGdpl/1mvPuyJN37GZ4vllG3N6nbVfuOGA7Xl84nSRR8CVGhuFBESTUTgODjMY9tI5D
+ n9MAOifQF+WncHG30lujDSVteNUnimrJsvXCBC96Bwvr168c9m14XBThXp5/Tq94NsHJn3GSF
+ kY7nRHCKrSDCrfKpd0/5rMikQ3yy8Z85KItVCblrUGJPGT3ZGrw305YHYEwl3TbBN/gjyoXnb
+ 15YaxD6/0vNuIsc+km2hn+0ccAy/sUfc6H6NlwcXktSQUEwfJ3s1o54YXXYYnsSHNnY+VtBZR
+ KFVH9f3qJ6YOMdwU53q6ybaU29LiQmwq8T6z4TXlbJ0I03DAvyWgzM+MYioEOmGjxvLIn/QTt
+ 21vPJSIP+C/NZqDwAsSOxCbNc7gxfqoC2m4oh1V/okT7CtLi8H4ApAZtNEtqRvzOXUpy1QIAu
+ Qtlmbf/2ThtPX5shsVCWEV+D18Dx+GZ5arYCrWxT5DjdkQ/FyRojkJzqoyuD2tU+VxQcTYJWh
+ TMVVa42KFHAx/eQ9ZqmGqpZ/83H1bS5LzCFZQLyOzHgkKq8jiJ4HWcVEcRbmfcj8ssfR0yYmz
+ mwXPUWDiHuBiyWtyeV+koYiF+Wvfs0KWuCfB4iv5nis5jFZfBupVH8ADjp39oHLIg11scuv3a
+ btXAZC0zke785hcP0jHucM3z6OjLDKbNAVAFuPiVARoGAn0EjLpLdiQPsXfYt/HTwsfNNNNA9
+ 5C3pQSYe9sorHV0rq
+Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:20
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -24
 X-Spam_score: -2.5
 X-Spam_bar: --
@@ -110,98 +110,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/l8AuOZVOaV9W4.w.EKwRSFx
+--Sig_/5kTYTU/5IwxYSoMwMX_qhmS
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-If we suceed in receiving ram state, but fail receiving the device
-state, there will be a mismatch between the two.
+If vmstate_loading is true, secondary_vm_do_failover will set failover
+status to FAILOVER_STATUS_RELAUNCH and return success without initiating
+failover. However, if there is an error during the vmstate_loading
+section, failover isn't relaunched. Instead we then wait for
+failover on colo_incoming_sem.
 
-Fix this by flushing the ram cache only after the vmstate has been
-received.
+Fix this by relaunching failover even if there was an error. Also,
+to make this work properly, set vmstate_loading to false when
+returning during the vmstate_loading section.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- migration/colo.c | 1 +
- migration/ram.c  | 5 +----
- migration/ram.h  | 1 +
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ migration/colo.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index 6b2ad35aa4..2947363ae5 100644
+index 2947363ae5..a69782efc5 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -739,6 +739,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+@@ -743,6 +743,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
 ncomingState *mis,
-
-     qemu_mutex_lock_iothread();
-     vmstate_loading =3D true;
-+    colo_flush_ram_cache();
      ret =3D qemu_load_device_state(fb);
      if (ret < 0) {
          error_setg(errp, "COLO: load device state failed");
-diff --git a/migration/ram.c b/migration/ram.c
-index 04f13feb2e..5baec5fce9 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3313,7 +3313,7 @@ static bool postcopy_is_running(void)
-  * Flush content of RAM cache into SVM's memory.
-  * Only flush the pages that be dirtied by PVM or SVM or both.
-  */
--static void colo_flush_ram_cache(void)
-+void colo_flush_ram_cache(void)
- {
-     RAMBlock *block =3D NULL;
-     void *dst_host;
-@@ -3585,9 +3585,6 @@ static int ram_load(QEMUFile *f, void *opaque, int ve=
-rsion_id)
++        vmstate_loading =3D false;
+         qemu_mutex_unlock_iothread();
+         return;
      }
-     trace_ram_load_complete(ret, seq_iter);
+@@ -751,6 +752,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
+     replication_get_error_all(&local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
++        vmstate_loading =3D false;
+         qemu_mutex_unlock_iothread();
+         return;
+     }
+@@ -759,6 +761,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
+     replication_do_checkpoint_all(&local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
++        vmstate_loading =3D false;
+         qemu_mutex_unlock_iothread();
+         return;
+     }
+@@ -770,6 +773,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
 
--    if (!ret  && migration_incoming_in_colo_state()) {
--        colo_flush_ram_cache();
--    }
-     return ret;
- }
+     if (local_err) {
+         error_propagate(errp, local_err);
++        vmstate_loading =3D false;
+         qemu_mutex_unlock_iothread();
+         return;
+     }
+@@ -780,9 +784,6 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
+     qemu_mutex_unlock_iothread();
 
-diff --git a/migration/ram.h b/migration/ram.h
-index 5ceaff7cb4..2eeaacfa13 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -65,6 +65,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *=
-rb);
+     if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
+-        failover_set_state(FAILOVER_STATUS_RELAUNCH,
+-                        FAILOVER_STATUS_NONE);
+-        failover_request_active(NULL);
+         return;
+     }
 
- /* ram cache */
- int colo_init_ram_cache(void);
-+void colo_flush_ram_cache(void);
- void colo_release_ram_cache(void);
- void colo_incoming_start_dirty_log(void);
+@@ -881,6 +882,14 @@ void *colo_process_incoming_thread(void *opaque)
+             error_report_err(local_err);
+             break;
+         }
++
++        if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
++            failover_set_state(FAILOVER_STATUS_RELAUNCH,
++                            FAILOVER_STATUS_NONE);
++            failover_request_active(NULL);
++            break;
++        }
++
+         if (failover_get_state() !=3D FAILOVER_STATUS_NONE) {
+             error_report("failover request");
+             break;
+@@ -888,8 +897,6 @@ void *colo_process_incoming_thread(void *opaque)
+     }
 
+ out:
+-    vmstate_loading =3D false;
+-
+     /*
+      * There are only two reasons we can get here, some error happened
+      * or the user triggered failover.
 --
 2.20.1
 
 
---Sig_/l8AuOZVOaV9W4.w.EKwRSFx
+--Sig_/5kTYTU/5IwxYSoMwMX_qhmS
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7FliwACgkQNasLKJxd
-slik1g//VQWDDRp+gzSUWmtOGpo0jPKP7A515wv8WvivTEIeVaFpkyQBxdv1QQJ8
-iVtAoH4Wga36y1j2nEqwM5dTAxHjX8O/NxBdio8wiiCsy/SBg1KRXwiK5hE/eIQj
-s6a5SpMwGz3OasdPwcKmJL4xpJ1ljUnMw0UYhEh6+7KtnIhzNBoinMykKIbgg0VI
-cDEOncdsDOYIzC2sHzTnCwEgjcK0aUYH3GP397alOdnIqRbyA/xtdYtAXx2CO2ZA
-lMVoEJAC3XEx6Ua291DPfCFrx92VMzgWfdU87eRZcMXro0YJH/GIOMKJNBPDT4Vm
-K1PdSZrpRP2MdVZ2xUg6L2t8LBTYGWhqwJwzzyNcU0dBXgRU3krXjtb0eePgFgsY
-5n7STaDJFbjXroAgYPJrL7/Vy1r5bu7HGsDVnn3S+N7G2Bf30HZc/g25gZWUQZ/J
-ka4fK56ChSBrgkHZZw+O9gJJ0R7C5qnwZ6p3Q9zqf4g1Yw5HOO7wHyiAMeTJXA/e
-zWrmNwYoq0cIcX8AL/UfiDZw4vYuEQnqCS3vmOmtZCQ7sJ93hYF73daOPoNJ5wLj
-9BUEZ2LPoGNEJhD56eklse8QzYWjKnvn3C+VzaQLGP0lu3NXKe67VWMY2m3DEcFv
-Gswu2sLFhKO2uOtXfyGkNvfzJkyWCFLr2iGHNSrAcn7RTglHjXU=
-=jLej
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7Fli8ACgkQNasLKJxd
+slhCtA/+NEEiPBIUoM31GRt37ytqX78lDccKBgOmWo8YJdIuh3/C9hexEISicC0p
+5aIZj2Hk4akqFqvP5GHddvgtWfKnbP+1dMjBGVZct6zX9cDJqqTZQXQNyH6AW3td
+V8pmTQdhZg+A+ETcpMCft6XsnCha/P42F6ADx02iQo5BMb3BV1B/7tWB4BjNPSww
+t5XNjkmjex4VCwqy/W+DkRJ9W0fMd0lfqZKr0eU9DW4h0pP0uNS6+J2O+llQmbzM
+dBC7280TM5L0eWwOjmTvgfeGsichXMtgOUdHL2aVo8qhoGHL7hjcSCIWqgW71GFd
+TKAq0FCGOGc3mm1MCDdxBGfv/vsKtC0Nx259J+QT+nrbhRCFmrqnjh7Es+PCSirN
+obFLJT84It88bvz6oz3PbXBduCBliP24+dEBUo0Q+wxuhwxmMOL9Vdn2tpOT/QMm
+2fTFPhh14f0Y7wJwUorG7XPCD5bRGAw1+bNvIHoRK5Krb5I/Rvl4ejXVsnO6OnXC
+w81WFpp0oAey87eIKE0e5TecSlU8/+DZVB9YyfjcLR8UZmeAPEPArKl59zzTsYiZ
+Mgz/X9jlWQSQUqWCxYqdZoBtcs1C4mj6Oo5USfKeXiW0Bmz3vJ0zEEj5iJ9pYUEb
+l5IeabbmPUawoZDCqeswRABUayoWkuJbduywV3gufKISdjq5nRk=
+=ViO6
 -----END PGP SIGNATURE-----
 
---Sig_/l8AuOZVOaV9W4.w.EKwRSFx--
+--Sig_/5kTYTU/5IwxYSoMwMX_qhmS--
 
