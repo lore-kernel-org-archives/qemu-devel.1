@@ -2,91 +2,56 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9316AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D4FC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6294F207D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:27:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrURtwIr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6294F207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C867207D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:28:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C867207D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPgb-0005k8-IO
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:27:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58586)
+	id 1jbPhf-0006ua-Jd
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:28:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbPfR-0004Oo-4Y
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:25:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41760
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbPfQ-00072g-6z
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:25:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589984755;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9MpxWR1WTIKqU/NfxPm3Fb7eoi+Gk5kSb+fuXQl4RTg=;
- b=OrURtwIrNj12ufVB1CK3t3tGUX8eI3GpZuT3pP7yBx771M9fL1F4eXEqjjPNm/BcVVq042
- 6/QnURlDf2vIBTzIA320mzFXqvlwaPQz0b5qPtIq/8MRwxrVY6VbvRwAlm+DrTgGOifbms
- 6Jmrya9VAgQ44VupHRXHG/9M3yniaTQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-wDOwwHeKN-GY9YGktpMBOQ-1; Wed, 20 May 2020 10:25:53 -0400
-X-MC-Unique: wDOwwHeKN-GY9YGktpMBOQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A324219200C9;
- Wed, 20 May 2020 14:25:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 70EC12E194;
- Wed, 20 May 2020 14:25:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F190611358BC; Wed, 20 May 2020 16:25:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 02/55] qdev: Drop redundant bus realization
-References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-3-armbru@redhat.com>
- <7f130f89-ae0d-ecb0-11f5-e9847548950b@redhat.com>
-Date: Wed, 20 May 2020 16:25:50 +0200
-In-Reply-To: <7f130f89-ae0d-ecb0-11f5-e9847548950b@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 20 May 2020 14:00:13
- +0200")
-Message-ID: <87eerer8cx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jbPXo-00052M-Pj
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:18:04 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:49756)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jbPXm-0004T2-NG
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:18:04 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id BC8F8748DDE;
+ Wed, 20 May 2020 16:17:49 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 38915748DC8; Wed, 20 May 2020 16:17:49 +0200 (CEST)
+Message-Id: <57104c20bf2838fef58623349b1c8ee7554be7b5.1589981990.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1589981990.git.balaton@eik.bme.hu>
+References: <cover.1589981990.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH 2/6] sm501: Shorten long variable names in sm501_2d_operation
+Date: Wed, 20 May 2020 15:39:50 +0200
+To: qemu-devel@nongnu.org
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 10:17:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,67 +64,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+This increases readability and cleans up some confusing naming.
 
-> +Marcel
->
-> On 5/19/20 4:54 PM, Markus Armbruster wrote:
->> Realizing a device automatically realizes its buses, in
->> device_set_realized().  Realizing them in realize methods is
->> redundant, unless the methods themselves require them to be realized
->> early.  None do.  Drop the redundant bus realiziations.
->
-> Typo realiziations-> realizations.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/sm501.c | 45 ++++++++++++++++++++++-----------------------
+ 1 file changed, 22 insertions(+), 23 deletions(-)
 
-Will fix, thanks!
-
-> So you are reverting commits 685f9a3428f & b1af7959a66...
-
-I should've checked where these lines come from.
-
-> I don't understand them, Marcel can you review this patch?
->
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   hw/pci-host/prep.c      | 1 -
->>   hw/pci-host/versatile.c | 1 -
->>   2 files changed, 2 deletions(-)
->>
->> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
->> index 1a02e9a670..c821ef889d 100644
->> --- a/hw/pci-host/prep.c
->> +++ b/hw/pci-host/prep.c
->> @@ -268,7 +268,6 @@ static void raven_pcihost_realizefn(DeviceState *d, =
-Error **errp)
->>       memory_region_add_subregion(address_space_mem, 0xbffffff0, &s->pci=
-_intack);
->>         /* TODO Remove once realize propagates to child devices. */
->> -    object_property_set_bool(OBJECT(&s->pci_bus), true, "realized", err=
-p);
->>       object_property_set_bool(OBJECT(&s->pci_dev), true, "realized", er=
-rp);
->>   }
->>   diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
->> index cfb9a78ea6..28817dbeec 100644
->> --- a/hw/pci-host/versatile.c
->> +++ b/hw/pci-host/versatile.c
->> @@ -458,7 +458,6 @@ static void pci_vpb_realize(DeviceState *dev, Error =
-**errp)
->>       }
->>         /* TODO Remove once realize propagates to child devices. */
->> -    object_property_set_bool(OBJECT(&s->pci_bus), true, "realized", err=
-p);
->>       object_property_set_bool(OBJECT(&s->pci_dev), true, "realized", er=
-rp);
->>   }
->>  =20
->>
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index bd3ccfe311..f42d05e1e4 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -700,17 +700,16 @@ static inline void hwc_invalidate(SM501State *s, int crt)
+ static void sm501_2d_operation(SM501State *s)
+ {
+     /* obtain operation parameters */
+-    int operation = (s->twoD_control >> 16) & 0x1f;
++    int cmd = (s->twoD_control >> 16) & 0x1F;
+     int rtl = s->twoD_control & 0x8000000;
+     int src_x = (s->twoD_source >> 16) & 0x01FFF;
+     int src_y = s->twoD_source & 0xFFFF;
+     int dst_x = (s->twoD_destination >> 16) & 0x01FFF;
+     int dst_y = s->twoD_destination & 0xFFFF;
+-    int operation_width = (s->twoD_dimension >> 16) & 0x1FFF;
+-    int operation_height = s->twoD_dimension & 0xFFFF;
++    int width = (s->twoD_dimension >> 16) & 0x1FFF;
++    int height = s->twoD_dimension & 0xFFFF;
+     uint32_t color = s->twoD_foreground;
+-    int format_flags = (s->twoD_stretch >> 20) & 0x3;
+-    int addressing = (s->twoD_stretch >> 16) & 0xF;
++    int format = (s->twoD_stretch >> 20) & 0x3;
+     int rop_mode = (s->twoD_control >> 15) & 0x1; /* 1 for rop2, else rop3 */
+     /* 1 if rop2 source is the pattern, otherwise the source is the bitmap */
+     int rop2_source_is_pattern = (s->twoD_control >> 14) & 0x1;
+@@ -721,12 +720,12 @@ static void sm501_2d_operation(SM501State *s)
+     /* get frame buffer info */
+     uint8_t *src = s->local_mem + src_base;
+     uint8_t *dst = s->local_mem + dst_base;
+-    int src_width = s->twoD_pitch & 0x1FFF;
+-    int dst_width = (s->twoD_pitch >> 16) & 0x1FFF;
++    int src_pitch = s->twoD_pitch & 0x1FFF;
++    int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
+     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
+     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
+ 
+-    if (addressing != 0x0) {
++    if ((s->twoD_stretch >> 16) & 0xF) {
+         qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
+         return;
+     }
+@@ -758,20 +757,20 @@ static void sm501_2d_operation(SM501State *s)
+         return;
+     }
+ 
+-    switch (operation) {
++    switch (cmd) {
+     case 0x00: /* copy area */
+ #define COPY_AREA(_bpp, _pixel_type, rtl) {                                   \
+         int y, x, index_d, index_s;                                           \
+-        for (y = 0; y < operation_height; y++) {                              \
+-            for (x = 0; x < operation_width; x++) {                           \
++        for (y = 0; y < height; y++) {                              \
++            for (x = 0; x < width; x++) {                           \
+                 _pixel_type val;                                              \
+                                                                               \
+                 if (rtl) {                                                    \
+-                    index_s = ((src_y - y) * src_width + src_x - x) * _bpp;   \
+-                    index_d = ((dst_y - y) * dst_width + dst_x - x) * _bpp;   \
++                    index_s = ((src_y - y) * src_pitch + src_x - x) * _bpp;   \
++                    index_d = ((dst_y - y) * dst_pitch + dst_x - x) * _bpp;   \
+                 } else {                                                      \
+-                    index_s = ((src_y + y) * src_width + src_x + x) * _bpp;   \
+-                    index_d = ((dst_y + y) * dst_width + dst_x + x) * _bpp;   \
++                    index_s = ((src_y + y) * src_pitch + src_x + x) * _bpp;   \
++                    index_d = ((dst_y + y) * dst_pitch + dst_x + x) * _bpp;   \
+                 }                                                             \
+                 if (rop_mode == 1 && rop == 5) {                              \
+                     /* Invert dest */                                         \
+@@ -783,7 +782,7 @@ static void sm501_2d_operation(SM501State *s)
+             }                                                                 \
+         }                                                                     \
+     }
+-        switch (format_flags) {
++        switch (format) {
+         case 0:
+             COPY_AREA(1, uint8_t, rtl);
+             break;
+@@ -799,15 +798,15 @@ static void sm501_2d_operation(SM501State *s)
+     case 0x01: /* fill rectangle */
+ #define FILL_RECT(_bpp, _pixel_type) {                                      \
+         int y, x;                                                           \
+-        for (y = 0; y < operation_height; y++) {                            \
+-            for (x = 0; x < operation_width; x++) {                         \
+-                int index = ((dst_y + y) * dst_width + dst_x + x) * _bpp;   \
++        for (y = 0; y < height; y++) {                            \
++            for (x = 0; x < width; x++) {                         \
++                int index = ((dst_y + y) * dst_pitch + dst_x + x) * _bpp;   \
+                 *(_pixel_type *)&dst[index] = (_pixel_type)color;           \
+             }                                                               \
+         }                                                                   \
+     }
+ 
+-        switch (format_flags) {
++        switch (format) {
+         case 0:
+             FILL_RECT(1, uint8_t);
+             break;
+@@ -824,14 +823,14 @@ static void sm501_2d_operation(SM501State *s)
+ 
+     default:
+         qemu_log_mask(LOG_UNIMP, "sm501: not implemented 2D operation: %d\n",
+-                      operation);
++                      cmd);
+         return;
+     }
+ 
+     if (dst_base >= get_fb_addr(s, crt) &&
+         dst_base <= get_fb_addr(s, crt) + fb_len) {
+-        int dst_len = MIN(fb_len, ((dst_y + operation_height - 1) * dst_width +
+-                           dst_x + operation_width) * (1 << format_flags));
++        int dst_len = MIN(fb_len, ((dst_y + height - 1) * dst_pitch +
++                          dst_x + width) * (1 << format));
+         if (dst_len) {
+             memory_region_set_dirty(&s->local_mem_region, dst_base, dst_len);
+         }
+-- 
+2.21.3
 
 
