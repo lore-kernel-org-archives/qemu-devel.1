@@ -2,56 +2,85 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D4FC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC46C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C867207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:28:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C867207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 8C348205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:33:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uiEUvca4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C348205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPhf-0006ua-Jd
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:28:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57134)
+	id 1jbPn4-0002y2-Og
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jbPXo-00052M-Pj
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:18:04 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:49756)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jbPXm-0004T2-NG
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:18:04 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id BC8F8748DDE;
- Wed, 20 May 2020 16:17:49 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 38915748DC8; Wed, 20 May 2020 16:17:49 +0200 (CEST)
-Message-Id: <57104c20bf2838fef58623349b1c8ee7554be7b5.1589981990.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1589981990.git.balaton@eik.bme.hu>
-References: <cover.1589981990.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 2/6] sm501: Shorten long variable names in sm501_2d_operation
-Date: Wed, 20 May 2020 15:39:50 +0200
+ (Exim 4.90_1) (envelope-from <e.mikitas@gmail.com>)
+ id 1jbPmU-0002Rf-67; Wed, 20 May 2020 10:33:14 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37226)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <e.mikitas@gmail.com>)
+ id 1jbPmT-0008Pl-Dk; Wed, 20 May 2020 10:33:13 -0400
+Received: by mail-wm1-x343.google.com with SMTP id z72so3115383wmc.2;
+ Wed, 20 May 2020 07:33:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=PXxBZetuYeBOwMYKyQFovUtIjAoxzqAocsmZ8HOO5i8=;
+ b=uiEUvca4nZ5Oqzkf8wtGDcHrGU9jK9S5S3JHLngZBQJhNJ/kjcXVcWw2Q41l9RGTU+
+ vn8fe9A6MzL9Q7w4Dhq+IQfJSRAqIGSysD7dRDkZzaEUxJKJcrjAKNNivH6XAV8X3bVi
+ JL0WjNJI89M25S6S4pm6HQyvFr5G7p1QQXseQnklj9KdLsI9nWRZuLTP90kT65WTUz9R
+ qSX4IIxr2lkPsvEs3p49Xc3f2DixbVbm+yuMYUVvzTGZ7DPTbCMABHDIJNOQuDHhvzWJ
+ DIyQm9ik4T51I0Tz++H8OIyVBJtv8etu8Cxc5cNhtKCJ2QRG05h7mP1HV5qCCuC1yayZ
+ dS0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=PXxBZetuYeBOwMYKyQFovUtIjAoxzqAocsmZ8HOO5i8=;
+ b=NhWqu2l1ETeU3UXBhoWgzWcG6rCDHxvOFsFDE4EN1Rk71aYHlNoobaVsOxwjaflc33
+ hClg9RHAcWtT8tblMhRr+8NQF5/Oh1ktV8tr54mUgHLT4pYik+Jzo+cJ1V8ZgPpqKg/Y
+ E92Y0ZARAluW68E6GZOzonNoNa4DPUld/NLpC/ZK+hSrEGalEFFO5q4CttIn3Q33UaeC
+ RvC8kJ31Gn8+KdycSA7CTCZC2qcnvaRgn5SlPrS5YeK+pWfN3LEWCvVKBLaXzyE0H5Z7
+ W7zLNEd7G9ECJytj3Qg6gyTBSh3RV0hZ7oZSvw355n2NVxbHIjI7Go1XpD6k0ZrHR1mj
+ a/VQ==
+X-Gm-Message-State: AOAM532lMt4Z3/KlLnN8CLYiQbeiYuq3grJz4caao3S4zttA6VqPS65E
+ iJkQFJufQtmPZ3C4eP599MdUU4PSu5pxiQ==
+X-Google-Smtp-Source: ABdhPJzTM2+VJbjJbYCth9jRCn3+Dojkh6SZC2R4GLztmApigLcmkkrR67gcVxqW1g/iv5HX7acs0A==
+X-Received: by 2002:a7b:c0d1:: with SMTP id s17mr4689213wmh.157.1589985190334; 
+ Wed, 20 May 2020 07:33:10 -0700 (PDT)
+Received: from eden-linux.lan (bzq-109-66-59-205.red.bezeqint.net.
+ [109.66.59.205])
+ by smtp.gmail.com with ESMTPSA id l18sm3180072wmj.22.2020.05.20.07.33.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 May 2020 07:33:09 -0700 (PDT)
+From: Eden Mikitas <e.mikitas@gmail.com>
 To: qemu-devel@nongnu.org
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 10:17:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PATCH] ssi/imx_spi: Removed unnecessary cast and fixed condition in
+ while statement
+Date: Wed, 20 May 2020 17:32:55 +0300
+Message-Id: <20200520143255.27235-1-e.mikitas@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=e.mikitas@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -64,139 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Alistair Francis <alistair@alistair23.me>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ "open list:i.MX31 kzm" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Eden Mikitas <e.mikitas@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This increases readability and cleans up some confusing naming.
+When inserting the value retrieved (rx) from the spi slave, rx is pushed to
+rx_fifo after being cast to uint8_t. rx_fifo is a fifo32, and the rx
+register the driver uses is also 32 bit. This zeroes the 24 most
+significant bits of rx. This proved problematic with devices that expect to
+use the whole 32 bits of the rx register.
+I tested this change by running `make check` and by booting linux on
+sabrelite (which uses an spi flash device).
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Eden Mikitas <e.mikitas@gmail.com>
 ---
- hw/display/sm501.c | 45 ++++++++++++++++++++++-----------------------
- 1 file changed, 22 insertions(+), 23 deletions(-)
+ hw/ssi/imx_spi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index bd3ccfe311..f42d05e1e4 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -700,17 +700,16 @@ static inline void hwc_invalidate(SM501State *s, int crt)
- static void sm501_2d_operation(SM501State *s)
- {
-     /* obtain operation parameters */
--    int operation = (s->twoD_control >> 16) & 0x1f;
-+    int cmd = (s->twoD_control >> 16) & 0x1F;
-     int rtl = s->twoD_control & 0x8000000;
-     int src_x = (s->twoD_source >> 16) & 0x01FFF;
-     int src_y = s->twoD_source & 0xFFFF;
-     int dst_x = (s->twoD_destination >> 16) & 0x01FFF;
-     int dst_y = s->twoD_destination & 0xFFFF;
--    int operation_width = (s->twoD_dimension >> 16) & 0x1FFF;
--    int operation_height = s->twoD_dimension & 0xFFFF;
-+    int width = (s->twoD_dimension >> 16) & 0x1FFF;
-+    int height = s->twoD_dimension & 0xFFFF;
-     uint32_t color = s->twoD_foreground;
--    int format_flags = (s->twoD_stretch >> 20) & 0x3;
--    int addressing = (s->twoD_stretch >> 16) & 0xF;
-+    int format = (s->twoD_stretch >> 20) & 0x3;
-     int rop_mode = (s->twoD_control >> 15) & 0x1; /* 1 for rop2, else rop3 */
-     /* 1 if rop2 source is the pattern, otherwise the source is the bitmap */
-     int rop2_source_is_pattern = (s->twoD_control >> 14) & 0x1;
-@@ -721,12 +720,12 @@ static void sm501_2d_operation(SM501State *s)
-     /* get frame buffer info */
-     uint8_t *src = s->local_mem + src_base;
-     uint8_t *dst = s->local_mem + dst_base;
--    int src_width = s->twoD_pitch & 0x1FFF;
--    int dst_width = (s->twoD_pitch >> 16) & 0x1FFF;
-+    int src_pitch = s->twoD_pitch & 0x1FFF;
-+    int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
-     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
-     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
+diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
+index 2dd9a631e1..43b2f14dd2 100644
+--- a/hw/ssi/imx_spi.c
++++ b/hw/ssi/imx_spi.c
+@@ -182,7 +182,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
  
--    if (addressing != 0x0) {
-+    if ((s->twoD_stretch >> 16) & 0xF) {
-         qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
-         return;
-     }
-@@ -758,20 +757,20 @@ static void sm501_2d_operation(SM501State *s)
-         return;
-     }
+         rx = 0;
  
--    switch (operation) {
-+    switch (cmd) {
-     case 0x00: /* copy area */
- #define COPY_AREA(_bpp, _pixel_type, rtl) {                                   \
-         int y, x, index_d, index_s;                                           \
--        for (y = 0; y < operation_height; y++) {                              \
--            for (x = 0; x < operation_width; x++) {                           \
-+        for (y = 0; y < height; y++) {                              \
-+            for (x = 0; x < width; x++) {                           \
-                 _pixel_type val;                                              \
-                                                                               \
-                 if (rtl) {                                                    \
--                    index_s = ((src_y - y) * src_width + src_x - x) * _bpp;   \
--                    index_d = ((dst_y - y) * dst_width + dst_x - x) * _bpp;   \
-+                    index_s = ((src_y - y) * src_pitch + src_x - x) * _bpp;   \
-+                    index_d = ((dst_y - y) * dst_pitch + dst_x - x) * _bpp;   \
-                 } else {                                                      \
--                    index_s = ((src_y + y) * src_width + src_x + x) * _bpp;   \
--                    index_d = ((dst_y + y) * dst_width + dst_x + x) * _bpp;   \
-+                    index_s = ((src_y + y) * src_pitch + src_x + x) * _bpp;   \
-+                    index_d = ((dst_y + y) * dst_pitch + dst_x + x) * _bpp;   \
-                 }                                                             \
-                 if (rop_mode == 1 && rop == 5) {                              \
-                     /* Invert dest */                                         \
-@@ -783,7 +782,7 @@ static void sm501_2d_operation(SM501State *s)
-             }                                                                 \
-         }                                                                     \
-     }
--        switch (format_flags) {
-+        switch (format) {
-         case 0:
-             COPY_AREA(1, uint8_t, rtl);
-             break;
-@@ -799,15 +798,15 @@ static void sm501_2d_operation(SM501State *s)
-     case 0x01: /* fill rectangle */
- #define FILL_RECT(_bpp, _pixel_type) {                                      \
-         int y, x;                                                           \
--        for (y = 0; y < operation_height; y++) {                            \
--            for (x = 0; x < operation_width; x++) {                         \
--                int index = ((dst_y + y) * dst_width + dst_x + x) * _bpp;   \
-+        for (y = 0; y < height; y++) {                            \
-+            for (x = 0; x < width; x++) {                         \
-+                int index = ((dst_y + y) * dst_pitch + dst_x + x) * _bpp;   \
-                 *(_pixel_type *)&dst[index] = (_pixel_type)color;           \
-             }                                                               \
-         }                                                                   \
-     }
+-        while (tx_burst) {
++        while (tx_burst > 0) {
+             uint8_t byte = tx & 0xff;
  
--        switch (format_flags) {
-+        switch (format) {
-         case 0:
-             FILL_RECT(1, uint8_t);
-             break;
-@@ -824,14 +823,14 @@ static void sm501_2d_operation(SM501State *s)
- 
-     default:
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented 2D operation: %d\n",
--                      operation);
-+                      cmd);
-         return;
-     }
- 
-     if (dst_base >= get_fb_addr(s, crt) &&
-         dst_base <= get_fb_addr(s, crt) + fb_len) {
--        int dst_len = MIN(fb_len, ((dst_y + operation_height - 1) * dst_width +
--                           dst_x + operation_width) * (1 << format_flags));
-+        int dst_len = MIN(fb_len, ((dst_y + height - 1) * dst_pitch +
-+                          dst_x + width) * (1 << format));
-         if (dst_len) {
-             memory_region_set_dirty(&s->local_mem_region, dst_base, dst_len);
+             DPRINTF("writing 0x%02x\n", (uint32_t)byte);
+@@ -206,7 +206,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+         if (fifo32_is_full(&s->rx_fifo)) {
+             s->regs[ECSPI_STATREG] |= ECSPI_STATREG_RO;
+         } else {
+-            fifo32_push(&s->rx_fifo, (uint8_t)rx);
++            fifo32_push(&s->rx_fifo, rx);
          }
+ 
+         if (s->burst_length <= 0) {
 -- 
-2.21.3
+2.17.1
 
 
