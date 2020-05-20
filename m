@@ -2,93 +2,91 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D639FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F21720829
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:07:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A149A20829
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 21:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="d0FVuWdx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F21720829
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="QsEb+/MF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A149A20829
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbVwN-0003Qv-KE
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:07:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44434)
+	id 1jbVxn-0004MD-NM
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 17:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVY1-0005uR-Lf
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:41 -0400
-Received: from mout.web.de ([212.227.15.14]:38821)
+ id 1jbVuK-0002Dl-G3; Wed, 20 May 2020 17:05:44 -0400
+Received: from mout.web.de ([212.227.15.3]:50145)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbVY0-00079y-Rb
- for qemu-devel@nongnu.org; Wed, 20 May 2020 16:42:41 -0400
+ id 1jbVuJ-0002Rb-JI; Wed, 20 May 2020 17:05:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590007353;
- bh=c2L3X4H7w/EoaLKNHwRFS99beuVs7O0gWwWmQO5Q7pQ=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=d0FVuWdx+Rru7Spb+JtjDo8GM10kgJjuZfqUCzW8BCQY/S2m3qeuBCl7OHHrIx26N
- rECdYCvQ/7CCo/AsHbODlRHs7w9ZD2NaTjynq9zSe+cRPTwCqmo14pLTWab2Cxsu6p
- aXWKConxVwiFrssqsdnnb4M+2U4GfdK5NVVp3Ta8=
+ s=dbaedf251592; t=1590008737;
+ bh=L7G8XxjG0NoxcFNUSt93wnRY5ibTk3fXbfaaNKPJnxY=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=QsEb+/MFft/hTnhd5G6zHDCYje4LViM0a8BBZpGKNO0NS7kqlMq34wt4skft0bySJ
+ Yp+F1gzwyUiBwVSuAqcOFMjFWyZRMjHKO5ZxQ6BVvB0JKvqVVuNMEjNKff9IGgnT7f
+ F/SvQStnfmrgSkxEi7av7rL9tiS3f3pO5gqGAhN0=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from luklap ([88.130.61.105]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0Lj2Cs-1j3pDj0jio-00dGNo; Wed, 20
- May 2020 22:42:33 +0200
-Date: Wed, 20 May 2020 22:42:32 +0200
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M8A09-1iokqG0akT-00vdOw; Wed, 20
+ May 2020 23:05:37 +0200
+Date: Wed, 20 May 2020 23:05:27 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v2 6/6] migration/migration.c: Fix hang in ram_save_host_page
-Message-ID: <e79085bbe2d46dfa007dd41820194d5e2d4fcd80.1590007004.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1590007004.git.lukasstraub2@web.de>
-References: <cover.1590007004.git.lukasstraub2@web.de>
+Subject: [PATCH v2 0/4] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <cover.1590008051.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/U1b7XtRRxqmbM7aHsgBi/5O";
+Content-Type: multipart/signed; boundary="Sig_/Gv_CWkNiI/8nD2OzMv1YR+h";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:FEH/aqH+YoSjHjWD+k0jCpanSaUTVOXNqQhtejSVbx26nrKA/WI
- top37b28OrYTQvNghaFlVP9Q2tyY/fK4tqB3ckW7vytHjBLCMbLkNvzWhc00w1gaqhrFL0s
- E9xn5sB7pLr4EUbDWOqXFudXv00hdStgbai80agWqW6eC8fMxEGNF9rV6vWxwqNPs9VhriJ
- OEmb7fSXHIA6oKx2P31RQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qFJ1REFqSlk=:NLRU0EmffZPPsFFGSJPQYW
- zfJ3bro42FkzSrpDTXvn9l/gOD7Dgasvfz+AqS6gn/dpguvivTpk4RydQcnwrqmEux9HePXjc
- oz1Zu/1hJZjXZwpBATzMd/LZbF3FHZ1efACcKDDIRNSDx4w9r6uvv9a46wj8wMt9+s6Ab+Vnp
- sg2CONFEFefZ7HR0CWR9hAmiuUqxtxsihZTElzPSZ3j0TfBgyKvAnn+qu+xiKz/jhEdc5jXPn
- dLRwTmuLtCkYZteO6gd5KMcNDvWSzltimy3GNcYIRhJ591Yy7AaLJR/SF5jYujAdN5FKW3GkB
- r7JkfuRyRjm9Nss5tCjbRigjEruDLzjHnmHSwy+QwO1aPB9Hb6rPYIpfpZaC4EE8W5PKI6BMA
- Txe7px/bkkk1agRXaKjU4eHY0/m3iGYiBpZgv1ouVfv0v7Z98MeLvrIMBi/fXXkKfmbz25pXh
- uX08USFjw/xf7YfR8X9rWfsr1Q+GsUbuD+eoxCDAjGIchTw4smNSjBoKoF2fWOG681RnLe16X
- zl5DapvM6m8Ydemgz2usx5K3yyss6P6y6+aFdURwqTa8Hc72w4m9ESqSXmjo13df5EZJb3UBI
- sKnKvyDpe/mzz9C58JaMJdZooKtPK1N77dEOX49YCTgIxC5vGxSL9oDx/HKON3F0hPdfiDhGD
- MP+CemicD81CvrDJ3ZxwrgGDAnmGKfowybt5u8ksAFjYMtdgiyCuNMghzQe/giCRh3dgBQzEt
- kICL4o9RNv8L5vP12ZpD6i48KIqksMZSI+NjTA+3O1d9+J9u6RkICiHZqmOWhHc+gS3SZ7K8o
- QBxLKd+10Mgm8JbgOEd9kv/CuT6kXugO06DJQqhTJpaD63blVJkxwvpnuYYGW1tZRfyAwQrZ3
- TGoe+yNO3I80BefDn7gIX089dBXfFU5dxY+t1TdifK269BXgeujS3qo+EnQmGLHqmFYkBZ0Kj
- CBohr6SMrIxqJ2WrN/tvZvc/983w89HcnuUFACpmHJEHgDXYsPHkrtoD/A43vHz+HmPKHkdKy
- Fm8psHrpX1Om/Da56BRVgHmpXwwIRBdZGYpPLsybfBxzsjD6qFRDmOPwqXNFaYHJ0gK9K3Dgq
- 3rWLN6Rya2Xq4os+zdzczluTiyb24828/F0xwG08970jDUiwW/LApQHey9LIOjQI+ySs44jp1
- 71hXRxXJHkJxtvRbvBTyGhLXmMtDF1neA2wnhIkEA0gicWcPQ3n6sgEdTOQwAVBpx6cLc2VvI
- VAOae4qd5oLvPBIcp
-Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:bYgdb7ZpTnsgkBtJz+VfMjSUetbTv35S4/8i1F/8LZyROcbMErv
+ 6MXdQFZB3MpaTKmO8AB0DdKqaJ1ZuVpDpl1qNJGkMbh6xFZwkGr+PD8liMhkVEcAWnMUVed
+ cHbCPzlZLST6hbLrzPUhhiuCzPZqRTd5TEOWVkRb6cXZ4S2+j94XujLR49kdV7bx/bC7Al8
+ zpE9AafAFb5f2B1ZgxSHQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Xqcc79j3tXg=:59Oc/m3fiUetJGuBH8OovJ
+ 6cPVhatDnyS4+0cID/bToppV6qZqyuxgM5sS46GrlUO23RaANrMUAP7J7kVBTwTFDsGGjvQ08
+ YUYlA2BKRFhqpVjGyIAWH5NSmpRdz47Ag7lq0yyoH6svwc0EkZKLKqIAvrtUK/yXDNTtOltOf
+ rR0Yaw/4RD95vrO0ZbFNsso1YERv5FZV5wjZJAFPpFlfuptv8DaWrhYh15eLmXU1ljZtqJ1of
+ 6f/Vb8oiHsU7jyCUbndIj0SUcjgS7ZnbrfjTqJAeV2rZ4YgTXmdTJF86SCSmwhWRAjM6Os+tS
+ Xgyd2tN5Ot+YnNDBwkKqhMfUDeP2Gdr9Zty1Lu6q8sMZ61nzwdJX2g79FKl/5X+p7YOw3gdgi
+ 54bVz8AvoDlppDC9Y77MPm/aS+Rp/oO7WL/U7gLhfI5m0YUO1cQ3iZ6/mxlCtuL2iqd+1llWn
+ MHAk+kywNHjOa2sCJJGXYmGx7zH/lmb2WIMRbPfvTMDOXYZ4UUU8Tc6UDCq9S/flsUj2djxg1
+ ZJDP2f0acJyNfVGSOCjhXzdwXCWiNqRdeq1D3vb/nLJN508n8SH85lqIG3QD7mmZmjk50sLVn
+ wG7DpNiulcMn/O4bkdLu4Pl9M1WiPU7GvTF+t9BKpNvqRIJp5msHt6KR77/EtRKM5h77zsHo/
+ wRaEZ7BTtcsrub4EfXFLqjavSrhux4nofLwsZYku6Whcl70Z9D2liekpKEiMN4QSaIUNihhBh
+ Pn2e6lvlTRO4aeOG/Viy/BIuaGfy554Wv6VDocl/Uz39svTdtscpDng/5m/2KKNS3/QPWhoyR
+ fdGm8w/puRFJuaakQl81qcrwT66vrLjMcmjQunzYSaPV27rFx5rWM2YRLL1377mN0r/Sh3qT6
+ htoAITN0fPdVazATvbggJ9iwK0pTj8fkb1mcYsrd9EkJvnfJSONaLdJbgjYzka6emzbyikxHN
+ ELvRiXl/Uga1//bR4ybjnM3YO54/ldntB8Iw5wtdBvv8cOF681VMe8sqQLZ8RCJQUCOAE8jcH
+ fBTX1WuJKzDcx3CxNBE8pWE97byRgtQn1D0AypEgq0QPcDODrsp80GV67TWJDKhQnJ9FTRnbg
+ o+mAuYfy2S7zTb5vLdRx7Hn9+fWPfnyAQmd+dGTE23QXwlpF0vpJx3YLYHDi+/ercKYq2B6Be
+ 1Lx1jk9naD4ppeGXYDnXUpTEysdsrBJ88BkaankdLXu2gmIScx3NdNbT1eNfKxPUuQxcGYXiy
+ myEF8uqdoHtsQtXMC
+Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 16:42:20
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,67 +99,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/U1b7XtRRxqmbM7aHsgBi/5O
+--Sig_/Gv_CWkNiI/8nD2OzMv1YR+h
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-migration_rate_limit will erroneously ratelimit a shutdown socket,
-which causes the migration thread to hang in ram_save_host_page
-if the socket is shutdown.
+Hello Everyone,
+In many cases, if qemu has a network connection (qmp, migration, chardev, e=
+tc.)
+to some other server and that server dies or hangs, qemu hangs too.
+These patches introduce the new 'yank' out-of-band qmp command to recover f=
+rom
+these kinds of hangs. The different subsystems register callbacks which get
+executed with the yank command. For example the callback can shutdown() a
+socket. This is intended for the colo use-case, but it can be used for other
+things too of course.
 
-Fix this by explicitly testing if the socket has errors or was
-shutdown in migration_rate_limit.
+Regards,
+Lukas Straub
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
----
- migration/migration.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+ -don't touch io/ code anymore
+ -always register yank functions
+ -'yank' now takes a list of instances to yank
+ -'query-yank' returns a list of yankable instances
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 187ac0410c..e8bd32d48c 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3347,6 +3347,10 @@ bool migration_rate_limit(void)
-     bool urgent =3D false;
-     migration_update_counters(s, now);
-     if (qemu_file_rate_limit(s->to_dst_file)) {
-+
-+        if (qemu_file_get_error(s->to_dst_file)) {
-+            return false;
-+        }
-         /*
-          * Wait for a delay to do rate limiting OR
-          * something urgent to post the semaphore.
+Lukas Straub (4):
+  Introduce yank feature
+  block/nbd.c: Add yank feature
+  chardev/char-socket.c: Add yank feature
+  migration: Add yank feature
+
+ Makefile.objs                 |   1 +
+ block/nbd.c                   | 101 ++++++++++++--------
+ chardev/char-socket.c         |  24 +++++
+ migration/migration.c         |   9 ++
+ migration/qemu-file-channel.c |   6 ++
+ migration/socket.c            |  11 +++
+ qapi/misc.json                |  45 +++++++++
+ softmmu/vl.c                  |   2 +
+ yank.c                        | 174 ++++++++++++++++++++++++++++++++++
+ yank.h                        |  69 ++++++++++++++
+ 10 files changed, 405 insertions(+), 37 deletions(-)
+ create mode 100644 yank.c
+ create mode 100644 yank.h
+
 --
 2.20.1
 
---Sig_/U1b7XtRRxqmbM7aHsgBi/5O
+--Sig_/Gv_CWkNiI/8nD2OzMv1YR+h
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7FljgACgkQNasLKJxd
-slhOBA/+K3em0d63PZm7XnAcSM5NOGlk12ALxCZtDcY9YZ+ZCYOh39bPwgQox0CZ
-Aa5G+73OBTXcg2k6y+jBxlXyLSN42Ir7hUUftUZH69fUW8h/ZEMKZalsK4UMquPD
-M+9+E9iGHkk8PKy3iQTAumDQangMA8OQDfmOOtRTtHhct0aZ3SmNVFv9ynru6nBS
-+lICkXJ/rjRMZVlNaj7dABEy9EfsuCZDjNrEatvYY6jUEgsi/cQ06PESwVA6S2Uv
-g1wmvvvnj3uX5t5/f+KIWwgaZ8HSDBvceHlAJrGbBWvLbLdLnwHDcQilL4YOWc4d
-5i8A/SEIfAbPozatn2fv8VmLPAL4RtENB4WXeIK9bc+GwI5iQ9Z9pTOdxAp/2eCz
-BWzPON58/skMGRiJS8EYZ4gEuLUI7RY+MGJxKaL5hgiNirbHR2f0DCRZ9mZBn43I
-njHu2bYTw+srAoim+ep7KxgZ8+CAoNEjhtGznu/L9yBzvjuJCitgaFGlZigQI6sC
-esmU5s88jfr2ZxPZJywGKIFmO5bjYKsPDpKsedI8D+8eHF7AyNdYjiTcNwQ3JKrR
-13gRe/uVdRvtOptGkL2kcU4SB7kbSQQWWN1+7rVkABltb5p46jLrjibLQm1a1fuO
-XCjv2E6cJ+jLGCCCUhDkStLBf5xTeAKpwvGf/PXDgmiba+AzNrM=
-=YTds
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7Fm5cACgkQNasLKJxd
+slgGKQ//YbV3xzDh3nDR8J4QvrEjdDccXvjYhj7ssxlfSzX16VCjVZo2y1jQrIoj
+6IJNvwG4LnIG/137i/oKWERi9cWKwFYYsJxYag/gPScBFt3z0rFixbHuqaqfXenQ
++2sn892Y50h/xXIqZOFAVLvIQM5oW72XEGjH2+zpFk9/B1hUViEcTmWwfGlbzSXv
+m43oZh33gpAVlkolhpew+D8kx8YnZ4+M0XpiH0Q75/xUliGWR2NTh9ysikZRsnVG
+A0Gw3sLRf3Y6K3GoIzPCiqT0SQQRN964vyhEkbKzWwwhaaTNrt2zjMN1d5+NcvtB
+hRkI1SbJc/GGI/8WBqtHgoBfK+z7t5xP8xDvcciHQDu+NdAnUZboKj2RN+thTVp9
+jGkQSY9E11mEV3WM83BBC4fQAdwaDnG1LeF+hUvRmvWeRhixVEQPD8DQc6doQyTu
+/O7HHlytjUEdgyRKM9kIJ5wEycGfk2nHVDtevtM7oIn1IoIwrL0qma9Se1FAM3zy
+BuJe6bQWDxXLr1y7Zyr9dCDwMmZsY8Ikm1UGBcsThSAAKBvXS9dEZyIu7B6w/kPT
+ieQc04vv29+5uw/Z9mFxPAjOPLgJXOTErC0QKd9n1ukalocyKKMA1Z0/CmOoPaW8
+ATaQ0WI3RzqLcy/B0Z41ES+Jl4VZ2+JxZLlvgmh4y4AKnD8aGI0=
+=p2ME
 -----END PGP SIGNATURE-----
 
---Sig_/U1b7XtRRxqmbM7aHsgBi/5O--
+--Sig_/Gv_CWkNiI/8nD2OzMv1YR+h--
 
