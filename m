@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE7DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225E1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:31:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6610C206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:30:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1A8120709
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LTlYbEmG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6610C206D4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qe1KLMgo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A8120709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbSXn-00062N-J9
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:30:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53564)
+	id 1jbSZ0-0007nS-3A
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:31:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbSVl-0001mP-Ts
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:09 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:33044)
+ id 1jbSVm-0001mw-NS
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:10 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38053)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbSVj-0004JP-Vz
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:09 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id z15so195646pjb.0
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:28:07 -0700 (PDT)
+ id 1jbSVl-0004Jk-Kx
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:10 -0400
+Received: by mail-pl1-x643.google.com with SMTP id m7so1616132plt.5
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pfOqd0W163btym5ANgJ/IhyJiwPH1qS8Yj0O7sKwHiQ=;
- b=LTlYbEmG0y9w9EEj+w6hceCghY+eIDoYDGfg/JlUnckhcOWWR4vb//edfXBLsAX4H6
- MbWFzGQ1tK6iH7pLANWBKicrx4+sGRToe6CcND+eAt//xL5pC3Yim6blMXn8nEhdI1sb
- QAhiM29FPK80xRqpS9U8vIlWAzDBLdpw3IWpiCgEujQVDIKSLt5m16lNZIgOO/6EfFh+
- iLEn/UuTIEDUdmlnwu9CndSRXkNmQ2PLiCv3XtrzpR24uG7HncBq2KCF3xxRrhDGHCUa
- QXXqUTTcDfjNzu25N/hnWyrrVS2D7JH0CrpT7ryM0uYRpY46Se/8u10tTZbfdviG+UKX
- CSxg==
+ bh=kNZVz8klhhmHc+6CSnLmSvrnq7KlJ9l7rdqsf1uPN3I=;
+ b=Qe1KLMgobeZhDjzsypCfxSLx4xtJO1IjMquCHfYfmVljfGRz1UNRKncmsT6HSil9kw
+ Kr6L0LLBLCtwORj3VdMJjTUjT2orsw6x2bhhZjI/SUE8zkY1e3YjUlvbdqlQyXnBs/gq
+ T1f2PgMb+hkI5R+wCLa9b3R9/danLQegAzbzlDqJRyWLBTjEHTrR861IT/MKBya89/nj
+ NO7NAB2dfk2P3umwbIrUJdoaD+SN+ikzTFc3VT1zxu8nvB3pT56OVozkJ6Wlfe3jBgWN
+ OyzxNHpvE+D15PS6gYhw/k9zN8o5FBjUm96atKcWeOFNsZJniosGyJF2rHFmGqsWPw5H
+ aY7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=pfOqd0W163btym5ANgJ/IhyJiwPH1qS8Yj0O7sKwHiQ=;
- b=pvd0SJNF0429hChATFj9UKwngfBX7DYRGKTwGdWG2yS7OLXS18TDdy6mm/nrbqOVXR
- ge7bf6E7r/SOhhi8bez8bJ51shRro7qPqOSXfkeLlm7LC6C8DKFFRVBeWgnNCrepDqVw
- pB/3nSu9HBaGjX/6gtWUXinHHJvdIxeVxH80nNIp+1zeRu3ALTkp0kJ1TWyVTm6JIEL3
- FeFWuuAvYF9PouKA9YmJxAw1FCMfxrFBCyfOytJrAe4cJESRRnZDKW1YfEx0Qs84lVtJ
- au0WVaFIMpWvU3yR7vdgP+lzTpKnwZnEuFYP5v3vVuMAHXeX6X846gm9MFB3bKgqFRR6
- GZ1g==
-X-Gm-Message-State: AOAM531jusEIeUG5HqFh0hFjHFXjrvqL7iJz+mZJhHpJSowUFV4mRijh
- QVta6GjC10FwpM9jqo4sj20QRxR25+Q=
-X-Google-Smtp-Source: ABdhPJxNqcIV0IUnioOdJpCgaG42lEsXeURUrgWovlLMMLcYh4tyeOlopLH2WF3LXDPiYdTdM3T5+A==
-X-Received: by 2002:a17:90a:6e4f:: with SMTP id
- s15mr3459723pjm.194.1589995686158; 
- Wed, 20 May 2020 10:28:06 -0700 (PDT)
+ bh=kNZVz8klhhmHc+6CSnLmSvrnq7KlJ9l7rdqsf1uPN3I=;
+ b=nE1OLXM5cC8R2HWdMeRqZNpb59NqR4i6gLZIBt4XhhDdZx3OJJOO8WgGa2NQAP7QD9
+ opvrvRS1VR/AR9Qq3cd0n9JszTNrs97HhcOHSaQmDvgXjMqatwc4aB35ZnUA6HnLEQM3
+ WGppuXKbQ3gwUCcAaeQA1A7ld6Zaa9sOR2ognr24te5rfEqW7vcDfSSHdRdLx3hYwI9p
+ bx4Qa/breKVh9onB8d5OzKunyMWyAvabv7uU9cLTbqIKHSRFwx0TdQl12HuutqApk+2N
+ r3IaJIKGZV0Y/7mZDM7+OAygotHBU852XP4t901PpyVTPZ4WHyfANfaIzPPLQeexNo9R
+ 5Chw==
+X-Gm-Message-State: AOAM533Tws8Fnd/9hLEb3UnMsVrEahCwGhC0yifBwHnh1ByoMA/mDbQg
+ xzWyCTOzRvgUcuX5bF7+ZawkTkeV3vU=
+X-Google-Smtp-Source: ABdhPJzUDUW653ntcxnWAaJbI6k0bsg4nQRHnUKCSp2ZpEDQ/kv2q3xNbryAgUAtNQcVEBkOdO30nQ==
+X-Received: by 2002:a17:902:fe0c:: with SMTP id
+ g12mr2833090plj.316.1589995687542; 
+ Wed, 20 May 2020 10:28:07 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id k18sm2643672pfg.217.2020.05.20.10.28.04
+ by smtp.gmail.com with ESMTPSA id k18sm2643672pfg.217.2020.05.20.10.28.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 10:28:05 -0700 (PDT)
+ Wed, 20 May 2020 10:28:06 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 3/5] include/elf: Add defines related to GNU property notes
- for AArch64
-Date: Wed, 20 May 2020 10:27:58 -0700
-Message-Id: <20200520172800.8499-4-richard.henderson@linaro.org>
+Subject: [PATCH v9 4/5] linux-user: Parse NT_GNU_PROPERTY_TYPE_0 notes
+Date: Wed, 20 May 2020 10:27:59 -0700
+Message-Id: <20200520172800.8499-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200520172800.8499-1-richard.henderson@linaro.org>
 References: <20200520172800.8499-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,60 +106,221 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These are all of the defines required to parse
-GNU_PROPERTY_AARCH64_FEATURE_1_AND, copied from binutils.
-Other missing defines related to other GNU program headers
-and notes are elided for now.
+For aarch64, this includes the GNU_PROPERTY_AARCH64_FEATURE_1_BTI bit,
+which indicates that the image should be mapped with guarded pages.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/elf.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+v9: Only map the startup executable with BTI; anything else must be
+    handled by the interpreter.
+---
+ linux-user/qemu.h    |   4 ++
+ linux-user/elfload.c | 143 ++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 112 insertions(+), 35 deletions(-)
 
-diff --git a/include/elf.h b/include/elf.h
-index 8fbfe60e09..9db4aae40c 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -26,9 +26,13 @@ typedef int64_t  Elf64_Sxword;
- #define PT_NOTE    4
- #define PT_SHLIB   5
- #define PT_PHDR    6
-+#define PT_LOOS    0x60000000
-+#define PT_HIOS    0x6fffffff
- #define PT_LOPROC  0x70000000
- #define PT_HIPROC  0x7fffffff
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index ce902f5132..d36b18b678 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -61,6 +61,10 @@ struct image_info {
+         abi_ulong       interpreter_loadmap_addr;
+         abi_ulong       interpreter_pt_dynamic_addr;
+         struct image_info *other_info;
++
++        /* For target-specific processing of NT_GNU_PROPERTY_TYPE_0. */
++        uint32_t        note_flags;
++
+ #ifdef TARGET_MIPS
+         int             fp_abi;
+         int             interp_fp_abi;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 01a9323a63..c84c9991fd 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2319,7 +2319,7 @@ static void load_elf_image(const char *image_name, int image_fd,
+     struct elfhdr *ehdr = (struct elfhdr *)bprm_buf;
+     struct elf_phdr *phdr;
+     abi_ulong load_addr, load_bias, loaddr, hiaddr, error;
+-    int i, retval;
++    int i, retval, prot_exec;
+     const char *errmsg;
  
-+#define PT_GNU_PROPERTY   (PT_LOOS + 0x474e553)
+     /* First of all, some simple consistency checks */
+@@ -2354,17 +2354,90 @@ static void load_elf_image(const char *image_name, int image_fd,
+     loaddr = -1, hiaddr = 0;
+     info->alignment = 0;
+     for (i = 0; i < ehdr->e_phnum; ++i) {
+-        if (phdr[i].p_type == PT_LOAD) {
+-            abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
++        struct elf_phdr *eppnt = phdr + i;
 +
- #define PT_MIPS_REGINFO   0x70000000
- #define PT_MIPS_RTPROC    0x70000001
- #define PT_MIPS_OPTIONS   0x70000002
-@@ -1652,6 +1656,24 @@ typedef struct elf64_shdr {
- #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
- #define NT_ARM_SVE      0x405           /* ARM Scalable Vector Extension regs */
++        if (eppnt->p_type == PT_LOAD) {
++            abi_ulong a = eppnt->p_vaddr - eppnt->p_offset;
+             if (a < loaddr) {
+                 loaddr = a;
+             }
+-            a = phdr[i].p_vaddr + phdr[i].p_memsz;
++            a = eppnt->p_vaddr + eppnt->p_memsz;
+             if (a > hiaddr) {
+                 hiaddr = a;
+             }
+             ++info->nsegs;
+-            info->alignment |= phdr[i].p_align;
++            info->alignment |= eppnt->p_align;
++        } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
++            char *interp_name;
++
++            if (*pinterp_name) {
++                errmsg = "Multiple PT_INTERP entries";
++                goto exit_errmsg;
++            }
++            interp_name = malloc(eppnt->p_filesz);
++            if (!interp_name) {
++                goto exit_perror;
++            }
++
++            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
++                memcpy(interp_name, bprm_buf + eppnt->p_offset,
++                       eppnt->p_filesz);
++            } else {
++                retval = pread(image_fd, interp_name, eppnt->p_filesz,
++                               eppnt->p_offset);
++                if (retval != eppnt->p_filesz) {
++                    goto exit_perror;
++                }
++            }
++            if (interp_name[eppnt->p_filesz - 1] != 0) {
++                errmsg = "Invalid PT_INTERP entry";
++                goto exit_errmsg;
++            }
++            *pinterp_name = interp_name;
++        } else if (eppnt->p_type == PT_GNU_PROPERTY) {
++            /* Process NT_GNU_PROPERTY_TYPE_0. */
++            const uint32_t gnu0_magic = const_le32('G' | 'N' << 8 | 'U' << 16);
++            uint32_t note[7];
++
++            /*
++             * The note contents are 7 words, but depending on LP64 vs ILP32
++             * there may be an 8th padding word at the end.  Check for and
++             * read the minimum size.  Further checks below will validate
++             * that the sizes of everything involved are as we expect.
++             */
++            if (eppnt->p_filesz < sizeof(note)) {
++                continue;
++            }
++            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
++                memcpy(note, bprm_buf + eppnt->p_offset, sizeof(note));
++            } else {
++                retval = pread(image_fd, note, sizeof(note), eppnt->p_offset);
++                if (retval != sizeof(note)) {
++                    goto exit_perror;
++                }
++            }
++#ifdef BSWAP_NEEDED
++            for (i = 0; i < ARRAY_SIZE(note); ++i) {
++                bswap32s(note + i);
++            }
++#endif
++            /*
++             * Check that this is a NT_GNU_PROPERTY_TYPE_0 note.
++             * Again, descsz includes padding.  Full size validation
++             * awaits checking the final payload.
++             */
++            if (note[0] != 4 ||                       /* namesz */
++                note[1] < 12 ||                       /* descsz */
++                note[2] != NT_GNU_PROPERTY_TYPE_0 ||  /* type */
++                note[3] != gnu0_magic) {              /* name */
++                continue;
++            }
++#ifdef TARGET_AARCH64
++            if (note[4] == GNU_PROPERTY_AARCH64_FEATURE_1_AND &&
++                note[5] == 4) {
++                info->note_flags = note[6];
++            }
++#endif /* TARGET_AARCH64 */
+         }
+     }
  
-+/* Defined note types for GNU systems.  */
+@@ -2453,15 +2526,42 @@ static void load_elf_image(const char *image_name, int image_fd,
+     info->brk = 0;
+     info->elf_flags = ehdr->e_flags;
+ 
++    prot_exec = PROT_EXEC;
++#ifdef TARGET_AARCH64
++    /*
++     * If the BTI feature is present, this indicates that the executable
++     * pages of the startup binary should be mapped with PROT_BTI, so that
++     * branch targets are enforced.
++     *
++     * The startup executable is either the interpreter or the static
++     * binary.  The interpreter is responsible for all pages of a
++     * dynamic executable.
++     *
++     * Elf notes are backward compatible to older cpus.
++     * Do not enable BTI unless it is supported.
++     */
++    if ((info->note_flags & GNU_PROPERTY_AARCH64_FEATURE_1_BTI)
++        && (pinterp_name == NULL || *pinterp_name == 0)
++        && cpu_isar_feature(aa64_bti, ARM_CPU(thread_cpu))) {
++        prot_exec |= TARGET_PROT_BTI;
++    }
++#endif
 +
-+#define NT_GNU_PROPERTY_TYPE_0  5       /* Program property */
-+
-+/* Values used in GNU .note.gnu.property notes (NT_GNU_PROPERTY_TYPE_0).  */
-+
-+#define GNU_PROPERTY_STACK_SIZE                 1
-+#define GNU_PROPERTY_NO_COPY_ON_PROTECTED       2
-+
-+#define GNU_PROPERTY_LOPROC                     0xc0000000
-+#define GNU_PROPERTY_HIPROC                     0xdfffffff
-+#define GNU_PROPERTY_LOUSER                     0xe0000000
-+#define GNU_PROPERTY_HIUSER                     0xffffffff
-+
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_AND      0xc0000000
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_BTI      (1u << 0)
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_PAC      (1u << 1)
-+
- /*
-  * Physical entry point into the kernel.
-  *
+     for (i = 0; i < ehdr->e_phnum; i++) {
+         struct elf_phdr *eppnt = phdr + i;
+         if (eppnt->p_type == PT_LOAD) {
+             abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em, vaddr_len;
+             int elf_prot = 0;
+ 
+-            if (eppnt->p_flags & PF_R) elf_prot =  PROT_READ;
+-            if (eppnt->p_flags & PF_W) elf_prot |= PROT_WRITE;
+-            if (eppnt->p_flags & PF_X) elf_prot |= PROT_EXEC;
++            if (eppnt->p_flags & PF_R) {
++                elf_prot |= PROT_READ;
++            }
++            if (eppnt->p_flags & PF_W) {
++                elf_prot |= PROT_WRITE;
++            }
++            if (eppnt->p_flags & PF_X) {
++                elf_prot |= prot_exec;
++            }
+ 
+             vaddr = load_bias + eppnt->p_vaddr;
+             vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr);
+@@ -2511,33 +2611,6 @@ static void load_elf_image(const char *image_name, int image_fd,
+                     info->brk = vaddr_em;
+                 }
+             }
+-        } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
+-            char *interp_name;
+-
+-            if (*pinterp_name) {
+-                errmsg = "Multiple PT_INTERP entries";
+-                goto exit_errmsg;
+-            }
+-            interp_name = malloc(eppnt->p_filesz);
+-            if (!interp_name) {
+-                goto exit_perror;
+-            }
+-
+-            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
+-                memcpy(interp_name, bprm_buf + eppnt->p_offset,
+-                       eppnt->p_filesz);
+-            } else {
+-                retval = pread(image_fd, interp_name, eppnt->p_filesz,
+-                               eppnt->p_offset);
+-                if (retval != eppnt->p_filesz) {
+-                    goto exit_perror;
+-                }
+-            }
+-            if (interp_name[eppnt->p_filesz - 1] != 0) {
+-                errmsg = "Invalid PT_INTERP entry";
+-                goto exit_errmsg;
+-            }
+-            *pinterp_name = interp_name;
+ #ifdef TARGET_MIPS
+         } else if (eppnt->p_type == PT_MIPS_ABIFLAGS) {
+             Mips_elf_abiflags_v0 abiflags;
 -- 
 2.20.1
 
