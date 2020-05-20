@@ -6,78 +6,81 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FBC2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE87C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FE9C206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:37:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59FEE206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:40:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/PPHVYQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FE9C206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u0Q6dzcz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59FEE206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbQn2-00029H-Cr
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39990)
+	id 1jbQpr-0003IV-KI
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:40:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbQmV-0001fT-T8
- for qemu-devel@nongnu.org; Wed, 20 May 2020 11:37:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29933
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jbQmU-0006TM-1K
- for qemu-devel@nongnu.org; Wed, 20 May 2020 11:37:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589989037;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=u2WwsyUcGJz2srx5/U1WvBECj7Ownp9FrrxKuPWQmIU=;
- b=c/PPHVYQn2vk3VhATvAS35m1XA7DgIlk4OeRaNEVTr2pFWpVkqPdtwiyQ0rJvUUl1s5sLB
- c0gLzxRhV2Y2UjLWwAHdpRlho/LO4GqS40jPFTtgQXZcboUfJoI1LB/TAPq+XDH8idIb/+
- tlQicV66wwnsuymyHJ1Yu/ZG3RP+yr0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-udhcV7GANhKaRZoogiSAJw-1; Wed, 20 May 2020 11:37:15 -0400
-X-MC-Unique: udhcV7GANhKaRZoogiSAJw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C6E1835B58;
- Wed, 20 May 2020 15:37:14 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-115-47.ams2.redhat.com [10.36.115.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F5212E18E;
- Wed, 20 May 2020 15:36:59 +0000 (UTC)
-Date: Wed, 20 May 2020 17:36:58 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Roman Kagan <rvkagan@yandex-team.ru>
-Subject: Re: [PATCH v4 1/3] virtio-blk: store opt_io_size with correct size
-Message-ID: <20200520153658.GD5192@linux.fritz.box>
-References: <20200520080657.29080-1-rvkagan@yandex-team.ru>
- <20200520080657.29080-2-rvkagan@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbQp4-0002o5-P0
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:39:58 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41996)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbQp3-0006jf-Mn
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 11:39:58 -0400
+Received: by mail-ot1-x343.google.com with SMTP id z3so2793924otp.9
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 08:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uP0JZu46WiAIyy8/dtcGiSkK4L1dtQwKedNq4X5WF6I=;
+ b=u0Q6dzcz70Cw4PDZYH+el8q5mNP/sc/13qgX1mwaII/ARoYe8LZ1+82mZ/C0fuRlrg
+ +id8RkOiJ5lBDUjahsgO6b74hrbzf8VJGY0wcbKbzQus9OGr4XUV8wqMQIFhws0JEq1V
+ cd/mlHqZ0isN3mg/iz5aQcaqJGJ4cXd69by2ONjkJcDoQzKVo8Q0rYFiV4YHjpsPgmlQ
+ UKdKxBDhmzME3ryl5fIOvkzK10QXoRGVIh2WZDNCC6SxEBZgox4rJcIjsxftcb7/mUhm
+ fSGS1671h3pfgtRNZP1Kwq9oslltqtQwoLEofgb27pNr7NNb6VutH7Br5S7WGFDSeMkU
+ 093A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uP0JZu46WiAIyy8/dtcGiSkK4L1dtQwKedNq4X5WF6I=;
+ b=IBXAhraw5WAXnZRV0GaFW5ZQbGcFgq4Opp6uEf9wb1i5smndyUd6Cev6UVbskd1Ney
+ zOH44+GbzXEcDTXONyzpc7GL3XGmjp/xz5Q1TU+4zMPS97ZsJhuHq/6sz8g1lg5ftWoO
+ FnA9Q+stOtoABDRYCLOAvGKrOYooI3ljwo9Q4jGWLd3kO4/D4SBozA0ghUTH8fooHUl4
+ Iw1wsUnaRpB/PfphpnIOQa8vb29wr2yrZydtDxrxcDT+gYd3dlXdvhKobT8ahlykovZN
+ dgm3+ScZ/NgpdQANH1Ubp/rygE39nDlJ3+UohHGQUN0G7bk7dDql2dEjs18sTMH72Pok
+ KJIA==
+X-Gm-Message-State: AOAM530sTa4LGBu7OABYti2QSG42yTPKwGXC9AgIchxovJdeZQD7cXUj
+ MUe7mPhh49AtVgxB7Nd9ecazcBt2FLPPr6r1rsHGdA==
+X-Google-Smtp-Source: ABdhPJyLiH5H7I+f0eo6Gi7QwiXVbhEOq1rlERGpbpEkCOU5TfhvpMvEfLsOi36KRKlH59U4HveRhG1COPgo8scUaw4=
+X-Received: by 2002:a05:6830:158b:: with SMTP id
+ i11mr3703636otr.135.1589989196314; 
+ Wed, 20 May 2020 08:39:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200520080657.29080-2-rvkagan@yandex-team.ru>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200520152450.200362-1-ppandit@redhat.com>
+ <20200520152450.200362-3-ppandit@redhat.com>
+In-Reply-To: <20200520152450.200362-3-ppandit@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 May 2020 16:39:45 +0100
+Message-ID: <CAFEAcA_WbJR9PWpw4f2jWecouSn7U0y9=0t4ek1rGwxtM6tXBQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] sd: disable sdhci-pci device by default
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,26 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.05.2020 um 10:06 hat Roman Kagan geschrieben:
-> The width of opt_io_size in virtio_blk_topology is 32bit.
+On Wed, 20 May 2020 at 16:28, P J P <ppandit@redhat.com> wrote:
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Disable rarely used sdhci-pci device build by default.
+>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
 
-I think you mean virtio_blk_config?
+Doesn't this break existing working command lines? The
+device exists, some people use it. We should treat it like
+other PCI devices -- if the guest arch/machine can handle
+PCI the device should be built.
 
-> Use the appropriate accessor to store it.
-> 
-> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+There's obviously scope for being more general and allowing
+some kind of "only build the subset of devices we feel
+more confident abut the security of" setup (don't RH do
+something like this downstream?), but upstream we don't
+have a concept like that, we just build everything.
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-
+thanks
+-- PMM
 
