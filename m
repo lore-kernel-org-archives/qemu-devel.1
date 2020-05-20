@@ -2,73 +2,80 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BB3C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9131C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37BB820829
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:49:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xb7uZcNb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BB820829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id AD07420708
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 01:51:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD07420708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbDrG-0000g9-GB
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 21:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34176)
+	id 1jbDtK-0001ti-Sh
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 21:51:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jbDpE-0006HW-7L
- for qemu-devel@nongnu.org; Tue, 19 May 2020 21:47:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33536)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jbDpD-0000cQ-4B
- for qemu-devel@nongnu.org; Tue, 19 May 2020 21:47:15 -0400
-Received: from sstabellini-ThinkPad-T480s.hsd1.ca.comcast.net
- (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9D619207D8;
- Wed, 20 May 2020 01:47:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589939233;
- bh=4/W/Pzh2gymBGgKA7KnPmOduUQtI3QITX4oFPL4mDos=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=xb7uZcNbQptT0Ye8VBvou5KfUxII6ADHU0mOX4eWKxDSH9s1EICUvscW4hxxF5A23
- LuprqIXka8K/g76G7iFeJMf0IdoemS1jMcQNG48NdyWhhhiA6sEqIz8GyfRn9Xv1Yi
- 4LqN5mnpM4VW8ZFYcWNFCnbDwHg+NAU0fwSjQUoo=
-From: Stefano Stabellini <sstabellini@kernel.org>
-To: groug@kaod.org,
-	qemu_oss@crudebyte.com
-Subject: [PATCH 1/2] Revert "9p: init_in_iov_from_pdu can truncate the size"
-Date: Tue, 19 May 2020 18:47:11 -0700
-Message-Id: <20200520014712.24213-1-sstabellini@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <alpine.DEB.2.21.2005191651130.27502@sstabellini-ThinkPad-T480s>
-References: <alpine.DEB.2.21.2005191651130.27502@sstabellini-ThinkPad-T480s>
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 21:47:04
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jbDsY-0001Bu-Fy
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 21:50:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40598)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jbDsW-0000xx-TV
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 21:50:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jbDsU-0005Hg-Rl
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:50:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CFF702E806D
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:50:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 May 2020 01:41:07 -0000
+From: cliff chen <1879425@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cliffchen
+X-Launchpad-Bug-Reporter: cliff chen (cliffchen)
+X-Launchpad-Bug-Modifier: cliff chen (cliffchen)
+References: <158985197617.30924.14122012304587735670.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158993886758.31351.13131516430257538828.malone@chaenomeles.canonical.com>
+Subject: [Bug 1879425] Re: The thread of "CPU 0 /KVM" keeping 99.9%CPU
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 420ea351ed718eb7ae8f587eb38abe090fd73f6b
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 20:30:42
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,206 +84,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anthony.perard@citrix.com, sstabellini@kernel.org, qemu-devel@nongnu.org,
- Stefano Stabellini <stefano.stabellini@xilinx.com>, paul@xen.org
+Reply-To: Bug 1879425 <1879425@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Stabellini <stefano.stabellini@xilinx.com>
+one changes:
+Guest VM is Red Hat Enterprise Linux 8.1 (Ootpa).
+there is no issue once guest VM is RHEL7.6.
 
-This reverts commit 16724a173049ac29c7b5ade741da93a0f46edff7.
-It causes https://bugs.launchpad.net/bugs/1877688.
+-- =
 
-Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
----
- hw/9pfs/9p.c               | 33 +++++++++++----------------------
- hw/9pfs/9p.h               |  2 +-
- hw/9pfs/virtio-9p-device.c | 11 ++++-------
- hw/9pfs/xen-9p-backend.c   | 15 ++++++---------
- 4 files changed, 22 insertions(+), 39 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879425
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index a2a14b5979..d39bfee462 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -2102,29 +2102,22 @@ out_nofid:
-  * with qemu_iovec_destroy().
-  */
- static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
--                                    size_t skip, size_t *size,
-+                                    size_t skip, size_t size,
-                                     bool is_write)
- {
-     QEMUIOVector elem;
-     struct iovec *iov;
-     unsigned int niov;
--    size_t alloc_size = *size + skip;
- 
-     if (is_write) {
--        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, alloc_size);
-+        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, size + skip);
-     } else {
--        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, &alloc_size);
--    }
--
--    if (alloc_size < skip) {
--        *size = 0;
--    } else {
--        *size = alloc_size - skip;
-+        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size + skip);
-     }
- 
-     qemu_iovec_init_external(&elem, iov, niov);
-     qemu_iovec_init(qiov, niov);
--    qemu_iovec_concat(qiov, &elem, skip, *size);
-+    qemu_iovec_concat(qiov, &elem, skip, size);
- }
- 
- static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-@@ -2132,14 +2125,15 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
- {
-     ssize_t err;
-     size_t offset = 7;
--    size_t read_count;
-+    uint64_t read_count;
-     QEMUIOVector qiov_full;
- 
-     if (fidp->fs.xattr.len < off) {
-         read_count = 0;
--    } else if (fidp->fs.xattr.len - off < max_count) {
--        read_count = fidp->fs.xattr.len - off;
-     } else {
-+        read_count = fidp->fs.xattr.len - off;
-+    }
-+    if (read_count > max_count) {
-         read_count = max_count;
-     }
-     err = pdu_marshal(pdu, offset, "d", read_count);
-@@ -2148,7 +2142,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-     }
-     offset += err;
- 
--    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
-+    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
-     err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
-                     ((char *)fidp->fs.xattr.value) + off,
-                     read_count);
-@@ -2277,11 +2271,9 @@ static void coroutine_fn v9fs_read(void *opaque)
-         QEMUIOVector qiov_full;
-         QEMUIOVector qiov;
-         int32_t len;
--        size_t size = max_count;
- 
--        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, &size, false);
-+        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count, false);
-         qemu_iovec_init(&qiov, qiov_full.niov);
--        max_count = size;
-         do {
-             qemu_iovec_reset(&qiov);
-             qemu_iovec_concat(&qiov, &qiov_full, count, qiov_full.size - count);
-@@ -2532,7 +2524,6 @@ static void coroutine_fn v9fs_write(void *opaque)
-     int32_t len = 0;
-     int32_t total = 0;
-     size_t offset = 7;
--    size_t size;
-     V9fsFidState *fidp;
-     V9fsPDU *pdu = opaque;
-     V9fsState *s = pdu->s;
-@@ -2545,9 +2536,7 @@ static void coroutine_fn v9fs_write(void *opaque)
-         return;
-     }
-     offset += err;
--    size = count;
--    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &size, true);
--    count = size;
-+    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
-     trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
- 
-     fidp = get_fid(pdu, fid);
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index dd1c6cb8d2..1b9e110605 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -436,7 +436,7 @@ struct V9fsTransport {
-     ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char *fmt,
-                                   va_list ap);
-     void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
--                                        unsigned int *pniov, size_t *size);
-+                                        unsigned int *pniov, size_t size);
-     void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-                                          unsigned int *pniov, size_t size);
-     void        (*push_and_notify)(V9fsPDU *pdu);
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index e5b44977c7..36f3aa9352 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -147,22 +147,19 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
- }
- 
- static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
--                                        unsigned int *pniov, size_t *size)
-+                                        unsigned int *pniov, size_t size)
- {
-     V9fsState *s = pdu->s;
-     V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
-     VirtQueueElement *elem = v->elems[pdu->idx];
-     size_t buf_size = iov_size(elem->in_sg, elem->in_num);
- 
--    if (buf_size < P9_IOHDRSZ) {
-+    if (buf_size < size) {
-         VirtIODevice *vdev = VIRTIO_DEVICE(v);
- 
-         virtio_error(vdev,
--                     "VirtFS reply type %d needs %zu bytes, buffer has %zu, less than minimum",
--                     pdu->id + 1, *size, buf_size);
--    }
--    if (buf_size < *size) {
--        *size = buf_size;
-+                     "VirtFS reply type %d needs %zu bytes, buffer has %zu",
-+                     pdu->id + 1, size, buf_size);
-     }
- 
-     *piov = elem->in_sg;
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index f04caabfe5..fc197f6c8a 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -188,7 +188,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
- static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-                                           struct iovec **piov,
-                                           unsigned int *pniov,
--                                          size_t *size)
-+                                          size_t size)
- {
-     Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
-     Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-@@ -198,19 +198,16 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-     g_free(ring->sg);
- 
-     ring->sg = g_new0(struct iovec, 2);
--    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
-+    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
- 
-     buf_size = iov_size(ring->sg, num);
--    if (buf_size  < P9_IOHDRSZ) {
--        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs "
--                      "%zu bytes, buffer has %zu, less than minimum\n",
--                      pdu->id + 1, *size, buf_size);
-+    if (buf_size  < size) {
-+        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
-+                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
-+                buf_size);
-         xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-         xen_9pfs_disconnect(&xen_9pfs->xendev);
-     }
--    if (buf_size  < *size) {
--        *size = buf_size;
--    }
- 
-     *piov = ring->sg;
-     *pniov = num;
--- 
-2.17.1
+Title:
+  The thread of "CPU 0 /KVM" keeping 99.9%CPU
 
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Expert:
+
+  The VM is hung here after (2, or 3, or 5 and the longest time is 10 hours=
+) by qemu-kvm.
+  Notes: =
+
+  for VM:
+    OS: RHEL 7.6
+    CPU: 1
+    MEM:4G
+  For qemu-kvm:
+    1) version:
+       /usr/libexec/qemu-kvm -version
+       QEMU emulator version 2.10.0(qemu-kvm-ev-2.10.0-21.el7_5.4.1)
+    2) once the issue is occurred, the CPU of "CPU0 /KVM" is more than 99% =
+by com "top -p VM_pro_ID"
+      PID  UDER   PR NI RES   S  % CPU %MEM  TIME+    COMMAND
+  872067   qemu   20 0  1.6g  R   99.9  0.6  37:08.87 CPU 0/KVM
+    3) use "pstack 493307" and below is function trace
+  Thread 1 (Thread 0x7f2572e73040 (LWP 872067)):
+  #0  0x00007f256cad8fcf in ppoll () from /lib64/libc.so.6
+  #1  0x000055ff34bdf4a9 in qemu_poll_ns ()
+  #2  0x000055ff34be02a8 in main_loop_wait ()
+  #3  0x000055ff348bfb1a in main ()
+    4) use strace "strace -tt -ff -p 872067 -o cfx" and below log keep prin=
+ting
+  21:24:02.977833 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
+ 0 (Timeout)
+  21:24:02.977918 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 911447}, NULL, 8=
+) =3D 0 (Timeout)
+  21:24:02.978945 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
+ 0 (Timeout)
+  Therefore, I think the thread "CPU 0/KVM" is in tight loop.
+    5) use reset can recover this issue. however, it will reoccurred again.
+  Current work around is increase one CPU for this VM, then issue is gone.
+
+  thanks
+  Cliff
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879425/+subscriptions
 
