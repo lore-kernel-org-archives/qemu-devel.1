@@ -2,83 +2,88 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFC6C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C5EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5123920709
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 353D520709
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="saSDNi8L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5123920709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="adslTD1e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353D520709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbSa1-0001Pi-Gz
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:32:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53582)
+	id 1jbSau-0003uA-C6
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbSVn-0001oo-PM
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:11 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38307)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jbSXw-0006p4-Eu
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:30:24 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:41386)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbSVm-0004L6-ND
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:28:11 -0400
-Received: by mail-pg1-x541.google.com with SMTP id u5so1754805pgn.5
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:28:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jbSXv-0004iM-EQ
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:30:24 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id x1so4964596ejd.8
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aq4v7IxgSTWwXHpmoImcRMGs5taMUuju/WMDtCLJnVA=;
- b=saSDNi8LLrzwncRHhVgKiAnvV6o6W6isX/L1jINEzyABAeYqIjH1tkDCYxx3VPzYrS
- 9tx+PDxN1q/SLgr7iRi/G8IYZ+XUQMOLKWXwQ+5xl42AwwnWcfBq94YfD9yVSNpbWmsS
- nImuU9bYXZScWvN3V0hCWs6NKAXOfkWAjTPmNaQC0BSZuIj6UQ4gKZfiHOrsTEDPMU1O
- b9TlLZz4P9Y49MGA9O1C2wo/2lo3tesIblGA3y3y/UDKmUXh1x+mxh0ROxNY7JrjNxXc
- 9ZwggUrXq9BF9bndaeDkR22YyvwcUG/GruD/ad84xP5OFFbMLKQUNrHMzC2k70vkoECQ
- QfKw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=gCsN2Hk1sU0xzNL4AIWx7BMeAlkTZEIG27VpbqniL2w=;
+ b=adslTD1ekujX7RSOAsUYT5haBjqAyII84V7/ApuyqqaI5CDu1b4Fq3KTmU2oHQwU0x
+ iZ0wp8wvS2SFsoaOEJSAxS5rqo8fkM/zyUCCW9t5NmeZckhPfYC6agaaMRZsVySoHssD
+ liMP69Rq/6LDx+8uZ/3kw4C810pyw0v90zkIS357+sJjvq0Z/zipk8lVzKNyFy7Ey0Ri
+ Zd8NMVjp2o7PToZI8fGrahrfXbGMq7JfgwhBhwdoPgPuUK7mF/1rd/iLPns1yXLBeUCp
+ WABh45Usd5sIq7i3Q0pjCpm/pZvdIdpCzosQ0Kt5n82bd86w8vSo44oGW+w7T9LYVX8K
+ Lzxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=aq4v7IxgSTWwXHpmoImcRMGs5taMUuju/WMDtCLJnVA=;
- b=QsKXx0XUwAKR5VdPTWKNNyWn0m+1TcEtqrzlvYpz4qEejQvIwIL7DdIPO93YivSxML
- KLkpjUj9ctkZW/opMIOIvTMMtCPp6XOcHGHd1q8nu7bqPAdc0ipt84mPoCszuPnNQPHa
- uPQHkKrZRpFPLT6QrIG8zyjk1U48rH3pAKJtMFvLMbXBIbPOXh8LOC/NVeHsV4SpK7KS
- JOdgYETdNP5RKxF3+e0YiRVcXcI7gE7kY0YARiBNrRduSoiopI60NPiux66GnNmlx55O
- uxuewA9bFT9PrMph4SodnFff1nVh72O7zNchUMKhHUN9kFmmJk1MktUYtl3uUq3VmBnS
- lSyg==
-X-Gm-Message-State: AOAM530nf2U1CZhDLGow6GOF5FzKsE2t3Bc9Vuch3ZgnkI+I9LjgODwk
- bBwZRDbjfrs+Q33jDmP35N6iI/rzUeA=
-X-Google-Smtp-Source: ABdhPJytpQpJyLk8QpzKXjHqT4osu8XJDovHXj7qF88e1k2EQ8SBPveN25S0RpC7OaZibu5VDI8vGg==
-X-Received: by 2002:a62:4dc3:: with SMTP id a186mr5204501pfb.269.1589995688856; 
- Wed, 20 May 2020 10:28:08 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id k18sm2643672pfg.217.2020.05.20.10.28.07
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=gCsN2Hk1sU0xzNL4AIWx7BMeAlkTZEIG27VpbqniL2w=;
+ b=LndXXu5ty4tc0u26gMANtL7L0ar+OPThZacuXU3pc5uNeVglZt6H6Dzyl5P65GyZv3
+ jF0iBK6mFpZTeCYCqfW0zXxsmqZkarvjOWuz/TLMfkpMlLXQU2bznSQazz6/kUwisAts
+ EMWuXYtg32uxxZkP44AR3ZTTSOGwk4BIb9EUKHV8J+h3acIN9GuXIuLq9FAY/nL5696+
+ VbKUyM88T/bGEh0z8BJHLlrBrrSMVyafASobzhZxE2Bj1NhxMehZhsILsw4zkRLy3DDW
+ vkoKKzl+6vEuYMVgPGoiQtxAXk7RdNHiB86gdofyBfgikVWXNs2MQIebhvHmxShKN0xe
+ 6U1g==
+X-Gm-Message-State: AOAM533J2b83gHI9n8j5QzsMk4q0l3O68xoy//klWuLUlmRrhOAyjIKQ
+ iyHfVPOlXXz4UbZ6mHhO2ll+Qw==
+X-Google-Smtp-Source: ABdhPJwVu676Ik6HHBoqgxuLh1kv2+y30/CW2Y6HlRQZSjRhUArBPdiEeAodrLIEZW5JEMnAGQMMGw==
+X-Received: by 2002:a17:906:3509:: with SMTP id
+ r9mr135686eja.382.1589995821602; 
+ Wed, 20 May 2020 10:30:21 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d22sm2531856edj.62.2020.05.20.10.30.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 10:28:08 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 5/5] tests/tcg/aarch64: Add bti smoke test
-Date: Wed, 20 May 2020 10:28:00 -0700
-Message-Id: <20200520172800.8499-6-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200520172800.8499-1-richard.henderson@linaro.org>
-References: <20200520172800.8499-1-richard.henderson@linaro.org>
+ Wed, 20 May 2020 10:30:20 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 945EE1FF7E;
+ Wed, 20 May 2020 18:30:19 +0100 (BST)
+References: <20200519025355.4420-1-richard.henderson@linaro.org>
+ <20200519025355.4420-16-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [RISU v2 15/17] Compute reginfo_size based on the reginfo
+In-reply-to: <20200519025355.4420-16-richard.henderson@linaro.org>
+Date: Wed, 20 May 2020 18:30:19 +0100
+Message-ID: <87sgfufr9w.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,184 +105,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, laurent@vivier.eu
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test requires gcc 10 for -mbranch-protection=standard.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v9: Expect and require gcc 10.
----
- tests/tcg/aarch64/bti-1.c         | 62 +++++++++++++++++++++++++++++++
- tests/tcg/aarch64/bti-crt.inc.c   | 51 +++++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.target |  7 ++++
- tests/tcg/configure.sh            |  4 ++
- 4 files changed, 124 insertions(+)
- create mode 100644 tests/tcg/aarch64/bti-1.c
- create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-diff --git a/tests/tcg/aarch64/bti-1.c b/tests/tcg/aarch64/bti-1.c
-new file mode 100644
-index 0000000000..61924f0d7a
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-1.c
-@@ -0,0 +1,62 @@
-+/*
-+ * Branch target identification, basic notskip cases.
-+ */
-+
-+#include "bti-crt.inc.c"
-+
-+static void skip2_sigill(int sig, siginfo_t *info, ucontext_t *uc)
-+{
-+    uc->uc_mcontext.pc += 8;
-+    uc->uc_mcontext.pstate = 1;
-+}
-+
-+#define NOP       "nop"
-+#define BTI_N     "hint #32"
-+#define BTI_C     "hint #34"
-+#define BTI_J     "hint #36"
-+#define BTI_JC    "hint #38"
-+
-+#define BTYPE_1(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; br x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16")
-+
-+#define BTYPE_2(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; blr x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16", "x30")
-+
-+#define BTYPE_3(DEST) \
-+    asm("mov %0,#1; adr x15, 1f; br x15; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x15")
-+
-+#define TEST(WHICH, DEST, EXPECT) \
-+    do { WHICH(DEST); fail += skipped ^ EXPECT; } while (0)
-+
-+
-+int main()
-+{
-+    int fail = 0;
-+    int skipped;
-+
-+    /* Signal-like with SA_SIGINFO.  */
-+    signal_info(SIGILL, skip2_sigill);
-+
-+    TEST(BTYPE_1, NOP, 1);
-+    TEST(BTYPE_1, BTI_N, 1);
-+    TEST(BTYPE_1, BTI_C, 0);
-+    TEST(BTYPE_1, BTI_J, 0);
-+    TEST(BTYPE_1, BTI_JC, 0);
-+
-+    TEST(BTYPE_2, NOP, 1);
-+    TEST(BTYPE_2, BTI_N, 1);
-+    TEST(BTYPE_2, BTI_C, 0);
-+    TEST(BTYPE_2, BTI_J, 1);
-+    TEST(BTYPE_2, BTI_JC, 0);
-+
-+    TEST(BTYPE_3, NOP, 1);
-+    TEST(BTYPE_3, BTI_N, 1);
-+    TEST(BTYPE_3, BTI_C, 1);
-+    TEST(BTYPE_3, BTI_J, 0);
-+    TEST(BTYPE_3, BTI_JC, 0);
-+
-+    return fail;
-+}
-diff --git a/tests/tcg/aarch64/bti-crt.inc.c b/tests/tcg/aarch64/bti-crt.inc.c
-new file mode 100644
-index 0000000000..47805f4e35
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-crt.inc.c
-@@ -0,0 +1,51 @@
-+/*
-+ * Minimal user-environment for testing BTI.
-+ *
-+ * Normal libc is not (yet) built with BTI support enabled,
-+ * and so could generate a BTI TRAP before ever reaching main.
-+ */
-+
-+#include <stdlib.h>
-+#include <signal.h>
-+#include <ucontext.h>
-+#include <asm/unistd.h>
-+
-+int main(void);
-+
-+void _start(void)
-+{
-+    exit(main());
-+}
-+
-+void exit(int ret)
-+{
-+    register int x0 __asm__("x0") = ret;
-+    register int x8 __asm__("x8") = __NR_exit;
-+
-+    asm volatile("svc #0" : : "r"(x0), "r"(x8));
-+    __builtin_unreachable();
-+}
-+
-+/*
-+ * Irritatingly, the user API struct sigaction does not match the
-+ * kernel API struct sigaction.  So for simplicity, isolate the
-+ * kernel ABI here, and make this act like signal.
-+ */
-+void signal_info(int sig, void (*fn)(int, siginfo_t *, ucontext_t *))
-+{
-+    struct kernel_sigaction {
-+        void (*handler)(int, siginfo_t *, ucontext_t *);
-+        unsigned long flags;
-+        unsigned long restorer;
-+        unsigned long mask;
-+    } sa = { fn, SA_SIGINFO, 0, 0 };
-+
-+    register int x0 __asm__("x0") = sig;
-+    register void *x1 __asm__("x1") = &sa;
-+    register void *x2 __asm__("x2") = 0;
-+    register int x3 __asm__("x3") = sizeof(unsigned long);
-+    register int x8 __asm__("x8") = __NR_rt_sigaction;
-+
-+    asm volatile("svc #0"
-+                 : : "r"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x8) : "memory");
-+}
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 312f36cde5..cf84787eb6 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -24,6 +24,13 @@ run-pauth-%: QEMU_OPTS += -cpu max
- pauth-%: CFLAGS += -march=armv8.3-a
- endif
- 
-+# BTI Tests
-+ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_BTI),)
-+AARCH64_TESTS += bti-1
-+bti-%: CFLAGS += -mbranch-protection=standard
-+bti-%: LDFLAGS += -nostdlib
-+endif
-+
- # Semihosting smoke test for linux-user
- AARCH64_TESTS += semihosting
- run-semihosting: semihosting
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 2326f97856..ebfe3e2ce5 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -231,6 +231,10 @@ for target in $target_list; do
-                -march=armv8.3-a -o $TMPE $TMPC; then
-                 echo "CROSS_CC_HAS_ARMV8_3=y" >> $config_target_mak
-             fi
-+            if do_compiler "$target_compiler" $target_compiler_cflags \
-+               -mbranch-protection=standard -o $TMPE $TMPC; then
-+                echo "CROSS_CC_HAS_ARMV8_BTI=y" >> $config_target_mak
-+            fi
-         ;;
-     esac
- 
--- 
-2.20.1
+> This will allow dumping of SVE frames without having
+> to know the SVE vector length beforehand.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  risu.h                 | 2 +-
+>  reginfo.c              | 6 +++---
+>  risu_reginfo_aarch64.c | 4 ++--
+>  risu_reginfo_arm.c     | 2 +-
+>  risu_reginfo_i386.c    | 2 +-
+>  risu_reginfo_m68k.c    | 2 +-
+>  risu_reginfo_ppc64.c   | 2 +-
+>  7 files changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/risu.h b/risu.h
+> index eeb6775..054cef7 100644
+> --- a/risu.h
+> +++ b/risu.h
+> @@ -155,6 +155,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f);
+>  int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
+>=20=20
+>  /* return size of reginfo */
+> -const int reginfo_size(void);
+> +int reginfo_size(struct reginfo *ri);
+>=20=20
+>  #endif /* RISU_H */
+> diff --git a/reginfo.c b/reginfo.c
+> index f187d9c..411c2a6 100644
+> --- a/reginfo.c
+> +++ b/reginfo.c
+> @@ -38,7 +38,7 @@ RisuResult send_register_info(void *uc)
+>      case OP_TESTEND:
+>      case OP_COMPARE:
+>      case OP_SIGILL:
+> -        header.size =3D reginfo_size();
+> +        header.size =3D reginfo_size(&ri);
+>          extra =3D &ri;
+>          break;
+>=20=20
+> @@ -109,7 +109,7 @@ RisuResult recv_and_compare_register_info(void *uc)
+>      case OP_TESTEND:
+>      case OP_COMPARE:
+>      case OP_SIGILL:
+> -        extra_size =3D reginfo_size();
+> +        extra_size =3D reginfo_size(&master_ri);
+>          break;
+>      case OP_SETMEMBLOCK:
+>      case OP_GETMEMBLOCK:
+> @@ -217,7 +217,7 @@ void report_mismatch_header(void)
+>          case OP_COMPARE:
+>          case OP_SIGILL:
+>              kind =3D "reginfo";
+> -            a_sz =3D reginfo_size();
+> +            a_sz =3D reginfo_size(&apprentice_ri);
+>              break;
+>          case OP_SETMEMBLOCK:
+>          case OP_GETMEMBLOCK:
+> diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
+> index 028c690..7044648 100644
+> --- a/risu_reginfo_aarch64.c
+> +++ b/risu_reginfo_aarch64.c
+> @@ -69,7 +69,7 @@ void process_arch_opt(int opt, const char *arg)
+>  #endif
+>  }
+>=20=20
+> -const int reginfo_size(void)
+> +int reginfo_size(struct reginfo *ri)
+>  {
+>      int size =3D offsetof(struct reginfo, simd.end);
+>  #ifdef SVE_MAGIC
+> @@ -194,7 +194,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+>  /* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal =
+*/
+>  int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
+>  {
+> -    return memcmp(r1, r2, reginfo_size()) =3D=3D 0;
+> +    return memcmp(r1, r2, reginfo_size(r1)) =3D=3D 0;
+>  }
+>=20=20
+>  #ifdef SVE_MAGIC
+> diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+> index 3662f12..3832e27 100644
+> --- a/risu_reginfo_arm.c
+> +++ b/risu_reginfo_arm.c
+> @@ -36,7 +36,7 @@ void process_arch_opt(int opt, const char *arg)
+>      abort();
+>  }
+>=20=20
+> -const int reginfo_size(void)
+> +int reginfo_size(struct reginfo *ri)
+>  {
+>      return sizeof(struct reginfo);
 
+I wonder if the fixed size architectures should return (sizeof *ri) to
+reinforce the point? Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
