@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C68D9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7663B207ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:38:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7663B207ED
+	by mail.kernel.org (Postfix) with ESMTPS id 7AB2A2075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:39:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB2A2075F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbLBb-0004VA-L8
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:38:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50816)
+	id 1jbLC2-0004yD-L1
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:39:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbLAK-0002wT-4s
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:37:32 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3694 helo=huawei.com)
+ id 1jbLAO-00036e-FD
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:37:36 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3695 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbLAJ-0008W9-23
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:37:31 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 3E4BEE58F091179424C9;
- Wed, 20 May 2020 17:37:27 +0800 (CST)
+ id 1jbLAM-00006H-GG
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:37:36 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 561A36B518D52D1DD6D2;
+ Wed, 20 May 2020 17:37:32 +0800 (CST)
 Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 20 May 2020 17:37:16 +0800
+ 14.3.487.0; Wed, 20 May 2020 17:37:24 +0800
 From: Yubo Miao <miaoyubo@huawei.com>
 To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v7 2/8] fw_cfg: Write the extra roots into the fw_cfg
-Date: Wed, 20 May 2020 17:36:23 +0800
-Message-ID: <20200520093629.1495-3-miaoyubo@huawei.com>
+Subject: [PATCH v7 3/8] acpi: Extract crs build form acpi_build.c
+Date: Wed, 20 May 2020 17:36:24 +0800
+Message-ID: <20200520093629.1495-4-miaoyubo@huawei.com>
 X-Mailer: git-send-email 2.24.1.windows.2
 In-Reply-To: <20200520093629.1495-1-miaoyubo@huawei.com>
 References: <20200520093629.1495-1-miaoyubo@huawei.com>
@@ -80,151 +80,659 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Write the extra roots into the fw_cfg, therefore the uefi could
-get the extra roots. Only if the uefi knows there are extra roots,
-the config space of devices behind the root could be obtained.
+Extract crs build form acpi_build.c, the function could also be used
+to build the crs for pxbs for arm. The resources are composed by two parts:
+1. The bar space of pci-bridge/pcie-root-ports
+2. The resources needed by devices behind PXBs.
+The base and limit of memory/io are obtained from the config via two APIs:
+pci_bridge_get_base and pci_bridge_get_limit
 
 Signed-off-by: Yubo Miao <miaoyubo@huawei.com>
 ---
- hw/arm/virt.c              |  8 ++++++++
- hw/i386/pc.c               | 18 ++----------------
- hw/nvram/fw_cfg.c          | 20 ++++++++++++++++++++
- include/hw/nvram/fw_cfg.h  |  2 ++
- include/hw/pci/pcie_host.h |  4 ++++
- 5 files changed, 36 insertions(+), 16 deletions(-)
+ hw/acpi/aml-build.c         | 275 ++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c        | 285 ------------------------------------
+ include/hw/acpi/aml-build.h |  25 ++++
+ 3 files changed, 300 insertions(+), 285 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c41d5f9778..f64ff42ab5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -78,6 +78,8 @@
- #include "hw/virtio/virtio-iommu.h"
- #include "hw/char/pl011.h"
- #include "qemu/guest-random.h"
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 3681ec6e3d..5802597f8a 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -26,6 +26,9 @@
+ #include "qemu/bitops.h"
+ #include "sysemu/numa.h"
+ #include "hw/boards.h"
++#include "hw/pci/pci_host.h"
 +#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pcie_host.h"
++#include "hw/pci/pci_bridge.h"
  
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1457,6 +1459,10 @@ void virt_machine_done(Notifier *notifier, void *data)
-     ARMCPU *cpu = ARM_CPU(first_cpu);
-     struct arm_boot_info *info = &vms->bootinfo;
-     AddressSpace *as = arm_boot_address_space(cpu, info);
-+    PCIHostState *s = PCI_GET_PCIE_HOST_STATE;
-+
-+    PCIBus *bus = s->bus;
-+    FWCfgState *fw_cfg = vms->fw_cfg;
+ static GArray *build_alloc_array(void)
+ {
+@@ -54,6 +57,125 @@ static void build_append_array(GArray *array, GArray *val)
  
-     /*
-      * If the user provided a dtb, we assume the dynamic sysbus nodes
-@@ -1475,6 +1481,8 @@ void virt_machine_done(Notifier *notifier, void *data)
-         exit(1);
-     }
+ #define ACPI_NAMESEG_LEN 4
  
-+    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
-+
-     virt_acpi_setup(vms);
-     virt_build_smbios(vms);
- }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..3227e0d2ea 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -842,26 +842,12 @@ void pc_machine_done(Notifier *notifier, void *data)
-                                         PCMachineState, machine_done);
-     X86MachineState *x86ms = X86_MACHINE(pcms);
-     PCIBus *bus = pcms->bus;
-+    FWCfgState *fw_cfg = pcms->fw_cfg;
- 
-     /* set the number of CPUs */
-     rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
- 
--    if (bus) {
--        int extra_hosts = 0;
--
--        QLIST_FOREACH(bus, &bus->child, sibling) {
--            /* look for expander root buses */
--            if (pci_bus_is_root(bus)) {
--                extra_hosts++;
--            }
--        }
--        if (extra_hosts && x86ms->fw_cfg) {
--            uint64_t *val = g_malloc(sizeof(*val));
--            *val = cpu_to_le64(extra_hosts);
--            fw_cfg_add_file(x86ms->fw_cfg,
--                    "etc/extra-pci-roots", val, sizeof(*val));
--        }
--    }
-+    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
- 
-     acpi_setup();
-     if (x86ms->fw_cfg) {
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 8dd50c2c72..824cfcf054 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -40,6 +40,7 @@
- #include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "hw/acpi/aml-build.h"
-+#include "hw/pci/pci_bus.h"
- 
- #define FW_CFG_FILE_SLOTS_DFLT 0x20
- 
-@@ -742,6 +743,25 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
-     return ptr;
- }
- 
-+void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s)
++void crs_range_insert(GPtrArray *ranges, uint64_t base, uint64_t limit)
 +{
-+    if (bus) {
-+        int extra_hosts = 0;
-+        QLIST_FOREACH(bus, &bus->child, sibling) {
-+            /* look for expander root buses */
-+            if (pci_bus_is_root(bus)) {
-+                extra_hosts++;
-+            }
-+        }
-+        if (extra_hosts && s) {
-+            uint64_t *val = g_malloc(sizeof(*val));
-+            *val = cpu_to_le64(extra_hosts);
-+            fw_cfg_add_file(s,
-+                   "etc/extra-pci-roots", val, sizeof(*val));
-+        }
++    CrsRangeEntry *entry;
++
++    entry = g_malloc(sizeof(*entry));
++    entry->base = base;
++    entry->limit = limit;
++
++    g_ptr_array_add(ranges, entry);
++}
++
++static void crs_range_free(gpointer data)
++{
++    CrsRangeEntry *entry = (CrsRangeEntry *)data;
++    g_free(entry);
++}
++
++void crs_range_set_init(CrsRangeSet *range_set)
++{
++    range_set->io_ranges = g_ptr_array_new_with_free_func(crs_range_free);
++    range_set->mem_ranges = g_ptr_array_new_with_free_func(crs_range_free);
++    range_set->mem_64bit_ranges =
++            g_ptr_array_new_with_free_func(crs_range_free);
++}
++
++void crs_range_set_free(CrsRangeSet *range_set)
++{
++    g_ptr_array_free(range_set->io_ranges, true);
++    g_ptr_array_free(range_set->mem_ranges, true);
++    g_ptr_array_free(range_set->mem_64bit_ranges, true);
++}
++
++static gint crs_range_compare(gconstpointer a, gconstpointer b)
++{
++    CrsRangeEntry *entry_a = *(CrsRangeEntry **)a;
++    CrsRangeEntry *entry_b = *(CrsRangeEntry **)b;
++
++    if (entry_a->base < entry_b->base) {
++        return -1;
++    } else if (entry_a->base > entry_b->base) {
++        return 1;
++    } else {
++        return 0;
 +    }
 +}
 +
- void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t len)
- {
-     trace_fw_cfg_add_bytes(key, trace_key_name(key), len);
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index 25d9307018..eb86ee5ae6 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -79,6 +79,8 @@ struct FWCfgMemState {
-     MemoryRegionOps wide_data_ops;
- };
- 
-+void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s);
++/*
++ * crs_replace_with_free_ranges - given the 'used' ranges within [start - end]
++ * interval, computes the 'free' ranges from the same interval.
++ * Example: If the input array is { [a1 - a2],[b1 - b2] }, the function
++ * will return { [base - a1], [a2 - b1], [b2 - limit] }.
++ */
++void crs_replace_with_free_ranges(GPtrArray *ranges,
++                                         uint64_t start, uint64_t end)
++{
++    GPtrArray *free_ranges = g_ptr_array_new();
++    uint64_t free_base = start;
++    int i;
 +
- /**
-  * fw_cfg_add_bytes:
-  * @s: fw_cfg device being modified
-diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
-index 3f7b9886d1..c93f2d7011 100644
---- a/include/hw/pci/pcie_host.h
-+++ b/include/hw/pci/pcie_host.h
-@@ -27,6 +27,10 @@
- #define TYPE_PCIE_HOST_BRIDGE "pcie-host-bridge"
- #define PCIE_HOST_BRIDGE(obj) \
-     OBJECT_CHECK(PCIExpressHost, (obj), TYPE_PCIE_HOST_BRIDGE)
-+#define PCI_GET_PCIE_HOST_STATE \
-+    OBJECT_CHECK(PCIHostState, \
-+                 object_resolve_path_type("", "pcie-host-bridge", NULL), \
-+                 TYPE_PCIE_HOST_BRIDGE)
++    g_ptr_array_sort(ranges, crs_range_compare);
++    for (i = 0; i < ranges->len; i++) {
++        CrsRangeEntry *used = g_ptr_array_index(ranges, i);
++
++        if (free_base < used->base) {
++            crs_range_insert(free_ranges, free_base, used->base - 1);
++        }
++
++        free_base = used->limit + 1;
++    }
++
++    if (free_base < end) {
++        crs_range_insert(free_ranges, free_base, end);
++    }
++
++    g_ptr_array_set_size(ranges, 0);
++    for (i = 0; i < free_ranges->len; i++) {
++        g_ptr_array_add(ranges, g_ptr_array_index(free_ranges, i));
++    }
++
++    g_ptr_array_free(free_ranges, true);
++}
++
++static void crs_range_merge(GPtrArray *range)
++{
++    GPtrArray *tmp =  g_ptr_array_new_with_free_func(crs_range_free);
++    CrsRangeEntry *entry;
++    uint64_t range_base, range_limit;
++    int i;
++
++    if (!range->len) {
++        return;
++    }
++
++    g_ptr_array_sort(range, crs_range_compare);
++
++    entry = g_ptr_array_index(range, 0);
++    range_base = entry->base;
++    range_limit = entry->limit;
++    for (i = 1; i < range->len; i++) {
++        entry = g_ptr_array_index(range, i);
++        if (entry->base - 1 == range_limit) {
++            range_limit = entry->limit;
++        } else {
++            crs_range_insert(tmp, range_base, range_limit);
++            range_base = entry->base;
++            range_limit = entry->limit;
++        }
++    }
++    crs_range_insert(tmp, range_base, range_limit);
++
++    g_ptr_array_set_size(range, 0);
++    for (i = 0; i < tmp->len; i++) {
++        entry = g_ptr_array_index(tmp, i);
++        crs_range_insert(range, entry->base, entry->limit);
++    }
++    g_ptr_array_free(tmp, true);
++}
++
++
+ static void
+ build_append_nameseg(GArray *array, const char *seg)
+ {
+@@ -1877,6 +1999,159 @@ build_hdr:
+                  "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+ }
  
- #define PCIE_HOST_MCFG_BASE "MCFG"
- #define PCIE_HOST_MCFG_SIZE "mcfg_size"
++Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
++{
++    Aml *crs = aml_resource_template();
++    CrsRangeSet temp_range_set;
++    CrsRangeEntry *entry;
++    uint8_t max_bus = pci_bus_num(host->bus);
++    uint8_t type;
++    int devfn;
++    int i;
++
++    crs_range_set_init(&temp_range_set);
++    for (devfn = 0; devfn < ARRAY_SIZE(host->bus->devices); devfn++) {
++        uint64_t range_base, range_limit;
++        PCIDevice *dev = host->bus->devices[devfn];
++
++        if (!dev) {
++            continue;
++        }
++
++        for (i = 0; i < PCI_NUM_REGIONS; i++) {
++            PCIIORegion *r = &dev->io_regions[i];
++
++            range_base = r->addr;
++            range_limit = r->addr + r->size - 1;
++
++            /*
++             * Work-around for old bioses
++             * that do not support multiple root buses
++             */
++            if (!range_base || range_base > range_limit) {
++                continue;
++            }
++
++            if (r->type & PCI_BASE_ADDRESS_SPACE_IO) {
++                crs_range_insert(temp_range_set.io_ranges,
++                                 range_base, range_limit);
++            } else { /* "memory" */
++                crs_range_insert(temp_range_set.mem_ranges,
++                                 range_base, range_limit);
++            }
++        }
++
++        type = dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
++        if (type == PCI_HEADER_TYPE_BRIDGE) {
++            uint8_t subordinate = dev->config[PCI_SUBORDINATE_BUS];
++            if (subordinate > max_bus) {
++                max_bus = subordinate;
++            }
++
++            range_base = pci_bridge_get_base(dev, PCI_BASE_ADDRESS_SPACE_IO);
++            range_limit = pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_SPACE_IO);
++             /*
++              * Work-around for old bioses
++              * that do not support multiple root buses
++              */
++            if (range_base && range_base <= range_limit) {
++                crs_range_insert(temp_range_set.io_ranges,
++                                 range_base, range_limit);
++            }
++
++            range_base =
++                pci_bridge_get_base(dev, PCI_BASE_ADDRESS_SPACE_MEMORY);
++            range_limit =
++                pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_SPACE_MEMORY);
++
++            /*
++             * Work-around for old bioses
++             * that do not support multiple root buses
++             */
++            if (range_base && range_base <= range_limit) {
++                uint64_t length = range_limit - range_base + 1;
++                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
++                    crs_range_insert(temp_range_set.mem_ranges,
++                                     range_base, range_limit);
++                } else {
++                    crs_range_insert(temp_range_set.mem_64bit_ranges,
++                                     range_base, range_limit);
++                }
++            }
++
++            range_base =
++                pci_bridge_get_base(dev, PCI_BASE_ADDRESS_MEM_PREFETCH);
++            range_limit =
++                pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_MEM_PREFETCH);
++
++            /*
++             * Work-around for old bioses
++             * that do not support multiple root buses
++             */
++            if (range_base && range_base <= range_limit) {
++                uint64_t length = range_limit - range_base + 1;
++                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
++                    crs_range_insert(temp_range_set.mem_ranges,
++                                     range_base, range_limit);
++                } else {
++                    crs_range_insert(temp_range_set.mem_64bit_ranges,
++                                     range_base, range_limit);
++                }
++            }
++        }
++    }
++
++    crs_range_merge(temp_range_set.io_ranges);
++    for (i = 0; i < temp_range_set.io_ranges->len; i++) {
++        entry = g_ptr_array_index(temp_range_set.io_ranges, i);
++        aml_append(crs,
++                   aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
++                               AML_POS_DECODE, AML_ENTIRE_RANGE,
++                               0, entry->base, entry->limit, 0,
++                               entry->limit - entry->base + 1));
++        crs_range_insert(range_set->io_ranges, entry->base, entry->limit);
++    }
++
++    crs_range_merge(temp_range_set.mem_ranges);
++    for (i = 0; i < temp_range_set.mem_ranges->len; i++) {
++        entry = g_ptr_array_index(temp_range_set.mem_ranges, i);
++        aml_append(crs,
++                   aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
++                                    AML_MAX_FIXED, AML_NON_CACHEABLE,
++                                    AML_READ_WRITE,
++                                    0, entry->base, entry->limit, 0,
++                                    entry->limit - entry->base + 1));
++        crs_range_insert(range_set->mem_ranges, entry->base, entry->limit);
++    }
++
++    crs_range_merge(temp_range_set.mem_64bit_ranges);
++    for (i = 0; i < temp_range_set.mem_64bit_ranges->len; i++) {
++        entry = g_ptr_array_index(temp_range_set.mem_64bit_ranges, i);
++        aml_append(crs,
++                   aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
++                                    AML_MAX_FIXED, AML_NON_CACHEABLE,
++                                    AML_READ_WRITE,
++                                    0, entry->base, entry->limit, 0,
++                                    entry->limit - entry->base + 1));
++        crs_range_insert(range_set->mem_64bit_ranges,
++                         entry->base, entry->limit);
++    }
++
++    crs_range_set_free(&temp_range_set);
++
++    aml_append(crs,
++        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
++                            0,
++                            pci_bus_num(host->bus),
++                            max_bus,
++                            0,
++                            max_bus - pci_bus_num(host->bus) + 1));
++
++    return crs;
++}
++
++
++
+ /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
+ static Aml *aml_serial_bus_device(uint8_t serial_bus_type, uint8_t flags,
+                                   uint16_t type_flags,
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2e15f6848e..4eb4fc566c 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -721,291 +721,6 @@ static Aml *build_prt(bool is_pci0_prt)
+     return method;
+ }
+ 
+-typedef struct CrsRangeEntry {
+-    uint64_t base;
+-    uint64_t limit;
+-} CrsRangeEntry;
+-
+-static void crs_range_insert(GPtrArray *ranges, uint64_t base, uint64_t limit)
+-{
+-    CrsRangeEntry *entry;
+-
+-    entry = g_malloc(sizeof(*entry));
+-    entry->base = base;
+-    entry->limit = limit;
+-
+-    g_ptr_array_add(ranges, entry);
+-}
+-
+-static void crs_range_free(gpointer data)
+-{
+-    CrsRangeEntry *entry = (CrsRangeEntry *)data;
+-    g_free(entry);
+-}
+-
+-typedef struct CrsRangeSet {
+-    GPtrArray *io_ranges;
+-    GPtrArray *mem_ranges;
+-    GPtrArray *mem_64bit_ranges;
+- } CrsRangeSet;
+-
+-static void crs_range_set_init(CrsRangeSet *range_set)
+-{
+-    range_set->io_ranges = g_ptr_array_new_with_free_func(crs_range_free);
+-    range_set->mem_ranges = g_ptr_array_new_with_free_func(crs_range_free);
+-    range_set->mem_64bit_ranges =
+-            g_ptr_array_new_with_free_func(crs_range_free);
+-}
+-
+-static void crs_range_set_free(CrsRangeSet *range_set)
+-{
+-    g_ptr_array_free(range_set->io_ranges, true);
+-    g_ptr_array_free(range_set->mem_ranges, true);
+-    g_ptr_array_free(range_set->mem_64bit_ranges, true);
+-}
+-
+-static gint crs_range_compare(gconstpointer a, gconstpointer b)
+-{
+-    CrsRangeEntry *entry_a = *(CrsRangeEntry **)a;
+-    CrsRangeEntry *entry_b = *(CrsRangeEntry **)b;
+-
+-    if (entry_a->base < entry_b->base) {
+-        return -1;
+-    } else if (entry_a->base > entry_b->base) {
+-        return 1;
+-    } else {
+-        return 0;
+-    }
+-}
+-
+-/*
+- * crs_replace_with_free_ranges - given the 'used' ranges within [start - end]
+- * interval, computes the 'free' ranges from the same interval.
+- * Example: If the input array is { [a1 - a2],[b1 - b2] }, the function
+- * will return { [base - a1], [a2 - b1], [b2 - limit] }.
+- */
+-static void crs_replace_with_free_ranges(GPtrArray *ranges,
+-                                         uint64_t start, uint64_t end)
+-{
+-    GPtrArray *free_ranges = g_ptr_array_new();
+-    uint64_t free_base = start;
+-    int i;
+-
+-    g_ptr_array_sort(ranges, crs_range_compare);
+-    for (i = 0; i < ranges->len; i++) {
+-        CrsRangeEntry *used = g_ptr_array_index(ranges, i);
+-
+-        if (free_base < used->base) {
+-            crs_range_insert(free_ranges, free_base, used->base - 1);
+-        }
+-
+-        free_base = used->limit + 1;
+-    }
+-
+-    if (free_base < end) {
+-        crs_range_insert(free_ranges, free_base, end);
+-    }
+-
+-    g_ptr_array_set_size(ranges, 0);
+-    for (i = 0; i < free_ranges->len; i++) {
+-        g_ptr_array_add(ranges, g_ptr_array_index(free_ranges, i));
+-    }
+-
+-    g_ptr_array_free(free_ranges, true);
+-}
+-
+-/*
+- * crs_range_merge - merges adjacent ranges in the given array.
+- * Array elements are deleted and replaced with the merged ranges.
+- */
+-static void crs_range_merge(GPtrArray *range)
+-{
+-    GPtrArray *tmp =  g_ptr_array_new_with_free_func(crs_range_free);
+-    CrsRangeEntry *entry;
+-    uint64_t range_base, range_limit;
+-    int i;
+-
+-    if (!range->len) {
+-        return;
+-    }
+-
+-    g_ptr_array_sort(range, crs_range_compare);
+-
+-    entry = g_ptr_array_index(range, 0);
+-    range_base = entry->base;
+-    range_limit = entry->limit;
+-    for (i = 1; i < range->len; i++) {
+-        entry = g_ptr_array_index(range, i);
+-        if (entry->base - 1 == range_limit) {
+-            range_limit = entry->limit;
+-        } else {
+-            crs_range_insert(tmp, range_base, range_limit);
+-            range_base = entry->base;
+-            range_limit = entry->limit;
+-        }
+-    }
+-    crs_range_insert(tmp, range_base, range_limit);
+-
+-    g_ptr_array_set_size(range, 0);
+-    for (i = 0; i < tmp->len; i++) {
+-        entry = g_ptr_array_index(tmp, i);
+-        crs_range_insert(range, entry->base, entry->limit);
+-    }
+-    g_ptr_array_free(tmp, true);
+-}
+-
+-static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
+-{
+-    Aml *crs = aml_resource_template();
+-    CrsRangeSet temp_range_set;
+-    CrsRangeEntry *entry;
+-    uint8_t max_bus = pci_bus_num(host->bus);
+-    uint8_t type;
+-    int devfn;
+-    int i;
+-
+-    crs_range_set_init(&temp_range_set);
+-    for (devfn = 0; devfn < ARRAY_SIZE(host->bus->devices); devfn++) {
+-        uint64_t range_base, range_limit;
+-        PCIDevice *dev = host->bus->devices[devfn];
+-
+-        if (!dev) {
+-            continue;
+-        }
+-
+-        for (i = 0; i < PCI_NUM_REGIONS; i++) {
+-            PCIIORegion *r = &dev->io_regions[i];
+-
+-            range_base = r->addr;
+-            range_limit = r->addr + r->size - 1;
+-
+-            /*
+-             * Work-around for old bioses
+-             * that do not support multiple root buses
+-             */
+-            if (!range_base || range_base > range_limit) {
+-                continue;
+-            }
+-
+-            if (r->type & PCI_BASE_ADDRESS_SPACE_IO) {
+-                crs_range_insert(temp_range_set.io_ranges,
+-                                 range_base, range_limit);
+-            } else { /* "memory" */
+-                crs_range_insert(temp_range_set.mem_ranges,
+-                                 range_base, range_limit);
+-            }
+-        }
+-
+-        type = dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
+-        if (type == PCI_HEADER_TYPE_BRIDGE) {
+-            uint8_t subordinate = dev->config[PCI_SUBORDINATE_BUS];
+-            if (subordinate > max_bus) {
+-                max_bus = subordinate;
+-            }
+-
+-            range_base = pci_bridge_get_base(dev, PCI_BASE_ADDRESS_SPACE_IO);
+-            range_limit = pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_SPACE_IO);
+-
+-            /*
+-             * Work-around for old bioses
+-             * that do not support multiple root buses
+-             */
+-            if (range_base && range_base <= range_limit) {
+-                crs_range_insert(temp_range_set.io_ranges,
+-                                 range_base, range_limit);
+-            }
+-
+-            range_base =
+-                pci_bridge_get_base(dev, PCI_BASE_ADDRESS_SPACE_MEMORY);
+-            range_limit =
+-                pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_SPACE_MEMORY);
+-
+-            /*
+-             * Work-around for old bioses
+-             * that do not support multiple root buses
+-             */
+-            if (range_base && range_base <= range_limit) {
+-                uint64_t length = range_limit - range_base + 1;
+-                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
+-                    crs_range_insert(temp_range_set.mem_ranges,
+-                                     range_base, range_limit);
+-                } else {
+-                    crs_range_insert(temp_range_set.mem_64bit_ranges,
+-                                     range_base, range_limit);
+-                }
+-            }
+-
+-            range_base =
+-                pci_bridge_get_base(dev, PCI_BASE_ADDRESS_MEM_PREFETCH);
+-            range_limit =
+-                pci_bridge_get_limit(dev, PCI_BASE_ADDRESS_MEM_PREFETCH);
+-
+-            /*
+-             * Work-around for old bioses
+-             * that do not support multiple root buses
+-             */
+-            if (range_base && range_base <= range_limit) {
+-                uint64_t length = range_limit - range_base + 1;
+-                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
+-                    crs_range_insert(temp_range_set.mem_ranges,
+-                                     range_base, range_limit);
+-                } else {
+-                    crs_range_insert(temp_range_set.mem_64bit_ranges,
+-                                     range_base, range_limit);
+-                }
+-            }
+-        }
+-    }
+-
+-    crs_range_merge(temp_range_set.io_ranges);
+-    for (i = 0; i < temp_range_set.io_ranges->len; i++) {
+-        entry = g_ptr_array_index(temp_range_set.io_ranges, i);
+-        aml_append(crs,
+-                   aml_word_io(AML_MIN_FIXED, AML_MAX_FIXED,
+-                               AML_POS_DECODE, AML_ENTIRE_RANGE,
+-                               0, entry->base, entry->limit, 0,
+-                               entry->limit - entry->base + 1));
+-        crs_range_insert(range_set->io_ranges, entry->base, entry->limit);
+-    }
+-
+-    crs_range_merge(temp_range_set.mem_ranges);
+-    for (i = 0; i < temp_range_set.mem_ranges->len; i++) {
+-        entry = g_ptr_array_index(temp_range_set.mem_ranges, i);
+-        aml_append(crs,
+-                   aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
+-                                    AML_MAX_FIXED, AML_NON_CACHEABLE,
+-                                    AML_READ_WRITE,
+-                                    0, entry->base, entry->limit, 0,
+-                                    entry->limit - entry->base + 1));
+-        crs_range_insert(range_set->mem_ranges, entry->base, entry->limit);
+-    }
+-
+-    crs_range_merge(temp_range_set.mem_64bit_ranges);
+-    for (i = 0; i < temp_range_set.mem_64bit_ranges->len; i++) {
+-        entry = g_ptr_array_index(temp_range_set.mem_64bit_ranges, i);
+-        aml_append(crs,
+-                   aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
+-                                    AML_MAX_FIXED, AML_NON_CACHEABLE,
+-                                    AML_READ_WRITE,
+-                                    0, entry->base, entry->limit, 0,
+-                                    entry->limit - entry->base + 1));
+-        crs_range_insert(range_set->mem_64bit_ranges,
+-                         entry->base, entry->limit);
+-    }
+-
+-    crs_range_set_free(&temp_range_set);
+-
+-    aml_append(crs,
+-        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                            0,
+-                            pci_bus_num(host->bus),
+-                            max_bus,
+-                            0,
+-                            max_bus - pci_bus_num(host->bus) + 1));
+-
+-    return crs;
+-}
+-
+ static void build_hpet_aml(Aml *table)
+ {
+     Aml *crs;
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index ed7c89309e..e0af85773c 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -224,6 +224,20 @@ struct AcpiBuildTables {
+     BIOSLinker *linker;
+ } AcpiBuildTables;
+ 
++typedef
++struct CrsRangeEntry {
++    uint64_t base;
++    uint64_t limit;
++} CrsRangeEntry;
++
++typedef
++struct CrsRangeSet {
++    GPtrArray *io_ranges;
++    GPtrArray *mem_ranges;
++    GPtrArray *mem_64bit_ranges;
++} CrsRangeSet;
++
++
+ /*
+  * ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors
+  * Serial Bus Type
+@@ -430,6 +444,17 @@ build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
+                      s->access_width, s->address);
+ }
+ 
++Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set);
++
++void crs_range_insert(GPtrArray *ranges, uint64_t base, uint64_t limit);
++
++void crs_replace_with_free_ranges(GPtrArray *ranges,
++                                         uint64_t start, uint64_t end);
++
++void crs_range_set_init(CrsRangeSet *range_set);
++
++void crs_range_set_free(CrsRangeSet *range_set);
++
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags);
+ 
 -- 
 2.19.1
 
