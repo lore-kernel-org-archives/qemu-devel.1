@@ -2,73 +2,80 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB5FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B61CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:36:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 320FF2070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:35:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320FF2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C9B342070A
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:36:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B342070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbYFX-0001CQ-87
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:35:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
+	id 1jbYG2-0002Eb-0R
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:36:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbYEb-0000GH-Fn
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:34:49 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:40864)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jbYEa-0005WT-Cv
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:34:49 -0400
-Received: from player799.ha.ovh.net (unknown [10.108.57.178])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9416816719C
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 01:34:45 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id 6EAFE1295AE82;
- Wed, 20 May 2020 23:34:38 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R005c10cd6dc-c206-4a5e-a6eb-8b673158eb3f,0C88E457D5774F601C3A42E7BE1517355FE6C707)
- smtp.auth=groug@kaod.org
-Date: Thu, 21 May 2020 01:34:37 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Reza Arbab <arbab@linux.ibm.com>
-Subject: Re: [PATCH v2 1/2] spapr: Add associativity reference point count
- to machine info
-Message-ID: <20200521013437.5da898fb@bahia.lan>
-In-Reply-To: <20200518214418.18248-1-arbab@linux.ibm.com>
-References: <20200518214418.18248-1-arbab@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jbYFH-00018F-QD
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:35:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57796)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jbYFG-0005fV-AW
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:35:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jbYFE-0007Kx-5Q
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 23:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 20CC62E802D
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 23:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13732882640812480827
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddutddgvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=178.33.111.220; envelope-from=groug@kaod.org;
- helo=1.mo179.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 19:34:45
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 May 2020 23:28:43 -0000
+From: Heiko Sieger <1856335@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Heiko Sieger (h-sieger)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <159001732338.19840.6413596738980744971.malone@soybean.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 079046ef53b245e410feb415b9974e39f6d8fd9a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 17:55:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,91 +84,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 16:44:17 -0500
-Reza Arbab <arbab@linux.ibm.com> wrote:
+This is the CPU cache layout as shown by lscpu -a -e
 
-> Make the number of NUMA associativity reference points a
-> machine-specific value, using the currently assumed default (two
-> reference points). This preps the next patch to conditionally change it.
-> 
-> Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
-> ---
->  hw/ppc/spapr.c         | 6 +++++-
->  include/hw/ppc/spapr.h | 1 +
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index c18eab0a2305..88b4a1f17716 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -889,10 +889,12 @@ static int spapr_dt_rng(void *fdt)
->  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->  {
->      MachineState *ms = MACHINE(spapr);
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
->      int rtas;
->      GString *hypertas = g_string_sized_new(256);
->      GString *qemu_hypertas = g_string_sized_new(256);
->      uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
-> +    uint32_t nr_refpoints;
->      uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
->          memory_region_size(&MACHINE(spapr)->device_memory->mr);
->      uint32_t lrdr_capacity[] = {
-> @@ -944,8 +946,9 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->                       qemu_hypertas->str, qemu_hypertas->len));
->      g_string_free(qemu_hypertas, TRUE);
->  
-> +    nr_refpoints = MIN(smc->nr_assoc_refpoints, ARRAY_SIZE(refpoints));
+CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ    MINMHZ
+  0    0      0    0 0:0:0:0          yes 3800.0000 2200.0000
+  1    0      0    1 1:1:1:0          yes 3800.0000 2200.0000
+  2    0      0    2 2:2:2:0          yes 3800.0000 2200.0000
+  3    0      0    3 3:3:3:1          yes 3800.0000 2200.0000
+  4    0      0    4 4:4:4:1          yes 3800.0000 2200.0000
+  5    0      0    5 5:5:5:1          yes 3800.0000 2200.0000
+  6    0      0    6 6:6:6:2          yes 3800.0000 2200.0000
+  7    0      0    7 7:7:7:2          yes 3800.0000 2200.0000
+  8    0      0    8 8:8:8:2          yes 3800.0000 2200.0000
+  9    0      0    9 9:9:9:3          yes 3800.0000 2200.0000
+ 10    0      0   10 10:10:10:3       yes 3800.0000 2200.0000
+ 11    0      0   11 11:11:11:3       yes 3800.0000 2200.0000
+ 12    0      0    0 0:0:0:0          yes 3800.0000 2200.0000
+ 13    0      0    1 1:1:1:0          yes 3800.0000 2200.0000
+ 14    0      0    2 2:2:2:0          yes 3800.0000 2200.0000
+ 15    0      0    3 3:3:3:1          yes 3800.0000 2200.0000
+ 16    0      0    4 4:4:4:1          yes 3800.0000 2200.0000
+ 17    0      0    5 5:5:5:1          yes 3800.0000 2200.0000
+ 18    0      0    6 6:6:6:2          yes 3800.0000 2200.0000
+ 19    0      0    7 7:7:7:2          yes 3800.0000 2200.0000
+ 20    0      0    8 8:8:8:2          yes 3800.0000 2200.0000
+ 21    0      0    9 9:9:9:3          yes 3800.0000 2200.0000
+ 22    0      0   10 10:10:10:3       yes 3800.0000 2200.0000
+ 23    0      0   11 11:11:11:3       yes 3800.0000 2200.0000
 
-Having the machine requesting more reference points than available
-would clearly be a bug. I'd rather add an assert() than silently
-clipping to the size of refpoints[].
+I was trying to allocate cache using the cachetune feature in libvirt,
+but it turns out to be either misleading or much too complicated to be
+usable. Here is what I tried:
 
->      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
-> -                     refpoints, sizeof(refpoints)));
-> +                     refpoints, nr_refpoints * sizeof(uint32_t)));
->  
+  <vcpu placement=3D"static">24</vcpu>
+  <cputune>
+    <vcpupin vcpu=3D"0" cpuset=3D"0"/>
+    <vcpupin vcpu=3D"1" cpuset=3D"12"/>
+    <vcpupin vcpu=3D"2" cpuset=3D"1"/>
+    <vcpupin vcpu=3D"3" cpuset=3D"13"/>
+    <vcpupin vcpu=3D"4" cpuset=3D"2"/>
+    <vcpupin vcpu=3D"5" cpuset=3D"14"/>
+    <vcpupin vcpu=3D"6" cpuset=3D"3"/>
+    <vcpupin vcpu=3D"7" cpuset=3D"15"/>
+    <vcpupin vcpu=3D"8" cpuset=3D"4"/>
+    <vcpupin vcpu=3D"9" cpuset=3D"16"/>
+    <vcpupin vcpu=3D"10" cpuset=3D"5"/>
+    <vcpupin vcpu=3D"11" cpuset=3D"17"/>
+    <vcpupin vcpu=3D"12" cpuset=3D"6"/>
+    <vcpupin vcpu=3D"13" cpuset=3D"18"/>
+    <vcpupin vcpu=3D"14" cpuset=3D"7"/>
+    <vcpupin vcpu=3D"15" cpuset=3D"19"/>
+    <vcpupin vcpu=3D"16" cpuset=3D"8"/>
+    <vcpupin vcpu=3D"17" cpuset=3D"20"/>
+    <vcpupin vcpu=3D"18" cpuset=3D"9"/>
+    <vcpupin vcpu=3D"19" cpuset=3D"21"/>
+    <vcpupin vcpu=3D"20" cpuset=3D"10"/>
+    <vcpupin vcpu=3D"21" cpuset=3D"22"/>
+    <vcpupin vcpu=3D"22" cpuset=3D"11"/>
+    <vcpupin vcpu=3D"23" cpuset=3D"23"/>
+    <cachetune vcpus=3D"0-2,12-14">
+      <cache id=3D"0" level=3D"3" type=3D"both" size=3D"16" unit=3D"MiB"/>
+      <monitor level=3D"3" vcpus=3D"0-2,12-14"/>
+    </cachetune>
+    <cachetune vcpus=3D"3-5,15-17">
+      <cache id=3D"1" level=3D"3" type=3D"both" size=3D"16" unit=3D"MiB"/>
+      <monitor level=3D"3" vcpus=3D"3-5,15-17"/>
+    </cachetune>
+    <cachetune vcpus=3D"6-8,18-20">
+      <cache id=3D"2" level=3D"3" type=3D"both" size=3D"16" unit=3D"MiB"/>
+      <monitor level=3D"3" vcpus=3D"6-8,18-20"/>
+    </cachetune>
+    <cachetune vcpus=3D"9-11,21-23">
+      <cache id=3D"3" level=3D"3" type=3D"both" size=3D"16" unit=3D"MiB"/>
+      <monitor level=3D"3" vcpus=3D"9-11,21-23"/>
+    </cachetune>
+  </cputune>
 
-Size can be expressed without yet another explicit reference to the
-uint32_t type:
+Unfortunately it gives the following error when I try to start the VM:
 
-nr_refpoints * sizeof(refpoints[0])
+Error starting domain: internal error: Missing or inconsistent resctrl
+info for memory bandwidth allocation
 
->      _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
->                       maxdomains, sizeof(maxdomains)));
-> @@ -4541,6 +4544,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      smc->linux_pci_probe = true;
->      smc->smp_threads_vsmt = true;
->      smc->nr_xirqs = SPAPR_NR_XIRQS;
-> +    smc->nr_assoc_refpoints = 2;
+I have resctrl mounted like this:
 
-When adding a new setting for the default machine type, we usually
-take care of older machine types at the same time, ie. folding this
-patch into the next one. Both patches are simple enough that it should
-be okay and this would avoid this line to be touched again.
+mount -t resctrl resctrl /sys/fs/resctrl
 
->      xfc->match_nvt = spapr_match_nvt;
->  }
->  
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index e579eaf28c05..abaf9a92adc0 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -129,6 +129,7 @@ struct SpaprMachineClass {
->      bool linux_pci_probe;
->      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
->      hwaddr rma_limit;          /* clamp the RMA to this size */
-> +    uint32_t nr_assoc_refpoints;
->  
->      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
->                            uint64_t *buid, hwaddr *pio, 
+This error leads to the following description on how to allocate memory
+bandwith: https://software.intel.com/content/www/us/en/develop/articles
+/use-intel-resource-director-technology-to-allocate-memory-
+bandwidth.html
 
+I think this is over the top and perhaps I'm trying the wrong approach.
+All I can say is that every suggestion I've seen and tried so far has
+led me to one conclusion: QEMU does NOT support the L3 cache layout of
+the new ZEN 2 arch CPUs such as the Ryzen 9 3900X.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856335
+
+Title:
+  Cache Layout wrong on many Zen Arch CPUs
+
+Status in QEMU:
+  New
+
+Bug description:
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
+
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+
+  In windows, coreinfo reports correctly:
+
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+
+  in windows, coreinfo reports incorrectly:
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
