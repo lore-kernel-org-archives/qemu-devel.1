@@ -2,107 +2,90 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0889EC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6357CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:37:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7E6F2070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:34:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A33F2072C
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:37:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfrQbE6I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E6F2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GK3nxaqJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A33F2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbRfY-000260-2M
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 12:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47732)
+	id 1jbRj2-0006jU-Ar
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 12:37:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbRes-0000c9-N3
- for qemu-devel@nongnu.org; Wed, 20 May 2020 12:33:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54384
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbRer-0002BE-RX
- for qemu-devel@nongnu.org; Wed, 20 May 2020 12:33:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589992408;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6iVZspdcL7XN594If70FRuGddioaD7TsYgHOYb61r1A=;
- b=hfrQbE6IIxcojHNGSxQhtJsYWbmtNrldvOp84tzCaJFyis8Wp6Hl9zZlMwMuHi+UiUD/wT
- M/2udx1wodM8I+v3LNNWOQPSRu+9ay8bOmYDuhbKy0mJ1VOgW2BXxItJL+Motrtz1MtCz9
- +5kvEEgqPT1G1MK7bH8+4KkgPTBj0O8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-JtlqPOSSPIW5ihCzqRdrYg-1; Wed, 20 May 2020 12:33:23 -0400
-X-MC-Unique: JtlqPOSSPIW5ihCzqRdrYg-1
-Received: by mail-ed1-f70.google.com with SMTP id m6so1463110eda.16
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 09:33:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6iVZspdcL7XN594If70FRuGddioaD7TsYgHOYb61r1A=;
- b=Fh7BAhANQT1ibNyNt79ckaXILNvhBellXFwFhBn4puoSZHL99GMb5OhVXxL155pqIt
- dyX8KHWhQPk3IHzgVnTL/AdsR8G9K0ITfWEbFZiFsmEEzuVOgubByNXI4fBPAIzTGojm
- kxR3cZ+ND2dSnLe4jxGqr8hYPuJ/SNdMaqeGcUrDbjI0XRC5+2Vih5oIDwolohgsZ2UN
- oYpDCNw76d013Ab8ofMh2ogAaedEwQTCz4pZ3zoTp4xY/HB86Tw84dYaQ5L06gms6g66
- KSPSRvhFxNfkRVGEQhUfMiJOTsI3kTbvQ1J2ZSMkmruT59RGo1eRc23w3WMcwAfoZyGf
- UFOg==
-X-Gm-Message-State: AOAM531rktoLD+qp00TUMBmpA9801gpy24cdyGJZC8LwFDytLeVY8njA
- Zof2Wd0bEFVvp7vamNp8TEv8k6ZIzIbqdy6dSd/GmlOczFwkP+ff4HwBNXJrJoFSuSfU/Cq1PvJ
- 7rxgubSlKzwsvmu4=
-X-Received: by 2002:a17:906:6893:: with SMTP id
- n19mr4751506ejr.354.1589992402183; 
- Wed, 20 May 2020 09:33:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxrSG3qiU8mxch+udvX85ZibuV4uVxywp9m3gbEkr0U4DLVdyxHuFGIOv+wIx+5D88jgowlmQ==
-X-Received: by 2002:a17:906:6893:: with SMTP id
- n19mr4751481ejr.354.1589992401891; 
- Wed, 20 May 2020 09:33:21 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id b62sm2356594edf.28.2020.05.20.09.33.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 09:33:21 -0700 (PDT)
-Subject: Re: [PATCH 2/2] sd: disable sdhci-pci device by default
-To: Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
-References: <20200520152450.200362-1-ppandit@redhat.com>
- <20200520152450.200362-3-ppandit@redhat.com>
- <CAFEAcA_WbJR9PWpw4f2jWecouSn7U0y9=0t4ek1rGwxtM6tXBQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <431930bb-ac30-62fb-11f0-c388c0e9c763@redhat.com>
-Date: Wed, 20 May 2020 18:33:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=40290bcd2=alistair.francis@wdc.com>)
+ id 1jbRi0-0005Bx-ME; Wed, 20 May 2020 12:36:44 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:11692)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=40290bcd2=alistair.francis@wdc.com>)
+ id 1jbRhy-0002lX-Sb; Wed, 20 May 2020 12:36:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1589992603; x=1621528603;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=xuST64lSQI4MP5MnAyrlyrGzoU5swXUNK7vHX545Zhc=;
+ b=GK3nxaqJn3KvTtG39E8Y52uTw6vUp5WeQ+AecLJcfHoqZr5Sph8nzf74
+ wybLe9cH/Zw/xaK8TyXBtj5i2FAaCS8JKNDU0o1AZ0lSD4DJS4OZ3kGYZ
+ aSs8Zkk4BTPLLPC7wbmtZ5gEedOeUvPPzi6i4H/QIvjotlIq1fimKNA0+
+ gD/mQ9lNPSgnkDB808yy2fPAaBg0SnUHXn4lvDQu3lviCP87FsvTKzRDz
+ gNdphoX5y5NkDx3RGsMfzfdeUIrVi4NOgy9cKliGXes67HgBPkaZPgslt
+ KiAVXd98zUYryrgDyUekOvT9RT4nThCyRfLpJCf+XzE58m+de6Cf6BEki g==;
+IronPort-SDR: 0Vfw5LMZpsioZjdAYZq1BDb+Mf1gILMKSg+3SeZrtk1a7GVttKzhJ0SZKNW0/Le+pNECVd6U2n
+ fX5Ma4OBQUzFBZMZLdKQH96091OzyUSH2UuvgyXnk0hOtKqLj/cuTL023JCdd7uaC5aguZ7E+F
+ gsgcV7Yzk5+BvJzOA4/PcxCxZJNUTllsUDAds8645sWUCyDNm4fxisPM9N6YDRFSUYDYDSLYb8
+ XQIz2m1s2lYGI9Q4Mkq4FtUci0PWjyymCF2aheCEVSvfU2PnBu1haFmg1/3fHiPWRbWFEdcuEq
+ 9Z8=
+X-IronPort-AV: E=Sophos;i="5.73,414,1583164800"; d="scan'208";a="138468207"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 21 May 2020 00:36:38 +0800
+IronPort-SDR: wfZSq2ypkXZd9OHKdf+Jvd40TQkeHj8QPzmQ4syjfKwwZKy0mK+lz4BKPJwImhjuzLlpclAywx
+ wPCuqWwrkNp1QPM+rWt6nNoCUaJkGpIx0=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 20 May 2020 09:26:40 -0700
+IronPort-SDR: tm166kVNQ001OILkzYpvoih8yDWiwuiyvwccTDZ5kiLQ1KAEB9COAlCxJiTeHZc2hoxf169+mb
+ WLVN+up8aiUQ==
+WDCIronportException: Internal
+Received: from 96yhgc2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.51])
+ by uls-op-cesaip02.wdc.com with ESMTP; 20 May 2020 09:36:37 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v2 0/2]  Add support for the HiFive1 revB
+Date: Wed, 20 May 2020 09:28:10 -0700
+Message-Id: <cover.1589992028.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_WbJR9PWpw4f2jWecouSn7U0y9=0t4ek1rGwxtM6tXBQ@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.144;
+ envelope-from=prvs=40290bcd2=alistair.francis@wdc.com;
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 12:36:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,85 +98,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: alistair.francis@wdc.com, philmd@redhat.com, palmer@dabbelt.com,
+ bmeng.cn@gmail.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Kevin, Paolo, Emanuele
 
-On 5/20/20 5:39 PM, Peter Maydell wrote:
-> On Wed, 20 May 2020 at 16:28, P J P <ppandit@redhat.com> wrote:
->>
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> Disable rarely used sdhci-pci device build by default.
->>
->> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
-> 
-> Doesn't this break existing working command lines? The
-> device exists, some people use it. We should treat it like
-> other PCI devices -- if the guest arch/machine can handle
-> PCI the device should be built.
+Add support for the HiFive1 revB board. We don't want to break current
+users so this is added as an option that is disabled by default. The
+main change is the address that we jump to at boot.
 
-Prasad, I once tried to remove it, and Kevin said he was using it:
+v2:
+ - Add a cover letter
 
-https://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02765.html
 
-   I do find qemu's PCI SDHCI support useful for testing.
-   SeaBIOS can launch an OS from PCI SDHCI (qemu-system-x86_64
-   -device sdhci-pci -device sd-card,drive=drive0 -drive
-   id=drive0,if=none,file=dos-drivec) and linux has drivers for
-   it as well.  A number of the Chromebooks ship with PCI SDHCI
-   devices on them, so it's not an unheard of configuration.
+Alistair Francis (2):
+  riscv: sifive_e: Manually define the machine
+  sifive_e: Support the revB machine
 
-> 
-> There's obviously scope for being more general and allowing
-> some kind of "only build the subset of devices we feel
-> more confident abut the security of" setup (don't RH do
-> something like this downstream?), but upstream we don't
-> have a concept like that, we just build everything.
+ include/hw/riscv/sifive_e.h |  5 +++
+ hw/riscv/sifive_e.c         | 76 +++++++++++++++++++++++++++++--------
+ 2 files changed, 66 insertions(+), 15 deletions(-)
 
-Prasad, again back at that time I tried to remove this (as the device 
-appears unused) Paolo told me after asking explanation for his comment 
-"PCI devices can be created with -device, they don't have to be added by
-boards." [*] - I guess it was on IRC - to check commit 224d10ff5ae, this 
-device was added with RH PCI ID because it was useful for testing:
-
-static void sdhci_pci_class_init(ObjectClass *klass, void *data)
-{
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-
-     k->init = sdhci_pci_init;
-     k->exit = sdhci_pci_exit;
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-     k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
-     k->class_id = PCI_CLASS_SYSTEM_SDHCI;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-     ...
-
-This device is also nicely used as example for the qgraph testing (see 
-tests/test-qgraph.c added in fc281c80202).
-
-[*] https://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02819.html
-
-Peter, indeed the Kconfig was added to allow distributions to disable 
-piece of code, and we want to keep this device in mainstream QEMU.
-Distributions are free to disable it setting SDHCI_PCI=n
-
-So to this patch:
-
-Nack.
-
-> 
-> thanks
-> -- PMM
-> 
+-- 
+2.26.2
 
 
