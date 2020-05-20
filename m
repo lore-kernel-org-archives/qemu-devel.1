@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE9EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 00:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF59C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 00:41:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3DCA207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 00:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3DCA207D8
+	by mail.kernel.org (Postfix) with ESMTPS id C6A6E20756
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 00:41:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A6E20756
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbCe0-0002Nq-32
-	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 20:31:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56552)
+	id 1jbCno-0007Ja-0m
+	for qemu-devel@archiver.kernel.org; Tue, 19 May 2020 20:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbCdC-0001vN-8l
- for qemu-devel@nongnu.org; Tue, 19 May 2020 20:30:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60842)
+ id 1jbCn1-0006Hs-PO
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 20:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34176)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jbCd9-0002mF-Jh
- for qemu-devel@nongnu.org; Tue, 19 May 2020 20:30:45 -0400
+ id 1jbCn0-0004al-O9
+ for qemu-devel@nongnu.org; Tue, 19 May 2020 20:40:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jbCd7-0007Si-Nd
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:30:41 +0000
+ id 1jbCmy-0008MK-Uk
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:40:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AE2452E8048
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:30:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E66FC2E806E
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 00:40:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 May 2020 00:24:59 -0000
+Date: Wed, 20 May 2020 00:32:40 -0000
 From: Julien Freche <1879587@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,8 +52,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: jfreche
 X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
 X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
-Message-Id: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Subject: [Bug 1879587] [NEW] Register number in ESR is incorrect for certain
+References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
+Message-Id: <158993476092.21470.14524424949082521060.malone@wampee.canonical.com>
+Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
  banked registers when switching from AA32 to AA64
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f51b4e621618da9eebe6a310fb872faaa4410ab3
+X-Launchpad-Hash: daa31580ec4e70cfb664cb8fdf77c0b59694a232
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 20:30:42
@@ -89,37 +90,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-I am running into a situation where I have:
-- A hypervisor running in EL2, AA64
-- A guest running in EL1, AA32
-
-We trap certain accesses to special registers such as DACR (via
-HCR.TVM). One instruction that is trapped is:
-
-ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-The guest is running in SVC mode. So, LR should refer to LR_svc there.
-LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-the actual ESR value is: 0xfe00dc0
-
-If we decode the 'rt':
->>> (0xfe00dc0 >> 5) & 0x1f
-14
-
-My understanding is that 14 is incorrect in the context of AA64. rt
-should be set to 18. The current mode being SVC, LR refers to LR_svc not
-LR_usr. In other words, the mapping between registers in AA64 and AA32
-doesn't seem to be accounted for. I've tested this with Qemu 5.0.0
-
-Let me know if that makes sense and if you would like more info. I am also =
-happy to test patches.
-Thanks for all the great work on Qemu!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+This is with qemu-system-aarch64 - forgot to mention it explicitly. So,
+it will only affect qemu for ARM 64-bit.
 
 -- =
 
