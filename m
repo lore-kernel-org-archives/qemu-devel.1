@@ -2,64 +2,91 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E47D5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:45:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 901B92075F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:42:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901B92075F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0F642075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 09:45:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BbfPCouU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F642075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbLEs-0002Cs-QI
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:42:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50906)
+	id 1jbLI1-0006nW-R8
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 05:45:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbLAs-00040G-Id
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:38:11 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43614 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbLAq-00009l-T9
- for qemu-devel@nongnu.org; Wed, 20 May 2020 05:38:06 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B60609ADF91E5186702C;
- Wed, 20 May 2020 17:38:02 +0800 (CST)
-Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 20 May 2020 17:37:56 +0800
-From: Yubo Miao <miaoyubo@huawei.com>
-To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v7 7/8] unit-test: Add testcase for pxb
-Date: Wed, 20 May 2020 17:36:28 +0800
-Message-ID: <20200520093629.1495-8-miaoyubo@huawei.com>
-X-Mailer: git-send-email 2.24.1.windows.2
-In-Reply-To: <20200520093629.1495-1-miaoyubo@huawei.com>
-References: <20200520093629.1495-1-miaoyubo@huawei.com>
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbLGm-0005RF-BB
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:44:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32328
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbLGk-00019U-Op
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 05:44:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589967848;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f256gQyF2bNPjagasxXRNnJXKcBnAD1ftRCGjQ8PvYU=;
+ b=BbfPCouUBXGL0dEXPmOZoEEJDR0bXT7aalCLXq+88iSfEbdSYJ/JzZ5IRE+A8ZyGPF3zBi
+ Tqa5GbmwLlTzz5vdRSMYqCnwZtOgdVqWKJ4g8HNHuNRBiuPNys0GxIk/Zqw6ssf7iLWrR7
+ dZPAbInoRhtINY2a2LseXmnKBnr8IDk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-Wrs0JCW3NDa1aZ_lfa-CMA-1; Wed, 20 May 2020 05:44:07 -0400
+X-MC-Unique: Wrs0JCW3NDa1aZ_lfa-CMA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 053771005510;
+ Wed, 20 May 2020 09:44:06 +0000 (UTC)
+Received: from nas.mammed.net (unknown [10.40.193.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 77B5919C4F;
+ Wed, 20 May 2020 09:43:57 +0000 (UTC)
+Date: Wed, 20 May 2020 11:43:54 +0200
+From: Igor Mammedow <imammedo@redhat.com>
+To: Ani Sinha <ani.sinha@nutanix.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Message-ID: <20200520114354.1982cb63@nas.mammed.net>
+In-Reply-To: <7FF83CE8-F25A-4458-80A7-EAA6296EF175@nutanix.com>
+References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
+ <20200511205352.05ff541a@redhat.com>
+ <9941B800-BBEF-4DF8-BEE0-EC39D2A20D98@nutanix.com>
+ <20200513214312.0dfa4752@redhat.com>
+ <7FF83CE8-F25A-4458-80A7-EAA6296EF175@nutanix.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.29]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=miaoyubo@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 05:37:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/19 22:48:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,104 +99,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, miaoyubo@huawei.com, imammedo@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add testcase for pxb to make sure the ACPI table is correct for guest.
+On Fri, 15 May 2020 12:13:53 +0000
+Ani Sinha <ani.sinha@nutanix.com> wrote:
 
-Signed-off-by: Yubo Miao <miaoyubo@huawei.com>
----
- tests/qtest/bios-tables-test.c | 58 ++++++++++++++++++++++++++++++----
- 1 file changed, 52 insertions(+), 6 deletions(-)
+> > On May 14, 2020, at 1:13 AM, Igor Mammedov <imammedo@redhat.com>
+> > wrote:=20
+> >>=20
+> >>  =20
+> >>> Will following hack work for you?
+> >>> possible permutations
+> >>> 1) ACPI hotplug everywhere
+> >>> -global PIIX4_PM.acpi-pci-hotplug=3Don -global
+> >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Don -device
+> >>> pci-bridge,chassis_nr=3D1,shpc=3Ddoesnt_matter -device
+> >>> e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1=20
+> >>>=20
+> >>> 2) No hotplug at all
+> >>> -global PIIX4_PM.acpi-pci-hotplug=3Doff -global
+> >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Don -device
+> >>> pci-bridge,chassis_nr=3D1,shpc=3Doff -device
+> >>> e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1
+> >>>=20
+> >>> -global PIIX4_PM.acpi-pci-hotplug=3Doff -global
+> >>> PIIX4_PM.acpi-pci-hotplug-with-bridge-support=3Doff -device
+> >>> pci-bridge,chassis_nr=3D1,shpc=3Ddoesnt_matter  -device
+> >>> e1000,bus=3Dpci.1,addr=3D01,id=3Dnetdev1   =20
+> >>=20
+> >> Given that my patch is not acceptable, I=E2=80=99d prefer the followin=
+g in
+> >> the order of preference:
+> >>=20
+> >> (a) Have an option to disable hot ejection of PCI-PCI bridge so
+> >> that Windows does not even show this HW in the =E2=80=9Csafely remove =
+HW=E2=80=9D
+> >> option. If we can do this then from OS perspective the GUI options
+> >> will be same as what is available with PCIE/q35 - none of the
+> >> devices will be hot ejectable if the hot plug option is turned off
+> >> from the PCIE slots where devices are plugged into. I looked at
+> >> the code. It seems to manipulate ACPI tables of the empty slots of
+> >> the root bus where no devices are attached (see comment "/* add
+> >> hotplug slots for non present devices */ =E2=80=9C). For cold plugged
+> >> bridges, it recurses down to scan the slots of the bridge. Is it
+> >> possible to disable hot plug for the slot to which the bridge is
+> >> attached? =20
+> >=20
+> > I don't think it's possible to have per slot hotplug on
+> > conventional PCI hardware. it's per bridge property. =20
+>=20
+> We add the AMLs per empty slot though. When the pic bridge is
+> attached, we do nothing, just recurse into the bridge slots. That is
+> what I was asking, if it was possible to just disable the AMLs or use
+> some tricks to say that this particular slot is not hotpluggable. I
+> am not sure why Windows is trying to eject the PCI bridge and
+> failing. Maybe something related to this comment?
+>=20
+>=20
+> /* When hotplug for bridges is enabled, bridges are
+>                              =20
+>          * described in ACPI separately (see build_pci_bus_end).
+>                                      =20
+>          * In this case they aren't themselves hot-pluggable.
+>                                      =20
+>          * Hotplugged bridges *are* hot-pluggable.
+> */
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index c9843829b3..557b7e40ff 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -621,12 +621,21 @@ static void test_acpi_one(const char *params, test_data *data)
-          * TODO: convert '-drive if=pflash' to new syntax (see e33763be7cd3)
-          * when arm/virt boad starts to support it.
-          */
--        args = g_strdup_printf("-machine %s %s -accel tcg -nodefaults -nographic "
--            "-drive if=pflash,format=raw,file=%s,readonly "
--            "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
--            data->machine, data->tcg_only ? "" : "-accel kvm",
--            data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
--
-+        if (data->cd) {
-+            args = g_strdup_printf("-machine %s %s -accel tcg "
-+                "-nodefaults -nographic "
-+                "-drive if=pflash,format=raw,file=%s,readonly "
-+                "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
-+                data->machine, data->tcg_only ? "" : "-accel kvm",
-+                data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
-+        } else {
-+            args = g_strdup_printf("-machine %s %s -accel tcg "
-+                "-nodefaults -nographic "
-+                "-drive if=pflash,format=raw,file=%s,readonly "
-+                "-drive if=pflash,format=raw,file=%s,snapshot=on %s",
-+                data->machine, data->tcg_only ? "" : "-accel kvm",
-+                data->uefi_fl1, data->uefi_fl2, params ? params : "");
-+        }
-     } else {
-         /* Disable kernel irqchip to be able to override apic irq0. */
-         args = g_strdup_printf("-machine %s,kernel-irqchip=off %s -accel tcg "
-@@ -966,6 +975,40 @@ static void test_acpi_virt_tcg_numamem(void)
- 
- }
- 
-+#ifdef CONFIG_PXB
-+static void test_acpi_virt_tcg_pxb(void)
-+{
-+    test_data data = {
-+        .machine = "virt",
-+        .tcg_only = true,
-+        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
-+        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
-+        .ram_start = 0x40000000ULL,
-+        .scan_len = 128ULL * 1024 * 1024,
-+    };
-+    /*
-+     * While using -cdrom, the cdrom would auto plugged into pxb-pcie,
-+     * the reason is the bus of pxb-pcie is also root bus, it would lead
-+     * to the error only PCI/PCIE bridge could plug onto pxb.
-+     * Therefore,thr cdrom is defined and plugged onto the scsi controller
-+     * to solve the conflicts.
-+     */
-+    data.variant = ".pxb";
-+    test_acpi_one(" -device pcie-root-port,chassis=1,id=pci.1"
-+                  " -device virtio-scsi-pci,id=scsi0,bus=pci.1"
-+                  " -drive file="
-+                  "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2,"
-+                  "if=none,media=cdrom,id=drive-scsi0-0-0-1,readonly=on"
-+                  " -device scsi-cd,bus=scsi0.0,scsi-id=0,"
-+                  "drive=drive-scsi0-0-0-1,id=scsi0-0-0-1,bootindex=1"
-+                  " -cpu cortex-a57"
-+                  " -device pxb-pcie,bus_nr=128",
-+                  &data);
-+
-+    free_test_data(&data);
-+}
-+#endif
-+
- static void test_acpi_tcg_acpi_hmat(const char *machine)
- {
-     test_data data;
-@@ -1058,6 +1101,9 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
-         qtest_add_func("acpi/virt/memhp", test_acpi_virt_tcg_memhp);
-+#ifdef CONFIG_PXB
-+        qtest_add_func("acpi/virt/pxb", test_acpi_virt_tcg_pxb);
-+#endif
-     }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
--- 
-2.19.1
+thinking some more on this topic, it seems that with ACPI hotplug we
+already have implicit non-hotpluggble slot (slot with bridge) while
+the rest are staying hotpluggable.
 
+So my question is: if it's acceptable to add 'PCIDevice::hotpluggable"
+property to all PCI devices so that user / libvirt could set it to
+false in case they do not want coldplugged device be considered as
+hotpluggable? (this way other devices could be treated the same way as
+bridges)
+
+[...]
 
 
