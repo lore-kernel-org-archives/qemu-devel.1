@@ -2,73 +2,90 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C884C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:39:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6769D2065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:38:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6769D2065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BE3AA2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 16:39:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eF+88Ywc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE3AA2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbRk8-0001se-Lf
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 12:38:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48116)
+	id 1jbRky-00038U-TS
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 12:39:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbRiX-0006R1-Pq
- for qemu-devel@nongnu.org; Wed, 20 May 2020 12:37:17 -0400
-Resent-Date: Wed, 20 May 2020 12:37:17 -0400
-Resent-Message-Id: <E1jbRiX-0006R1-Pq@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21706)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbRiR-00067f-0N
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 12:37:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45193
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbRiW-0002pc-67
- for qemu-devel@nongnu.org; Wed, 20 May 2020 12:37:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589992628; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=EEjW6J786Gg0KYZjB9lM70jl+wW77bTfYaz7p3doZlC3MXuy3iVZ8kFy1unieepNmWlph3G7KXAVEBJkiyIY7Ur9Kf5lsgx0B5E4v+J7b/Ft9PqHf1YrpRMaMHozE/XAOGSN6KJHj0OHjEhUcfUd4jqR5xlUolc0OnpHVpYZhfw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589992628;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WWcWYoJhJJvkjB74GCWKe/ioEo/D0pgJ1I+cbEt7xlo=; 
- b=NVPkufQnyq9ebhACYsU/Gyzs0tYT7c1se/Yb6iWaoPcpbA9rroeK0+Z8EPa0xks/Cetlj82owDinSydBma9dpCtLlLwf5g39hJYUqvSmHYP9krYH3VNtBPTg4kWiKHJtU/qZO0dNsWs/YvPHK97XQcgSSGHUK4pKXAnAHIuxiCQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589992625464864.4334126673858;
- Wed, 20 May 2020 09:37:05 -0700 (PDT)
-Message-ID: <158999262434.28633.15810749315451113314@45ef0f9c86ae>
-In-Reply-To: <20200520140541.30256-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH  v1 00/15] testing and plugin updates
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbRiQ-0002pG-7j
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 12:37:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589992628;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TBRvMfOMbiXya+uHCxoK5QMvFin67YIdkJDyBoFf+9Y=;
+ b=eF+88YwcTFAMizEkPKyiewl81hDk5iUYhptBSlvjl9j1AzbnS9R9mUshiKKhfg1ruVSyFG
+ 6Lz9D3SVe34udUHoj35HPu4I09LwmIjRkyfVFy484zRslKPTq/UClRFb6PNV8Gdp7naIN6
+ n0485lO8zih1bMUtB2y1p+fxcdBiYDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-jpvSz3yXMuy8ci8kk47WdA-1; Wed, 20 May 2020 12:37:04 -0400
+X-MC-Unique: jpvSz3yXMuy8ci8kk47WdA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11BAB107ACF4;
+ Wed, 20 May 2020 16:37:03 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0329D34214;
+ Wed, 20 May 2020 16:36:58 +0000 (UTC)
+Subject: Re: [PATCH v3 4/5] block/io: fix bdrv_is_allocated_above
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200520083520.25793-1-vsementsov@virtuozzo.com>
+ <20200520083520.25793-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <6e1143e2-2bd6-f75c-b2ff-2074f4423ca2@redhat.com>
+Date: Wed, 20 May 2020 11:36:58 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Wed, 20 May 2020 09:37:05 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 11:46:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200520083520.25793-5-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,105 +98,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyMDE0MDU0MS4zMDI1
-Ni0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0
-aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4g
-cHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEg
-Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9M
-SVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgogcGVybC1FbmNvZGUtZGV2ZWwgICAgICAgICAgICAgICAgICAgICAgIHg4Nl82NCAgNDozLjA2
-LTQ0NS5mYzMyICAgICAgICAgICAgICAgICAgICB1cGRhdGVzICAgNDIgawogcGVybC1FbnYgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5vYXJjaCAgMS4wNC00NDAuZmMzMiAgICAgICAg
-ICAgICAgICAgICAgICBmZWRvcmEgICAgMTkgawogcGVybC1FcnJubyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHg4Nl82NCAgMS4zMC00NTIuZmMzMiAgICAgICAgICAgICAgICAgICAgICBm
-ZWRvcmEgICAgMjQgawogcGVybC1FcnJvciAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5v
-YXJjaCAgMTowLjE3MDI5LTEuZmMzMiAgICAgICAgICAgICAgICAgICBmZWRvcmEgICAgNDIgawog
-cGVybC1FeHBvcnRlciAgICAgICAgICAgICAgICAgICAgICAgICAgIG5vYXJjaCAgNS43NC0yLmZj
-MzIgICAgICAgICAgICAgICAgICAgICAgICBmZWRvcmEgICAgMzIgawogcGVybC1FeHBvcnRlci1U
-aW55ICAgICAgICAgICAgICAgICAgICAgIG5vYXJjaCAgMS4wMDIwMDEtNS5mYzMyICAgICAgICAg
-ICAgICAgICAgICBmZWRvcmEgICAgNTEgawogcGVybC1FeHRVdGlscy1DQnVpbGRlciAgICAgICAg
-ICAgICAgICAgIG5vYXJjaCAgMTowLjI4MDIzNC0yLmZjMzIgICAgICAgICAgICAgICAgICBmZWRv
-cmEgICAgNDcgawotLS0KKDQ5Ny82OTkpOiBwZXJsLUVudi0xLjA0LTQ0MC5mYzMyLm5vYXJjaC5y
-cG0gICAgMTk4IGtCL3MgfCAgMTkga0IgICAgIDAwOjAwICAgIAooNDk4LzY5OSk6IHBlcmwtRGln
-ZXN0LVNIQS02LjAyLTQ0Mi5mYzMyLng4Nl82NCAzMjUga0IvcyB8ICA2NCBrQiAgICAgMDA6MDAg
-ICAgCig0OTkvNjk5KTogcGVybC1FcnJuby0xLjMwLTQ1Mi5mYzMyLng4Nl82NC5ycG0gIDI0NSBr
-Qi9zIHwgIDI0IGtCICAgICAwMDowMCAgICAKKDUwMC82OTkpOiBwZXJsLUVycm9yLTAuMTcwMjkt
-MS5mYzMyLm5vYXJjaC5ycG0gNDE1IGtCL3MgfCAgNDIga0IgICAgIDAwOjAwICAgIAooNTAxLzY5
-OSk6IHBlcmwtRXhwb3J0ZXItNS43NC0yLmZjMzIubm9hcmNoLnJwbSAzMTgga0IvcyB8ICAzMiBr
-QiAgICAgMDA6MDAgICAgCig1MDIvNjk5KTogcGVybC1FeHBvcnRlci1UaW55LTEuMDAyMDAxLTUu
-ZmMzMi5uIDQ5NyBrQi9zIHwgIDUxIGtCICAgICAwMDowMCAgICAKKDUwMy82OTkpOiBwZXJsLUV4
-dFV0aWxzLUNCdWlsZGVyLTAuMjgwMjM0LTIuZmMgNDU1IGtCL3MgfCAgNDcga0IgICAgIDAwOjAw
-ICAgIAotLS0KICBJbnN0YWxsaW5nICAgICAgIDogcGVybC1EQl9GaWxlLTEuODUzLTIuZmMzMi54
-ODZfNjQgICAgICAgICAgICAgICAgICAgMTc1LzcwMCAKICBJbnN0YWxsaW5nICAgICAgIDogcGVy
-bC1EZXZlbC1TaXplLTAuODMtNS5mYzMyLng4Nl82NCAgICAgICAgICAgICAgICAgMTc2LzcwMCAK
-ICBJbnN0YWxsaW5nICAgICAgIDogcGVybC1FbnYtMS4wNC00NDAuZmMzMi5ub2FyY2ggICAgICAg
-ICAgICAgICAgICAgICAgMTc3LzcwMCAKICBJbnN0YWxsaW5nICAgICAgIDogcGVybC1FcnJvci0x
-OjAuMTcwMjktMS5mYzMyLm5vYXJjaCAgICAgICAgICAgICAgICAgMTc4LzcwMCAKICBJbnN0YWxs
-aW5nICAgICAgIDogcGVybC1FeHRVdGlscy1NTS1VdGlscy0yOjcuNDQtMi5mYzMyLm5vYXJjaCAg
-ICAgICAgMTc5LzcwMCAKICBJbnN0YWxsaW5nICAgICAgIDogcGVybC1JUEMtU3lzVi0yLjA3LTQ0
-Mi5mYzMyLng4Nl82NCAgICAgICAgICAgICAgICAgMTgwLzcwMCAKICBJbnN0YWxsaW5nICAgICAg
-IDogcGVybC1JUEMtU3lzdGVtLVNpbXBsZS0xLjMwLTEuZmMzMi5ub2FyY2ggICAgICAgICAgMTgx
-LzcwMCAKLS0tCiAgVmVyaWZ5aW5nICAgICAgICA6IHBlcmwtRW5jb2RlLUxvY2FsZS0xLjA1LTE1
-LmZjMzIubm9hcmNoICAgICAgICAgICAgIDQ5Ny83MDAgCiAgVmVyaWZ5aW5nICAgICAgICA6IHBl
-cmwtRW52LTEuMDQtNDQwLmZjMzIubm9hcmNoICAgICAgICAgICAgICAgICAgICAgIDQ5OC83MDAg
-CiAgVmVyaWZ5aW5nICAgICAgICA6IHBlcmwtRXJybm8tMS4zMC00NTIuZmMzMi54ODZfNjQgICAg
-ICAgICAgICAgICAgICAgIDQ5OS83MDAgCiAgVmVyaWZ5aW5nICAgICAgICA6IHBlcmwtRXJyb3It
-MTowLjE3MDI5LTEuZmMzMi5ub2FyY2ggICAgICAgICAgICAgICAgIDUwMC83MDAgCiAgVmVyaWZ5
-aW5nICAgICAgICA6IHBlcmwtRXhwb3J0ZXItNS43NC0yLmZjMzIubm9hcmNoICAgICAgICAgICAg
-ICAgICAgIDUwMS83MDAgCiAgVmVyaWZ5aW5nICAgICAgICA6IHBlcmwtRXhwb3J0ZXItVGlueS0x
-LjAwMjAwMS01LmZjMzIubm9hcmNoICAgICAgICAgIDUwMi83MDAgCiAgVmVyaWZ5aW5nICAgICAg
-ICA6IHBlcmwtRXh0VXRpbHMtQ0J1aWxkZXItMTowLjI4MDIzNC0yLmZjMzIubm9hcmNoICAgIDUw
-My83MDAgCi0tLQogIHBlcmwtRW5jb2RlLWRldmVsLTQ6My4wNi00NDUuZmMzMi54ODZfNjQgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogIHBlcmwtRW52LTEuMDQtNDQwLmZj
-MzIubm9hcmNoICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IAogIHBlcmwtRXJybm8tMS4zMC00NTIuZmMzMi54ODZfNjQgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIAogIHBlcmwtRXJyb3ItMTowLjE3MDI5LTEuZmMzMi5u
-b2FyY2ggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogIHBlcmwt
-RXhwb3J0ZXItNS43NC0yLmZjMzIubm9hcmNoICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIAogIHBlcmwtRXhwb3J0ZXItVGlueS0xLjAwMjAwMS01LmZjMzIubm9h
-cmNoICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogIHBlcmwtRXh0VXRpbHMt
-Q0J1aWxkZXItMTowLjI4MDIzNC0yLmZjMzIubm9hcmNoICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIAotLS0KICBDQyAgICAgIGJhY2tlbmRzL3RwbS5vCiAgQ0MgICAgICBiYWNrZW5kcy9o
-b3N0bWVtLm8KICBDQyAgICAgIGJhY2tlbmRzL2hvc3RtZW0tcmFtLm8KL3RtcC9xZW11LXRlc3Qv
-c3JjL2F1ZGlvL21peGVuZy5jOjI3NDozNDogZXJyb3I6IGltcGxpY2l0IGNvbnZlcnNpb24gZnJv
-bSAndW5zaWduZWQgaW50JyB0byAnZmxvYXQnIGNoYW5nZXMgdmFsdWUgZnJvbSA0Mjk0OTY3Mjk1
-IHRvIDQyOTQ5NjcyOTYgWy1XZXJyb3IsLVdpbXBsaWNpdC1pbnQtZmxvYXQtY29udmVyc2lvbl0K
-c3RhdGljIGNvbnN0IGZsb2F0IGZsb2F0X3NjYWxlID0gVUlOVF9NQVggLyAyLmY7CiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+IH4KL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvaW5jbHVkZS9saW1pdHMuaDo1NjozNzogbm90ZTogZXhwYW5kZWQgZnJvbSBtYWNybyAnVUlO
-VF9NQVgnCiNkZWZpbmUgVUlOVF9NQVggIChfX0lOVF9NQVhfXyAgKjJVICsxVSkKICAgICAgICAg
-ICAgICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+Xn5+CjEgZXJyb3IgZ2VuZXJhdGVkLgptYWtlOiAq
-KiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGF1ZGlvL21peGVuZy5vXSBFcnJv
-ciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAo
-bW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHki
-LCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
-cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydz
-dWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
-ZS51dWlkPTA3ZDg3MzkwMjljMjQ2MDQ4MGYyZThmNDk4NzhlNjFlJywgJy11JywgJzEwMDMnLCAn
-LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFS
-R0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9Jywg
-Jy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5W
-PScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
-aGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1qdXV3dXljbS9zcmMvZG9ja2VyLXNyYy4yMDIw
-LTA1LTIwLTEyLjMyLjU1LjYwMTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAn
-L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1kZWJ1ZyddJyByZXR1cm5lZCBub24temVybyBleGl0
-IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0w
-N2Q4NzM5MDI5YzI0NjA0ODBmMmU4ZjQ5ODc4ZTYxZQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
-IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC1qdXV3dXljbS9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LWRlYnVnQGZl
-ZG9yYV0gRXJyb3IgMgoKcmVhbCAgICA0bTE2LjU3MXMKdXNlciAgICAwbTkuNDI1cwoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MjAx
-NDA1NDEuMzAyNTYtMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rlc3RpbmcuYXNhbi8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On 5/20/20 3:35 AM, Vladimir Sementsov-Ogievskiy wrote:
+> bdrv_is_allocated_above wrongly handles short backing files: it reports
+> after-EOF space as UNALLOCATED which is wrong, as on read the data is
+> generated on the level of short backing file (if all overlays has
+> unallocated area at that place).
+> 
+> Reusing bdrv_common_block_status_above fixes the issue and unifies code
+> path.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/io.c | 43 +++++--------------------------------------
+>   1 file changed, 5 insertions(+), 38 deletions(-)
+> 
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
