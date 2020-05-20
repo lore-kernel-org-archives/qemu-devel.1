@@ -2,85 +2,87 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4220C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529EFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 924662065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1337B2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAZ/tnxv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924662065F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FcGiZMh0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1337B2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPVB-0007fv-PD
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:15:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55192)
+	id 1jbPVX-0000Kx-81
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:15:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM2-0008Sz-H8
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:54 -0400
-Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:34964)
+ id 1jbPME-0000LO-5G
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:06 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:34020)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbPM0-0001ur-OJ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:54 -0400
-Received: by mail-ej1-x633.google.com with SMTP id s21so3982651ejd.2
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:50 -0700 (PDT)
+ id 1jbPMC-00022Q-Pj
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:06:05 -0400
+Received: by mail-ej1-x643.google.com with SMTP id j21so3986517ejy.1
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+eYBUW9i9LEqNAlwNOSXlSk7O/CmGupV0lmi1g2GZD4=;
- b=qAZ/tnxvhbwE8lF4CoUEsT1QfzJvxKEy9Zn159AoIUQFUH7eqeycSQj3fFG+5HXHOa
- +g5HgxBGl8VQyekidzHCF1O1r6M0dpW4356a0wfYPY4GtfbfFG9bst8QFZZzCio7AXdy
- YPPE5V7eTHgBcQe1KFzPywxQWKVj7GXUf85dn57eV/0Fyc5EzmSAe6dJUBLfe5WnfnOy
- l8g16uFzwvnS5r6bDDoD4eDEMSwGSy2p6TAeIJibgy3XQdFWXUJUtiO5nJMdC38rrTb3
- cUUuK/JZuEEU4tYA9kqQCCKYAG2Ba8ZGoID7qlyrg+5to8+B1M7uX8ly5aSfELA7wb08
- 8kRA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=tVaA6VVKMxT5atPOq3mupoaoOxw2j2mNyFQd2GQU77U=;
+ b=FcGiZMh0mR/7XmqKUTy7DPfOsaqDwIbdy4LZrUUlNMvGnlptykNuU61UfgovyZMh0T
+ L29g1s2OvORb//bFqpZUsoOPfAUwEdJ9cjzMV6wkZU1UGiSL11YQyZWOWlYSldh+Zjvh
+ 3bq6NwVHikpdhpg6eKFLWDFrV+wpTKrhz7ENdG4pqg6tPcABUlqlUweRofaobCOXaGnx
+ ETOyygfgqABLLwXc3lY7LOsdGvrhKBmO+CXkv87xyjEtcfkOvC4fx5EVUc5poibIA2UQ
+ wQuSrlN8s+9jQp8GPDts0HsaipNWuGa8rjB205Gb7s3nUimPrm5zPmjXy8GkIafZ+Orw
+ cFSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+eYBUW9i9LEqNAlwNOSXlSk7O/CmGupV0lmi1g2GZD4=;
- b=f+IU06eHs4+sJ/x95WV+XUG9WaXSDz0U6izjT5svpwm647m4/ZipkYSS9G1E3rXGyg
- FGT+zErnb5kPiS/2yS1HkkZEFrY3FefwDMHP6vWbF1i5X8ljUDLASL7EmPiFhCOeM0kl
- SdnXubb99KD4cIc0Ptd8wex+FzLEqAD3e4KsVQCBaCd6Rsd2Y9+9Nv/YFbGpylTJHdkv
- iZwf62xMV89U2pENBFZEbLZPP3+5Pn6U+huMGRMAvmfHYvUuvpGpMuADregQ2D4ZSvck
- ky2mJ8l8k7k1Ns3qViY2S4jJi/2dvO8WOgkeMtMuCKNK2/7oV7LOFsDQVZgdQu+9wUFC
- fshg==
-X-Gm-Message-State: AOAM533nt9+KFzQXjcpuMtKZ/rRZrU8JEyf8Ox3gIQuZ0NRg9RQO7bFX
- wQu3OT3WfCEY90656XBnAXhQjA==
-X-Google-Smtp-Source: ABdhPJzzfwD/nEoTUOfwmj4n8I+Zm3Z4wz+xUrNImqfYoOHdmgRUXKCBOdtg7n3zayQZT2/v6MfaaA==
-X-Received: by 2002:a17:906:2610:: with SMTP id
- h16mr3994006ejc.423.1589983544544; 
- Wed, 20 May 2020 07:05:44 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=tVaA6VVKMxT5atPOq3mupoaoOxw2j2mNyFQd2GQU77U=;
+ b=sOlhn92b6zcXsWv4bbalqVKzvCQlqvg/5Gj3vzycD8MGM1MrzGiBHkqwqEgLZyGG9X
+ 5bNBsj8ILld9+RZLC0K/tpVlwgJgsdQh8DRwiAQZvk32S94OuraVJjExFXoruvXksTIc
+ Wt9rY6xS38ab+usCLlpTRKWDYua8tKOLVdMsagMxavVFC9ECOYYqZqcH8+zRMI2OvldJ
+ Vq+iIuXIpuHS1sV9n3bXIhNzNoKuZrXX+P6TCbeQyzldHLky5Ubdj9lyWtvkVh09M//9
+ vrswu6+3uj6/Zi5kCqk2r7TaxAwc+p5jZkbE+NTg7UargV77tr/vVLbR9eGS63KErzMw
+ VfkQ==
+X-Gm-Message-State: AOAM533U5HhiOd/3kk/v6fi5M0eReKwxX64IC2CAMpWRdgNvorsw7jRh
+ pEXEUY5EEhgPmM5VxrnCywhwQg==
+X-Google-Smtp-Source: ABdhPJz/47npYSYpLNEmFuF0YR0OljuFNxxEIk9xR/zyaqYEO79RuOmsaXnmnB3UgRoROhLqfDC2dw==
+X-Received: by 2002:a17:906:780b:: with SMTP id
+ u11mr3625508ejm.341.1589983563430; 
+ Wed, 20 May 2020 07:06:03 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id lr21sm2026808ejb.117.2020.05.20.07.05.41
+ by smtp.gmail.com with ESMTPSA id dt12sm2017082ejb.102.2020.05.20.07.05.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 07:05:42 -0700 (PDT)
+ Wed, 20 May 2020 07:05:54 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 357221FF7E;
- Wed, 20 May 2020 15:05:41 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 750B41FF9D;
+ Wed, 20 May 2020 15:05:42 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 00/15] testing and plugin updates
-Date: Wed, 20 May 2020 15:05:26 +0100
-Message-Id: <20200520140541.30256-1-alex.bennee@linaro.org>
+Subject: [PATCH  v1 14/15] tests/tcg: add new threadcount test
+Date: Wed, 20 May 2020 15:05:40 +0100
+Message-Id: <20200520140541.30256-15-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200520140541.30256-1-alex.bennee@linaro.org>
+References: <20200520140541.30256-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::633;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x633.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,83 +104,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Nikolay Igotti <igotti@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Based on the original testcase by Nikolay Igotti.
 
-Here is the current status of various testing and plugin related
-patches. Most of the patches should be uncontroversial although I
-would draw attention to the cpu and linux-user QOM object lifetime
-patches. I think properly de-referencing the vCPU object associated
-with the linux-user thread is the cleaner solution but it does involve
-also changing some assumptions about the cpu indexing.
+Message-ID: <CAEme+7GLKg_dNsHizzTKDymX9HyD+Ph2iZ=WKhOw2XG+zhViXg@mail.gmail.com>
+Signed-off-by: Nikolay Igotti <igotti@gmail.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-The following patches need review:
-  - plugins: new lockstep plugin for debugging TCG changes
-  - linux-user: properly "unrealize" vCPU object
-  - cpus-common: ensure auto-assigned cpu_indexes don't clash
-  - tests/docker: use a gcc-10 based image for arm64 tests
-  - tests/docker: add debian11 base image
-  - tests/docker: bump fedora to 32
-  - tests/tcg: better detect confused gdb which can't connect
-  - tests/fp: split and audit the conversion tests
-  - tests/fp: enable extf80_le_quite tests
-  - configure: add alternate binary for genisoimage
-
-Alex Bennée (13):
-  configure: add alternate binary for genisoimage
-  tests/vm: pass --genisoimage to basevm script
-  tests/tcg: fix invocation of the memory record/replay tests
-  tests/fp: enable extf80_le_quite tests
-  tests/fp: split and audit the conversion tests
-  tests/tcg: better detect confused gdb which can't connect
-  tests/docker: bump fedora to 32
-  tests/docker: add debian11 base image
-  tests/docker: use a gcc-10 based image for arm64 tests
-  cpus-common: ensure auto-assigned cpu_indexes don't clash
-  linux-user: properly "unrealize" vCPU object
-  tests/tcg: add new threadcount test
-  plugins: new lockstep plugin for debugging TCG changes
-
-Richard Henderson (1):
-  tests/tcg/aarch64: Add bti smoke test
-
-Thomas Huth (1):
-  travis.yml: Use clang++ in the Clang tests
-
- configure                                     |   2 +-
- cpus-common.c                                 |  10 +-
- linux-user/syscall.c                          |  19 +-
- tests/plugin/lockstep.c                       | 340 ++++++++++++++++++
- tests/tcg/aarch64/bti-1.c                     |  62 ++++
- tests/tcg/aarch64/bti-crt.inc.c               |  51 +++
- tests/tcg/multiarch/threadcount.c             |  64 ++++
- .travis.yml                                   |   8 +-
- tests/Makefile.include                        |  44 ++-
- tests/docker/Makefile.include                 |   4 +-
- .../debian-arm64-test-cross.docker            |  13 +
- tests/docker/dockerfiles/debian11.docker      |  18 +
- tests/docker/dockerfiles/fedora.docker        |   2 +-
- tests/plugin/Makefile                         |   1 +
- tests/tcg/Makefile.target                     |   2 +-
- tests/tcg/aarch64/Makefile.softmmu-target     |   2 +-
- tests/tcg/aarch64/Makefile.target             |   9 +
- tests/tcg/configure.sh                        |   8 +-
- tests/tcg/multiarch/Makefile.target           |   2 +
- tests/tcg/multiarch/gdbstub/sha1.py           |   4 +
- tests/vm/Makefile.include                     |   1 +
- tests/vm/basevm.py                            |  16 +-
- 22 files changed, 641 insertions(+), 41 deletions(-)
- create mode 100644 tests/plugin/lockstep.c
- create mode 100644 tests/tcg/aarch64/bti-1.c
- create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
+---
+v2
+  - add Nikolay's s-o-b
+  - checkpatch fixes
+---
+ tests/tcg/multiarch/threadcount.c   | 64 +++++++++++++++++++++++++++++
+ tests/tcg/multiarch/Makefile.target |  2 +
+ 2 files changed, 66 insertions(+)
  create mode 100644 tests/tcg/multiarch/threadcount.c
- create mode 100644 tests/docker/dockerfiles/debian-arm64-test-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian11.docker
 
+diff --git a/tests/tcg/multiarch/threadcount.c b/tests/tcg/multiarch/threadcount.c
+new file mode 100644
+index 00000000000..545a1c81466
+--- /dev/null
++++ b/tests/tcg/multiarch/threadcount.c
+@@ -0,0 +1,64 @@
++/*
++ * Thread Exerciser
++ *
++ * Unlike testthread which is mainly concerned about testing thread
++ * semantics this test is used to exercise the thread creation and
++ * accounting. A version of this test found a problem with clashing
++ * cpu_indexes which caused a break in plugin handling.
++ *
++ * Based on the original test case by Nikolay Igotti.
++ *
++ * Copyright (c) 2020 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <pthread.h>
++
++int max_threads = 10;
++
++typedef struct {
++    int delay;
++} ThreadArg;
++
++static void *thread_fn(void* varg)
++{
++    ThreadArg *arg = varg;
++    usleep(arg->delay);
++    free(arg);
++    return NULL;
++}
++
++int main(int argc, char **argv)
++{
++    int i;
++    pthread_t *threads;
++
++    if (argc > 1) {
++        max_threads = atoi(argv[1]);
++    }
++    threads = calloc(sizeof(pthread_t), max_threads);
++
++    for (i = 0; i < max_threads; i++) {
++        ThreadArg *arg = calloc(sizeof(ThreadArg), 1);
++        arg->delay = i * 100;
++        pthread_create(threads + i, NULL, thread_fn, arg);
++    }
++
++    printf("Created %d threads\n", max_threads);
++
++    /* sleep until roughly half the threads have "finished" */
++    usleep(max_threads * 50);
++
++    for (i = 0; i < max_threads; i++) {
++        pthread_join(threads[i], NULL);
++    }
++
++    printf("Done\n");
++
++    return 0;
++}
+diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
+index 51fb75ecfdd..cb49cc9ccb2 100644
+--- a/tests/tcg/multiarch/Makefile.target
++++ b/tests/tcg/multiarch/Makefile.target
+@@ -28,6 +28,8 @@ run-float_%: float_%
+ 
+ testthread: LDFLAGS+=-lpthread
+ 
++threadcount: LDFLAGS+=-lpthread
++
+ # We define the runner for test-mmap after the individual
+ # architectures have defined their supported pages sizes. If no
+ # additional page sizes are defined we only run the default test.
 -- 
 2.20.1
 
