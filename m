@@ -2,105 +2,94 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B17A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BEBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:58:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 632D22075F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6DC72075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 08:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FKB9pRnw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 632D22075F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8GTdkx+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DC72075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbKXz-0000kj-Ke
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46568)
+	id 1jbKYz-00026d-0Z
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 04:58:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbKXH-0008KK-D2
- for qemu-devel@nongnu.org; Wed, 20 May 2020 04:57:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52916
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbKYI-0001DX-B7
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:58:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55641
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbKXF-0001Hw-WF
- for qemu-devel@nongnu.org; Wed, 20 May 2020 04:57:11 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbKYG-0001QR-S1
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 04:58:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589965027;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1589965091;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4Q+r+uSD6XxHwyY47fFMsWDIRMSq4JY6RGiALLBke4w=;
- b=FKB9pRnwmwj1Fc490oQHTYk4zWKzlw1d6+GNFXzOhOtDjWL8fhWdu9mq+YV5mpE28rz4sZ
- f2pt939l5xlJ8Mi7WbmdMJcgU1e9FsJ3sgj8NEioDDPfrhkd0pyefftvzIk7IiOl9m8aou
- u1KuWegwmrgyXjPThIqazeagwQEqUW0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-m88WOLDmPUi3ayg4OTy5jQ-1; Wed, 20 May 2020 04:57:04 -0400
-X-MC-Unique: m88WOLDmPUi3ayg4OTy5jQ-1
-Received: by mail-wm1-f69.google.com with SMTP id l26so654391wmh.3
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 01:57:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4Q+r+uSD6XxHwyY47fFMsWDIRMSq4JY6RGiALLBke4w=;
- b=oD6j8+yjKQiW7SuzSc9oDgQ997/5gQYkZww/Pj4172AQ3exZmsNqywgZz7aAyqoQ8I
- MVx7Dk9k5GH3qpeYpsvEhceA7/WcT8b0zkKlJmlMjcqd9nrO5rzfHQmzC/RWZXD6nCbf
- 3wjOq2hvtMDmkpl9krg7Z8nc83O4Vc5K5757UtQ7przXM5bwf2AFi8r/lY7nEQQnXaMG
- aH++9eNzNqzWLymc8m5hf+0aqOjEDVtVv/Cp0DR7+N/d5N0iP0jU7RECAxVEr4KWhVSB
- jqKoYiQ/coXONhdP8795D92meqPUJU8fvFRUYDdVC+RduMSlE7btnbJRX/XsMNknwK6E
- hwBw==
-X-Gm-Message-State: AOAM530dxSi76twPCNomc3EuPETLJgM/9gHf9FilVxdh26uLTNR8tTp/
- kf6vpH8c5fau21O8ThSsv9hxuQfL978bJo+ND/gjZOj+IbtMPP40TZyxIXUQUozHrME1xcg/xpH
- 5PHkD97UG8u11UjQ=
-X-Received: by 2002:a7b:c306:: with SMTP id k6mr3572686wmj.40.1589965022191;
- Wed, 20 May 2020 01:57:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzyhUOUX6Hw2F7xtHpfbjs8bfNLuWub9z+Z1DxoxXGe0VYelAUrTpaE43fOxfg+xIz0h3Hj4w==
-X-Received: by 2002:a7b:c306:: with SMTP id k6mr3572651wmj.40.1589965021847;
- Wed, 20 May 2020 01:57:01 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id g6sm2069726wrp.75.2020.05.20.01.57.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 01:57:01 -0700 (PDT)
-Subject: Re: [PATCH v4 2/3] block: consolidate blocksize properties
- consistency checks
-To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org
-References: <20200520080657.29080-1-rvkagan@yandex-team.ru>
- <20200520080657.29080-3-rvkagan@yandex-team.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ae8e02be-8cce-6b4d-dc12-4c2c70a8d1a0@redhat.com>
-Date: Wed, 20 May 2020 10:57:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=jAjC8Tv7YrmSgnHGy6FyOLQlwHYeoJF8+anYg9n4dOE=;
+ b=I8GTdkx+EcTIE2l7rzOoEnRsAlQB+QgwOjiYOftOllC9053m6JwuEN2wCVvQlmmetXZVBM
+ PwIJ0GW89s3kkqUvSnIjPwbWROB0nWSw/elP28aaYjURgWJVPuHn6E9FcfsAQ8rGaldP6G
+ pinZ/zrWqkn5NDQRIf6ohU79/2vGTBM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-O5Akpfo6N92GSfYbX2MEvQ-1; Wed, 20 May 2020 04:57:52 -0400
+X-MC-Unique: O5Akpfo6N92GSfYbX2MEvQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C573800053;
+ Wed, 20 May 2020 08:57:51 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B864A5C1C8;
+ Wed, 20 May 2020 08:57:42 +0000 (UTC)
+Date: Wed, 20 May 2020 09:57:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
+ test?
+Message-ID: <20200520085739.GA2194189@redhat.com>
+References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
+ <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
+ <20200515102321.GH1300305@redhat.com>
+ <613f5cf5-7019-7447-6ba1-8050ab05303a@redhat.com>
+ <20200519090441.GD2003821@redhat.com>
+ <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200520080657.29080-3-rvkagan@yandex-team.ru>
-Content-Language: en-US
+In-Reply-To: <166b5fd7-2583-fdb1-6fb6-fd6b64e92d7f@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,256 +103,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-discuss@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Roman,
-
-On 5/20/20 10:06 AM, Roman Kagan wrote:
-> Several block device properties related to blocksize configuration must
-> be in certain relationship WRT each other: physical block must be no
-> smaller than logical block; min_io_size, opt_io_size, and
-> discard_granularity must be a multiple of a logical block.
+On Tue, May 19, 2020 at 07:06:40PM -0400, John Snow wrote:
 > 
-> To ensure these requirements are met, add corresponding consistency
-> checks to blkconf_blocksizes, adjusting its signature to communicate
-> possible error to the caller.  Also remove the now redundant consistency
-> checks from the specific devices.
 > 
-> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-> ---
-> v4: new patch
+> On 5/19/20 5:04 AM, Daniel P. Berrangé wrote:
+> > On Mon, May 18, 2020 at 03:56:36PM -0400, John Snow wrote:
+> >>
+> >>
+> >> On 5/15/20 6:23 AM, Daniel P. Berrangé wrote:
+> >>> On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
+> >>>> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
+> >>>>> Hello,
+> >>>>>
+> >>>>> Following Markus thread on deprecating unmaintained (untested) code
+> >>>>> (machines) [1] and the effort done to gather the information shared in
+> >>>>> the replies [2], and the various acceptance tests added, is it
+> >>>>> feasible to require for the next release that each new device/machine
+> >>>>> is provided a test covering it?
+> >>>>>
+> >>>>> If no, what is missing?
+> >>>>
+> >>>> If a qtest is feasible, yes, I think we should require one for new
+> >>>> devices. But what about machines - you normally need a test image for
+> >>>> this. In that case, there is still the question where testing images
+> >>>> could be hosted. Not every developer has a web space where they could
+> >>>> put their test images onto. And what about images that contain non-free
+> >>>> code?
+> >>>
+> >>> Yep, it isn't feasible to make this a hard rule.
+> >>>
+> >>> IMHO this is where a support tier classification comes into play
+> >>>
+> >>>  - Tier 1: actively maintained, qtest coverage available. Expected
+> >>>            to work reliably at all times since every commit is CI
+> >>> 	   tested
+> >>>
+> >>>   - Tier 2: actively maintained, no qtest coverage. Should usually
+> >>>            work but regression may creep in due to reliance on the
+> >>> 	   maintainer to manually test on adhoc basis
+> >>>
+> >>>   - Tier 3: not actively maintained, unknown state but liable to
+> >>>             be broken indefinitely
+> >>>
+> >>> Tier 1 is obviously the most desirable state we would like everthing to
+> >>> be at. Contributors will have to fix problems their patches cause as
+> >>> they will be blocked by CI.
+> >>>
+> >>> Tier 2 is an admission that reality gets in the way. Ideally stuff in
+> >>> this tier will graduate to Tier 1 at some point. Even if it doesn't
+> >>> though, it is still valid to keep it in QEMU long term. Contributors
+> >>> shouldn't gratuitously break stuff in these board, but if they do,
+> >>> then the maintainer is ultimately responsible for fixing it, as the
+> >>> contributors don't have a test rig for it.
+> >>>
+> >>> Tier 3 is abandonware. If a maintainer doesn't appear, users should
+> >>> not expect it to continue to exist long term. Contributors are free
+> >>> to send patches which break this, and are under no obligation to
+> >>> fix problems in these boards. We may deprecate & delete it after a
+> >>> while
+> >>>
+> >>>
+> >>> Over time we'll likely add more criteria to stuff in Tier 1. This
+> >>> could lead to some things dropping from Tier 1 to Tier 2. This is
+> >>> OK, as it doesn't make those things worse than they already were.
+> >>> We're just saying that Tier 2 isn't as thoroughly tested as we
+> >>> would like it to be in an ideal world.
+> >>
+> >> I really like the idea of device support tiers codified directly in the
+> >> QEMU codebase, to give upstream users some idea of which devices we
+> >> expect to work and which we ... don't, really.
+> >>
+> >> Not every last device we offer is enterprise production ready, but we
+> >> don't necessarily do a good job of explaining which devices fall into
+> >> which categories, and we've got quite a few of them.
+> >>
+> >> I wonder if a 2.5th tier would be useful; something like a "hobbyist"
+> >> tier for pet project SoC boards and the like -- they're not abandoned,
+> >> but we also don't expect them to work, exactly.
+> >>
+> >> Mild semantic difference from Tier 3.
+> > 
+> > I guess I was thinking such hobbyist stuff would fall into tier 2  if the
+> > hobbyist maintainer actually responds to fixing stuff, or tier 3 if they
+> > largely aren't active on the mailing list responding to issues/questions.
+> > 
+> > We add have a 4 tier system overall and put hobbyist stuff at tier 3,
+> > and abandonware at tier 4.
+> > 
+> > Probably shouldn't go beyond 4 tiers though, as the more criteria we add
+> > the harder it is to clearly decide which tier something should go into.
+> > 
+> > The tier 1 vs 2 divison is clearly split based on CI which is a simple
+> > classification to decide on.
+> > 
+> > The tier 2 vs 3 division is moderately clearly split based on whether
+> > there is a frequently active maintainer.
+> > 
+> > We can probably squeeze in the 4th tier without too much ambiguity in
+> > the classisfication if we think it is adding something worthwhile either
+> > from our POV as maintainers, or for users consuming it.
 > 
->   include/hw/block/block.h   |  2 +-
->   hw/block/block.c           | 29 ++++++++++++++++++++++++++++-
->   hw/block/fdc.c             |  5 ++++-
->   hw/block/nvme.c            |  5 ++++-
->   hw/block/virtio-blk.c      |  7 +------
->   hw/ide/qdev.c              |  5 ++++-
->   hw/scsi/scsi-disk.c        | 10 +++-------
->   hw/usb/dev-storage.c       |  5 ++++-
->   tests/qemu-iotests/172.out |  2 +-
->   9 files changed, 50 insertions(+), 20 deletions(-)
+> Yes, I didn't mean to start watering it down into a 1,380 tier system
+> that we're never able to properly utilize.
 > 
-> diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-> index d7246f3862..784953a237 100644
-> --- a/include/hw/block/block.h
-> +++ b/include/hw/block/block.h
-> @@ -87,7 +87,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
->   bool blkconf_geometry(BlockConf *conf, int *trans,
->                         unsigned cyls_max, unsigned heads_max, unsigned secs_max,
->                         Error **errp);
-> -void blkconf_blocksizes(BlockConf *conf);
-> +bool blkconf_blocksizes(BlockConf *conf, Error **errp);
->   bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
->                                      bool resizable, Error **errp);
->   
-> diff --git a/hw/block/block.c b/hw/block/block.c
-> index bf56c7612b..5f8ebff59c 100644
-> --- a/hw/block/block.c
-> +++ b/hw/block/block.c
-> @@ -61,7 +61,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
->       return true;
->   }
->   
-> -void blkconf_blocksizes(BlockConf *conf)
-> +bool blkconf_blocksizes(BlockConf *conf, Error **errp)
->   {
->       BlockBackend *blk = conf->blk;
->       BlockSizes blocksizes;
-> @@ -83,6 +83,33 @@ void blkconf_blocksizes(BlockConf *conf)
->               conf->logical_block_size = BDRV_SECTOR_SIZE;
->           }
->       }
-> +
-> +    if (conf->logical_block_size > conf->physical_block_size) {
-> +        error_setg(errp,
-> +                   "logical_block_size > physical_block_size not supported");
-
-"not supported" or "invalid"?
-
-> +        return false;
-> +    }
-> +
-> +    if (conf->min_io_size % conf->logical_block_size) {
-
-It seems the block code usually do:
-
-        if (!QEMU_IS_ALIGNED(conf->min_io_size, conf->logical_block_size)) {
-
-> +        error_setg(errp,
-> +                   "min_io_size must be a multple of logical_block_size");
-
-Typo "multple" -> "multiple".
-
-> +        return false;
-> +    }
-> +
-> +    if (conf->opt_io_size % conf->logical_block_size) {
-> +        error_setg(errp,
-> +                   "opt_io_size must be a multple of logical_block_size");
-
-Ditto.
-
-> +        return false;
-> +    }
-> +
-> +    if (conf->discard_granularity != -1 &&
-> +        conf->discard_granularity % conf->logical_block_size) {
-> +        error_setg(errp, "discard_granularity must be "
-> +                   "a multple of logical_block_size");
-
-Again.
-
-> +        return false;
-> +    }
-> +
-> +    return true;
-
-Usually we return true for error, isn't it?
-
->   }
->   
->   bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index c5fb9d6ece..8eda572ef4 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -554,7 +554,10 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
->           read_only = !blk_bs(dev->conf.blk) || blk_is_read_only(dev->conf.blk);
->       }
->   
-> -    blkconf_blocksizes(&dev->conf);
-> +    if (!blkconf_blocksizes(&dev->conf, errp)) {
-> +        return;
-> +    }
-> +
->       if (dev->conf.logical_block_size != 512 ||
->           dev->conf.physical_block_size != 512)
->       {
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 2f3100e56c..672650e162 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1390,7 +1390,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->           host_memory_backend_set_mapped(n->pmrdev, true);
->       }
->   
-> -    blkconf_blocksizes(&n->conf);
-> +    if (!blkconf_blocksizes(&n->conf, errp)) {
-> +        return;
-> +    }
-> +
->       if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
->                                          false, errp)) {
->           return;
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 413083e62f..4ffdb130be 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -1162,12 +1162,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
->           return;
->       }
->   
-> -    blkconf_blocksizes(&conf->conf);
-> -
-> -    if (conf->conf.logical_block_size >
-> -        conf->conf.physical_block_size) {
-> -        error_setg(errp,
-> -                   "logical_block_size > physical_block_size not supported");
-
-Ah, "not supported" comes from here, OK.
-
-> +    if (!blkconf_blocksizes(&conf->conf, errp)) {
->           return;
->       }
->   
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index 06b11583f5..b4821b2403 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -187,7 +187,10 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
->           return;
->       }
->   
-> -    blkconf_blocksizes(&dev->conf);
-> +    if (!blkconf_blocksizes(&dev->conf, errp)) {
-> +        return;
-> +    }
-> +
->       if (dev->conf.logical_block_size != 512) {
->           error_setg(errp, "logical_block_size must be 512 for IDE");
->           return;
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 387503e11b..06c8f1ba92 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -2346,12 +2346,7 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
->           return;
->       }
->   
-> -    blkconf_blocksizes(&s->qdev.conf);
-> -
-> -    if (s->qdev.conf.logical_block_size >
-> -        s->qdev.conf.physical_block_size) {
-> -        error_setg(errp,
-> -                   "logical_block_size > physical_block_size not supported");
-> +    if (!blkconf_blocksizes(&s->qdev.conf, errp)) {
->           return;
->       }
->   
-> @@ -2436,7 +2431,8 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
->       if (s->qdev.conf.blk) {
->           ctx = blk_get_aio_context(s->qdev.conf.blk);
->           aio_context_acquire(ctx);
-> -        blkconf_blocksizes(&s->qdev.conf);
-> +        /* ignore errors, blocksizes will be revalidated in scsi_realize */
-> +        blkconf_blocksizes(&s->qdev.conf, NULL);
-
-Hmm, why not bail out ASAP on error?
-
-Good cleanup otherwise.
-
->       }
->       s->qdev.blocksize = s->qdev.conf.logical_block_size;
->       s->qdev.type = TYPE_DISK;
-> diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-> index 4eba47538d..de461f37bd 100644
-> --- a/hw/usb/dev-storage.c
-> +++ b/hw/usb/dev-storage.c
-> @@ -599,7 +599,10 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
->           return;
->       }
->   
-> -    blkconf_blocksizes(&s->conf);
-> +    if (!blkconf_blocksizes(&s->conf, errp)) {
-> +        return;
-> +    }
-> +
->       if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
->                                          errp)) {
->           return;
-> diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-> index 7abbe82427..59cc70aebb 100644
-> --- a/tests/qemu-iotests/172.out
-> +++ b/tests/qemu-iotests/172.out
-> @@ -1204,7 +1204,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physica
->                   drive-type = "144"
->   
->   Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,logical_block_size=4096
-> -QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: Physical and logical block size must be 512 for floppy
-> +QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: logical_block_size > physical_block_size not supported
->   
->   Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physical_block_size=1024
->   QEMU_PROG: -device floppy,drive=none0,physical_block_size=1024: Physical and logical block size must be 512 for floppy
+> I was thinking more along the lines of:
 > 
+> - Device works and is well loved
+> - Device works and is well loved (but we have to test manually)
+> - Device doesn't work, but is well loved
+>   (Use at your own peril, please file a bug report)
+> - Device doesn't work, and is unloved
+> 
+> Perhaps it'd be clearer to name these Tier 1A, 1B, 2, and 3; where
+> things can shift from 1A to 1B as their test coverage allows, but it's
+> not meant to indicate general status otherwise.
+
+Yeah 1A/1B would be fairly effective.
+
+> Mostly, I would just like some way for users to avoid accidentally
+> running tier 2 or 3 devices /by accident/, or the ability to compile
+> QEMU versions that only allow tier 1 devices to be used.
+> 
+> It's all arbitrary -- but I think we agree more than not! I'd love to
+> have a list of first-class boards and devices that we promise to test
+> and have working.
+
+Yes, I think we're basically in agreement on the both the goal and
+way to achieve it.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
