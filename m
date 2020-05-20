@@ -2,86 +2,94 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A5EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4220C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36A0A207F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:13:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 924662065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 14:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HjiZ+jC+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A0A207F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAZ/tnxv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924662065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbPTA-0004g3-ES
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:13:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55480)
+	id 1jbPVB-0007fv-PD
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 10:15:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbPNR-0002rW-SF
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:07:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60101
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbPNR-0002Jo-5S
- for qemu-devel@nongnu.org; Wed, 20 May 2020 10:07:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589983640;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YR2FoUY7vdTYcYyk7WUgvCbigEn6xSFvQxyQJ1F8nKM=;
- b=HjiZ+jC+Qkb/VuX5piskAF9xiN9FRdKVWHZQLB1dtVphj1Qg+6kucQ5j2ihAh6r79NT8pB
- OepbknwYNsU1a68BGRfMpo1hhJG1s/52tH5Hf4oTEcHpJ0nE/0WTG6py0ubmzBo+Z7xzsG
- x8pywqaU6vanr6n6aARkWJj5EmGyuKY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-XecUaje-NEa1nIv0VSSaIg-1; Wed, 20 May 2020 10:07:16 -0400
-X-MC-Unique: XecUaje-NEa1nIv0VSSaIg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C113835B40;
- Wed, 20 May 2020 14:07:15 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A13105D9CA;
- Wed, 20 May 2020 14:07:03 +0000 (UTC)
-Date: Wed, 20 May 2020 16:07:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 13/22] x86: coldplug cpus
-Message-ID: <20200520160701.2157aad0@redhat.com>
-In-Reply-To: <20200520132003.9492-14-kraxel@redhat.com>
-References: <20200520132003.9492-1-kraxel@redhat.com>
- <20200520132003.9492-14-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jbPM2-0008Sz-H8
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:54 -0400
+Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:34964)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jbPM0-0001ur-OJ
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 10:05:54 -0400
+Received: by mail-ej1-x633.google.com with SMTP id s21so3982651ejd.2
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 07:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+eYBUW9i9LEqNAlwNOSXlSk7O/CmGupV0lmi1g2GZD4=;
+ b=qAZ/tnxvhbwE8lF4CoUEsT1QfzJvxKEy9Zn159AoIUQFUH7eqeycSQj3fFG+5HXHOa
+ +g5HgxBGl8VQyekidzHCF1O1r6M0dpW4356a0wfYPY4GtfbfFG9bst8QFZZzCio7AXdy
+ YPPE5V7eTHgBcQe1KFzPywxQWKVj7GXUf85dn57eV/0Fyc5EzmSAe6dJUBLfe5WnfnOy
+ l8g16uFzwvnS5r6bDDoD4eDEMSwGSy2p6TAeIJibgy3XQdFWXUJUtiO5nJMdC38rrTb3
+ cUUuK/JZuEEU4tYA9kqQCCKYAG2Ba8ZGoID7qlyrg+5to8+B1M7uX8ly5aSfELA7wb08
+ 8kRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+eYBUW9i9LEqNAlwNOSXlSk7O/CmGupV0lmi1g2GZD4=;
+ b=f+IU06eHs4+sJ/x95WV+XUG9WaXSDz0U6izjT5svpwm647m4/ZipkYSS9G1E3rXGyg
+ FGT+zErnb5kPiS/2yS1HkkZEFrY3FefwDMHP6vWbF1i5X8ljUDLASL7EmPiFhCOeM0kl
+ SdnXubb99KD4cIc0Ptd8wex+FzLEqAD3e4KsVQCBaCd6Rsd2Y9+9Nv/YFbGpylTJHdkv
+ iZwf62xMV89U2pENBFZEbLZPP3+5Pn6U+huMGRMAvmfHYvUuvpGpMuADregQ2D4ZSvck
+ ky2mJ8l8k7k1Ns3qViY2S4jJi/2dvO8WOgkeMtMuCKNK2/7oV7LOFsDQVZgdQu+9wUFC
+ fshg==
+X-Gm-Message-State: AOAM533nt9+KFzQXjcpuMtKZ/rRZrU8JEyf8Ox3gIQuZ0NRg9RQO7bFX
+ wQu3OT3WfCEY90656XBnAXhQjA==
+X-Google-Smtp-Source: ABdhPJzzfwD/nEoTUOfwmj4n8I+Zm3Z4wz+xUrNImqfYoOHdmgRUXKCBOdtg7n3zayQZT2/v6MfaaA==
+X-Received: by 2002:a17:906:2610:: with SMTP id
+ h16mr3994006ejc.423.1589983544544; 
+ Wed, 20 May 2020 07:05:44 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id lr21sm2026808ejb.117.2020.05.20.07.05.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 May 2020 07:05:42 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 357221FF7E;
+ Wed, 20 May 2020 15:05:41 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 00/15] testing and plugin updates
+Date: Wed, 20 May 2020 15:05:26 +0100
+Message-Id: <20200520140541.30256-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 02:22:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::633;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x633.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,70 +102,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 May 2020 15:19:54 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Hi,
 
-> microvm needs this, for correct madt creation
-> (make sure enable bit is set).
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/i386/x86.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 7a3bc7ab6639..ac7a0a958781 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -118,6 +118,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
->  
->  void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
->  {
-> +    MachineClass *mc = MACHINE_GET_CLASS(x86ms);
->      Object *cpu = NULL;
->      Error *local_err = NULL;
->  
-> @@ -126,6 +127,16 @@ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
->      object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
->      object_property_set_bool(cpu, true, "realized", &local_err);
->  
-> +    if (!mc->has_hotpluggable_cpus) {
-> +        /* coldplug cpu */
-> +        MachineState *ms = MACHINE(x86ms);
-> +        int i = 0;
-> +        while (ms->possible_cpus->cpus[i].arch_id != apic_id) {
-> +            i++;
-> +        }
-> +        ms->possible_cpus->cpus[i].cpu = cpu;
-> +    }
+Here is the current status of various testing and plugin related
+patches. Most of the patches should be uncontroversial although I
+would draw attention to the cpu and linux-user QOM object lifetime
+patches. I think properly de-referencing the vCPU object associated
+with the linux-user thread is the cleaner solution but it does involve
+also changing some assumptions about the cpu indexing.
 
-I'm thinking about removing x86_cpu_new alogether (in favor of device_add),
-so I'd preffer avoid adding direct access to possible_cpus here.
+The following patches need review:
+  - plugins: new lockstep plugin for debugging TCG changes
+  - linux-user: properly "unrealize" vCPU object
+  - cpus-common: ensure auto-assigned cpu_indexes don't clash
+  - tests/docker: use a gcc-10 based image for arm64 tests
+  - tests/docker: add debian11 base image
+  - tests/docker: bump fedora to 32
+  - tests/tcg: better detect confused gdb which can't connect
+  - tests/fp: split and audit the conversion tests
+  - tests/fp: enable extf80_le_quite tests
+  - configure: add alternate binary for genisoimage
 
-that's the job of pc_cpu_plug (and possibly pc_cpu_pre_plug) in combination with
-static const TypeInfo pc_machine_info = {
-    .name = TYPE_PC_MACHINE,
-...
-    .interfaces = (InterfaceInfo[]) {
-         { TYPE_HOTPLUG_HANDLER },
-         { }
-    },
-};
+Alex Bennée (13):
+  configure: add alternate binary for genisoimage
+  tests/vm: pass --genisoimage to basevm script
+  tests/tcg: fix invocation of the memory record/replay tests
+  tests/fp: enable extf80_le_quite tests
+  tests/fp: split and audit the conversion tests
+  tests/tcg: better detect confused gdb which can't connect
+  tests/docker: bump fedora to 32
+  tests/docker: add debian11 base image
+  tests/docker: use a gcc-10 based image for arm64 tests
+  cpus-common: ensure auto-assigned cpu_indexes don't clash
+  linux-user: properly "unrealize" vCPU object
+  tests/tcg: add new threadcount test
+  plugins: new lockstep plugin for debugging TCG changes
 
-I'd reuse common code if possible in microvm or make microvm specific simplified version of it
-if it makes job easier.
+Richard Henderson (1):
+  tests/tcg/aarch64: Add bti smoke test
 
->      object_unref(cpu);
->      error_propagate(errp, local_err);
->  }
+Thomas Huth (1):
+  travis.yml: Use clang++ in the Clang tests
+
+ configure                                     |   2 +-
+ cpus-common.c                                 |  10 +-
+ linux-user/syscall.c                          |  19 +-
+ tests/plugin/lockstep.c                       | 340 ++++++++++++++++++
+ tests/tcg/aarch64/bti-1.c                     |  62 ++++
+ tests/tcg/aarch64/bti-crt.inc.c               |  51 +++
+ tests/tcg/multiarch/threadcount.c             |  64 ++++
+ .travis.yml                                   |   8 +-
+ tests/Makefile.include                        |  44 ++-
+ tests/docker/Makefile.include                 |   4 +-
+ .../debian-arm64-test-cross.docker            |  13 +
+ tests/docker/dockerfiles/debian11.docker      |  18 +
+ tests/docker/dockerfiles/fedora.docker        |   2 +-
+ tests/plugin/Makefile                         |   1 +
+ tests/tcg/Makefile.target                     |   2 +-
+ tests/tcg/aarch64/Makefile.softmmu-target     |   2 +-
+ tests/tcg/aarch64/Makefile.target             |   9 +
+ tests/tcg/configure.sh                        |   8 +-
+ tests/tcg/multiarch/Makefile.target           |   2 +
+ tests/tcg/multiarch/gdbstub/sha1.py           |   4 +
+ tests/vm/Makefile.include                     |   1 +
+ tests/vm/basevm.py                            |  16 +-
+ 22 files changed, 641 insertions(+), 41 deletions(-)
+ create mode 100644 tests/plugin/lockstep.c
+ create mode 100644 tests/tcg/aarch64/bti-1.c
+ create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
+ create mode 100644 tests/tcg/multiarch/threadcount.c
+ create mode 100644 tests/docker/dockerfiles/debian-arm64-test-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian11.docker
+
+-- 
+2.20.1
 
 
