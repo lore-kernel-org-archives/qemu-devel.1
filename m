@@ -2,81 +2,82 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4243C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E70C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D68F207C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:56:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03D5820708
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 23:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="baOpg5ab"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D68F207C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kEwWNQRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D5820708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbYZQ-0004fi-Dd
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:56:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34926)
+	id 1jbYZi-0005Iw-5j
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 19:56:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jbYYF-0002og-Pv
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:55:07 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40601)
+ id 1jbYXu-0002Gt-4F
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:54:46 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:55803)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jbYYC-00007d-BC
- for qemu-devel@nongnu.org; Wed, 20 May 2020 19:55:07 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id ci23so2127971pjb.5
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 16:55:03 -0700 (PDT)
+ id 1jbYXs-00006R-5z
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 19:54:45 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id k7so2077787pjs.5
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 16:54:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Rf1ovJyHJH52bsETTiVbqoeF69Wlxw80LcJNY8x9zfs=;
- b=baOpg5abIYUGUzdPjf/LHE0sLRrYBhv+lJEl6G5Wpc01C3DYYkdFUihBgsOorWwTsM
- 5Y17P/5eozrTll1j+guAn7da/y3Zfw1byHPr4ZV4fofk1qEiSB7Us3Z07EDszEvfdhpf
- u129QCo1q6uSlFv0nO162xVknwevmnD1Mo3GPox4J+puknCd+e5Mmoz4MN+EaZx1HXZW
- /UvyTsRjlUfpeb5Tx9C9eZZbw4tEKyBQuwbs36PQsz4NBTutbEvL5dEq3CfSR6q7OtAz
- w/1TpyORLlbTLjD0k7ThfPk0aTEJ1uFlNvoCsMl0Nb9QPj8IoSpqnM8cUkrzpLuIKxMj
- nwDg==
+ bh=W7h0HGOzyVyXkzPPaxCDHNOeGAHHzUpHx89w97Th7bE=;
+ b=kEwWNQRGzMp+hgBNtLRPieOKx2NLsMasPpsF9gc/w3DpIc2YI2Xnu/0Rc8KGRafTrY
+ LhgF7eB7LDrzMHzuEBebnrVhJobQ6V7UIDsYYHz2jVvmiSqIC+hZUrYZHnU2iFi/2tXr
+ IYNVzmwgBvyiil3x+Q9QRjn/AlSlqEPR0zIempSw8wIWcmIu7Jk8gSODm4MEG5nF+I6c
+ qfFSgELvJVmS/+mhakVvaz+L4P7gy8BidQ9ciqZ64f0eFLfpaQenUqc5d86Exoi+l+Fw
+ DKDYztL0qPZydIEIjpROeHh2WWMcrmTZJ3RgBQFGshpOzimPHkZAaotKRYnjeNOL+pI4
+ /Wgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=Rf1ovJyHJH52bsETTiVbqoeF69Wlxw80LcJNY8x9zfs=;
- b=TXynmHBXWMMeW1aBu3ri1MvooMMIeKZA3CIbuqhvlyDXkD8zsJ7oQMkb1bE1WCayN/
- lvmF5qOjRcZc1lUy7ojFMUdx0T3UdpCBeF51dWND8rDkNX0eSC/cDYmbsTAQSo50x6Hy
- 6L/tcrpVP2draiGbN5OW1HaEEX+C1piwEGmHnhjnKzoLPjCm5Jlez64lFFXcgUSjC+Ym
- cGWen8ttGCgRn1hwJ+aBcLFu04zcprwNz1FA1Sqi5Y8aIBNLzYsAi1PrkkU6o5XgThQi
- SsiVdHpzRPb7ugtr9jEa7vZYGeFEBEyt/BC8lGwj2DRGoBLS62TETFn07659wUPLvpfL
- eCEg==
-X-Gm-Message-State: AOAM533BcSgwfMUgL1VD2xAbJykQTaT6qVFNJgtyrOis2TS+2EC0z1HH
- dLoqECGeOJrkyMByXIn43OE=
-X-Google-Smtp-Source: ABdhPJwpL0+6nkZAYN1gwZb/ZenLoNY6rvNesND4FUqNVBhr0D9ySa+dT3MK1swTK0M1T2l6uTD2ww==
-X-Received: by 2002:a17:902:868f:: with SMTP id
- g15mr6596314plo.247.1590018902638; 
- Wed, 20 May 2020 16:55:02 -0700 (PDT)
+ bh=W7h0HGOzyVyXkzPPaxCDHNOeGAHHzUpHx89w97Th7bE=;
+ b=JVNahmReZFbBqeSFSabq5QlTBJb+gSVk7OIRqwoJ1c31F76rXY5iZ50ee4v61Vvtar
+ IaPKPkEbL331OBwv4jbLOAsAb6AJtWV6jXEZSq0+W8HhbBYcjsJ3DvHlcnicmPUpWpO7
+ 5aF/bwu7E1p/FVzJi6YP20R5my2mqSs50K0s5wKMjH7ht4PrlWTMw/hpjuptcBIkwsjd
+ nXsdEgpbIfhUIgAPq5VuA4qPLOMhFmSSGXvuggJoRXnrFuVTaj8d2HrTvMO59XB26RDS
+ SaORPlI8BuJr0JWR2qijlbyY+wj4LF4kI8vbIrK8uqReTfTSUqF+nuJLkJhAac2Nj41X
+ uD4A==
+X-Gm-Message-State: AOAM533WVIp0RiLrCTEpJTIK4emcMutjrLKXVC4hJbyFRVixf2WwPxis
+ YoBPSHaqJMLQjPnFRW7C0aE=
+X-Google-Smtp-Source: ABdhPJz2NX9ovdy2N8LhpMVxgE3m2xedStYeixvrjpUj7UoEEtlpg27ca8a88fXFN949zPyrNNPykA==
+X-Received: by 2002:a17:90a:9604:: with SMTP id
+ v4mr7880496pjo.198.1590018882212; 
+ Wed, 20 May 2020 16:54:42 -0700 (PDT)
 Received: from localhost.localdomain ([75.167.104.59])
- by smtp.gmail.com with ESMTPSA id d20sm2761882pjs.12.2020.05.20.16.55.01
+ by smtp.gmail.com with ESMTPSA id d20sm2761882pjs.12.2020.05.20.16.54.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 16:55:02 -0700 (PDT)
+ Wed, 20 May 2020 16:54:41 -0700 (PDT)
 From: Paul Zimmerman <pauldzim@gmail.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v6 4/7] dwc-hsotg (dwc2) USB host controller emulation
-Date: Wed, 20 May 2020 16:53:46 -0700
-Message-Id: <20200520235349.21215-5-pauldzim@gmail.com>
+Subject: [PATCH v6 2/7] dwc-hsotg (dwc2) USB host controller register
+ definitions
+Date: Wed, 20 May 2020 16:53:44 -0700
+Message-Id: <20200520235349.21215-3-pauldzim@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200520235349.21215-1-pauldzim@gmail.com>
 References: <20200520235349.21215-1-pauldzim@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=pauldzim@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=pauldzim@gmail.com; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -85,7 +86,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ UPPERCASE_50_75=0.008 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,1551 +107,924 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the dwc-hsotg (dwc2) USB host controller emulation code.
-Based on hw/usb/hcd-ehci.c and hw/usb/hcd-ohci.c.
-
-Note that to use this with the dwc-otg driver in the Raspbian
-kernel, you must pass the option "dwc_otg.fiq_fsm_enable=0" on
-the kernel command line.
-
-Emulation of slave mode and of descriptor-DMA mode has not been
-implemented yet. These modes are seldom used.
-
-I have used some on-line sources of information while developing
-this emulation, including:
-
-http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
-which has a pretty complete description of the controller starting
-on page 370.
-
-https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
-which has a description of the controller registers starting on
-page 130.
-
-Thanks to Felippe Mathieu-Daude for providing a cleaner method
-of implementing the memory regions for the controller registers.
+Import the dwc-hsotg (dwc2) register definitions file from the
+Linux kernel. This is a copy of drivers/usb/dwc2/hw.h from the
+mainline Linux kernel, the only changes being to the header, and
+two instances of 'u32' changed to 'uint32_t' to allow it to
+compile. Checkpatch throws a boatload of errors due to the tab
+indentation, but I would rather import it as-is than reformat it.
 
 Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
 ---
- hw/usb/Kconfig       |    5 +
- hw/usb/Makefile.objs |    1 +
- hw/usb/hcd-dwc2.c    | 1417 ++++++++++++++++++++++++++++++++++++++++++
- hw/usb/trace-events  |   50 ++
- 4 files changed, 1473 insertions(+)
- create mode 100644 hw/usb/hcd-dwc2.c
+ include/hw/usb/dwc2-regs.h | 895 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 895 insertions(+)
+ create mode 100644 include/hw/usb/dwc2-regs.h
 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 464348ba14..d4d8c37c28 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -46,6 +46,11 @@ config USB_MUSB
-     bool
-     select USB
- 
-+config USB_DWC2
-+    bool
-+    default y
-+    select USB
-+
- config TUSB6010
-     bool
-     select USB_MUSB
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 66835e5bf7..fa5c3fa1b8 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_EHCI_SYSBUS) += hcd-ehci-sysbus.o
- common-obj-$(CONFIG_USB_XHCI) += hcd-xhci.o
- common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
- common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
-+common-obj-$(CONFIG_USB_DWC2) += hcd-dwc2.o
- 
- common-obj-$(CONFIG_TUSB6010) += tusb6010.o
- common-obj-$(CONFIG_IMX)      += chipidea.o
-diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
+diff --git a/include/hw/usb/dwc2-regs.h b/include/hw/usb/dwc2-regs.h
 new file mode 100644
-index 0000000000..72cbd051f3
+index 0000000000..96dc07fb6f
 --- /dev/null
-+++ b/hw/usb/hcd-dwc2.c
-@@ -0,0 +1,1417 @@
++++ b/include/hw/usb/dwc2-regs.h
+@@ -0,0 +1,899 @@
++/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
 +/*
-+ * dwc-hsotg (dwc2) USB host controller emulation
++ * Imported from the Linux kernel file drivers/usb/dwc2/hw.h, commit
++ * a89bae709b3492b478480a2c9734e7e9393b279c ("usb: dwc2: Move
++ * UTMI_PHY_DATA defines closer")
 + *
-+ * Based on hw/usb/hcd-ehci.c and hw/usb/hcd-ohci.c
++ * hw.h - DesignWare HS OTG Controller hardware definitions
 + *
-+ * Note that to use this emulation with the dwc-otg driver in the
-+ * Raspbian kernel, you must pass the option "dwc_otg.fiq_fsm_enable=0"
-+ * on the kernel command line.
++ * Copyright 2004-2013 Synopsys, Inc.
 + *
-+ * Some useful documentation used to develop this emulation can be
-+ * found online (as of April 2020) at:
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The names of the above-listed copyright holders may not be used
++ *    to endorse or promote products derived from this software without
++ *    specific prior written permission.
 + *
-+ * http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
-+ * which has a pretty complete description of the controller starting
-+ * on page 370.
++ * ALTERNATIVELY, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") as published by the Free Software
++ * Foundation; either version 2 of the License, or (at your option) any
++ * later version.
 + *
-+ * https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
-+ * which has a description of the controller registers starting on
-+ * page 130.
-+ *
-+ * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
++ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
++ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
++ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "qapi/error.h"
-+#include "hw/usb/dwc2-regs.h"
-+#include "hw/usb/hcd-dwc2.h"
-+#include "migration/vmstate.h"
-+#include "trace.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
-+#include "hw/qdev-properties.h"
-+
-+#define USB_HZ_FS       12000000
-+#define USB_HZ_HS       96000000
-+#define USB_FRMINTVL    12000
-+
-+/* nifty macros from Arnon's EHCI version  */
-+#define get_field(data, field) \
-+    (((data) & field##_MASK) >> field##_SHIFT)
-+
-+#define set_field(data, newval, field) do { \
-+    uint32_t val = *(data); \
-+    val &= ~field##_MASK; \
-+    val |= ((newval) << field##_SHIFT) & field##_MASK; \
-+    *(data) = val; \
-+} while (0)
-+
-+#define get_bit(data, bitmask) \
-+    (!!((data) & (bitmask)))
-+
-+/* update irq line */
-+static inline void dwc2_update_irq(DWC2State *s)
-+{
-+    static int oldlevel;
-+    int level = 0;
-+
-+    if ((s->gintsts & s->gintmsk) && (s->gahbcfg & GAHBCFG_GLBL_INTR_EN)) {
-+        level = 1;
-+    }
-+    if (level != oldlevel) {
-+        oldlevel = level;
-+        trace_usb_dwc2_update_irq(level);
-+        qemu_set_irq(s->irq, level);
-+    }
-+}
-+
-+/* flag interrupt condition */
-+static inline void dwc2_raise_global_irq(DWC2State *s, uint32_t intr)
-+{
-+    if (!(s->gintsts & intr)) {
-+        s->gintsts |= intr;
-+        trace_usb_dwc2_raise_global_irq(intr);
-+        dwc2_update_irq(s);
-+    }
-+}
-+
-+static inline void dwc2_lower_global_irq(DWC2State *s, uint32_t intr)
-+{
-+    if (s->gintsts & intr) {
-+        s->gintsts &= ~intr;
-+        trace_usb_dwc2_lower_global_irq(intr);
-+        dwc2_update_irq(s);
-+    }
-+}
-+
-+static inline void dwc2_raise_host_irq(DWC2State *s, uint32_t host_intr)
-+{
-+    if (!(s->haint & host_intr)) {
-+        s->haint |= host_intr;
-+        s->haint &= 0xffff;
-+        trace_usb_dwc2_raise_host_irq(host_intr);
-+        if (s->haint & s->haintmsk) {
-+            dwc2_raise_global_irq(s, GINTSTS_HCHINT);
-+        }
-+    }
-+}
-+
-+static inline void dwc2_lower_host_irq(DWC2State *s, uint32_t host_intr)
-+{
-+    if (s->haint & host_intr) {
-+        s->haint &= ~host_intr;
-+        trace_usb_dwc2_lower_host_irq(host_intr);
-+        if (!(s->haint & s->haintmsk)) {
-+            dwc2_lower_global_irq(s, GINTSTS_HCHINT);
-+        }
-+    }
-+}
-+
-+static inline void dwc2_update_hc_irq(DWC2State *s, int index)
-+{
-+    uint32_t host_intr = 1 << (index >> 3);
-+
-+    if (s->hreg1[index + 2] & s->hreg1[index + 3]) {
-+        dwc2_raise_host_irq(s, host_intr);
-+    } else {
-+        dwc2_lower_host_irq(s, host_intr);
-+    }
-+}
-+
-+/* set a timer for EOF */
-+static void dwc2_eof_timer(DWC2State *s)
-+{
-+    timer_mod(s->eof_timer, s->sof_time + s->usb_frame_time);
-+}
-+
-+/* Set a timer for EOF and generate SOF event */
-+static void dwc2_sof(DWC2State *s)
-+{
-+    s->sof_time += s->usb_frame_time;
-+    trace_usb_dwc2_sof(s->sof_time);
-+    dwc2_eof_timer(s);
-+    dwc2_raise_global_irq(s, GINTSTS_SOF);
-+}
-+
-+/* Do frame processing on frame boundary */
-+static void dwc2_frame_boundary(void *opaque)
-+{
-+    DWC2State *s = opaque;
-+    int64_t now;
-+    uint16_t frcnt;
-+
-+    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    /* Frame boundary, so do EOF stuff here */
-+
-+    /* Increment frame number */
-+    frcnt = (uint16_t)((now - s->sof_time) / s->fi);
-+    s->frame_number = (s->frame_number + frcnt) & 0xffff;
-+    s->hfnum = s->frame_number & HFNUM_MAX_FRNUM;
-+
-+    /* Do SOF stuff here */
-+    dwc2_sof(s);
-+}
-+
-+/* Start sending SOF tokens on the USB bus */
-+static void dwc2_bus_start(DWC2State *s)
-+{
-+    trace_usb_dwc2_bus_start();
-+    s->sof_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    dwc2_eof_timer(s);
-+}
-+
-+/* Stop sending SOF tokens on the USB bus */
-+static void dwc2_bus_stop(DWC2State *s)
-+{
-+    trace_usb_dwc2_bus_stop();
-+    timer_del(s->eof_timer);
-+}
-+
-+static USBDevice *dwc2_find_device(DWC2State *s, uint8_t addr)
-+{
-+    USBDevice *dev;
-+
-+    trace_usb_dwc2_find_device(addr);
-+
-+    if (!(s->hprt0 & HPRT0_ENA)) {
-+        trace_usb_dwc2_port_disabled(0);
-+    } else {
-+        dev = usb_find_device(&s->uport, addr);
-+        if (dev != NULL) {
-+            trace_usb_dwc2_device_found(0);
-+            return dev;
-+        }
-+    }
-+
-+    trace_usb_dwc2_device_not_found();
-+    return NULL;
-+}
-+
-+static const char *pstatus[] = {
-+    "USB_RET_SUCCESS", "USB_RET_NODEV", "USB_RET_NAK", "USB_RET_STALL",
-+    "USB_RET_BABBLE", "USB_RET_IOERROR", "USB_RET_ASYNC",
-+    "USB_RET_ADD_TO_QUEUE", "USB_RET_REMOVE_FROM_QUEUE"
-+};
-+
-+static uint32_t pintr[] = {
-+    HCINTMSK_XFERCOMPL, HCINTMSK_XACTERR, HCINTMSK_NAK, HCINTMSK_STALL,
-+    HCINTMSK_BBLERR, HCINTMSK_XACTERR, HCINTMSK_XACTERR, HCINTMSK_XACTERR,
-+    HCINTMSK_XACTERR
-+};
-+
-+static const char *types[] = {
-+    "Ctrl", "Isoc", "Bulk", "Intr"
-+};
-+
-+static const char *dirs[] = {
-+    "Out", "In"
-+};
-+
-+static void dwc2_handle_packet(DWC2State *s, uint32_t devadr, USBDevice *dev,
-+                               USBEndpoint *ep, uint32_t index, bool send)
-+{
-+    DWC2Packet *p;
-+    uint32_t hcchar = s->hreg1[index];
-+    uint32_t hctsiz = s->hreg1[index + 4];
-+    uint32_t hcdma = s->hreg1[index + 5];
-+    uint32_t chan, epnum, epdir, eptype, mps, pid, pcnt, len, tlen, intr = 0;
-+    uint32_t tpcnt, stsidx, actual = 0;
-+    bool do_intr = false, done = false;
-+
-+    epnum = get_field(hcchar, HCCHAR_EPNUM);
-+    epdir = get_bit(hcchar, HCCHAR_EPDIR);
-+    eptype = get_field(hcchar, HCCHAR_EPTYPE);
-+    mps = get_field(hcchar, HCCHAR_MPS);
-+    pid = get_field(hctsiz, TSIZ_SC_MC_PID);
-+    pcnt = get_field(hctsiz, TSIZ_PKTCNT);
-+    len = get_field(hctsiz, TSIZ_XFERSIZE);
-+    assert(len <= DWC2_MAX_XFER_SIZE);
-+    chan = index >> 3;
-+    p = &s->packet[chan];
-+
-+    trace_usb_dwc2_handle_packet(chan, dev, &p->packet, epnum, types[eptype],
-+                                 dirs[epdir], mps, len, pcnt);
-+
-+    if (eptype == USB_ENDPOINT_XFER_CONTROL && pid == TSIZ_SC_MC_PID_SETUP) {
-+        pid = USB_TOKEN_SETUP;
-+    } else {
-+        pid = epdir ? USB_TOKEN_IN : USB_TOKEN_OUT;
-+    }
-+
-+    if (send) {
-+        tlen = len;
-+        if (p->small) {
-+            if (tlen > mps) {
-+                tlen = mps;
-+            }
-+        }
-+
-+        if (pid != USB_TOKEN_IN) {
-+            trace_usb_dwc2_memory_read(hcdma, tlen);
-+            if (dma_memory_read(&s->dma_as, hcdma,
-+                                s->usb_buf[chan], tlen) != MEMTX_OK) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "%s: dma_memory_read failed\n",
-+                              __func__);
-+            }
-+        }
-+
-+        usb_packet_init(&p->packet);
-+        usb_packet_setup(&p->packet, pid, ep, 0, hcdma,
-+                         pid != USB_TOKEN_IN, true);
-+        usb_packet_addbuf(&p->packet, s->usb_buf[chan], tlen);
-+        p->async = DWC2_ASYNC_NONE;
-+        usb_handle_packet(dev, &p->packet);
-+    } else {
-+        tlen = p->len;
-+    }
-+
-+    stsidx = -p->packet.status;
-+    assert(stsidx < sizeof(pstatus) / sizeof(*pstatus));
-+    actual = p->packet.actual_length;
-+    trace_usb_dwc2_packet_status(pstatus[stsidx], actual);
-+
-+babble:
-+    if (p->packet.status != USB_RET_SUCCESS &&
-+            p->packet.status != USB_RET_NAK &&
-+            p->packet.status != USB_RET_STALL &&
-+            p->packet.status != USB_RET_ASYNC) {
-+        trace_usb_dwc2_packet_error(pstatus[stsidx]);
-+    }
-+
-+    if (p->packet.status == USB_RET_ASYNC) {
-+        trace_usb_dwc2_async_packet(&p->packet, chan, dev, epnum,
-+                                    dirs[epdir], tlen);
-+        usb_device_flush_ep_queue(dev, ep);
-+        assert(p->async != DWC2_ASYNC_INFLIGHT);
-+        p->devadr = devadr;
-+        p->epnum = epnum;
-+        p->epdir = epdir;
-+        p->mps = mps;
-+        p->pid = pid;
-+        p->index = index;
-+        p->pcnt = pcnt;
-+        p->len = tlen;
-+        p->async = DWC2_ASYNC_INFLIGHT;
-+        p->needs_service = false;
-+        return;
-+    }
-+
-+    if (p->packet.status == USB_RET_SUCCESS) {
-+        if (actual > tlen) {
-+            p->packet.status = USB_RET_BABBLE;
-+            goto babble;
-+        }
-+
-+        if (pid == USB_TOKEN_IN) {
-+            trace_usb_dwc2_memory_write(hcdma, actual);
-+            if (dma_memory_write(&s->dma_as, hcdma, s->usb_buf[chan],
-+                                 actual) != MEMTX_OK) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "%s: dma_memory_write failed\n",
-+                              __func__);
-+            }
-+        }
-+
-+        tpcnt = actual / mps;
-+        if (actual % mps) {
-+            tpcnt++;
-+            if (pid == USB_TOKEN_IN) {
-+                done = true;
-+            }
-+        }
-+
-+        pcnt -= tpcnt < pcnt ? tpcnt : pcnt;
-+        set_field(&hctsiz, pcnt, TSIZ_PKTCNT);
-+        len -= actual < len ? actual : len;
-+        set_field(&hctsiz, len, TSIZ_XFERSIZE);
-+        s->hreg1[index + 4] = hctsiz;
-+        hcdma += actual;
-+        s->hreg1[index + 5] = hcdma;
-+
-+        if (!pcnt || len == 0 || actual == 0) {
-+            done = true;
-+        }
-+    } else {
-+        intr |= pintr[stsidx];
-+        if (p->packet.status == USB_RET_NAK &&
-+            (eptype == USB_ENDPOINT_XFER_CONTROL ||
-+             eptype == USB_ENDPOINT_XFER_BULK)) {
-+            /*
-+             * for ctrl/bulk, automatically retry on NAK,
-+             * but send the interrupt anyway
-+             */
-+            intr &= ~HCINTMSK_RESERVED14_31;
-+            s->hreg1[index + 2] |= intr;
-+            do_intr = true;
-+        } else {
-+            intr |= HCINTMSK_CHHLTD;
-+            done = true;
-+        }
-+    }
-+
-+    usb_packet_cleanup(&p->packet);
-+
-+    if (done) {
-+        hcchar &= ~HCCHAR_CHENA;
-+        s->hreg1[index] = hcchar;
-+        if (!(intr & HCINTMSK_CHHLTD)) {
-+            intr |= HCINTMSK_CHHLTD | HCINTMSK_XFERCOMPL;
-+        }
-+        intr &= ~HCINTMSK_RESERVED14_31;
-+        s->hreg1[index + 2] |= intr;
-+        p->needs_service = false;
-+        trace_usb_dwc2_packet_done(pstatus[stsidx], actual, len, pcnt);
-+        dwc2_update_hc_irq(s, index);
-+        return;
-+    }
-+
-+    p->devadr = devadr;
-+    p->epnum = epnum;
-+    p->epdir = epdir;
-+    p->mps = mps;
-+    p->pid = pid;
-+    p->index = index;
-+    p->pcnt = pcnt;
-+    p->len = len;
-+    p->needs_service = true;
-+    trace_usb_dwc2_packet_next(pstatus[stsidx], len, pcnt);
-+    if (do_intr) {
-+        dwc2_update_hc_irq(s, index);
-+    }
-+}
-+
-+/* Attach or detach a device on root hub */
-+
-+static const char *speeds[] = {
-+    "low", "full", "high"
-+};
-+
-+static void dwc2_attach(USBPort *port)
-+{
-+    DWC2State *s = port->opaque;
-+    int hispd = 0;
-+
-+    trace_usb_dwc2_attach(port);
-+    assert(port->index == 0);
-+
-+    if (!port->dev || !port->dev->attached) {
-+        return;
-+    }
-+
-+    assert(port->dev->speed <= USB_SPEED_HIGH);
-+    trace_usb_dwc2_attach_speed(speeds[port->dev->speed]);
-+    s->hprt0 &= ~HPRT0_SPD_MASK;
-+
-+    switch (port->dev->speed) {
-+    case USB_SPEED_LOW:
-+        s->hprt0 |= HPRT0_SPD_LOW_SPEED << HPRT0_SPD_SHIFT;
-+        break;
-+    case USB_SPEED_FULL:
-+        s->hprt0 |= HPRT0_SPD_FULL_SPEED << HPRT0_SPD_SHIFT;
-+        break;
-+    case USB_SPEED_HIGH:
-+        s->hprt0 |= HPRT0_SPD_HIGH_SPEED << HPRT0_SPD_SHIFT;
-+        hispd = 1;
-+        break;
-+    }
-+
-+    if (hispd) {
-+        s->usb_frame_time = NANOSECONDS_PER_SECOND / 8000;        /* 125000 */
-+        if (NANOSECONDS_PER_SECOND >= USB_HZ_HS) {
-+            s->usb_bit_time = NANOSECONDS_PER_SECOND / USB_HZ_HS; /* 10.4 */
-+        } else {
-+            s->usb_bit_time = 1;
-+        }
-+    } else {
-+        s->usb_frame_time = NANOSECONDS_PER_SECOND / 1000;        /* 1000000 */
-+        if (NANOSECONDS_PER_SECOND >= USB_HZ_FS) {
-+            s->usb_bit_time = NANOSECONDS_PER_SECOND / USB_HZ_FS; /* 83.3 */
-+        } else {
-+            s->usb_bit_time = 1;
-+        }
-+    }
-+
-+    s->fi = USB_FRMINTVL - 1;
-+    s->hprt0 |= HPRT0_CONNDET | HPRT0_CONNSTS;
-+
-+    dwc2_bus_start(s);
-+    dwc2_raise_global_irq(s, GINTSTS_PRTINT);
-+}
-+
-+static void dwc2_detach(USBPort *port)
-+{
-+    DWC2State *s = port->opaque;
-+
-+    trace_usb_dwc2_detach(port);
-+    assert(port->index == 0);
-+
-+    dwc2_bus_stop(s);
-+
-+    s->hprt0 &= ~(HPRT0_SPD_MASK | HPRT0_SUSP | HPRT0_ENA | HPRT0_CONNSTS);
-+    s->hprt0 |= HPRT0_CONNDET | HPRT0_ENACHG;
-+
-+    dwc2_raise_global_irq(s, GINTSTS_PRTINT);
-+}
-+
-+static void dwc2_child_detach(USBPort *port, USBDevice *child)
-+{
-+    trace_usb_dwc2_child_detach(port, child);
-+    assert(port->index == 0);
-+}
-+
-+static void dwc2_wakeup(USBPort *port)
-+{
-+    DWC2State *s = port->opaque;
-+
-+    trace_usb_dwc2_wakeup(port);
-+    assert(port->index == 0);
-+
-+    if (s->hprt0 & HPRT0_SUSP) {
-+        s->hprt0 |= HPRT0_RES;
-+        dwc2_raise_global_irq(s, GINTSTS_PRTINT);
-+    }
-+
-+    qemu_bh_schedule(s->async_bh);
-+}
-+
-+static void dwc2_async_packet_complete(USBPort *port, USBPacket *packet)
-+{
-+    DWC2State *s = port->opaque;
-+    DWC2Packet *p;
-+    USBDevice *dev;
-+    USBEndpoint *ep;
-+
-+    assert(port->index == 0);
-+    p = container_of(packet, DWC2Packet, packet);
-+    dev = dwc2_find_device(s, p->devadr);
-+    ep = usb_ep_get(dev, p->pid, p->epnum);
-+    trace_usb_dwc2_async_packet_complete(port, packet, p->index >> 3, dev,
-+                                         p->epnum, dirs[p->epdir], p->len);
-+    assert(p->async == DWC2_ASYNC_INFLIGHT);
-+
-+    if (packet->status == USB_RET_REMOVE_FROM_QUEUE) {
-+        usb_cancel_packet(packet);
-+        usb_packet_cleanup(packet);
-+        return;
-+    }
-+
-+    dwc2_handle_packet(s, p->devadr, dev, ep, p->index, false);
-+
-+    p->async = DWC2_ASYNC_FINISHED;
-+    qemu_bh_schedule(s->async_bh);
-+}
-+
-+static USBPortOps dwc2_port_ops = {
-+    .attach = dwc2_attach,
-+    .detach = dwc2_detach,
-+    .child_detach = dwc2_child_detach,
-+    .wakeup = dwc2_wakeup,
-+    .complete = dwc2_async_packet_complete,
-+};
-+
-+static uint32_t dwc2_get_frame_remaining(DWC2State *s)
-+{
-+    uint32_t fr = 0;
-+    int64_t tks;
-+
-+    tks = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - s->sof_time;
-+    if (tks < 0) {
-+        tks = 0;
-+    }
-+
-+    /* avoid muldiv if possible */
-+    if (tks >= s->usb_frame_time) {
-+        goto out;
-+    }
-+    if (tks < s->usb_bit_time) {
-+        fr = s->fi;
-+        goto out;
-+    }
-+
-+    /* tks = number of ns since SOF, divided by 83 (fs) or 10 (hs) */
-+    tks = tks / s->usb_bit_time;
-+    if (tks >= (int64_t)s->fi) {
-+        goto out;
-+    }
-+
-+    /* remaining = frame interval minus tks */
-+    fr = (uint32_t)((int64_t)s->fi - tks);
-+
-+out:
-+    return fr;
-+}
-+
-+static void dwc2_work_bh(void *opaque)
-+{
-+    DWC2State *s = opaque;
-+    DWC2Packet *p;
-+    USBDevice *dev;
-+    USBEndpoint *ep;
-+    int64_t t_now, expire_time;
-+    int chan;
-+    bool found = false;
-+
-+    trace_usb_dwc2_work_bh();
-+    if (s->working) {
-+        return;
-+    }
-+    s->working = true;
-+
-+    t_now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    chan = s->next_chan;
-+
-+    do {
-+        p = &s->packet[chan];
-+        if (p->needs_service) {
-+            dev = dwc2_find_device(s, p->devadr);
-+            ep = usb_ep_get(dev, p->pid, p->epnum);
-+            trace_usb_dwc2_work_bh_service(s->next_chan, chan, dev, p->epnum);
-+            dwc2_handle_packet(s, p->devadr, dev, ep, p->index, true);
-+            found = true;
-+        }
-+        if (++chan == DWC2_NB_CHAN) {
-+            chan = 0;
-+        }
-+        if (found) {
-+            s->next_chan = chan;
-+            trace_usb_dwc2_work_bh_next(chan);
-+        }
-+    } while (chan != s->next_chan);
-+
-+    if (found) {
-+        expire_time = t_now + NANOSECONDS_PER_SECOND / 4000;
-+        timer_mod(s->frame_timer, expire_time);
-+    }
-+    s->working = false;
-+}
-+
-+static void dwc2_enable_chan(DWC2State *s,  uint32_t index)
-+{
-+    USBDevice *dev;
-+    USBEndpoint *ep;
-+    uint32_t hcchar;
-+    uint32_t hctsiz;
-+    uint32_t devadr, epnum, epdir, eptype, pid, len;
-+    DWC2Packet *p;
-+
-+    assert((index >> 3) < DWC2_NB_CHAN);
-+    p = &s->packet[index >> 3];
-+    hcchar = s->hreg1[index];
-+    hctsiz = s->hreg1[index + 4];
-+    devadr = get_field(hcchar, HCCHAR_DEVADDR);
-+    epnum = get_field(hcchar, HCCHAR_EPNUM);
-+    epdir = get_bit(hcchar, HCCHAR_EPDIR);
-+    eptype = get_field(hcchar, HCCHAR_EPTYPE);
-+    pid = get_field(hctsiz, TSIZ_SC_MC_PID);
-+    len = get_field(hctsiz, TSIZ_XFERSIZE);
-+
-+    dev = dwc2_find_device(s, devadr);
-+
-+    trace_usb_dwc2_enable_chan(index >> 3, dev, &p->packet, epnum);
-+    if (dev == NULL) {
-+        return;
-+    }
-+
-+    if (eptype == USB_ENDPOINT_XFER_CONTROL && pid == TSIZ_SC_MC_PID_SETUP) {
-+        pid = USB_TOKEN_SETUP;
-+    } else {
-+        pid = epdir ? USB_TOKEN_IN : USB_TOKEN_OUT;
-+    }
-+
-+    ep = usb_ep_get(dev, pid, epnum);
-+
-+    /*
-+     * Hack: Networking doesn't like us delivering large transfers, it kind
-+     * of works but the latency is horrible. So if the transfer is <= the mtu
-+     * size, we take that as a hint that this might be a network transfer,
-+     * and do the transfer packet-by-packet.
-+     */
-+    if (len > 1536) {
-+        p->small = false;
-+    } else {
-+        p->small = true;
-+    }
-+
-+    dwc2_handle_packet(s, devadr, dev, ep, index, true);
-+    qemu_bh_schedule(s->async_bh);
-+}
-+
-+static const char *glbregnm[] = {
-+    "GOTGCTL  ", "GOTGINT  ", "GAHBCFG  ", "GUSBCFG  ", "GRSTCTL  ",
-+    "GINTSTS  ", "GINTMSK  ", "GRXSTSR  ", "GRXSTSP  ", "GRXFSIZ  ",
-+    "GNPTXFSIZ", "GNPTXSTS ", "GI2CCTL  ", "GPVNDCTL ", "GGPIO    ",
-+    "GUID     ", "GSNPSID  ", "GHWCFG1  ", "GHWCFG2  ", "GHWCFG3  ",
-+    "GHWCFG4  ", "GLPMCFG  ", "GPWRDN   ", "GDFIFOCFG", "GADPCTL  ",
-+    "GREFCLK  ", "GINTMSK2 ", "GINTSTS2 "
-+};
-+
-+static uint64_t dwc2_glbreg_read(void *ptr, hwaddr addr, int index,
-+                                 unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint32_t val;
-+
-+    assert(addr <= GINTSTS2);
-+    val = s->glbreg[index];
-+
-+    switch (addr) {
-+    case GRSTCTL:
-+        /* clear any self-clearing bits that were set */
-+        val &= ~(GRSTCTL_TXFFLSH | GRSTCTL_RXFFLSH | GRSTCTL_IN_TKNQ_FLSH |
-+                 GRSTCTL_FRMCNTRRST | GRSTCTL_HSFTRST | GRSTCTL_CSFTRST);
-+        s->glbreg[index] = val;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    trace_usb_dwc2_glbreg_read(addr, glbregnm[index], val);
-+    return val;
-+}
-+
-+static void dwc2_glbreg_write(void *ptr, hwaddr addr, int index, uint64_t val,
-+                              unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint64_t orig = val;
-+    uint32_t *mmio;
-+    uint32_t old;
-+    int iflg = 0;
-+
-+    assert(addr <= GINTSTS2);
-+    mmio = &s->glbreg[index];
-+    old = *mmio;
-+
-+    switch (addr) {
-+    case GOTGCTL:
-+        /* don't allow setting of read-only bits */
-+        val &= ~(GOTGCTL_MULT_VALID_BC_MASK | GOTGCTL_BSESVLD |
-+                 GOTGCTL_ASESVLD | GOTGCTL_DBNC_SHORT | GOTGCTL_CONID_B |
-+                 GOTGCTL_HSTNEGSCS | GOTGCTL_SESREQSCS);
-+        /* don't allow clearing of read-only bits */
-+        val |= old & (GOTGCTL_MULT_VALID_BC_MASK | GOTGCTL_BSESVLD |
-+                      GOTGCTL_ASESVLD | GOTGCTL_DBNC_SHORT | GOTGCTL_CONID_B |
-+                      GOTGCTL_HSTNEGSCS | GOTGCTL_SESREQSCS);
-+        break;
-+    case GAHBCFG:
-+        if ((val & GAHBCFG_GLBL_INTR_EN) && !(old & GAHBCFG_GLBL_INTR_EN)) {
-+            iflg = 1;
-+        }
-+        break;
-+    case GRSTCTL:
-+        val |= GRSTCTL_AHBIDLE;
-+        val &= ~GRSTCTL_DMAREQ;
-+        if (!(old & GRSTCTL_TXFFLSH) && (val & GRSTCTL_TXFFLSH)) {
-+                /* TODO - TX fifo flush */
-+            qemu_log_mask(LOG_UNIMP, "Tx FIFO flush not implemented\n");
-+        }
-+        if (!(old & GRSTCTL_RXFFLSH) && (val & GRSTCTL_RXFFLSH)) {
-+                /* TODO - RX fifo flush */
-+            qemu_log_mask(LOG_UNIMP, "Rx FIFO flush not implemented\n");
-+        }
-+        if (!(old & GRSTCTL_IN_TKNQ_FLSH) && (val & GRSTCTL_IN_TKNQ_FLSH)) {
-+                /* TODO - device IN token queue flush */
-+            qemu_log_mask(LOG_UNIMP, "Token queue flush not implemented\n");
-+        }
-+        if (!(old & GRSTCTL_FRMCNTRRST) && (val & GRSTCTL_FRMCNTRRST)) {
-+                /* TODO - host frame counter reset */
-+            qemu_log_mask(LOG_UNIMP, "Frame counter reset not implemented\n");
-+        }
-+        if (!(old & GRSTCTL_HSFTRST) && (val & GRSTCTL_HSFTRST)) {
-+                /* TODO - host soft reset */
-+            qemu_log_mask(LOG_UNIMP, "Host soft reset not implemented\n");
-+        }
-+        if (!(old & GRSTCTL_CSFTRST) && (val & GRSTCTL_CSFTRST)) {
-+                /* TODO - core soft reset */
-+            qemu_log_mask(LOG_UNIMP, "Core soft reset not implemented\n");
-+        }
-+        /* don't allow clearing of self-clearing bits */
-+        val |= old & (GRSTCTL_TXFFLSH | GRSTCTL_RXFFLSH |
-+                      GRSTCTL_IN_TKNQ_FLSH | GRSTCTL_FRMCNTRRST |
-+                      GRSTCTL_HSFTRST | GRSTCTL_CSFTRST);
-+        break;
-+    case GINTSTS:
-+        /* clear the write-1-to-clear bits */
-+        val |= ~old;
-+        val = ~val;
-+        /* don't allow clearing of read-only bits */
-+        val |= old & (GINTSTS_PTXFEMP | GINTSTS_HCHINT | GINTSTS_PRTINT |
-+                      GINTSTS_OEPINT | GINTSTS_IEPINT | GINTSTS_GOUTNAKEFF |
-+                      GINTSTS_GINNAKEFF | GINTSTS_NPTXFEMP | GINTSTS_RXFLVL |
-+                      GINTSTS_OTGINT | GINTSTS_CURMODE_HOST);
-+        iflg = 1;
-+        break;
-+    case GINTMSK:
-+        iflg = 1;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    trace_usb_dwc2_glbreg_write(addr, glbregnm[index], orig, old, val);
-+    *mmio = val;
-+
-+    if (iflg) {
-+        dwc2_update_irq(s);
-+    }
-+}
-+
-+static uint64_t dwc2_fszreg_read(void *ptr, hwaddr addr, int index,
-+                                 unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint32_t val;
-+
-+    assert(addr == HPTXFSIZ);
-+    val = s->fszreg[index];
-+
-+    trace_usb_dwc2_fszreg_read(addr, val);
-+    return val;
-+}
-+
-+static void dwc2_fszreg_write(void *ptr, hwaddr addr, int index, uint64_t val,
-+                              unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint64_t orig = val;
-+    uint32_t *mmio;
-+    uint32_t old;
-+
-+    assert(addr == HPTXFSIZ);
-+    mmio = &s->fszreg[index];
-+    old = *mmio;
-+
-+    trace_usb_dwc2_fszreg_write(addr, orig, old, val);
-+    *mmio = val;
-+}
-+
-+static const char *hreg0nm[] = {
-+    "HCFG     ", "HFIR     ", "HFNUM    ", "<rsvd>   ", "HPTXSTS  ",
-+    "HAINT    ", "HAINTMSK ", "HFLBADDR ", "<rsvd>   ", "<rsvd>   ",
-+    "<rsvd>   ", "<rsvd>   ", "<rsvd>   ", "<rsvd>   ", "<rsvd>   ",
-+    "<rsvd>   ", "HPRT0    "
-+};
-+
-+static uint64_t dwc2_hreg0_read(void *ptr, hwaddr addr, int index,
-+                                unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint32_t val;
-+
-+    assert(addr >= HCFG && addr <= HPRT0);
-+    val = s->hreg0[index];
-+
-+    switch (addr) {
-+    case HFNUM:
-+        val = (dwc2_get_frame_remaining(s) << HFNUM_FRREM_SHIFT) |
-+              (s->hfnum << HFNUM_FRNUM_SHIFT);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    trace_usb_dwc2_hreg0_read(addr, hreg0nm[index], val);
-+    return val;
-+}
-+
-+static void dwc2_hreg0_write(void *ptr, hwaddr addr, int index, uint64_t val,
-+                             unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    USBDevice *dev = s->uport.dev;
-+    uint64_t orig = val;
-+    uint32_t *mmio;
-+    uint32_t tval, told, old;
-+    int prst = 0;
-+    int iflg = 0;
-+
-+    assert(addr >= HCFG && addr <= HPRT0);
-+    mmio = &s->hreg0[index];
-+    old = *mmio;
-+
-+    switch (addr) {
-+    case HFIR:
-+        break;
-+    case HFNUM:
-+    case HPTXSTS:
-+    case HAINT:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to read-only register\n",
-+                      __func__);
-+        return;
-+    case HAINTMSK:
-+        val &= 0xffff;
-+        break;
-+    case HPRT0:
-+        /* don't allow clearing of read-only bits */
-+        val |= old & (HPRT0_SPD_MASK | HPRT0_LNSTS_MASK | HPRT0_OVRCURRACT |
-+                      HPRT0_CONNSTS);
-+        /* don't allow clearing of self-clearing bits */
-+        val |= old & (HPRT0_SUSP | HPRT0_RES);
-+        /* don't allow setting of self-setting bits */
-+        if (!(old & HPRT0_ENA) && (val & HPRT0_ENA)) {
-+            val &= ~HPRT0_ENA;
-+        }
-+        /* clear the write-1-to-clear bits */
-+        tval = val & (HPRT0_OVRCURRCHG | HPRT0_ENACHG | HPRT0_ENA |
-+                      HPRT0_CONNDET);
-+        told = old & (HPRT0_OVRCURRCHG | HPRT0_ENACHG | HPRT0_ENA |
-+                      HPRT0_CONNDET);
-+        tval |= ~told;
-+        tval = ~tval;
-+        tval &= (HPRT0_OVRCURRCHG | HPRT0_ENACHG | HPRT0_ENA |
-+                 HPRT0_CONNDET);
-+        val &= ~(HPRT0_OVRCURRCHG | HPRT0_ENACHG | HPRT0_ENA |
-+                 HPRT0_CONNDET);
-+        val |= tval;
-+        if (!(val & HPRT0_RST) && (old & HPRT0_RST)) {
-+            if (dev && dev->attached) {
-+                val |= HPRT0_ENA | HPRT0_ENACHG;
-+                prst = 1;
-+            }
-+        }
-+        if (val & (HPRT0_OVRCURRCHG | HPRT0_ENACHG | HPRT0_CONNDET)) {
-+            iflg = 1;
-+        } else {
-+            iflg = -1;
-+        }
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    if (prst) {
-+        trace_usb_dwc2_hreg0_write(addr, hreg0nm[index], orig, old,
-+                                   val & ~HPRT0_CONNDET);
-+        trace_usb_dwc2_hreg0_action("call usb_port_reset");
-+        usb_port_reset(&s->uport);
-+        val &= ~HPRT0_CONNDET;
-+    } else {
-+        trace_usb_dwc2_hreg0_write(addr, hreg0nm[index], orig, old, val);
-+    }
-+
-+    *mmio = val;
-+
-+    if (iflg > 0) {
-+        trace_usb_dwc2_hreg0_action("enable PRTINT");
-+        dwc2_raise_global_irq(s, GINTSTS_PRTINT);
-+    } else if (iflg < 0) {
-+        trace_usb_dwc2_hreg0_action("disable PRTINT");
-+        dwc2_lower_global_irq(s, GINTSTS_PRTINT);
-+    }
-+}
-+
-+static const char *hreg1nm[] = {
-+    "HCCHAR  ", "HCSPLT  ", "HCINT   ", "HCINTMSK", "HCTSIZ  ", "HCDMA   ",
-+    "<rsvd>  ", "HCDMAB  "
-+};
-+
-+static uint64_t dwc2_hreg1_read(void *ptr, hwaddr addr, int index,
-+                                unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint32_t val;
-+
-+    assert(addr >= HCCHAR(0) && addr <= HCDMAB(DWC2_NB_CHAN - 1));
-+    val = s->hreg1[index];
-+
-+    trace_usb_dwc2_hreg1_read(addr, hreg1nm[index & 7], addr >> 5, val);
-+    return val;
-+}
-+
-+static void dwc2_hreg1_write(void *ptr, hwaddr addr, int index, uint64_t val,
-+                             unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint64_t orig = val;
-+    uint32_t *mmio;
-+    uint32_t old;
-+    int iflg = 0;
-+    int enflg = 0;
-+    int disflg = 0;
-+
-+    assert(addr >= HCCHAR(0) && addr <= HCDMAB(DWC2_NB_CHAN - 1));
-+    mmio = &s->hreg1[index];
-+    old = *mmio;
-+
-+    switch (HSOTG_REG(0x500) + (addr & 0x1c)) {
-+    case HCCHAR(0):
-+        if ((val & HCCHAR_CHDIS) && !(old & HCCHAR_CHDIS)) {
-+            val &= ~(HCCHAR_CHENA | HCCHAR_CHDIS);
-+            disflg = 1;
-+        } else {
-+            val |= old & HCCHAR_CHDIS;
-+            if ((val & HCCHAR_CHENA) && !(old & HCCHAR_CHENA)) {
-+                val &= ~HCCHAR_CHDIS;
-+                enflg = 1;
-+            } else {
-+                val |= old & HCCHAR_CHENA;
-+            }
-+        }
-+        break;
-+    case HCINT(0):
-+        /* clear the write-1-to-clear bits */
-+        val |= ~old;
-+        val = ~val;
-+        val &= ~HCINTMSK_RESERVED14_31;
-+        iflg = 1;
-+        break;
-+    case HCINTMSK(0):
-+        val &= ~HCINTMSK_RESERVED14_31;
-+        iflg = 1;
-+        break;
-+    case HCDMAB(0):
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to read-only register\n",
-+                      __func__);
-+        return;
-+    default:
-+        break;
-+    }
-+
-+    trace_usb_dwc2_hreg1_write(addr, hreg1nm[index & 7], index >> 3, orig,
-+                               old, val);
-+    *mmio = val;
-+
-+    if (disflg) {
-+        /* set ChHltd in HCINT */
-+        s->hreg1[(index & ~7) + 2] |= HCINTMSK_CHHLTD;
-+        iflg = 1;
-+    }
-+
-+    if (enflg) {
-+        dwc2_enable_chan(s, index & ~7);
-+    }
-+
-+    if (iflg) {
-+        dwc2_update_hc_irq(s, index & ~7);
-+    }
-+}
-+
-+static const char *pcgregnm[] = {
-+        "PCGCTL   ", "PCGCCTL1 "
-+};
-+
-+static uint64_t dwc2_pcgreg_read(void *ptr, hwaddr addr, int index,
-+                                 unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint32_t val;
-+
-+    assert(addr >= PCGCTL && addr <= PCGCCTL1);
-+    val = s->pcgreg[index];
-+
-+    trace_usb_dwc2_pcgreg_read(addr, pcgregnm[index], val);
-+    return val;
-+}
-+
-+static void dwc2_pcgreg_write(void *ptr, hwaddr addr, int index,
-+                              uint64_t val, unsigned size)
-+{
-+    DWC2State *s = ptr;
-+    uint64_t orig = val;
-+    uint32_t *mmio;
-+    uint32_t old;
-+
-+    assert(addr >= PCGCTL && addr <= PCGCCTL1);
-+    mmio = &s->pcgreg[index];
-+    old = *mmio;
-+
-+    trace_usb_dwc2_pcgreg_write(addr, pcgregnm[index], orig, old, val);
-+    *mmio = val;
-+}
-+
-+static uint64_t dwc2_hsotg_read(void *ptr, hwaddr addr, unsigned size)
-+{
-+    uint64_t val;
-+
-+    switch (addr) {
-+    case HSOTG_REG(0x000) ... HSOTG_REG(0x0fc):
-+        val = dwc2_glbreg_read(ptr, addr, (addr - HSOTG_REG(0x000)) >> 2, size);
-+        break;
-+    case HSOTG_REG(0x100):
-+        val = dwc2_fszreg_read(ptr, addr, (addr - HSOTG_REG(0x100)) >> 2, size);
-+        break;
-+    case HSOTG_REG(0x104) ... HSOTG_REG(0x3fc):
-+        /* Gadget-mode registers, just return 0 for now */
-+        val = 0;
-+        break;
-+    case HSOTG_REG(0x400) ... HSOTG_REG(0x4fc):
-+        val = dwc2_hreg0_read(ptr, addr, (addr - HSOTG_REG(0x400)) >> 2, size);
-+        break;
-+    case HSOTG_REG(0x500) ... HSOTG_REG(0x7fc):
-+        val = dwc2_hreg1_read(ptr, addr, (addr - HSOTG_REG(0x500)) >> 2, size);
-+        break;
-+    case HSOTG_REG(0x800) ... HSOTG_REG(0xdfc):
-+        /* Gadget-mode registers, just return 0 for now */
-+        val = 0;
-+        break;
-+    case HSOTG_REG(0xe00) ... HSOTG_REG(0xffc):
-+        val = dwc2_pcgreg_read(ptr, addr, (addr - HSOTG_REG(0xe00)) >> 2, size);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    return val;
-+}
-+
-+static void dwc2_hsotg_write(void *ptr, hwaddr addr, uint64_t val,
-+                             unsigned size)
-+{
-+    switch (addr) {
-+    case HSOTG_REG(0x000) ... HSOTG_REG(0x0fc):
-+        dwc2_glbreg_write(ptr, addr, (addr - HSOTG_REG(0x000)) >> 2, val, size);
-+        break;
-+    case HSOTG_REG(0x100):
-+        dwc2_fszreg_write(ptr, addr, (addr - HSOTG_REG(0x100)) >> 2, val, size);
-+        break;
-+    case HSOTG_REG(0x104) ... HSOTG_REG(0x3fc):
-+        /* Gadget-mode registers, do nothing for now */
-+        break;
-+    case HSOTG_REG(0x400) ... HSOTG_REG(0x4fc):
-+        dwc2_hreg0_write(ptr, addr, (addr - HSOTG_REG(0x400)) >> 2, val, size);
-+        break;
-+    case HSOTG_REG(0x500) ... HSOTG_REG(0x7fc):
-+        dwc2_hreg1_write(ptr, addr, (addr - HSOTG_REG(0x500)) >> 2, val, size);
-+        break;
-+    case HSOTG_REG(0x800) ... HSOTG_REG(0xdfc):
-+        /* Gadget-mode registers, do nothing for now */
-+        break;
-+    case HSOTG_REG(0xe00) ... HSOTG_REG(0xffc):
-+        dwc2_pcgreg_write(ptr, addr, (addr - HSOTG_REG(0xe00)) >> 2, val, size);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static const MemoryRegionOps dwc2_mmio_hsotg_ops = {
-+    .read = dwc2_hsotg_read,
-+    .write = dwc2_hsotg_write,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static uint64_t dwc2_hreg2_read(void *ptr, hwaddr addr, unsigned size)
-+{
-+    /* TODO - implement FIFOs to support slave mode */
-+    trace_usb_dwc2_hreg2_read(addr, addr >> 12, 0);
-+    qemu_log_mask(LOG_UNIMP, "FIFO read not implemented\n");
-+    return 0;
-+}
-+
-+static void dwc2_hreg2_write(void *ptr, hwaddr addr, uint64_t val,
-+                             unsigned size)
-+{
-+    uint64_t orig = val;
-+
-+    /* TODO - implement FIFOs to support slave mode */
-+    trace_usb_dwc2_hreg2_write(addr, addr >> 12, orig, 0, val);
-+    qemu_log_mask(LOG_UNIMP, "FIFO write not implemented\n");
-+}
-+
-+static const MemoryRegionOps dwc2_mmio_hreg2_ops = {
-+    .read = dwc2_hreg2_read,
-+    .write = dwc2_hreg2_write,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void dwc2_wakeup_endpoint(USBBus *bus, USBEndpoint *ep,
-+                                 unsigned int stream)
-+{
-+    DWC2State *s = container_of(bus, DWC2State, bus);
-+
-+    trace_usb_dwc2_wakeup_endpoint(ep, stream);
-+
-+    /* TODO - do something here? */
-+    qemu_bh_schedule(s->async_bh);
-+}
-+
-+static USBBusOps dwc2_bus_ops = {
-+    .wakeup_endpoint = dwc2_wakeup_endpoint,
-+};
-+
-+static void dwc2_work_timer(void *opaque)
-+{
-+    DWC2State *s = opaque;
-+
-+    trace_usb_dwc2_work_timer();
-+    qemu_bh_schedule(s->async_bh);
-+}
-+
-+static void dwc2_reset_enter(Object *obj, ResetType type)
-+{
-+    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2State *s = DWC2_USB(obj);
-+    int i;
-+
-+    trace_usb_dwc2_reset_enter();
-+
-+    if (c->parent_phases.enter) {
-+        c->parent_phases.enter(obj, type);
-+    }
-+
-+    timer_del(s->frame_timer);
-+    qemu_bh_cancel(s->async_bh);
-+
-+    if (s->uport.dev && s->uport.dev->attached) {
-+        usb_detach(&s->uport);
-+    }
-+
-+    dwc2_bus_stop(s);
-+
-+    s->gotgctl = GOTGCTL_BSESVLD | GOTGCTL_ASESVLD | GOTGCTL_CONID_B;
-+    s->gotgint = 0;
-+    s->gahbcfg = 0;
-+    s->gusbcfg = 5 << GUSBCFG_USBTRDTIM_SHIFT;
-+    s->grstctl = GRSTCTL_AHBIDLE;
-+    s->gintsts = GINTSTS_CONIDSTSCHNG | GINTSTS_PTXFEMP | GINTSTS_NPTXFEMP |
-+                 GINTSTS_CURMODE_HOST;
-+    s->gintmsk = 0;
-+    s->grxstsr = 0;
-+    s->grxstsp = 0;
-+    s->grxfsiz = 1024;
-+    s->gnptxfsiz = 1024 << FIFOSIZE_DEPTH_SHIFT;
-+    s->gnptxsts = (4 << FIFOSIZE_DEPTH_SHIFT) | 1024;
-+    s->gi2cctl = GI2CCTL_I2CDATSE0 | GI2CCTL_ACK;
-+    s->gpvndctl = 0;
-+    s->ggpio = 0;
-+    s->guid = 0;
-+    s->gsnpsid = 0x4f54294a;
-+    s->ghwcfg1 = 0;
-+    s->ghwcfg2 = (8 << GHWCFG2_DEV_TOKEN_Q_DEPTH_SHIFT) |
-+                 (4 << GHWCFG2_HOST_PERIO_TX_Q_DEPTH_SHIFT) |
-+                 (4 << GHWCFG2_NONPERIO_TX_Q_DEPTH_SHIFT) |
-+                 GHWCFG2_DYNAMIC_FIFO |
-+                 GHWCFG2_PERIO_EP_SUPPORTED |
-+                 ((DWC2_NB_CHAN - 1) << GHWCFG2_NUM_HOST_CHAN_SHIFT) |
-+                 (GHWCFG2_INT_DMA_ARCH << GHWCFG2_ARCHITECTURE_SHIFT) |
-+                 (GHWCFG2_OP_MODE_NO_SRP_CAPABLE_HOST << GHWCFG2_OP_MODE_SHIFT);
-+    s->ghwcfg3 = (4096 << GHWCFG3_DFIFO_DEPTH_SHIFT) |
-+                 (4 << GHWCFG3_PACKET_SIZE_CNTR_WIDTH_SHIFT) |
-+                 (4 << GHWCFG3_XFER_SIZE_CNTR_WIDTH_SHIFT);
-+    s->ghwcfg4 = 0;
-+    s->glpmcfg = 0;
-+    s->gpwrdn = GPWRDN_PWRDNRSTN;
-+    s->gdfifocfg = 0;
-+    s->gadpctl = 0;
-+    s->grefclk = 0;
-+    s->gintmsk2 = 0;
-+    s->gintsts2 = 0;
-+
-+    s->hptxfsiz = 500 << FIFOSIZE_DEPTH_SHIFT;
-+
-+    s->hcfg = 2 << HCFG_RESVALID_SHIFT;
-+    s->hfir = 60000;
-+    s->hfnum = 0x3fff;
-+    s->hptxsts = (16 << TXSTS_QSPCAVAIL_SHIFT) | 32768;
-+    s->haint = 0;
-+    s->haintmsk = 0;
-+    s->hprt0 = 0;
-+
-+    memset(s->hreg1, 0, sizeof(s->hreg1));
-+    memset(s->pcgreg, 0, sizeof(s->pcgreg));
-+
-+    s->sof_time = 0;
-+    s->frame_number = 0;
-+    s->fi = USB_FRMINTVL - 1;
-+    s->next_chan = 0;
-+    s->working = false;
-+
-+    for (i = 0; i < DWC2_NB_CHAN; i++) {
-+        s->packet[i].needs_service = false;
-+    }
-+}
-+
-+static void dwc2_reset_hold(Object *obj)
-+{
-+    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2State *s = DWC2_USB(obj);
-+
-+    trace_usb_dwc2_reset_hold();
-+
-+    if (c->parent_phases.hold) {
-+        c->parent_phases.hold(obj);
-+    }
-+
-+    dwc2_update_irq(s);
-+}
-+
-+static void dwc2_reset_exit(Object *obj)
-+{
-+    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2State *s = DWC2_USB(obj);
-+
-+    trace_usb_dwc2_reset_exit();
-+
-+    if (c->parent_phases.exit) {
-+        c->parent_phases.exit(obj);
-+    }
-+
-+    s->hprt0 = HPRT0_PWR;
-+    if (s->uport.dev && s->uport.dev->attached) {
-+        usb_attach(&s->uport);
-+        usb_device_reset(s->uport.dev);
-+    }
-+}
-+
-+static void dwc2_realize(DeviceState *dev, Error **errp)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    DWC2State *s = DWC2_USB(dev);
-+    Object *obj;
-+    Error *err = NULL;
-+
-+    obj = object_property_get_link(OBJECT(dev), "dma-mr", &err);
-+    if (err) {
-+        error_setg(errp, "dwc2: required dma-mr link not found: %s",
-+                   error_get_pretty(err));
-+        return;
-+    }
-+    assert(obj != NULL);
-+
-+    s->dma_mr = MEMORY_REGION(obj);
-+    address_space_init(&s->dma_as, s->dma_mr, "dwc2");
-+
-+    usb_bus_new(&s->bus, sizeof(s->bus), &dwc2_bus_ops, dev);
-+    usb_register_port(&s->bus, &s->uport, s, 0, &dwc2_port_ops,
-+                      USB_SPEED_MASK_LOW | USB_SPEED_MASK_FULL |
-+                      (s->usb_version == 2 ? USB_SPEED_MASK_HIGH : 0));
-+    s->uport.dev = 0;
-+
-+    s->usb_frame_time = NANOSECONDS_PER_SECOND / 1000;          /* 1000000 */
-+    if (NANOSECONDS_PER_SECOND >= USB_HZ_FS) {
-+        s->usb_bit_time = NANOSECONDS_PER_SECOND / USB_HZ_FS;   /* 83.3 */
-+    } else {
-+        s->usb_bit_time = 1;
-+    }
-+
-+    s->fi = USB_FRMINTVL - 1;
-+    s->eof_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, dwc2_frame_boundary, s);
-+    s->frame_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, dwc2_work_timer, s);
-+    s->async_bh = qemu_bh_new(dwc2_work_bh, s);
-+
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+static void dwc2_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    DWC2State *s = DWC2_USB(obj);
-+
-+    memory_region_init(&s->container, obj, "dwc2", DWC2_MMIO_SIZE);
-+    sysbus_init_mmio(sbd, &s->container);
-+
-+    memory_region_init_io(&s->hsotg, obj, &dwc2_mmio_hsotg_ops, s,
-+                          "dwc2-io", 4 * KiB);
-+    memory_region_add_subregion(&s->container, 0x0000, &s->hsotg);
-+
-+    memory_region_init_io(&s->fifos, obj, &dwc2_mmio_hreg2_ops, s,
-+                          "dwc2-fifo", 64 * KiB);
-+    memory_region_add_subregion(&s->container, 0x1000, &s->fifos);
-+}
-+
-+static const VMStateDescription vmstate_dwc2_state_packet = {
-+    .name = "dwc2/packet",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(devadr, DWC2Packet),
-+        VMSTATE_UINT32(epnum, DWC2Packet),
-+        VMSTATE_UINT32(epdir, DWC2Packet),
-+        VMSTATE_UINT32(mps, DWC2Packet),
-+        VMSTATE_UINT32(pid, DWC2Packet),
-+        VMSTATE_UINT32(index, DWC2Packet),
-+        VMSTATE_UINT32(pcnt, DWC2Packet),
-+        VMSTATE_UINT32(len, DWC2Packet),
-+        VMSTATE_INT32(async, DWC2Packet),
-+        VMSTATE_BOOL(small, DWC2Packet),
-+        VMSTATE_BOOL(needs_service, DWC2Packet),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+const VMStateDescription vmstate_dwc2_state = {
-+    .name = "dwc2",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(glbreg, DWC2State,
-+                             DWC2_GLBREG_SIZE / sizeof(uint32_t)),
-+        VMSTATE_UINT32_ARRAY(fszreg, DWC2State,
-+                             DWC2_FSZREG_SIZE / sizeof(uint32_t)),
-+        VMSTATE_UINT32_ARRAY(hreg0, DWC2State,
-+                             DWC2_HREG0_SIZE / sizeof(uint32_t)),
-+        VMSTATE_UINT32_ARRAY(hreg1, DWC2State,
-+                             DWC2_HREG1_SIZE / sizeof(uint32_t)),
-+        VMSTATE_UINT32_ARRAY(pcgreg, DWC2State,
-+                             DWC2_PCGREG_SIZE / sizeof(uint32_t)),
-+
-+        VMSTATE_TIMER_PTR(eof_timer, DWC2State),
-+        VMSTATE_TIMER_PTR(frame_timer, DWC2State),
-+        VMSTATE_INT64(sof_time, DWC2State),
-+        VMSTATE_INT64(usb_frame_time, DWC2State),
-+        VMSTATE_INT64(usb_bit_time, DWC2State),
-+        VMSTATE_UINT32(usb_version, DWC2State),
-+        VMSTATE_UINT16(frame_number, DWC2State),
-+        VMSTATE_UINT16(fi, DWC2State),
-+        VMSTATE_UINT16(next_chan, DWC2State),
-+        VMSTATE_BOOL(working, DWC2State),
-+
-+        VMSTATE_STRUCT_ARRAY(packet, DWC2State, DWC2_NB_CHAN, 1,
-+                             vmstate_dwc2_state_packet, DWC2Packet),
-+        VMSTATE_UINT8_2DARRAY(usb_buf, DWC2State, DWC2_NB_CHAN,
-+                              DWC2_MAX_XFER_SIZE),
-+
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property dwc2_usb_properties[] = {
-+    DEFINE_PROP_UINT32("usb_version", DWC2State, usb_version, 2),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void dwc2_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    DWC2Class *c = DWC2_CLASS(klass);
-+    ResettableClass *rc = RESETTABLE_CLASS(klass);
-+
-+    dc->realize = dwc2_realize;
-+    dc->vmsd = &vmstate_dwc2_state;
-+    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-+    device_class_set_props(dc, dwc2_usb_properties);
-+    resettable_class_set_parent_phases(rc, dwc2_reset_enter, dwc2_reset_hold,
-+                                       dwc2_reset_exit, &c->parent_phases);
-+}
-+
-+static const TypeInfo dwc2_usb_type_info = {
-+    .name          = TYPE_DWC2_USB,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(DWC2State),
-+    .instance_init = dwc2_init,
-+    .class_size    = sizeof(DWC2Class),
-+    .class_init    = dwc2_class_init,
-+};
-+
-+static void dwc2_usb_register_types(void)
-+{
-+    type_register_static(&dwc2_usb_type_info);
-+}
-+
-+type_init(dwc2_usb_register_types)
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 1c24d82c09..5817ce4421 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -176,6 +176,56 @@ usb_xhci_xfer_error(void *xfer, uint32_t ret) "%p: ret %d"
- usb_xhci_unimplemented(const char *item, int nr) "%s (0x%x)"
- usb_xhci_enforced_limit(const char *item) "%s"
- 
-+# hcd-dwc2.c
-+usb_dwc2_update_irq(uint32_t level) "level=%d"
-+usb_dwc2_raise_global_irq(uint32_t intr) "0x%08x"
-+usb_dwc2_lower_global_irq(uint32_t intr) "0x%08x"
-+usb_dwc2_raise_host_irq(uint32_t intr) "0x%04x"
-+usb_dwc2_lower_host_irq(uint32_t intr) "0x%04x"
-+usb_dwc2_sof(int64_t next) "next SOF %" PRId64
-+usb_dwc2_bus_start(void) "start SOFs"
-+usb_dwc2_bus_stop(void) "stop SOFs"
-+usb_dwc2_find_device(uint8_t addr) "%d"
-+usb_dwc2_port_disabled(uint32_t pnum) "port %d disabled"
-+usb_dwc2_device_found(uint32_t pnum) "device found on port %d"
-+usb_dwc2_device_not_found(void) "device not found"
-+usb_dwc2_handle_packet(uint32_t chan, void *dev, void *pkt, uint32_t ep, const char *type, const char *dir, uint32_t mps, uint32_t len, uint32_t pcnt) "ch %d dev %p pkt %p ep %d type %s dir %s mps %d len %d pcnt %d"
-+usb_dwc2_memory_read(uint32_t addr, uint32_t len) "addr %d len %d"
-+usb_dwc2_packet_status(const char *status, uint32_t len) "status %s len %d"
-+usb_dwc2_packet_error(const char *status) "ERROR %s"
-+usb_dwc2_async_packet(void *pkt, uint32_t chan, void *dev, uint32_t ep, const char *dir, uint32_t len) "pkt %p ch %d dev %p ep %d %s len %d"
-+usb_dwc2_memory_write(uint32_t addr, uint32_t len) "addr %d len %d"
-+usb_dwc2_packet_done(const char *status, uint32_t actual, uint32_t len, uint32_t pcnt) "status %s actual %d len %d pcnt %d"
-+usb_dwc2_packet_next(const char *status, uint32_t len, uint32_t pcnt) "status %s len %d pcnt %d"
-+usb_dwc2_attach(void *port) "port %p"
-+usb_dwc2_attach_speed(const char *speed) "%s-speed device attached"
-+usb_dwc2_detach(void *port) "port %p"
-+usb_dwc2_child_detach(void *port, void *child) "port %p child %p"
-+usb_dwc2_wakeup(void *port) "port %p"
-+usb_dwc2_async_packet_complete(void *port, void *pkt, uint32_t chan, void *dev, uint32_t ep, const char *dir, uint32_t len) "port %p packet %p ch %d dev %p ep %d %s len %d"
-+usb_dwc2_work_bh(void) ""
-+usb_dwc2_work_bh_service(uint32_t first, uint32_t current, void *dev, uint32_t ep) "first %d servicing %d dev %p ep %d"
-+usb_dwc2_work_bh_next(uint32_t chan) "next %d"
-+usb_dwc2_enable_chan(uint32_t chan, void *dev, void *pkt, uint32_t ep) "ch %d dev %p pkt %p ep %d"
-+usb_dwc2_glbreg_read(uint64_t addr, const char *reg, uint32_t val) " 0x%04" PRIx64 " %s val 0x%08x"
-+usb_dwc2_glbreg_write(uint64_t addr, const char *reg, uint64_t val, uint32_t old, uint64_t result) "0x%04" PRIx64 " %s val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_fszreg_read(uint64_t addr, uint32_t val) " 0x%04" PRIx64 " HPTXFSIZ  val 0x%08x"
-+usb_dwc2_fszreg_write(uint64_t addr, uint64_t val, uint32_t old, uint64_t result) "0x%04" PRIx64 " HPTXFSIZ  val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_hreg0_read(uint64_t addr, const char *reg, uint32_t val) "  0x%04" PRIx64 " %s val 0x%08x"
-+usb_dwc2_hreg0_write(uint64_t addr, const char *reg, uint64_t val, uint32_t old, uint64_t result) " 0x%04" PRIx64 " %s val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_hreg1_read(uint64_t addr, const char *reg, uint64_t chan, uint32_t val) "  0x%04" PRIx64 " %s%" PRId64 " val 0x%08x"
-+usb_dwc2_hreg1_write(uint64_t addr, const char *reg, uint64_t chan, uint64_t val, uint32_t old, uint64_t result) " 0x%04" PRIx64 " %s%" PRId64 " val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_pcgreg_read(uint64_t addr, const char *reg, uint32_t val) " 0x%04" PRIx64 " %s val 0x%08x"
-+usb_dwc2_pcgreg_write(uint64_t addr, const char *reg, uint64_t val, uint32_t old, uint64_t result) "0x%04" PRIx64 " %s val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_hreg2_read(uint64_t addr, uint64_t fifo, uint32_t val) "  0x%04" PRIx64 " FIFO%" PRId64 "     val 0x%08x"
-+usb_dwc2_hreg2_write(uint64_t addr, uint64_t fifo, uint64_t val, uint32_t old, uint64_t result) " 0x%04" PRIx64 " FIFO%" PRId64 "     val 0x%08" PRIx64 " old 0x%08x result 0x%08" PRIx64
-+usb_dwc2_hreg0_action(const char *s) "%s"
-+usb_dwc2_wakeup_endpoint(void *ep, uint32_t stream) "endp %p stream %d"
-+usb_dwc2_work_timer(void) ""
-+usb_dwc2_reset_enter(void) "=== RESET enter ==="
-+usb_dwc2_reset_hold(void) "=== RESET hold ==="
-+usb_dwc2_reset_exit(void) "=== RESET exit ==="
-+
- # desc.c
- usb_desc_device(int addr, int len, int ret) "dev %d query device, len %d, ret %d"
- usb_desc_device_qualifier(int addr, int len, int ret) "dev %d query device qualifier, len %d, ret %d"
++#ifndef __DWC2_HW_H__
++#define __DWC2_HW_H__
++
++#define HSOTG_REG(x)	(x)
++
++#define GOTGCTL				HSOTG_REG(0x000)
++#define GOTGCTL_CHIRPEN			BIT(27)
++#define GOTGCTL_MULT_VALID_BC_MASK	(0x1f << 22)
++#define GOTGCTL_MULT_VALID_BC_SHIFT	22
++#define GOTGCTL_OTGVER			BIT(20)
++#define GOTGCTL_BSESVLD			BIT(19)
++#define GOTGCTL_ASESVLD			BIT(18)
++#define GOTGCTL_DBNC_SHORT		BIT(17)
++#define GOTGCTL_CONID_B			BIT(16)
++#define GOTGCTL_DBNCE_FLTR_BYPASS	BIT(15)
++#define GOTGCTL_DEVHNPEN		BIT(11)
++#define GOTGCTL_HSTSETHNPEN		BIT(10)
++#define GOTGCTL_HNPREQ			BIT(9)
++#define GOTGCTL_HSTNEGSCS		BIT(8)
++#define GOTGCTL_SESREQ			BIT(1)
++#define GOTGCTL_SESREQSCS		BIT(0)
++
++#define GOTGINT				HSOTG_REG(0x004)
++#define GOTGINT_DBNCE_DONE		BIT(19)
++#define GOTGINT_A_DEV_TOUT_CHG		BIT(18)
++#define GOTGINT_HST_NEG_DET		BIT(17)
++#define GOTGINT_HST_NEG_SUC_STS_CHNG	BIT(9)
++#define GOTGINT_SES_REQ_SUC_STS_CHNG	BIT(8)
++#define GOTGINT_SES_END_DET		BIT(2)
++
++#define GAHBCFG				HSOTG_REG(0x008)
++#define GAHBCFG_AHB_SINGLE		BIT(23)
++#define GAHBCFG_NOTI_ALL_DMA_WRIT	BIT(22)
++#define GAHBCFG_REM_MEM_SUPP		BIT(21)
++#define GAHBCFG_P_TXF_EMP_LVL		BIT(8)
++#define GAHBCFG_NP_TXF_EMP_LVL		BIT(7)
++#define GAHBCFG_DMA_EN			BIT(5)
++#define GAHBCFG_HBSTLEN_MASK		(0xf << 1)
++#define GAHBCFG_HBSTLEN_SHIFT		1
++#define GAHBCFG_HBSTLEN_SINGLE		0
++#define GAHBCFG_HBSTLEN_INCR		1
++#define GAHBCFG_HBSTLEN_INCR4		3
++#define GAHBCFG_HBSTLEN_INCR8		5
++#define GAHBCFG_HBSTLEN_INCR16		7
++#define GAHBCFG_GLBL_INTR_EN		BIT(0)
++#define GAHBCFG_CTRL_MASK		(GAHBCFG_P_TXF_EMP_LVL | \
++					 GAHBCFG_NP_TXF_EMP_LVL | \
++					 GAHBCFG_DMA_EN | \
++					 GAHBCFG_GLBL_INTR_EN)
++
++#define GUSBCFG				HSOTG_REG(0x00C)
++#define GUSBCFG_FORCEDEVMODE		BIT(30)
++#define GUSBCFG_FORCEHOSTMODE		BIT(29)
++#define GUSBCFG_TXENDDELAY		BIT(28)
++#define GUSBCFG_ICTRAFFICPULLREMOVE	BIT(27)
++#define GUSBCFG_ICUSBCAP		BIT(26)
++#define GUSBCFG_ULPI_INT_PROT_DIS	BIT(25)
++#define GUSBCFG_INDICATORPASSTHROUGH	BIT(24)
++#define GUSBCFG_INDICATORCOMPLEMENT	BIT(23)
++#define GUSBCFG_TERMSELDLPULSE		BIT(22)
++#define GUSBCFG_ULPI_INT_VBUS_IND	BIT(21)
++#define GUSBCFG_ULPI_EXT_VBUS_DRV	BIT(20)
++#define GUSBCFG_ULPI_CLK_SUSP_M		BIT(19)
++#define GUSBCFG_ULPI_AUTO_RES		BIT(18)
++#define GUSBCFG_ULPI_FS_LS		BIT(17)
++#define GUSBCFG_OTG_UTMI_FS_SEL		BIT(16)
++#define GUSBCFG_PHY_LP_CLK_SEL		BIT(15)
++#define GUSBCFG_USBTRDTIM_MASK		(0xf << 10)
++#define GUSBCFG_USBTRDTIM_SHIFT		10
++#define GUSBCFG_HNPCAP			BIT(9)
++#define GUSBCFG_SRPCAP			BIT(8)
++#define GUSBCFG_DDRSEL			BIT(7)
++#define GUSBCFG_PHYSEL			BIT(6)
++#define GUSBCFG_FSINTF			BIT(5)
++#define GUSBCFG_ULPI_UTMI_SEL		BIT(4)
++#define GUSBCFG_PHYIF16			BIT(3)
++#define GUSBCFG_PHYIF8			(0 << 3)
++#define GUSBCFG_TOUTCAL_MASK		(0x7 << 0)
++#define GUSBCFG_TOUTCAL_SHIFT		0
++#define GUSBCFG_TOUTCAL_LIMIT		0x7
++#define GUSBCFG_TOUTCAL(_x)		((_x) << 0)
++
++#define GRSTCTL				HSOTG_REG(0x010)
++#define GRSTCTL_AHBIDLE			BIT(31)
++#define GRSTCTL_DMAREQ			BIT(30)
++#define GRSTCTL_TXFNUM_MASK		(0x1f << 6)
++#define GRSTCTL_TXFNUM_SHIFT		6
++#define GRSTCTL_TXFNUM_LIMIT		0x1f
++#define GRSTCTL_TXFNUM(_x)		((_x) << 6)
++#define GRSTCTL_TXFFLSH			BIT(5)
++#define GRSTCTL_RXFFLSH			BIT(4)
++#define GRSTCTL_IN_TKNQ_FLSH		BIT(3)
++#define GRSTCTL_FRMCNTRRST		BIT(2)
++#define GRSTCTL_HSFTRST			BIT(1)
++#define GRSTCTL_CSFTRST			BIT(0)
++
++#define GINTSTS				HSOTG_REG(0x014)
++#define GINTMSK				HSOTG_REG(0x018)
++#define GINTSTS_WKUPINT			BIT(31)
++#define GINTSTS_SESSREQINT		BIT(30)
++#define GINTSTS_DISCONNINT		BIT(29)
++#define GINTSTS_CONIDSTSCHNG		BIT(28)
++#define GINTSTS_LPMTRANRCVD		BIT(27)
++#define GINTSTS_PTXFEMP			BIT(26)
++#define GINTSTS_HCHINT			BIT(25)
++#define GINTSTS_PRTINT			BIT(24)
++#define GINTSTS_RESETDET		BIT(23)
++#define GINTSTS_FET_SUSP		BIT(22)
++#define GINTSTS_INCOMPL_IP		BIT(21)
++#define GINTSTS_INCOMPL_SOOUT		BIT(21)
++#define GINTSTS_INCOMPL_SOIN		BIT(20)
++#define GINTSTS_OEPINT			BIT(19)
++#define GINTSTS_IEPINT			BIT(18)
++#define GINTSTS_EPMIS			BIT(17)
++#define GINTSTS_RESTOREDONE		BIT(16)
++#define GINTSTS_EOPF			BIT(15)
++#define GINTSTS_ISOUTDROP		BIT(14)
++#define GINTSTS_ENUMDONE		BIT(13)
++#define GINTSTS_USBRST			BIT(12)
++#define GINTSTS_USBSUSP			BIT(11)
++#define GINTSTS_ERLYSUSP		BIT(10)
++#define GINTSTS_I2CINT			BIT(9)
++#define GINTSTS_ULPI_CK_INT		BIT(8)
++#define GINTSTS_GOUTNAKEFF		BIT(7)
++#define GINTSTS_GINNAKEFF		BIT(6)
++#define GINTSTS_NPTXFEMP		BIT(5)
++#define GINTSTS_RXFLVL			BIT(4)
++#define GINTSTS_SOF			BIT(3)
++#define GINTSTS_OTGINT			BIT(2)
++#define GINTSTS_MODEMIS			BIT(1)
++#define GINTSTS_CURMODE_HOST		BIT(0)
++
++#define GRXSTSR				HSOTG_REG(0x01C)
++#define GRXSTSP				HSOTG_REG(0x020)
++#define GRXSTS_FN_MASK			(0x7f << 25)
++#define GRXSTS_FN_SHIFT			25
++#define GRXSTS_PKTSTS_MASK		(0xf << 17)
++#define GRXSTS_PKTSTS_SHIFT		17
++#define GRXSTS_PKTSTS_GLOBALOUTNAK	1
++#define GRXSTS_PKTSTS_OUTRX		2
++#define GRXSTS_PKTSTS_HCHIN		2
++#define GRXSTS_PKTSTS_OUTDONE		3
++#define GRXSTS_PKTSTS_HCHIN_XFER_COMP	3
++#define GRXSTS_PKTSTS_SETUPDONE		4
++#define GRXSTS_PKTSTS_DATATOGGLEERR	5
++#define GRXSTS_PKTSTS_SETUPRX		6
++#define GRXSTS_PKTSTS_HCHHALTED		7
++#define GRXSTS_HCHNUM_MASK		(0xf << 0)
++#define GRXSTS_HCHNUM_SHIFT		0
++#define GRXSTS_DPID_MASK		(0x3 << 15)
++#define GRXSTS_DPID_SHIFT		15
++#define GRXSTS_BYTECNT_MASK		(0x7ff << 4)
++#define GRXSTS_BYTECNT_SHIFT		4
++#define GRXSTS_EPNUM_MASK		(0xf << 0)
++#define GRXSTS_EPNUM_SHIFT		0
++
++#define GRXFSIZ				HSOTG_REG(0x024)
++#define GRXFSIZ_DEPTH_MASK		(0xffff << 0)
++#define GRXFSIZ_DEPTH_SHIFT		0
++
++#define GNPTXFSIZ			HSOTG_REG(0x028)
++/* Use FIFOSIZE_* constants to access this register */
++
++#define GNPTXSTS			HSOTG_REG(0x02C)
++#define GNPTXSTS_NP_TXQ_TOP_MASK		(0x7f << 24)
++#define GNPTXSTS_NP_TXQ_TOP_SHIFT		24
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_MASK		(0xff << 16)
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_SHIFT		16
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_GET(_v)	(((_v) >> 16) & 0xff)
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_MASK		(0xffff << 0)
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_SHIFT		0
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_GET(_v)	(((_v) >> 0) & 0xffff)
++
++#define GI2CCTL				HSOTG_REG(0x0030)
++#define GI2CCTL_BSYDNE			BIT(31)
++#define GI2CCTL_RW			BIT(30)
++#define GI2CCTL_I2CDATSE0		BIT(28)
++#define GI2CCTL_I2CDEVADDR_MASK		(0x3 << 26)
++#define GI2CCTL_I2CDEVADDR_SHIFT	26
++#define GI2CCTL_I2CSUSPCTL		BIT(25)
++#define GI2CCTL_ACK			BIT(24)
++#define GI2CCTL_I2CEN			BIT(23)
++#define GI2CCTL_ADDR_MASK		(0x7f << 16)
++#define GI2CCTL_ADDR_SHIFT		16
++#define GI2CCTL_REGADDR_MASK		(0xff << 8)
++#define GI2CCTL_REGADDR_SHIFT		8
++#define GI2CCTL_RWDATA_MASK		(0xff << 0)
++#define GI2CCTL_RWDATA_SHIFT		0
++
++#define GPVNDCTL			HSOTG_REG(0x0034)
++#define GGPIO				HSOTG_REG(0x0038)
++#define GGPIO_STM32_OTG_GCCFG_PWRDWN	BIT(16)
++
++#define GUID				HSOTG_REG(0x003c)
++#define GSNPSID				HSOTG_REG(0x0040)
++#define GHWCFG1				HSOTG_REG(0x0044)
++#define GSNPSID_ID_MASK			GENMASK(31, 16)
++
++#define GHWCFG2				HSOTG_REG(0x0048)
++#define GHWCFG2_OTG_ENABLE_IC_USB		BIT(31)
++#define GHWCFG2_DEV_TOKEN_Q_DEPTH_MASK		(0x1f << 26)
++#define GHWCFG2_DEV_TOKEN_Q_DEPTH_SHIFT		26
++#define GHWCFG2_HOST_PERIO_TX_Q_DEPTH_MASK	(0x3 << 24)
++#define GHWCFG2_HOST_PERIO_TX_Q_DEPTH_SHIFT	24
++#define GHWCFG2_NONPERIO_TX_Q_DEPTH_MASK	(0x3 << 22)
++#define GHWCFG2_NONPERIO_TX_Q_DEPTH_SHIFT	22
++#define GHWCFG2_MULTI_PROC_INT			BIT(20)
++#define GHWCFG2_DYNAMIC_FIFO			BIT(19)
++#define GHWCFG2_PERIO_EP_SUPPORTED		BIT(18)
++#define GHWCFG2_NUM_HOST_CHAN_MASK		(0xf << 14)
++#define GHWCFG2_NUM_HOST_CHAN_SHIFT		14
++#define GHWCFG2_NUM_DEV_EP_MASK			(0xf << 10)
++#define GHWCFG2_NUM_DEV_EP_SHIFT		10
++#define GHWCFG2_FS_PHY_TYPE_MASK		(0x3 << 8)
++#define GHWCFG2_FS_PHY_TYPE_SHIFT		8
++#define GHWCFG2_FS_PHY_TYPE_NOT_SUPPORTED	0
++#define GHWCFG2_FS_PHY_TYPE_DEDICATED		1
++#define GHWCFG2_FS_PHY_TYPE_SHARED_UTMI		2
++#define GHWCFG2_FS_PHY_TYPE_SHARED_ULPI		3
++#define GHWCFG2_HS_PHY_TYPE_MASK		(0x3 << 6)
++#define GHWCFG2_HS_PHY_TYPE_SHIFT		6
++#define GHWCFG2_HS_PHY_TYPE_NOT_SUPPORTED	0
++#define GHWCFG2_HS_PHY_TYPE_UTMI		1
++#define GHWCFG2_HS_PHY_TYPE_ULPI		2
++#define GHWCFG2_HS_PHY_TYPE_UTMI_ULPI		3
++#define GHWCFG2_POINT2POINT			BIT(5)
++#define GHWCFG2_ARCHITECTURE_MASK		(0x3 << 3)
++#define GHWCFG2_ARCHITECTURE_SHIFT		3
++#define GHWCFG2_SLAVE_ONLY_ARCH			0
++#define GHWCFG2_EXT_DMA_ARCH			1
++#define GHWCFG2_INT_DMA_ARCH			2
++#define GHWCFG2_OP_MODE_MASK			(0x7 << 0)
++#define GHWCFG2_OP_MODE_SHIFT			0
++#define GHWCFG2_OP_MODE_HNP_SRP_CAPABLE		0
++#define GHWCFG2_OP_MODE_SRP_ONLY_CAPABLE	1
++#define GHWCFG2_OP_MODE_NO_HNP_SRP_CAPABLE	2
++#define GHWCFG2_OP_MODE_SRP_CAPABLE_DEVICE	3
++#define GHWCFG2_OP_MODE_NO_SRP_CAPABLE_DEVICE	4
++#define GHWCFG2_OP_MODE_SRP_CAPABLE_HOST	5
++#define GHWCFG2_OP_MODE_NO_SRP_CAPABLE_HOST	6
++#define GHWCFG2_OP_MODE_UNDEFINED		7
++
++#define GHWCFG3				HSOTG_REG(0x004c)
++#define GHWCFG3_DFIFO_DEPTH_MASK		(0xffff << 16)
++#define GHWCFG3_DFIFO_DEPTH_SHIFT		16
++#define GHWCFG3_OTG_LPM_EN			BIT(15)
++#define GHWCFG3_BC_SUPPORT			BIT(14)
++#define GHWCFG3_OTG_ENABLE_HSIC			BIT(13)
++#define GHWCFG3_ADP_SUPP			BIT(12)
++#define GHWCFG3_SYNCH_RESET_TYPE		BIT(11)
++#define GHWCFG3_OPTIONAL_FEATURES		BIT(10)
++#define GHWCFG3_VENDOR_CTRL_IF			BIT(9)
++#define GHWCFG3_I2C				BIT(8)
++#define GHWCFG3_OTG_FUNC			BIT(7)
++#define GHWCFG3_PACKET_SIZE_CNTR_WIDTH_MASK	(0x7 << 4)
++#define GHWCFG3_PACKET_SIZE_CNTR_WIDTH_SHIFT	4
++#define GHWCFG3_XFER_SIZE_CNTR_WIDTH_MASK	(0xf << 0)
++#define GHWCFG3_XFER_SIZE_CNTR_WIDTH_SHIFT	0
++
++#define GHWCFG4				HSOTG_REG(0x0050)
++#define GHWCFG4_DESC_DMA_DYN			BIT(31)
++#define GHWCFG4_DESC_DMA			BIT(30)
++#define GHWCFG4_NUM_IN_EPS_MASK			(0xf << 26)
++#define GHWCFG4_NUM_IN_EPS_SHIFT		26
++#define GHWCFG4_DED_FIFO_EN			BIT(25)
++#define GHWCFG4_DED_FIFO_SHIFT		25
++#define GHWCFG4_SESSION_END_FILT_EN		BIT(24)
++#define GHWCFG4_B_VALID_FILT_EN			BIT(23)
++#define GHWCFG4_A_VALID_FILT_EN			BIT(22)
++#define GHWCFG4_VBUS_VALID_FILT_EN		BIT(21)
++#define GHWCFG4_IDDIG_FILT_EN			BIT(20)
++#define GHWCFG4_NUM_DEV_MODE_CTRL_EP_MASK	(0xf << 16)
++#define GHWCFG4_NUM_DEV_MODE_CTRL_EP_SHIFT	16
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_MASK	(0x3 << 14)
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_SHIFT	14
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_8		0
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_16		1
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_8_OR_16	2
++#define GHWCFG4_ACG_SUPPORTED			BIT(12)
++#define GHWCFG4_IPG_ISOC_SUPPORTED		BIT(11)
++#define GHWCFG4_SERVICE_INTERVAL_SUPPORTED      BIT(10)
++#define GHWCFG4_XHIBER				BIT(7)
++#define GHWCFG4_HIBER				BIT(6)
++#define GHWCFG4_MIN_AHB_FREQ			BIT(5)
++#define GHWCFG4_POWER_OPTIMIZ			BIT(4)
++#define GHWCFG4_NUM_DEV_PERIO_IN_EP_MASK	(0xf << 0)
++#define GHWCFG4_NUM_DEV_PERIO_IN_EP_SHIFT	0
++
++#define GLPMCFG				HSOTG_REG(0x0054)
++#define GLPMCFG_INVSELHSIC		BIT(31)
++#define GLPMCFG_HSICCON			BIT(30)
++#define GLPMCFG_RSTRSLPSTS		BIT(29)
++#define GLPMCFG_ENBESL			BIT(28)
++#define GLPMCFG_LPM_RETRYCNT_STS_MASK	(0x7 << 25)
++#define GLPMCFG_LPM_RETRYCNT_STS_SHIFT	25
++#define GLPMCFG_SNDLPM			BIT(24)
++#define GLPMCFG_RETRY_CNT_MASK		(0x7 << 21)
++#define GLPMCFG_RETRY_CNT_SHIFT		21
++#define GLPMCFG_LPM_REJECT_CTRL_CONTROL	BIT(21)
++#define GLPMCFG_LPM_ACCEPT_CTRL_ISOC	BIT(22)
++#define GLPMCFG_LPM_CHNL_INDX_MASK	(0xf << 17)
++#define GLPMCFG_LPM_CHNL_INDX_SHIFT	17
++#define GLPMCFG_L1RESUMEOK		BIT(16)
++#define GLPMCFG_SLPSTS			BIT(15)
++#define GLPMCFG_COREL1RES_MASK		(0x3 << 13)
++#define GLPMCFG_COREL1RES_SHIFT		13
++#define GLPMCFG_HIRD_THRES_MASK		(0x1f << 8)
++#define GLPMCFG_HIRD_THRES_SHIFT	8
++#define GLPMCFG_HIRD_THRES_EN		(0x10 << 8)
++#define GLPMCFG_ENBLSLPM		BIT(7)
++#define GLPMCFG_BREMOTEWAKE		BIT(6)
++#define GLPMCFG_HIRD_MASK		(0xf << 2)
++#define GLPMCFG_HIRD_SHIFT		2
++#define GLPMCFG_APPL1RES		BIT(1)
++#define GLPMCFG_LPMCAP			BIT(0)
++
++#define GPWRDN				HSOTG_REG(0x0058)
++#define GPWRDN_MULT_VAL_ID_BC_MASK	(0x1f << 24)
++#define GPWRDN_MULT_VAL_ID_BC_SHIFT	24
++#define GPWRDN_ADP_INT			BIT(23)
++#define GPWRDN_BSESSVLD			BIT(22)
++#define GPWRDN_IDSTS			BIT(21)
++#define GPWRDN_LINESTATE_MASK		(0x3 << 19)
++#define GPWRDN_LINESTATE_SHIFT		19
++#define GPWRDN_STS_CHGINT_MSK		BIT(18)
++#define GPWRDN_STS_CHGINT		BIT(17)
++#define GPWRDN_SRP_DET_MSK		BIT(16)
++#define GPWRDN_SRP_DET			BIT(15)
++#define GPWRDN_CONNECT_DET_MSK		BIT(14)
++#define GPWRDN_CONNECT_DET		BIT(13)
++#define GPWRDN_DISCONN_DET_MSK		BIT(12)
++#define GPWRDN_DISCONN_DET		BIT(11)
++#define GPWRDN_RST_DET_MSK		BIT(10)
++#define GPWRDN_RST_DET			BIT(9)
++#define GPWRDN_LNSTSCHG_MSK		BIT(8)
++#define GPWRDN_LNSTSCHG			BIT(7)
++#define GPWRDN_DIS_VBUS			BIT(6)
++#define GPWRDN_PWRDNSWTCH		BIT(5)
++#define GPWRDN_PWRDNRSTN		BIT(4)
++#define GPWRDN_PWRDNCLMP		BIT(3)
++#define GPWRDN_RESTORE			BIT(2)
++#define GPWRDN_PMUACTV			BIT(1)
++#define GPWRDN_PMUINTSEL		BIT(0)
++
++#define GDFIFOCFG			HSOTG_REG(0x005c)
++#define GDFIFOCFG_EPINFOBASE_MASK	(0xffff << 16)
++#define GDFIFOCFG_EPINFOBASE_SHIFT	16
++#define GDFIFOCFG_GDFIFOCFG_MASK	(0xffff << 0)
++#define GDFIFOCFG_GDFIFOCFG_SHIFT	0
++
++#define ADPCTL				HSOTG_REG(0x0060)
++#define ADPCTL_AR_MASK			(0x3 << 27)
++#define ADPCTL_AR_SHIFT			27
++#define ADPCTL_ADP_TMOUT_INT_MSK	BIT(26)
++#define ADPCTL_ADP_SNS_INT_MSK		BIT(25)
++#define ADPCTL_ADP_PRB_INT_MSK		BIT(24)
++#define ADPCTL_ADP_TMOUT_INT		BIT(23)
++#define ADPCTL_ADP_SNS_INT		BIT(22)
++#define ADPCTL_ADP_PRB_INT		BIT(21)
++#define ADPCTL_ADPENA			BIT(20)
++#define ADPCTL_ADPRES			BIT(19)
++#define ADPCTL_ENASNS			BIT(18)
++#define ADPCTL_ENAPRB			BIT(17)
++#define ADPCTL_RTIM_MASK		(0x7ff << 6)
++#define ADPCTL_RTIM_SHIFT		6
++#define ADPCTL_PRB_PER_MASK		(0x3 << 4)
++#define ADPCTL_PRB_PER_SHIFT		4
++#define ADPCTL_PRB_DELTA_MASK		(0x3 << 2)
++#define ADPCTL_PRB_DELTA_SHIFT		2
++#define ADPCTL_PRB_DSCHRG_MASK		(0x3 << 0)
++#define ADPCTL_PRB_DSCHRG_SHIFT		0
++
++#define GREFCLK				    HSOTG_REG(0x0064)
++#define GREFCLK_REFCLKPER_MASK		    (0x1ffff << 15)
++#define GREFCLK_REFCLKPER_SHIFT		    15
++#define GREFCLK_REF_CLK_MODE		    BIT(14)
++#define GREFCLK_SOF_CNT_WKUP_ALERT_MASK	    (0x3ff)
++#define GREFCLK_SOF_CNT_WKUP_ALERT_SHIFT    0
++
++#define GINTMSK2			HSOTG_REG(0x0068)
++#define GINTMSK2_WKUP_ALERT_INT_MSK	BIT(0)
++
++#define GINTSTS2			HSOTG_REG(0x006c)
++#define GINTSTS2_WKUP_ALERT_INT		BIT(0)
++
++#define HPTXFSIZ			HSOTG_REG(0x100)
++/* Use FIFOSIZE_* constants to access this register */
++
++#define DPTXFSIZN(_a)			HSOTG_REG(0x104 + (((_a) - 1) * 4))
++/* Use FIFOSIZE_* constants to access this register */
++
++/* These apply to the GNPTXFSIZ, HPTXFSIZ and DPTXFSIZN registers */
++#define FIFOSIZE_DEPTH_MASK		(0xffff << 16)
++#define FIFOSIZE_DEPTH_SHIFT		16
++#define FIFOSIZE_STARTADDR_MASK		(0xffff << 0)
++#define FIFOSIZE_STARTADDR_SHIFT	0
++#define FIFOSIZE_DEPTH_GET(_x)		(((_x) >> 16) & 0xffff)
++
++/* Device mode registers */
++
++#define DCFG				HSOTG_REG(0x800)
++#define DCFG_DESCDMA_EN			BIT(23)
++#define DCFG_EPMISCNT_MASK		(0x1f << 18)
++#define DCFG_EPMISCNT_SHIFT		18
++#define DCFG_EPMISCNT_LIMIT		0x1f
++#define DCFG_EPMISCNT(_x)		((_x) << 18)
++#define DCFG_IPG_ISOC_SUPPORDED		BIT(17)
++#define DCFG_PERFRINT_MASK		(0x3 << 11)
++#define DCFG_PERFRINT_SHIFT		11
++#define DCFG_PERFRINT_LIMIT		0x3
++#define DCFG_PERFRINT(_x)		((_x) << 11)
++#define DCFG_DEVADDR_MASK		(0x7f << 4)
++#define DCFG_DEVADDR_SHIFT		4
++#define DCFG_DEVADDR_LIMIT		0x7f
++#define DCFG_DEVADDR(_x)		((_x) << 4)
++#define DCFG_NZ_STS_OUT_HSHK		BIT(2)
++#define DCFG_DEVSPD_MASK		(0x3 << 0)
++#define DCFG_DEVSPD_SHIFT		0
++#define DCFG_DEVSPD_HS			0
++#define DCFG_DEVSPD_FS			1
++#define DCFG_DEVSPD_LS			2
++#define DCFG_DEVSPD_FS48		3
++
++#define DCTL				HSOTG_REG(0x804)
++#define DCTL_SERVICE_INTERVAL_SUPPORTED BIT(19)
++#define DCTL_PWRONPRGDONE		BIT(11)
++#define DCTL_CGOUTNAK			BIT(10)
++#define DCTL_SGOUTNAK			BIT(9)
++#define DCTL_CGNPINNAK			BIT(8)
++#define DCTL_SGNPINNAK			BIT(7)
++#define DCTL_TSTCTL_MASK		(0x7 << 4)
++#define DCTL_TSTCTL_SHIFT		4
++#define DCTL_GOUTNAKSTS			BIT(3)
++#define DCTL_GNPINNAKSTS		BIT(2)
++#define DCTL_SFTDISCON			BIT(1)
++#define DCTL_RMTWKUPSIG			BIT(0)
++
++#define DSTS				HSOTG_REG(0x808)
++#define DSTS_SOFFN_MASK			(0x3fff << 8)
++#define DSTS_SOFFN_SHIFT		8
++#define DSTS_SOFFN_LIMIT		0x3fff
++#define DSTS_SOFFN(_x)			((_x) << 8)
++#define DSTS_ERRATICERR			BIT(3)
++#define DSTS_ENUMSPD_MASK		(0x3 << 1)
++#define DSTS_ENUMSPD_SHIFT		1
++#define DSTS_ENUMSPD_HS			0
++#define DSTS_ENUMSPD_FS			1
++#define DSTS_ENUMSPD_LS			2
++#define DSTS_ENUMSPD_FS48		3
++#define DSTS_SUSPSTS			BIT(0)
++
++#define DIEPMSK				HSOTG_REG(0x810)
++#define DIEPMSK_NAKMSK			BIT(13)
++#define DIEPMSK_BNAININTRMSK		BIT(9)
++#define DIEPMSK_TXFIFOUNDRNMSK		BIT(8)
++#define DIEPMSK_TXFIFOEMPTY		BIT(7)
++#define DIEPMSK_INEPNAKEFFMSK		BIT(6)
++#define DIEPMSK_INTKNEPMISMSK		BIT(5)
++#define DIEPMSK_INTKNTXFEMPMSK		BIT(4)
++#define DIEPMSK_TIMEOUTMSK		BIT(3)
++#define DIEPMSK_AHBERRMSK		BIT(2)
++#define DIEPMSK_EPDISBLDMSK		BIT(1)
++#define DIEPMSK_XFERCOMPLMSK		BIT(0)
++
++#define DOEPMSK				HSOTG_REG(0x814)
++#define DOEPMSK_BNAMSK			BIT(9)
++#define DOEPMSK_BACK2BACKSETUP		BIT(6)
++#define DOEPMSK_STSPHSERCVDMSK		BIT(5)
++#define DOEPMSK_OUTTKNEPDISMSK		BIT(4)
++#define DOEPMSK_SETUPMSK		BIT(3)
++#define DOEPMSK_AHBERRMSK		BIT(2)
++#define DOEPMSK_EPDISBLDMSK		BIT(1)
++#define DOEPMSK_XFERCOMPLMSK		BIT(0)
++
++#define DAINT				HSOTG_REG(0x818)
++#define DAINTMSK			HSOTG_REG(0x81C)
++#define DAINT_OUTEP_SHIFT		16
++#define DAINT_OUTEP(_x)			(1 << ((_x) + 16))
++#define DAINT_INEP(_x)			(1 << (_x))
++
++#define DTKNQR1				HSOTG_REG(0x820)
++#define DTKNQR2				HSOTG_REG(0x824)
++#define DTKNQR3				HSOTG_REG(0x830)
++#define DTKNQR4				HSOTG_REG(0x834)
++#define DIEPEMPMSK			HSOTG_REG(0x834)
++
++#define DVBUSDIS			HSOTG_REG(0x828)
++#define DVBUSPULSE			HSOTG_REG(0x82C)
++
++#define DIEPCTL0			HSOTG_REG(0x900)
++#define DIEPCTL(_a)			HSOTG_REG(0x900 + ((_a) * 0x20))
++
++#define DOEPCTL0			HSOTG_REG(0xB00)
++#define DOEPCTL(_a)			HSOTG_REG(0xB00 + ((_a) * 0x20))
++
++/* EP0 specialness:
++ * bits[29..28] - reserved (no SetD0PID, SetD1PID)
++ * bits[25..22] - should always be zero, this isn't a periodic endpoint
++ * bits[10..0]  - MPS setting different for EP0
++ */
++#define D0EPCTL_MPS_MASK		(0x3 << 0)
++#define D0EPCTL_MPS_SHIFT		0
++#define D0EPCTL_MPS_64			0
++#define D0EPCTL_MPS_32			1
++#define D0EPCTL_MPS_16			2
++#define D0EPCTL_MPS_8			3
++
++#define DXEPCTL_EPENA			BIT(31)
++#define DXEPCTL_EPDIS			BIT(30)
++#define DXEPCTL_SETD1PID		BIT(29)
++#define DXEPCTL_SETODDFR		BIT(29)
++#define DXEPCTL_SETD0PID		BIT(28)
++#define DXEPCTL_SETEVENFR		BIT(28)
++#define DXEPCTL_SNAK			BIT(27)
++#define DXEPCTL_CNAK			BIT(26)
++#define DXEPCTL_TXFNUM_MASK		(0xf << 22)
++#define DXEPCTL_TXFNUM_SHIFT		22
++#define DXEPCTL_TXFNUM_LIMIT		0xf
++#define DXEPCTL_TXFNUM(_x)		((_x) << 22)
++#define DXEPCTL_STALL			BIT(21)
++#define DXEPCTL_SNP			BIT(20)
++#define DXEPCTL_EPTYPE_MASK		(0x3 << 18)
++#define DXEPCTL_EPTYPE_CONTROL		(0x0 << 18)
++#define DXEPCTL_EPTYPE_ISO		(0x1 << 18)
++#define DXEPCTL_EPTYPE_BULK		(0x2 << 18)
++#define DXEPCTL_EPTYPE_INTERRUPT	(0x3 << 18)
++
++#define DXEPCTL_NAKSTS			BIT(17)
++#define DXEPCTL_DPID			BIT(16)
++#define DXEPCTL_EOFRNUM			BIT(16)
++#define DXEPCTL_USBACTEP		BIT(15)
++#define DXEPCTL_NEXTEP_MASK		(0xf << 11)
++#define DXEPCTL_NEXTEP_SHIFT		11
++#define DXEPCTL_NEXTEP_LIMIT		0xf
++#define DXEPCTL_NEXTEP(_x)		((_x) << 11)
++#define DXEPCTL_MPS_MASK		(0x7ff << 0)
++#define DXEPCTL_MPS_SHIFT		0
++#define DXEPCTL_MPS_LIMIT		0x7ff
++#define DXEPCTL_MPS(_x)			((_x) << 0)
++
++#define DIEPINT(_a)			HSOTG_REG(0x908 + ((_a) * 0x20))
++#define DOEPINT(_a)			HSOTG_REG(0xB08 + ((_a) * 0x20))
++#define DXEPINT_SETUP_RCVD		BIT(15)
++#define DXEPINT_NYETINTRPT		BIT(14)
++#define DXEPINT_NAKINTRPT		BIT(13)
++#define DXEPINT_BBLEERRINTRPT		BIT(12)
++#define DXEPINT_PKTDRPSTS		BIT(11)
++#define DXEPINT_BNAINTR			BIT(9)
++#define DXEPINT_TXFIFOUNDRN		BIT(8)
++#define DXEPINT_OUTPKTERR		BIT(8)
++#define DXEPINT_TXFEMP			BIT(7)
++#define DXEPINT_INEPNAKEFF		BIT(6)
++#define DXEPINT_BACK2BACKSETUP		BIT(6)
++#define DXEPINT_INTKNEPMIS		BIT(5)
++#define DXEPINT_STSPHSERCVD		BIT(5)
++#define DXEPINT_INTKNTXFEMP		BIT(4)
++#define DXEPINT_OUTTKNEPDIS		BIT(4)
++#define DXEPINT_TIMEOUT			BIT(3)
++#define DXEPINT_SETUP			BIT(3)
++#define DXEPINT_AHBERR			BIT(2)
++#define DXEPINT_EPDISBLD		BIT(1)
++#define DXEPINT_XFERCOMPL		BIT(0)
++
++#define DIEPTSIZ0			HSOTG_REG(0x910)
++#define DIEPTSIZ0_PKTCNT_MASK		(0x3 << 19)
++#define DIEPTSIZ0_PKTCNT_SHIFT		19
++#define DIEPTSIZ0_PKTCNT_LIMIT		0x3
++#define DIEPTSIZ0_PKTCNT(_x)		((_x) << 19)
++#define DIEPTSIZ0_XFERSIZE_MASK		(0x7f << 0)
++#define DIEPTSIZ0_XFERSIZE_SHIFT	0
++#define DIEPTSIZ0_XFERSIZE_LIMIT	0x7f
++#define DIEPTSIZ0_XFERSIZE(_x)		((_x) << 0)
++
++#define DOEPTSIZ0			HSOTG_REG(0xB10)
++#define DOEPTSIZ0_SUPCNT_MASK		(0x3 << 29)
++#define DOEPTSIZ0_SUPCNT_SHIFT		29
++#define DOEPTSIZ0_SUPCNT_LIMIT		0x3
++#define DOEPTSIZ0_SUPCNT(_x)		((_x) << 29)
++#define DOEPTSIZ0_PKTCNT		BIT(19)
++#define DOEPTSIZ0_XFERSIZE_MASK		(0x7f << 0)
++#define DOEPTSIZ0_XFERSIZE_SHIFT	0
++
++#define DIEPTSIZ(_a)			HSOTG_REG(0x910 + ((_a) * 0x20))
++#define DOEPTSIZ(_a)			HSOTG_REG(0xB10 + ((_a) * 0x20))
++#define DXEPTSIZ_MC_MASK		(0x3 << 29)
++#define DXEPTSIZ_MC_SHIFT		29
++#define DXEPTSIZ_MC_LIMIT		0x3
++#define DXEPTSIZ_MC(_x)			((_x) << 29)
++#define DXEPTSIZ_PKTCNT_MASK		(0x3ff << 19)
++#define DXEPTSIZ_PKTCNT_SHIFT		19
++#define DXEPTSIZ_PKTCNT_LIMIT		0x3ff
++#define DXEPTSIZ_PKTCNT_GET(_v)		(((_v) >> 19) & 0x3ff)
++#define DXEPTSIZ_PKTCNT(_x)		((_x) << 19)
++#define DXEPTSIZ_XFERSIZE_MASK		(0x7ffff << 0)
++#define DXEPTSIZ_XFERSIZE_SHIFT		0
++#define DXEPTSIZ_XFERSIZE_LIMIT		0x7ffff
++#define DXEPTSIZ_XFERSIZE_GET(_v)	(((_v) >> 0) & 0x7ffff)
++#define DXEPTSIZ_XFERSIZE(_x)		((_x) << 0)
++
++#define DIEPDMA(_a)			HSOTG_REG(0x914 + ((_a) * 0x20))
++#define DOEPDMA(_a)			HSOTG_REG(0xB14 + ((_a) * 0x20))
++
++#define DTXFSTS(_a)			HSOTG_REG(0x918 + ((_a) * 0x20))
++
++#define PCGCTL				HSOTG_REG(0x0e00)
++#define PCGCTL_IF_DEV_MODE		BIT(31)
++#define PCGCTL_P2HD_PRT_SPD_MASK	(0x3 << 29)
++#define PCGCTL_P2HD_PRT_SPD_SHIFT	29
++#define PCGCTL_P2HD_DEV_ENUM_SPD_MASK	(0x3 << 27)
++#define PCGCTL_P2HD_DEV_ENUM_SPD_SHIFT	27
++#define PCGCTL_MAC_DEV_ADDR_MASK	(0x7f << 20)
++#define PCGCTL_MAC_DEV_ADDR_SHIFT	20
++#define PCGCTL_MAX_TERMSEL		BIT(19)
++#define PCGCTL_MAX_XCVRSELECT_MASK	(0x3 << 17)
++#define PCGCTL_MAX_XCVRSELECT_SHIFT	17
++#define PCGCTL_PORT_POWER		BIT(16)
++#define PCGCTL_PRT_CLK_SEL_MASK		(0x3 << 14)
++#define PCGCTL_PRT_CLK_SEL_SHIFT	14
++#define PCGCTL_ESS_REG_RESTORED		BIT(13)
++#define PCGCTL_EXTND_HIBER_SWITCH	BIT(12)
++#define PCGCTL_EXTND_HIBER_PWRCLMP	BIT(11)
++#define PCGCTL_ENBL_EXTND_HIBER		BIT(10)
++#define PCGCTL_RESTOREMODE		BIT(9)
++#define PCGCTL_RESETAFTSUSP		BIT(8)
++#define PCGCTL_DEEP_SLEEP		BIT(7)
++#define PCGCTL_PHY_IN_SLEEP		BIT(6)
++#define PCGCTL_ENBL_SLEEP_GATING	BIT(5)
++#define PCGCTL_RSTPDWNMODULE		BIT(3)
++#define PCGCTL_PWRCLMP			BIT(2)
++#define PCGCTL_GATEHCLK			BIT(1)
++#define PCGCTL_STOPPCLK			BIT(0)
++
++#define PCGCCTL1                        HSOTG_REG(0xe04)
++#define PCGCCTL1_TIMER                  (0x3 << 1)
++#define PCGCCTL1_GATEEN                 BIT(0)
++
++#define EPFIFO(_a)			HSOTG_REG(0x1000 + ((_a) * 0x1000))
++
++/* Host Mode Registers */
++
++#define HCFG				HSOTG_REG(0x0400)
++#define HCFG_MODECHTIMEN		BIT(31)
++#define HCFG_PERSCHEDENA		BIT(26)
++#define HCFG_FRLISTEN_MASK		(0x3 << 24)
++#define HCFG_FRLISTEN_SHIFT		24
++#define HCFG_FRLISTEN_8				(0 << 24)
++#define FRLISTEN_8_SIZE				8
++#define HCFG_FRLISTEN_16			BIT(24)
++#define FRLISTEN_16_SIZE			16
++#define HCFG_FRLISTEN_32			(2 << 24)
++#define FRLISTEN_32_SIZE			32
++#define HCFG_FRLISTEN_64			(3 << 24)
++#define FRLISTEN_64_SIZE			64
++#define HCFG_DESCDMA			BIT(23)
++#define HCFG_RESVALID_MASK		(0xff << 8)
++#define HCFG_RESVALID_SHIFT		8
++#define HCFG_ENA32KHZ			BIT(7)
++#define HCFG_FSLSSUPP			BIT(2)
++#define HCFG_FSLSPCLKSEL_MASK		(0x3 << 0)
++#define HCFG_FSLSPCLKSEL_SHIFT		0
++#define HCFG_FSLSPCLKSEL_30_60_MHZ	0
++#define HCFG_FSLSPCLKSEL_48_MHZ		1
++#define HCFG_FSLSPCLKSEL_6_MHZ		2
++
++#define HFIR				HSOTG_REG(0x0404)
++#define HFIR_FRINT_MASK			(0xffff << 0)
++#define HFIR_FRINT_SHIFT		0
++#define HFIR_RLDCTRL			BIT(16)
++
++#define HFNUM				HSOTG_REG(0x0408)
++#define HFNUM_FRREM_MASK		(0xffff << 16)
++#define HFNUM_FRREM_SHIFT		16
++#define HFNUM_FRNUM_MASK		(0xffff << 0)
++#define HFNUM_FRNUM_SHIFT		0
++#define HFNUM_MAX_FRNUM			0x3fff
++
++#define HPTXSTS				HSOTG_REG(0x0410)
++#define TXSTS_QTOP_ODD			BIT(31)
++#define TXSTS_QTOP_CHNEP_MASK		(0xf << 27)
++#define TXSTS_QTOP_CHNEP_SHIFT		27
++#define TXSTS_QTOP_TOKEN_MASK		(0x3 << 25)
++#define TXSTS_QTOP_TOKEN_SHIFT		25
++#define TXSTS_QTOP_TERMINATE		BIT(24)
++#define TXSTS_QSPCAVAIL_MASK		(0xff << 16)
++#define TXSTS_QSPCAVAIL_SHIFT		16
++#define TXSTS_FSPCAVAIL_MASK		(0xffff << 0)
++#define TXSTS_FSPCAVAIL_SHIFT		0
++
++#define HAINT				HSOTG_REG(0x0414)
++#define HAINTMSK			HSOTG_REG(0x0418)
++#define HFLBADDR			HSOTG_REG(0x041c)
++
++#define HPRT0				HSOTG_REG(0x0440)
++#define HPRT0_SPD_MASK			(0x3 << 17)
++#define HPRT0_SPD_SHIFT			17
++#define HPRT0_SPD_HIGH_SPEED		0
++#define HPRT0_SPD_FULL_SPEED		1
++#define HPRT0_SPD_LOW_SPEED		2
++#define HPRT0_TSTCTL_MASK		(0xf << 13)
++#define HPRT0_TSTCTL_SHIFT		13
++#define HPRT0_PWR			BIT(12)
++#define HPRT0_LNSTS_MASK		(0x3 << 10)
++#define HPRT0_LNSTS_SHIFT		10
++#define HPRT0_RST			BIT(8)
++#define HPRT0_SUSP			BIT(7)
++#define HPRT0_RES			BIT(6)
++#define HPRT0_OVRCURRCHG		BIT(5)
++#define HPRT0_OVRCURRACT		BIT(4)
++#define HPRT0_ENACHG			BIT(3)
++#define HPRT0_ENA			BIT(2)
++#define HPRT0_CONNDET			BIT(1)
++#define HPRT0_CONNSTS			BIT(0)
++
++#define HCCHAR(_ch)			HSOTG_REG(0x0500 + 0x20 * (_ch))
++#define HCCHAR_CHENA			BIT(31)
++#define HCCHAR_CHDIS			BIT(30)
++#define HCCHAR_ODDFRM			BIT(29)
++#define HCCHAR_DEVADDR_MASK		(0x7f << 22)
++#define HCCHAR_DEVADDR_SHIFT		22
++#define HCCHAR_MULTICNT_MASK		(0x3 << 20)
++#define HCCHAR_MULTICNT_SHIFT		20
++#define HCCHAR_EPTYPE_MASK		(0x3 << 18)
++#define HCCHAR_EPTYPE_SHIFT		18
++#define HCCHAR_LSPDDEV			BIT(17)
++#define HCCHAR_EPDIR			BIT(15)
++#define HCCHAR_EPNUM_MASK		(0xf << 11)
++#define HCCHAR_EPNUM_SHIFT		11
++#define HCCHAR_MPS_MASK			(0x7ff << 0)
++#define HCCHAR_MPS_SHIFT		0
++
++#define HCSPLT(_ch)			HSOTG_REG(0x0504 + 0x20 * (_ch))
++#define HCSPLT_SPLTENA			BIT(31)
++#define HCSPLT_COMPSPLT			BIT(16)
++#define HCSPLT_XACTPOS_MASK		(0x3 << 14)
++#define HCSPLT_XACTPOS_SHIFT		14
++#define HCSPLT_XACTPOS_MID		0
++#define HCSPLT_XACTPOS_END		1
++#define HCSPLT_XACTPOS_BEGIN		2
++#define HCSPLT_XACTPOS_ALL		3
++#define HCSPLT_HUBADDR_MASK		(0x7f << 7)
++#define HCSPLT_HUBADDR_SHIFT		7
++#define HCSPLT_PRTADDR_MASK		(0x7f << 0)
++#define HCSPLT_PRTADDR_SHIFT		0
++
++#define HCINT(_ch)			HSOTG_REG(0x0508 + 0x20 * (_ch))
++#define HCINTMSK(_ch)			HSOTG_REG(0x050c + 0x20 * (_ch))
++#define HCINTMSK_RESERVED14_31		(0x3ffff << 14)
++#define HCINTMSK_FRM_LIST_ROLL		BIT(13)
++#define HCINTMSK_XCS_XACT		BIT(12)
++#define HCINTMSK_BNA			BIT(11)
++#define HCINTMSK_DATATGLERR		BIT(10)
++#define HCINTMSK_FRMOVRUN		BIT(9)
++#define HCINTMSK_BBLERR			BIT(8)
++#define HCINTMSK_XACTERR		BIT(7)
++#define HCINTMSK_NYET			BIT(6)
++#define HCINTMSK_ACK			BIT(5)
++#define HCINTMSK_NAK			BIT(4)
++#define HCINTMSK_STALL			BIT(3)
++#define HCINTMSK_AHBERR			BIT(2)
++#define HCINTMSK_CHHLTD			BIT(1)
++#define HCINTMSK_XFERCOMPL		BIT(0)
++
++#define HCTSIZ(_ch)			HSOTG_REG(0x0510 + 0x20 * (_ch))
++#define TSIZ_DOPNG			BIT(31)
++#define TSIZ_SC_MC_PID_MASK		(0x3 << 29)
++#define TSIZ_SC_MC_PID_SHIFT		29
++#define TSIZ_SC_MC_PID_DATA0		0
++#define TSIZ_SC_MC_PID_DATA2		1
++#define TSIZ_SC_MC_PID_DATA1		2
++#define TSIZ_SC_MC_PID_MDATA		3
++#define TSIZ_SC_MC_PID_SETUP		3
++#define TSIZ_PKTCNT_MASK		(0x3ff << 19)
++#define TSIZ_PKTCNT_SHIFT		19
++#define TSIZ_NTD_MASK			(0xff << 8)
++#define TSIZ_NTD_SHIFT			8
++#define TSIZ_SCHINFO_MASK		(0xff << 0)
++#define TSIZ_SCHINFO_SHIFT		0
++#define TSIZ_XFERSIZE_MASK		(0x7ffff << 0)
++#define TSIZ_XFERSIZE_SHIFT		0
++
++#define HCDMA(_ch)			HSOTG_REG(0x0514 + 0x20 * (_ch))
++
++#define HCDMAB(_ch)			HSOTG_REG(0x051c + 0x20 * (_ch))
++
++#define HCFIFO(_ch)			HSOTG_REG(0x1000 + 0x1000 * (_ch))
++
++/**
++ * struct dwc2_dma_desc - DMA descriptor structure,
++ * used for both host and gadget modes
++ *
++ * @status: DMA descriptor status quadlet
++ * @buf:    DMA descriptor data buffer pointer
++ *
++ * DMA Descriptor structure contains two quadlets:
++ * Status quadlet and Data buffer pointer.
++ */
++struct dwc2_dma_desc {
++	uint32_t status;
++	uint32_t buf;
++} __packed;
++
++/* Host Mode DMA descriptor status quadlet */
++
++#define HOST_DMA_A			BIT(31)
++#define HOST_DMA_STS_MASK		(0x3 << 28)
++#define HOST_DMA_STS_SHIFT		28
++#define HOST_DMA_STS_PKTERR		BIT(28)
++#define HOST_DMA_EOL			BIT(26)
++#define HOST_DMA_IOC			BIT(25)
++#define HOST_DMA_SUP			BIT(24)
++#define HOST_DMA_ALT_QTD		BIT(23)
++#define HOST_DMA_QTD_OFFSET_MASK	(0x3f << 17)
++#define HOST_DMA_QTD_OFFSET_SHIFT	17
++#define HOST_DMA_ISOC_NBYTES_MASK	(0xfff << 0)
++#define HOST_DMA_ISOC_NBYTES_SHIFT	0
++#define HOST_DMA_NBYTES_MASK		(0x1ffff << 0)
++#define HOST_DMA_NBYTES_SHIFT		0
++#define HOST_DMA_NBYTES_LIMIT		131071
++
++/* Device Mode DMA descriptor status quadlet */
++
++#define DEV_DMA_BUFF_STS_MASK		(0x3 << 30)
++#define DEV_DMA_BUFF_STS_SHIFT		30
++#define DEV_DMA_BUFF_STS_HREADY		0
++#define DEV_DMA_BUFF_STS_DMABUSY	1
++#define DEV_DMA_BUFF_STS_DMADONE	2
++#define DEV_DMA_BUFF_STS_HBUSY		3
++#define DEV_DMA_STS_MASK		(0x3 << 28)
++#define DEV_DMA_STS_SHIFT		28
++#define DEV_DMA_STS_SUCC		0
++#define DEV_DMA_STS_BUFF_FLUSH		1
++#define DEV_DMA_STS_BUFF_ERR		3
++#define DEV_DMA_L			BIT(27)
++#define DEV_DMA_SHORT			BIT(26)
++#define DEV_DMA_IOC			BIT(25)
++#define DEV_DMA_SR			BIT(24)
++#define DEV_DMA_MTRF			BIT(23)
++#define DEV_DMA_ISOC_PID_MASK		(0x3 << 23)
++#define DEV_DMA_ISOC_PID_SHIFT		23
++#define DEV_DMA_ISOC_PID_DATA0		0
++#define DEV_DMA_ISOC_PID_DATA2		1
++#define DEV_DMA_ISOC_PID_DATA1		2
++#define DEV_DMA_ISOC_PID_MDATA		3
++#define DEV_DMA_ISOC_FRNUM_MASK		(0x7ff << 12)
++#define DEV_DMA_ISOC_FRNUM_SHIFT	12
++#define DEV_DMA_ISOC_TX_NBYTES_MASK	(0xfff << 0)
++#define DEV_DMA_ISOC_TX_NBYTES_LIMIT	0xfff
++#define DEV_DMA_ISOC_RX_NBYTES_MASK	(0x7ff << 0)
++#define DEV_DMA_ISOC_RX_NBYTES_LIMIT	0x7ff
++#define DEV_DMA_ISOC_NBYTES_SHIFT	0
++#define DEV_DMA_NBYTES_MASK		(0xffff << 0)
++#define DEV_DMA_NBYTES_SHIFT		0
++#define DEV_DMA_NBYTES_LIMIT		0xffff
++
++#define MAX_DMA_DESC_NUM_GENERIC	64
++#define MAX_DMA_DESC_NUM_HS_ISOC	256
++
++#endif /* __DWC2_HW_H__ */
 -- 
 2.17.1
 
