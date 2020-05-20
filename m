@@ -6,91 +6,92 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7077DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F17FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 397F220671
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:27:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47FD8207C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 10:28:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ij58N6vN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397F220671
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCfeVw/n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47FD8207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbLwB-0007zv-F8
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 06:26:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55448)
+	id 1jbLxB-0000mT-9H
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 06:28:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbLva-0007Iw-3A
- for qemu-devel@nongnu.org; Wed, 20 May 2020 06:26:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56694
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbLwI-0008EG-82
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 06:27:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25137
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbLvZ-0000Nv-1E
- for qemu-devel@nongnu.org; Wed, 20 May 2020 06:26:21 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbLwH-0000Ru-Gj
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 06:27:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589970379;
+ s=mimecast20190719; t=1589970424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1WqekJu921czZs4WghQfQg3RGUfTEcR4yw7P7OzZTiE=;
- b=Ij58N6vN9D6SRHTUJIrqOll3x6GAQEbxGfpF6e2wieJHzl0YTPbAKrPg7axOOc0Y/i9Unk
- pkN66yfBHnjumT8M0hx07SqW3jR6da9gngn7S6aTJu8pkCPisk7WdFq3Tkxp6SSPTmJUfU
- jleUut7LhroY8vo/RyL0xRJQxg4KtD4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-9xeDWfQJMVWlVdCPtzKixw-1; Wed, 20 May 2020 06:26:16 -0400
-X-MC-Unique: 9xeDWfQJMVWlVdCPtzKixw-1
-Received: by mail-wm1-f71.google.com with SMTP id 23so1044150wma.8
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 03:26:16 -0700 (PDT)
+ bh=ZVSGKa9QJ5UaN5VkA7QNtPZa/lOGyKzyenKT1fE5/b8=;
+ b=cCfeVw/nhvDFicYX7rKpv9mChYVNAhl1JmoH8WOAWGtvsrDSAk/ZEbxGpGTvFuNJlMEaPz
+ 9xmmnHnbO6+ql1L4AtpqVYdU+pPudNJksrdJg2ydGzjT3wo+NGs2snwcjVKmep99CL4byZ
+ SSECFKAK9JrWs0ZxlnRt4/oiewF0euw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-Rks_hnrzM0m5q4V_uhfUwQ-1; Wed, 20 May 2020 06:27:03 -0400
+X-MC-Unique: Rks_hnrzM0m5q4V_uhfUwQ-1
+Received: by mail-wr1-f70.google.com with SMTP id p2so1220629wrm.6
+ for <qemu-devel@nongnu.org>; Wed, 20 May 2020 03:27:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=1WqekJu921czZs4WghQfQg3RGUfTEcR4yw7P7OzZTiE=;
- b=sHv8NQsqHzu1ZUg/gLSwaLrNkS+EUmZwhaiwIdO1tgmOTJ/7bTnN+JJGSKoeyUuJYu
- F5ksALWxD16JzuqnW7gL/Ds92V0U89NJ88nbaGuQ6umFBB5LwmxdZ+J+bEeLaEZN9wAs
- 7GQN9JsqcVD4EkWr6it/RofLPyWJN/RihhkCZtp2yXO9kOAaYOF4kSAT3iRBw2mBoThv
- LCNK1bqWWDZeRHCItOu8XRWTW2pk8CJSCNp0W746ptS4FgzrH/yKQR19bw32hxV1uWjD
- EXU0qh2O5sWBRGHmoK8dIZzVXW5kR8YvR2MLN6fbqGZ0U9X3w0oYxOfl6DbCovDm9bbf
- ekbQ==
-X-Gm-Message-State: AOAM5326TaPdh8eAZYKKqMzYMA4Nzl5fw5h1u4aplfbEnjCtCktzNxhw
- SDZZkMtnTrHkYEj2NtlkVWglGTNxHaoyvx/oQOK/gdCR3Zjg5OZgwuBK8AiVHvy8kUa1m+xlQV1
- Or3GPN1OdcttqTMw=
-X-Received: by 2002:a7b:cb4e:: with SMTP id v14mr3924007wmj.164.1589970375106; 
- Wed, 20 May 2020 03:26:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwU0kzx9ie/b6LJ3lmwCOBIligp5EHg8DrBSx/bwI9MUprTcUZ6Jbc6Xx020WRvdn9NL/GLAg==
-X-Received: by 2002:a7b:cb4e:: with SMTP id v14mr3923985wmj.164.1589970374906; 
- Wed, 20 May 2020 03:26:14 -0700 (PDT)
+ bh=ZVSGKa9QJ5UaN5VkA7QNtPZa/lOGyKzyenKT1fE5/b8=;
+ b=Gv+RibIF2bINSmsai73puamWCLf7Y/uX+JU/JxL96EcV1kW7RU1iERu99VezfoXvT8
+ i6iCKJ5f9QWmb0/bhHMC1Tw1Rgvr2RfLu5WNoXB5RdsR0FwhoqARe4+v45BLBz9IslBb
+ mR+CoJ/vWtMC+4hjeNnnWt82Z+BAz7sBax2yIjFwOhqJlkulLytM1doo+cZeONS8v+TT
+ NGUg3NP8jcP1yQ/yixqFYGset+R+VGjzYlCwJ5S2zBeisqSlrzXG4S5juHBtZRlJ5lRt
+ +xMUKlCyb1Nf3fhNGFtw1CR6RYKXMWEHMA3e1WZDsE5FziT517MS3CBQ2bTB+ELJ297d
+ FdjA==
+X-Gm-Message-State: AOAM533BDp+MWqVcvyCKakqSvJ5fxBUV8ZlvN04FUOBFnP0pqkTlOo/S
+ gNEpJZ6PC+gYrJj40JnUm9yCKdS7w2iSQ0B9Zee14HSz+MLFHInTG0mYdQx7Ve95nun93sm7R9I
+ tK8U3i30YNPCNBsI=
+X-Received: by 2002:a1c:80d0:: with SMTP id b199mr3941265wmd.93.1589970422248; 
+ Wed, 20 May 2020 03:27:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoBZK9xFFUb+UnIvkzHcrtkXj09l76CIwlkRQ1JDeaHUTL75kvFywndGXQMggvCvGZjWhCbA==
+X-Received: by 2002:a1c:80d0:: with SMTP id b199mr3941241wmd.93.1589970421933; 
+ Wed, 20 May 2020 03:27:01 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id v20sm2695069wrd.9.2020.05.20.03.26.13
+ by smtp.gmail.com with ESMTPSA id r11sm610446wre.25.2020.05.20.03.27.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 May 2020 03:26:14 -0700 (PDT)
-Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
-To: "Justin Terry (VM)" <juterry@microsoft.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190920113329.16787-1-philmd@redhat.com>
- <01f2f0ee-a288-921a-58f4-78aeb4d457e1@redhat.com>
- <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
+ Wed, 20 May 2020 03:27:01 -0700 (PDT)
+Subject: Re: [PATCH v2] WHPX: support for xcr0
+To: Sunil Muthuswamy <sunilmut@microsoft.com>, Stefan Weil <sw@weilnetz.de>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <MW2PR2101MB1116F07C07A26FD7A7ED8DCFC0780@MW2PR2101MB1116.namprd21.prod.outlook.com>
+ <1c446cc0-8a22-41d6-fe38-db0b7333ed89@weilnetz.de>
+ <MW2PR2101MB111666F06FADEC582CAE4184C0780@MW2PR2101MB1116.namprd21.prod.outlook.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
-Date: Wed, 20 May 2020 12:26:13 +0200
+Message-ID: <8a787221-0c91-3a65-1527-6d329466a6a1@redhat.com>
+Date: Wed, 20 May 2020 12:27:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
+In-Reply-To: <MW2PR2101MB111666F06FADEC582CAE4184C0780@MW2PR2101MB1116.namprd21.prod.outlook.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
@@ -101,7 +102,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,71 +115,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Paolo Bonzini <pbonzini@redhat.com>, 1879672@bugs.launchpad.net,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: 1879672@bugs.launchpad.net, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 +launchpad ticket
 
-On 9/20/19 6:53 PM, Justin Terry (VM) wrote:
-> Hey Phil,
-> 
-> I have contacted our legal department for guidance on this specific use case and will update you when I hear back. Thank you for your patience.
-> 
-> Justin Terry
-> 
->> -----Original Message-----
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Sent: Friday, September 20, 2019 8:18 AM
->> To: qemu-devel@nongnu.org; Justin Terry (VM) <juterry@microsoft.com>
->> Cc: Daniel P . Berrangé <berrange@redhat.com>; Fam Zheng
->> <fam@euphon.net>; Thomas Huth <thuth@redhat.com>; Paolo Bonzini
->> <pbonzini@redhat.com>; Alex Bennée <alex.bennee@linaro.org>; Richard
->> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>;
->> Stefan Weil <sw@weilnetz.de>
->> Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+On 11/7/19 11:52 PM, Sunil Muthuswamy wrote:
+>>> You will need the Windows 10 SDK for RS5 (build 17763) or above to
+>>> to be able to compile this patch because of the definition of the
+>>> XCR0 register.
+>>>
+>>> Changes since v1:
+>>> - Added a sign-off line in the patch.
 >>
->> On 9/20/19 1:33 PM, Philippe Mathieu-Daudé wrote:
->>> Add a job to cross-build QEMU with WHPX enabled.
->>>
->>> Since the WHPX is currently broken, include the patch required to have
->>> successful Shippable build.
->>>
->>> I previously included the WHPX headers shared by the Android project,
->>> and Daniel asked me to check the EULA. While trying to manually
->>> install the Windows SDK, I noticed the installer fetches archives
->>> directly, kindly asking where they are stored via the /fwlink API.
->>> Do the same, fetch the required archives and extract them. No need to
->>> accept EULA...
->>>
->>> Docker build the image first, then build QEMU in a instance of this
->>> image. The image is internal to Shippable, the instances are not
->>> reachable and are thrown once the build is finished. What we collect
->>> from Shippable is the console output of QEMU build process, and if the
->>> build process succeed or failed. So far we do not redistribute the
->>> image or built binaries.
->>>
->>> Philippe Mathieu-Daudé (3):
->>>    target/i386: Fix broken build with WHPX enabled
->>>    tests/docker: Add fedora-win10sdk-cross image
->>>    .shippable.yml: Build WHPX enabled binaries
 >>
->> FWIW here is the result of this series:
->> https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Fapp.
->> shippable.com%2Fgithub%2Fphilmd%2Fqemu%2Fruns%2F516%2F11%2Fcon
->> sole&amp;data=02%7C01%7Cjuterry%40microsoft.com%7C733a566f3233427
->> 8ae6f08d73dddb39f%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C6
->> 37045894733463150&amp;sdata=55URgDII5r74QMUpLOD%2FWT5%2B5jbzyv
->> nfCSdv%2FNaWDAw%3D&amp;reserved=0
->> Duration 17 minutes (1076 seconds)
+>> I am not very happy with the current situation which suggests using non
+>> free header files from the Microsoft Windows SDK, thus making it
+>> impossible to produce QEMU executables for Windows with WHPX support
+>> without having legal complications.
 >>
->> 4m49s building the qemu:fedora-win10sdk-cross docker image, 11m10s
->> building WHPX QEMU.
+>> Could you please add the required headers with a suitable license to the
+>> QEMU source code? That would clarify the license issue and make builds
+>> with WHPX much easier because those files would not have to be extracted
+>> from a very large SDK installation.
+>>
+>> It would also be acceptable if Microsoft could update the license
+>> comments in those files and use a QEMU compatible license.
+>>
+> I agree in principle that there should be an easier way to consume the Windows
+> SDK headers without having to play around with the licenses. I also agree that
+> that will make life lot easier for many developers. I am reaching out
+> internally here to see what can be done about this, but, that might take some
+> time. Meanwhile, is it possible to make some progress on this patch?
+> 
+>> Kind regards
+>> Stefan Weil
+>>
+>>
+> 
 
 
