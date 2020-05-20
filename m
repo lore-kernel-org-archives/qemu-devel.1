@@ -2,92 +2,71 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7919DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0E7C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:47:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F00E206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:44:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJAA6T/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F00E206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2299A20709
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 15:47:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2299A20709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbQtl-0005hn-CT
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:44:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40952)
+	id 1jbQwN-0000Zw-Cj
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 11:47:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbQt6-00059e-Tw
- for qemu-devel@nongnu.org; Wed, 20 May 2020 11:44:08 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27609
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jbQvl-0008FB-9c; Wed, 20 May 2020 11:46:53 -0400
+Resent-Date: Wed, 20 May 2020 11:46:53 -0400
+Resent-Message-Id: <E1jbQvl-0008FB-9c@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21707)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jbQt5-0007SE-Sm
- for qemu-devel@nongnu.org; Wed, 20 May 2020 11:44:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589989447;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wreKgBScCT1Ow7Kfzml9t+at0y/IdJTYhFdJ2mdLT3M=;
- b=QJAA6T/VWbaHxiy+bGsFQD/c4sZhHfz+kp4V9qKxyNJWVYLvLu5/Vy2MFUwegab47J2etk
- prhaQbWstMxlROBtLxqEnkfYz51r+8zFITQOVxj58/0cus/7VcnjaQrLVk6SNKhM33w4X1
- b4dNr2K0xD051XemUlzoOYj6LuC6Y0M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-7vv5ytg3OVyHQvRHJCZHPg-1; Wed, 20 May 2020 11:43:45 -0400
-X-MC-Unique: 7vv5ytg3OVyHQvRHJCZHPg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 658DA1902EBE;
- Wed, 20 May 2020 15:43:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DF66860BEC;
- Wed, 20 May 2020 15:43:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 53A9111358BC; Wed, 20 May 2020 17:43:41 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] arm/aspeed: Rework NIC attachment
-References: <20200519161957.1056027-1-clg@kaod.org>
- <87zha3t8qg.fsf@dusky.pond.sub.org>
- <3ead6228-b61b-ca8b-6ebc-dd9299f1a334@kaod.org>
-Date: Wed, 20 May 2020 17:43:41 +0200
-In-Reply-To: <3ead6228-b61b-ca8b-6ebc-dd9299f1a334@kaod.org>
- (=?utf-8?Q?=22C=C3=A9dric?= Le
- Goater"'s message of "Wed, 20 May 2020 09:01:56 +0200")
-Message-ID: <87367uobma.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jbQvi-0008QL-QS; Wed, 20 May 2020 11:46:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589989592; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=JjXKDnHfzbG0F3pv5eqzoRsDmYm7h9YekicqNTqpZoLdnl0HEO0xTGNN6a7iEMjmOji3IcBNdBl1jzdD2z9Ph3O/AoTaQAYs+LLFohPbJOZSp4u8p+SC1iOPamW+q2Ydbm+pj2aomti7aZcJSgihY8CN0S86C2V995Q5FkwxhDk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589989592;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=SpqsM4PIGVpITCq3Wa25exovhIYupk7y+yWxhCnNkYI=; 
+ b=NdbZDgltofN6BXaACOp6RGlbv580MX9Qh8EI5FDFCLAGmGNKXZLXgs4zbj2UsfC207OkNx2nn4Af9gYpLAFfYpSDXq2Nlblm0fyx6thO6foORiieAQKaHycriR8RAqzOKJ8ZPAF0FW/WjxmNouLIl4hCGm3d60uGiTUwqBI1KrQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589989589169152.62668925978915;
+ Wed, 20 May 2020 08:46:29 -0700 (PDT)
+Message-ID: <158998958743.28633.1092966168018027071@45ef0f9c86ae>
+In-Reply-To: <20200520132003.9492-1-kraxel@redhat.com>
+Subject: Re: [PATCH v3 00/22] microvm: add acpi support
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 04:09:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kraxel@redhat.com
+Date: Wed, 20 May 2020 08:46:29 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 11:46:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,289 +79,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
+ mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, kraxel@redhat.com, imammedo@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-C=C3=A9dric Le Goater <clg@kaod.org> writes:
-
-> On 5/20/20 8:34 AM, Markus Armbruster wrote:
->> C=C3=A9dric Le Goater <clg@kaod.org> writes:
->>=20
->>> The AST2400 and AST2500 SoCs have two MACs but only the first MAC0 is
->>> active on the Aspeed machines using these SoCs. The AST2600 has four
->>> MACs. The AST2600 EVB machine activates MAC1, MAC2 and MAC3 and the
->>> Tacoma BMC machine activates MAC2.
->>>
->>> Introduce a bit-field property "macs-mask" under the Aspeed SoC model
->>> to link the active MACs of the machine being started with the available
->>> network devices.
->>>
->>> Inactive MACs will have no peer and QEMU will warn the user with :
->>>
->>>     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->>>     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->>>     qemu-system-arm: warning: nic ftgmac100.3 has no peer
->>=20
->> I can't reproduce this warning.  What's your exact command line?
->
-> Get a witherspoon-tacoma flash image :
->
->     $ wget https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,label=
-=3Dbuilder,target=3Dwitherspoon-tacoma/lastSuccessfulBuild/artifact/deploy/=
-images/witherspoon-tacoma/flash-witherspoon-tacoma
->
-> Run :
->
->     $ qemu-system-arm -M tacoma-bmc -nic user -drive file=3D./flash-withe=
-rspoon-tacoma,format=3Draw,if=3Dmtd -nographic -nodefaults -serial mon:stdi=
-o
->     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->     qemu-system-arm: warning: nic ftgmac100.3 has no peer
-
-I must have run the wrong binary somehow.
-
->>=20
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>> ---
->>>
->>>  To be applied on top of patch "arm/aspeed: Compute the number of CPUs
->>>  from the SoC definition"=20
->>> =20
->>>  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.10=
-06073-1-clg@kaod.org/
->>> =20
->>>  include/hw/arm/aspeed.h     |  1 +
->>>  include/hw/arm/aspeed_soc.h |  6 ++++++
->>>  hw/arm/aspeed.c             |  6 ++++++
->>>  hw/arm/aspeed_ast2600.c     | 11 ++++++++---
->>>  hw/arm/aspeed_soc.c         | 10 ++++++++--
->>>  5 files changed, 29 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
->>> index 18521484b90e..842dff485f5b 100644
->>> --- a/include/hw/arm/aspeed.h
->>> +++ b/include/hw/arm/aspeed.h
->>> @@ -39,6 +39,7 @@ typedef struct AspeedMachineClass {
->>>      const char *fmc_model;
->>>      const char *spi_model;
->>>      uint32_t num_cs;
->>> +    uint32_t macs_mask;
->>>      void (*i2c_init)(AspeedBoardState *bmc);
->>>  } AspeedMachineClass;
->>> =20
->>> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
->>> index 914115f3ef77..fdb9e05bc47c 100644
->>> --- a/include/hw/arm/aspeed_soc.h
->>> +++ b/include/hw/arm/aspeed_soc.h
->>> @@ -34,6 +34,11 @@
->>>  #define ASPEED_CPUS_NUM  2
->>>  #define ASPEED_MACS_NUM  4
->>> =20
->>> +#define ASPEED_MAC0_ON   (1 << 0)
->>> +#define ASPEED_MAC1_ON   (1 << 1)
->>> +#define ASPEED_MAC2_ON   (1 << 2)
->>> +#define ASPEED_MAC3_ON   (1 << 3)
->>> +
->>>  typedef struct AspeedSoCState {
->>>      /*< private >*/
->>>      DeviceState parent;
->>> @@ -55,6 +60,7 @@ typedef struct AspeedSoCState {
->>>      AspeedSDMCState sdmc;
->>>      AspeedWDTState wdt[ASPEED_WDTS_NUM];
->>>      FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
->>> +    uint32_t macs_mask;
->>=20
->> What's the purpose of this member?  When and how would it be different
->> from AspeedMachineClass's macs_mask?
->
-> Each machine activates a different set of MACs even if using the same SoC=
-.
-> So, the SoC macs_mask is overiden when the machine initializes the SoC in=
-=20
-> aspeed_machine_init().
-
-Let me try to rephrase my question below.
-
-> That said, I think the default SoC macs_mask should be all MACS, a value=
-=20
-> of 0xFFFFFFFF would be fine, and not only the first MAC as this patch doe=
-s.
->
->>>      AspeedMiiState mii[ASPEED_MACS_NUM];
->>>      AspeedGPIOState gpio;
->>>      AspeedGPIOState gpio_1_8v;
->>> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
->>> index 6f8f4b88f8ab..79c683864d7e 100644
->>> --- a/hw/arm/aspeed.c
->>> +++ b/hw/arm/aspeed.c
->>> @@ -283,6 +283,8 @@ static void aspeed_machine_init(MachineState *machi=
-ne)
->>>                              &error_abort);
->>>      object_property_set_int(OBJECT(&bmc->soc), amc->num_cs, "num-cs",
->>>                              &error_abort);
->>> +    object_property_set_int(OBJECT(&bmc->soc), amc->macs_mask, "macs-m=
-ask",
->>> +                            &error_abort);
-
-Here, you set AspeedSocState member macs_mask to AspeedMachineClass
-member macs_mask.
-
->>>      object_property_set_link(OBJECT(&bmc->soc), OBJECT(&bmc->ram_conta=
-iner),
->>>                               "dram", &error_abort);
->>>      if (machine->kernel_filename) {
->>> @@ -556,12 +558,14 @@ static int aspeed_soc_num_cpus(const char *soc_na=
-me)
->>>  static void aspeed_machine_class_init(ObjectClass *oc, void *data)
->>>  {
->>>      MachineClass *mc =3D MACHINE_CLASS(oc);
->>> +    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
->>> =20
->>>      mc->init =3D aspeed_machine_init;
->>>      mc->no_floppy =3D 1;
->>>      mc->no_cdrom =3D 1;
->>>      mc->no_parallel =3D 1;
->>>      mc->default_ram_id =3D "ram";
->>> +    amc->macs_mask =3D ASPEED_MAC0_ON;
-
-Abstract base type's .class_init() sets AspeedMachineClass's macs_mask
-to "just first one".
-
->>> =20
->>>      aspeed_machine_class_props_init(oc);
->>>  }
->>> @@ -680,6 +684,7 @@ static void aspeed_machine_ast2600_evb_class_init(O=
-bjectClass *oc, void *data)
->>>      amc->fmc_model =3D "w25q512jv";
->>>      amc->spi_model =3D "mx66u51235f";
->>>      amc->num_cs    =3D 1;
->>> +    amc->macs_mask  =3D ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_=
-ON;
->>>      amc->i2c_init  =3D ast2600_evb_i2c_init;
->>>      mc->default_ram_size =3D 1 * GiB;
->>>      mc->default_cpus =3D mc->min_cpus =3D mc->max_cpus =3D
->>> @@ -698,6 +703,7 @@ static void aspeed_machine_tacoma_class_init(Object=
-Class *oc, void *data)
->>>      amc->fmc_model =3D "mx66l1g45g";
->>>      amc->spi_model =3D "mx66l1g45g";
->>>      amc->num_cs    =3D 2;
->>> +    amc->macs_mask  =3D ASPEED_MAC2_ON;
->>>      amc->i2c_init  =3D witherspoon_bmc_i2c_init; /* Same board layout =
-*/
->>>      mc->default_ram_size =3D 1 * GiB;
->>>      mc->default_cpus =3D mc->min_cpus =3D mc->max_cpus =3D
-
-Two concrete types' .class_init() override this default.
-
-Fine with me.
-
->>> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
->>> index 114b94f8f44d..fa85122f6d78 100644
->>> --- a/hw/arm/aspeed_ast2600.c
->>> +++ b/hw/arm/aspeed_ast2600.c
->>> @@ -247,6 +247,7 @@ static void aspeed_soc_ast2600_realize(DeviceState =
-*dev, Error **errp)
->>>      AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
->>>      Error *err =3D NULL, *local_err =3D NULL;
->>>      qemu_irq irq;
->>> +    NICInfo *nd =3D &nd_table[0];
->>> =20
->>>      /* IO space */
->>>      create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOM=
-EM],
->>> @@ -462,8 +463,12 @@ static void aspeed_soc_ast2600_realize(DeviceState=
- *dev, Error **errp)
->>>      }
->>> =20
->>>      /* Net */
->>> -    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
->>> -        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]=
-);
->>> +    for (i =3D 0; i < sc->macs_num; i++) {
->>> +        if ((s->macs_mask & (1 << i)) && nd->used) {
-
-This checks AspeedSocState's member.
-
->>> +            qemu_check_nic_model(nd, TYPE_FTGMAC100);
->>> +            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
->>> +            nd++;
->>> +        }
->>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspe=
-ed",
->>>                                   &err);
->>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "real=
-ized",
->>> @@ -471,7 +476,7 @@ static void aspeed_soc_ast2600_realize(DeviceState =
-*dev, Error **errp)
->>>          error_propagate(&err, local_err);
->>>          if (err) {
->>>              error_propagate(errp, err);
->>> -           return;
->>> +            return;
->>>          }
->>>          sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
->>>                          sc->memmap[ASPEED_ETH1 + i]);
->>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->>> index 984d29087dce..d2c6a5760790 100644
->>> --- a/hw/arm/aspeed_soc.c
->>> +++ b/hw/arm/aspeed_soc.c
->>> @@ -234,6 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
-ror **errp)
->>>      AspeedSoCState *s =3D ASPEED_SOC(dev);
->>>      AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
->>>      Error *err =3D NULL, *local_err =3D NULL;
->>> +    NICInfo *nd =3D &nd_table[0];
->>> =20
->>>      /* IO space */
->>>      create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOM=
-EM],
->>> @@ -405,8 +406,12 @@ static void aspeed_soc_realize(DeviceState *dev, E=
-rror **errp)
->>>      }
->>> =20
->>>      /* Net */
->>> -    for (i =3D 0; i < nb_nics && i < sc->macs_num; i++) {
->>> -        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]=
-);
->>> +    for (i =3D 0; i < sc->macs_num; i++) {
->>> +        if ((s->macs_mask & (1 << i)) && nd->used) {
-
-Likewise.
-
-Now my rephrased question: why do you need to store macs_mask both in
-AspeedSoCState and in AspeedMachineClass?  As far as I can tell, their
-values are the same for any given machine.
-
->>> +            qemu_check_nic_model(nd, TYPE_FTGMAC100);
->>> +            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
->>> +            nd++;
->>> +        }
->>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspe=
-ed",
->>>                                   &err);
->>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "real=
-ized",
->>> @@ -455,6 +460,7 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
-ror **errp)
->>>                         aspeed_soc_get_irq(s, ASPEED_SDHCI));
->>>  }
->>>  static Property aspeed_soc_properties[] =3D {
->>> +    DEFINE_PROP_UINT32("macs-mask", AspeedSoCState, macs_mask, 0x1),
-
-Shouldn't this be ASPEED_MAC0_ON rather than 0x1?
-
-Hmm, isn't aspeed_machine_class_init()'s amc->macs_mask =3D ASPEED_MAC0_ON
-redundant with this?
-
->>>      DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGI=
-ON,
->>>                       MemoryRegion *),
->>>      DEFINE_PROP_END_OF_LIST(),
->>=20
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyMDEzMjAwMy45NDky
+LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIGFhcmNoNjQtc29m
+dG1tdS9ody9hcm0vaW50ZWdyYXRvcmNwLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kz
+ODYva3ZtL2k4MjU0Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYvYWNwaS1taWNyb3ZtLmM6
+IEluIGZ1bmN0aW9uICdidWlsZF9kc2R0X21pY3Jvdm0nOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcv
+aTM4Ni9hY3BpLW1pY3Jvdm0uYzoxMDk6NTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9m
+IGZ1bmN0aW9uICdmd19jZmdfYWRkX2FjcGlfZHNkdCcgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rp
+b24tZGVjbGFyYXRpb25dCiAgICAgZndfY2ZnX2FkZF9hY3BpX2RzZHQoc2Jfc2NvcGUsIHg4Nm1z
+LT5md19jZmcpOwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYvYWNwaS1taWNyb3Zt
+LmM6MTA5OjU6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9mICdmd19jZmdfYWRk
+X2FjcGlfZHNkdCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCmNjMTogYWxsIHdhcm5pbmdzIGJl
+aW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbaHcvaTM4Ni9hY3BpLW1pY3Jvdm0u
+b10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9tYWluc3RvbmUubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L2FybS9taWNyb2JpdC5vCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L3RhcmdldC9hcm0vZ2Ric3R1YjY0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJn
+ZXQvYXJtL21hY2hpbmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vYXJj
+aF9kdW1wLm8KbWFrZTogKioqIFt4ODZfNjQtc29mdG1tdS9hbGxdIEVycm9yIDIKbWFrZTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS90YXJnZXQvYXJtL21vbml0b3IubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9h
+cm0vYXJtLXBvd2VyY3RsLm8KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
+ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
+Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
+PTVjZmEwOTAwZmFkNzRkM2U5NmYwMjkzODY4OTZmNzUxJywgJy11JywgJzEwMDEnLCAnLS1zZWN1
+cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
+U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
+PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9E
+SVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9j
+a2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtNjEyZ3gwcjAvc3JjL2RvY2tlci1zcmMuMjAyMC0wNS0yMC0xMS40My41Ni4zMjA5
+NTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVu
+JywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVy
+PS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NWNmYTA5MDBmYWQ3NGQzZTk2
+ZjAyOTM4Njg5NmY3NTEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06
+IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNjEyZ3gwcjAv
+c3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpy
+ZWFsICAgIDJtMzEuNTc4cwp1c2VyICAgIDBtOC42MjBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDUyMDEzMjAwMy45NDkyLTEta3Jh
+eGVsQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
