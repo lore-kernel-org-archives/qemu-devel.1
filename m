@@ -2,97 +2,72 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C5EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB91C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:35:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 353D520709
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:33:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D94012075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 17:35:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="adslTD1e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353D520709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tcoEXJmI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D94012075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbSau-0003uA-C6
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:33:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53838)
+	id 1jbSdA-0007kl-1T
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 13:35:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbSXw-0006p4-Eu
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:30:24 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:41386)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbSXv-0004iM-EQ
- for qemu-devel@nongnu.org; Wed, 20 May 2020 13:30:24 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id x1so4964596ejd.8
- for <qemu-devel@nongnu.org>; Wed, 20 May 2020 10:30:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=gCsN2Hk1sU0xzNL4AIWx7BMeAlkTZEIG27VpbqniL2w=;
- b=adslTD1ekujX7RSOAsUYT5haBjqAyII84V7/ApuyqqaI5CDu1b4Fq3KTmU2oHQwU0x
- iZ0wp8wvS2SFsoaOEJSAxS5rqo8fkM/zyUCCW9t5NmeZckhPfYC6agaaMRZsVySoHssD
- liMP69Rq/6LDx+8uZ/3kw4C810pyw0v90zkIS357+sJjvq0Z/zipk8lVzKNyFy7Ey0Ri
- Zd8NMVjp2o7PToZI8fGrahrfXbGMq7JfgwhBhwdoPgPuUK7mF/1rd/iLPns1yXLBeUCp
- WABh45Usd5sIq7i3Q0pjCpm/pZvdIdpCzosQ0Kt5n82bd86w8vSo44oGW+w7T9LYVX8K
- Lzxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=gCsN2Hk1sU0xzNL4AIWx7BMeAlkTZEIG27VpbqniL2w=;
- b=LndXXu5ty4tc0u26gMANtL7L0ar+OPThZacuXU3pc5uNeVglZt6H6Dzyl5P65GyZv3
- jF0iBK6mFpZTeCYCqfW0zXxsmqZkarvjOWuz/TLMfkpMlLXQU2bznSQazz6/kUwisAts
- EMWuXYtg32uxxZkP44AR3ZTTSOGwk4BIb9EUKHV8J+h3acIN9GuXIuLq9FAY/nL5696+
- VbKUyM88T/bGEh0z8BJHLlrBrrSMVyafASobzhZxE2Bj1NhxMehZhsILsw4zkRLy3DDW
- vkoKKzl+6vEuYMVgPGoiQtxAXk7RdNHiB86gdofyBfgikVWXNs2MQIebhvHmxShKN0xe
- 6U1g==
-X-Gm-Message-State: AOAM533J2b83gHI9n8j5QzsMk4q0l3O68xoy//klWuLUlmRrhOAyjIKQ
- iyHfVPOlXXz4UbZ6mHhO2ll+Qw==
-X-Google-Smtp-Source: ABdhPJwVu676Ik6HHBoqgxuLh1kv2+y30/CW2Y6HlRQZSjRhUArBPdiEeAodrLIEZW5JEMnAGQMMGw==
-X-Received: by 2002:a17:906:3509:: with SMTP id
- r9mr135686eja.382.1589995821602; 
- Wed, 20 May 2020 10:30:21 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d22sm2531856edj.62.2020.05.20.10.30.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 May 2020 10:30:20 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 945EE1FF7E;
- Wed, 20 May 2020 18:30:19 +0100 (BST)
-References: <20200519025355.4420-1-richard.henderson@linaro.org>
- <20200519025355.4420-16-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [RISU v2 15/17] Compute reginfo_size based on the reginfo
-In-reply-to: <20200519025355.4420-16-richard.henderson@linaro.org>
-Date: Wed, 20 May 2020 18:30:19 +0100
-Message-ID: <87sgfufr9w.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jbScS-0006rx-Nk
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:35:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34354)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jbScR-0005UR-Ey
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 13:35:04 -0400
+Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A57D220709;
+ Wed, 20 May 2020 17:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1589996102;
+ bh=I4OjoXpzqnyuXULuQZ/vUsj6Sj5E8T2qU9GYKKG5SE4=;
+ h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+ b=tcoEXJmIB0Ow4D2q5YDEJNtMp00t+gsF63QycBG73m8eTGXKbRggKlh7/xuR0Iyls
+ ilgaClwSwh5udmz2UyOwwOLWo+MmasxEtl8oQCcQKh9+SlQoa65jsQFX7heX0luqRo
+ p7Ol83sghNZ22bT5oc5/tgyWnO1s1l/N1YvKP/G0=
+Date: Wed, 20 May 2020 10:35:00 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH 2/2] xen/9pfs: yield when there isn't enough room on the
+ ring
+In-Reply-To: <14197604.KFEeGaIGOr@silver>
+Message-ID: <alpine.DEB.2.21.2005201016280.27502@sstabellini-ThinkPad-T480s>
+References: <alpine.DEB.2.21.2005191651130.27502@sstabellini-ThinkPad-T480s>
+ <20200520014712.24213-2-sstabellini@kernel.org> <14197604.KFEeGaIGOr@silver>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x62d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=198.145.29.99;
+ envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 13:35:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,112 +80,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, paul@xen.org,
+ qemu-devel@nongnu.org, groug@kaod.org, anthony.perard@citrix.com,
+ Stefano Stabellini <stefano.stabellini@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 20 May 2020, Christian Schoenebeck wrote:
+> On Mittwoch, 20. Mai 2020 03:47:12 CEST Stefano Stabellini wrote:
+> > From: Stefano Stabellini <stefano.stabellini@xilinx.com>
+> > 
+> > Instead of truncating replies, which is problematic, wait until the
+> > client reads more data and frees bytes on the reply ring.
+> > 
+> > Do that by calling qemu_coroutine_yield(). The corresponding
+> > qemu_coroutine_enter_if_inactive() is called from xen_9pfs_bh upon
+> > receiving the next notification from the client.
+> > 
+> > We need to be careful to avoid races in case xen_9pfs_bh and the
+> > coroutine are both active at the same time. In xen_9pfs_bh, wait until
+> > either the critical section is over (ring->co == NULL) or until the
+> > coroutine becomes inactive (qemu_coroutine_yield() was called) before
+> > continuing. Then, simply wake up the coroutine if it is inactive.
+> > 
+> > Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+> > ---
+> 
+> In general this patch makes sense to me, and much better and cleaner solution 
+> than what we discussed before. Just one detail ...
+> 
+> >  hw/9pfs/xen-9p-backend.c | 28 ++++++++++++++++++++++------
+> >  1 file changed, 22 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > index fc197f6c8a..3939539028 100644
+> > --- a/hw/9pfs/xen-9p-backend.c
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -37,6 +37,7 @@ typedef struct Xen9pfsRing {
+> > 
+> >      struct iovec *sg;
+> >      QEMUBH *bh;
+> > +    Coroutine *co;
+> > 
+> >      /* local copies, so that we can read/write PDU data directly from
+> >       * the ring */
+> > @@ -198,16 +199,18 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
+> > *pdu, g_free(ring->sg);
+> > 
+> >      ring->sg = g_new0(struct iovec, 2);
+> > -    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+> > +    ring->co = qemu_coroutine_self();
+> > +    smp_wmb();
+> > 
+> > +again:
+> > +    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+> >      buf_size = iov_size(ring->sg, num);
+> >      if (buf_size  < size) {
+> > -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+> > -                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
+> > -                buf_size);
+> > -        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+> > -        xen_9pfs_disconnect(&xen_9pfs->xendev);
+> > +        qemu_coroutine_yield();
+> > +        goto again;
+> >      }
+> > +    ring->co = NULL;
+> > +    smp_wmb();
+> > 
+> >      *piov = ring->sg;
+> >      *pniov = num;
+> > @@ -292,6 +295,19 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
+> >  static void xen_9pfs_bh(void *opaque)
+> >  {
+> >      Xen9pfsRing *ring = opaque;
+> > +    bool wait;
+> > +
+> > +again:
+> > +    wait = ring->co != NULL && qemu_coroutine_entered(ring->co);
+> > +    smp_rmb();
+> > +    if (wait) {
+> > +        cpu_relax();
+> > +        goto again;
+> > +    }
+> > +
+> > +    if (ring->co != NULL) {
+> > +        qemu_coroutine_enter_if_inactive(ring->co);
+> 
+> ... correct me if I am wrong, but AFAIK qemu_coroutine_enter_if_inactive() 
+> will simply run the coroutine directly on caller's thread, it will not 
+> dispatch the coroutine onto the thread which yielded the coroutine before.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Yes, that is correct. I thought it would be fine because the caller here
+is a bh function so it should have no problems entering the coroutine.
 
-> This will allow dumping of SVE frames without having
-> to know the SVE vector length beforehand.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  risu.h                 | 2 +-
->  reginfo.c              | 6 +++---
->  risu_reginfo_aarch64.c | 4 ++--
->  risu_reginfo_arm.c     | 2 +-
->  risu_reginfo_i386.c    | 2 +-
->  risu_reginfo_m68k.c    | 2 +-
->  risu_reginfo_ppc64.c   | 2 +-
->  7 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/risu.h b/risu.h
-> index eeb6775..054cef7 100644
-> --- a/risu.h
-> +++ b/risu.h
-> @@ -155,6 +155,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f);
->  int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
->=20=20
->  /* return size of reginfo */
-> -const int reginfo_size(void);
-> +int reginfo_size(struct reginfo *ri);
->=20=20
->  #endif /* RISU_H */
-> diff --git a/reginfo.c b/reginfo.c
-> index f187d9c..411c2a6 100644
-> --- a/reginfo.c
-> +++ b/reginfo.c
-> @@ -38,7 +38,7 @@ RisuResult send_register_info(void *uc)
->      case OP_TESTEND:
->      case OP_COMPARE:
->      case OP_SIGILL:
-> -        header.size =3D reginfo_size();
-> +        header.size =3D reginfo_size(&ri);
->          extra =3D &ri;
->          break;
->=20=20
-> @@ -109,7 +109,7 @@ RisuResult recv_and_compare_register_info(void *uc)
->      case OP_TESTEND:
->      case OP_COMPARE:
->      case OP_SIGILL:
-> -        extra_size =3D reginfo_size();
-> +        extra_size =3D reginfo_size(&master_ri);
->          break;
->      case OP_SETMEMBLOCK:
->      case OP_GETMEMBLOCK:
-> @@ -217,7 +217,7 @@ void report_mismatch_header(void)
->          case OP_COMPARE:
->          case OP_SIGILL:
->              kind =3D "reginfo";
-> -            a_sz =3D reginfo_size();
-> +            a_sz =3D reginfo_size(&apprentice_ri);
->              break;
->          case OP_SETMEMBLOCK:
->          case OP_GETMEMBLOCK:
-> diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-> index 028c690..7044648 100644
-> --- a/risu_reginfo_aarch64.c
-> +++ b/risu_reginfo_aarch64.c
-> @@ -69,7 +69,7 @@ void process_arch_opt(int opt, const char *arg)
->  #endif
->  }
->=20=20
-> -const int reginfo_size(void)
-> +int reginfo_size(struct reginfo *ri)
->  {
->      int size =3D offsetof(struct reginfo, simd.end);
->  #ifdef SVE_MAGIC
-> @@ -194,7 +194,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
->  /* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal =
-*/
->  int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
->  {
-> -    return memcmp(r1, r2, reginfo_size()) =3D=3D 0;
-> +    return memcmp(r1, r2, reginfo_size(r1)) =3D=3D 0;
->  }
->=20=20
->  #ifdef SVE_MAGIC
-> diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-> index 3662f12..3832e27 100644
-> --- a/risu_reginfo_arm.c
-> +++ b/risu_reginfo_arm.c
-> @@ -36,7 +36,7 @@ void process_arch_opt(int opt, const char *arg)
->      abort();
->  }
->=20=20
-> -const int reginfo_size(void)
-> +int reginfo_size(struct reginfo *ri)
->  {
->      return sizeof(struct reginfo);
+But I am not that much of an expert on coroutines... Do you think there
+could be issues?
 
-I wonder if the fixed size architectures should return (sizeof *ri) to
-reinforce the point? Anyway:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > +    }
+> >      xen_9pfs_receive(ring);
+> >  }
+> 
+> AFAICS you have not addressed the problem msize >> xen ringbuffer size, in 
+> which case I would expect the Xen driver to loop forever. Am I missing 
+> something or have you postponed addressing this?
 
---=20
-Alex Benn=C3=A9e
+Yes, I postponed addressing that issue because of a couple of reasons.
+
+For starter strictly speaking it should not be required: msize cannot be
+bigger than the ring, but it can be equal to the ring increasing the
+chances of having to wait in QEMU. It should still be correct but the
+performance might not be great.
+
+The other reason is that I already have the patches for both QEMU and
+Linux, but I am seeing a strange error setting order = 10. Order = 9
+works fine. I would like to do a bit more investigation before sending
+those patches.
 
