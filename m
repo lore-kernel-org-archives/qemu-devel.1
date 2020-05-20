@@ -2,105 +2,97 @@ Return-Path: <SRS0=CoOB=7C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B75C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF02C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:40:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A61682075F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:35:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEC622075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 May 2020 05:40:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MIX/wky/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61682075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oPw5xPkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC622075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbHOA-0006VJ-Nv
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 01:35:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52826)
+	id 1jbHSh-0000QT-1A
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 01:40:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbHNY-0005sB-82
- for qemu-devel@nongnu.org; Wed, 20 May 2020 01:34:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49700
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbHNU-0005Cg-Cm
- for qemu-devel@nongnu.org; Wed, 20 May 2020 01:34:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589952891;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D/yYznJjjbKntahD85eM3G3iBzc/4A4M0fpH6H+uGs8=;
- b=MIX/wky/k6HWQfVxHG3fZfd5TdDKlRHtm0DcZGYj2l4X0WmVlZYPLgJwf8OsDZniK+ph2j
- KSn/GSPNplS6fqt+t4+cW5rVPWohLNDR/mqrNyLIdZlNZ/OcfAog6tNK/II2pywCMrwOpv
- ksW4+Z+HFqWXGy//JmzsIYxo1OX9IW4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-dZlPq8FtM6KZqXL8Yjiuxg-1; Wed, 20 May 2020 01:34:49 -0400
-X-MC-Unique: dZlPq8FtM6KZqXL8Yjiuxg-1
-Received: by mail-wm1-f71.google.com with SMTP id t23so472359wmi.2
- for <qemu-devel@nongnu.org>; Tue, 19 May 2020 22:34:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jbHRn-000848-Ex
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 01:39:19 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37432)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jbHRl-00061k-Ej
+ for qemu-devel@nongnu.org; Wed, 20 May 2020 01:39:19 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y198so1033075pfb.4
+ for <qemu-devel@nongnu.org>; Tue, 19 May 2020 22:39:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FInLJZsz7DTqWcGwjBxLaRbWeRV5xABJxDSojaES5KY=;
+ b=oPw5xPkA2TMKFp1prKUSo+rayv5WQx3+L/8acQ7kvJ5WzXKD9SiUs1AVcR6OD2S5Ud
+ Ov0q8I7b285SO/yGTVTjQuDfFak13rE/1bBdUiHbAmojclT97yF5Uo+KpDitVsWVrxnR
+ /FH700R5Wr34EtK5xw37Bs/AJPm4UPWPf7MMru995LOdEwUZa4oEhxWrk83fsYnJYqce
+ mSAz+QYfwqVt64DXni6Z+STyluThihunrv1Y9xLy47VbRbmCroX6j+7B7EyRMuDAs6Pp
+ bbwZH2r8Vh+cMUGJ2gjfqQ+yAbQY8CNh+kA5f4SoioYQSAk1LwGu4AqK5a9+ylyBZqbc
+ PN4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=D/yYznJjjbKntahD85eM3G3iBzc/4A4M0fpH6H+uGs8=;
- b=EcGsGXAk9rfcj/JfITZPxGYG0ztvRRbrP75LsRHNuwjLnveuJajfOPLvEnlooVg78S
- Zwls6H1BnhN3ZvtWF5RZJHM/VPunBbVsh6zNbDVvZ8bODUkvRaOUeoIabSsHVAV+LlcP
- B9x36E55lbRudosVlybNS8d7l7nQdD3soWz/qo5hwevsKc1mV6euELLdDXsNQKnrWmIE
- i8XeTiC32/LVj3eyKxuM7oVUHSp81O51ksSvjxw2wL4S54v18aSIOqsw3Y1Kxt5qNFny
- nE4d7ERDl4NfNIvYv4MqQtAnfCx4IbziHcNfDRH5mZXUuP5He+Ei8n4FhpiMLKN/iV5D
- Z3zA==
-X-Gm-Message-State: AOAM530QsGBPKn+HV3jvaxwaRkGBf6F7F+ZlEsP5JXui3luAGMS2O+44
- EcSSWAjcV0vQGOo99zYYTa80AIyXwp7s9CxuSaWO6iu+4eWaWAYasIo7GxqjBex4XTE0y4wU1a6
- 18xGSpA4hOYyaQJI=
-X-Received: by 2002:a1c:1d12:: with SMTP id d18mr2740590wmd.109.1589952887965; 
- Tue, 19 May 2020 22:34:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+SOI1Gmyov1lTPJzY3jQUMg10BGC+7T14icI66hcTHgN45PaD+092ApR1AQR1o9aTNpPEXQ==
-X-Received: by 2002:a1c:1d12:: with SMTP id d18mr2740572wmd.109.1589952887716; 
- Tue, 19 May 2020 22:34:47 -0700 (PDT)
-Received: from [192.168.1.40] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id w82sm1910070wmg.28.2020.05.19.22.34.46
+ bh=FInLJZsz7DTqWcGwjBxLaRbWeRV5xABJxDSojaES5KY=;
+ b=S2fZ8UiFEE/xONjPnftSrXKnB4jsfowgcKJm7V2NLk2ZuDJ1SzT+o39dNSZuCqEXmC
+ iSvCYWxVP7fcBgVOl7vzy9imZJ0q5x41+/AzPC2FWJSUbnkH0vbcMVg9SQTyLz7KEZu+
+ RzMtd/oH9VkY7EncpJ8TOwQprgkWbL/khe2FI+jeGJkPzsMkMusCP+3E8sTv+V1EqTWL
+ q5pWcG1z9Wk7qtPDrrdxf6rRe4+EcTpXux2CNm4J14pd/fBx1BVX7aZ7I63LM56OVdMp
+ ZMy8keBKqhUv/EIK+rG2IXmCFONJR1Mmn2TBVZRycdAPf2mvgbhqPHuRVZ1Zoxj85/2h
+ kMcw==
+X-Gm-Message-State: AOAM532hegjvbLy7s9kOeVgjBKR4azI646397gd9AniVk45NwJ/gEhYS
+ 34gWTMRVDMt4Q4njLdE+qmRk6A==
+X-Google-Smtp-Source: ABdhPJwLb7sqsvqUu6Q29FaPEPim2OcgLc/9qs1KFVPeRYlOXneX5oVgn3PFdKu/9uRA8dXdMbxZeg==
+X-Received: by 2002:aa7:955d:: with SMTP id w29mr2757768pfq.133.1589953155824; 
+ Tue, 19 May 2020 22:39:15 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id d4sm902663pgk.2.2020.05.19.22.39.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 May 2020 22:34:47 -0700 (PDT)
-Subject: Re: [PATCH 3/7] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-To: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>
-References: <20200519200207.17773-1-chen.zhang@intel.com>
- <20200519200207.17773-4-chen.zhang@intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <02f98f09-5e41-601f-4a40-9ce6236994ad@redhat.com>
-Date: Wed, 20 May 2020 07:34:45 +0200
+ Tue, 19 May 2020 22:39:15 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/8] riscv: Add RV64I instructions description
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, peter.maydell@linaro.org
+References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+ <20200430072139.4602-2-zhiwei_liu@c-sky.com>
+ <eb866cde-b8c1-f722-d364-1ae015bb277d@linaro.org>
+ <c776b7f2-ceda-4ab8-b006-698dd41fcc48@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3f84427c-8978-0e36-f4e8-d498e15ead20@linaro.org>
+Date: Tue, 19 May 2020 22:39:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200519200207.17773-4-chen.zhang@intel.com>
+In-Reply-To: <c776b7f2-ceda-4ab8-b006-698dd41fcc48@c-sky.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 01:34:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,58 +105,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Straub <lukasstraub2@web.de>, qemu-dev <qemu-devel@nongnu.org>,
- Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, palmer@dabbelt.com, alistair23@gmail.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/20 10:02 PM, Zhang Chen wrote:
-> From: Lukas Straub <lukasstraub2@web.de>
-> 
-> This will be needed in the next patch.
+On 5/19/20 7:41 PM, LIU Zhiwei wrote:
+>> Since all of sp, gp, tp are not in risu's control, why is rs1 only excluding
+>> sp, and not gp and tp as well?
+> When I test the patch set, I find gp and tp will be the same in slave and master，
+> so they can be used as source register.
 
-Can you reword to something clearer, maybe:
+Ah, try again with different builds of risu, e.g. one with -O2 and one with
+-O0.  I think you will find that these values are set by the linker for the image.
 
-"To be able to convert compare_chr_send to a coroutine in the
-next commit, use qemu_co_sleep_ns if in coroutine."
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->   chardev/char.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 0196e2887b..4c58ea1836 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -38,6 +38,7 @@
->   #include "qemu/module.h"
->   #include "qemu/option.h"
->   #include "qemu/id.h"
-> +#include "qemu/coroutine.h"
->   
->   #include "chardev/char-mux.h"
->   
-> @@ -119,7 +120,11 @@ static int qemu_chr_write_buffer(Chardev *s,
->       retry:
->           res = cc->chr_write(s, buf + *offset, len - *offset);
->           if (res < 0 && errno == EAGAIN && write_all) {
-> -            g_usleep(100);
-> +            if (qemu_in_coroutine()) {
-> +                qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
-> +            } else {
-> +                g_usleep(100);
-> +            }
->               goto retry;
->           }
->   
-> 
-
+r~
 
