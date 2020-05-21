@@ -2,101 +2,90 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F170C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B893EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:04:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C112D206F6
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 855A2206F6
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:04:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fN7/2RTQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C112D206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiWfoA53"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855A2206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbmek-0005Ez-W6
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 10:58:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36912)
+	id 1jbmkE-0007jK-PD
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:04:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jbme5-0004jG-Rr
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:58:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35332
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jbme5-0005Bc-3G
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:58:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590073083;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=3Si3qtkn40kX0AiF533h/p6EDRcZ7Trw0xx0ZzJl84Y=;
- b=fN7/2RTQKRa/f9rokgYJyXKyfBIOsa6i67okTQILKgxsRHaqZ2Tz0tRBQ06b62fEdpfjUR
- gvaHaWLigXAneHqvcLEokMu4PHUkpAJg6ala90VmAe58yaeQQdGju25iaG3B0nwEIHBUTK
- /4UQCnO4Ga4AL2g/ctnAGDPlOCPNSoE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-g-Tw4jGTNNObhqL2Ar3W1Q-1; Thu, 21 May 2020 10:57:57 -0400
-X-MC-Unique: g-Tw4jGTNNObhqL2Ar3W1Q-1
-Received: by mail-wr1-f71.google.com with SMTP id d16so3010347wrv.18
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 07:57:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jbmjV-0007Bq-Bx; Thu, 21 May 2020 11:03:41 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37812)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jbmjU-0006Qe-0Y; Thu, 21 May 2020 11:03:41 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l17so6986521wrr.4;
+ Thu, 21 May 2020 08:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=jV5z+Kcrxa9LISUBYrnyYVTjGTANh97spCgmRUf0OCo=;
+ b=BiWfoA53QyDf8xiwCKXAZC792q9Zc/228YGLH+105UqOVmssnxZumKU5a7+6cnh+lQ
+ 2bUImRf3c5jDYUwIWkqAa7tS4gV6sCdrz55yUUGxT6UsL8wc5FW3HF71SxzXWl6EKy+T
+ RR7J4B36BEBx68AjqNp8r1Y9vvSwdsTxssjda0A3/mHRPQCqWabonHQUz9SDvJVKYk3m
+ uTyI2OwmOPmmivQzqjoDrrVBF+uh1aup3er1PVNIYKSLN6TUA697j6tvUydLWh4iw+L/
+ bCxuhBfxDHqyGlxGi5AcrgdwfAYByFgB07H3Te1q2NhIXso9kvMXMQNI+cjh+XLGfizZ
+ qN6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=3Si3qtkn40kX0AiF533h/p6EDRcZ7Trw0xx0ZzJl84Y=;
- b=Mxh/jat9cWUPWqZylvOSn6zVD+DaIRDLBfL2Kykcs53BHT0XJ0ikcD/SXUWltsc1FK
- 2RU4Sgr6QzA43Ov/zU/lUBP57tN846C6xaVKJN9Ezw2KONMoPuTC7nA4aKTCkUssbYGa
- Ux6ZcgxE8GiFMxr/GXcuy9g80iJ3JufV8dFH1e6hjlFYXVP3RLL1lvyr0c6MyTkjeTfQ
- RtJ7bfAszwOfk0e3pELQKAUMZmIBD7h+7iUGLDF6H1/RI+UGVj+/RbQctaQnXOWp5X+B
- HgdqJERF5j4u5GUtsrVMj3WqYC92YEb8iuQqMP8/fRwrD+dT5+zrx86H4apaPcE9av6a
- 6NEg==
-X-Gm-Message-State: AOAM531H1n7cVyEZuJHLeY835kNmMDys+ZYeG/CyktSgNMwDXhj2kakH
- ds6TnAMlGUhFNgiCQoXGCAgPfgNIz+Z697E79Tgnr84/kWC7uIhOyyhWvmvH6BQg1lB/O1+0kWZ
- f8U6RaChHrzBHYBY=
-X-Received: by 2002:a5d:608d:: with SMTP id w13mr4802845wrt.298.1590073076308; 
- Thu, 21 May 2020 07:57:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwOFS5TejhR15+Y2WeAZJPpL455gAydDwrBHpXNH3HyID9tenRjiiMm+wrbBFwPOfB+5/kMew==
-X-Received: by 2002:a5d:608d:: with SMTP id w13mr4802821wrt.298.1590073076040; 
- Thu, 21 May 2020 07:57:56 -0700 (PDT)
-Received: from steredhat ([79.49.207.108])
- by smtp.gmail.com with ESMTPSA id w20sm6729890wmk.25.2020.05.21.07.57.54
+ bh=jV5z+Kcrxa9LISUBYrnyYVTjGTANh97spCgmRUf0OCo=;
+ b=S8Kiamlbzfo9fT5EIswocgpteBaTkloDUk3+Pnidw6aKIefrTtFaTOJ+9DMsQU10di
+ Wm5UXChQI0raDPu1HKO3a0XZgNwT0Nbl+SuxtXN8mCGEtIJWknTJB7rpDuLFN4XGBWg/
+ CpC6BT7OagZo+8LPyBe3rbfRYCzo8Ma11KEN5B9sELVPy6UD/u7PWg4gb2+O6db3ZbyF
+ 0JpLu8g7gvC1M64CgBqqblYAxAz9A+4OIs+T0il/vh0zQwuMwM2yiCszYLG9mOBtYGRk
+ s05ZE3VX1WibTMfOu5ofHezcxPaoM5xglGFGcSr7/Fh5eUjboRympMjy36ZS1wj6oFEt
+ 8Ywg==
+X-Gm-Message-State: AOAM530YyxHYgio21F3vwHL5OhgUJ31SFM37iGCAUpy/pCFmRGznG17u
+ ytMAchPMHKh76xJ0QBHAEwM=
+X-Google-Smtp-Source: ABdhPJyadM7DzptqrGXHeetrqos/V5uQuwT8vg8ZO1HsuW8GbVDOi7mFM0/iXawCn0XC9MoTQsursw==
+X-Received: by 2002:adf:ef47:: with SMTP id c7mr1515936wrp.57.1590073418041;
+ Thu, 21 May 2020 08:03:38 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id 5sm6760994wmz.16.2020.05.21.08.03.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 07:57:55 -0700 (PDT)
-Date: Thu, 21 May 2020 16:57:53 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [PATCH] io_uring: use io_uring_cq_ready() to check for ready cqes
-Message-ID: <20200521145753.psawkk3elsgnxony@steredhat>
-References: <20200519134942.118178-1-sgarzare@redhat.com>
- <20200521144534.GN251811@stefanha-x1.localdomain>
+ Thu, 21 May 2020 08:03:37 -0700 (PDT)
+Date: Thu, 21 May 2020 16:03:35 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v2 1/4] Introduce yank feature
+Message-ID: <20200521150335.GO251811@stefanha-x1.localdomain>
+References: <cover.1590008051.git.lukasstraub2@web.de>
+ <20005a15c708fbda983f9be602c55fc0b1979a18.1590008051.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20200521144534.GN251811@stefanha-x1.localdomain>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="rQ7Ovc9/RBrrr0/1"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <20005a15c708fbda983f9be602c55fc0b1979a18.1590008051.git.lukasstraub2@web.de>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,38 +98,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 03:45:34PM +0100, Stefan Hajnoczi wrote:
-> On Tue, May 19, 2020 at 03:49:42PM +0200, Stefano Garzarella wrote:
-> > In qemu_luring_poll_cb() we are not using the cqe peeked from the
-> > CQ ring. We are using io_uring_peek_cqe() only to see if there
-> > are cqes ready, so we can replace it with io_uring_cq_ready().
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  block/io_uring.c | 9 +++------
-> >  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> io_uring_cq_ready() was added in liburing 0.2 and is already used by
-> fdmon-io_uring.c. It's safe to use here.
-> 
-> I wanted to mention this in case anyone is concerned about dependencies.
-> liburing is a fast-moving target and everyone should be on liburing 0.5+.
 
-Yeah, thanks for doing that. I did this check, but I forgot to write it down...
+--rQ7Ovc9/RBrrr0/1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Thanks, applied to my block tree:
-> https://github.com/stefanha/qemu/commits/block
+On Wed, May 20, 2020 at 11:05:39PM +0200, Lukas Straub wrote:
+> +void yank_generic_iochannel(void *opaque)
+> +{
+> +    QIOChannel *ioc =3D QIO_CHANNEL(opaque);
+> +
+> +    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
+> +}
+> +
+> +void qmp_yank(strList *instances, Error **errp)
+> +{
+> +    strList *tmp;
+> +    struct YankInstance *instance;
+> +    struct YankFuncAndParam *entry;
+> +
+> +    qemu_mutex_lock(&lock);
+> +    tmp =3D instances;
+> +    for (; tmp; tmp =3D tmp->next) {
+> +        instance =3D yank_find_instance(tmp->value);
+> +        if (!instance) {
+> +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> +                      "Instance '%s' not found", tmp->value);
+> +            qemu_mutex_unlock(&lock);
+> +            return;
+> +        }
+> +    }
+> +    tmp =3D instances;
+> +    for (; tmp; tmp =3D tmp->next) {
+> +        instance =3D yank_find_instance(tmp->value);
+> +        assert(instance);
+> +        QLIST_FOREACH(entry, &instance->yankfns, next) {
+> +            entry->func(entry->opaque);
+> +        }
+> +    }
+> +    qemu_mutex_unlock(&lock);
+> +}
 
-Thanks,
-Stefano
+=46rom docs/devel/qapi-code-gen.txt:
 
+  An OOB-capable command handler must satisfy the following conditions:
+
+  - It terminates quickly.
+  - It does not invoke system calls that may block.
+  - It does not access guest RAM that may block when userfaultfd is
+    enabled for postcopy live migration.
+  - It takes only "fast" locks, i.e. all critical sections protected by
+    any lock it takes also satisfy the conditions for OOB command
+    handler code.
+
+This patch series violates these rules and calls existing functions that
+were not designed for OOB execution.
+
+Please explain why it is safe to do this.
+
+Stefan
+
+--rQ7Ovc9/RBrrr0/1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7GmEcACgkQnKSrs4Gr
+c8i3+Qf+KjAq5xl0Wlr557uX2HgDwl4orAe+VjbRS9HmH3UO/djYRmEktdL/OdFv
+5+L76GRiw4BWCwVQKNohmQjDd2vr+qpqzHvpenu72e/wGbn+Zg023vYjM31OB1u7
+evzWy8nTNERmQ4fhrZs35GakYoZSEbaQTrQqwzwiL3QRUEJm1yaoRJoAFRGQPKfb
+up4c56iUSqIqixhFN1CgvClWVufkBXg84ajEiuBJzDYvKGoC5ScuPJwpTNi4GHk5
+A2GZxOdBbcgN61L1t7jSnXk0H6yDiOREXcjWaG+GpmaxEyB5/0n71E9EWDLTwHjH
+jh0c9EVsMXClaOMFPJs/Q7F+cLCsLw==
+=6u+S
+-----END PGP SIGNATURE-----
+
+--rQ7Ovc9/RBrrr0/1--
 
