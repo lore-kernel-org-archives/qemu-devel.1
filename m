@@ -2,83 +2,144 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F98C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D07C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:38:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56EAB204EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF7F920814
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:38:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ArSlexCf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56EAB204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AKhXTo5Z";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="jxANxaS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF7F920814
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbr0i-00077M-Gz
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
+	id 1jbr1C-0008Aq-1W
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:38:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlP-0005JC-WC
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:56 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22398
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlN-0001iM-8z
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590088912;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6OVr8ibEOE5mMIhIy7+qnvD4Z98j/0E/PW+Pi7JthXk=;
- b=ArSlexCfxYNhjEivr9iWYRSdm3CKfZeOCyLPLZXIrpQ84VZBgKcv4l3uyC/6H1HZ6+lESt
- WNRVO90q8YoJiDRSnn73BSJfIPWzLVVnIoRylLZEamOWMddT8K3bBYmUEBWwyODWnZyRMo
- tWG3E4vqLGzkG48GVNkprobBH0PZ4lU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-Yv2qJoO3PpOzSeXM1rD6mw-1; Thu, 21 May 2020 15:21:49 -0400
-X-MC-Unique: Yv2qJoO3PpOzSeXM1rD6mw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 120278015D1;
- Thu, 21 May 2020 19:21:48 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88AA460C05;
- Thu, 21 May 2020 19:21:47 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 5/5] iotests: Add test 291 to for qemu-img bitmap coverage
-Date: Thu, 21 May 2020 14:21:37 -0500
-Message-Id: <20200521192137.1120211-6-eblake@redhat.com>
-In-Reply-To: <20200521192137.1120211-1-eblake@redhat.com>
-References: <20200521192137.1120211-1-eblake@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jbqp7-0005h3-F4
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:25:45 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:9569)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jbqp5-0002NA-Gn
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:25:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1590089143; x=1621625143;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:content-transfer-encoding:mime-version;
+ bh=IWFwfpIoAao4jDfNWuiM3Pv4IGU6alL9Ti8VPi+ePzk=;
+ b=AKhXTo5Zf31GSb+gtuJmz6AcSoyu13q5jwvPcAQCtWYTwBG5VNym/tL3
+ J7kZlHEhc5foRhnroZm92x8MYMlHYiYx2zjY81hl1NBiix2rcilIBv4gP
+ OHzXbgDjWB1uI/8iejhd2SbYqX2dY+i6RfRRNa/vsevM4TfKdJhnLhhHm E=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 21 May 2020 12:25:42 -0700
+Received: from nasanexm01h.na.qualcomm.com ([10.85.0.34])
+ by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 21 May 2020 12:25:42 -0700
+Received: from APSANEXR01A.ap.qualcomm.com (10.85.0.36) by
+ NASANEXM01H.na.qualcomm.com (10.85.0.34) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 21 May 2020 12:25:42 -0700
+Received: from nasanexm03g.na.qualcomm.com (10.85.0.49) by
+ APSANEXR01A.ap.qualcomm.com (10.85.0.36) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 21 May 2020 12:25:39 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Thu, 21 May 2020 12:25:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gBOqO3Vj/LyHJD/DAQWAuxu2W8CukfHNn1+Oate+9qIT0PhSLCJoqL+zqaX+KxBQk/VnFh0dZdM0CrnqGTcMkFksb64JcaCQyFYOmNqtV0sXiI3QsvTcIW2oYh5yt4NMQeewAP6iURiydl1ACD8KvZ0sp5EB21GQNgzcxN/KmONWfS0IsMEZYpxIh4etmFdIAXP2ErapPyhTo8/1QrgsGQqMW0ed7yahK5qdV1X24mzzf9fQfhzkOi5G+JlWtJuyhXwzxpJ2WYR3P1Jt5gSCP6QdE6NG2UX8WBSt3oAWw375hhka/wz3v8Y6EQk4ns8Qq0HlpWah3KFjycaH7irVHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NhUlpTqKrwPN4HgFztA2qUe3kAmLFvfLHE5Fn9MUsDs=;
+ b=FQYC9MLRaQ7mAeJE6RNs5BV9ZK5P4QxPrx7BgpZQwXUm2Q26Wp0DQIT62Tfoivmxe+nHEHlCtZJmDI17Wpawosado8iiZkQbkCZt3b0+kIKX145xqkfx7Cb5iOGIubJ3rghsPYwajA9xOHfIXXjpQNweGYtkla7kXgubaiUnspVSnzhXKeag4u6STtFM97gfBaLBkZRd56pTwc3hc1du2Z4ZDXA/K1ol25g2tLflqlzPboP9NfJAkI+EaicgF0nzxrYBlhVIIbR2+QMu3Ok/CfS6SsFUzGx9icA4uV2MyosbaBYSEID+UNx1nlvgdlf63OymXer+Px3BsQ2EvHFTHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NhUlpTqKrwPN4HgFztA2qUe3kAmLFvfLHE5Fn9MUsDs=;
+ b=jxANxaS4+b21ywVri0J8ERS4jnWdzKpGtbkZ/hgfDpQcJWAUvBZGgEb4/AsSI6WABnFDjzHf3y85vTRauIzWXcSCT9ltHWMeMksBIVYi6a/FiWRTD4VZExz9yDZLA8893gyrrPk33Gz1BwZ/4b33uv7ERtWG8V2E/uGD8DH+n5g=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3627.namprd02.prod.outlook.com
+ (2603:10b6:301:80::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.33; Thu, 21 May
+ 2020 19:25:38 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.3000.034; Thu, 21 May 2020
+ 19:25:38 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [RISU PATCH v2 11/22] sve2.risu: Add patterns for bitwise shift
+ (unpredicated) ops
+Date: Thu, 21 May 2020 12:25:00 -0700
+Message-ID: <20200521192511.6623-12-steplong@quicinc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200521192511.6623-1-steplong@quicinc.com>
+References: <20200521192511.6623-1-steplong@quicinc.com>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR20CA0056.namprd20.prod.outlook.com
+ (2603:10b6:208:235::25) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.qualcomm.com (24.102.122.190) by
+ MN2PR20CA0056.namprd20.prod.outlook.com (2603:10b6:208:235::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend
+ Transport; Thu, 21 May 2020 19:25:38 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [24.102.122.190]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 791dc7b3-0ac4-4703-6103-08d7fdbcbe46
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3627:
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB3627F208F7DB4C192DE9E751C7B70@MWHPR0201MB3627.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1079;
+X-Forefront-PRVS: 041032FF37
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bvG5wmwyC6zZWIn718WL5k4Zwx0ZluXp4qm9CVaTnnSSZ2p6SL54GvCoEC2HmR2qmxaMRkEMQkkX8vd5qNabcR01G+YZw7klJ95uITxwxz6rX1/tUjOgkey9v22vmsq1CM4EI/Em4Ku1C81pDZ9iAPzFR2YuoL64eLdnv4vnorAt5W84nyzF0QsEutXTHqjww2Wq4olZrDX1T9zfOIb5Nm0PZcC9agxwYDwKc6AMSGSgQlgyb/IG/2+OBjHEekeASjIdAAxpboszZRZQFDXpt1jEGIendHiSqSlL++id85BdDwhg9VQSAFQgv/vYRLUVmgrdgG7ApeYHiaw4Ceu/acBLlfDHlNzIA2/VkwMo65u7Rnal6MUelwcJUzNzYsEDKk78wgiZcZuDQ/0IehD2IrTaXT+nsMCw8U7jYgPvi9TEATA4PRudFR4cJGbNvRQH
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(366004)(346002)(376002)(39860400002)(396003)(136003)(26005)(186003)(16526019)(6666004)(6916009)(1076003)(86362001)(478600001)(2906002)(6486002)(5660300002)(8676002)(36756003)(8936002)(6512007)(6506007)(4326008)(66556008)(316002)(956004)(66476007)(66946007)(52116002)(2616005);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: gl4Qf72p+t0HQjT5a3e9ZV2YPuupIVoFay2hi0ps6Z19vcpEQlxBXRB8OkrK9knxYzaUNurGr1KijLGUt4s6YDXe5q4lWWs0iIxgvflVByqFJf8fuTzqayu6zNg0wKx6OjBFY2z2qaJib4jAouJ5vBz+e+SbMy1ILfMmafJlcuwJUZOMEm4ZfsWSPlksEj5/WFSwOIWcUjbujbvD4DWNbnEjsg3ysa/CwE7WvSMGsOFk0+r1eKS0VCyyM98qgI1dyIfZdQo8a3V6woQ12OKAxollFT1lbFokBamjiQy2POL1OWdc+4sHUul0wiNuX03FldiFzvZqw45agM/2CXXtUXGCEK9/vJlwgBzXpS0lKt+7B1JTCsNi3TywQHxo5nx5XOQZlwHto/iUnI3+hAeKYzLxtMxD4MqLIpa9j2Q8KFvhZWRzca07wJ4YjNxnWRkZcTf24udB+cp61IAsR7ZEThF9K40OBFJ4BbX7S4sP7Js=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 791dc7b3-0ac4-4703-6103-08d7fdbcbe46
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2020 19:25:38.7974 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wpbiz8Djs40VsMlk7rf4nnwPKu6hXeLX/hVJ1W0JC4cg1aCKAcJC1KNmtpXflS0xUpcwcVfMAhWfp1utPviWNw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3627
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 15:25:32
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,242 +153,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new test covering the 'qemu-img bitmap' subcommand, as well as
-'qemu-img convert --bitmaps', both added in recent patches.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Stephen Long <steplong@quicinc.com>
 ---
- tests/qemu-iotests/291     | 112 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/291.out |  80 ++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 193 insertions(+)
- create mode 100755 tests/qemu-iotests/291
- create mode 100644 tests/qemu-iotests/291.out
+ sve2.risu | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
-new file mode 100755
-index 000000000000..3ca83b9cd1f7
---- /dev/null
-+++ b/tests/qemu-iotests/291
-@@ -0,0 +1,112 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img bitmap handling
-+#
-+# Copyright (C) 2018-2020 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/sve2.risu b/sve2.risu
+index 6177848..adc5dd1 100755
+--- a/sve2.risu
++++ b/sve2.risu
+@@ -1,6 +1,19 @@
+ # Input file for risugen defining AArch64 SVE2 instructions
+ .mode arm.aarch64
+ 
++# Bitwise Shift (Unpredicated)
++## bitwise shift by immediate (predicated)
++SQSHL_imm   A64_V    00000100 tszh:2 00 0110 100 pg:3 tszl:2 imm3:3 zdn:5 \
++!constraints { !($tszh == 0 && $tszl == 0); }
++UQSHL_imm   A64_V    00000100 tszh:2 00 0111 100 pg:3 tszl:2 imm3:3 zdn:5 \
++!constraints { !($tszh == 0 && $tszl == 0); }
++SRSHR       A64_V    00000100 tszh:2 00 1100 100 pg:3 tszl:2 imm3:3 zdn:5 \
++!constraints { !($tszh == 0 && $tszl == 0); }
++URSHR       A64_V    00000100 tszh:2 00 1101 100 pg:3 tszl:2 imm3:3 zdn:5 \
++!constraints { !($tszh == 0 && $tszl == 0); }
++SQSHLU      A64_V    00000100 tszh:2 00 1111 100 pg:3 tszl:2 imm3:3 zdn:5 \
++!constraints { !($tszh == 0 && $tszl == 0); }
 +
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+status=1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    nbd_server_stop
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.nbd
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+_require_command QEMU_NBD
-+
-+echo
-+echo "=== Initial image setup ==="
-+echo
-+
-+# Create backing image with one bitmap
-+TEST_IMG="$TEST_IMG.base" _make_test_img 10M
-+$QEMU_IMG bitmap --add -f $IMGFMT "$TEST_IMG.base" b0
-+$QEMU_IO -c 'w 3M 1M' -f $IMGFMT "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Create initial image and populate two bitmaps: one active, one inactive.
-+ORIG_IMG=$TEST_IMG
-+TEST_IMG=$TEST_IMG.orig
-+_make_test_img -b "$ORIG_IMG.base" -F $IMGFMT 10M
-+$QEMU_IO -c 'w 0 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG bitmap --add -g 512k -f $IMGFMT "$TEST_IMG" b1
-+$QEMU_IMG bitmap --add --disable -f $IMGFMT "$TEST_IMG" b2
-+$QEMU_IO -c 'w 3M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG bitmap --clear -f $IMGFMT "$TEST_IMG" b1
-+$QEMU_IO -c 'w 1M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG bitmap --disable -f $IMGFMT "$TEST_IMG" b1
-+$QEMU_IMG bitmap --enable -f $IMGFMT "$TEST_IMG" b2
-+$QEMU_IO -c 'w 2M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+
-+echo
-+echo "=== Bitmap preservation not possible to non-qcow2 ==="
-+echo
-+
-+TEST_IMG=$ORIG_IMG
-+$QEMU_IMG convert --bitmaps -O raw "$TEST_IMG.orig" "$TEST_IMG" &&
-+    echo "unexpected success"
-+
-+echo
-+echo "=== Convert with bitmap preservation ==="
-+echo
-+
-+# Only bitmaps from the active layer are copied
-+$QEMU_IMG convert --bitmaps -O qcow2 "$TEST_IMG.orig" "$TEST_IMG"
-+$QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
-+# But we can also merge in bitmaps from other layers.  This test is a bit
-+# contrived to cover more code paths, in reality, you could merge directly
-+# into b0 without going through tmp
-+$QEMU_IMG bitmap --add --disable -f $IMGFMT "$TEST_IMG" b0
-+$QEMU_IMG bitmap --add --merge b0 -b "$TEST_IMG.base" -F $IMGFMT \
-+     -f $IMGFMT "$TEST_IMG" tmp
-+$QEMU_IMG bitmap --merge tmp -f $IMGFMT "$TEST_IMG" b0
-+$QEMU_IMG bitmap --remove --image-opts \
-+    driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG" tmp
-+$QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
-+
-+echo
-+echo "=== Check bitmap contents ==="
-+echo
-+
-+# x-dirty-bitmap is a hack for reading bitmaps; it abuses block status to
-+# report "data":false for portions of the bitmap which are set
-+IMG="driver=nbd,server.type=unix,server.path=$nbd_unix_socket"
-+nbd_server_start_unix_socket -r -f qcow2 -B b0 "$TEST_IMG"
-+$QEMU_IMG map --output=json --image-opts \
-+    "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b0" | _filter_qemu_img_map
-+nbd_server_start_unix_socket -r -f qcow2 -B b1 "$TEST_IMG"
-+$QEMU_IMG map --output=json --image-opts \
-+    "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b1" | _filter_qemu_img_map
-+nbd_server_start_unix_socket -r -f qcow2 -B b2 "$TEST_IMG"
-+$QEMU_IMG map --output=json --image-opts \
-+    "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b2" | _filter_qemu_img_map
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
-new file mode 100644
-index 000000000000..8c62017567e9
---- /dev/null
-+++ b/tests/qemu-iotests/291.out
-@@ -0,0 +1,80 @@
-+QA output created by 291
-+
-+=== Initial image setup ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=10485760
-+wrote 1048576/1048576 bytes at offset 3145728
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=10485760 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1048576/1048576 bytes at offset 3145728
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1048576/1048576 bytes at offset 2097152
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Bitmap preservation not possible to non-qcow2 ===
-+
-+qemu-img: Format driver 'raw' does not support bitmaps
-+
-+=== Convert with bitmap preservation ===
-+
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 10 MiB (10485760 bytes)
-+disk size: 4.39 MiB
-+Format specific information:
-+    compat: 1.1
-+    compression type: zlib
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+            name: b1
-+            granularity: 524288
-+        [1]:
-+            flags:
-+                [0]: auto
-+            name: b2
-+            granularity: 65536
-+    refcount bits: 16
-+    corrupt: false
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 10 MiB (10485760 bytes)
-+disk size: 4.48 MiB
-+Format specific information:
-+    compat: 1.1
-+    compression type: zlib
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+            name: b1
-+            granularity: 524288
-+        [1]:
-+            flags:
-+                [0]: auto
-+            name: b2
-+            granularity: 65536
-+        [2]:
-+            flags:
-+            name: b0
-+            granularity: 65536
-+    refcount bits: 16
-+    corrupt: false
-+
-+=== Check bitmap contents ===
-+
-+[{ "start": 0, "length": 3145728, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 3145728, "length": 1048576, "depth": 0, "zero": false, "data": false},
-+{ "start": 4194304, "length": 6291456, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false, "data": false},
-+{ "start": 2097152, "length": 8388608, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 2097152, "length": 1048576, "depth": 0, "zero": false, "data": false},
-+{ "start": 3145728, "length": 7340032, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 445c26f8d2e2..d886fa0cb355 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -299,5 +299,6 @@
- 288 quick
- 289 rw quick
- 290 rw auto quick
-+291 rw quick
- 292 rw auto quick
- 297 meta
+ # Integer Multiply (Unpredicated)
+ ## integer multiply vectors (unpredicated)
+ MUL         A64_V    00000100 size:2 1 zm:5 0110 00 zn:5 zd:5
 -- 
-2.26.2
+2.25.1
 
 
