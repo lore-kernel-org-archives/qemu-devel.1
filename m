@@ -2,110 +2,91 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABD6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40057C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:06:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8232B20671
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F03C5207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:06:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EpHDgFRt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8232B20671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qVUMJPyl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03C5207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnhH-000145-Np
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44866)
+	id 1jbnho-0002BC-5d
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:06:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbnf2-00060i-Ff
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:03:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44713
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbney-0004o4-NC
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:03:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590076982;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xGmYH1jC98Zq6xEJaKzyV5qDw2qZzLWN2/8MC35T9l4=;
- b=EpHDgFRtZKQ27LQlPtAqCKWd+R3hHbm107vdGrXhrPWHqdrgGFjWP6IznOLQeGa08HOmMS
- KhDLG0HUkF9k0PdzeVbTHN6IcPZP+N6AETrqAg7b2cNBOC+HsqT56PSe/m/5NutMp5BYQC
- DHX/x7wOeFMvcO6BX+XSDiZT9WIy3Kg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-U76cR2pZMlKiDewi7DSYKw-1; Thu, 21 May 2020 12:02:11 -0400
-X-MC-Unique: U76cR2pZMlKiDewi7DSYKw-1
-Received: by mail-wr1-f71.google.com with SMTP id r7so3102917wrc.13
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:02:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbndw-0004uR-2V; Thu, 21 May 2020 12:02:02 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:33554)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbndk-0004Y6-27; Thu, 21 May 2020 12:01:55 -0400
+Received: by mail-io1-xd44.google.com with SMTP id k18so8035014ion.0;
+ Thu, 21 May 2020 09:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uTHTIfmNBf76SWC/ADq3fQt/dNmanjgMWjPMSWG66gs=;
+ b=qVUMJPylQt/gJadtzON+UgGN3yxHKWAuBvi+M/QNmmIr0YafgmDoPMd38Xe9B+WVsc
+ Q4AOScajlmB7LHlxQKpo6+9AP+bU9ZBReDWjH+ivTjdsk4xaAkD7lNqpKnXy5oFl5/AP
+ Hj0pqJBloT5QhlGKSzBsihOiY1sI0Dys86wcKOLDIdXoaat+tXgmer5qU3J7lD3rGGfy
+ CZsbGkv7ycKN+nifbqRXEetoDbMPjfBfDWO/ZKisZHuGt5l7kiPSVl7Zd5OAqDlIAhcn
+ 6BxR113UioExTivMxTia4ezbTXid+vu4jeSjqKNOS9exLou2KdejXoba6BFg18sNkfXx
+ mv2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xGmYH1jC98Zq6xEJaKzyV5qDw2qZzLWN2/8MC35T9l4=;
- b=aSROBRfL1Cgs1o4jS3R4AgOD01zDKar9vikLGaVcmH68Z6RfgZcGlPIiUgNJJuX1lw
- RnVg9vrpGajcf5MGJL30twn20g0m2+WbDiLE0BpCUtvx0b+WvMhGyHzPgzGrWWkOEAoI
- 7SXF7YD5gSyAap7xBspaW9/amNfFi67cxhw813GaGe25k+URMpxkV1wGmBrljAdtf60a
- HtE+Chs8xd0Y/MWwBKBNDcmsLLDA3XNsKYen9tDg5JS4vTIvspxDlxICS7O1+WhipLfl
- /TLo6O2AqTj2RmQlhnhqkIDGPCOA9mF5zkacHY++cTJc1a1FlbbxZkIfHIbEhC7LuAIJ
- FrBg==
-X-Gm-Message-State: AOAM531xp5DGJuVTl/DcbR7/4obQq0GDAUd7IyJNNseYsO3KJ209bUU7
- uuGIfqVRbNgyFbuFHtEItdfUAqFSxNYAqv3T+r9Rlod28nGwMiDu9jiWpRjudl/tQVqQvYdF6QB
- M3hwDg9O7b4qM/a8=
-X-Received: by 2002:a05:600c:2c4e:: with SMTP id
- r14mr10066868wmg.118.1590076930346; 
- Thu, 21 May 2020 09:02:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwN1XT+ltL1eLoDcfylfjzJC+4mSl14Wv+YoPA2+5eB9Hsx0vy1/PEvU2PN9mh/nuPAlSHmyw==
-X-Received: by 2002:a05:600c:2c4e:: with SMTP id
- r14mr10066820wmg.118.1590076929743; 
- Thu, 21 May 2020 09:02:09 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.160.154])
- by smtp.gmail.com with ESMTPSA id v131sm7465617wmb.27.2020.05.21.09.02.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 09:02:09 -0700 (PDT)
-Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
-To: Igor Mammedov <imammedo@redhat.com>, Roman Kagan <rvkagan@yandex-team.ru>
-References: <20200424123444.3481728-1-arilou@gmail.com>
- <20200424123444.3481728-6-arilou@gmail.com>
- <20200505150637.7131e79b@redhat.com> <20200511182121.GA1307176@rvkaganb.lan>
- <20200513173414.62e3cb4e@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fb1661c0-7282-58b4-03b4-a77793cc8e97@redhat.com>
-Date: Thu, 21 May 2020 18:02:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uTHTIfmNBf76SWC/ADq3fQt/dNmanjgMWjPMSWG66gs=;
+ b=nE8bvZZMQObKIPTEM1cS43nsIBuSJbLrP5g8kIQD+VM4nmvHRVCoeEZqderEjvL0HI
+ 3l4560Yv46eOOJnX5V0pD8YAZExu0H109uBSrsLcCWR61ZndrCg2pSY5wK8ap8G8uH9Z
+ i/V4L0/AqiK7qQnRoLzKx5fUtX4YSwtICmBgGi0ay2gSUm+H9mrx3ZJcV/FTHqPhf7C0
+ XaCphPJalgOHMTfK/lHwsQoTOfSuhI/WrofSL0DxqlsInSL7XeJMNSc0H3pDFDg0lq5H
+ nKizEVvfpXgVEx8DG1OePtIPfZQtWKFdhNZw9TEIp4zS1aVowRes/iSoTfDf6devbCdr
+ o1Wg==
+X-Gm-Message-State: AOAM531lT50t0blgIjq1R6p2SGj8nw8m2LeRHxkr7lmLzD36TWSjcq+E
+ qA6P1lyzFXkfsZYePHB/ShY0zWjPXVViwHM/66I=
+X-Google-Smtp-Source: ABdhPJxShgMMu6A9SuWD+GwsjM+R6WUkYtn2izYoMLlACqvJATUUwqIePO/5/IjZg7uW3tDJTen+9mypvMCOmPqkNjg=
+X-Received: by 2002:a02:a118:: with SMTP id f24mr4530548jag.8.1590076906254;
+ Thu, 21 May 2020 09:01:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200513173414.62e3cb4e@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1588335545-649-1-git-send-email-bmeng.cn@gmail.com>
+ <CAKmqyKMdmVrvYDNVtm6_iviDT_mofGZO9DC2vtZdZaHN31T07A@mail.gmail.com>
+ <CAKmqyKO6HGQrMxsNovPkoB4TncEmeD=uFV_oXEpQ0t+=g20Wfw@mail.gmail.com>
+ <CAEUhbmVTg+521EHutukOod_PKx0RQ-s=EgnKu=JM-vduMn4mNA@mail.gmail.com>
+ <CAKmqyKPdjBFmPcQY+O4zsaTHYeLVC9zanXhS5CBovfn4LLRdJg@mail.gmail.com>
+ <CAEUhbmXPRN=1QCfr=ekG_m5wiWkQoG7pb-OzR-guixRutYJOEg@mail.gmail.com>
+In-Reply-To: <CAEUhbmXPRN=1QCfr=ekG_m5wiWkQoG7pb-OzR-guixRutYJOEg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 21 May 2020 08:52:50 -0700
+Message-ID: <CAKmqyKO+Yowc57izjx_5V6u8ncj1VZ897dTQNmkhWi9yT-PESg@mail.gmail.com>
+Subject: Re: [PATCH] riscv: Change the default behavior if no -bios option is
+ specified
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,22 +99,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com,
- Jon Doron <arilou@gmail.com>, qemu-devel@nongnu.org, liran.alon@oracle.com,
- Roman Kagan <rkagan@virtuozzo.com>, vkuznets@redhat.com,
- "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>, ehabkost@redhat.com
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/05/20 17:34, Igor Mammedov wrote:
-> I'd rather avoid using random IRQ numbers (considering we are dealing with
-> black-box here). So if it's really necessary to have IRQ described here,
-> I'd suggest to implement them in device model so they would be reserved
-> and QEMU would error out in a sane way if IRQ conflict is detected.
+On Wed, May 20, 2020 at 6:37 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Alistair,
+>
+> On Thu, May 7, 2020 at 5:02 AM Alistair Francis <alistair23@gmail.com> wrote:
+> >
+> > On Tue, May 5, 2020 at 6:34 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >
+> > > Hi Alistair,
+> > >
+> > > On Wed, May 6, 2020 at 6:37 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > > >
+> > > > On Tue, May 5, 2020 at 1:34 PM Alistair Francis <alistair23@gmail.com> wrote:
+> > > > >
+> > > > > On Fri, May 1, 2020 at 5:21 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > > > >
+> > > > > > From: Bin Meng <bin.meng@windriver.com>
+> > > > > >
+> > > > > > Per QEMU deprecated doc, QEMU 4.1 introduced support for the -bios
+> > > > > > option in QEMU for RISC-V for the virt machine and sifive_u machine.
+> > > > > > The default behavior has been that QEMU does not automatically load
+> > > > > > any firmware if no -bios option is included.
+> > > > > >
+> > > > > > Now 2 releases passed, it's time to change the default behavior to
+> > > > > > load the default OpenSBI firmware automatically. The firmware is
+> > > > > > included with the QEMU release and no user interaction is required.
+> > > > > > All a user needs to do is specify the kernel they want to boot with
+> > > > > > the -kernel option.
+> > > > > >
+> > > > > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > > > >
+> > > > > Thanks!
+> > > > >
+> > > > > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > > > >
+> > > > > Applied to the RISC-V tree.
+> > > >
+> > > > This fails `make check`
+> > > >
+> > > > qemu-system-riscv64: Unable to load the RISC-V firmware
+> > > > "opensbi-riscv64-spike-fw_jump.elf"
+> > > > Broken pipe
+> > > > /scratch/alistair/software/qemu/tests/qtest/libqtest.c:166:
+> > > > kill_qemu() tried to terminate QEMU process but encountered exit
+> > > > status 1 (expected 0)
+> > > > ERROR - too few tests run (expected 7, got 2)
+> > > > make: *** [/scratch/alistair/software/qemu/tests/Makefile.include:637:
+> > > > check-qtest-riscv64] Error 1
+> > > >
+> > >
+> > > Please apply this patch to fix the "make check" as well.
+> > >
+> > > [5/5] riscv: Suppress the error report for QEMU testing with
+> > > riscv_find_firmware()
+> > > http://patchwork.ozlabs.org/project/qemu-devel/patch/1588348254-7241-6-git-send-email-bmeng.cn@gmail.com/
+> >
+> > In future please send all related patches in a single series.
+> >
+> > I have applied those two patches.
+>
+> I checked https://github.com/alistair23/qemu/ but could not find where
+> these 2 patches applied. Just make sure I was not looking at the wrong
+> place?
 
-We don't generally detect ISA IRQ conflicts though, do we?
+That's the right place, I just hadn't pushed it there yet.
 
-Paolo
+I have an internal Git instance that does all the testing so I usually
+push it there.
 
+Alistair
+
+>
+> Regards,
+> Bin
 
