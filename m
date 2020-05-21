@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2959C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB9DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B663207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 588F6207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mau7wHTl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B663207D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fzpyOZJL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 588F6207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbqln-0005hx-Ew
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38022)
+	id 1jbqmk-0007bu-Dv
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqg5-0002AO-EQ
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:25 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55223)
+ id 1jbqg6-0002Cq-HF
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:26 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35272)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqg4-0000Pf-DU
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:25 -0400
-Received: by mail-wm1-x344.google.com with SMTP id h4so6505528wmb.4
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 12:16:23 -0700 (PDT)
+ id 1jbqg5-0000Qt-DC
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x14so2390848wrp.2
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 12:16:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=+UWd65MNaXy/OQDuLVzrQNt/oF82AvY7dMV37Xy5Rco=;
- b=mau7wHTlx20GUrMORsDr55dfX3PsdozLoDNwGmuKSpIVgMI6rSKWujLHj8V4If3/pr
- IXuvCDcShhjCQyTqTLaXr6uU324nwO/Sq+0z2jyop821BRi7Lf1tVYvvRzvStpagy7/T
- 1a8Vbxa9awEAHDHOEhiEDBcWAEHx3wmC8O24DycyTgBOzygMHhrDZubAiW+GGM0F8rJX
- oVlAe2vziAftYz0NeFkw5bL3yFxKuW8UHoLuRaCSzQH+ZTxTeep/s9Tv2U0kceg758Mn
- 72TO9kr1EaLrH4//uHE/v9TObtQBvn+onQWTU5/2sK4ubLIDwcHWy5yA1tf51cgs53TV
- tISg==
+ bh=SO0tJgJgn/EVNKJE79ekFtYmNOY8AvESSw03LMos9hM=;
+ b=fzpyOZJLlKmK5Yy561WQO4BU1pOaw0uW4dwrKR88etF5OV4L+0or4c7Y9C/1reZIcQ
+ m8E42WjQ+wtcsVEi5SVPNa0eQMrkVacIGPSWZWGoLrMYss5DxLAmWDUxry0yOdxzhUKJ
+ sAxddE7qPzUTTUINDeccQvk8lxD13mnyxeUeguQkx919rWd5Hljz3g8MAd9TWicmR+a9
+ 6dlXbEMRY52nqPWnlw3FOD/P6KQIDjHQhJGYyJdAntFLZEl5A50X8jeNJ8uJTrAyj3ig
+ BQYFUg86XLeRQnOt++t/w3Is3R2wyFuTnE0MeR8esOJWQ5wMXGsE6rFJmG4wPhBJc02e
+ mm0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+UWd65MNaXy/OQDuLVzrQNt/oF82AvY7dMV37Xy5Rco=;
- b=TwVeLWOHblrnm+o4fMrNHjzKzY3TQTvgWus+wWkhxl/AwoR9l3CuOOQigK+dA4IQCV
- fOspE/W/nAxk1+GFoajLxcbN12YG7zRKSDT67sip/3Dr14cpSb4WEk1JDBly0f9Z8c0g
- GFrWJqIYgaeDl3Pq/Ws6Gj6yRLJFprEwHTEAKbh8yhEmdBZF8CBBH1DORBle9mE2FBst
- sf/5V2ciBhbrejQ+bMwOE+DBWIzvIC+D+WcWy8Wr9JKgNSQKOpwIaRXY8gOVIlP05yHM
- aTatGlOg2dkAxfbb7Mmddz6CKPckopJYcXh9VRAe2EaXB/+JjsnXgdnXPJVNw5OznlQh
- ATbA==
-X-Gm-Message-State: AOAM531vw/1N8oZnRrwNsTMdGnzAOgxY1pgDtgJmkiOhaIANfqWMzh5P
- okaCXhKQbgX+V9/4N6EeX8gpdqVZGiTkmg==
-X-Google-Smtp-Source: ABdhPJwBZMV1vohQrSX/qYNWj/lzb5dEOuB2gpZqhnYLi8rJzpomY3lXfpgQxXrGN7MSyzgUHzfROA==
-X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr9543395wmt.129.1590088582641; 
- Thu, 21 May 2020 12:16:22 -0700 (PDT)
+ bh=SO0tJgJgn/EVNKJE79ekFtYmNOY8AvESSw03LMos9hM=;
+ b=f2Ai+9rq/N1Smto+Hi3FQ2r2m/o99nT+xM28mW1QIu2KizobdZ4S57vX0DDjHtGS70
+ xtrygQpP0xWaWnS6LM6uvL30UUmVAp3zIyRIWlYhj7sTKERpnwRztpLYsnpJLTEHv0gJ
+ eOc8eDL7bJ1eXMmIE3qxJ4mwQMIN27mCwC9QRE7gChO4gT0i9YyuamIOuHUIbESjlOa3
+ +gmWS4z9aZEH1uI0xeF8dA/StfOnD+9vg07CSE+gtpH5y5YEXL0cE43OVxNarj4eNL94
+ c2ulaMyrhFmAT+vPSKJZPs1DOY+Y2uobtcn0x+HjDX5zSa45PxP/dUyU8L7mTL/bzoqz
+ mJAg==
+X-Gm-Message-State: AOAM532QC8wo9l5eoh16pKp+sTIlQkqiDpT1C3E5nwEA7O/99d4G6eIb
+ q5Uca3iDzQsRQq0frvR1O2oanoOBcUh0dQ==
+X-Google-Smtp-Source: ABdhPJzr0Qo0h7vJug9tyT/R7iydg/VQNF6UcsyTZhplX9Qqkl1VBFqbn3idLwatunG2QSeoGF7UnA==
+X-Received: by 2002:adf:f007:: with SMTP id j7mr101079wro.294.1590088583667;
+ Thu, 21 May 2020 12:16:23 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z124sm7335100wmg.20.2020.05.21.12.16.21
+ by smtp.gmail.com with ESMTPSA id z124sm7335100wmg.20.2020.05.21.12.16.22
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 12:16:22 -0700 (PDT)
+ Thu, 21 May 2020 12:16:23 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/29] linux-user/arm: Remove bogus SVC 0xf0002 handling
-Date: Thu, 21 May 2020 20:15:49 +0100
-Message-Id: <20200521191610.10941-9-peter.maydell@linaro.org>
+Subject: [PULL 09/29] linux-user/arm: Handle invalid arm-specific syscalls
+ correctly
+Date: Thu, 21 May 2020 20:15:50 +0100
+Message-Id: <20200521191610.10941-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200521191610.10941-1-peter.maydell@linaro.org>
 References: <20200521191610.10941-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,47 +106,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We incorrectly treat SVC 0xf0002 as a cacheflush request (which is a
-NOP for QEMU).  This is the wrong syscall number, because in the
-svc-immediate OABI syscall numbers are all offset by the
-ARM_SYSCALL_BASE value and so the correct insn is SVC 0x9f0002.
-(This is handled further down in the code with the other Arm-specific
-syscalls like NR_breakpoint.)
+The kernel has different handling for syscalls with invalid
+numbers that are in the "arm-specific" range 0x9f0000 and up:
+ * 0x9f0000..0x9f07ff return -ENOSYS if not implemented
+ * other out of range syscalls cause a SIGILL
+(see the kernel's arch/arm/kernel/traps.c:arm_syscall())
 
-When this code was initially added in commit 6f1f31c069b20611 in
-2004, ARM_NR_cacheflush was defined as (ARM_SYSCALL_BASE + 0xf0000 + 2)
-so the value in the comparison took account of the extra 0x900000
-offset. In commit fbb4a2e371f2fa7 in 2008, the ARM_SYSCALL_BASE
-was removed from the definition of ARM_NR_cacheflush and handling
-for this group of syscalls was added below the point where we subtract
-ARM_SYSCALL_BASE from the SVC immediate value. However that commit
-forgot to remove the now-obsolete earlier handling code.
-
-Remove the spurious ARM_NR_cacheflush condition.
+Implement this distinction. (Note that our code doesn't look
+quite like the kernel's, because we have removed the
+0x900000 prefix by this point, whereas the kernel retains
+it in arm_syscall().)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200420212206.12776-3-peter.maydell@linaro.org
+Message-id: 20200420212206.12776-4-peter.maydell@linaro.org
 ---
- linux-user/arm/cpu_loop.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ linux-user/arm/cpu_loop.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
 diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-index 82d0dd3c312..025887d6b86 100644
+index 025887d6b86..df8b7b3fa96 100644
 --- a/linux-user/arm/cpu_loop.c
 +++ b/linux-user/arm/cpu_loop.c
-@@ -308,9 +308,7 @@ void cpu_loop(CPUARMState *env)
-                     n = insn & 0xffffff;
-                 }
- 
--                if (n == ARM_NR_cacheflush) {
--                    /* nop */
--                } else if (n == 0 || n >= ARM_SYSCALL_BASE || env->thumb) {
-+                if (n == 0 || n >= ARM_SYSCALL_BASE || env->thumb) {
-                     /* linux syscall */
-                     if (env->thumb || n == 0) {
-                         n = env->regs[7];
+@@ -332,10 +332,32 @@ void cpu_loop(CPUARMState *env)
+                             env->regs[0] = cpu_get_tls(env);
+                             break;
+                         default:
+-                            qemu_log_mask(LOG_UNIMP,
+-                                          "qemu: Unsupported ARM syscall: 0x%x\n",
+-                                          n);
+-                            env->regs[0] = -TARGET_ENOSYS;
++                            if (n < 0xf0800) {
++                                /*
++                                 * Syscalls 0xf0000..0xf07ff (or 0x9f0000..
++                                 * 0x9f07ff in OABI numbering) are defined
++                                 * to return -ENOSYS rather than raising
++                                 * SIGILL. Note that we have already
++                                 * removed the 0x900000 prefix.
++                                 */
++                                qemu_log_mask(LOG_UNIMP,
++                                    "qemu: Unsupported ARM syscall: 0x%x\n",
++                                              n);
++                                env->regs[0] = -TARGET_ENOSYS;
++                            } else {
++                                /* Otherwise SIGILL */
++                                info.si_signo = TARGET_SIGILL;
++                                info.si_errno = 0;
++                                info.si_code = TARGET_ILL_ILLTRP;
++                                info._sifields._sigfault._addr = env->regs[15];
++                                if (env->thumb) {
++                                    info._sifields._sigfault._addr -= 2;
++                                } else {
++                                    info._sifields._sigfault._addr -= 4;
++                                }
++                                queue_signal(env, info.si_signo,
++                                             QEMU_SI_FAULT, &info);
++                            }
+                             break;
+                         }
+                     } else {
 -- 
 2.20.1
 
