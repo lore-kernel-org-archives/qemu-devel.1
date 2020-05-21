@@ -2,61 +2,85 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1009DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E28CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D00F62072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:11:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D00F62072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id E1622207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:12:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uN3jSS0I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1622207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbiAt-0000lS-2g
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:11:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34016)
+	id 1jbiBE-0001kB-2p
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:12:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbi9t-00088i-M1; Thu, 21 May 2020 06:10:37 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54723)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbi9s-0008QG-Ak; Thu, 21 May 2020 06:10:37 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07175729|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.352125-0.0102329-0.637642;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03295; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbcARRC_1590055831; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbcARRC_1590055831)
- by smtp.aliyun-inc.com(10.147.41.121);
- Thu, 21 May 2020 18:10:31 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 13/62] target/riscv: vector bitwise logical instructions
-Date: Thu, 21 May 2020 17:43:24 +0800
-Message-Id: <20200521094413.10425-14-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbiAT-0000Eh-Kl
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:11:13 -0400
+Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:35910)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbiAS-0000E0-HD
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:11:13 -0400
+Received: by mail-oo1-xc44.google.com with SMTP id z6so1340947ooz.3
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 03:11:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pw2spoNl9hq2cynOq7AsA2bEwjM65Mh8ubI6Jh+9VLc=;
+ b=uN3jSS0IeCYxo59x3867j+0fMtDOxx/xFd+sxX1D+cjbfHXyjmzMdMw2teOAwZdYqa
+ LlfRCc8C/jNq4/jAf/lOpEMe3smysFypiUdxlqjxRA2HAaTEzAk3VHCQZ6Vx8u/TrPBb
+ pT3jxdqer7kGQLugdptpR2U/ZgvaVL5M8Hht2v2iA2LThOibIx5+c5HvDbQj0tT1tAcb
+ rsTnPVA1IR8H/ECExfv0mOHOZHt5aCQVVTIo38dbdpBK/9WAXVU3as0BUB/xj7dUrKPn
+ A+R4O+DRadxDj9PzCn7Mfg5dzncwLqNXT1hilSWMI1y6O7/hEuXpz+fevX1sTcDY70vz
+ AVZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pw2spoNl9hq2cynOq7AsA2bEwjM65Mh8ubI6Jh+9VLc=;
+ b=RwGLEVKYJMCjsPX1gad1wVhe7tJFhgAv0J2cAiJfuC+CMDA3ApLng5zquI7Def0SMB
+ peTAqZbc6I4MBHgUIKqOGeE28pQBLoyb85tnN5Rd7lYePVuVLfSJcXNjhgkRTO2KcKqL
+ n8W0PoplGHmPpcu+Eod7qfgCLmw/UMnfFDt6FbDQ4fS2/wkfm3eSm3TTMhCZ7xg7UOtG
+ 3U89TOsvN9sEGzje87/ZZ/K8WRyL/VWjMBqO892DysgZzesQPKiWot40MKNKyurlYMPC
+ dCSmRfB8boCL9SO2zu5BZ71Mva2cAr07pIllVik32CC5ldJ+qKs1kitePOelv3tBTA8T
+ +1Ow==
+X-Gm-Message-State: AOAM532jHpYlrzNkigPujSaFFDFesXq1XH/IvoYuVbYfTpMgyuMA1SQP
+ kozs9INPgmbvX7PIo3S5YwfjiYX++UzIdBrOEeoYFg==
+X-Google-Smtp-Source: ABdhPJwCxJ6Iv/lH6iTN8nEXIbXqUhQGZH2eCPbREAO4MI4OnyYVC7ewwPgaq6hZOI9PuWo6+z/b4OaV/iZnHk+UXqM=
+X-Received: by 2002:a05:6820:5b:: with SMTP id
+ v27mr4541688oob.85.1590055865872; 
+ Thu, 21 May 2020 03:11:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
+References: <20200519164957.26920-1-richard.henderson@linaro.org>
+In-Reply-To: <20200519164957.26920-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 May 2020 11:10:54 +0100
+Message-ID: <CAFEAcA_jOS6dSxbF2UaKpmzNd5EC1dbA6i8YBN9r1LDxF=bwWw@mail.gmail.com>
+Subject: Re: [PULL 00/10] softfloat misc cleanups
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,155 +94,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 25 ++++++++++++
- target/riscv/insn32.decode              |  9 +++++
- target/riscv/insn_trans/trans_rvv.inc.c | 11 ++++++
- target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++++
- 4 files changed, 96 insertions(+)
+On Tue, 19 May 2020 at 17:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit f2465433b43fb87766d79f42191607dac4aed5b4:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-05-19 13:42:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-fpu-20200519
+>
+> for you to fetch changes up to 150c7a91ce7862bcaf7422f6038dcf0ba4a7eee3:
+>
+>   softfloat: Return bool from all classification predicates (2020-05-19 08:43:05 -0700)
+>
+> ----------------------------------------------------------------
+> Misc cleanups
+>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 186d72a2aa..ea4a4a6054 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -376,3 +376,28 @@ DEF_HELPER_6(vmsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vand_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vand_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vand_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vand_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vor_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vor_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vor_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vor_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vxor_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vxor_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vxor_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vxor_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vand_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vand_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vand_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vand_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vxor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vxor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vxor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vxor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 022c8ea18b..3ad6724632 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -311,6 +311,15 @@ vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r_vm_1
- vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r_vm_1
- vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r_vm_1
- vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vand_vv         001001 . ..... ..... 000 ..... 1010111 @r_vm
-+vand_vx         001001 . ..... ..... 100 ..... 1010111 @r_vm
-+vand_vi         001001 . ..... ..... 011 ..... 1010111 @r_vm
-+vor_vv          001010 . ..... ..... 000 ..... 1010111 @r_vm
-+vor_vx          001010 . ..... ..... 100 ..... 1010111 @r_vm
-+vor_vi          001010 . ..... ..... 011 ..... 1010111 @r_vm
-+vxor_vv         001011 . ..... ..... 000 ..... 1010111 @r_vm
-+vxor_vx         001011 . ..... ..... 100 ..... 1010111 @r_vm
-+vxor_vi         001011 . ..... ..... 011 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 3ce70388ea..d66e89631d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1362,3 +1362,14 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
- 
- GEN_OPIVI_TRANS(vadc_vim, 0, vadc_vxm, opivx_vadc_check)
- GEN_OPIVI_TRANS(vmadc_vim, 0, vmadc_vxm, opivx_vmadc_check)
-+
-+/* Vector Bitwise Logical Instructions */
-+GEN_OPIVV_GVEC_TRANS(vand_vv, and)
-+GEN_OPIVV_GVEC_TRANS(vor_vv,  or)
-+GEN_OPIVV_GVEC_TRANS(vxor_vv, xor)
-+GEN_OPIVX_GVEC_TRANS(vand_vx, ands)
-+GEN_OPIVX_GVEC_TRANS(vor_vx,  ors)
-+GEN_OPIVX_GVEC_TRANS(vxor_vx, xors)
-+GEN_OPIVI_GVEC_TRANS(vand_vi, 0, vand_vx, andi)
-+GEN_OPIVI_GVEC_TRANS(vor_vi, 0, vor_vx,  ori)
-+GEN_OPIVI_GVEC_TRANS(vxor_vi, 0, vxor_vx, xori)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 6a43b53c8c..57a780a24e 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1264,3 +1264,54 @@ GEN_VEXT_VMADC_VXM(vmsbc_vxm_b, uint8_t,  H1, DO_MSBC)
- GEN_VEXT_VMADC_VXM(vmsbc_vxm_h, uint16_t, H2, DO_MSBC)
- GEN_VEXT_VMADC_VXM(vmsbc_vxm_w, uint32_t, H4, DO_MSBC)
- GEN_VEXT_VMADC_VXM(vmsbc_vxm_d, uint64_t, H8, DO_MSBC)
-+
-+/* Vector Bitwise Logical Instructions */
-+RVVCALL(OPIVV2, vand_vv_b, OP_SSS_B, H1, H1, H1, DO_AND)
-+RVVCALL(OPIVV2, vand_vv_h, OP_SSS_H, H2, H2, H2, DO_AND)
-+RVVCALL(OPIVV2, vand_vv_w, OP_SSS_W, H4, H4, H4, DO_AND)
-+RVVCALL(OPIVV2, vand_vv_d, OP_SSS_D, H8, H8, H8, DO_AND)
-+RVVCALL(OPIVV2, vor_vv_b, OP_SSS_B, H1, H1, H1, DO_OR)
-+RVVCALL(OPIVV2, vor_vv_h, OP_SSS_H, H2, H2, H2, DO_OR)
-+RVVCALL(OPIVV2, vor_vv_w, OP_SSS_W, H4, H4, H4, DO_OR)
-+RVVCALL(OPIVV2, vor_vv_d, OP_SSS_D, H8, H8, H8, DO_OR)
-+RVVCALL(OPIVV2, vxor_vv_b, OP_SSS_B, H1, H1, H1, DO_XOR)
-+RVVCALL(OPIVV2, vxor_vv_h, OP_SSS_H, H2, H2, H2, DO_XOR)
-+RVVCALL(OPIVV2, vxor_vv_w, OP_SSS_W, H4, H4, H4, DO_XOR)
-+RVVCALL(OPIVV2, vxor_vv_d, OP_SSS_D, H8, H8, H8, DO_XOR)
-+GEN_VEXT_VV(vand_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vand_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vand_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vand_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vor_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vor_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vor_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vor_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vxor_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vxor_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vxor_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vxor_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vand_vx_b, OP_SSS_B, H1, H1, DO_AND)
-+RVVCALL(OPIVX2, vand_vx_h, OP_SSS_H, H2, H2, DO_AND)
-+RVVCALL(OPIVX2, vand_vx_w, OP_SSS_W, H4, H4, DO_AND)
-+RVVCALL(OPIVX2, vand_vx_d, OP_SSS_D, H8, H8, DO_AND)
-+RVVCALL(OPIVX2, vor_vx_b, OP_SSS_B, H1, H1, DO_OR)
-+RVVCALL(OPIVX2, vor_vx_h, OP_SSS_H, H2, H2, DO_OR)
-+RVVCALL(OPIVX2, vor_vx_w, OP_SSS_W, H4, H4, DO_OR)
-+RVVCALL(OPIVX2, vor_vx_d, OP_SSS_D, H8, H8, DO_OR)
-+RVVCALL(OPIVX2, vxor_vx_b, OP_SSS_B, H1, H1, DO_XOR)
-+RVVCALL(OPIVX2, vxor_vx_h, OP_SSS_H, H2, H2, DO_XOR)
-+RVVCALL(OPIVX2, vxor_vx_w, OP_SSS_W, H4, H4, DO_XOR)
-+RVVCALL(OPIVX2, vxor_vx_d, OP_SSS_D, H8, H8, DO_XOR)
-+GEN_VEXT_VX(vand_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vand_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vand_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vand_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vor_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vor_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vor_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vor_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vxor_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vxor_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vxor_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vxor_vx_d, 8, 8, clearq)
--- 
-2.23.0
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
