@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5AEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A82DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:54:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0469A20738
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B921420738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:54:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pZb91J4+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0469A20738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qxolO3NH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B921420738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jboSD-0006WN-0J
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:53:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49824)
+	id 1jboSJ-0006dT-SV
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:54:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboIP-0002oR-CW
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:43:49 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:43885)
+ id 1jboIH-0002Tc-Lz
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:43:41 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:41358)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboIO-0006YJ-8c
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:43:49 -0400
-Received: by mail-qt1-x844.google.com with SMTP id o19so5959582qtr.10
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:43:47 -0700 (PDT)
+ id 1jboIG-0006XM-Mm
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:43:41 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id v15so3357276qvr.8
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:43:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=g63owhhb8d7q+R165WbO0bbEASJ91qSEhs9R7K8DZ68=;
- b=pZb91J4+YV1jkHgjHuVL16X0gRx2pwVmAFRvZc3r7ppD8tNl4e4ssbPY62XRNoDpZu
- IE0+VzWruGoYhdw9k2kqB8lrboZGXkAmX0rjGf9V85f7fcoV2ow4k7fHDkYjTeDOPltX
- s7bJZCktdCI7Gs+RN0YkXSONm7E3cYXLNTCx3HNDjCbkQPJU/19CVBEFH2DuxWWqqSO6
- a5s5ZbTwTZeAH/rrJsu2x1jeEWTgZjRQReo7AxajmxTNAiwAcrhNWXDaCQCIZ/7OK4YQ
- iUpfjJWQtoxw0uP4UB0g9iLOAW+SSfsX1bVeb0wPz2LCWy9xTJtOrqyVhg6J2wiN/idr
- DKNA==
+ bh=dMJD65Hlj8sZEjsVc6zG0Ir/AhvAmDKltVf3k3r4CgY=;
+ b=qxolO3NHBjbuWSRVm36ecn5krJ1xJDM5MsGZe5bSWEmRz2qykCI/o2yo/NPfJ3CxQP
+ UqPRK/+HK3cnZax4qIl/EXV5PqZd/zWzN9uyUetgiB/7NayvCslb5KR2+jKttR6Flm2o
+ oXT0VevNgkoD14jUvTXvMbjiDA++0c8Oxv6GGAMV8JWe2+MxNWrBAx2195PKKvY0FGUv
+ PG/n6uqVOMcQO9T4xYRpIRjbIaoyaCYpJzMPk/pkLqj/XsNniKiEmGjm9TwiyZqI64dO
+ BBWUZDbpuiCo6+JCd2RC0lsYhp/6YKmL9IeXLsLkxmkzObsyg3H/Y7sf+uHiLQXhrWbv
+ 7/sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=g63owhhb8d7q+R165WbO0bbEASJ91qSEhs9R7K8DZ68=;
- b=eYbEhl1GE0QUvOcv/NaxZT0lNzuoixxQeox1PUad9t/tI7E0lOcboV3KLrqiKtFNyi
- zIMh2/56BlC4lSA2pxLfwyZdAYuwMPQ0D5FNRKMtIN4RAnzqrQlU/3OR6qVknNRxu+3P
- SDB3e/FgxrcGBgmZKRI2c/eJwcNXjG4eiuJ9nC/dwoB05ILQb997WqSPckd27Arg3qLe
- hntgvIyOS62yoV4Ra9KQoL2ltlODHum3VotGLRwCpymSxUlBEHfloA2S4yh9sjowA6Ch
- dcGTGbA7Fv0YB1ykHOqdOeGudioIP3NUlzDTKYnZc+eBEc69gEKKoRCFSJbfrx9vlqOS
- fBow==
-X-Gm-Message-State: AOAM530Td0fp3E6uW5Yi+VyFTwAFtjWLeo9mL6xGU95PMWhxFMuS4fJc
- rJPp8v4UGJDKVkPb16zdHldwq9zKUcFPVw==
-X-Google-Smtp-Source: ABdhPJxoSA+WpbJOz0cRapSvWGyFgNqZskC4h70FVJaCxHtB3cxQ7wfGL4lkfk+WXbNiZu8tuO9BHg==
-X-Received: by 2002:ac8:6c54:: with SMTP id z20mr11445559qtu.76.1590079427042; 
- Thu, 21 May 2020 09:43:47 -0700 (PDT)
+ bh=dMJD65Hlj8sZEjsVc6zG0Ir/AhvAmDKltVf3k3r4CgY=;
+ b=KuYo6IZlTZ1XttfxunsmF1aGxFv4mcvDe0aIuZ31VVzTZ6DAkqGoTEoXH/hBnM+dTj
+ AP7RBtA9iY8mWIQvj5HPQICSUwFqQ+IaGzoYUSOoyfVcrPswBkMMG47xGUHTWq+gJpgM
+ 0f8zY3Cgh2CuHwolhLwB7vI2o+7CIvVy4DUtfs3Pyss60uRE2EAFGma2QbJu0bfkYDB4
+ FP57VJ0OD4OWpUpz8kIEM95KCIbp1HR5sdWHHnEPvf0al/8/b38wz6HHX1Xh9H4ksLCK
+ jvb98sA5Is5fMQH7qEGkGPiaQ+DfJT4CjB7xo4OlYJ4pNzZ+/0SbblF5XHeFRxBcys4j
+ D1Zw==
+X-Gm-Message-State: AOAM5332XtZyh+abh8PK8/yt4zD86oNYgCBXHRSlXW7VrP2A8UeW86n4
+ LjrjaM4h5eunNvDZK7wQYLVJ/iNenEvjMw==
+X-Google-Smtp-Source: ABdhPJzU6+L9m9eKgmFy4T2CpzBwZGdFhnu+SPFlwBxgP8YjJY+IKwveBx7QWv1alWwOabyJgBzpMA==
+X-Received: by 2002:a0c:f590:: with SMTP id k16mr11076855qvm.81.1590079418769; 
+ Thu, 21 May 2020 09:43:38 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.43.45
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.43.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:43:46 -0700 (PDT)
+ Thu, 21 May 2020 09:43:37 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 24/74] mips: convert to cpu_halted
-Date: Thu, 21 May 2020 12:39:21 -0400
-Message-Id: <20200521164011.638-25-robert.foley@linaro.org>
+Subject: [PATCH v9 18/74] arm: convert to cpu_halted
+Date: Thu, 21 May 2020 12:39:15 -0400
+Message-Id: <20200521164011.638-19-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
- envelope-from=robert.foley@linaro.org; helo=mail-qt1-x844.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,142 +101,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
- robert.foley@linaro.org, peter.puhov@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, robert.foley@linaro.org,
+ alex.bennee@linaro.org, richard.henderson@linaro.org, cota@braap.org,
+ qemu-arm@nongnu.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
+Cc: Andrzej Zaborowski <balrogg@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-[RF: Converted code in target/mips/kvm.c to cpu_halted.]
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/mips/cps.c            | 2 +-
- hw/misc/mips_itu.c       | 4 ++--
- target/mips/cp0_helper.c | 6 +++---
- target/mips/kvm.c        | 2 +-
- target/mips/op_helper.c  | 2 +-
- target/mips/translate.c  | 4 ++--
- 6 files changed, 10 insertions(+), 10 deletions(-)
+ hw/arm/omap1.c            | 4 ++--
+ hw/arm/pxa2xx_gpio.c      | 2 +-
+ hw/arm/pxa2xx_pic.c       | 2 +-
+ target/arm/arm-powerctl.c | 6 +++---
+ target/arm/cpu.c          | 2 +-
+ target/arm/op_helper.c    | 2 +-
+ 6 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 92b9b1a5f6..0123510fab 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -54,7 +54,7 @@ static void main_cpu_reset(void *opaque)
-     cpu_reset(cs);
- 
-     /* All VPs are halted on reset. Leave powering up to CPC. */
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
- }
- 
- static bool cpu_mips_itu_supported(CPUMIPSState *env)
-diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
-index 3540985258..623a600ed1 100644
---- a/hw/misc/mips_itu.c
-+++ b/hw/misc/mips_itu.c
-@@ -183,7 +183,7 @@ static void wake_blocked_threads(ITCStorageCell *c)
- {
-     CPUState *cs;
-     CPU_FOREACH(cs) {
--        if (cs->halted && (c->blocked_threads & (1ULL << cs->cpu_index))) {
-+        if (cpu_halted(cs) && (c->blocked_threads & (1ULL << cs->cpu_index))) {
-             cpu_interrupt(cs, CPU_INTERRUPT_WAKE);
-         }
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 761cc17ea9..83b1d63f27 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -1776,7 +1776,7 @@ static uint64_t omap_clkdsp_read(void *opaque, hwaddr addr,
+     case 0x18:	/* DSP_SYSST */
+         cpu = CPU(s->cpu);
+         return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
+-                (cpu->halted << 6);      /* Quite useless... */
++                (cpu_halted(cpu) << 6);      /* Quite useless... */
      }
-@@ -193,7 +193,7 @@ static void wake_blocked_threads(ITCStorageCell *c)
- static void QEMU_NORETURN block_thread_and_exit(ITCStorageCell *c)
- {
-     c->blocked_threads |= 1ULL << current_cpu->cpu_index;
--    current_cpu->halted = 1;
-+    cpu_halted_set(current_cpu, 1);
-     current_cpu->exception_index = EXCP_HLT;
-     cpu_loop_exit_restore(current_cpu, current_cpu->mem_io_pc);
+ 
+     OMAP_BAD_REG(addr);
+@@ -3797,7 +3797,7 @@ void omap_mpu_wakeup(void *opaque, int irq, int req)
+     struct omap_mpu_state_s *mpu = (struct omap_mpu_state_s *) opaque;
+     CPUState *cpu = CPU(mpu->cpu);
+ 
+-    if (cpu->halted) {
++    if (cpu_halted(cpu)) {
+         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+     }
  }
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index bbf12e4a97..4d413c24d3 100644
---- a/target/mips/cp0_helper.c
-+++ b/target/mips/cp0_helper.c
-@@ -43,7 +43,7 @@ static bool mips_vpe_is_wfi(MIPSCPU *c)
-      * If the VPE is halted but otherwise active, it means it's waiting for
-      * an interrupt.\
-      */
--    return cpu->halted && mips_vpe_active(env);
-+    return cpu_halted(cpu) && mips_vpe_active(env);
+diff --git a/hw/arm/pxa2xx_gpio.c b/hw/arm/pxa2xx_gpio.c
+index f8df3cc227..23b4a06a4f 100644
+--- a/hw/arm/pxa2xx_gpio.c
++++ b/hw/arm/pxa2xx_gpio.c
+@@ -132,7 +132,7 @@ static void pxa2xx_gpio_set(void *opaque, int line, int level)
+         pxa2xx_gpio_irq_update(s);
+ 
+     /* Wake-up GPIOs */
+-    if (cpu->halted && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
++    if (cpu_halted(cpu) && (mask & ~s->dir[bank] & pxa2xx_gpio_wake[bank])) {
+         cpu_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+     }
+ }
+diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
+index 203d4d28af..057448c2ed 100644
+--- a/hw/arm/pxa2xx_pic.c
++++ b/hw/arm/pxa2xx_pic.c
+@@ -58,7 +58,7 @@ static void pxa2xx_pic_update(void *opaque)
+     PXA2xxPICState *s = (PXA2xxPICState *) opaque;
+     CPUState *cpu = CPU(s->cpu);
+ 
+-    if (cpu->halted) {
++    if (cpu_halted(cpu)) {
+         mask[0] = s->int_pending[0] & (s->int_enabled[0] | s->int_idle);
+         mask[1] = s->int_pending[1] & (s->int_enabled[1] | s->int_idle);
+         if (mask[0] || mask[1]) {
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index b75f813b40..f0db413519 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -64,7 +64,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+ 
+     /* Initialize the cpu we are turning on */
+     cpu_reset(target_cpu_state);
+-    target_cpu_state->halted = 0;
++    cpu_halted_set(target_cpu_state, 0);
+ 
+     if (info->target_aa64) {
+         if ((info->target_el < 3) && arm_feature(&target_cpu->env,
+@@ -241,7 +241,7 @@ static void arm_set_cpu_on_and_reset_async_work(CPUState *target_cpu_state,
+ 
+     /* Initialize the cpu we are turning on */
+     cpu_reset(target_cpu_state);
+-    target_cpu_state->halted = 0;
++    cpu_halted_set(target_cpu_state, 0);
+ 
+     /* Finally set the power status */
+     assert(qemu_mutex_iothread_locked());
+@@ -297,7 +297,7 @@ static void arm_set_cpu_off_async_work(CPUState *target_cpu_state,
+ 
+     assert(qemu_mutex_iothread_locked());
+     target_cpu->power_state = PSCI_OFF;
+-    target_cpu_state->halted = 1;
++    cpu_halted_set(target_cpu_state, 1);
+     target_cpu_state->exception_index = EXCP_HLT;
  }
  
- static bool mips_vp_is_wfi(MIPSCPU *c)
-@@ -51,7 +51,7 @@ static bool mips_vp_is_wfi(MIPSCPU *c)
-     CPUState *cpu = CPU(c);
-     CPUMIPSState *env = &c->env;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 32bec156f2..dc435a18a1 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -175,7 +175,7 @@ static void arm_cpu_reset(DeviceState *dev)
+     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
  
--    return cpu->halted && mips_vp_active(env);
-+    return cpu_halted(cpu) && mips_vp_active(env);
- }
+     cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
+-    s->halted = cpu->start_powered_off;
++    cpu_halted_set(s, cpu->start_powered_off);
  
- static inline void mips_vpe_wake(MIPSCPU *c)
-@@ -74,7 +74,7 @@ static inline void mips_vpe_sleep(MIPSCPU *cpu)
-      * The VPE was shut off, really go to bed.
-      * Reset any old _WAKE requests.
-      */
+     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
+         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index eb0de080f1..88c86a4346 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -305,7 +305,7 @@ void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
+     }
+ 
+     cs->exception_index = EXCP_HLT;
 -    cs->halted = 1;
 +    cpu_halted_set(cs, 1);
-     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
+     cpu_loop_exit(cs);
  }
  
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index de3e26ef1f..2b7d680547 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -162,7 +162,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- 
- int kvm_arch_process_async_events(CPUState *cs)
- {
--    return cs->halted;
-+    return cpu_halted(cs);
- }
- 
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 9552b280e0..152b45826c 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -1124,7 +1124,7 @@ void helper_wait(CPUMIPSState *env)
- {
-     CPUState *cs = env_cpu(env);
- 
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
-     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
-     /*
-      * Last instruction in the block, PC was updated before
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 25b595a17d..35ea86a49b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -31328,7 +31328,7 @@ void cpu_state_reset(CPUMIPSState *env)
-             env->tcs[i].CP0_TCHalt = 1;
-         }
-         env->active_tc.CP0_TCHalt = 1;
--        cs->halted = 1;
-+        cpu_halted_set(cs, 1);
- 
-         if (cs->cpu_index == 0) {
-             /* VPE0 starts up enabled.  */
-@@ -31336,7 +31336,7 @@ void cpu_state_reset(CPUMIPSState *env)
-             env->CP0_VPEConf0 |= (1 << CP0VPEC0_MVP) | (1 << CP0VPEC0_VPA);
- 
-             /* TC0 starts up unhalted.  */
--            cs->halted = 0;
-+            cpu_halted_set(cs, 0);
-             env->active_tc.CP0_TCHalt = 0;
-             env->tcs[0].CP0_TCHalt = 0;
-             /* With thread 0 active.  */
 -- 
 2.17.1
 
