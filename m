@@ -2,105 +2,86 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E21C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8241AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:10:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B510B20826
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:09:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4107320748
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:10:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOn39Jb2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B510B20826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HONoJ9zw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4107320748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbltB-0003NH-Ud
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 10:09:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60048)
+	id 1jbltp-0004WW-GC
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 10:10:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbls6-0001iA-JI
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:08:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42615
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jbls5-0003t8-O4
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:08:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590070108;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jWHBb3oLbjCDWidhFKq+QmigY0VgmRV13r6ELObzerw=;
- b=JOn39Jb2D2FStyvUHVfqilNtcJTZLBeULrXBUckYs7KOJtkU/GGxNE46Lze8d05UQe4JFD
- NKy7Zuei30hGAHliq2S5YCKZuhA75N66z1cyVEQSr2U6KUCBqoE2Cg6r1WEhavTPE3Nf1o
- ssVazXaCUs+XtW1hWGUuPqQMilZolS0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-mOfH5dLqMdSGM5gOC5U9ZA-1; Thu, 21 May 2020 10:08:26 -0400
-X-MC-Unique: mOfH5dLqMdSGM5gOC5U9ZA-1
-Received: by mail-wm1-f70.google.com with SMTP id v23so1908652wmj.0
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 07:08:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jblsb-00030j-Ei
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 10:09:02 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44999)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jblsa-0003xp-AG
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 10:09:00 -0400
+Received: by mail-oi1-x244.google.com with SMTP id y85so6259702oie.11
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 07:08:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=v+4zKBMipe8VLEbaLWYBkDY62U3XWJ+1vsATZL+j7ws=;
+ b=HONoJ9zwytOVmTzi34Voc6xOTBJK4EGERCufLsXSIX8bdrJF+w+tRD5dOxeLytdMAK
+ biA49+BqZTwYCnHeBK1NC4gTxRQCG/ctdXNd+7As+qkN8813OhaRU+VKiQbRqZNA/qZ0
+ 4jnYlKX44jDHfSZKeQt8oK3OWvxOytg3tn0muqgyyUw0vXQ9l9ce3Sp6eWRcYHMDCJ9S
+ H1QzR/+Qpr4B18KmvqlAX/rvtuLS6Q3OBfx1pMatrM8xJr6PCR36Ddmhi19mDH0nlYkd
+ MAniegGS2HoZHzd2lIIlHe0JT5Ad3ejg8MF52Ezsa/5E8HG/fuWioXGHeK2ZilOa60JP
+ Tunw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jWHBb3oLbjCDWidhFKq+QmigY0VgmRV13r6ELObzerw=;
- b=IN52HRtLrouqjLDTsnD0iA6+GJu4Tm/YZ+r01y+mzscRfZPbgeDH0jXwy6D/je7qcn
- 6qRy9eF59rz2yFhlTwaEy9XpSN8Ty0dtSCIjKRkpm+K4Q/RTA7DWeU6bmvitiMBbTkh6
- Gyws9XRKJTSB3h1dHfzgENq2I9oTnONYHGfZTKDwJ+9rmK5bDo370ddMHVUOE9G1M+VB
- PobCTtIaFMqaB3fkcEKiHunlWUyA6WjPDD1Xj9dvQOcIDh0umDacoE1Fs3zYL0bGD5yS
- r9cNUVhtv02rVY1jLHuJH8mEasybtED7ANqIcmPK6ss4XXqAS9sz+kiLxva1QvCJI5bm
- +hSg==
-X-Gm-Message-State: AOAM533WDYhPnz9dDDkpwkHXNxsAEJzqoFUG4S3bgNfX0/ZzfmOa66cz
- T97xGLAsTczscc47GV1BNYB/5ZpjPX7ZJCzimNdEas0k4W0iU4zAtTECNPdsA5OdoSwtyFtUUwE
- BnTpPkYxF3mEvZfM=
-X-Received: by 2002:a5d:6b83:: with SMTP id n3mr9410312wrx.213.1590070104751; 
- Thu, 21 May 2020 07:08:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxcA1F3tFUp5bo8U3p7Zyf+jXGKn8i7k+3qryOsnRc8/lisqeBP8ADcCiwlmEpU8b0vLDdhBQ==
-X-Received: by 2002:a5d:6b83:: with SMTP id n3mr9410293wrx.213.1590070104571; 
- Thu, 21 May 2020 07:08:24 -0700 (PDT)
-Received: from [192.168.1.40] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id g187sm6637393wmf.30.2020.05.21.07.08.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 07:08:23 -0700 (PDT)
-Subject: Re: [PATCH 6/6] sm501: Remove obsolete changelog and todo comment
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
-References: <cover.1589981990.git.balaton@eik.bme.hu>
- <0edaadbc25f1eeb6eef648816770cbcd6a4efa2e.1589981990.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <135ea132-61c5-1e43-901a-06d4fa9e1399@redhat.com>
-Date: Thu, 21 May 2020 16:08:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=v+4zKBMipe8VLEbaLWYBkDY62U3XWJ+1vsATZL+j7ws=;
+ b=GxNi7lZRCc8XEpJcg42PKN8MrmA8J/gLoB1rMsEbgcCihbo3gKKwSvSH0Kdf+GvdZ9
+ ZLG/gu7Wmk7lE451XKQxR3G+r0FN2c3RsLfglgBbJy62//7OqYrZVRzfQ3+MWibV7R6o
+ pbhxvTcImUhcGjS/XJohs0YKH0VhPJMom/fKmSJD2zbnFSNq7b5BYizcjhQ8EC+uH5oL
+ Q/qzhlTcs6x8jIfoVocq0zGeB2aoDWMeHcYwuimP6N5NXJKA+gi1F8OEaVwOTnfAA+Cl
+ HSdxzQ81b0C+meplytE6XnKpXFTPEjXVnYkHfoKUIdrE5ZZ/Y2uza2qrO7Z/9vXQWgXs
+ QBwA==
+X-Gm-Message-State: AOAM533RgtqKiB+AzVjjF+QxtYWku1Dp/7moVXRqkT+h6193psUSmlTa
+ cJjEkMUYunmKWt7YHdRJb0pmMvuOaAkDP5ihIH3LGA==
+X-Google-Smtp-Source: ABdhPJzIL210s8jDG2oxz0NZLsPYxqG5XNKfTcZW+Cr0PGqE+5HA6yvS8nBwsrI1IBcirAFt6WpXBIjsXa+RkwZdsH8=
+X-Received: by 2002:aca:ed16:: with SMTP id l22mr6506722oih.146.1590070138559; 
+ Thu, 21 May 2020 07:08:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0edaadbc25f1eeb6eef648816770cbcd6a4efa2e.1589981990.git.balaton@eik.bme.hu>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200521135748.9859-1-alex.bennee@linaro.org>
+In-Reply-To: <20200521135748.9859-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 May 2020 15:08:47 +0100
+Message-ID: <CAFEAcA-kdX1nkEgqNMn-Bvg6UHxt3Og11yS5A9zE1h4ChdnBLA@mail.gmail.com>
+Subject: Re: [PATCH v2] linux-user: limit check to HOST_LONG_BITS == 32
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,61 +94,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/20 3:39 PM, BALATON Zoltan wrote:
-> Also update copyright year for latest changes
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->   hw/display/sm501.c | 19 +------------------
->   1 file changed, 1 insertion(+), 18 deletions(-)
-> 
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 13269cc9f4..b76b691674 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -2,7 +2,7 @@
->    * QEMU SM501 Device
->    *
->    * Copyright (c) 2008 Shin-ichiro KAWASAKI
-> - * Copyright (c) 2016 BALATON Zoltan
-> + * Copyright (c) 2016-2020 BALATON Zoltan
->    *
->    * Permission is hereby granted, free of charge, to any person obtaining a copy
->    * of this software and associated documentation files (the "Software"), to deal
-> @@ -40,23 +40,6 @@
->   #include "ui/pixel_ops.h"
->   #include "qemu/bswap.h"
->   
-> -/*
-> - * Status: 2010/05/07
-> - *   - Minimum implementation for Linux console : mmio regs and CRT layer.
-> - *   - 2D graphics acceleration partially supported : only fill rectangle.
-> - *
-> - * Status: 2016/12/04
-> - *   - Misc fixes: endianness, hardware cursor
-> - *   - Panel support
-> - *
-> - * TODO:
-> - *   - Touch panel support
-> - *   - USB support
-> - *   - UART support
-> - *   - More 2D graphics engine support
-> - *   - Performance tuning
-> - */
-> -
->   /*#define DEBUG_SM501*/
->   /*#define DEBUG_BITBLT*/
->   
-> 
+On Thu, 21 May 2020 at 14:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> Newer clangs rightly spot that you can never exceed the full address
+> space of 64 bit hosts with:
+>
+>   linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
+>   long' > 18446744073709551615 is always false
+>   [-Werror,-Wtautological-type-limit-compare]
+>   4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>   4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
+>   4687 1 error generated.
+>
+> So lets limit the check to 32 bit hosts only.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> +#if HOST_LONG_BITS =3D=3D 32
+>          if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>              error_report("%s: requires more virtual address space "
+>                           "than the host can provide (0x%" PRIx64 ")",
+>                           image_name, (uint64_t)guest_hiaddr - guest_base=
+);
+>              exit(EXIT_FAILURE);
+>          }
+> +#endif
 
+Is this also a tautological compare in the host=3D=3D32 && guest=3D=3D32
+case? Do we maybe want "#if HOST_LONG_BITS < TARGET_ABI_BITS" ?
+
+thanks
+-- PMM
 
