@@ -2,73 +2,90 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40428C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 04:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 04:44:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 043CC206D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 04:36:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043CC206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5AD5720738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 04:44:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RysXgJNB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD5720738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbcwM-0001K7-4b
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 00:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57642)
+	id 1jbd4N-0004hW-Ju
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 00:44:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbcvY-0000oK-Nu
- for qemu-devel@nongnu.org; Thu, 21 May 2020 00:35:28 -0400
-Resent-Date: Thu, 21 May 2020 00:35:28 -0400
-Resent-Message-Id: <E1jbcvY-0000oK-Nu@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21722)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbd3K-0004Di-Dr
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 00:43:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59553
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbcvW-0004lg-Qc
- for qemu-devel@nongnu.org; Thu, 21 May 2020 00:35:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590035708; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=OxeqhCKk5evO0uZKKKiYtmu5lGBGEkpHvdrEfAN6pG0UZb115r42epF1i6ptMbgupqG14wUw+toXfFU396qqys9HxhVWBDJ2egffD3CGlSnGLob2ofRg3oWNpklUSAhq+4QUo4Vo5s/k+xeW8hcoZ2D2cq1X6t+IhI6TnbJewEI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590035708;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=8NFdN6UA/ZavTDfaWviLuRG8GyssSdCsE4rZArnLagk=; 
- b=BP3UHDO5nPg43t2aB4+XxMFmUvTQUZuaONObnpodIBUS+MVrt+nvjJa0p7q9gv3WAbYwpJaGykRlGV6B61utCtnN8hLJMbGKCoQ3iHg73yAxKb0eiDn2dEwBxW+qpU+Jc248n/8iGe+gK6MpazazwOZ8scfJTtzIs3/h2YRm8ls=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159003570716410.319184097556558;
- Wed, 20 May 2020 21:35:07 -0700 (PDT)
-Message-ID: <159003570554.29084.2558885547986389801@45ef0f9c86ae>
-In-Reply-To: <20200521033631.1605-1-miaoyubo@huawei.com>
-Subject: Re: [PATCH v8 0/8] pci_expander_brdige:acpi: Support pxb-pcie for ARM
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jbd3H-0006QH-TO
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 00:43:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590036206;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=giE285k9sIgJf/ygeiyjVz4uez8ees6tXUNmorLDtdM=;
+ b=RysXgJNBIuxzufKp90PgadtY52Ga8F4dNArmLoofVWgZXloiJj+KaiXnXS3W7MBxHcSvqc
+ bB70XrmAzA/PKEDCYL474JhN5+kWByb/FEwg05lhjNNaO1ZhC823m4xGqmz0Tnnxfx9GnJ
+ Ymr9l7Iq4YefrlNHaJT4D3+oDMAUPmg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210-Vz-JS9wdMmqYZaCpsVDFlg-1; Thu, 21 May 2020 00:43:22 -0400
+X-MC-Unique: Vz-JS9wdMmqYZaCpsVDFlg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A08C218FE860;
+ Thu, 21 May 2020 04:43:20 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 774055EE0E;
+ Thu, 21 May 2020 04:43:18 +0000 (UTC)
+Subject: Re: [PATCH v1 04/10] linux-user: completely re-write init_guest_space
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200513175134.19619-1-alex.bennee@linaro.org>
+ <20200513175134.19619-5-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <958a1d7e-305d-96f5-2e0c-f8a2dd53e1c0@redhat.com>
+Date: Thu, 21 May 2020 06:43:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: miaoyubo@huawei.com
-Date: Wed, 20 May 2020 21:35:07 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 00:11:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200513175134.19619-5-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 00:43:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,59 +98,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, shannon.zhaosl@gmail.com,
- miaoyubo@huawei.com, imammedo@redhat.com, lersek@redhat.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyMTAzMzYzMS4xNjA1
-LTEtbWlhb3l1Ym9AaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MjEwMzM2MzEuMTYwNS0xLW1pYW95dWJvQGh1
-YXdlaS5jb20KU3ViamVjdDogW1BBVENIIHY4IDAvOF0gcGNpX2V4cGFuZGVyX2JyZGlnZTphY3Bp
-OiBTdXBwb3J0IHB4Yi1wY2llIGZvciBBUk0KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMDY3
-YTEyIHVuaXQtdGVzdDogQWRkIHRoZSBiaW5hcnkgZmlsZSBhbmQgY2xlYXIgZGlmZi5oCjkzYWQw
-ZjIgdW5pdC10ZXN0OiBBZGQgdGVzdGNhc2UgZm9yIHB4YgoxYzdiY2IxIHVuaXQtdGVzdDogVGhl
-IGZpbGVzIGNoYW5nZWQuCmFkNWZhZmMgYWNwaTogQWxpZ24gdGhlIHNpemUgdG8gMTI4awphMDhj
-NjllIGFjcGk6IFJlZmFjdG9yIHRoZSBzb3VyY2Ugb2YgaG9zdCBicmlkZ2UgYW5kIGJ1aWxkIHRh
-YmxlcyBmb3IgcHhiCmUxYWQ5YTQgYWNwaTogRXh0cmFjdCBjcnMgYnVpbGQgZm9ybSBhY3BpX2J1
-aWxkLmMKYzk2ZTBkZSBmd19jZmc6IFdyaXRlIHRoZSBleHRyYSByb290cyBpbnRvIHRoZSBmd19j
-ZmcKODg3YWM0OCBhY3BpOiBFeHRyYWN0IHR3byBBUElzIGZyb20gYWNwaV9kc2R0X2FkZF9wY2kK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2luZyBjb21taXQgODg3YWM0ODAzZjA3IChh
-Y3BpOiBFeHRyYWN0IHR3byBBUElzIGZyb20gYWNwaV9kc2R0X2FkZF9wY2kpCjIvOCBDaGVja2lu
-ZyBjb21taXQgYzk2ZTBkZTkwZDdlIChmd19jZmc6IFdyaXRlIHRoZSBleHRyYSByb290cyBpbnRv
-IHRoZSBmd19jZmcpCjMvOCBDaGVja2luZyBjb21taXQgZTFhZDlhNDZhM2IwIChhY3BpOiBFeHRy
-YWN0IGNycyBidWlsZCBmb3JtIGFjcGlfYnVpbGQuYykKNC84IENoZWNraW5nIGNvbW1pdCBhMDhj
-NjllYTRlYTkgKGFjcGk6IFJlZmFjdG9yIHRoZSBzb3VyY2Ugb2YgaG9zdCBicmlkZ2UgYW5kIGJ1
-aWxkIHRhYmxlcyBmb3IgcHhiKQo1LzggQ2hlY2tpbmcgY29tbWl0IGFkNWZhZmNmMGVlNSAoYWNw
-aTogQWxpZ24gdGhlIHNpemUgdG8gMTI4aykKNi84IENoZWNraW5nIGNvbW1pdCAxYzdiY2IxMzRi
-ZjUgKHVuaXQtdGVzdDogVGhlIGZpbGVzIGNoYW5nZWQuKQo3LzggQ2hlY2tpbmcgY29tbWl0IDkz
-YWQwZjIxNDhjMCAodW5pdC10ZXN0OiBBZGQgdGVzdGNhc2UgZm9yIHB4YikKOC84IENoZWNraW5n
-IGNvbW1pdCBiMDY3YTEyNjNlYjYgKHVuaXQtdGVzdDogQWRkIHRoZSBiaW5hcnkgZmlsZSBhbmQg
-Y2xlYXIgZGlmZi5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-CgpFUlJPUjogRG8gbm90IGFkZCBleHBlY3RlZCBmaWxlcyB0b2dldGhlciB3aXRoIHRlc3RzLCBm
-b2xsb3cgaW5zdHJ1Y3Rpb25zIGluIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzogYm90
-aCB0ZXN0cy9kYXRhL2FjcGkvdmlydC9EU0RULnB4YiBhbmQgdGVzdHMvcXRlc3QvYmlvcy10YWJs
-ZXMtdGVzdC1hbGxvd2VkLWRpZmYuaCBmb3VuZAoKRVJST1I6IERvIG5vdCBhZGQgZXhwZWN0ZWQg
-ZmlsZXMgdG9nZXRoZXIgd2l0aCB0ZXN0cywgZm9sbG93IGluc3RydWN0aW9ucyBpbiB0ZXN0cy9x
-dGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6IGJvdGggdGVzdHMvZGF0YS9hY3BpL3ZpcnQvRFNEVC5w
-eGIgYW5kIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QtYWxsb3dlZC1kaWZmLmggZm91bmQK
-CnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgMSBsaW5lcyBjaGVja2VkCgpQYXRjaCA4Lzgg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTIxMDMzNjMxLjE2MDUtMS1taWFveXVib0BodWF3
-ZWkuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 13/05/2020 19.51, Alex Bennée wrote:
+> First we ensure all guest space initialisation logic comes through
+> probe_guest_base once we understand the nature of the binary we are
+> loading. The convoluted init_guest_space routine is removed and
+> replaced with a number of pgb_* helpers which are called depending on
+> what requirements we have when loading the binary.
+> 
+> We first try to do what is requested by the host. Failing that we try
+> and satisfy the guest requested base address. If all those options
+> fail we fall back to finding a space in the memory map using our
+> recently written read_self_maps() helper.
+> 
+> There are some additional complications we try and take into account
+> when looking for holes in the address space. We try not to go directly
+> after the system brk() space so there is space for a little growth. We
+> also don't want to have to use negative offsets which would result in
+> slightly less efficient code on x86 when it's unable to use the
+> segment offset register.
+> 
+> Less mind-binding gotos and hopefully clearer logic throughout.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Acked-by: Laurent Vivier <laurent@vivier.eu>
+[...]
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 619c054cc48..01a9323a637 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -11,6 +11,7 @@
+>  #include "qemu/queue.h"
+>  #include "qemu/guest-random.h"
+>  #include "qemu/units.h"
+> +#include "qemu/selfmap.h"
+>  
+>  #ifdef _ARCH_PPC64
+>  #undef ARCH_DLINFO
+> @@ -382,68 +383,30 @@ enum {
+>  
+>  /* The commpage only exists for 32 bit kernels */
+>  
+> -/* Return 1 if the proposed guest space is suitable for the guest.
+> - * Return 0 if the proposed guest space isn't suitable, but another
+> - * address space should be tried.
+> - * Return -1 if there is no way the proposed guest space can be
+> - * valid regardless of the base.
+> - * The guest code may leave a page mapped and populate it if the
+> - * address is suitable.
+> - */
+> -static int init_guest_commpage(unsigned long guest_base,
+> -                               unsigned long guest_size)
+> -{
+> -    unsigned long real_start, test_page_addr;
+> -
+> -    /* We need to check that we can force a fault on access to the
+> -     * commpage at 0xffff0fxx
+> -     */
+> -    test_page_addr = guest_base + (0xffff0f00 & qemu_host_page_mask);
+> -
+> -    /* If the commpage lies within the already allocated guest space,
+> -     * then there is no way we can allocate it.
+> -     *
+> -     * You may be thinking that that this check is redundant because
+> -     * we already validated the guest size against MAX_RESERVED_VA;
+> -     * but if qemu_host_page_mask is unusually large, then
+> -     * test_page_addr may be lower.
+> -     */
+> -    if (test_page_addr >= guest_base
+> -        && test_page_addr < (guest_base + guest_size)) {
+> -        return -1;
+> -    }
+> +#define ARM_COMMPAGE (intptr_t)0xffff0f00u
+>  
+> -    /* Note it needs to be writeable to let us initialise it */
+> -    real_start = (unsigned long)
+> -                 mmap((void *)test_page_addr, qemu_host_page_size,
+> -                     PROT_READ | PROT_WRITE,
+> -                     MAP_ANONYMOUS | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +static bool init_guest_commpage(void)
+> +{
+> +    void *want = g2h(ARM_COMMPAGE & -qemu_host_page_size);
+> +    void *addr = mmap(want, qemu_host_page_size, PROT_READ | PROT_WRITE,
+> +                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  
+> -    /* If we can't map it then try another address */
+> -    if (real_start == -1ul) {
+> -        return 0;
+> +    if (addr == MAP_FAILED) {
+> +        perror("Allocating guest commpage");
+> +        exit(EXIT_FAILURE);
+>      }
+> -
+> -    if (real_start != test_page_addr) {
+> -        /* OS didn't put the page where we asked - unmap and reject */
+> -        munmap((void *)real_start, qemu_host_page_size);
+> -        return 0;
+> +    if (addr != want) {
+> +        return false;
+>      }
+>  
+> -    /* Leave the page mapped
+> -     * Populate it (mmap should have left it all 0'd)
+> -     */
+> -
+> -    /* Kernel helper versions */
+> -    __put_user(5, (uint32_t *)g2h(0xffff0ffcul));
+> +    /* Set kernel helper versions; rest of page is 0.  */
+> +    __put_user(5, (uint32_t *)g2h(0xffff0ffcu));
+>  
+> -    /* Now it's populated make it RO */
+> -    if (mprotect((void *)test_page_addr, qemu_host_page_size, PROT_READ)) {
+> +    if (mprotect(addr, qemu_host_page_size, PROT_READ)) {
+>          perror("Protecting guest commpage");
+> -        exit(-1);
+> +        exit(EXIT_FAILURE);
+>      }
+> -
+> -    return 1; /* All good */
+> +    return true;
+>  }
+>  
+>  #define ELF_HWCAP get_elf_hwcap()
+> @@ -2075,239 +2038,267 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+>      return sp;
+>  }
+>  
+> -unsigned long init_guest_space(unsigned long host_start,
+> -                               unsigned long host_size,
+> -                               unsigned long guest_start,
+> -                               bool fixed)
+> -{
+> -    /* In order to use host shmat, we must be able to honor SHMLBA.  */
+> -    unsigned long align = MAX(SHMLBA, qemu_host_page_size);
+> -    unsigned long current_start, aligned_start;
+> -    int flags;
+> -
+> -    assert(host_start || host_size);
+> -
+> -    /* If just a starting address is given, then just verify that
+> -     * address.  */
+> -    if (host_start && !host_size) {
+> -#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
+> -        if (init_guest_commpage(host_start, host_size) != 1) {
+> -            return (unsigned long)-1;
+> -        }
+> +#ifndef ARM_COMMPAGE
+> +#define ARM_COMMPAGE 0
+> +#define init_guest_commpage() true
+>  #endif
+> -        return host_start;
+> -    }
+>  
+> -    /* Setup the initial flags and start address.  */
+> -    current_start = host_start & -align;
+> -    flags = MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE;
+> -    if (fixed) {
+> -        flags |= MAP_FIXED;
+> -    }
+> +static void pgb_fail_in_use(const char *image_name)
+> +{
+> +    error_report("%s: requires virtual address space that is in use "
+> +                 "(omit the -B option or choose a different value)",
+> +                 image_name);
+> +    exit(EXIT_FAILURE);
+> +}
+>  
+> -    /* Otherwise, a non-zero size region of memory needs to be mapped
+> -     * and validated.  */
+> +static void pgb_have_guest_base(const char *image_name, abi_ulong guest_loaddr,
+> +                                abi_ulong guest_hiaddr, long align)
+> +{
+> +    const int flags = MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE;
+> +    void *addr, *test;
+>  
+> -#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
+> -    /* On 32-bit ARM, we need to map not just the usable memory, but
+> -     * also the commpage.  Try to find a suitable place by allocating
+> -     * a big chunk for all of it.  If host_start, then the naive
+> -     * strategy probably does good enough.
+> -     */
+> -    if (!host_start) {
+> -        unsigned long guest_full_size, host_full_size, real_start;
+> -
+> -        guest_full_size =
+> -            (0xffff0f00 & qemu_host_page_mask) + qemu_host_page_size;
+> -        host_full_size = guest_full_size - guest_start;
+> -        real_start = (unsigned long)
+> -            mmap(NULL, host_full_size, PROT_NONE, flags, -1, 0);
+> -        if (real_start == (unsigned long)-1) {
+> -            if (host_size < host_full_size - qemu_host_page_size) {
+> -                /* We failed to map a continous segment, but we're
+> -                 * allowed to have a gap between the usable memory and
+> -                 * the commpage where other things can be mapped.
+> -                 * This sparseness gives us more flexibility to find
+> -                 * an address range.
+> -                 */
+> -                goto naive;
+> -            }
+> -            return (unsigned long)-1;
+> +    if (!QEMU_IS_ALIGNED(guest_base, align)) {
+> +        fprintf(stderr, "Requested guest base 0x%lx does not satisfy "
+> +                "host minimum alignment (0x%lx)\n",
+> +                guest_base, align);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    /* Sanity check the guest binary. */
+> +    if (reserved_va) {
+> +        if (guest_hiaddr > reserved_va) {
+> +            error_report("%s: requires more than reserved virtual "
+> +                         "address space (0x%" PRIx64 " > 0x%lx)",
+> +                         image_name, (uint64_t)guest_hiaddr, reserved_va);
+> +            exit(EXIT_FAILURE);
+>          }
+> -        munmap((void *)real_start, host_full_size);
+> -        if (real_start & (align - 1)) {
+> -            /* The same thing again, but with extra
+> -             * so that we can shift around alignment.
+> -             */
+> -            unsigned long real_size = host_full_size + qemu_host_page_size;
+> -            real_start = (unsigned long)
+> -                mmap(NULL, real_size, PROT_NONE, flags, -1, 0);
+> -            if (real_start == (unsigned long)-1) {
+> -                if (host_size < host_full_size - qemu_host_page_size) {
+> -                    goto naive;
+> -                }
+> -                return (unsigned long)-1;
+> -            }
+> -            munmap((void *)real_start, real_size);
+> -            real_start = ROUND_UP(real_start, align);
+> +    } else {
+> +        if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+> +            error_report("%s: requires more virtual address space "
+> +                         "than the host can provide (0x%" PRIx64 ")",
+> +                         image_name, (uint64_t)guest_hiaddr - guest_base);
+> +            exit(EXIT_FAILURE);
+>          }
+
+ Hi Alex,
+
+this causes an error with newer versions of Clang:
+
+linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
+long' > 18446744073709551615 is always false
+[-Werror,-Wtautological-type-limit-compare]
+4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
+4687 1 error generated.
+
+Any ideas how to fix this?
+
+ Thomas
+
 
