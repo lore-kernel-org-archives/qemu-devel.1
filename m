@@ -2,91 +2,91 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E12CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97C0620759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:07:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53C0420759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Txw6dxuF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C0620759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mgt/Chuc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C0420759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbsPf-0006lC-Nm
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 17:07:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50072)
+	id 1jbsSc-0001Pm-Ig
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 17:10:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbsOm-0005xS-Kl
- for qemu-devel@nongnu.org; Thu, 21 May 2020 17:06:40 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54041)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbsOl-0004uz-F6
- for qemu-devel@nongnu.org; Thu, 21 May 2020 17:06:40 -0400
-Received: by mail-wm1-x335.google.com with SMTP id u1so6770659wmn.3
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 14:06:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=BQnja4CLhTIHO/htXAOOPgvjJFfYEFPCs0xxkxoK+AE=;
- b=Txw6dxuFHz25FSC5SVS9+uM2MXmsvajy32xJktnk7hiOPpOCDdGB8j9Ld6y8KJ6ECq
- qSDrg7WFBe+fzJO8MwlcLOk7Ce/qujDLgrQQs2AGGSmL3DMhOpsD5JXt5g/iSareJsF+
- jDKojhG+5PBQF3EEyLzpjQinKSFJhuA4lLHk68ytT/3mVr+E3Bm4GQMl2uvgmyudWom4
- kSVbDhxqV5V9sBG8M5f7zYhPQYwnv+hkUGfBI6gcB7ekp29jkJkTauLQa7RBb33M1vPE
- 4R4e/rkA5ODDl699NuDFf5fsuSslZ/bwygXHGc91Gf8825cajgkCgtRiLQd+mcKNXLV5
- q8JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=BQnja4CLhTIHO/htXAOOPgvjJFfYEFPCs0xxkxoK+AE=;
- b=FMjSOPH8xZde+dfCjzBEjSRpLqlMDFkkdZAEDy2MqNZCZzHb9TDdPLLlcVdXRVdVH7
- D3BrlAs7QLLBCY2RInlwyHCyec9Sjb5Nmq12aPdQNb3vbPSmkt4il/h3p/sidkmldjpe
- d+dhfoZnQ/ItSQNPSx5b5CT0sk5neRHLOk1msyAxLoS5S6WZ6yOP5EjSbshSIkOEyF1+
- 1FDKUgCTPNcYX1g3dfDO1gPCVqsqJ/WHzDOEgauhV3KD6XSE/dMTHvot6GSriV6IsomZ
- U8ES7xEzGJa+poKvWgP/GTaJD7ms9bXNqO+ymuyzQAKao7OQKJmZD6gFclJbNGHaB4UC
- 7WNQ==
-X-Gm-Message-State: AOAM531bHjBdAFnYAsF0Tix6rwd8ea1et02TVVAn1kZvP6efKiOQeGNN
- UTXiofhhY9hyZUfO0YWKWinp3zlz5VHCKQ==
-X-Google-Smtp-Source: ABdhPJwxlARyj2GHnka9NMDOEvXOXq/xQ1U9LS0pnxeMJsHyZ8yzhevjlChngC3M7kEGCS08L6kw3g==
-X-Received: by 2002:a1c:4e0a:: with SMTP id g10mr10258302wmh.75.1590095197231; 
- Thu, 21 May 2020 14:06:37 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t14sm7170387wrb.56.2020.05.21.14.06.36
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 14:06:36 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/29] target-arm queue
-Date: Thu, 21 May 2020 22:06:35 +0100
-Message-Id: <20200521210635.17088-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbsRs-0000m5-FJ
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 17:09:52 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43225
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbsRo-0005ju-5u
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 17:09:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590095386;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LnfrAb5BxF2wxu5wJynTOm9j/vKRNiz5wVgCk02A2V0=;
+ b=Mgt/ChucvHR8AR+YM6jk2FZj+WKfrIbSpfBNGM3MNam0Uq+1ir5Am8RGHqOqnT2bH5gwk7
+ nfEW8jfLnqj/E3AxALAU/+Cy14ZTKL9SP5LYCX061VVkIt4l/lx49Edd33q7r/35GrYwE2
+ Kp/sbgS664gSgL1g6xftMsOLg1Baeeo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-339-rATEH_a0MO6Hov_2ljVMwg-1; Thu, 21 May 2020 17:09:42 -0400
+X-MC-Unique: rATEH_a0MO6Hov_2ljVMwg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16A97107ACCA;
+ Thu, 21 May 2020 21:09:41 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BBF8779D4;
+ Thu, 21 May 2020 21:09:37 +0000 (UTC)
+Subject: Re: [PATCH v3 6/7] migration/block-dirty-bitmap: add_bitmaps_to_list:
+ check disk name once
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200515124024.3491-1-vsementsov@virtuozzo.com>
+ <20200515124024.3491-7-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <a840be30-5af8-481a-fe00-e8a7f587400a@redhat.com>
+Date: Thu, 21 May 2020 16:09:36 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200515124024.3491-7-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 04:44:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,127 +99,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, pavel.dovgaluk@ispras.ru,
+ quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ mreitz@redhat.com, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2: added Property array terminator (which caused crashes on
-various non-x86 host architectures).
+On 5/15/20 7:40 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   migration/block-dirty-bitmap.c | 17 +++++++++++------
+>   1 file changed, 11 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> index 5d3a7d2b07..e0e081ce60 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -274,17 +274,22 @@ static int add_bitmaps_to_list(BlockDriverState *bs, const char *bs_name)
+>       DirtyBitmapMigBitmapState *dbms;
+>       Error *local_err = NULL;
+>   
+> +    bitmap = bdrv_dirty_bitmap_first(bs);
+> +    if (!bitmap) {
+> +        return 0;
+> +    }
+> +
+> +    if (!bs_name || strcmp(bs_name, "") == 0) {
+> +        error_report("Found bitmap '%s' in unnamed node %p. It can't "
+> +                     "be migrated", bdrv_dirty_bitmap_name(bitmap), bs);
 
-The following changes since commit ae3aa5da96f4ccf0c2a28851449d92db9fcfad71:
+The %p is unusual; it does not help the end user, but only a developer 
+with gdb access.
 
-  Merge remote-tracking branch 'remotes/berrange/tags/socket-next-pull-request' into staging (2020-05-21 16:47:28 +0100)
+Maybe we could compress to:
 
-are available in the Git repository at:
+"Bitmap '%s' in unnamed node can't be migrated"
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200521-1
+> +        return -1;
+> +    }
+> +
+>       FOR_EACH_DIRTY_BITMAP(bs, bitmap) {
+>           if (!bdrv_dirty_bitmap_name(bitmap)) {
+>               continue;
+>           }
+>   
+> -        if (!bs_name || strcmp(bs_name, "") == 0) {
+> -            error_report("Found bitmap '%s' in unnamed node %p. It can't "
+> -                         "be migrated", bdrv_dirty_bitmap_name(bitmap), bs);
+> -            return -1;
+> -        }
+> -
 
-for you to fetch changes up to fafe7229272f39500c14845bc7ea60a8504a5a20:
+But since this is just code motion (hoisting an check outside of a loop, 
+for fewer executions of something that does not change within the loop), 
+it doesn't matter whether this patch goes in as-is or if you also tweak 
+the error message.
 
-  linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32 (2020-05-21 22:05:27 +0100)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-----------------------------------------------------------------
-target-arm queue:
- * tests/acceptance: Add a test for the canon-a1100 machine
- * docs/system: Document some of the Arm development boards
- * linux-user: make BKPT insn cause SIGTRAP, not be a syscall
- * target/arm: Remove unused GEN_NEON_INTEGER_OP macro
- * fsl-imx25, fsl-imx31, fsl-imx6, fsl-imx6ul, fsl-imx7: implement watchdog
- * hw/arm: Use qemu_log_mask() instead of hw_error() in various places
- * ARM: PL061: Introduce N_GPIOS
- * target/arm: Improve clear_vec_high() usage
- * target/arm: Allow user-mode code to write CPSR.E via MSR
- * linux-user/arm: Reset CPSR_E when entering a signal handler
- * linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-----------------------------------------------------------------
-Amanieu d'Antras (1):
-      linux-user/arm: Reset CPSR_E when entering a signal handler
-
-Geert Uytterhoeven (1):
-      ARM: PL061: Introduce N_GPIOS
-
-Guenter Roeck (8):
-      hw: Move i.MX watchdog driver to hw/watchdog
-      hw/watchdog: Implement full i.MX watchdog support
-      hw/arm/fsl-imx25: Wire up watchdog
-      hw/arm/fsl-imx31: Wire up watchdog
-      hw/arm/fsl-imx6: Connect watchdog interrupts
-      hw/arm/fsl-imx6ul: Connect watchdog interrupts
-      hw/arm/fsl-imx7: Instantiate various unimplemented devices
-      hw/arm/fsl-imx7: Connect watchdog interrupts
-
-Peter Maydell (12):
-      docs/system: Add 'Arm' to the Integrator/CP document title
-      docs/system: Sort Arm board index into alphabetical order
-      docs/system: Document Arm Versatile Express boards
-      docs/system: Document the various MPS2 models
-      docs/system: Document Musca boards
-      linux-user/arm: BKPT should cause SIGTRAP, not be a syscall
-      linux-user/arm: Remove bogus SVC 0xf0002 handling
-      linux-user/arm: Handle invalid arm-specific syscalls correctly
-      linux-user/arm: Fix identification of syscall numbers
-      target/arm: Remove unused GEN_NEON_INTEGER_OP macro
-      target/arm: Allow user-mode code to write CPSR.E via MSR
-      linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32
-
-Philippe Mathieu-Daudé (4):
-      hw/arm/integratorcp: Replace hw_error() by qemu_log_mask()
-      hw/arm/pxa2xx: Replace hw_error() by qemu_log_mask()
-      hw/char/xilinx_uartlite: Replace hw_error() by qemu_log_mask()
-      hw/timer/exynos4210_mct: Replace hw_error() by qemu_log_mask()
-
-Richard Henderson (2):
-      target/arm: Use tcg_gen_gvec_mov for clear_vec_high
-      target/arm: Use clear_vec_high more effectively
-
-Thomas Huth (1):
-      tests/acceptance: Add a test for the canon-a1100 machine
-
- docs/system/arm/integratorcp.rst           |   4 +-
- docs/system/arm/mps2.rst                   |  29 +++
- docs/system/arm/musca.rst                  |  31 +++
- docs/system/arm/vexpress.rst               |  60 ++++++
- docs/system/target-arm.rst                 |  20 +-
- include/hw/arm/fsl-imx25.h                 |   5 +
- include/hw/arm/fsl-imx31.h                 |   4 +
- include/hw/arm/fsl-imx6.h                  |   2 +-
- include/hw/arm/fsl-imx6ul.h                |   2 +-
- include/hw/arm/fsl-imx7.h                  |  23 ++-
- include/hw/misc/imx2_wdt.h                 |  33 ----
- include/hw/watchdog/wdt_imx2.h             |  90 +++++++++
- target/arm/cpu.h                           |   2 +-
- hw/arm/fsl-imx25.c                         |  10 +
- hw/arm/fsl-imx31.c                         |   6 +
- hw/arm/fsl-imx6.c                          |   9 +
- hw/arm/fsl-imx6ul.c                        |  10 +
- hw/arm/fsl-imx7.c                          |  35 ++++
- hw/arm/integratorcp.c                      |  23 ++-
- hw/arm/pxa2xx_gpio.c                       |   7 +-
- hw/char/xilinx_uartlite.c                  |   5 +-
- hw/display/pxa2xx_lcd.c                    |   8 +-
- hw/dma/pxa2xx_dma.c                        |  14 +-
- hw/gpio/pl061.c                            |  12 +-
- hw/misc/imx2_wdt.c                         |  90 ---------
- hw/timer/exynos4210_mct.c                  |  12 +-
- hw/watchdog/wdt_imx2.c                     | 304 +++++++++++++++++++++++++++++
- linux-user/arm/cpu_loop.c                  | 145 ++++++++------
- linux-user/arm/signal.c                    |  15 +-
- target/arm/translate-a64.c                 |  63 +++---
- target/arm/translate.c                     |  23 ---
- MAINTAINERS                                |   6 +
- hw/arm/Kconfig                             |   5 +
- hw/misc/Makefile.objs                      |   1 -
- hw/watchdog/Kconfig                        |   3 +
- hw/watchdog/Makefile.objs                  |   1 +
- tests/acceptance/machine_arm_canona1100.py |  35 ++++
- 37 files changed, 855 insertions(+), 292 deletions(-)
- create mode 100644 docs/system/arm/mps2.rst
- create mode 100644 docs/system/arm/musca.rst
- create mode 100644 docs/system/arm/vexpress.rst
- delete mode 100644 include/hw/misc/imx2_wdt.h
- create mode 100644 include/hw/watchdog/wdt_imx2.h
- delete mode 100644 hw/misc/imx2_wdt.c
- create mode 100644 hw/watchdog/wdt_imx2.c
- create mode 100644 tests/acceptance/machine_arm_canona1100.py
 
