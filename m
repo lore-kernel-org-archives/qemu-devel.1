@@ -2,63 +2,85 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C590C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:30:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE03C2072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE03C2072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8D5206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:30:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YOVel/6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8D5206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbiS4-0006lQ-1y
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:29:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35736)
+	id 1jbiT7-00081U-EE
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:30:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbiRQ-0005v5-CR; Thu, 21 May 2020 06:28:44 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49823)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbiRP-0003My-4w; Thu, 21 May 2020 06:28:44 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07625957|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.727025-0.000620295-0.272354;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03268; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbcuUgB_1590056917; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbcuUgB_1590056917)
- by smtp.aliyun-inc.com(10.147.41.178);
- Thu, 21 May 2020 18:28:37 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 22/62] target/riscv: vector widening integer multiply-add
- instructions
-Date: Thu, 21 May 2020 17:43:33 +0800
-Message-Id: <20200521094413.10425-23-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbiSU-0007ZA-8G
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:29:50 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45848)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbiST-0003Y8-91
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:29:49 -0400
+Received: by mail-ot1-x342.google.com with SMTP id c3so5075842otr.12
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 03:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=lbc3oGCIDmO2jipSEDw8CsxoRSv6ED+VDoPM8fWpJRs=;
+ b=YOVel/6fHtXOK4rigc08CHqD4DsLNP1vZASwTVNRBP8lGShkbmZtGtKxSR7qxgTOkH
+ Y2ErfdTyUpsadmuLi7TDgNhdjg3luC3A+/P+5ZPJ5b3ggYYblp1vLlymjPt7EW7v2RP6
+ cPrpntxAN2weihOxghsFBsqDAkfSZLncbipP1XVqLtbeCd8DIVOUU+UIWniv3i39YA5w
+ KOrwLSUYmar8LPt/1OjJnnt9I0nRBSUVjREgPLXcGl8fh6H+xxYAQCg0U1/C1flPFP11
+ 0dEK3/YNCm1IVT9A+N8HcM2wmxaip4EKgjQ3pRQ2yig0VTmnK04cuUnzucRwRL8MAOJB
+ TkPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=lbc3oGCIDmO2jipSEDw8CsxoRSv6ED+VDoPM8fWpJRs=;
+ b=k88zzzRIlYfKRuFlharcvy7kIPSEBvnHB8ThYW7t9mhieNcXbHyXwtvKHCszmpONvk
+ V/u1esnzqIF53B9/b2p0wVwFB7Ld3GO/r07eY7EDgG1cYrYxQX/Ygttc3VX/Z2oCUTBj
+ AN+A0rHbqOD2HBBDk23o84PZh64qVX85yCT6xfoGJlqILMF2A4/FOXq/EkNKiFmZfkYY
+ 5WzapsMH3Zc3UUDaWW+STwwsOakI39SaKKyf01QZYUuFJXI33DYfmKzG4VQqA84nZXRW
+ I2KrafhoPTuIKJlOg9Ler8IJVSpk1ujTrKxx/SSJ39yUfzDA3gAqYcsrrCkGu7pmJVdR
+ IzsQ==
+X-Gm-Message-State: AOAM530vYT/S5JL8sxVcGfb9Je9yspRbTeFlLg0fBNGlHSWrphf990Ha
+ N0WPw3iUVkQrxVTE9WvQvSESLqWohQjDPtFZbO0u6w==
+X-Google-Smtp-Source: ABdhPJxY4Mo8DjhtvJqUOe8lxQZd4xtmAf9XcrUi0ghyCMlaEClKP19jNyufv4KjloAxe1C5CKLbgKB8rWHMTRew+gk=
+X-Received: by 2002:a9d:3623:: with SMTP id w32mr6417206otb.91.1590056987902; 
+ Thu, 21 May 2020 03:29:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
+References: <20200521102130.17619-1-alex.bennee@linaro.org>
+In-Reply-To: <20200521102130.17619-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 May 2020 11:29:37 +0100
+Message-ID: <CAFEAcA-0f8tsTSu2nc9Z2tnEA4YBMbzWru1yUbW_xxM1=zV0JQ@mail.gmail.com>
+Subject: Re: [PATCH] linux-user: limit check to HOST_LONG_BITS == 32
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,142 +94,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 22 ++++++++++++
- target/riscv/insn32.decode              |  7 ++++
- target/riscv/insn_trans/trans_rvv.inc.c |  9 +++++
- target/riscv/vector_helper.c            | 45 +++++++++++++++++++++++++
- 4 files changed, 83 insertions(+)
+On Thu, 21 May 2020 at 11:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> Newer clangs rightly spot that you can never exceed the full address
+> space of 64 bit hosts with:
+>
+>   linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
+>   long' > 18446744073709551615 is always false
+>   [-Werror,-Wtautological-type-limit-compare]
+>   4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>   4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
+>   4687 1 error generated.
+>
+> So lets limit the check to 32 bit hosts only.
+>
+> Fixes: ee94743034bf
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  linux-user/elfload.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 01a9323a637..797fbf2337a 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2072,6 +2072,7 @@ static void pgb_have_guest_base(const char *image_n=
+ame, abi_ulong guest_loaddr,
+>                           image_name, (uint64_t)guest_hiaddr, reserved_va=
+);
+>              exit(EXIT_FAILURE);
+>          }
+> +#if HOST_LONG_BITS =3D=3D 32
+>      } else {
+>          if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>              error_report("%s: requires more virtual address space "
+> @@ -2079,6 +2080,7 @@ static void pgb_have_guest_base(const char *image_n=
+ame, abi_ulong guest_loaddr,
+>                           image_name, (uint64_t)guest_hiaddr - guest_base=
+);
+>              exit(EXIT_FAILURE);
+>          }
+> +#endif
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 08c2544b20..1a9495ceac 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -647,3 +647,25 @@ DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vwmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index b49b60aea1..9735ac3565 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -393,6 +393,13 @@ vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
- vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
- vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
- vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
-+vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
-+vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
-+vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 07e0c212ed..b2f57e2259 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1609,3 +1609,12 @@ GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
- GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
- GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
- GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
-+
-+/* Vector Widening Integer Multiply-Add Instructions */
-+GEN_OPIVV_WIDEN_TRANS(vwmaccu_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwmacc_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwmaccsu_vv, opivv_widen_check)
-+GEN_OPIVX_WIDEN_TRANS(vwmaccu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwmacc_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwmaccsu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwmaccus_vx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 8c327cc070..2786fca52a 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1978,3 +1978,48 @@ GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
-+
-+/* Vector Widening Integer Multiply-Add Instructions */
-+RVVCALL(OPIVV3, vwmaccu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MACC)
-+RVVCALL(OPIVV3, vwmaccu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MACC)
-+RVVCALL(OPIVV3, vwmaccu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MACC)
-+RVVCALL(OPIVV3, vwmacc_vv_b, WOP_SSS_B, H2, H1, H1, DO_MACC)
-+RVVCALL(OPIVV3, vwmacc_vv_h, WOP_SSS_H, H4, H2, H2, DO_MACC)
-+RVVCALL(OPIVV3, vwmacc_vv_w, WOP_SSS_W, H8, H4, H4, DO_MACC)
-+RVVCALL(OPIVV3, vwmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, DO_MACC)
-+RVVCALL(OPIVV3, vwmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, DO_MACC)
-+RVVCALL(OPIVV3, vwmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, DO_MACC)
-+GEN_VEXT_VV(vwmaccu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwmaccu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwmaccu_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwmacc_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwmacc_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwmacc_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwmaccsu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwmaccsu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwmaccsu_vv_w, 4, 8, clearq)
-+
-+RVVCALL(OPIVX3, vwmaccu_vx_b, WOP_UUU_B, H2, H1, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccu_vx_h, WOP_UUU_H, H4, H2, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccu_vx_w, WOP_UUU_W, H8, H4, DO_MACC)
-+RVVCALL(OPIVX3, vwmacc_vx_b, WOP_SSS_B, H2, H1, DO_MACC)
-+RVVCALL(OPIVX3, vwmacc_vx_h, WOP_SSS_H, H4, H2, DO_MACC)
-+RVVCALL(OPIVX3, vwmacc_vx_w, WOP_SSS_W, H8, H4, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccsu_vx_b, WOP_SSU_B, H2, H1, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccsu_vx_h, WOP_SSU_H, H4, H2, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccsu_vx_w, WOP_SSU_W, H8, H4, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccus_vx_b, WOP_SUS_B, H2, H1, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccus_vx_h, WOP_SUS_H, H4, H2, DO_MACC)
-+RVVCALL(OPIVX3, vwmaccus_vx_w, WOP_SUS_W, H8, H4, DO_MACC)
-+GEN_VEXT_VX(vwmaccu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwmaccu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwmaccu_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwmacc_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwmacc_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwmacc_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwmaccsu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwmaccsu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwmaccsu_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwmaccus_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwmaccus_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwmaccus_vx_w, 4, 8, clearq)
--- 
-2.23.0
+Could we write this so that we have the #if...#endif
+conditional nested inside the if { ... } else { ... },
+rather than having the two conditional constructs
+oddly intermeshed?
 
+thanks
+-- PMM
 
