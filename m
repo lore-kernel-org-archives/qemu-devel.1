@@ -2,95 +2,87 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD80BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF1BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7219E2070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:22:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E65E207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UD//r3+9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7219E2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eEvsr0TY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E65E207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbgT3-0002DV-Lh
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 04:22:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51060)
+	id 1jbgnP-0003BS-RM
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 04:43:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbgSS-0001bF-9H
- for qemu-devel@nongnu.org; Thu, 21 May 2020 04:21:40 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:45466)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jbgmh-0002eR-O7; Thu, 21 May 2020 04:42:35 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40660)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jbgSR-0004cb-6u
- for qemu-devel@nongnu.org; Thu, 21 May 2020 04:21:39 -0400
-Received: by mail-ej1-x641.google.com with SMTP id yc10so7717408ejb.12
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 01:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=OMw43quhwDvr8YM34+2OA0PExH0CGujLiL9X+yF0Djg=;
- b=UD//r3+9uGv57NR0jSEMcPUq08OVJE05M9h8gaaJXRJCjVU95pj8nijc9UDYb53BmM
- SDP9J4MYZHdsBybWszdpq2uncfYYhM9fUjf+GH5vT3SYSXgRUFvSZIR/4PoK2Jhw7RcY
- +aC1OxB8KpfpNBBq6E1fsbZYlIiewp1olU/6/+serJ4qiFXcyiSkCOPqO8wULpnuLhMU
- Y+P8zS2FsMtbuLCUeOwufdR+vBy48PG5/JlBexNA7UXS51+fTnIcdwc5u8c9jSUd95Ah
- OPfRpOxK+R/itz/SWxj1SrTo4QRFhimemE2jYnxdLMIl8qdeXPS/NYxEfk2T2pV+8Ois
- Sr2w==
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jbgmg-0000C2-AX; Thu, 21 May 2020 04:42:35 -0400
+Received: by mail-wm1-x343.google.com with SMTP id n18so5530288wmj.5;
+ Thu, 21 May 2020 01:42:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=QQeyNMYyr6h5PfngvnfF/86Fl3mYVL82wgSLqkkAHQg=;
+ b=eEvsr0TYeas0gkH7cs4SLzulzE/hE25fjLhZ3vlqQNRpavLhHzN3PmKPITKmlWDE42
+ D8VJdiJkpMsuGDoXA3pa3BtnPHKtJFDT0mezGHMmdc2Q8H5LGNG1DRS4llbdDFuYzARl
+ begsAP7HPb5prFzzVIyniedYoPYgSDa2yBapWAJG6K1tHXwbAyTnKZksUyOgudo1ntJH
+ sA+fha3pXU86vddpdGer20DF+CkDaaP1bCiRdhWkvFVoTBlDSm762BOeHOa4DNUFQUeu
+ lHhFmwHr+ECZ0OXzIYVONK6iR7ZXjwLHTKLYZ7Rh8BrgiBgSGtMNDebuc9vgi9TVZJzh
+ PdjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=OMw43quhwDvr8YM34+2OA0PExH0CGujLiL9X+yF0Djg=;
- b=AfZoBuvlNUbHcfWwAT+g18UBQjAdCJw2jF9ECHt6J5Y9gtC9QbK83KHEhuunThyQWS
- UOv7SyGtZpZEW2spObtJa41cq3b8/PN+ufHlgKudQHVnMJHXegA5HtVwsNkq9alVB0T3
- k0tIWiKtzFb/h2m+TUZAkfhD+pJU6WdA6iPQGiFKfRdaaYk+qIZQeJoSDpctPir6DGus
- I1d1vN3G9QUlDTgwbcRWiBWTv6M/22aW+/YHIPgXzx088QD5s0MVWMv0hIpKtl+mBpqM
- Bo1HHs1kRXuOs7JZG6awPXFLzsu9uWsaXGJEqkVqeV+eXwnzDl+nMs+DDL76Hq728pLE
- 2kxg==
-X-Gm-Message-State: AOAM532pVdl5CyIBbGyrDB4BvaaUVIrqt6LEwrYIkOGiJS710eFelLyU
- UoFU5EXpOifijBteXl/ci2bt4w==
-X-Google-Smtp-Source: ABdhPJx3m/yMalOrKnqsnMwUQaXFogH6WO/VrJ4FahWE/REyGkf1b8JgH1jMDEbS/UDImu/XmCf/rQ==
-X-Received: by 2002:a17:906:195a:: with SMTP id
- b26mr2425887eje.534.1590049297352; 
- Thu, 21 May 2020 01:21:37 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id cm26sm3971934edb.87.2020.05.21.01.21.35
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=QQeyNMYyr6h5PfngvnfF/86Fl3mYVL82wgSLqkkAHQg=;
+ b=hyQBTT41VMkznhi3Pq7Jq8JQNGde7TpB7rDtaNIe3lw/JB2LKGFfNtkgpQUn7QatMP
+ g14vg+gRxLxpu+gOE57vSFaiLxMyeMViV52g72jSoU/hImEtEtnqo9lD3exerktTYcJU
+ v3eF7AK9vvt4rGoyNfgI704XnFN7zCKITDhBfKH9HK9DsoZza/qX51n7DdmvRgVKDL5+
+ 8UKmL3Z3GSMRAGeFRwuLD+HudHIJrXqfE+SaqWynAFWTUf1z1jRt2iKtMvC6dZ2UVY7I
+ h1sdf9nCRqBLdqXnsE2gJiFqi7U5+z7B8HOyOGhAULL0KeFYoqZlLG7LIrgx2DWUsnvD
+ VdiA==
+X-Gm-Message-State: AOAM532sJp9G/cv8kkQrrjwCTQ2y9ZR3xI4ZJZRHXpOQ5J9f18jiPHV6
+ /avdmVjN+Ko49AA7oKjb5Kd+pbbs
+X-Google-Smtp-Source: ABdhPJxiU7svautQk2/DqO/wP74cYWHQVLPY32vIvIkil7RT/dnJruvfdHHoyROxI/1bOXkIgc/Xqg==
+X-Received: by 2002:a7b:cbc5:: with SMTP id n5mr8152828wmi.110.1590050551464; 
+ Thu, 21 May 2020 01:42:31 -0700 (PDT)
+Received: from donizetti.redhat.com ([151.30.94.134])
+ by smtp.gmail.com with ESMTPSA id t14sm5153398wrb.56.2020.05.21.01.42.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 01:21:35 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C74411FF7E;
- Thu, 21 May 2020 09:21:34 +0100 (BST)
-References: <20200513175134.19619-1-alex.bennee@linaro.org>
- <20200513175134.19619-5-alex.bennee@linaro.org>
- <958a1d7e-305d-96f5-2e0c-f8a2dd53e1c0@redhat.com>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v1 04/10] linux-user: completely re-write init_guest_space
-In-reply-to: <958a1d7e-305d-96f5-2e0c-f8a2dd53e1c0@redhat.com>
-Date: Thu, 21 May 2020 09:21:34 +0100
-Message-ID: <87eerdg0kx.fsf@linaro.org>
+ Thu, 21 May 2020 01:42:30 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target-i386: do not force-expose WAITPKG if -overcommit
+ cpu-pm=on
+Date: Thu, 21 May 2020 10:42:29 +0200
+Message-Id: <20200521084229.13235-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x641.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -105,72 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: ehabkost@redhat.com, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+By force-enabling the WAITPKG bit whenever -overcommit cpu-pm=on is used,
+commit 67192a298f ("x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE",
+2019-10-23) broke that option is the host processor does not have
+WAITPKG or the host kernel is too old.  This is because TPAUSE, UMWAIT
+and UMONITOR are not NOPs on older processors (though perhaps they should
+have been!).
 
-Thomas Huth <thuth@redhat.com> writes:
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/kvm.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> On 13/05/2020 19.51, Alex Benn=C3=A9e wrote:
->> First we ensure all guest space initialisation logic comes through
->> probe_guest_base once we understand the nature of the binary we are
->> loading. The convoluted init_guest_space routine is removed and
->> replaced with a number of pgb_* helpers which are called depending on
->> what requirements we have when loading the binary.
->>=20
->> We first try to do what is requested by the host. Failing that we try
->> and satisfy the guest requested base address. If all those options
->> fail we fall back to finding a space in the memory map using our
->> recently written read_self_maps() helper.
->>=20
->> There are some additional complications we try and take into account
->> when looking for holes in the address space. We try not to go directly
->> after the system brk() space so there is space for a little growth. We
->> also don't want to have to use negative offsets which would result in
->> slightly less efficient code on x86 when it's unable to use the
->> segment offset register.
->>=20
->> Less mind-binding gotos and hopefully clearer logic throughout.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Acked-by: Laurent Vivier <laurent@vivier.eu>
-<snip>
->> +    } else {
->> +        if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
->> +            error_report("%s: requires more virtual address space "
->> +                         "than the host can provide (0x%" PRIx64 ")",
->> +                         image_name, (uint64_t)guest_hiaddr - guest_bas=
-e);
->> +            exit(EXIT_FAILURE);
->>          }
->
->  Hi Alex,
->
-> this causes an error with newer versions of Clang:
->
-> linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
-> long' > 18446744073709551615 is always false
-> [-Werror,-Wtautological-type-limit-compare]
-> 4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
-> 4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
-> 4687 1 error generated.
->
-> Any ideas how to fix this?
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6513584948..6554fdef3c 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -408,9 +408,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+             ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+         }
+     } else if (function == 7 && index == 0 && reg == R_ECX) {
+-        if (enable_cpu_pm) {
+-            ret |= CPUID_7_0_ECX_WAITPKG;
+-        } else {
++        if (!enable_cpu_pm) {
+             ret &= ~CPUID_7_0_ECX_WAITPKG;
+         }
+     } else if (function == 7 && index == 0 && reg == R_EDX) {
+-- 
+2.25.4
 
-I guess this check only makes sense when abi_ulong > uintptr_t or IOW 64
-bit guests running on 32 bit hosts. We could just wrap that check in:
-
-#if HOST_LONG_BITS =3D=3D 32
-
-#endif
-
->
->  Thomas
-
-
---=20
-Alex Benn=C3=A9e
 
