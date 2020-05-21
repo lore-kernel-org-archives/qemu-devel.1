@@ -2,73 +2,86 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54503C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 07:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFC7C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:00:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1264C20829
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 07:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1264C20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CADA22065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:00:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h5jiAtZH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CADA22065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbflG-0001x9-Aq
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 03:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46954)
+	id 1jbg7T-0005vG-Sv
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 03:59:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jbfkg-0001KW-FQ
- for qemu-devel@nongnu.org; Thu, 21 May 2020 03:36:26 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:37058)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jbfkd-0004pX-OF
- for qemu-devel@nongnu.org; Thu, 21 May 2020 03:36:26 -0400
-Received: from player762.ha.ovh.net (unknown [10.108.54.97])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 4E5AF1D758A
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:36:13 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-335-225.w86-206.abo.wanadoo.fr
- [86.206.169.225]) (Authenticated sender: clg@kaod.org)
- by player762.ha.ovh.net (Postfix) with ESMTPSA id B92691293AA64;
- Thu, 21 May 2020 07:36:05 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G002ed2bfcd1-964a-43d4-b8bd-815c8a3d78d8,814BE501F1048BCFB57FB4F14E8CAD466B88CA3D)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] arm/aspeed: Rework NIC attachment
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200519161957.1056027-1-clg@kaod.org>
- <87zha3t8qg.fsf@dusky.pond.sub.org>
- <3ead6228-b61b-ca8b-6ebc-dd9299f1a334@kaod.org>
- <87367uobma.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <836e30f9-d029-5ec9-3b05-b0d8541869ff@kaod.org>
-Date: Thu, 21 May 2020 09:36:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbg6o-00057S-1F
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 03:59:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35794
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jbg6m-0000Z4-PA
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 03:59:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590047954;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=57YaKa9BHFEUtBziFfUy/l9IGUB153INf5Tvp3kpsqc=;
+ b=h5jiAtZH2jwzykyCdzPKN36Aa8Z6voBRwla8LzGXb7uf6Y7Bz7iHPpmU/2JRmNGd2G0uix
+ 2Cw4Hbid9OeTNAoSaQ9xeTEbylNVmoSYXbDqHu9382/t68Uq32Ala/ceiMkLwTz9+9Z70M
+ 7TXNGFLUjtVKEqWJ9mk9uHjfvbLlr+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-1IXsag8KPb6BdouentaxGA-1; Thu, 21 May 2020 03:59:13 -0400
+X-MC-Unique: 1IXsag8KPb6BdouentaxGA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8063107ACCA;
+ Thu, 21 May 2020 07:59:11 +0000 (UTC)
+Received: from nas.mammed.net (unknown [10.40.193.252])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6167B5C1B0;
+ Thu, 21 May 2020 07:59:01 +0000 (UTC)
+Date: Thu, 21 May 2020 09:58:59 +0200
+From: Igor Mammedow <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v3 09/22] acpi: ged: rename event memory region
+Message-ID: <20200521095859.45791508@nas.mammed.net>
+In-Reply-To: <20200520132003.9492-10-kraxel@redhat.com>
+References: <20200520132003.9492-1-kraxel@redhat.com>
+ <20200520132003.9492-10-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87367uobma.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 3417106217695218467
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -77
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddutddguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlhcuvffnffculddvfedmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeiuddvhfefjeegjeeiheeftddtveekjefghffgffeuvdffleeiveefteekgefggeenucffohhmrghinhepohhpvghnphhofigvrhdrgiihiidpohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdekiedrvddtiedrudeiledrvddvheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=87.98.172.75; envelope-from=clg@kaod.org;
- helo=4.mo2.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 03:36:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 00:43:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,290 +94,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/20 5:43 PM, Markus Armbruster wrote:
-> Cédric Le Goater <clg@kaod.org> writes:
-> 
->> On 5/20/20 8:34 AM, Markus Armbruster wrote:
->>> Cédric Le Goater <clg@kaod.org> writes:
->>>
->>>> The AST2400 and AST2500 SoCs have two MACs but only the first MAC0 is
->>>> active on the Aspeed machines using these SoCs. The AST2600 has four
->>>> MACs. The AST2600 EVB machine activates MAC1, MAC2 and MAC3 and the
->>>> Tacoma BMC machine activates MAC2.
->>>>
->>>> Introduce a bit-field property "macs-mask" under the Aspeed SoC model
->>>> to link the active MACs of the machine being started with the available
->>>> network devices.
->>>>
->>>> Inactive MACs will have no peer and QEMU will warn the user with :
->>>>
->>>>     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->>>>     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->>>>     qemu-system-arm: warning: nic ftgmac100.3 has no peer
->>>
->>> I can't reproduce this warning.  What's your exact command line?
->>
->> Get a witherspoon-tacoma flash image :
->>
->>     $ wget https://openpower.xyz/job/openbmc-build/distro=ubuntu,label=builder,target=witherspoon-tacoma/lastSuccessfulBuild/artifact/deploy/images/witherspoon-tacoma/flash-witherspoon-tacoma
->>
->> Run :
->>
->>     $ qemu-system-arm -M tacoma-bmc -nic user -drive file=./flash-witherspoon-tacoma,format=raw,if=mtd -nographic -nodefaults -serial mon:stdio
->>     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->>     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->>     qemu-system-arm: warning: nic ftgmac100.3 has no peer
-> 
-> I must have run the wrong binary somehow.
-> 
->>>
->>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>>> ---
->>>>
->>>>  To be applied on top of patch "arm/aspeed: Compute the number of CPUs
->>>>  from the SoC definition" 
->>>>  
->>>>  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.1006073-1-clg@kaod.org/
->>>>  
->>>>  include/hw/arm/aspeed.h     |  1 +
->>>>  include/hw/arm/aspeed_soc.h |  6 ++++++
->>>>  hw/arm/aspeed.c             |  6 ++++++
->>>>  hw/arm/aspeed_ast2600.c     | 11 ++++++++---
->>>>  hw/arm/aspeed_soc.c         | 10 ++++++++--
->>>>  5 files changed, 29 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
->>>> index 18521484b90e..842dff485f5b 100644
->>>> --- a/include/hw/arm/aspeed.h
->>>> +++ b/include/hw/arm/aspeed.h
->>>> @@ -39,6 +39,7 @@ typedef struct AspeedMachineClass {
->>>>      const char *fmc_model;
->>>>      const char *spi_model;
->>>>      uint32_t num_cs;
->>>> +    uint32_t macs_mask;
->>>>      void (*i2c_init)(AspeedBoardState *bmc);
->>>>  } AspeedMachineClass;
->>>>  
->>>> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
->>>> index 914115f3ef77..fdb9e05bc47c 100644
->>>> --- a/include/hw/arm/aspeed_soc.h
->>>> +++ b/include/hw/arm/aspeed_soc.h
->>>> @@ -34,6 +34,11 @@
->>>>  #define ASPEED_CPUS_NUM  2
->>>>  #define ASPEED_MACS_NUM  4
->>>>  
->>>> +#define ASPEED_MAC0_ON   (1 << 0)
->>>> +#define ASPEED_MAC1_ON   (1 << 1)
->>>> +#define ASPEED_MAC2_ON   (1 << 2)
->>>> +#define ASPEED_MAC3_ON   (1 << 3)
->>>> +
->>>>  typedef struct AspeedSoCState {
->>>>      /*< private >*/
->>>>      DeviceState parent;
->>>> @@ -55,6 +60,7 @@ typedef struct AspeedSoCState {
->>>>      AspeedSDMCState sdmc;
->>>>      AspeedWDTState wdt[ASPEED_WDTS_NUM];
->>>>      FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
->>>> +    uint32_t macs_mask;
->>>
->>> What's the purpose of this member?  When and how would it be different
->>> from AspeedMachineClass's macs_mask?
->>
->> Each machine activates a different set of MACs even if using the same SoC.
->> So, the SoC macs_mask is overiden when the machine initializes the SoC in 
->> aspeed_machine_init().
-> 
-> Let me try to rephrase my question below.
-> 
->> That said, I think the default SoC macs_mask should be all MACS, a value 
->> of 0xFFFFFFFF would be fine, and not only the first MAC as this patch does.
->>
->>>>      AspeedMiiState mii[ASPEED_MACS_NUM];
->>>>      AspeedGPIOState gpio;
->>>>      AspeedGPIOState gpio_1_8v;
->>>> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
->>>> index 6f8f4b88f8ab..79c683864d7e 100644
->>>> --- a/hw/arm/aspeed.c
->>>> +++ b/hw/arm/aspeed.c
->>>> @@ -283,6 +283,8 @@ static void aspeed_machine_init(MachineState *machine)
->>>>                              &error_abort);
->>>>      object_property_set_int(OBJECT(&bmc->soc), amc->num_cs, "num-cs",
->>>>                              &error_abort);
->>>> +    object_property_set_int(OBJECT(&bmc->soc), amc->macs_mask, "macs-mask",
->>>> +                            &error_abort);
-> 
-> Here, you set AspeedSocState member macs_mask to AspeedMachineClass
-> member macs_mask.
+On Wed, 20 May 2020 15:19:50 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-yes. aspeed_machine_init() is common to all machines. AspeedMachineClass
-gathers the differences.
-
+> Rename memory region and callbacks and ops to carry "evt" in the name
+> because a second region will be added shortly.
 > 
->>>>      object_property_set_link(OBJECT(&bmc->soc), OBJECT(&bmc->ram_container),
->>>>                               "dram", &error_abort);
->>>>      if (machine->kernel_filename) {
->>>> @@ -556,12 +558,14 @@ static int aspeed_soc_num_cpus(const char *soc_name)
->>>>  static void aspeed_machine_class_init(ObjectClass *oc, void *data)
->>>>  {
->>>>      MachineClass *mc = MACHINE_CLASS(oc);
->>>> +    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
->>>>  
->>>>      mc->init = aspeed_machine_init;
->>>>      mc->no_floppy = 1;
->>>>      mc->no_cdrom = 1;
->>>>      mc->no_parallel = 1;
->>>>      mc->default_ram_id = "ram";
->>>> +    amc->macs_mask = ASPEED_MAC0_ON;
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Igor Mammedow <imammedo@redhat.com>
+
+> ---
+>  include/hw/acpi/generic_event_device.h |  2 +-
+>  hw/acpi/generic_event_device.c         | 16 ++++++++--------
+>  2 files changed, 9 insertions(+), 9 deletions(-)
 > 
-> Abstract base type's .class_init() sets AspeedMachineClass's macs_mask
-> to "just first one".
-
-Yes. This covers all AST2400 and AST2500 machines. Only the AST2600 
-use a different set of MACs.
- 
-> 
->>>>  
->>>>      aspeed_machine_class_props_init(oc);
->>>>  }
->>>> @@ -680,6 +684,7 @@ static void aspeed_machine_ast2600_evb_class_init(ObjectClass *oc, void *data)
->>>>      amc->fmc_model = "w25q512jv";
->>>>      amc->spi_model = "mx66u51235f";
->>>>      amc->num_cs    = 1;
->>>> +    amc->macs_mask  = ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_ON;
->>>>      amc->i2c_init  = ast2600_evb_i2c_init;
->>>>      mc->default_ram_size = 1 * GiB;
->>>>      mc->default_cpus = mc->min_cpus = mc->max_cpus =
->>>> @@ -698,6 +703,7 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
->>>>      amc->fmc_model = "mx66l1g45g";
->>>>      amc->spi_model = "mx66l1g45g";
->>>>      amc->num_cs    = 2;
->>>> +    amc->macs_mask  = ASPEED_MAC2_ON;
->>>>      amc->i2c_init  = witherspoon_bmc_i2c_init; /* Same board layout */
->>>>      mc->default_ram_size = 1 * GiB;
->>>>      mc->default_cpus = mc->min_cpus = mc->max_cpus =
-> 
-> Two concrete types' .class_init() override this default.
-
-yes.
- 
-> Fine with me.
-> 
->>>> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
->>>> index 114b94f8f44d..fa85122f6d78 100644
->>>> --- a/hw/arm/aspeed_ast2600.c
->>>> +++ b/hw/arm/aspeed_ast2600.c
->>>> @@ -247,6 +247,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
->>>>      AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
->>>>      Error *err = NULL, *local_err = NULL;
->>>>      qemu_irq irq;
->>>> +    NICInfo *nd = &nd_table[0];
->>>>  
->>>>      /* IO space */
->>>>      create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
->>>> @@ -462,8 +463,12 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
->>>>      }
->>>>  
->>>>      /* Net */
->>>> -    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
->>>> -        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
->>>> +    for (i = 0; i < sc->macs_num; i++) {
->>>> +        if ((s->macs_mask & (1 << i)) && nd->used) {
-> 
-> This checks AspeedSocState's member.
->
->>>> +            qemu_check_nic_model(nd, TYPE_FTGMAC100);
->>>> +            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
->>>> +            nd++;
->>>> +        }
->>>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
->>>>                                   &err);
->>>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
->>>> @@ -471,7 +476,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
->>>>          error_propagate(&err, local_err);
->>>>          if (err) {
->>>>              error_propagate(errp, err);
->>>> -           return;
->>>> +            return;
->>>>          }
->>>>          sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
->>>>                          sc->memmap[ASPEED_ETH1 + i]);
->>>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->>>> index 984d29087dce..d2c6a5760790 100644
->>>> --- a/hw/arm/aspeed_soc.c
->>>> +++ b/hw/arm/aspeed_soc.c
->>>> @@ -234,6 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->>>>      AspeedSoCState *s = ASPEED_SOC(dev);
->>>>      AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
->>>>      Error *err = NULL, *local_err = NULL;
->>>> +    NICInfo *nd = &nd_table[0];
->>>>  
->>>>      /* IO space */
->>>>      create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
->>>> @@ -405,8 +406,12 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->>>>      }
->>>>  
->>>>      /* Net */
->>>> -    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
->>>> -        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
->>>> +    for (i = 0; i < sc->macs_num; i++) {
->>>> +        if ((s->macs_mask & (1 << i)) && nd->used) {
-> 
-> Likewise.
-> 
-> Now my rephrased question: why do you need to store macs_mask both in
-> AspeedSoCState and in AspeedMachineClass?  As far as I can tell, their
-> values are the same for any given machine.
-
-yes, they are the same because the parent machine "propagates" the top 
-level configuration to all sub-devices. The SoC is one of these and its 
-initial settings are generic and do not make assumption on the machine 
-characteristics.
-
-The general case is "use MAC0" only, which works for all AST2400 and
-AST2500 machines but the AST2600 machines have a different configuration. 
-
-I agree there is some redundancy in this design pattern. What do you 
-have in mind ? 
-
-> 
->>>> +            qemu_check_nic_model(nd, TYPE_FTGMAC100);
->>>> +            qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), nd);
->>>> +            nd++;
->>>> +        }
->>>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
->>>>                                   &err);
->>>>          object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
->>>> @@ -455,6 +460,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->>>>                         aspeed_soc_get_irq(s, ASPEED_SDHCI));
->>>>  }
->>>>  static Property aspeed_soc_properties[] = {
->>>> +    DEFINE_PROP_UINT32("macs-mask", AspeedSoCState, macs_mask, 0x1),
-> 
-> Shouldn't this be ASPEED_MAC0_ON rather than 0x1?
-
-yes. or 0x0 ? and let the machine fully in charge of the configuration.
-
-> Hmm, isn't aspeed_machine_class_init()'s amc->macs_mask = ASPEED_MAC0_ON
-> redundant with this?
-
-yes. So 0x0 is better.
-
-Thanks,
-
-C.
-
-> 
->>>>      DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGION,
->>>>                       MemoryRegion *),
->>>>      DEFINE_PROP_END_OF_LIST(),
->>>
-> 
+> diff --git a/include/hw/acpi/generic_event_device.h
+> b/include/hw/acpi/generic_event_device.h index
+> 83917de02425..90a9180db572 100644 ---
+> a/include/hw/acpi/generic_event_device.h +++
+> b/include/hw/acpi/generic_event_device.h @@ -86,7 +86,7 @@
+>  #define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
+>  
+>  typedef struct GEDState {
+> -    MemoryRegion io;
+> +    MemoryRegion evt;
+>      uint32_t     sel;
+>  } GEDState;
+>  
+> diff --git a/hw/acpi/generic_event_device.c
+> b/hw/acpi/generic_event_device.c index b1cbdd86b66c..1cb34111e59a
+> 100644 --- a/hw/acpi/generic_event_device.c
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -142,7 +142,7 @@ void build_ged_aml(Aml *table, const char *name,
+> HotplugHandler *hotplug_dev, }
+>  
+>  /* Memory read by the GED _EVT AML dynamic method */
+> -static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
+> +static uint64_t ged_evt_read(void *opaque, hwaddr addr, unsigned
+> size) {
+>      uint64_t val = 0;
+>      GEDState *ged_st = opaque;
+> @@ -161,14 +161,14 @@ static uint64_t ged_read(void *opaque, hwaddr
+> addr, unsigned size) }
+>  
+>  /* Nothing is expected to be written to the GED memory region */
+> -static void ged_write(void *opaque, hwaddr addr, uint64_t data,
+> -                      unsigned int size)
+> +static void ged_evt_write(void *opaque, hwaddr addr, uint64_t data,
+> +                          unsigned int size)
+>  {
+>  }
+>  
+> -static const MemoryRegionOps ged_ops = {
+> -    .read = ged_read,
+> -    .write = ged_write,
+> +static const MemoryRegionOps ged_evt_ops = {
+> +    .read = ged_evt_read,
+> +    .write = ged_evt_write,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>      .valid = {
+>          .min_access_size = 4,
+> @@ -287,9 +287,9 @@ static void acpi_ged_initfn(Object *obj)
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>      GEDState *ged_st = &s->ged_state;
+>  
+> -    memory_region_init_io(&ged_st->io, obj, &ged_ops, ged_st,
+> +    memory_region_init_io(&ged_st->evt, obj, &ged_evt_ops, ged_st,
+>                            TYPE_ACPI_GED, ACPI_GED_EVT_SEL_LEN);
+> -    sysbus_init_mmio(sbd, &ged_st->io);
+> +    sysbus_init_mmio(sbd, &ged_st->evt);
+>  
+>      sysbus_init_irq(sbd, &s->irq);
+>  
 
 
