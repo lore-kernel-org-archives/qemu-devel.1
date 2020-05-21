@@ -7,76 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDD4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78064C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:11:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B1220759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35B9420759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:11:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WOlVPG7o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B1220759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xo2yYsbX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B9420759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbojI-0001ry-OE
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50236)
+	id 1jboja-0002VF-94
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:11:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJL-0004m4-R9
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:47 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:45697)
+ id 1jboJ2-0004Ie-O1
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:29 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:38477)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJK-0006tD-PV
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:47 -0400
-Received: by mail-qk1-x742.google.com with SMTP id i5so7791409qkl.12
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:46 -0700 (PDT)
+ id 1jboJ1-0006hF-WA
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:28 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id fb16so3366126qvb.5
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=xM5F5VKH4+4sC5/UG8rh4cawXyjUH8jNOSP42/FFGNs=;
- b=WOlVPG7otck/gVRhYO+Jc23elD7wfUNztElUGh7nG+igheI00J51UQJQnwIRTmqjde
- r2OUVB73e5ZfrGfinTwDfveRWcJYSCSCoZN330heJ9DkmVi766yaIN4l8bbsY3sPCjTA
- MZE1wRYzk+B9NLd7PmL1Ow+QnpgFTlPX5YnJEuz2wQMVuGX7uXw9dT2Lkk3+y5uK3ckN
- NEkIg55JonbPVUg7Xzaj7yrGU2VzMXBSbOWxmfKiq58HW6DfBfs09/DXG+6JAMZKNzvN
- sD66XKl6u9uVYSCM3Ic74b0h1cdpHZIHCpQB6sNC3uiNaiuQloCHOd7nQm67V2cNJSZo
- rHmg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=E/tQbITHc97dgORFyK3tE34tNsNJB0LGdPZMzeOAZ2A=;
+ b=xo2yYsbXMAYWcZxDsNeGRW8GPlpUHMnVUMqE+npgdAvvBTMJ4zLTNBUeognUwKOa9/
+ v/HIbnYn5Bn6AwN050T3TEZhj48pBqOUh3gcAwQFluN6qt4dTnyOSO841BOvSNk7odn/
+ WfpcB+Z8qVUKrsHjOE6eWLk6KsIQZiu0RGKcyrOYCgUxweZRZwc9VAG0/NnmbQxuTinY
+ cElnvomWcGhm1jbv720+BxZRNKMET/FATNZhYODBDYUQsYjeQTRY48Vo4oRs1OCRCwnS
+ pLD01f4u3P2LQwO3NPs9Y5Ys8PurP8bM+fHCJGCdDYfBKjfthe7+Oagmmlez8K+HuYAU
+ 5RJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=xM5F5VKH4+4sC5/UG8rh4cawXyjUH8jNOSP42/FFGNs=;
- b=k+UW4guuhHqbjOjoLUGsUuycQXrqQ3EAm0uiCMVSzPDfuZ3PD+1RZPOcAstJe0Ppih
- gTli3o7qTu45BvaCLX39Er5yil11d/8gzhIgsy8OQOl+lORT8lebg6fm7H2Vu3Bjnc3u
- DZZGue1gF1I5qcgxFIUBiNDpDKizLN5vS91nXUH9KKtmuMmMqPuhLvXCA1144Sbjb6ex
- CmBYqARUHssmQkrEIMOUWY6sxVS/ozlCTNQZBlsWt5sw32R8OAqFq7TdrUW+cgAM249y
- phSzdq3s4/Cn7jVysswkjcpGJ6HdoWtR4LOEpSA+xKcJXoOclUgOGc6MEFthtnjCNJki
- /rkQ==
-X-Gm-Message-State: AOAM533KmkmXFDK3TctC18aKkwDR01kg+V5by0J7s+gowITT4jLkAPV0
- NW2DPEc7W7tNGm7NCOadSz6g2S3rV1WNZg==
-X-Google-Smtp-Source: ABdhPJxX5hXseZH8WZi3XJU4bMVgeGrhs/VO2QA9caPKh+vvAU/1WOMHJBk5WcDmk4Wa2wAc+co/xg==
-X-Received: by 2002:a37:4e81:: with SMTP id
- c123mr10463609qkb.467.1590079485560; 
- Thu, 21 May 2020 09:44:45 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=E/tQbITHc97dgORFyK3tE34tNsNJB0LGdPZMzeOAZ2A=;
+ b=ddqNINA2qshbT3rZAVP/57jzw7iTynsupgZzRgn6oP4X61+f1AQG0Qmym6a0ysTOaN
+ E13pZj9KKAzPpuPG9js2nJVVlzxUhk0iaxTntbjmBjR46d4xHVhiBCV22qRFQopP0CBC
+ KcbCMnr6EiEj8We2EKhfYUXcFA1kgQnaTMTxc5TzDZbcrF9BU0Soe1bGDfb5pnFSyP/H
+ 7tV0DlkWmX8jKW3paalf5yk+YXb3KJ9i10Vx+wY1rLP1OVEMGMAtzTOyn1AOWdDalgFZ
+ 9IkiwyqokbQaZlr6iD03URhOPrREVpZjm4gFE1AITABou4MFLWHDVWosBGp2KY2LwFPv
+ p8og==
+X-Gm-Message-State: AOAM5311A7NdmX0/eQKpygCeOQuSF/L+oie/B6Ls1z2zOr2okocK/iD6
+ eKdopbwKFkIMbwacbRD7OANe5s6Dd8gc3w==
+X-Google-Smtp-Source: ABdhPJwto4RstkhwO2dZaQUBcN7/lRGVXAsx4K+KaMtCaTG01RIU/7xnCwC6LeP+nX387ko7L9yD4A==
+X-Received: by 2002:a0c:b2c5:: with SMTP id d5mr10934829qvf.36.1590079466923; 
+ Thu, 21 May 2020 09:44:26 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.44
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:45 -0700 (PDT)
+ Thu, 21 May 2020 09:44:26 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 68/74] sparc: convert to cpu_has_work_with_iothread_lock
-Date: Thu, 21 May 2020 12:40:05 -0400
-Message-Id: <20200521164011.638-69-robert.foley@linaro.org>
+Subject: [PATCH v9 54/74] alpha: convert to cpu_interrupt_request
+Date: Thu, 21 May 2020 12:39:51 -0400
+Message-Id: <20200521164011.638-55-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x742.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,48 +101,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, richard.henderson@linaro.org, cota@braap.org,
- peter.puhov@linaro.org, alex.bennee@linaro.org,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Soon we will call cpu_has_work without the BQL.
-
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/sparc/cpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/alpha/cpu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index cef25238a5..3fa1a535d9 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -704,6 +704,8 @@ static bool sparc_cpu_has_work(CPUState *cs)
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-            cpu_interrupts_enabled(env);
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index b3fd6643e8..09677c6c44 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -42,10 +42,10 @@ static bool alpha_cpu_has_work(CPUState *cs)
+        assume that if a CPU really wants to stay asleep, it will mask
+        interrupts at the chipset level, which will prevent these bits
+        from being set in the first place.  */
+-    return cs->interrupt_request & (CPU_INTERRUPT_HARD
+-                                    | CPU_INTERRUPT_TIMER
+-                                    | CPU_INTERRUPT_SMP
+-                                    | CPU_INTERRUPT_MCHK);
++    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD
++                                        | CPU_INTERRUPT_TIMER
++                                        | CPU_INTERRUPT_SMP
++                                        | CPU_INTERRUPT_MCHK);
  }
-@@ -863,7 +865,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
  
-     cc->class_by_name = sparc_cpu_class_by_name;
-     cc->parse_features = sparc_cpu_parse_features;
--    cc->has_work = sparc_cpu_has_work;
-+    cc->has_work_with_iothread_lock = sparc_cpu_has_work;
-     cc->do_interrupt = sparc_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
-     cc->dump_state = sparc_cpu_dump_state;
+ static void alpha_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
 -- 
 2.17.1
 
