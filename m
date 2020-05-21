@@ -2,78 +2,78 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC45C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91FF020759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AAAF20759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x13aPp24"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91FF020759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o7hilh0u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAAF20759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbqPT-00073x-PM
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:59:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35548)
+	id 1jbqPl-0007Vb-HC
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqMu-0004Pn-GR
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:56:36 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36779)
+ id 1jbqOo-0006fU-7W
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:58:34 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:34817)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqMt-0004ep-79
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:56:36 -0400
-Received: by mail-oi1-x241.google.com with SMTP id x23so7133369oic.3
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 11:56:34 -0700 (PDT)
+ id 1jbqOn-000574-36
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:58:33 -0400
+Received: by mail-ot1-x334.google.com with SMTP id 69so6369336otv.2
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 11:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TF/4RMNyI5qjXnX73kTH6e164dARfUFpER4eJwbwepk=;
- b=x13aPp24N7diruopnilbK14LbEKg+qUFvVXyFPZtSKlRVaelrpa1LGdwgWd1A4OZDr
- ewHTubmW4VbEqWXZOGNEj8UjNBTyKMCP0r3QkqAN6fVWrhiWyrgUv5VfegaOvnNHFZPu
- Sv9AISsNcu2I0sknLgXgTK2/qhCh1FG/89ISw9c/uMKuyuO1dkFVilkXOilPutz9eaCB
- sc+A3Ks9KoEaDvEIGAEgwogPWhqc494cZVq+LV65QiE+KkaCDgrsR4QDD3gdROAJg06q
- 9YNC3vWCRAWASOK05glsCJ0VIoEk3HKcg5J7PIW4BZMYuCSfeObLtsZUKfeUIkjnkns3
- GluA==
+ :cc:content-transfer-encoding;
+ bh=VUXXS2b4NKm0Um/uK+1jXkjiOxSziLQSg6mTY3/bpkY=;
+ b=o7hilh0u3YRVigo6FWrFuJtElYKVQcF0Iwep5ORIds9PNIhkGvLHEHMcNV1k80zp87
+ I/JpwreRHZ0LIyTfUnJDFeOGuYaGVrM/j0XaHPAOzf/MsGu0pgE9wRnVfl6aEcocEhRd
+ JUcKE8qcN7DFMPcVff8Lk0PhmpPw9SuhOrlSzx/SVDYucpZ8oSKDdjUGmgRAiQvH5pUp
+ cwg4vaUW1B3jOSICEkfmNIbOI0YeTEAhFL3sr8Q0JqQMMaRT+o7dy/N3Wk3Pp0wPznTj
+ Yf5Tb1PvSGInbRme3iZNJ8pRcfBwAtOgscyeN9BgX86iOBzObdNdsJtno947O3flNy//
+ vgDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TF/4RMNyI5qjXnX73kTH6e164dARfUFpER4eJwbwepk=;
- b=myiHZVWmwE3uvvRqLoj6o7H2Bo3ElUnLbDtEC3K+tV6gV4+b9EJf/tknkiFC3JNxWH
- sE9qcwiqlwTnaJvQHh9dTb8A/ETjQdzWo1HWvX9sFPLPAityEp0ttnh2oYb51eGXpf9U
- 8Uop6l4WE1F8aubZS2FH78SjS6rLrpvHZcGZQMvhe9qyORmblpGzpcR2tpWaEAYDjKlL
- C5okRVqG51n7IWJ5uxZMIrGQcv7zSvuciXITCV4eV3E2JG0PMXBCGCRh++oqnbAx0UDx
- O7AnXj1qBIg3LH+fJ9Y+5gGiy5NCCn9cb3/5sSFPWeJrTJf1jS3E96C2s3S0N0vgSic8
- V2IA==
-X-Gm-Message-State: AOAM532WfosDPbMs0OtBzk2iu3hVMjgD5N7kGY5ICDuD4pOkMcAUvpjR
- pHhtJRr3/nzS2H2WAOUQr87cMwyoyjziK5IKhrMjKQ==
-X-Google-Smtp-Source: ABdhPJyyOWw//6yaWNPXFnep6pcVnM1AEIzNZf759TwBmJp93O5shnhmWBPzt+8quhBqFAng0w62U+fp7aOsw652udo=
-X-Received: by 2002:a05:6808:6c6:: with SMTP id
- m6mr6391567oih.163.1590087393845; 
- Thu, 21 May 2020 11:56:33 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VUXXS2b4NKm0Um/uK+1jXkjiOxSziLQSg6mTY3/bpkY=;
+ b=Wa+tUUXSExw3XXmRAlzpp50+2bKGKvBwvldQlOhSXxB8Xr9APReMLUb7XmJLb4hgNk
+ RHiNRGiNouU/lSiRPgToYfNe/1f5NJBDrX2VN03EQjQSGJUeToyEcxBIUnvyrLGMh5ef
+ hzwb4ywNgv7XcdbMCzJITcS7cHhlnfd923LHGfT6ERVvOKvrGhba18iSi0d3+ClI7weh
+ 7NByIJ3UQivWZWun3f0lB8jTEzuF0xAnDlt53yonhF0znReqo7+Fg0RW/RwJC+2Rafew
+ cM4C9ta0SI7ZWn8GyMYOG3ynJt1CMvVpL66PGELyTnj4xnjlQBLN9o2ndmn7lLTM+rnJ
+ 22IQ==
+X-Gm-Message-State: AOAM53278wdAIT5ag2jgd6djWIJ+DvI0y4x/Adp5gWPE//QRt6y9lH1d
+ OFK4YOcdSTSjAo/XNzybp+4zSGbr/GZCfiNYl57f9O4c
+X-Google-Smtp-Source: ABdhPJy0XMZBDBkdClFZcIBxqUyFD5S9rE1SRo/g1L7V4NJshGO84Q08INJ7y6nIi33NTAitd4CON+xQSERVcwYl6+g=
+X-Received: by 2002:a9d:b82:: with SMTP id 2mr7763235oth.221.1590087511851;
+ Thu, 21 May 2020 11:58:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAFEAcA_i=HsBtpJh_o4+NWNeUihvNTccfB67gs0WrXttYdTc2A@mail.gmail.com>
- <20200521184923.19360-1-e.mikitas@gmail.com>
-In-Reply-To: <20200521184923.19360-1-e.mikitas@gmail.com>
+References: <20200520130025.2201467-1-berrange@redhat.com>
+In-Reply-To: <20200520130025.2201467-1-berrange@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 May 2020 19:56:23 +0100
-Message-ID: <CAFEAcA8FFc_Vf-UQO9f_3qoXiCJf9N1uWh7qB-WXrEWTzKBu8Q@mail.gmail.com>
-Subject: Re: [PATCH] ssi/imx_spi: Removed unnecessary cast and fixed condition
- in while statement
-To: Eden Mikitas <e.mikitas@gmail.com>
+Date: Thu, 21 May 2020 19:58:20 +0100
+Message-ID: <CAFEAcA_KQZysxZ3xx9xznh5xEdD=ja7pxh7U4oqb-XmFPP2WCg@mail.gmail.com>
+Subject: Re: [PULL 0/3] Socket next patches
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::334;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x334.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,40 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Jean-Christophe DUBOIS <jcd@tribudubois.net>, qemu-arm <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 May 2020 at 19:49, Eden Mikitas <e.mikitas@gmail.com> wrote:
+On Wed, 20 May 2020 at 14:03, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
 >
-> The ecspi controller is supposed to support burst length of 1 to 4096 bits,
-> meaning it is possible to configure it to use a value that isn't a multiple
-> of 8 (to my understanding). In that case, since tx_burst is always
-> decremented by 8, it will underflow. Sorry I didn't include an explanation.
-
-Ah, yes, I misread the code. On the first time into the loop
-tx_burst must be positive, but this is a while() condition
-and on subsequent loops we might end up negative. So all
-the code changes in this patch are correct, they just need
-to be split into two commits I think.
-
-> > This seems like a separate change to the first one;
-> > in general unrelated changes should be each in their
-> > own patch, rather than combined into a single patch.
+> The following changes since commit f2465433b43fb87766d79f42191607dac4aed5=
+b4:
 >
-> Should I resubmit this as a patch?
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2020-05-19 13:42:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/berrange/qemu tags/socket-next-pull-request
+>
+> for you to fetch changes up to e339273bfc514824410a49837e4f16dd4e51ae8e:
+>
+>   qemu-options: updates for abstract unix sockets (2020-05-20 10:34:53 +0=
+100)
+>
+> ----------------------------------------------------------------
+> Add support for UNIX sockets in the abstract namespace
+>
 
-Yes, if you could submit a 2-patch patch series where
-one patch is the fix for handling burst lengths which aren't
-multiples of 8, and the other is the fix for saving all the
-data into the rx fifo rather than just the low byte, that
-would be great.
 
-thanks
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
 -- PMM
 
