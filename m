@@ -2,108 +2,125 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCCFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21469C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 724B92072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:09:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5AA72072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:10:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLwdIBXW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 724B92072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="XlpUGo/h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5AA72072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbmpJ-0003OP-Ky
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:09:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38030)
+	id 1jbmqG-0004l8-2P
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:10:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbmom-0002xs-K8
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:09:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26396
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbmol-0007ht-TE
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:09:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590073746;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8zyjfyXT7K8479zjqqGZm9G8RcbVfG7qnCINZEZgQ4M=;
- b=hLwdIBXWKmxUF+71SjDMMaCWsDDu5lcWhIPqn5I1m0wqtINRCzB3/KNhu6nxTZ6Vfbf3Xy
- r7n1iTmjAmqzfQN0A+MJsrzwc4JJr/eB3ixzkzWbaZAAa21NHEUhRAO5V24bgDzC+Arlji
- oqVHKcbGVqRb4DoY6i/MLiw+w1KM/mo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-m8lpokmuOK-8Oe3M2b2Xpw-1; Thu, 21 May 2020 11:09:03 -0400
-X-MC-Unique: m8lpokmuOK-8Oe3M2b2Xpw-1
-Received: by mail-wr1-f70.google.com with SMTP id r14so3036599wrw.8
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 08:09:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8zyjfyXT7K8479zjqqGZm9G8RcbVfG7qnCINZEZgQ4M=;
- b=oRv+XNpy079JN8Mc2t6acuodvuvYPF0bs+PZCt0U3So1eQ2rV6iP8HYG5+Bp020wgr
- T3+dljgVuDLxdOGh812IXHFHN1tGCPLkmLvFsXOqn7i8ni6qXvOUn+APVnJBCjeowxKX
- ZMWyb3YKW2fSLHCCJq7yiAY76Vw4O7D21oiLHYOY5PtZIdn+ZOPIh0YUWr3nYLiDoRC2
- qONyfjt6663SmCx2SGC/wVi2zvGHQRKRBUfwNcRlQgG269BDe9O4vkSIZY5GHlF+foYv
- Y605nKgAuZ1CC9cclCgSOEIkAMvptMt8IEy74rhOBpIAnkxU+FM4gwltTY0BcUFBdS1H
- W3fQ==
-X-Gm-Message-State: AOAM531NvktcybRGxWZZfIDXYMR7DV5xjUnAXhNjRdVzMz8cQABgn2Cx
- Nm/hKMtgyFR15b609ttNzXJft6gr71IACj7TPzupqdYMrpo6WOrypFOLm2z7yirqDHABTTNqxTJ
- aFF2TGo5rUQJYcSQ=
-X-Received: by 2002:a05:600c:2257:: with SMTP id
- a23mr9943101wmm.13.1590073741902; 
- Thu, 21 May 2020 08:09:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwmvD1Ravrcn+f6oOYJxvwEZpK8+Lg9SAXpUepqfdglxzJDEF3lp+3raLgyhw3QcG7ClLzs0w==
-X-Received: by 2002:a05:600c:2257:: with SMTP id
- a23mr9943073wmm.13.1590073741673; 
- Thu, 21 May 2020 08:09:01 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.160.154])
- by smtp.gmail.com with ESMTPSA id z11sm2144287wrw.67.2020.05.21.08.09.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 08:09:01 -0700 (PDT)
-Subject: Re: [PATCH v2] cpus: Fix botched configure_icount() error API
- violation fix
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200515042231.18201-1-armbru@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c9adf045-3f36-06d5-f385-0c0a3659be95@redhat.com>
-Date: Thu, 21 May 2020 17:08:59 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbmpU-0003hY-BK; Thu, 21 May 2020 11:09:52 -0400
+Received: from mail-am6eur05on2117.outbound.protection.outlook.com
+ ([40.107.22.117]:47131 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbmpR-0007nI-Th; Thu, 21 May 2020 11:09:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LhfffSDfsebGMAQYPet5IObgs/IsnWBiFn4GtTkHkohFrtncoZPaq3mLOt9R4aXlHliZ77r0AXrVMVWvrd6GOHCWb/JiZaUM2OOysfdhR7XdSKqFvkApB88NVXAhH6G1yP7CxEbmWK/1sF5UZRd01+Xy9jGiU7YvXVBL1iA/p5mPpJfNd+LbQRhiK3rafGX+NFg+ob6mcbpOjhFcEbMqwSnpEj1bvLPH7APgKTAT4/ybV+/zJ6oFAQdAKtQwtxXXaX+WJ8tlaD7DS8kkppRh5xnDHiMe542kVrbf8pl/+jOnbD/1FyLsRRj85wvfSjDyiJMC+ySXAR3Rp5tdVJcSrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zBDdkHXvP7g9hWs1FCjA0O1NTGkCmgb+JInXvUfUzg4=;
+ b=P5edrzh5/GVu/dxW4hzRAb63QRDnbN92gvMwPOkrbEAB7fCpDChLAtTRIHdIzNSzSJT1ohuyKb91NP2U1+fYoDqsvfKKETpHSdE2wwytX2k75zVQQENanP3u+A9piaMwGBz+Jt6rC7bKJdMDuIhgvjXHdfCe7DBHIZkLBpcLC4x95uOckJ1OcfLqSziyywJBKLaYIwY71MT4gt35yz+KTJVr+tLx5/JsY8CUtz4uuI97JBEW8dlbqBIfHZAuq8OXZfXzRVHdnB+OIURoebqwn+SU2URaYl9YjexXiJ9kWhFPlR3sePR83V/ZtVJrxhikHdgaz541PcDNXL2/2SYk1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zBDdkHXvP7g9hWs1FCjA0O1NTGkCmgb+JInXvUfUzg4=;
+ b=XlpUGo/hLQEvZthRo23OtRPA4Y0HN3HrM0/CpClWVq6/iNqzTVeYB4YQ/np22Jl82Ai0jMwcFYqb7gs9UIlitcKYd6MrJ31HBYqupB688Bpf0JS5esJ7Eleg15dn8MtPl7bCS4bnFAkLBndiBtVv7Nts6pk+cN9XJLHhnP7DMrU=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5351.eurprd08.prod.outlook.com (2603:10a6:20b:dc::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Thu, 21 May
+ 2020 15:09:46 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.020; Thu, 21 May 2020
+ 15:09:46 +0000
+Subject: Re: [PATCH v5 2/5] qcow2: Expose bitmaps' size during measure
+To: Nir Soffer <nsoffer@redhat.com>
+References: <20200520220118.1037094-1-eblake@redhat.com>
+ <20200520220118.1037094-3-eblake@redhat.com>
+ <CAMRbyytCZ5KuqPLXkv_kw1Fbgw-w05s0iApmhP69ev_q3VjOnA@mail.gmail.com>
+ <295f514d-f4c8-551a-d828-77a70b4d6fa3@virtuozzo.com>
+ <CAMRbyyvrYmhh9OK+6-nBVs1wqbHruYTq7Stn8iBZ17a_V_4wkQ@mail.gmail.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e2fe2f35-9df3-163b-c29a-470505c00590@virtuozzo.com>
+Date: Thu, 21 May 2020 18:09:44 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200515042231.18201-1-armbru@redhat.com>
+ Thunderbird/68.8.0
+In-Reply-To: <CAMRbyyvrYmhh9OK+6-nBVs1wqbHruYTq7Stn8iBZ17a_V_4wkQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:44:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM3PR05CA0149.eurprd05.prod.outlook.com
+ (2603:10a6:207:3::27) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.167) by
+ AM3PR05CA0149.eurprd05.prod.outlook.com (2603:10a6:207:3::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.24 via Frontend Transport; Thu, 21 May 2020 15:09:45 +0000
+X-Originating-IP: [185.215.60.167]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 95fae9b5-aa6c-49a6-d587-08d7fd98ff65
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5351:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB53514597664BB0AF035026E0C1B70@AM7PR08MB5351.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 041032FF37
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Otpw4vMCesyczUQXN4VtijgZaLvL4L/1vTCGGJ9UQusyYN4R3uONadyWqNakYlII8dSdr5iGpr6hPbzJsyw36Ic06PiVBIgESK205p4mRTr3Ag539x58RU6MuyDNRczfyVKnjSQwdRYeMk23GpcSa3OmzqLyzDmUqZvb0sH1isHdlTDO0zjrQKJ683ysMHbIrFF1+1PwBoKue7MnJsR2s0BLg0izoknakHINfLj5KK1ete2wPLuXXC4k/WfldDF6DXBIuAVSQ9lU7XXTzliilE03hi+3/RY6bb3WVNM41CIPfqlQKND1WqoPsnwgomRYDtdBn77XDMdi8Qr0oQr0fL6BqwwtV/WsxyMznnGHAYuQ1nDqjp4+kiPt2X248e7RahFL2ZaY/0g9I1Ooh6tBxROCEaU3/aXwWHIrkrIu6X7ujBiqwD6lkY2hOVzHjlI1qOIJ3WZqzR4OxP3bVmvTs57ekAYORaodgzjzMIfGt4lO3zyLP1CON84rEmgh8y1U
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(396003)(366004)(346002)(376002)(39840400004)(16576012)(52116002)(478600001)(54906003)(316002)(4326008)(53546011)(36756003)(26005)(16526019)(2906002)(8936002)(186003)(5660300002)(8676002)(2616005)(6916009)(31686004)(956004)(31696002)(86362001)(6486002)(66556008)(66946007)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: s+j5XvZf1HaBfigNWGZrFNF4V/XKvCbhNGeb/wZzeGsfsM/kEujzNqaGNZP4MDe9V0pySAuL5mlU9QyJWxA+NgC+sBcjbMCD76fyzSoh1Sb6Kxlg3kP8izgGK90MHyt+/sdjyI+WlHJFKWkBCUoWC+WtgrjhN0QKa4ajCR7jNUoXBuL2j3DlHJhJ/vwGHRuKEROv7j4o+tYlMMFSc9s+1E+uz3FFh+5qzqno1xwF8tXPhm9UjZTQ7nUHU4FAHAQZrlMpkHYEohsh0EEcZ1Mu5h+tQ3NlwpRjYJxK6dWujvg8WxUNQo2aWO3eNHjtTOTbIKrdI3NsppzzX79NmUii2Eybhq0fHKKaw2Pe+2VG0mR9dlEZr7uY1Iq6y0xf0EIz5IXln77CKBtcMjrvZqaKODZhsRRtPAk5JZ7vcP9qzA/8RWsLYS3K2p/BZRIREHacrNs3EtGA2kFua7nxL2+HwwgNvBc6ue1c7rI5Xt86Z8gf6IQntL7Xq2c5PER66Ff6
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95fae9b5-aa6c-49a6-d587-08d7fd98ff65
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2020 15:09:45.9766 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EoALZOSlt+yrSHI1+Rjjm3/4QvK56g4lkOv1/j3J9pzkBxlvrfBYP8DeUmk7/c1X6g+CA8uUs765fwMZIbuTNXZx2sFRbp+bY6Fq4Fm+jZQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5351
+Received-SPF: pass client-ip=40.107.22.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 11:09:46
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,50 +133,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, philmd@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/05/20 06:22, Markus Armbruster wrote:
-> Before recent commit abc9bf69a66, configure_icount() returned early
-> when option "shift" was absent: succeed when option "align" was also
-> absent, else fail.
+21.05.2020 16:29, Nir Soffer wrote:
+> On Thu, May 21, 2020 at 2:40 PM Vladimir Sementsov-Ogievskiy
+> <vsementsov@virtuozzo.com> wrote:
+>>
+>> 21.05.2020 02:00, Nir Soffer wrote:
+>>> On Thu, May 21, 2020 at 1:01 AM Eric Blake <eblake@redhat.com> wrote:
+>>>>
+>>>> It's useful to know how much space can be occupied by qcow2 persistent
+>>>> bitmaps, even though such metadata is unrelated to the guest-visible
+>>>> data.  Report this value as an additional QMP field, present when
+>>>> measuring an existing image and output format that both support
+>>>> bitmaps.  Update iotest 178 and 190 to updated output, as well as new
+>>>> coverage in 190 demonstrating non-zero values made possible with the
+>>>> recently-added qemu-img bitmap command.
+>>>>
+>>>> On the command-line side, 'qemu-img measure' gains a new --bitmaps
+>>>> flag.  When present, the bitmap size is rolled into the two existing
+>>>> measures (or errors if either the source image or destination format
+>>>> lacks bitmaps); when absent, there is never an error (for
+>>>> back-compat), but the output will instead include a new line item for
+>>>> bitmaps (which you would have to manually add), with that line being
+>>>> omitted in the same cases where passing --bitmaps would error.
+>>>
+>>> Supporting 2 ways to measure, one by specifying --bitmaps, and another
+>>> by adding bitmaps key is not a good idea. We really need one way.
+>>>
+>>> Each one has advantages. adding --bitmaps flag is consistent with
+>>> "qemu-img convert"
+>>> and future extensions that may require  new flag, and adding "bitmaps"
+>>> key is consistent
+>>> with "qmeu-img info", showing bitmaps when they exist.
+>>>
+>>> Adding a "bitmaps" key has an advantage that we can use it to test if qemu-img
+>>> supports measuring and copying bitmaps (since both features are expected to
+>>> be delivered at the same time). So we can avoid checking --help learn about
+>>> the capabilities.
+>>>
+>>> I'm ok with both options, can we have only one?
+>>
+>> Hi! What are your scenarios? Are you using qemu-img by hand, or it is used from some management tool? For management tool, I'd recommend to use qmp interface, which is a lot more strict, reliable and stable, and documented. You just need to run qemu binary in stopped mode for it.
 > 
-> Since then, it still errors out when only "align" is present, but
-> continues when both are absent.  Crashes when examining the value of
-> "shift" further.  Reproducer: -icount "".
+> The use case is oVirt - it is a management system but it uses qemu-img
+> to perform various
+> operations, like copying disks around. The specific use case is
+> cloning qcow2 image chain
+> from one server to another, or cloning on the same server.
 > 
-> Revert this erroneous part of the commit.
+> In the case of qcow2 images on logical volumes, we need to create a
+> large enough  logical
+> volume to copy an image, and for this we use "qemu-img measure". With
+> the current patches
+> we will be able to create large enough logical volume and copy the
+> image data and the bitmps
+> to the destination.
 > 
-> Fixes: abc9bf69a66a11499a801ff545b8fe7adbb3a04c
-> Fixes: Coverity CID 1428754
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  cpus.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 5670c96bcf..ee906dd08f 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -803,8 +803,10 @@ void configure_icount(QemuOpts *opts, Error **errp)
->      bool align = qemu_opt_get_bool(opts, "align", false);
->      long time_shift = -1;
->  
-> -    if (!option && qemu_opt_get(opts, "align")) {
-> -        error_setg(errp, "Please specify shift option when using align");
-> +    if (!option) {
-> +        if (qemu_opt_get(opts, "align") != NULL) {
-> +            error_setg(errp, "Please specify shift option when using align");
-> +        }
->          return;
->      }
->  
-> 
+> qmp interface is nice but to use it we have to rewrite all the code
+> using qemu-img to start qemu
+> with the relevant disks and perform operation via qmp or via libvirt.
+> This a huge rewrite and I'm
+> not sure it's worth the effort.
 
-Got the nicer commit message, too.
+OK, I'm not familiar with oVirt.. But maybe, you don't need to rewrite everything, but just add a possibility to use qmp interface, so, keep old features working on qemu-img, while adding new features using qmp?
 
-Paolo
+> 
+> This approach also has limitations, for example using qemu-img we can
+> copy disks in parallel on
+> multiple hosts, while using libvirt and qemu will limit us to using
+> one host since qemu takes locks
+> that we control.
 
+hmm.. do you open same image RW in several qemu-img processes? Or I don't follow, what behavior is blocked by Qemu locks... qemu-img takes locks as well..
+
+> 
+> Also using libvirt means that all new features take more time to
+> complete since now we have
+> a new layer between oVirt and qemu.
+
+May be, using qmp directly is still a good option.
+
+
+-- 
+Best regards,
+Vladimir
 
