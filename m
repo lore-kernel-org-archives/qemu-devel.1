@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5518EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E9CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:52:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2343C20748
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:52:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6D8F20721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:52:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GPSqg05B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2343C20748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NyyiKIgR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D8F20721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbcFm-0001fq-9j
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:52:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53302)
+	id 1jbcG7-0002Co-Th
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:52:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7J-00037J-RE; Wed, 20 May 2020 23:43:33 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60887 helo=ozlabs.org)
+ id 1jbc7J-000362-AA; Wed, 20 May 2020 23:43:33 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7I-0003Wy-B1; Wed, 20 May 2020 23:43:33 -0400
+ id 1jbc7H-0003Wh-PI; Wed, 20 May 2020 23:43:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49SFns3n23z9sTq; Thu, 21 May 2020 13:43:13 +1000 (AEST)
+ id 49SFns1NXdz9sTT; Thu, 21 May 2020 13:43:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1590032593;
- bh=5KLDWlcKYyTYo3NQYirtMT0jjuuJjP++orsplm2jw/g=;
+ bh=d27Ffc+UM25I6jMKKixH/o4N+rS/wECOugs7Ml/AULE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GPSqg05BjZwbm6erLBBKafVtKtXNxUDW5hP+sPLfb1kphPhopYmRy2Gqgw3KSXVHu
- 4PAshUTPvB228yu4FvEzJy1BXcoAw2appFcR2QEIunhprXziTsV6ilJqLAjQHaXXNN
- Am+4HY9hn40sP0efS/rBIyJhmF7TRy+ZgfZ5Syfo=
+ b=NyyiKIgRv8Sa41xtepCYVJluBW+AhLBvINnbN87OdeeyM3yp4/39vXYbVeNhQymmh
+ w9h5HFnBxqtFma/Dgw4COf4HOWHWO0y7kNHNCWwxUKEF0NL/sue/3Cjot/cnJ24R8g
+ 0hCZAyi+kNc4RRVPYdd1yxxpob8XWUeWxID41pRw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, frankja@linux.ibm.com,
  dgilbert@redhat.com, pair@us.ibm.com
-Subject: [RFC v2 10/18] guest memory protection: Add guest memory protection
- interface
-Date: Thu, 21 May 2020 13:42:56 +1000
-Message-Id: <20200521034304.340040-11-david@gibson.dropbear.id.au>
+Subject: [RFC v2 08/18] target/i386: sev: Remove redundant handle field
+Date: Thu, 21 May 2020 13:42:54 +1000
+Message-Id: <20200521034304.340040-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 23:43:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -85,112 +84,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several architectures have mechanisms which are designed to protect guest
-memory from interference or eavesdropping by a compromised hypervisor.  AMD
-SEV does this with in-chip memory encryption and Intel has a similar
-mechanism.  POWER's Protected Execution Framework (PEF) accomplishes a
-similar goal using an ultravisor and new memory protection features,
-instead of encryption.
+The user can explicitly specify a handle via the "handle" property wired
+to SevGuestState::handle.  That gets passed to the KVM_SEV_LAUNCH_START
+ioctl() which may update it, the final value being copied back to both
+SevGuestState::handle and SEVState::handle.
 
-This introduces a new GuestMemoryProtection QOM interface which we'll use
-to (partially) unify handling of these various mechanisms.
+AFAICT, nothing will be looking SEVState::handle before it and
+SevGuestState::handle have been updated from the ioctl().  So, remove the
+field and just use SevGuestState::handle directly.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- backends/Makefile.objs                 |  2 ++
- backends/guest-memory-protection.c     | 29 +++++++++++++++++++++
- include/exec/guest-memory-protection.h | 36 ++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+)
- create mode 100644 backends/guest-memory-protection.c
- create mode 100644 include/exec/guest-memory-protection.h
+ target/i386/sev.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index 28a847cd57..e4fb4f5280 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -21,3 +21,5 @@ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
- common-obj-$(CONFIG_GIO) += dbus-vmstate.o
- dbus-vmstate.o-cflags = $(GIO_CFLAGS)
- dbus-vmstate.o-libs = $(GIO_LIBS)
-+
-+common-obj-y += guest-memory-protection.o
-diff --git a/backends/guest-memory-protection.c b/backends/guest-memory-protection.c
-new file mode 100644
-index 0000000000..7e538214f7
---- /dev/null
-+++ b/backends/guest-memory-protection.c
-@@ -0,0 +1,29 @@
-+#/*
-+ * QEMU Guest Memory Protection interface
-+ *
-+ * Copyright: David Gibson, Red Hat Inc. 2020
-+ *
-+ * Authors:
-+ *  David Gibson <david@gibson.dropbear.id.au>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "exec/guest-memory-protection.h"
-+
-+static const TypeInfo guest_memory_protection_info = {
-+    .name = TYPE_GUEST_MEMORY_PROTECTION,
-+    .parent = TYPE_INTERFACE,
-+    .class_size = sizeof(GuestMemoryProtectionClass),
-+};
-+
-+static void guest_memory_protection_register_types(void)
-+{
-+    type_register_static(&guest_memory_protection_info);
-+}
-+
-+type_init(guest_memory_protection_register_types)
-diff --git a/include/exec/guest-memory-protection.h b/include/exec/guest-memory-protection.h
-new file mode 100644
-index 0000000000..38e9b01667
---- /dev/null
-+++ b/include/exec/guest-memory-protection.h
-@@ -0,0 +1,36 @@
-+#/*
-+ * QEMU Guest Memory Protection interface
-+ *
-+ * Copyright: David Gibson, Red Hat Inc. 2020
-+ *
-+ * Authors:
-+ *  David Gibson <david@gibson.dropbear.id.au>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef QEMU_GUEST_MEMORY_PROTECTION_H
-+#define QEMU_GUEST_MEMORY_PROTECTION_H
-+
-+#include "qom/object.h"
-+
-+typedef struct GuestMemoryProtection GuestMemoryProtection;
-+
-+#define TYPE_GUEST_MEMORY_PROTECTION "guest-memory-protection"
-+#define GUEST_MEMORY_PROTECTION(obj)                                    \
-+    INTERFACE_CHECK(GuestMemoryProtection, (obj),                       \
-+                    TYPE_GUEST_MEMORY_PROTECTION)
-+#define GUEST_MEMORY_PROTECTION_CLASS(klass)                            \
-+    OBJECT_CLASS_CHECK(GuestMemoryProtectionClass, (klass),             \
-+                       TYPE_GUEST_MEMORY_PROTECTION)
-+#define GUEST_MEMORY_PROTECTION_GET_CLASS(obj)                          \
-+    OBJECT_GET_CLASS(GuestMemoryProtectionClass, (obj),                 \
-+                     TYPE_GUEST_MEMORY_PROTECTION)
-+
-+typedef struct GuestMemoryProtectionClass {
-+    InterfaceClass parent;
-+} GuestMemoryProtectionClass;
-+
-+#endif /* QEMU_GUEST_MEMORY_PROTECTION_H */
-+
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 4b261beaa7..24e2dea9b8 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -40,7 +40,6 @@ struct SEVState {
+     uint8_t api_minor;
+     uint8_t build_id;
+     uint64_t me_mask;
+-    uint32_t handle;
+     int sev_fd;
+     SevState state;
+     gchar *measurement;
+@@ -64,13 +63,13 @@ struct SevGuestState {
+     /* configuration parameters */
+     char *sev_device;
+     uint32_t policy;
+-    uint32_t handle;
+     char *dh_cert_file;
+     char *session_file;
+     uint32_t cbitpos;
+     uint32_t reduced_phys_bits;
+ 
+     /* runtime state */
++    uint32_t handle;
+     SEVState state;
+ };
+ 
+@@ -398,7 +397,7 @@ sev_get_info(void)
+         info->build_id = sev_guest->state.build_id;
+         info->policy = sev_guest->policy;
+         info->state = sev_guest->state.state;
+-        info->handle = sev_guest->state.handle;
++        info->handle = sev_guest->handle;
+     }
+ 
+     return info;
+@@ -517,8 +516,7 @@ sev_launch_start(SevGuestState *sev)
+ 
+     start = g_new0(struct kvm_sev_launch_start, 1);
+ 
+-    start->handle = object_property_get_int(OBJECT(sev), "handle",
+-                                            &error_abort);
++    start->handle = sev->handle;
+     start->policy = sev->policy;
+     if (sev->session_file) {
+         if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
+@@ -544,10 +542,8 @@ sev_launch_start(SevGuestState *sev)
+         goto out;
+     }
+ 
+-    object_property_set_int(OBJECT(sev), start->handle, "handle",
+-                            &error_abort);
+     sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
+-    s->handle = start->handle;
++    sev->handle = start->handle;
+     ret = 0;
+ 
+ out:
 -- 
 2.26.2
 
