@@ -2,94 +2,88 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF67FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F561C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:19:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9D020759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E10720759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:19:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U+GT93lC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9D020759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RPbShwKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E10720759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbopy-00087W-S5
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:18:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50192)
+	id 1jboqc-00013h-AL
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:19:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJG-0004Vu-9A
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:42 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:34331)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJF-0006ke-98
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:41 -0400
-Received: by mail-qk1-x741.google.com with SMTP id 190so7918081qki.1
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=f6jTs4l1FUMMcryMnS/4lJD5Ni20LOW4nBzyszoy3L4=;
- b=U+GT93lCYq8RuQBsNpW0FvQNeYBg/ZDm0UBcKUlTv6NGzMx5QowNjosWOW4Hh6fFBR
- o5qDdlykIEaKgxcHDCZrh0HJ16sSegni6A1tRjV5ajlB8OSq/P9VYMlC97qb/fqIg3of
- S0nXOoxsvgybjD9x4aHyL8bpD+6ECZ+AiciwPI+wF3l4jMmaNOVjkZIKKXOMOCvo7pMC
- wD/EOQIucPF0VtHzaL9kiB1ZcSUCpn5DVo/M0XlXjCjoUXRSOay/HD30DSnsGFQmSGkv
- UsihxjAu/dVejODKWx423p61s7tP4sKGJCz6oVCbzwZ3QkmTiXLwaMlKsr/dPAdTR3lu
- uBwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=f6jTs4l1FUMMcryMnS/4lJD5Ni20LOW4nBzyszoy3L4=;
- b=WBvvlwrGDB1Gx8EyMZzJkjDUmReYOXutqoCGeTSsUhU+HeOqsiPh5/rapK/2dnY+Si
- YQebIMUPPhF+7cqAUj3S8A5xmQ7oLWQUKnHqZoCZHHNp2rGtsiLZOMmgMSLBfndV9IAG
- /F+Z7kJPnuLgy1MWxPD00nx4O3KYYrWaVijlW8POLuYyy57tTBXPDHqkqjqnVWH9mFxn
- VXp/Etoerx9pRbgZ0g3dRKWtp7MvvwPegym5QpTg6J4SnFNPQG2aLkDgd7SmEdil37r/
- C7Y+WwLQprlW5wFlMS6hyncVC1cKLeYMYZuGmTTomvuQmk8VUJGA+tENA2aWS2sHxnM6
- puOA==
-X-Gm-Message-State: AOAM533NlcToEzmcSqsNOJ8dnl3GbfsBQOTbkUa3CzsMmiGKgQREb5fb
- +Npf5Ss+qhi8NOOKorv4oPR2EOs5d4J/NQ==
-X-Google-Smtp-Source: ABdhPJzs90Pwp95Q4YWsVV7Q0rqm4Bp7Xbmm0LmluS7V13wMY2eWTxpv/A7YYTYSJEJaQQV1CfDbRg==
-X-Received: by 2002:a05:620a:a83:: with SMTP id
- v3mr10997896qkg.84.1590079478970; 
- Thu, 21 May 2020 09:44:38 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:38 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 63/74] cpu: introduce cpu_has_work_with_iothread_lock
-Date: Thu, 21 May 2020 12:40:00 -0400
-Message-Id: <20200521164011.638-64-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
-References: <20200521164011.638-1-robert.foley@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jboQT-0003ug-Ea
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:52:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59462
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jboQR-0008KJ-Gn
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:52:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590079925;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ec4RLZmFUi/ZWVXLoJtBmMk7Zv9vYqbGpEU/jXVQFhk=;
+ b=RPbShwKxtbAp/CmfagqPOaAHrBswHjJ8kXirolamqKrtW2YCzrcpc+mmMq1n32av5nL7oA
+ QJD4lD19xEiP7dBtxK8z1OxaXR+HjXop4ycaVPoYrZn9OHghMt4v970zO6+0FhpYbawZLF
+ Qn+gq3t0BBtpyvNvahO9T025Fe/tmy8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-j9GGX-QjN6WQ4Tsnx_xs6A-1; Thu, 21 May 2020 12:52:03 -0400
+X-MC-Unique: j9GGX-QjN6WQ4Tsnx_xs6A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E23EE157D8;
+ Thu, 21 May 2020 16:51:43 +0000 (UTC)
+Received: from work-vm (ovpn-113-115.ams2.redhat.com [10.36.113.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53D631801D;
+ Thu, 21 May 2020 16:51:02 +0000 (UTC)
+Date: Thu, 21 May 2020 17:50:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v23 14/18] vfio: Add function to start and stop
+ dirty pages tracking
+Message-ID: <20200521165059.GK2752@work-vm>
+References: <1589999088-31477-1-git-send-email-kwankhede@nvidia.com>
+ <1589999088-31477-15-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x741.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <1589999088-31477-15-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:44:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,100 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
- robert.foley@linaro.org, peter.puhov@linaro.org
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
+> for VFIO devices.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 
-It will gain some users soon.
+This does seem to match my reading of your 4/8 ioctl sefinition patch,
+so:
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- include/hw/core/cpu.h | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 7bf7700630..9766477e62 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -26,6 +26,7 @@
- #include "exec/memattrs.h"
- #include "qapi/qapi-types-run-state.h"
- #include "qemu/bitmap.h"
-+#include "qemu/main-loop.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/queue.h"
- #include "qemu/thread.h"
-@@ -82,6 +83,8 @@ struct TranslationBlock;
-  * @reset_dump_flags: #CPUDumpFlags to use for reset logging.
-  * @has_work: Callback for checking if there is work to do. Called with the
-  * CPU lock held.
-+ * @has_work_with_iothread_lock: Callback for checking if there is work to do.
-+ * Called with both the BQL and the CPU lock held.
-  * @do_interrupt: Callback for interrupt handling.
-  * @do_unaligned_access: Callback for unaligned access handling, if
-  * the target defines #TARGET_ALIGNED_ONLY.
-@@ -167,6 +170,7 @@ typedef struct CPUClass {
- 
-     int reset_dump_flags;
-     bool (*has_work)(CPUState *cpu);
-+    bool (*has_work_with_iothread_lock)(CPUState *cpu);
-     void (*do_interrupt)(CPUState *cpu);
-     void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
-                                 MMUAccessType access_type,
-@@ -800,14 +804,41 @@ const char *parse_cpu_option(const char *cpu_option);
- static inline bool cpu_has_work(CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-+    bool has_cpu_lock = cpu_mutex_locked(cpu);
-+    bool (*func)(CPUState *cpu);
-     bool ret;
- 
-+    /* some targets require us to hold the BQL when checking for work */
-+    if (cc->has_work_with_iothread_lock) {
-+        if (qemu_mutex_iothread_locked()) {
-+            func = cc->has_work_with_iothread_lock;
-+            goto call_func;
-+        }
-+
-+        if (has_cpu_lock) {
-+            /* avoid deadlock by acquiring the locks in order */
-+            cpu_mutex_unlock(cpu);
-+        }
-+        qemu_mutex_lock_iothread();
-+        cpu_mutex_lock(cpu);
-+
-+        ret = cc->has_work_with_iothread_lock(cpu);
-+
-+        qemu_mutex_unlock_iothread();
-+        if (!has_cpu_lock) {
-+            cpu_mutex_unlock(cpu);
-+        }
-+        return ret;
-+    }
-+
-     g_assert(cc->has_work);
--    if (cpu_mutex_locked(cpu)) {
--        return cc->has_work(cpu);
-+    func = cc->has_work;
-+ call_func:
-+    if (has_cpu_lock) {
-+        return func(cpu);
-     }
-     cpu_mutex_lock(cpu);
--    ret = cc->has_work(cpu);
-+    ret = func(cpu);
-     cpu_mutex_unlock(cpu);
-     return ret;
- }
--- 
-2.17.1
+I must admit I don't see why 'argsz' is needed.
+
+Dave
+
+> ---
+>  hw/vfio/migration.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index b9bbe38e539c..7729c90782bd 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -9,6 +9,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/main-loop.h"
+> +#include <sys/ioctl.h>
+>  #include <linux/vfio.h>
+>  
+>  #include "sysemu/runstate.h"
+> @@ -297,6 +298,32 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+>      return qemu_file_get_error(f);
+>  }
+>  
+> +static int vfio_start_dirty_page_tracking(VFIODevice *vbasedev, bool start)
+> +{
+> +    int ret;
+> +    VFIOContainer *container = vbasedev->group->container;
+> +    struct vfio_iommu_type1_dirty_bitmap dirty = {
+> +        .argsz = sizeof(dirty),
+> +    };
+> +
+> +    if (start) {
+> +        if (vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) {
+> +            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_START;
+> +        } else {
+> +            return -EINVAL;
+> +        }
+> +    } else {
+> +            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP;
+> +    }
+> +
+> +    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, &dirty);
+> +    if (ret) {
+> +        error_report("Failed to set dirty tracking flag 0x%x errno: %d",
+> +                     dirty.flags, errno);
+> +    }
+> +    return ret;
+> +}
+> +
+>  /* ---------------------------------------------------------------------- */
+>  
+>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+> @@ -327,6 +354,11 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
+>          return ret;
+>      }
+>  
+> +    ret = vfio_start_dirty_page_tracking(vbasedev, true);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+>      qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+>  
+>      ret = qemu_file_get_error(f);
+> @@ -342,6 +374,8 @@ static void vfio_save_cleanup(void *opaque)
+>      VFIODevice *vbasedev = opaque;
+>      VFIOMigration *migration = vbasedev->migration;
+>  
+> +    vfio_start_dirty_page_tracking(vbasedev, false);
+> +
+>      if (migration->region.mmaps) {
+>          vfio_region_unmap(&migration->region);
+>      }
+> @@ -676,6 +710,8 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+>          if (ret) {
+>              error_report("%s: Failed to set state RUNNING", vbasedev->name);
+>          }
+> +
+> +        vfio_start_dirty_page_tracking(vbasedev, false);
+>      }
+>  }
+>  
+> -- 
+> 2.7.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
