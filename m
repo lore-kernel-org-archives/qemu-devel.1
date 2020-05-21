@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58903C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F2BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CBBC20738
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:17:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 869CF207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:17:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nhp2jQQm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CBBC20738
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ve643H7V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 869CF207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbqhB-0004LR-B0
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:17:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37986)
+	id 1jbqhC-0004PD-Jm
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:17:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqfz-0001y1-AO
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:19 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:40848)
+ id 1jbqg1-00021K-Ba
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:21 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43146)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbqfy-0000Ou-H2
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:19 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id n18so7557819wmj.5
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 12:16:18 -0700 (PDT)
+ id 1jbqg0-0000P9-89
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:16:21 -0400
+Received: by mail-wr1-x443.google.com with SMTP id i15so7731385wrx.10
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 12:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=u7KCiGuOgAZ7UqunOZf69lXCjQ+SrqjjB07ACAIR9HQ=;
- b=Nhp2jQQmmXApv1pE5D9w1AtHZ4YqZL/UHM+CikIQ2a49cZaCvxBLcGJKzNw5qbwaFt
- +tov3wEl35c4dj/KyVViEh4OzRGhJs4JH8X7Unjg2qii1MOKlb2bYsm3XZM7fj0Z76un
- cgfh1FNJCN/FDOm5oNpNFOxp3sEd8gGwrZFHtvCjVWt354ktCuah9gnkoS/EaP7YaG14
- 2LwOH3yMW0ykFDMpRrxKUNjk6lKJUsZYWALNrnOnT3oD5cq+BHl2pa+KLv24Eop3AG9q
- kcBeyTrCc92zABMzDLFW1U6eoPwYDpkGv01pGV/1dt431U+2vMSxbj6oYUP52KPZyJw7
- gfQA==
+ bh=CcIe3RQsnYbg8g+NInxK1LG4Wd7si9pCUTbnuZRw2Kg=;
+ b=ve643H7V7zDSjRdar8kSOyH7SUt/JzrJN8nfsYVm8H5yIsVCL7xC4jeog31S2bRNqb
+ jBqdMT4qlJ4VY9rga7RP/NTyRTjGwwKGuZ9wQ9w3KzDwKc6ctsF+6rvn4AHrn8EJTcVh
+ 2zXq7DUt3MrgsYMmBdzbcF5htSo9R6s+E56Gx1oRA9GHAMwByqIZSs1TVP8E7nJLP3Sy
+ mRA2nuXxqzd66JtPewzMpuDqcM4UyxS0SZ0idB++7nKDx3qEk4j3hGGzxcg3fqc6jQsl
+ BU48clPzL301O889DYV+DPWvD7eN9+WjuZXZyqNuyTM7F0gQUrVke+6jtUeFqk3EBNvp
+ GO7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=u7KCiGuOgAZ7UqunOZf69lXCjQ+SrqjjB07ACAIR9HQ=;
- b=seAMZXGkJJ7opREsaMg4uqnfz08eaD8GYUcyFYRPuA+s7sX7ln1QnDfOQiYaZGp2+b
- ru0V4805A4rjFzneCAU1crAE/QPnlSzVCPhaYIzeNfoKchzwuUzVBfTBjqmWKmEg7G2B
- q7Hz5yjtMMTDaW/FtgCTGH1KSQMCuQcMjuacxtS9vpevZTdHKh6n46qnQqenUKbRMh/e
- tmol9ChL5+cC5GohSHdH9wBvRTz/PQqbJeH6v2JPaRTTFGLsoeEFj7rMIf2KkLwkUY61
- H360WZgLLLNHwq6vGY3kgV17qxBfQiOUv5xO3Rh5nKQaLLLaR0iW0BUn5bCx3zpd1wlk
- pDOg==
-X-Gm-Message-State: AOAM530+Yq6au7ZmYJT8O1qvuv+/dM8/QXuXFl+450rXe2at4Y3IsFmP
- 3lzoy6Jp/RQ5LU3zdrBC/ySTaOJeYTnQtQ==
-X-Google-Smtp-Source: ABdhPJwdsXEOAxv/+gy5DyrvZCOxJ6gANqcTvUPZMbarEXR3FTNkDRPU2BGDnNGobgX7YKwbhSnoog==
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr10059710wmb.123.1590088576824; 
- Thu, 21 May 2020 12:16:16 -0700 (PDT)
+ bh=CcIe3RQsnYbg8g+NInxK1LG4Wd7si9pCUTbnuZRw2Kg=;
+ b=f8MP36Uy38APvAu7jba8fd6ya46LliHjWhBn4ktNMxbVmzif3zV8Lz2oHOoGo4fyGl
+ vaiQnoQNQJYGJnsJxFi6Qj41oua5j0w972MYdvlWfkJ7uitoX9hl8N01gut8xunO9Ihh
+ wsikk875ABkOiYWGxbmidDKttxPPrNFgBatiEd46iMVNAWn/FLdAYw3eN2Q0gEywAZEL
+ hLEK7csZt4fBYt93yFKL6cKXSHx2Rtrh6yFUyZf4GTvpgaAKL7cL5iKodNgKKwXUz4n7
+ rRnyO+200nvju0wA8ebAXEccsz1adNfYcVSr721nmzSUtDtBo1PEfqMIBuVjccVbaVtm
+ 9jnw==
+X-Gm-Message-State: AOAM533WsJhs6nNcjQubBh4+P4qcAfoC4n/dWopzrh+ZdaR/QvIZ1g09
+ tJSOHJeJss9ydDDAzWA9M3odmfnodWkMwA==
+X-Google-Smtp-Source: ABdhPJyOxlZbKJ6UhIi86q3LQVZK4qrt0A5FPf7UIhAUWbxjA3JWATjUcfzzbN/8ZEII85FRw94GSg==
+X-Received: by 2002:adf:f601:: with SMTP id t1mr87334wrp.207.1590088578531;
+ Thu, 21 May 2020 12:16:18 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z124sm7335100wmg.20.2020.05.21.12.16.15
+ by smtp.gmail.com with ESMTPSA id z124sm7335100wmg.20.2020.05.21.12.16.16
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 12:16:16 -0700 (PDT)
+ Thu, 21 May 2020 12:16:17 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/29] docs/system: Sort Arm board index into alphabetical order
-Date: Thu, 21 May 2020 20:15:44 +0100
-Message-Id: <20200521191610.10941-4-peter.maydell@linaro.org>
+Subject: [PULL 04/29] docs/system: Document Arm Versatile Express boards
+Date: Thu, 21 May 2020 20:15:45 +0100
+Message-Id: <20200521191610.10941-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200521191610.10941-1-peter.maydell@linaro.org>
 References: <20200521191610.10941-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,54 +105,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sort the board index into alphabetical order.  (Note that we need to
-sort alphabetically by the title text of each file, which isn't the
-same ordering as sorting by the filename.)
+Provide a minimal documentation of the Versatile Express boards
+(vexpress-a9, vexpress-a15).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20200507151819.28444-3-peter.maydell@linaro.org
+Message-id: 20200507151819.28444-4-peter.maydell@linaro.org
 ---
- docs/system/target-arm.rst | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ docs/system/arm/vexpress.rst | 60 ++++++++++++++++++++++++++++++++++++
+ docs/system/target-arm.rst   |  1 +
+ MAINTAINERS                  |  1 +
+ 3 files changed, 62 insertions(+)
+ create mode 100644 docs/system/arm/vexpress.rst
 
+diff --git a/docs/system/arm/vexpress.rst b/docs/system/arm/vexpress.rst
+new file mode 100644
+index 00000000000..7f1bcbef078
+--- /dev/null
++++ b/docs/system/arm/vexpress.rst
+@@ -0,0 +1,60 @@
++Arm Versatile Express boards (``vexpress-a9``, ``vexpress-a15``)
++================================================================
++
++QEMU models two variants of the Arm Versatile Express development
++board family:
++
++- ``vexpress-a9`` models the combination of the Versatile Express
++  motherboard and the CoreTile Express A9x4 daughterboard
++- ``vexpress-a15`` models the combination of the Versatile Express
++  motherboard and the CoreTile Express A15x2 daughterboard
++
++Note that as this hardware does not have PCI, IDE or SCSI,
++the only available storage option is emulated SD card.
++
++Implemented devices:
++
++- PL041 audio
++- PL181 SD controller
++- PL050 keyboard and mouse
++- PL011 UARTs
++- SP804 timers
++- I2C controller
++- PL031 RTC
++- PL111 LCD display controller
++- Flash memory
++- LAN9118 ethernet
++
++Unimplemented devices:
++
++- SP810 system control block
++- PCI-express
++- USB controller (Philips ISP1761)
++- Local DAP ROM
++- CoreSight interfaces
++- PL301 AXI interconnect
++- SCC
++- System counter
++- HDLCD controller (``vexpress-a15``)
++- SP805 watchdog
++- PL341 dynamic memory controller
++- DMA330 DMA controller
++- PL354 static memory controller
++- BP147 TrustZone Protection Controller
++- TrustZone Address Space Controller
++
++Other differences between the hardware and the QEMU model:
++
++- QEMU will default to creating one CPU unless you pass a different
++  ``-smp`` argument
++- QEMU allows the amount of RAM provided to be specified with the
++  ``-m`` argument
++- QEMU defaults to providing a CPU which does not provide either
++  TrustZone or the Virtualization Extensions: if you want these you
++  must enable them with ``-machine secure=on`` and ``-machine
++  virtualization=on``
++- QEMU provides 4 virtio-mmio virtio transports; these start at
++  address ``0x10013000`` for ``vexpress-a9`` and at ``0x1c130000`` for
++  ``vexpress-a15``, and have IRQs from 40 upwards. If a dtb is
++  provided on the command line then QEMU will edit it to include
++  suitable entries describing these transports for the guest.
 diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-index 324e2af1cbc..d459efb3d20 100644
+index d459efb3d20..1c759aa1a08 100644
 --- a/docs/system/target-arm.rst
 +++ b/docs/system/target-arm.rst
-@@ -67,19 +67,24 @@ Unfortunately many of the Arm boards QEMU supports are currently
- undocumented; you can get a complete list by running
- ``qemu-system-aarch64 --machine help``.
- 
-+..
-+   This table of contents should be kept sorted alphabetically
-+   by the title text of each file, which isn't the same ordering
-+   as an alphabetical sort by filename.
-+
- .. toctree::
-    :maxdepth: 1
- 
+@@ -78,6 +78,7 @@ undocumented; you can get a complete list by running
     arm/integratorcp
--   arm/versatile
     arm/realview
--   arm/xscale
--   arm/palm
--   arm/nseries
--   arm/stellaris
-+   arm/versatile
+    arm/versatile
++   arm/vexpress
     arm/musicpal
--   arm/sx1
-+   arm/nseries
+    arm/nseries
     arm/orangepi
-+   arm/palm
-+   arm/xscale
-+   arm/sx1
-+   arm/stellaris
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1e006c98fab..6a9280c1b03 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -828,6 +828,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/arm/vexpress.c
++F: docs/system/arm/vexpress.rst
  
- Arm CPU features
- ================
+ Versatile PB
+ M: Peter Maydell <peter.maydell@linaro.org>
 -- 
 2.20.1
 
