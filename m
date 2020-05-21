@@ -2,63 +2,67 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F30C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8507DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:34:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BBA0207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:34:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4839B207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:34:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebMP053K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBA0207D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CSXcpkXg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4839B207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbqxJ-0006ux-9k
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:34:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38634)
+	id 1jbqxq-0008Hc-Da
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:34:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlI-00052f-OC
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31133
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlM-0005CD-BV
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55430
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlH-0001hU-9u
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:48 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbqlL-0001hz-Ga
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:21:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590088905;
+ s=mimecast20190719; t=1590088910;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=0dWrQHzMO2bvioYZy9HWQ2OEjk9nhqZm/Ulwpu5bLpI=;
- b=ebMP053KPDcSWGE2YyMWyBC5jII3GCTJFjSztXQFxH+XZK9FZUE9ULbJuduLTHlSXxiULJ
- FqQ0Nk2w/AnYWtIAKntuV7uVOIJWxsNS6JaBsu0Qx/zZgSLmwpeleg10QL9CkrSQRQIDPF
- Hyq9KYEKJzGVMcbkM06Jd0C+7tUF8gY=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aFJEW9ACp29DluMsRhz7v1QmEAynaBEkSNARuo6jPzI=;
+ b=CSXcpkXgLBSEQytJXcZzEKvJ0RZE3XPsBUWgEvBI19UNpNT/EgHDm7Hduwb8ht2oEVhk8f
+ GzFZiaTgvyZzPD75T1kTKCy0mWSMChHQgtrKVdWvA4izE57VDBCs+p/JmTeq5mJiAcY+p9
+ U1J8UDjeJxqHsoOZBi3jFv2QpctQNOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-C0JgTjrZPnijNhmOUxm9Uw-1; Thu, 21 May 2020 15:21:39 -0400
-X-MC-Unique: C0JgTjrZPnijNhmOUxm9Uw-1
+ us-mta-274-zQ5hYJnwN427CSO3xc77-Q-1; Thu, 21 May 2020 15:21:43 -0400
+X-MC-Unique: zQ5hYJnwN427CSO3xc77-Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5056E8005AA;
- Thu, 21 May 2020 19:21:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD1E81005510;
+ Thu, 21 May 2020 19:21:42 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92CC660C05;
- Thu, 21 May 2020 19:21:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 159D860C05;
+ Thu, 21 May 2020 19:21:40 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 0/5] qemu-img: Add convert --bitmaps
-Date: Thu, 21 May 2020 14:21:32 -0500
-Message-Id: <20200521192137.1120211-1-eblake@redhat.com>
+Subject: [PATCH v6 1/5] iotests: Fix test 178
+Date: Thu, 21 May 2020 14:21:33 -0500
+Message-Id: <20200521192137.1120211-2-eblake@redhat.com>
+In-Reply-To: <20200521192137.1120211-1-eblake@redhat.com>
+References: <20200521192137.1120211-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
@@ -94,54 +98,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v5 was here:
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05958.html
-original cover letter here:
-https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg03464.html
+A recent change to qemu-img changed expected error message output, but
+178 takes long enough to execute that it does not get run by 'make
+check' or './check -g quick'.
 
-Hopefully this version is close enough to do a pull request Monday.
+Fixes: 43d589b074
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/178.out.qcow2 | 2 +-
+ tests/qemu-iotests/178.out.raw   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Since then:
-- patch 2: drop 'measure --bitmaps' sugar on top of QMP [Nir]
-- patch 3: add function comment
-- patch 4: fallout from patch 2
+diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.out.qcow2
+index f59bf4b2fbc4..4b69524c80ee 100644
+--- a/tests/qemu-iotests/178.out.qcow2
++++ b/tests/qemu-iotests/178.out.qcow2
+@@ -13,7 +13,7 @@ qemu-img: Invalid option list: ,
+ qemu-img: Invalid parameter 'snapshot.foo'
+ qemu-img: Failed in parsing snapshot param 'snapshot.foo'
+ qemu-img: --output must be used with human or json as argument.
+-qemu-img: Image size must be less than 8 EiB!
++qemu-img: Invalid image size specified. Must be between 0 and 9223372036854775807.
+ qemu-img: Unknown file format 'foo'
 
-001/5:[----] [--] 'iotests: Fix test 178'
-002/5:[0073] [FC] 'qcow2: Expose bitmaps' size during measure'
-003/5:[0001] [FC] 'qemu-img: Factor out code for merging bitmaps'
-004/5:[0001] [FC] 'qemu-img: Add convert --bitmaps option'
-005/5:[----] [--] 'iotests: Add test 291 to for qemu-img bitmap coverage'
+ == Size calculation for a new file (human) ==
+diff --git a/tests/qemu-iotests/178.out.raw b/tests/qemu-iotests/178.out.raw
+index 404ca908d8c2..20e17da115cb 100644
+--- a/tests/qemu-iotests/178.out.raw
++++ b/tests/qemu-iotests/178.out.raw
+@@ -13,7 +13,7 @@ qemu-img: Invalid option list: ,
+ qemu-img: Invalid parameter 'snapshot.foo'
+ qemu-img: Failed in parsing snapshot param 'snapshot.foo'
+ qemu-img: --output must be used with human or json as argument.
+-qemu-img: Image size must be less than 8 EiB!
++qemu-img: Invalid image size specified. Must be between 0 and 9223372036854775807.
+ qemu-img: Unknown file format 'foo'
 
-Series can also be downloaded at:
-https://repo.or.cz/qemu/ericb.git/shortlog/refs/tags/qemu-img-bitmaps-v6
-
-Eric Blake (5):
-  iotests: Fix test 178
-  qcow2: Expose bitmaps' size during measure
-  qemu-img: Factor out code for merging bitmaps
-  qemu-img: Add convert --bitmaps option
-  iotests: Add test 291 to for qemu-img bitmap coverage
-
- docs/tools/qemu-img.rst          |  13 +++-
- qapi/block-core.json             |  16 +++--
- block/qcow2.h                    |   2 +
- block/crypto.c                   |   2 +-
- block/qcow2-bitmap.c             |  36 ++++++++++
- block/qcow2.c                    |  14 +++-
- block/raw-format.c               |   2 +-
- qemu-img.c                       | 115 ++++++++++++++++++++++++++-----
- qemu-img-cmds.hx                 |   4 +-
- tests/qemu-iotests/178.out.qcow2 |  18 ++++-
- tests/qemu-iotests/178.out.raw   |   2 +-
- tests/qemu-iotests/190           |  45 +++++++++++-
- tests/qemu-iotests/190.out       |  27 +++++++-
- tests/qemu-iotests/291           | 112 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/291.out       |  80 +++++++++++++++++++++
- tests/qemu-iotests/group         |   1 +
- 16 files changed, 455 insertions(+), 34 deletions(-)
- create mode 100755 tests/qemu-iotests/291
- create mode 100644 tests/qemu-iotests/291.out
-
+ == Size calculation for a new file (human) ==
 -- 
 2.26.2
 
