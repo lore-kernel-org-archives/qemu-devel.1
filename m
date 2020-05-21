@@ -2,63 +2,88 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE9AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7633CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC923206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:51:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC923206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 374C1206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:51:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2h3l17x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 374C1206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbhr4-0006pD-TI
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 05:51:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59758)
+	id 1jbhro-0007oS-DF
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 05:51:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbhqP-0005oq-GX; Thu, 21 May 2020 05:50:29 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34497)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbhqN-0004EF-JT; Thu, 21 May 2020 05:50:29 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06436283|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.155258-0.000218274-0.844524;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbbmpWD_1590054623; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbbmpWD_1590054623)
- by smtp.aliyun-inc.com(10.147.41.143);
- Thu, 21 May 2020 17:50:23 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 03/62] target/riscv: support vector extension csr
-Date: Thu, 21 May 2020 17:43:14 +0800
-Message-Id: <20200521094413.10425-4-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jbhr5-0006xV-Ig
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 05:51:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50660
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jbhr3-0004fh-Rv
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 05:51:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590054668;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=btIJmlA35txe50tKOiqgniR4jcsUyRlZV8Qrww94X4U=;
+ b=E2h3l17xgfhJUC2bUoePm/meQjZe+bPxH9XYLhl0HtjDNHO0dkZG/j9idbXJpECGNIGBTt
+ lIK7Je/L3GKoFhaHFPrBgn3Wpbof91zCC3vzkanpqRkbXC7mUBQGje1hJruqf9MzUnYCpP
+ YzOpKsLT6N5GhtGw/Twt3sRaiXj4haI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-uAvd5aRzNiS3hsdddHBVFQ-1; Thu, 21 May 2020 05:51:06 -0400
+X-MC-Unique: uAvd5aRzNiS3hsdddHBVFQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F32541005510;
+ Thu, 21 May 2020 09:51:03 +0000 (UTC)
+Received: from work-vm (ovpn-113-115.ams2.redhat.com [10.36.113.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5ADC105912E;
+ Thu, 21 May 2020 09:50:51 +0000 (UTC)
+Date: Thu, 21 May 2020 10:50:49 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v23 04/18] vfio: Add save and load functions for
+ VFIO PCI devices
+Message-ID: <20200521095049.GB2752@work-vm>
+References: <1589999088-31477-1-git-send-email-kwankhede@nvidia.com>
+ <1589999088-31477-5-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <1589999088-31477-5-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,176 +96,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The v0.7.1 specification does not define vector status within mstatus.
-A future revision will define the privileged portion of the vector status.
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> These functions save and restore PCI device specific data - config
+> space of PCI device.
+> Tested save and restore with MSI and MSIX type.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/cpu_bits.h | 15 +++++++++
- target/riscv/csr.c      | 75 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 89 insertions(+), 1 deletion(-)
+So I'm OK with this from the migration side, but I'd like Alex to check it from
+the PCI side of things.
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 7f64ee1174..8117e8b5a7 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -29,6 +29,14 @@
- #define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
- #define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
- 
-+/* Vector Fixed-Point round model */
-+#define FSR_VXRM_SHIFT      9
-+#define FSR_VXRM            (0x3 << FSR_VXRM_SHIFT)
-+
-+/* Vector Fixed-Point saturation flag */
-+#define FSR_VXSAT_SHIFT     8
-+#define FSR_VXSAT           (0x1 << FSR_VXSAT_SHIFT)
-+
- /* Control and Status Registers */
- 
- /* User Trap Setup */
-@@ -48,6 +56,13 @@
- #define CSR_FRM             0x002
- #define CSR_FCSR            0x003
- 
-+/* User Vector CSRs */
-+#define CSR_VSTART          0x008
-+#define CSR_VXSAT           0x009
-+#define CSR_VXRM            0x00a
-+#define CSR_VL              0xc20
-+#define CSR_VTYPE           0xc21
-+
- /* User Timers and Counters */
- #define CSR_CYCLE           0xc00
- #define CSR_TIME            0xc01
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 11d184cd16..d71c49dfff 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -46,6 +46,10 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
- static int fs(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
-+    /* loose check condition for fcsr in vector extension */
-+    if ((csrno == CSR_FCSR) && (env->misa & RVV)) {
-+        return 0;
-+    }
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
-         return -1;
-     }
-@@ -53,6 +57,14 @@ static int fs(CPURISCVState *env, int csrno)
-     return 0;
- }
- 
-+static int vs(CPURISCVState *env, int csrno)
-+{
-+    if (env->misa & RVV) {
-+        return 0;
-+    }
-+    return -1;
-+}
-+
- static int ctr(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
-@@ -174,6 +186,10 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
- #endif
-     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
-         | (env->frm << FSR_RD_SHIFT);
-+    if (vs(env, csrno) >= 0) {
-+        *val |= (env->vxrm << FSR_VXRM_SHIFT)
-+                | (env->vxsat << FSR_VXSAT_SHIFT);
-+    }
-     return 0;
- }
- 
-@@ -186,10 +202,62 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
-     env->mstatus |= MSTATUS_FS;
- #endif
-     env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
-+    if (vs(env, csrno) >= 0) {
-+        env->vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
-+        env->vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
-+    }
-     riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
-     return 0;
- }
- 
-+static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vtype;
-+    return 0;
-+}
-+
-+static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vl;
-+    return 0;
-+}
-+
-+static int read_vxrm(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vxrm;
-+    return 0;
-+}
-+
-+static int write_vxrm(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vxrm = val;
-+    return 0;
-+}
-+
-+static int read_vxsat(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vxsat;
-+    return 0;
-+}
-+
-+static int write_vxsat(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vxsat = val;
-+    return 0;
-+}
-+
-+static int read_vstart(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vstart;
-+    return 0;
-+}
-+
-+static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vstart = val;
-+    return 0;
-+}
-+
- /* User Timers and Counters */
- static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
- {
-@@ -1269,7 +1337,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_FFLAGS] =              { fs,   read_fflags,      write_fflags      },
-     [CSR_FRM] =                 { fs,   read_frm,         write_frm         },
-     [CSR_FCSR] =                { fs,   read_fcsr,        write_fcsr        },
--
-+    /* Vector CSRs */
-+    [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
-+    [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
-+    [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
-+    [CSR_VL] =                  { vs,   read_vl                             },
-+    [CSR_VTYPE] =               { vs,   read_vtype                          },
-     /* User Timers and Counters */
-     [CSR_CYCLE] =               { ctr,  read_instret                        },
-     [CSR_INSTRET] =             { ctr,  read_instret                        },
--- 
-2.23.0
+I still think that you'd be better:
+  a) Using a VMStateDescription to encode the structure
+  b) or at least adding a flag at the end so you can add more data later
+
+Experience with every other device shows you're shooting yourself in the
+foot by hard coding the layout and not giving yourself a chance to
+expand it.
+
+but for now,
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hw/vfio/pci.c                 | 163 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h |   2 +
+>  2 files changed, 165 insertions(+)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 0514ba373d1c..94535f0e27cd 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -41,6 +41,7 @@
+>  #include "trace.h"
+>  #include "qapi/error.h"
+>  #include "migration/blocker.h"
+> +#include "migration/qemu-file.h"
+>  
+>  #define TYPE_VFIO_PCI "vfio-pci"
+>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+> @@ -1632,6 +1633,50 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
+>      }
+>  }
+>  
+> +static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
+> +{
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    VFIOBAR *bar = &vdev->bars[nr];
+> +    uint64_t addr;
+> +    uint32_t addr_lo, addr_hi = 0;
+> +
+> +    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
+> +    if (!bar->size) {
+> +        return 0;
+> +    }
+> +
+> +    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
+> +
+> +    addr_lo &= (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
+> +                              PCI_BASE_ADDRESS_MEM_MASK);
+> +    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
+> +        addr_hi = pci_default_read_config(pdev,
+> +                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
+> +    }
+> +
+> +    addr = ((uint64_t)addr_hi << 32) | addr_lo;
+> +
+> +    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int vfio_bars_validate(VFIOPCIDevice *vdev)
+> +{
+> +    int i, ret;
+> +
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        ret = vfio_bar_validate(vdev, i);
+> +        if (ret) {
+> +            error_report("vfio: BAR address %d validation failed", i);
+> +            return ret;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
+>  {
+>      VFIOBAR *bar = &vdev->bars[nr];
+> @@ -2414,11 +2459,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
+>      return OBJECT(vdev);
+>  }
+>  
+> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> +{
+> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    uint16_t pci_cmd;
+> +    int i;
+> +
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        uint32_t bar;
+> +
+> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> +        qemu_put_be32(f, bar);
+> +    }
+> +
+> +    qemu_put_be32(f, vdev->interrupt);
+> +    if (vdev->interrupt == VFIO_INT_MSI) {
+> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> +        bool msi_64bit;
+> +
+> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> +                                            2);
+> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> +
+> +        msi_addr_lo = pci_default_read_config(pdev,
+> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> +        qemu_put_be32(f, msi_addr_lo);
+> +
+> +        if (msi_64bit) {
+> +            msi_addr_hi = pci_default_read_config(pdev,
+> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                                             4);
+> +        }
+> +        qemu_put_be32(f, msi_addr_hi);
+> +
+> +        msi_data = pci_default_read_config(pdev,
+> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +                2);
+> +        qemu_put_be16(f, msi_data);
+> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
+> +        uint16_t offset;
+> +
+> +        /* save enable bit and maskall bit */
+> +        offset = pci_default_read_config(pdev,
+> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
+> +        qemu_put_be16(f, offset);
+> +        msix_save(pdev, f);
+> +    }
+> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> +    qemu_put_be16(f, pci_cmd);
+> +}
+> +
+> +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> +{
+> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    uint32_t interrupt_type;
+> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> +    uint16_t pci_cmd;
+> +    bool msi_64bit;
+> +    int i, ret;
+> +
+> +    /* retore pci bar configuration */
+> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        uint32_t bar = qemu_get_be32(f);
+> +
+> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
+> +    }
+> +
+> +    ret = vfio_bars_validate(vdev);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    interrupt_type = qemu_get_be32(f);
+> +
+> +    if (interrupt_type == VFIO_INT_MSI) {
+> +        /* restore msi configuration */
+> +        msi_flags = pci_default_read_config(pdev,
+> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> +
+> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
+> +
+> +        msi_addr_lo = qemu_get_be32(f);
+> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
+> +                              msi_addr_lo, 4);
+> +
+> +        msi_addr_hi = qemu_get_be32(f);
+> +        if (msi_64bit) {
+> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                                  msi_addr_hi, 4);
+> +        }
+> +        msi_data = qemu_get_be16(f);
+> +        vfio_pci_write_config(pdev,
+> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +                msi_data, 2);
+> +
+> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
+> +    } else if (interrupt_type == VFIO_INT_MSIX) {
+> +        uint16_t offset = qemu_get_be16(f);
+> +
+> +        /* load enable bit and maskall bit */
+> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
+> +                              offset, 2);
+> +        msix_load(pdev, f);
+> +    }
+> +    pci_cmd = qemu_get_be16(f);
+> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
+> +    return 0;
+> +}
+> +
+>  static VFIODeviceOps vfio_pci_ops = {
+>      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
+>      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
+>      .vfio_eoi = vfio_intx_eoi,
+>      .vfio_get_object = vfio_pci_get_object,
+> +    .vfio_save_config = vfio_pci_save_config,
+> +    .vfio_load_config = vfio_pci_load_config,
+>  };
+>  
+>  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 74261feaeac9..d69a7f3ae31e 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -120,6 +120,8 @@ struct VFIODeviceOps {
+>      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
+>      void (*vfio_eoi)(VFIODevice *vdev);
+>      Object *(*vfio_get_object)(VFIODevice *vdev);
+> +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
+> +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
+>  };
+>  
+>  typedef struct VFIOGroup {
+> -- 
+> 2.7.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
