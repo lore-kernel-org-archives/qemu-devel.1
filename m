@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67144C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DE6C433E1
 	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2168120748
+	by mail.kernel.org (Postfix) with ESMTPS id 0E9612070A
 	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="qyKcbRAE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2168120748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="FmGh/JYn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9612070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbdLE-0004nX-8F
+	id 1jbdLE-0004qC-3q
 	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:02:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59982)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdJn-00031q-MU
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:31 -0400
-Received: from o1.dev.nutanix.com ([198.21.4.205]:16893)
+ id 1jbdJo-00032T-KV
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:32 -0400
+Received: from o1.dev.nutanix.com ([198.21.4.205]:61607)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdJl-0001D5-IS
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:31 -0400
+ id 1jbdJn-0001Em-Fi
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
  h=from:subject:in-reply-to:references:to:cc:content-type:
  content-transfer-encoding;
- s=smtpapi; bh=m0NtnfVnp0PzfL8px4sfwdcZTA8azBlcXjhOtOvFdl8=;
- b=qyKcbRAElTLIoMwmJk3K5OyHEzV8NJAV/23kVGO0oi+X2YtoY4wNBZzejpXGOvTOeQKy
- /S61zLrqL8yWdgX/ioi9hglrA0dVVubY2dT8xTqBbDAdc3w7pTgrcBF9Wf/E/M88rvKtRI
- WsiIDnpXZWJzlv25+g+oRzwiSigxYjAA8=
-Received: by filterdrecv-p3iad2-8ddf98858-4fqk8 with SMTP id
- filterdrecv-p3iad2-8ddf98858-4fqk8-19-5EC60AEA-4F
- 2020-05-21 05:00:26.281457718 +0000 UTC m=+4852371.715890103
+ s=smtpapi; bh=Va0Wof9z55xrrI91p6vOei7zjKTVO0gLIlQPs/0NLmE=;
+ b=FmGh/JYnQSvIZ4wRUmE8bI8AYrD7+lLDbFzg6gXXR+1NlJ/knB3WjzG2aYQ39XQykp1X
+ FwKySoYH/LR/f+Cu1TYLwYywWjuuyjFLdrTxiP01abbMWYNyavH1cuHYTSNfdgB7jJG3S8
+ FFU7clvFVXfWiwMNAFyyxFJcWGoz0posQ=
+Received: by filterdrecv-p3iad2-8ddf98858-lwgxm with SMTP id
+ filterdrecv-p3iad2-8ddf98858-lwgxm-19-5EC60AED-C7
+ 2020-05-21 05:00:29.450879106 +0000 UTC m=+4852378.688574636
 Received: from localhost.localdomain.com (unknown)
  by ismtpd0026p1las1.sendgrid.net (SG) with ESMTP
- id Z5pJocFvQ2aULHmAcDnqJg Thu, 21 May 2020 05:00:26.069 +0000 (UTC)
+ id wgexu8MbRYaJaOvAFOQoKA Thu, 21 May 2020 05:00:29.256 +0000 (UTC)
 From: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: [PATCH v4 01/10] Add helper to populate vhost-user message regions
-Date: Thu, 21 May 2020 05:00:26 +0000 (UTC)
-Message-Id: <1588533678-23450-2-git-send-email-raphael.norwitz@nutanix.com>
+Subject: [PATCH v4 02/10] Add vhost-user helper to get MemoryRegion data
+Date: Thu, 21 May 2020 05:00:29 +0000 (UTC)
+Message-Id: <1588533678-23450-3-git-send-email-raphael.norwitz@nutanix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 References: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 X-SG-EID: =?us-ascii?Q?YCLURHX+pjNDm1i7d69iKyMnQi=2FdvWah9veFa8nllaoUC0ScIWrCgiaWGu43Vg?=
- =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zVv1yMmJe5tLurTe2?=
- =?us-ascii?Q?InvQ9mYtNZqTmxdk8Wla7zw5jovEWVmb0cMKqQC?=
- =?us-ascii?Q?nGqneqYtWnvMojJzCWfPEHHNp6tswzP=2FZicf521?=
- =?us-ascii?Q?quUeuIlPiWefyyNsx0qOplGYXsoaAgfiENr3TH1?=
- =?us-ascii?Q?w0b5MygRWewOer9Y7=2F6BLbR3G6xqmrVTXQ9ENFz?=
- =?us-ascii?Q?2L=2FQuGPrff1TgOahPTl3g=3D=3D?=
+ =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zciUKG=2Fx94H5nEBLg?=
+ =?us-ascii?Q?g=2FS3DlyXmSKv4CA51oOqz3CA8a=2FreLwKwMAf9Wy?=
+ =?us-ascii?Q?o9Wg=2Fa7=2Fvapv9BZvycGWTZq6T4WMC2q5bzTtgiz?=
+ =?us-ascii?Q?myzRGq3XaWYU5JV50IE7cYN6sWzNxqe5OLE9s9B?=
+ =?us-ascii?Q?h1d=2FW7L4ADsvciINJL9ingAfeU8s95v36Qi++SV?=
+ =?us-ascii?Q?GKIzVGUH2BJtWpl7ato5g=3D=3D?=
 To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
@@ -97,59 +97,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When setting vhost-user memory tables, memory region descriptors must be
-copied from the vhost_dev struct to the vhost-user message. To avoid
-duplicating code in setting the memory tables, we should use a helper to
-populate this field. This change adds this helper.
+When setting the memory tables, qemu uses a memory region's userspace
+address to look up the region's MemoryRegion struct. Among other things,
+the MemoryRegion contains the region's offset and associated file
+descriptor, all of which need to be sent to the backend.
+
+With VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS, this logic will be
+needed in multiple places, so before feature support is added it
+should be moved to a helper function.
+
+This helper is also used to simplify the vhost_user_can_merge()
+function.
 
 Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 ---
- hw/virtio/vhost-user.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ hw/virtio/vhost-user.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index ec21e8f..2e0552d 100644
+index 2e0552d..442b0d6 100644
 --- a/hw/virtio/vhost-user.c
 +++ b/hw/virtio/vhost-user.c
-@@ -407,6 +407,15 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+@@ -407,6 +407,18 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
      return 0;
  }
  
-+static void vhost_user_fill_msg_region(VhostUserMemoryRegion *dst,
-+                                       struct vhost_memory_region *src)
++static MemoryRegion *vhost_user_get_mr_data(uint64_t addr, ram_addr_t *offset,
++                                            int *fd)
 +{
-+    assert(src != NULL && dst != NULL);
-+    dst->userspace_addr = src->userspace_addr;
-+    dst->memory_size = src->memory_size;
-+    dst->guest_phys_addr = src->guest_phys_addr;
++    MemoryRegion *mr;
++
++    assert((uintptr_t)addr == addr);
++    mr = memory_region_from_host((void *)(uintptr_t)addr, offset);
++    *fd = memory_region_get_fd(mr);
++
++    return mr;
 +}
 +
- static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-                                              struct vhost_dev *dev,
-                                              VhostUserMsg *msg,
-@@ -417,6 +426,7 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
+ static void vhost_user_fill_msg_region(VhostUserMemoryRegion *dst,
+                                        struct vhost_memory_region *src)
+ {
+@@ -433,10 +445,7 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
+     for (i = 0; i < dev->mem->nregions; ++i) {
+         reg = dev->mem->regions + i;
+ 
+-        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+-        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+-                                     &offset);
+-        fd = memory_region_get_fd(mr);
++        mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
+         if (fd > 0) {
+             if (track_ramblocks) {
+                 assert(*fd_num < VHOST_MEMORY_MAX_NREGIONS);
+@@ -1551,13 +1560,9 @@ static bool vhost_user_can_merge(struct vhost_dev *dev,
+ {
      ram_addr_t offset;
-     MemoryRegion *mr;
-     struct vhost_memory_region *reg;
-+    VhostUserMemoryRegion region_buffer;
+     int mfd, rfd;
+-    MemoryRegion *mr;
+-
+-    mr = memory_region_from_host((void *)(uintptr_t)start1, &offset);
+-    mfd = memory_region_get_fd(mr);
  
-     msg->hdr.request = VHOST_USER_SET_MEM_TABLE;
+-    mr = memory_region_from_host((void *)(uintptr_t)start2, &offset);
+-    rfd = memory_region_get_fd(mr);
++    (void)vhost_user_get_mr_data(start1, &offset, &mfd);
++    (void)vhost_user_get_mr_data(start2, &offset, &rfd);
  
-@@ -441,12 +451,8 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-                 error_report("Failed preparing vhost-user memory table msg");
-                 return -1;
-             }
--            msg->payload.memory.regions[*fd_num].userspace_addr =
--                reg->userspace_addr;
--            msg->payload.memory.regions[*fd_num].memory_size =
--                reg->memory_size;
--            msg->payload.memory.regions[*fd_num].guest_phys_addr =
--                reg->guest_phys_addr;
-+            vhost_user_fill_msg_region(&region_buffer, reg);
-+            msg->payload.memory.regions[*fd_num] = region_buffer;
-             msg->payload.memory.regions[*fd_num].mmap_offset = offset;
-             fds[(*fd_num)++] = fd;
-         } else if (track_ramblocks) {
+     return mfd == rfd;
+ }
 -- 
 1.8.3.1
 
