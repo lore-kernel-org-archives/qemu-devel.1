@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FF7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 388B8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC74C20721
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E314720721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:05:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="Pp6N4gFS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC74C20721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="AWFMhsOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E314720721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbdOb-0002nu-TE
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60014)
+	id 1jbdOl-00034Y-2u
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:05:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdJz-0003KF-Me
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:44 -0400
-Received: from o1.dev.nutanix.com ([198.21.4.205]:28555)
+ id 1jbdKG-0003ak-0V
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:01:00 -0400
+Received: from o1.dev.nutanix.com ([198.21.4.205]:40221)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdJy-0001Gj-Gx
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:43 -0400
+ id 1jbdKE-0001IG-RV
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
  h=from:subject:in-reply-to:references:to:cc:content-type:
  content-transfer-encoding;
- s=smtpapi; bh=1gT8UANEjY26OpRqhyqDy/W0PyLouFTI8A05goPKUko=;
- b=Pp6N4gFSKNFrYaBRfKLXcuY1y+EaC5eJE7DRb5GRy9ka62d1rKQ91F/mvpqwYpRBVXao
- 6bl/BS1m5CaV3w5Yzn+9ElwsCaMyllHF20JRxMqYLUHcCadUG+ywJf0notCf/5Gcnar48l
- PJkc8Vqe6VpTPfH+jg8GTOpdtV34UTaOs=
-Received: by filterdrecv-p3iad2-8ddf98858-w5zgs with SMTP id
- filterdrecv-p3iad2-8ddf98858-w5zgs-17-5EC60AF8-92
- 2020-05-21 05:00:40.516925812 +0000 UTC m=+4852394.811253408
+ s=smtpapi; bh=t3fz5473SIIHnN2NwCjhpDyWkhB4xeDUz228FyTM6Gk=;
+ b=AWFMhsOjiKCxzo1S1j8QIz/FVZVYwygItB0AGbcb9a8C8J7KBGAb2VmjyrV8iCKV1JPN
+ YHGNJud3Tz98GJI7t41YS0MSb5xvSwoZm6qi81iRnRKkE7vh9oKnoEJIGgB+iLIi44HYY6
+ h0Rjn+LttE1FXQe0MZUiSYApYd0It2lqU=
+Received: by filterdrecv-p3iad2-8ddf98858-xm5rk with SMTP id
+ filterdrecv-p3iad2-8ddf98858-xm5rk-18-5EC60B08-E2
+ 2020-05-21 05:00:56.802137655 +0000 UTC m=+4775845.781871036
 Received: from localhost.localdomain.com (unknown)
  by ismtpd0026p1las1.sendgrid.net (SG) with ESMTP
- id p5IHhxkhQSG-k2Y6vHr4Rg Thu, 21 May 2020 05:00:40.319 +0000 (UTC)
+ id yqpAbHQuRdOSTJlRZqj__A Thu, 21 May 2020 05:00:56.585 +0000 (UTC)
 From: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: [PATCH v4 05/10] Lift max memory slots limit imposed by vhost-user
-Date: Thu, 21 May 2020 05:00:40 +0000 (UTC)
-Message-Id: <1588533678-23450-6-git-send-email-raphael.norwitz@nutanix.com>
+Subject: [PATCH v4 09/10] Support individual region unmap in libvhost-user
+Date: Thu, 21 May 2020 05:00:56 +0000 (UTC)
+Message-Id: <1588533678-23450-10-git-send-email-raphael.norwitz@nutanix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 References: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 X-SG-EID: =?us-ascii?Q?YCLURHX+pjNDm1i7d69iKyMnQi=2FdvWah9veFa8nllaoUC0ScIWrCgiaWGu43Vg?=
- =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zcHs6ANfyz+yj7wQh?=
- =?us-ascii?Q?8uN2B2Wv9Rj8vSG31+Kau6EBCR0zg27Ee0wWyHx?=
- =?us-ascii?Q?XxKtnyh=2FxRuUXSytKpyNJKwm00jGRjRJKNfntTm?=
- =?us-ascii?Q?AB=2FoJLcq3TJlfI1EbQobKe3r0HgH9aeExKIGIj0?=
- =?us-ascii?Q?kguJ4ufyrvYyXuAclt=2FNt6fLKt9DAb+ULzvrDxT?=
- =?us-ascii?Q?KBU6aIgBmEBDOgxdS9xDw=3D=3D?=
+ =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zQJ3KVDq2XRWa2Xbk?=
+ =?us-ascii?Q?OOq+vXI84eLiafeClUC7SbSEGIm8qHo7LMQsMaD?=
+ =?us-ascii?Q?8JSr1sgASWuJnCZqSfYv9NBNcvFfbskxRzhOADd?=
+ =?us-ascii?Q?HGs3ViQ2=2F5lpu4j=2F2=2Fvy1Fz0xxGtwChw8CJ3z+6?=
+ =?us-ascii?Q?PU5U=2F1JMFVsURDvWXreJntRQ3uRzcZYsAxo7o9c?=
+ =?us-ascii?Q?6icQRKoClbohf2dBfdTAA=3D=3D?=
 To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
@@ -91,235 +91,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Turschmid <peter.turschm@nutanix.com>, raphael.s.norwitz@gmail.com,
- marcandre.lureau@gmail.com, Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: raphael.s.norwitz@gmail.com, marcandre.lureau@gmail.com,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Historically, sending all memory regions to vhost-user backends in a
-single message imposed a limitation on the number of times memory
-could be hot-added to a VM with a vhost-user device. Now that backends
-which support the VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS send memory
-regions individually, we no longer need to impose this limitation on
-devices which support this feature.
+When the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS protocol feature is
+enabled, on memory hot-unplug qemu will transmit memory regions to
+remove individually using the new message VHOST_USER_REM_MEM_REG
+message. With this change, vhost-user backends build with libvhost-user
+can now unmap individual memory regions when receiving the
+VHOST_USER_REM_MEM_REG message.
 
-With this change, VMs with a vhost-user device which supports the
-VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS can support a configurable
-number of memory slots, up to the maximum allowed by the target
-platform.
-
-Existing backends which do not support
-VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS are unaffected.
+Qemu only sends VHOST_USER_REM_MEM_REG messages when the
+VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS feature is negotiated, and
+support for that feature has not yet been added in libvhost-user, this
+new functionality is not yet used.
 
 Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Signed-off-by: Peter Turschmid <peter.turschm@nutanix.com>
-Suggested-by: Mike Cui <cui@nutanix.com>
 ---
- docs/interop/vhost-user.rst |  7 +++---
- hw/virtio/vhost-user.c      | 56 ++++++++++++++++++++++++++++++---------------
- 2 files changed, 40 insertions(+), 23 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 63 +++++++++++++++++++++++++++++++++++
+ contrib/libvhost-user/libvhost-user.h |  1 +
+ 2 files changed, 64 insertions(+)
 
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 037eefa..688b7c6 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -1273,10 +1273,9 @@ Master message types
-   feature has been successfully negotiated, this message is submitted
-   by master to the slave. The slave should return the message with a
-   u64 payload containing the maximum number of memory slots for
--  QEMU to expose to the guest. At this point, the value returned
--  by the backend will be capped at the maximum number of ram slots
--  which can be supported by vhost-user. Currently that limit is set
--  at VHOST_USER_MAX_RAM_SLOTS = 8.
-+  QEMU to expose to the guest. The value returned by the backend
-+  will be capped at the maximum number of ram slots which can be
-+  supported by the target platform.
- 
- ``VHOST_USER_ADD_MEM_REG``
-   :id: 37
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 9358406..48b8081 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -35,11 +35,29 @@
- #include <linux/userfaultfd.h>
- #endif
- 
--#define VHOST_MEMORY_MAX_NREGIONS    8
-+#define VHOST_MEMORY_BASELINE_NREGIONS    8
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
- #define VHOST_USER_SLAVE_MAX_FDS     8
- 
- /*
-+ * Set maximum number of RAM slots supported to
-+ * the maximum number supported by the target
-+ * hardware plaform.
-+ */
-+#if defined(TARGET_X86) || defined(TARGET_X86_64) || \
-+    defined(TARGET_ARM) || defined(TARGET_ARM_64)
-+#include "hw/acpi/acpi.h"
-+#define VHOST_USER_MAX_RAM_SLOTS ACPI_MAX_RAM_SLOTS
-+
-+#elif defined(TARGET_PPC) || defined(TARGET_PPC_64)
-+#include "hw/ppc/spapr.h"
-+#define VHOST_USER_MAX_RAM_SLOTS SPAPR_MAX_RAM_SLOTS
-+
-+#else
-+#define VHOST_USER_MAX_RAM_SLOTS 512
-+#endif
-+
-+/*
-  * Maximum size of virtio device config space
-  */
- #define VHOST_USER_MAX_CONFIG_SIZE 256
-@@ -127,7 +145,7 @@ typedef struct VhostUserMemoryRegion {
- typedef struct VhostUserMemory {
-     uint32_t nregions;
-     uint32_t padding;
--    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
-+    VhostUserMemoryRegion regions[VHOST_MEMORY_BASELINE_NREGIONS];
- } VhostUserMemory;
- 
- typedef struct VhostUserMemRegMsg {
-@@ -222,7 +240,7 @@ struct vhost_user {
-     int slave_fd;
-     NotifierWithReturn postcopy_notifier;
-     struct PostCopyFD  postcopy_fd;
--    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
-+    uint64_t           postcopy_client_bases[VHOST_USER_MAX_RAM_SLOTS];
-     /* Length of the region_rb and region_rb_offset arrays */
-     size_t             region_rb_len;
-     /* RAMBlock associated with a given region */
-@@ -237,7 +255,7 @@ struct vhost_user {
- 
-     /* Our current regions */
-     int num_shadow_regions;
--    struct vhost_memory_region shadow_regions[VHOST_MEMORY_MAX_NREGIONS];
-+    struct vhost_memory_region shadow_regions[VHOST_USER_MAX_RAM_SLOTS];
- };
- 
- struct scrub_regions {
-@@ -392,7 +410,7 @@ int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd)
- static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
-                                    struct vhost_log *log)
- {
--    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int fds[VHOST_USER_MAX_RAM_SLOTS];
-     size_t fd_num = 0;
-     bool shmfd = virtio_has_feature(dev->protocol_features,
-                                     VHOST_USER_PROTOCOL_F_LOG_SHMFD);
-@@ -470,7 +488,7 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-         mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
-         if (fd > 0) {
-             if (track_ramblocks) {
--                assert(*fd_num < VHOST_MEMORY_MAX_NREGIONS);
-+                assert(*fd_num < VHOST_MEMORY_BASELINE_NREGIONS);
-                 trace_vhost_user_set_mem_table_withfd(*fd_num, mr->name,
-                                                       reg->memory_size,
-                                                       reg->guest_phys_addr,
-@@ -478,7 +496,7 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-                                                       offset);
-                 u->region_rb_offset[i] = offset;
-                 u->region_rb[i] = mr->ram_block;
--            } else if (*fd_num == VHOST_MEMORY_MAX_NREGIONS) {
-+            } else if (*fd_num == VHOST_MEMORY_BASELINE_NREGIONS) {
-                 error_report("Failed preparing vhost-user memory table msg");
-                 return -1;
-             }
-@@ -523,7 +541,7 @@ static void scrub_shadow_regions(struct vhost_dev *dev,
-                                  bool track_ramblocks)
- {
-     struct vhost_user *u = dev->opaque;
--    bool found[VHOST_MEMORY_MAX_NREGIONS] = {};
-+    bool found[VHOST_USER_MAX_RAM_SLOTS] = {};
-     struct vhost_memory_region *reg, *shadow_reg;
-     int i, j, fd, add_idx = 0, rm_idx = 0, fd_num = 0;
-     ram_addr_t offset;
-@@ -777,9 +795,9 @@ static int vhost_user_add_remove_regions(struct vhost_dev *dev,
-                                          bool track_ramblocks)
- {
-     struct vhost_user *u = dev->opaque;
--    struct scrub_regions add_reg[VHOST_MEMORY_MAX_NREGIONS];
--    struct scrub_regions rem_reg[VHOST_MEMORY_MAX_NREGIONS];
--    uint64_t shadow_pcb[VHOST_MEMORY_MAX_NREGIONS] = {};
-+    struct scrub_regions add_reg[VHOST_USER_MAX_RAM_SLOTS];
-+    struct scrub_regions rem_reg[VHOST_USER_MAX_RAM_SLOTS];
-+    uint64_t shadow_pcb[VHOST_USER_MAX_RAM_SLOTS] = {};
-     int nr_add_reg, nr_rem_reg;
- 
-     msg->hdr.size = sizeof(msg->payload.mem_reg.padding) +
-@@ -803,7 +821,7 @@ static int vhost_user_add_remove_regions(struct vhost_dev *dev,
- 
-     if (track_ramblocks) {
-         memcpy(u->postcopy_client_bases, shadow_pcb,
--               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+               sizeof(uint64_t) * VHOST_USER_MAX_RAM_SLOTS);
-         /*
-          * Now we've registered this with the postcopy code, we ack to the
-          * client, because now we're in the position to be able to deal with
-@@ -823,7 +841,7 @@ static int vhost_user_add_remove_regions(struct vhost_dev *dev,
- err:
-     if (track_ramblocks) {
-         memcpy(u->postcopy_client_bases, shadow_pcb,
--               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+               sizeof(uint64_t) * VHOST_USER_MAX_RAM_SLOTS);
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index d8ee7a2..386449b 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -139,6 +139,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_VRING_KICK),
+         REQ(VHOST_USER_GET_MAX_MEM_SLOTS),
+         REQ(VHOST_USER_ADD_MEM_REG),
++        REQ(VHOST_USER_REM_MEM_REG),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -763,6 +764,66 @@ vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
      }
+ }
  
-     return -1;
-@@ -835,7 +853,7 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-                                              bool config_mem_slots)
++static inline bool reg_equal(VuDevRegion *vudev_reg,
++                             VhostUserMemoryRegion *msg_reg)
++{
++    if (vudev_reg->gpa == msg_reg->guest_phys_addr &&
++        vudev_reg->qva == msg_reg->userspace_addr &&
++        vudev_reg->size == msg_reg->memory_size) {
++        return true;
++    }
++
++    return false;
++}
++
++static bool
++vu_rem_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
++    int i, j;
++    bool found = false;
++    VuDevRegion shadow_regions[VHOST_MEMORY_MAX_NREGIONS] = {};
++    VhostUserMemoryRegion m = vmsg->payload.memreg.region, *msg_region = &m;
++
++    DPRINT("Removing region:\n");
++    DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
++           msg_region->guest_phys_addr);
++    DPRINT("    memory_size:     0x%016"PRIx64"\n",
++           msg_region->memory_size);
++    DPRINT("    userspace_addr   0x%016"PRIx64"\n",
++           msg_region->userspace_addr);
++    DPRINT("    mmap_offset      0x%016"PRIx64"\n",
++           msg_region->mmap_offset);
++
++    for (i = 0, j = 0; i < dev->nregions; i++) {
++        if (!reg_equal(&dev->regions[i], msg_region)) {
++            shadow_regions[j].gpa = dev->regions[i].gpa;
++            shadow_regions[j].size = dev->regions[i].size;
++            shadow_regions[j].qva = dev->regions[i].qva;
++            shadow_regions[j].mmap_offset = dev->regions[i].mmap_offset;
++            j++;
++        } else {
++            found = true;
++            VuDevRegion *r = &dev->regions[i];
++            void *m = (void *) (uintptr_t) r->mmap_addr;
++
++            if (m) {
++                munmap(m, r->size + r->mmap_offset);
++            }
++        }
++    }
++
++    if (found) {
++        memcpy(dev->regions, shadow_regions,
++               sizeof(VuDevRegion) * VHOST_MEMORY_MAX_NREGIONS);
++        DPRINT("Successfully removed a region\n");
++        dev->nregions--;
++        vmsg_set_reply_u64(vmsg, 0);
++    } else {
++        vu_panic(dev, "Specified region not found\n");
++    }
++
++    return true;
++}
++
+ static bool
+ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
  {
-     struct vhost_user *u = dev->opaque;
--    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int fds[VHOST_MEMORY_BASELINE_NREGIONS];
-     size_t fd_num = 0;
-     VhostUserMsg msg_reply;
-     int region_i, msg_i;
-@@ -893,7 +911,7 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-         }
- 
-         memset(u->postcopy_client_bases, 0,
--               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+               sizeof(uint64_t) * VHOST_USER_MAX_RAM_SLOTS);
- 
-         /*
-          * They're in the same order as the regions that were sent
-@@ -942,7 +960,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
- {
-     struct vhost_user *u = dev->opaque;
--    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int fds[VHOST_MEMORY_BASELINE_NREGIONS];
-     size_t fd_num = 0;
-     bool do_postcopy = u->postcopy_listen && u->postcopy_fd.handler;
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-@@ -1149,7 +1167,7 @@ static int vhost_set_vring_file(struct vhost_dev *dev,
-                                 VhostUserRequest request,
-                                 struct vhost_vring_file *file)
- {
--    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int fds[VHOST_USER_MAX_RAM_SLOTS];
-     size_t fd_num = 0;
-     VhostUserMsg msg = {
-         .hdr.request = request,
-@@ -1845,7 +1863,7 @@ static int vhost_user_backend_init(struct vhost_dev *dev, void *opaque)
-         /* get max memory regions if backend supports configurable RAM slots */
-         if (!virtio_has_feature(dev->protocol_features,
-                                 VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS)) {
--            u->user->memory_slots = VHOST_MEMORY_MAX_NREGIONS;
-+            u->user->memory_slots = VHOST_MEMORY_BASELINE_NREGIONS;
-         } else {
-             err = vhost_user_get_max_memslots(dev, &ram_slots);
-             if (err < 0) {
-@@ -1860,7 +1878,7 @@ static int vhost_user_backend_init(struct vhost_dev *dev, void *opaque)
-                 return -1;
-             }
- 
--            u->user->memory_slots = MIN(ram_slots, VHOST_MEMORY_MAX_NREGIONS);
-+            u->user->memory_slots = MIN(ram_slots, VHOST_USER_MAX_RAM_SLOTS);
-         }
-     }
+@@ -1771,6 +1832,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_handle_get_max_memslots(dev, vmsg);
+     case VHOST_USER_ADD_MEM_REG:
+         return vu_add_mem_reg(dev, vmsg);
++    case VHOST_USER_REM_MEM_REG:
++        return vu_rem_mem_reg(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 60ef7fd..f843971 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -99,6 +99,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_VRING_KICK = 35,
+     VHOST_USER_GET_MAX_MEM_SLOTS = 36,
+     VHOST_USER_ADD_MEM_REG = 37,
++    VHOST_USER_REM_MEM_REG = 38,
+     VHOST_USER_MAX
+ } VhostUserRequest;
  
 -- 
 1.8.3.1
