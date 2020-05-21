@@ -2,76 +2,77 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA6BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C97C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:04:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F582072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:56:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDFDF2072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:04:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tOyv/adW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F582072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BpMJZPem"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDFDF2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbkkW-0003C3-Gw
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 08:56:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51948)
+	id 1jbksH-0000oU-VD
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 09:04:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbkju-0002lc-Nr
- for qemu-devel@nongnu.org; Thu, 21 May 2020 08:55:58 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43772)
+ id 1jbkrW-0008UW-6X
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 09:03:50 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbkjt-0006oH-Af
- for qemu-devel@nongnu.org; Thu, 21 May 2020 08:55:58 -0400
-Received: by mail-oi1-x244.google.com with SMTP id i22so6084809oik.10
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 05:55:56 -0700 (PDT)
+ id 1jbkrU-0007xs-VL
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 09:03:49 -0400
+Received: by mail-ot1-x343.google.com with SMTP id z3so5408856otp.9
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 06:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jlvYop/nsRa1Z2SoUprDziSFSUsm6ehAvHYpB6zvbvE=;
- b=tOyv/adWQbIGcmUxB6y6Uxp0F9TuzbnQzm5DwKuw0ULG1Lj7emX1TxPyts14iFud1J
- NzNa0lZB/yFSWd7+GBzb+YvxYJ1RNkMeqjlOmgQZ+JFV3J7MdMQv3u1wyJMic5aEcphv
- 4ZA91G0jM6qBEGm/hezj/anR+ScNRNjoq8tckPQv6oD+NM9SqSKX7LfOIAbP2ckUR1Hz
- Sl/pIsqjgJg8Uqf27v5+bUn9JlZ+AKzEMEpW97bd0F19h9mtrwVbiYcBAuYUfU39ZtrT
- pYJSNE8dWKjjHDy/CeWzYlWcehkRP0cE7tdN3TuPS4cSFBchAekgjNOaGmZ1kGFhaiZA
- KQww==
+ :cc; bh=rN1A86gX8Zaqy8L+ej3ws6/vAjx88+tA7UfKo62wTHI=;
+ b=BpMJZPemrMvFgooBYmCmDWknkWT7gLHdpRE59t8WHdZOp1J89tvNJeH4zZ5YMRkYQA
+ PRZHgW9NABopgEKNDoWMCgchlr+Xc6zriY065WsoMbXkXP3AmQfqmOv02DOOTLm1kVqh
+ 1ZW+IjATa/Qt06FwgkUpDtENsJBHbZKfjeZmzpCOG8Ky+eNK8K9dqWow9uS+M5POMXa6
+ L66KYDX2fxXNCNM1/TCGo53mDhsaf4+Obglcuqm9nW9zPlFyGV4NIQDxKGie0vAuKc7Q
+ Ov8kP1PMXxi+jBRKeW4KhHOEKbk5mV3lNZFsTpTpfYyaOE+PKtv30ejJrfx+g2trIMyk
+ a24w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jlvYop/nsRa1Z2SoUprDziSFSUsm6ehAvHYpB6zvbvE=;
- b=JWhxO0Td38hTueHwLwQr+/ZlJeudIrZUuqvwQkU1a55LEI0ih9B925F9LTW/H5u/eW
- A7+Sc8fJHUZIGVISXGB8TcIVJgfFZy/QF38OK+pSY8ScgtTdy7HX4uU/bTejFaeruoEH
- R80CzFefJayMS4i1b2hu+ZQoxfrqiQoXcJM9D2fPEeA9avEqglme23f2oamy5SxSxK/T
- R77Cag7R+j0DzVSU/i4BaFNoeGigPOa6ETz38I0j5e2YwcqZB1Da6WMSfvvYmxQXXIAV
- lambLID/0RdEIC3iaLExkAeJv+z7fe8rDpMTYykvUD+DkYJkZzT1SKoiqPbwgh298929
- ueUg==
-X-Gm-Message-State: AOAM530oC9vPxqQEphex/NuelRpgqJb9s6bM+miiDVP5HCFT5GI5pGVQ
- kJcmRT8CFICGNzHuY7wO963Wl1gdY6BogTARSbWIhA==
-X-Google-Smtp-Source: ABdhPJzGt8imRQS84A8E7OlukTJN4J5WULPfLTTXNNbQi1WzeYLALgD907gXoz8MJW7trYWXZz7oGCmJyX3loQFCbFI=
-X-Received: by 2002:aca:ed16:: with SMTP id l22mr6258404oih.146.1590065755716; 
- Thu, 21 May 2020 05:55:55 -0700 (PDT)
+ bh=rN1A86gX8Zaqy8L+ej3ws6/vAjx88+tA7UfKo62wTHI=;
+ b=jfRl9cB87XTgfOzL1wh7PYnGZ4Z7Uo/SmmiFZOdPQ6bfroMxp6u+gfm1y5O1OliQVz
+ eyxQZfrjcNaAM4KT9HaGb9Xxw3T13kWzxU7NQRyLD8w2j7dLLCk7EBfzEhiRkSXi7FcR
+ 0pKKaV9XSJEHVNgl8ImzCpMBZhkrUW0/TaJ8jsvIiZi7wx/3kLAXJjhls/ObO50O4acw
+ AgJzLvWKzkXI4x48+lgYEH1cQi0Pax1A2az3iH18iJnP+7DAFKazwTRl3XwXMcA+JHL4
+ Qfji/XWhydaoDTN1pgfnAjQNQIeOcxX4e8qpGsx7Minjc418Vux6sp7w8rZX6+2vNBIl
+ ZKYA==
+X-Gm-Message-State: AOAM531ge/DNVXw5jBLTYwAJV3DtKkLtcymbd3T1wR+JmUsBBOLVdHCz
+ cu9pyOceuBv5UxIfMXb0K/4dnAfPEM2+34wt28U76uSW
+X-Google-Smtp-Source: ABdhPJyk4eNMiFLAVGvCztYPJN3nExJCVrNexKXVKCmCRjX5E0NhQgxkLMUCHJrxPFcePGOAhsarh5DVAA/XwVZMOpw=
+X-Received: by 2002:a05:6830:158b:: with SMTP id
+ i11mr7142844otr.135.1590066227329; 
+ Thu, 21 May 2020 06:03:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200521124535.5329-1-pbonzini@redhat.com>
- <20200521124535.5329-5-pbonzini@redhat.com>
-In-Reply-To: <20200521124535.5329-5-pbonzini@redhat.com>
+References: <20200514142138.20875-1-peter.maydell@linaro.org>
+ <20200514142138.20875-27-peter.maydell@linaro.org>
+In-Reply-To: <20200514142138.20875-27-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 May 2020 13:55:44 +0100
-Message-ID: <CAFEAcA_b_hMYQWZP4T=E83tgLH4gwJskF=wnzTb6BmzK9GeHUQ@mail.gmail.com>
-Subject: Re: [PATCH v2 4/8] run-coverity-scan: use docker.py
-To: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 21 May 2020 14:03:36 +0100
+Message-ID: <CAFEAcA_a4yiE9UZx=MAFUM+f0LSiNvjQ=X1+dObELRzfnTyUHQ@mail.gmail.com>
+Subject: Re: [PULL 26/45] ACPI: Record Generic Error Status Block(GESB) table
+To: QEMU Developers <qemu-devel@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,68 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Dongjiu Geng <gengdongjiu@huawei.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 May 2020 at 13:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, 14 May 2020 at 15:22, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Our trusted docker wrapper allows run-coverity-scan to run with both
-> docker and podman.
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
 >
-> For the "run" phase this is transparent; for the "build" phase however
-> scripts are replaced with a bind mount (-v).  This is not an issue
-> because the secret option is meant for secrets stored globally in the
-> system and bind mounts are a valid substitute for secrets that are known
-> to whoever builds the container.
+> kvm_arch_on_sigbus_vcpu() error injection uses source_id as
+> index in etc/hardware_errors to find out Error Status Data
+> Block entry corresponding to error source. So supported source_id
+> values should be assigned here and not be changed afterwards to
+> make sure that guest will write error into expected Error Status
+> Data Block.
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/coverity-scan/coverity-scan.docker |  2 +-
->  scripts/coverity-scan/run-coverity-scan    | 32 ++++++++++++++--------
->  2 files changed, 22 insertions(+), 12 deletions(-)
+> Before QEMU writes a new error to ACPI table, it will check whether
+> previous error has been acknowledged. If not acknowledged, the new
+> errors will be ignored and not be recorded. For the errors section
+> type, QEMU simulate it to memory section error.
 
-> @@ -300,12 +312,10 @@ if [ "$DOCKER" = yes ]; then
->      # TODO: This re-downloads the tools every time, rather than
->      # caching and reusing the image produced with the downloaded tools.
->      # Not sure why.
-> -    # TODO: how do you get 'docker build' to print the output of the
-> -    # commands it is running to its stdout? This would be useful for debug.
-> -    DOCKER_BUILDKIT=1 docker build -t coverity-scanner \
-> -                   --secret id=coverity.token,src="$SECRET" \
-> -                   -f scripts/coverity-scan/coverity-scan.docker \
-> -                   scripts/coverity-scan
-> +    tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
-> +                   -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
-> +                   -v "$SECRETDIR:/work" \
-> +                   --extra-files scripts/coverity-scan/run-coverity-scan
+Hi; Coverity points out (CID 1428962) that there is
+unreachable code in this function:
 
-Generally this script uses a "./" prefix for invoking scripts
-that are within the current directory...
+> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+> +                                      uint64_t error_physical_addr)
+> +{
+> +    GArray *block;
+> +
+> +    /* Memory Error Section Type */
+> +    const uint8_t uefi_cper_mem_sec[] =
+> +          UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
+> +                  0xED, 0x7C, 0x83, 0xB1);
+> +
+> +    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
+> +     * Table 17-13 Generic Error Data Entry
+> +     */
+> +    QemuUUID fru_id = {};
+> +    uint32_t data_length;
+> +
+> +    block = g_array_new(false, true /* clear */, 1);
+> +
+> +    /* This is the length if adding a new generic error data entry*/
+> +    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
 
->      echo "Archiving sources to be analyzed..."
->      ./scripts/archive-source.sh "$SECRETDIR/qemu-sources.tgz"
+Here data_length has a constant value...
 
-...as for instance here. It would be nice to follow that convention.
+> +
+> +    /*
+> +     * Check whether it will run out of the preallocated memory if adding a new
+> +     * generic error data entry
+> +     */
+> +    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
 
->      if [ "$DRYRUN" = yes ]; then
-> @@ -323,7 +333,7 @@ if [ "$DOCKER" = yes ]; then
->      # Arrange for this docker run to get access to the sources with -v.
->      # We pass through all the configuration from the outer script to the inner.
->      export COVERITY_EMAIL COVERITY_BUILD_CMD
-> -    docker run -it --env COVERITY_EMAIL --env COVERITY_BUILD_CMD \
-> +    tests/docker/docker.py run -it --env COVERITY_EMAIL --env COVERITY_BUILD_CMD \
->             -v "$SECRETDIR:/work" coverity-scanner \
->             ./run-coverity-scan --version "$VERSION" \
->             --description "$DESCRIPTION" $DRYRUNARG --tokenfile /work/token \
+...but here we immediately have a runtime check which can't possibly
+fail because of the values of the constants involved, so this
+if() block is dead code.
 
-Ditto.
+> +        error_report("Not enough memory to record new CPER!!!");
+> +        g_array_free(block, true);
+> +        return -1;
+> +    }
 
-otherwise
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+What was this code trying to do? Is the initial value of
+data_length incorrect, or is the if() condition wrong, or
+should this simply have been an assert() ?
 
 thanks
 -- PMM
