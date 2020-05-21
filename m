@@ -2,86 +2,102 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFC7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36497C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CADA22065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:00:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E420420738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 08:11:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h5jiAtZH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CADA22065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="xx1hTwXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E420420738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbg7T-0005vG-Sv
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 03:59:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49360)
+	id 1jbgIB-0003l3-UN
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 04:11:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbg6o-00057S-1F
- for qemu-devel@nongnu.org; Thu, 21 May 2020 03:59:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35794
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbg6m-0000Z4-PA
- for qemu-devel@nongnu.org; Thu, 21 May 2020 03:59:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590047954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=57YaKa9BHFEUtBziFfUy/l9IGUB153INf5Tvp3kpsqc=;
- b=h5jiAtZH2jwzykyCdzPKN36Aa8Z6voBRwla8LzGXb7uf6Y7Bz7iHPpmU/2JRmNGd2G0uix
- 2Cw4Hbid9OeTNAoSaQ9xeTEbylNVmoSYXbDqHu9382/t68Uq32Ala/ceiMkLwTz9+9Z70M
- 7TXNGFLUjtVKEqWJ9mk9uHjfvbLlr+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-1IXsag8KPb6BdouentaxGA-1; Thu, 21 May 2020 03:59:13 -0400
-X-MC-Unique: 1IXsag8KPb6BdouentaxGA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8063107ACCA;
- Thu, 21 May 2020 07:59:11 +0000 (UTC)
-Received: from nas.mammed.net (unknown [10.40.193.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6167B5C1B0;
- Thu, 21 May 2020 07:59:01 +0000 (UTC)
-Date: Thu, 21 May 2020 09:58:59 +0200
-From: Igor Mammedow <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 09/22] acpi: ged: rename event memory region
-Message-ID: <20200521095859.45791508@nas.mammed.net>
-In-Reply-To: <20200520132003.9492-10-kraxel@redhat.com>
-References: <20200520132003.9492-1-kraxel@redhat.com>
- <20200520132003.9492-10-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbgHb-0003Jw-AJ
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 04:10:27 -0400
+Received: from mail-ua1-x935.google.com ([2607:f8b0:4864:20::935]:39715)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jbgHY-0002SU-Ag
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 04:10:26 -0400
+Received: by mail-ua1-x935.google.com with SMTP id z12so2299377uap.6
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 01:10:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=smartx-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Qhcuo79NLFtebnSynStGf6/lRydyScOyIyWBjxOApRM=;
+ b=xx1hTwXDaieXCc/qn9RzMjAVrzZEWRNsK0VcN/JtptzJj9VLOuYL+u6dWrTSMVF6o5
+ ODeFTB+tZVDitFsKpklngR+mZH6llGZTyn9+/lkCizHIbcJcb7cevDHi1yS7zjLGsdKj
+ uftPvM0YhF+hzkhK/mcusHdHYbrda/uAJnUDq/0vLiQKnN5CWthqiKkN5KQWmClNq7vi
+ UuLj50qG0u/hDCJ8osJVWcmogACvgmGCxptCZXQzxsPvU9S5xS259jw5P/f3L1PtI8jv
+ bSTil8tjsnsLVPbOvOkzNmbA0VJSa6vxxjPl1k0gwqQODnqexmpuyepOyhj27m6Qc/QD
+ 95uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Qhcuo79NLFtebnSynStGf6/lRydyScOyIyWBjxOApRM=;
+ b=Cow39+CzUI+oX562bbSAF7Fn/mK1SjhAlQnmNVviHuovCzlJMtjft+FNP6QGan+Y5X
+ /YNszlmUn1QMTF99ZxncLYgY2yIPN2BK7aaBrwGH4Lf5zeXECB55vMtHtxElqVl0zbaZ
+ Ppbz/SdOlRxeG2xaPSWQRYVRKJL/tVrlRDDXrIWV7U0NAkYkT9E8K7yXXxhFp9hxr4eA
+ TM8lJwc4zKzEt+RCVC/wMom3Q6UbL+se+jDeIpht2qo6JVackqt+eSYYb5u95dwwOV8o
+ JB+1XE1oNWdurlVRrBOKg16Sgh0kO2ASWr6gVihx3pf7nfOhYdbvIu2FNkkbB2U0DfDx
+ naGA==
+X-Gm-Message-State: AOAM5318RgZSq9P6s4KaiOA80j4zGszCXLS9E1LaaY17lOvVk/8jpMF8
+ EV+MLa6R9ivdeGf3s1KBQVL+w5N3YunQGQPzC7nc5Q==
+X-Google-Smtp-Source: ABdhPJzp/X4gA1ti4XgZG0Uvvoii/qhKRWMA6ycoFU1njFfNK/ca2XEVtUpcV/qHehiJ7LXTlKeYtRUZntoS8fHYKJQ=
+X-Received: by 2002:ab0:e17:: with SMTP id g23mr6215458uak.31.1590048621583;
+ Thu, 21 May 2020 01:10:21 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 00:43:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
+ <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
+ <20200514125220.GJ2787@work-vm>
+ <CAHckoCyegWG9yH_y6VjHhnghfHJD-Wq+EmOyRZE3EYguTOHfPw@mail.gmail.com>
+ <20200514151600.GO2787@work-vm>
+ <CAHckoCxc2XTA3ckU0sq-BmbZZFtfAY_GaEOW46XFzfZ2qXjeMQ@mail.gmail.com>
+ <20200514153129.GP2787@work-vm>
+ <CAHckoCxOjNEAM4DwWtXS9JT_aPsqOtDAzf5zhhiRrDyAmQa00Q@mail.gmail.com>
+ <CAHckoCwee+aNHcgRFvReCCz_0J-vLrM5=MPZFpqvQjkefV2MiQ@mail.gmail.com>
+ <986fbf33-8127-870b-9163-4aa8d332553f@redhat.com>
+ <CAHckoCxw=j8+uXHD3tzQc4vGkRu-_xhcHn8sSeiKaSHw=Bt6mA@mail.gmail.com>
+ <7ecfb762-0359-92a4-d8b3-1a9e081ace92@redhat.com>
+ <CAHckoCwEt+citc5pQkJxhsWkLuqJa47A98YUYtMHd7epmx0esQ@mail.gmail.com>
+ <5902006b-655a-9208-796d-1af7b36da52c@redhat.com>
+ <CAHckoCyZmYXU8bz-3UAVXGi1MpdNdb20no1-kB09MoWOGPz_VA@mail.gmail.com>
+ <8ce60286-85a5-f338-c079-20e868da59dd@redhat.com>
+ <CAHckoCxFGTgPwTXvf6H4AeGDmDyy2dfQRtEHD51QojZpv-0E+Q@mail.gmail.com>
+ <c1a3a26b-7ce1-9be6-836e-cf5ff1f10a2c@redhat.com>
+In-Reply-To: <c1a3a26b-7ce1-9be6-836e-cf5ff1f10a2c@redhat.com>
+From: Li Feng <fengli@smartx.com>
+Date: Thu, 21 May 2020 16:10:10 +0800
+Message-ID: <CAHckoCwL38dd_b08cFB=dWaLqaQpD7nEVsDC=qOwE8_Qq4-XcQ@mail.gmail.com>
+Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
+ failed.
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: none client-ip=2607:f8b0:4864:20::935;
+ envelope-from=fengli@smartx.com; helo=mail-ua1-x935.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,87 +110,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: vkuznets@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 May 2020 15:19:50 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Paolo, Million thanks.
+I will try to dig into this code in my spare time.
 
-> Rename memory region and callbacks and ops to carry "evt" in the name
-> because a second region will be added shortly.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Thanks,
 
-Reviewed-by: Igor Mammedow <imammedo@redhat.com>
+Feng Li
 
-> ---
->  include/hw/acpi/generic_event_device.h |  2 +-
->  hw/acpi/generic_event_device.c         | 16 ++++++++--------
->  2 files changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/hw/acpi/generic_event_device.h
-> b/include/hw/acpi/generic_event_device.h index
-> 83917de02425..90a9180db572 100644 ---
-> a/include/hw/acpi/generic_event_device.h +++
-> b/include/hw/acpi/generic_event_device.h @@ -86,7 +86,7 @@
->  #define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
->  
->  typedef struct GEDState {
-> -    MemoryRegion io;
-> +    MemoryRegion evt;
->      uint32_t     sel;
->  } GEDState;
->  
-> diff --git a/hw/acpi/generic_event_device.c
-> b/hw/acpi/generic_event_device.c index b1cbdd86b66c..1cb34111e59a
-> 100644 --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -142,7 +142,7 @@ void build_ged_aml(Aml *table, const char *name,
-> HotplugHandler *hotplug_dev, }
->  
->  /* Memory read by the GED _EVT AML dynamic method */
-> -static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
-> +static uint64_t ged_evt_read(void *opaque, hwaddr addr, unsigned
-> size) {
->      uint64_t val = 0;
->      GEDState *ged_st = opaque;
-> @@ -161,14 +161,14 @@ static uint64_t ged_read(void *opaque, hwaddr
-> addr, unsigned size) }
->  
->  /* Nothing is expected to be written to the GED memory region */
-> -static void ged_write(void *opaque, hwaddr addr, uint64_t data,
-> -                      unsigned int size)
-> +static void ged_evt_write(void *opaque, hwaddr addr, uint64_t data,
-> +                          unsigned int size)
->  {
->  }
->  
-> -static const MemoryRegionOps ged_ops = {
-> -    .read = ged_read,
-> -    .write = ged_write,
-> +static const MemoryRegionOps ged_evt_ops = {
-> +    .read = ged_evt_read,
-> +    .write = ged_evt_write,
->      .endianness = DEVICE_LITTLE_ENDIAN,
->      .valid = {
->          .min_access_size = 4,
-> @@ -287,9 +287,9 @@ static void acpi_ged_initfn(Object *obj)
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      GEDState *ged_st = &s->ged_state;
->  
-> -    memory_region_init_io(&ged_st->io, obj, &ged_ops, ged_st,
-> +    memory_region_init_io(&ged_st->evt, obj, &ged_evt_ops, ged_st,
->                            TYPE_ACPI_GED, ACPI_GED_EVT_SEL_LEN);
-> -    sysbus_init_mmio(sbd, &ged_st->io);
-> +    sysbus_init_mmio(sbd, &ged_st->evt);
->  
->      sysbus_init_irq(sbd, &s->irq);
->  
-
+Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2020=E5=B9=B45=E6=9C=8820=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=886:27=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 20/05/20 12:15, Li Feng wrote:
+> > /root/qemu-master/x86_64-softmmu/qemu-system-x86_64 -enable-kvm
+> > -device virtio-balloon -cpu
+> > host,-vmx-exit-nosave-debugctl,-vmx-exit-ack-intr,-vmx-exit-save-pat,-v=
+mx-exit-load-pat,-vmx-exit-save-efer,-vmx-exit-load-efer,-vmx-exit-save-pre=
+emption-timer
+> > -smp 4 -m 2G -drive
+> > file=3D/root/html/fedora-10g.img,format=3Draw,cache=3Dnone,aio=3Dnative=
+,if=3Dnone,id=3Ddrive-virtio-disk1
+> > -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dvirti=
+o-disk1,bootindex=3D1
+> > -device virtio-net,netdev=3Dnw1,mac=3D00:11:22:EE:EE:10 -netdev
+> > tap,id=3Dnw1,script=3Dno,downscript=3Dno,ifname=3Dtap0 -serial mon:stdi=
+o
+> > -nographic -object
+> > memory-backend-file,id=3Dmem0,size=3D2G,mem-path=3D/dev/hugepages,share=
+=3Don
+> > -numa node,memdev=3Dmem0 -vnc 0.0.0.0:100 -machine usb=3Don,nvdimm -dev=
+ice
+> > usb-tablet -monitor tcp:0.0.0.0:1234,server,nowait -qmp
+> > tcp:0.0.0.0:2234,server,nowait -device
+> > virtio-serial-pci,id=3Dvirtio-serial0,max_ports=3D16 -chardev
+> > socket,id=3Dchannel1,path=3D/tmp/helloworld1,server,nowait -device
+> > virtserialport,chardev=3Dchannel1,name=3Dcom.redhat.rhevm.vdsm1,bus=3Dv=
+irtio-serial0.0,id=3Dport1
+> >
+> > The CentOS version(qemu-kvm-ev-2.12.0-33.1.el7) works well on my VM.
+> > So I guess this is an issue in the upstream master codebase.
+>
+> I don't know, it's really weird that KVM rejects bit 9.  It should be
+> fine as long as KVM_SET_CPUID2 is called before kvm_init_msrs (which is
+> true, it's some 30 lines earlier in kvm_arch_init_vcpu).
+>
+> Thanks,
+>
+> Paolo
+>
 
