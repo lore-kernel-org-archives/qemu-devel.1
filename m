@@ -2,88 +2,86 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CBAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EBDC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:50:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C47BF207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F17E20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:50:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbmX0639"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47BF207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SlQZLiB4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F17E20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnRe-0005HQ-14
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:49:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43276)
+	id 1jbnSO-0008HN-Fp
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:50:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jbnQy-0002yX-It
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:48:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23341
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jbnQx-0001x9-3P
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:48:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590076113;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=zBH8atWFDlPPOx7CdZcY6nT/3fT0D+F9IB0HdGBJsBU=;
- b=MbmX0639Y6r4i4cSaUgVm6NF71w8wMWjhePtqCu/PB2tnZAMqnMv5rNRd4DQnqeJ4F6FQI
- GalKvXFu21qCtqVDNt7LldEPDl+mfluriUHX6h6jffnL5dmn9um3mNvRDttxVm0TQnRCEG
- Gze5reUugfcfaa9hC1VnviJ1k4uD9Kc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-xjRZlXfoMmyOOKY3hPeeqg-1; Thu, 21 May 2020 11:48:20 -0400
-X-MC-Unique: xjRZlXfoMmyOOKY3hPeeqg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C04C78018A5;
- Thu, 21 May 2020 15:48:19 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B0ED90068;
- Thu, 21 May 2020 15:48:09 +0000 (UTC)
-Date: Thu, 21 May 2020 16:48:06 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v2 1/4] Introduce yank feature
-Message-ID: <20200521154806.GI2211791@redhat.com>
-References: <cover.1590008051.git.lukasstraub2@web.de>
- <20005a15c708fbda983f9be602c55fc0b1979a18.1590008051.git.lukasstraub2@web.de>
- <20200521150335.GO251811@stefanha-x1.localdomain>
- <20200521174241.3b0a267f@luklap>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbnOP-0006qx-Lk
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:46:01 -0400
+Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:42143)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jbnON-0001Ob-RH
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:45:57 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id a83so1526469oob.9
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 08:45:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8h1ZPoBxJvuQvx2ziXpdx/NQiUgWmqZ1hoQbkwoXnSQ=;
+ b=SlQZLiB4OFUSMtrURCnULNta22198oi+Z5RQAyBqo38LQk9Wha8N10/YPkuBWPYcSV
+ v0dSGU9HBPNNIrm+eyaZTbxOTlAN/5UVuXo/cRYgucmP/HGV5nChW+Q00R9WpbIoCX6x
+ PnDtVFdl4tD0EDId0iZ4Y8lp9MVazgA3g1/JGyZzN5QoT2KYF2uaj3bXRr4B5IhSI9Ix
+ A+ZRl1caqAKOoRzSsN2cMlYXlQA5F+VlGNFj5+2ufUKqgS/NXx0aew8IzlZBikCPtrD5
+ bMgxLoeMq5bcK8G35nZBb9ubrSzNanS+gwpQBB9ZWi77//UAfqBJZd82VOxRt5ykYr9O
+ 2Ozg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8h1ZPoBxJvuQvx2ziXpdx/NQiUgWmqZ1hoQbkwoXnSQ=;
+ b=PBNsr5Yk9Uhrgq8BUviLMvEm1ihnTZRyD0T6Rm2QwGnlflkyyEfXBiWgX7kTRv1LU4
+ bLP4peQ/8ihNnVkCNCZ5q9Oh+8TRW8OzWJST9LN+fkkuBN7u92L1bnca8Iu4fxaa3ETH
+ E94yPggqLR8e0tzbWOjIiRIJ9sMGm1RFOicXLN/SqWbS3oUspzYetBKPV7iNpUwBXOex
+ G01qiQDLTEAZLswz/pb2e7P5w0lN1sh/gG1jUl1D5A1m+/QtFN81CIVv/h6aCenFsX82
+ HUaFTkjE1CpHBvbU+Od29lFYFijDS2ktTHP+aVgFycpQoANb8lt5uUmrV37T2AEv2KYU
+ JTBw==
+X-Gm-Message-State: AOAM530dGfZDacWnf+K+HuI+fen9Gx1x8WIJruUMQcgcSKe93/3NSHy8
+ d2hwBxXiSloHN8IUhmR5ghMuitMbcMSLEtvN61WY6A==
+X-Google-Smtp-Source: ABdhPJw5xr8eYxO7RpfOFZCX1bJlGCyf6NovnXN5CNJ3JraeuvE/zpszL7WYd8lUI2xweMQ38hKNv6LHhQvcl3d9SF0=
+X-Received: by 2002:a4a:8253:: with SMTP id t19mr7809624oog.69.1590075954348; 
+ Thu, 21 May 2020 08:45:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200521174241.3b0a267f@luklap>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+References: <20200518155308.15851-1-f4bug@amsat.org>
+ <20200518155308.15851-7-f4bug@amsat.org>
+ <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
+ <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
+In-Reply-To: <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 May 2020 16:45:43 +0100
+Message-ID: <CAFEAcA_WOEeV53yr7SmWqyOnbfWYg3COr-C+mjaCuAPw=refcQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 6/7] accel/kvm: Let KVM_EXIT_MMIO return error
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,98 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 05:42:41PM +0200, Lukas Straub wrote:
-> On Thu, 21 May 2020 16:03:35 +0100
-> Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> 
-> > On Wed, May 20, 2020 at 11:05:39PM +0200, Lukas Straub wrote:
-> > > +void yank_generic_iochannel(void *opaque)
-> > > +{
-> > > +    QIOChannel *ioc = QIO_CHANNEL(opaque);
-> > > +
-> > > +    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-> > > +}
-> > > +
-> > > +void qmp_yank(strList *instances, Error **errp)
-> > > +{
-> > > +    strList *tmp;
-> > > +    struct YankInstance *instance;
-> > > +    struct YankFuncAndParam *entry;
-> > > +
-> > > +    qemu_mutex_lock(&lock);
-> > > +    tmp = instances;
-> > > +    for (; tmp; tmp = tmp->next) {
-> > > +        instance = yank_find_instance(tmp->value);
-> > > +        if (!instance) {
-> > > +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> > > +                      "Instance '%s' not found", tmp->value);
-> > > +            qemu_mutex_unlock(&lock);
-> > > +            return;
-> > > +        }
-> > > +    }
-> > > +    tmp = instances;
-> > > +    for (; tmp; tmp = tmp->next) {
-> > > +        instance = yank_find_instance(tmp->value);
-> > > +        assert(instance);
-> > > +        QLIST_FOREACH(entry, &instance->yankfns, next) {
-> > > +            entry->func(entry->opaque);
-> > > +        }
-> > > +    }
-> > > +    qemu_mutex_unlock(&lock);
-> > > +}  
-> > 
-> > From docs/devel/qapi-code-gen.txt:
-> > 
-> >   An OOB-capable command handler must satisfy the following conditions:
-> > 
-> >   - It terminates quickly.
-> Check.
-> 
-> >   - It does not invoke system calls that may block.
-> brk/sbrk (malloc and friends):
-> The manpage doesn't say anything about blocking, but malloc is already used while handling the qmp command.
-> 
-> shutdown():
-> The manpage doesn't say anything about blocking, but this is already used in migration oob qmp commands.
+On Thu, 21 May 2020 at 16:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 18/05/20 18:01, Peter Maydell wrote:
+> > The "right" answer is that the kernel should enhance the KVM_EXIT_MMIO
+> > API to allow userspace to say "sorry, you got a bus error on that
+> > memory access the guest just tried" (which the kernel then has to
+> > turn into an appropriate guest exception, or ignore, depending on
+> > what the architecture requires.) You don't want to set ret to
+> > non-zero here, because that will cause us to VM_STOP, and I
+> > suspect that x86 at least is relying on the implict RAZ/WI
+> > behaviour it currently gets.
+>
+> Yes, it is.  It may even be already possible to inject the right
+> exception (on ARM) through KVM_SET_VCPU_EVENTS or something like that, too.
 
-It just marks the socket state in local kernel side. It doesn't involve
-any blocking roundtrips over the wire, so this is fine.
+Yeah, in theory we could deliver an exception from userspace
+by updating all the register state, but I think the kernel really
+ought to do it both (a) because it's just a neater API to do it
+that way round and (b) because the kernel is the one that has
+the info about the faulting insn that it might need for things
+like setting up a syndrome register value.
 
-> 
-> There are no other syscalls involved to my knowledge.
-> 
-> >   - It does not access guest RAM that may block when userfaultfd is
-> >     enabled for postcopy live migration.
-> Check.
-> 
-> >   - It takes only "fast" locks, i.e. all critical sections protected by
-> >     any lock it takes also satisfy the conditions for OOB command
-> >     handler code.
-> 
-> The lock in yank.c satisfies this requirement.
-> 
-> qio_channel_shutdown doesn't take any locks.
-
-Agreed, I think the yank code is compliant with all the points
-listed above.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
