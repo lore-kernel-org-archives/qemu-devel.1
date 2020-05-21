@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDF4C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:23:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E91C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:24:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C922072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:23:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A40702072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:24:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D7TRfDNX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C922072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="veO3K/vj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40702072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbouW-0002aF-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:23:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50266)
+	id 1jbow6-0006zR-QF
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:24:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJS-00053q-4f
+ id 1jboJS-000569-V8
  for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:54 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:36690)
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:39771)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJQ-0006zm-99
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:53 -0400
-Received: by mail-qt1-x843.google.com with SMTP id v4so6015721qte.3
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:51 -0700 (PDT)
+ id 1jboJR-0006zw-Ra
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:54 -0400
+Received: by mail-qt1-x841.google.com with SMTP id l1so5989489qtp.6
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PofzzyIN8ZoMX3VcbhKeSDmt2Z4USbgC222e6DzhLWQ=;
- b=D7TRfDNXXyAbBnWHO/BW6jNN13ajx8i1EgERkdVyXr7GHH7kmYc0qcFfaEv5z90mzQ
- wuvWFcuTFMYe71jc8dK6Y2eoiVzeROO9SJ9UUrEn+f3GWXJtoDS2vX35PSfUxnt5pjqj
- mN+dngBfIAC/cBXTS6iZr4GQwqmbZtdKo4nCDSs0SFAXFIwu2016qImQ/07+1jtxPI8Z
- d3ADahoV8cHN5EuQ/AODEBRx1+bgj3hHTM7JXBwTn428UCS2ubzjGjZg1vUHrNnoCpkT
- iTwapSBkDSCLFB9eswwIDfEMcKt6soQndSmfdQSUjpSLNSZwFz1S4760QCUkkhgHpv2J
- fosA==
+ bh=GxlpAA+PZ/IrNPvmGjLlDG9tH8eZcMlAHM/CkfDCuY4=;
+ b=veO3K/vjcVpuQ+C+yQY2XAkmnfKBO7Fk/QZ6Uq7Ad74lHb6rjDuwWx3jbsLltck3Ef
+ IuVf0lyi1gbyPazl0nzvdZFR0CAFpcRet/R1ApaXwdbTLb2bpwAStPS5/A7pAx+H6YeW
+ 8KvyhX3H7cg5fO6ntD2B1rV3hf2ge+s6hXr+dhcEAojlBHDwsNtGlsrqvNM5foLRsLhL
+ dmjV0jN701NWNAdQA8B9Ys1P0vio0BgTBYyFr5p0XSNi6b0RbScbN1ct+Gq1HSfjSAfU
+ MYxcLwRMpegzOBs0kBOFbE9dLQ/dYAXjM12bfNK0fFAFxM4xngkSobQHZGyxRP+vniFy
+ gaaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PofzzyIN8ZoMX3VcbhKeSDmt2Z4USbgC222e6DzhLWQ=;
- b=LzEeLx75ILLDLVcF/5JjIzNMJnmKM3udi1zMIwTcOi6vzaeyJrz2p9jOk0BTm5HZwA
- 2eKISy2cGBVAWlkgQiqoOm6W1UQCTryS7re9wiYuSIGfzIlOctNwrhhyNZ9nEHy7rlhI
- pSzsMPlmDLTXmutfEsBnu6f+WgPZMUkbBF/kG6A0lhbAi3GOgGP7wG0u75EOMjkLQI54
- dArk9YyoKnwC8BGZY7/99eFra1QlPDsUVLRYeO57HK6qLRRFyjB0vsTbiPmcYtc2P9eH
- 9PV5OKpuBJnz3iVY4HswY5IOKCmn6uSDcVCaYJfB7cs/UG8HbuXaEKyRjhOkQroWqZz6
- HRyQ==
-X-Gm-Message-State: AOAM531+4Prox6WkOvjhxFcgSYZmPn87ykTZDK9R5KWI7SK4yUtYa052
- 0WjMWYJA0fvXQz7xZIPw6NnVZMR2yj+mZQ==
-X-Google-Smtp-Source: ABdhPJx3PBSSY/7rEerhpOl51AZ6/Gz54wzFVddOmzO2JQv5TK1tTCuB4g454I66N4X7v6gG/JbQHw==
-X-Received: by 2002:ac8:6c54:: with SMTP id z20mr11450617qtu.76.1590079491175; 
- Thu, 21 May 2020 09:44:51 -0700 (PDT)
+ bh=GxlpAA+PZ/IrNPvmGjLlDG9tH8eZcMlAHM/CkfDCuY4=;
+ b=SNdGzfjV3CyPgu+cu6T5kOzHhj7k103pF7XsWdrmgd3fZWKu1mb9Qththmt4SEGLXj
+ 4rCjwqE7t5BRdlHy4BQN2RBzTzat2Q9JXORD1I6VSuRAk+z0l+seem7jEMx2eNVqMNFd
+ epOSLMhxMNVZNN+tmqkWc/Jn0rCzoEYJpYEN2hSpKC0vvPNran2ls96v9wvz0B6OwG+M
+ kR/5jB7bWAqN6ssTkK4EsAs9Q8rwHW/9OiAKq9dUlY4JmJQRXybDPFIAmVyZIuuwuV8g
+ Fet8c1tCgu9+hcBy0mfUkSlhrIPSuT2iie3ypay/pQ6tOhWpc+e8ounZa4LLasyY8pHR
+ wiIw==
+X-Gm-Message-State: AOAM532QymB8PiqrWuz6KJNizrnUI4oUolaYxI0TxM8dtmpuTUGOqsIw
+ vmuuxtbAaKokrs0sEGbQoABCLz0vEarIug==
+X-Google-Smtp-Source: ABdhPJypdGKUc8YKxGycEvbQX/1ExOqOFr03PfU8cnNsFj1yxnihx20FzBrsV/KPceK0sFFuIisTIg==
+X-Received: by 2002:aed:35a1:: with SMTP id c30mr11738669qte.228.1590079492546; 
+ Thu, 21 May 2020 09:44:52 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.49
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:50 -0700 (PDT)
+ Thu, 21 May 2020 09:44:51 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 72/74] cpus-common: release BQL earlier in run_on_cpu
-Date: Thu, 21 May 2020 12:40:09 -0400
-Message-Id: <20200521164011.638-73-robert.foley@linaro.org>
+Subject: [PATCH v9 73/74] cpu: add async_run_on_cpu_no_bql
+Date: Thu, 21 May 2020 12:40:10 -0400
+Message-Id: <20200521164011.638-74-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::843;
- envelope-from=robert.foley@linaro.org; helo=mail-qt1-x843.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::841;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x841.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,55 +109,131 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-After completing the conversion to per-CPU locks, there is no need
-to release the BQL after having called cpu_kick.
+Some async jobs do not need the BQL.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- cpus-common.c | 20 +++++---------------
- 1 file changed, 5 insertions(+), 15 deletions(-)
+ cpus-common.c         | 39 ++++++++++++++++++++++++++++++++++-----
+ include/hw/core/cpu.h | 14 ++++++++++++++
+ 2 files changed, 48 insertions(+), 5 deletions(-)
 
 diff --git a/cpus-common.c b/cpus-common.c
-index d418eb5aef..7ccc7df876 100644
+index 7ccc7df876..651f9b31cc 100644
 --- a/cpus-common.c
 +++ b/cpus-common.c
-@@ -135,6 +135,11 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-         return;
-     }
+@@ -99,6 +99,7 @@ struct qemu_work_item {
+     run_on_cpu_func func;
+     run_on_cpu_data data;
+     bool free, exclusive, done;
++    bool bql;
+ };
  
-+    /* We are going to sleep on the CPU lock, so release the BQL */
-+    if (has_bql) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-     wi.func = func;
-     wi.data = data;
+ /* Called with the CPU's lock held */
+@@ -145,6 +146,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
      wi.done = false;
-@@ -143,21 +148,6 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+     wi.free = false;
+     wi.exclusive = false;
++    wi.bql = true;
  
      cpu_mutex_lock(cpu);
      queue_work_on_cpu_locked(cpu, &wi);
--
--    /*
--     * We are going to sleep on the CPU lock, so release the BQL.
--     *
--     * During the transition to per-CPU locks, we release the BQL _after_
--     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
--     * This makes sure that the enqueued work will be seen by the CPU
--     * after being woken up from the kick, since the CPU sleeps on the BQL.
--     * Once we complete the transition to per-CPU locks, we will release
--     * the BQL earlier in this function.
--     */
--    if (has_bql) {
--        qemu_mutex_unlock_iothread();
--    }
--
-     while (!atomic_mb_read(&wi.done)) {
-         CPUState *self_cpu = current_cpu;
+@@ -169,6 +171,21 @@ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+     wi->func = func;
+     wi->data = data;
+     wi->free = true;
++    wi->bql = true;
++
++    queue_work_on_cpu(cpu, wi);
++}
++
++void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
++                             run_on_cpu_data data)
++{
++    struct qemu_work_item *wi;
++
++    wi = g_malloc0(sizeof(struct qemu_work_item));
++    wi->func = func;
++    wi->data = data;
++    wi->free = true;
++    /* wi->bql initialized to false */
  
+     queue_work_on_cpu(cpu, wi);
+ }
+@@ -315,6 +332,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+     wi->data = data;
+     wi->free = true;
+     wi->exclusive = true;
++    /* wi->bql initialized to false */
+ 
+     queue_work_on_cpu(cpu, wi);
+ }
+@@ -339,6 +357,7 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
+              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
+              * neither CPU can proceed.
+              */
++            g_assert(!wi->bql);
+             if (has_bql) {
+                 qemu_mutex_unlock_iothread();
+             }
+@@ -349,12 +368,22 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
+                 qemu_mutex_lock_iothread();
+             }
+         } else {
+-            if (has_bql) {
+-                wi->func(cpu, wi->data);
++            if (wi->bql) {
++                if (has_bql) {
++                    wi->func(cpu, wi->data);
++                } else {
++                    qemu_mutex_lock_iothread();
++                    wi->func(cpu, wi->data);
++                    qemu_mutex_unlock_iothread();
++                }
+             } else {
+-                qemu_mutex_lock_iothread();
+-                wi->func(cpu, wi->data);
+-                qemu_mutex_unlock_iothread();
++                if (has_bql) {
++                    qemu_mutex_unlock_iothread();
++                    wi->func(cpu, wi->data);
++                    qemu_mutex_lock_iothread();
++                } else {
++                    wi->func(cpu, wi->data);
++                }
+             }
+         }
+         cpu_mutex_lock(cpu);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 8478628fdb..b061618666 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -889,9 +889,23 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+  * @data: Data to pass to the function.
+  *
+  * Schedules the function @func for execution on the vCPU @cpu asynchronously.
++ * See also: async_run_on_cpu_no_bql()
+  */
+ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+ 
++/**
++ * async_run_on_cpu_no_bql:
++ * @cpu: The vCPU to run on.
++ * @func: The function to be executed.
++ * @data: Data to pass to the function.
++ *
++ * Schedules the function @func for execution on the vCPU @cpu asynchronously.
++ * This function is run outside the BQL.
++ * See also: async_run_on_cpu()
++ */
++void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
++                             run_on_cpu_data data);
++
+ /**
+  * async_safe_run_on_cpu:
+  * @cpu: The vCPU to run on.
 -- 
 2.17.1
 
