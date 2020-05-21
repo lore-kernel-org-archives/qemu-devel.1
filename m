@@ -7,80 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3E0C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0EFC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AE7E20759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D06A20759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DAhu+KMm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AE7E20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gyGnLVoc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D06A20759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbojv-0003QP-Hq
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:12:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50124)
+	id 1jbokD-0003zY-Es
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:12:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJ6-0004L8-GB
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:32 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:40821)
+ id 1jboIx-0004CU-Mn
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:23 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:33294)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJ5-0006hd-FA
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:32 -0400
-Received: by mail-qk1-x741.google.com with SMTP id g185so7847863qke.7
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:30 -0700 (PDT)
+ id 1jboIw-0006f2-RX
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:23 -0400
+Received: by mail-qk1-x744.google.com with SMTP id z80so7920000qka.0
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cWfP+0MUzrrNImWYZpz2KO/NSgj5qKMFSKUqs77s2xU=;
- b=DAhu+KMmtFGINUOHDZ4Q4aM3giQponNsqp92LFUNsEYUuNFf9gOFBt/bz07NCt6YW/
- ++Qx/BgVOiQ/lqFc69hWm+EIOvTLO6+IFspteIoJR0OCROpruA1x8l1qAY19hJA6aY+b
- dEPTYRWOcXc1C3kCLZEbv45/vHzjC/DO5vIU+uRZeEVZsj/xyOIcbezLbwfsOCCHQDBn
- HscOo0j7SNsaQwg5nrEqagLHhTLdVmZLBSTPcIgHEbREvU9mYeM87qf4TnjmGpQdYmLn
- 2T3sEuzAhX/+SlZ/SGgblnWO0YdzufuSplf4AJ5bs/CEbMVFZf1rzcqHpAjaQG6sAdw1
- Aukg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=lvs+qOX6bs/iZi7N2ZR8e7cxDlqBQWqbjCB2CJTYkPk=;
+ b=gyGnLVocNsqusg7aysasSPmEq8EbrQoPhaHALMkIrdkI+AvNly4pE78i1Bu1PYCNVD
+ qlwnYH/llKom/fosGdp5qKqr4tG0Bvu1HorIXbHU2OdqMzKE/yMgU5yaAnJSKCNVmlPX
+ JUCtdVcIqLC2ZHA2WjvAYgz6FO+Fxyu8aeBBJCJUnZpS4FTYGucfwybRYqvDR44cPSt3
+ Fj99KATnODezSf+3PzcfC4DGqJY0aNyxit2B8gGq8iLoYOwWxJ524ZAV2stAqCYd5IAN
+ NQ+ORLLPWNthNBYWAEEro2JtgzfmEPJWdkM6k9/P/T4XDJIk+bRtVv0VtXMmBCozn0i/
+ 8xnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cWfP+0MUzrrNImWYZpz2KO/NSgj5qKMFSKUqs77s2xU=;
- b=qK44mAZmmT9fa0tAfzpTJq7tV1x0bfeZG5bOVoae2DCho99/g6FZ6eNNQVU4tEkJOr
- rh+Wjei4jw+pNyW812GvWtEUhaTJQHapIQobNYttb9fAb0WWWP5uEUsWodeRr4nGGXI8
- qvHBcZSow7dWaC0GsPa8U6zrMS5jMAsj59LvF7iS/oRJB1X5+Sbcf2YK/QRVGN7wEGO5
- 6TRc/6ntq9ALJx3O4KZ5pBCcJqIF1rtCkOb2jNPQ3DCna+zJ/PmTInoYkguq4qoAjTOX
- qejrXlnBqP7xrGxEI4XS8vcc3L0Olz8wVmxsUdvMa+yg9HohdiJe1DnDorXen6VnGnIn
- 6jcg==
-X-Gm-Message-State: AOAM53089VQzdrBctFISjoRDA7a6gakVuxZihUIrmxCwSRw9zL0cg25H
- ucdGNfVsjWnFmRdoD9cOVTPf4Qz0cDWuyQ==
-X-Google-Smtp-Source: ABdhPJzlQUpsoiL3MmVIR2NRHmaDBT2W71HWdond+YZy0Nm0+xGd6FV/8Z8c4PD3YheznV8IVdFvBA==
-X-Received: by 2002:a05:620a:634:: with SMTP id
- 20mr10172139qkv.15.1590079470076; 
- Thu, 21 May 2020 09:44:30 -0700 (PDT)
+ :references;
+ bh=lvs+qOX6bs/iZi7N2ZR8e7cxDlqBQWqbjCB2CJTYkPk=;
+ b=Dp5P22OouW/LEkMvxv2MD5TtNOAo+7B3wGoeAtE2ayY+5kegQRlO96Qw2isNCgyr6J
+ A9J4oNnGIZsoBBMhWULW3ktK1LSvfHhuuh2TOMWe/PpGf7T39RjcpWU+8Mnicp/cet/z
+ fGji7ywHe11pGePQRMRP6Q21x3M3x4AmxHr3XFwpFt5guu55i9d529oIafS6JX8EWw67
+ VY2egJkbqd/VkXJVa9Zuhb75+rEF6c0ykfJ7HmpX1ltdO7bANU8zn/Jhr/1PLfqidEDd
+ KXbm6MLedDLVVzREy8ynjoP8kBADaAQ+LLlFZo4kdz+7mm0jAvDl+YtyFvJKjHaVimZK
+ Iujw==
+X-Gm-Message-State: AOAM532vLt9h4dR1VJ9h2W3XmpJZGfnFyfZLTSA0HSwvrkFx8RvLF4yR
+ jC4RwhPLqlBkMLM/wLAz/jRNNAsupF1l1g==
+X-Google-Smtp-Source: ABdhPJxCRsKEYiJ3IXN2Q52UA5s5EvSSEwU90+lzihNA4bvHZNdyuNl2InPb3URfRHRSpFG/HqrcAw==
+X-Received: by 2002:a37:6fc3:: with SMTP id k186mr7872318qkc.419.1590079461789; 
+ Thu, 21 May 2020 09:44:21 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.28
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:28 -0700 (PDT)
+ Thu, 21 May 2020 09:44:21 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 56/74] sparc: convert to cpu_interrupt_request
-Date: Thu, 21 May 2020 12:39:53 -0400
-Message-Id: <20200521164011.638-57-robert.foley@linaro.org>
+Subject: [PATCH v9 50/74] m68k: convert to cpu_interrupt_request
+Date: Thu, 21 May 2020 12:39:47 -0400
+Message-Id: <20200521164011.638-51-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x741.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x744.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,61 +97,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, richard.henderson@linaro.org, cota@braap.org,
- peter.puhov@linaro.org, alex.bennee@linaro.org,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/sparc64/sparc64.c | 4 ++--
- target/sparc/cpu.c   | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ target/m68k/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index fe9c678459..191ebfbb93 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -57,7 +57,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-     /* The bit corresponding to psrpil is (1<< psrpil), the next bit
-        is (2 << psrpil). */
-     if (pil < (2 << env->psrpil)) {
--        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-             trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
-             env->interrupt_index = 0;
-             cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-@@ -88,7 +88,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-                 break;
-             }
-         }
--    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-+    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
-         trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
-                                               env->interrupt_index);
-         env->interrupt_index = 0;
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 3f05aba9d6..cef25238a5 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -704,7 +704,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 72c545149e..f2585154f5 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -33,7 +33,7 @@ static void m68k_cpu_set_pc(CPUState *cs, vaddr value)
  
--    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-            cpu_interrupts_enabled(env);
+ static bool m68k_cpu_has_work(CPUState *cs)
+ {
+-    return cs->interrupt_request & CPU_INTERRUPT_HARD;
++    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
  }
  
+ static void m68k_set_feature(CPUM68KState *env, int feature)
 -- 
 2.17.1
 
