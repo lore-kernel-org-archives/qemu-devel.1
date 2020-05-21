@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD88C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CAE6C433E0
 	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1967A20823
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:56:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1967A20823
+	by mail.kernel.org (Postfix) with ESMTPS id E27D820738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 19:56:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E27D820738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbrJ0-00075U-9q
+	id 1jbrIz-00075r-Tc
 	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 15:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41994)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jbrGR-0002Dq-0m
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:53:59 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:57736)
+ id 1jbrGP-0002DV-JZ
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:53:57 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:57735)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jbrGQ-0007c1-5P
- for qemu-devel@nongnu.org; Thu, 21 May 2020 15:53:58 -0400
+ id 1jbrGO-0007bm-Q8
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 15:53:57 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 057E7748DDC;
+ by localhost (Postfix) with SMTP id 06F73748DDD;
  Thu, 21 May 2020 21:53:44 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 7027C748DCB; Thu, 21 May 2020 21:53:43 +0200 (CEST)
-Message-Id: <1392cad2ad1315a5a50409970e0af061821462e6.1590089984.git.balaton@eik.bme.hu>
+ id 69C16748DCF; Thu, 21 May 2020 21:53:43 +0200 (CEST)
+Message-Id: <7946852258d528497e85f465327fc90b5c3b59fb.1590089984.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1590089984.git.balaton@eik.bme.hu>
 References: <cover.1590089984.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v2 7/7] sm501: Remove obsolete changelog and todo comment
+Subject: [PATCH v2 6/7] sm501: Optimize small overlapping blits
 Date: Thu, 21 May 2020 21:39:44 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,51 +75,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also update copyright year for latest changes
+AmigaOS tends to do a lot of small blits (even 1 pixel). Avoid malloc
+overhead by keeping around a buffer for this and only alloc when
+blitting larger areas.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/display/sm501.c | 19 +------------------
- 1 file changed, 1 insertion(+), 18 deletions(-)
+ hw/display/sm501.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index e7a9f77de7..edd8d24a76 100644
+index 8bf4d111f4..e7a9f77de7 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -2,7 +2,7 @@
-  * QEMU SM501 Device
-  *
-  * Copyright (c) 2008 Shin-ichiro KAWASAKI
-- * Copyright (c) 2016 BALATON Zoltan
-+ * Copyright (c) 2016-2020 BALATON Zoltan
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -40,23 +40,6 @@
- #include "ui/pixel_ops.h"
- #include "qemu/bswap.h"
- 
--/*
-- * Status: 2010/05/07
-- *   - Minimum implementation for Linux console : mmio regs and CRT layer.
-- *   - 2D graphics acceleration partially supported : only fill rectangle.
-- *
-- * Status: 2016/12/04
-- *   - Misc fixes: endianness, hardware cursor
-- *   - Panel support
-- *
-- * TODO:
-- *   - Touch panel support
-- *   - USB support
-- *   - UART support
-- *   - More 2D graphics engine support
-- *   - Performance tuning
-- */
--
- /*#define DEBUG_SM501*/
- /*#define DEBUG_BITBLT*/
- 
+@@ -750,6 +750,7 @@ static void sm501_2d_operation(SM501State *s)
+     switch (cmd) {
+     case 0: /* BitBlt */
+     {
++        static uint32_t tmp_buf[16384];
+         unsigned int src_x = (s->twoD_source >> 16) & 0x01FFF;
+         unsigned int src_y = s->twoD_source & 0xFFFF;
+         uint32_t src_base = s->twoD_source_base & 0x03FFFFFF;
+@@ -812,10 +813,14 @@ static void sm501_2d_operation(SM501State *s)
+             de = db + width + height * (width + dst_pitch);
+             if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+                 /* regions may overlap: copy via temporary */
+-                int llb = width * (1 << format);
++                int free_buf = 0, llb = width * (1 << format);
+                 int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
+-                uint32_t *tmp = g_malloc(tmp_stride * sizeof(uint32_t) *
+-                                         height);
++                uint32_t *tmp = tmp_buf;
++
++                if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
++                    tmp = g_malloc(tmp_stride * sizeof(uint32_t) * height);
++                    free_buf = 1;
++                }
+                 pixman_blt((uint32_t *)&s->local_mem[src_base], tmp,
+                            src_pitch * (1 << format) / sizeof(uint32_t),
+                            tmp_stride, 8 * (1 << format), 8 * (1 << format),
+@@ -825,7 +830,9 @@ static void sm501_2d_operation(SM501State *s)
+                            dst_pitch * (1 << format) / sizeof(uint32_t),
+                            8 * (1 << format), 8 * (1 << format),
+                            0, 0, dst_x, dst_y, width, height);
+-                g_free(tmp);
++                if (free_buf) {
++                    g_free(tmp);
++                }
+             } else {
+                 pixman_blt((uint32_t *)&s->local_mem[src_base],
+                            (uint32_t *)&s->local_mem[dst_base],
 -- 
 2.21.3
 
