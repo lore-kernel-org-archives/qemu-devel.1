@@ -2,69 +2,74 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA14C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6004C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:19:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6154420748
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:15:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IdFeghp7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6154420748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 84AFD20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:19:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84AFD20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbdXt-000204-Fv
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32788)
+	id 1jbdcB-0004z6-LD
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:19:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbdXD-0000yf-EA; Thu, 21 May 2020 01:14:23 -0400
-Received: from ozlabs.org ([203.11.71.1]:51605)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jbdbY-0004Yv-7o
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:18:52 -0400
+Received: from mga05.intel.com ([192.55.52.43]:28125)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbdXB-0003Gj-LI; Thu, 21 May 2020 01:14:23 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49SHpw4vZBz9sTC; Thu, 21 May 2020 15:14:16 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1590038056;
- bh=HlpPo307BgyGZ1fDfIK9tCCEldKEwCvd1Wje0PtzBCs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=IdFeghp7A0Lz6rqCGKdbiPKKaWktbRz/A6iGNRsznSLSa/KXTWn7jFlx8syLIrCeR
- q9+ee/ShhkZ6M1exAK55KrsKv1QhyLfpnrw1oE0CnzYiIGlXYRV76GlswtdZuS4XVr
- BtPBNfUoCvblbvptNQuHIFuvtLRPkZ63v7f5pfAM=
-Date: Thu, 21 May 2020 15:12:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 1/2] spapr: Add associativity reference point count to
- machine info
-Message-ID: <20200521051249.GF63349@umbus.fritz.box>
-References: <20200518214418.18248-1-arbab@linux.ibm.com>
- <20200521013437.5da898fb@bahia.lan>
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jbdbV-0004CZ-Dl
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:18:51 -0400
+IronPort-SDR: lIhUhNCQ4bB61+5HqrJB43RKKv7uNSNNQjJq35Q5ZhNjBDcz1iD+E5Cbf1rWIr4rjtBWOKQV5w
+ NDKX2AEhA6QA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 20 May 2020 22:18:44 -0700
+IronPort-SDR: PyQBc6QrQH5MeOG4YoWWgZ978estFyoBDusDoj0/YZC+l3Zbsyu4OyOR9nmeImA20dGsWtPGwx
+ uVuVpYeusRiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,416,1583222400"; d="scan'208";a="264929876"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga003.jf.intel.com with ESMTP; 20 May 2020 22:18:37 -0700
+Date: Thu, 21 May 2020 01:08:46 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200521050846.GC10369@joy-OptiPlex-7040>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200520025500.GA10369@joy-OptiPlex-7040>
+ <97977ede-3c5b-c5a5-7858-7eecd7dd531c@nvidia.com>
+ <20200520104612.03a32977@w520.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Zi0sgQQBxRFxMTsj"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200521013437.5da898fb@bahia.lan>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 23:43:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200520104612.03a32977@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.43; envelope-from=yan.y.zhao@intel.com;
+ helo=mga05.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:18:44
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,137 +82,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- Reza Arbab <arbab@linux.ibm.com>, qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, Kirti Wankhede <kwankhede@nvidia.com>,
+ eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, May 20, 2020 at 10:46:12AM -0600, Alex Williamson wrote:
+> On Wed, 20 May 2020 19:10:07 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+> > On 5/20/2020 8:25 AM, Yan Zhao wrote:
+> > > On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:  
+> > >> Hi folks,
+> > >>
+> > >> My impression is that we're getting pretty close to a workable
+> > >> implementation here with v22 plus respins of patches 5, 6, and 8.  We
+> > >> also have a matching QEMU series and a proposal for a new i40e
+> > >> consumer, as well as I assume GVT-g updates happening internally at
+> > >> Intel.  I expect all of the latter needs further review and discussion,
+> > >> but we should be at the point where we can validate these proposed
+> > >> kernel interfaces.  Therefore I'd like to make a call for reviews so
+> > >> that we can get this wrapped up for the v5.8 merge window.  I know
+> > >> Connie has some outstanding documentation comments and I'd like to make
+> > >> sure everyone has an opportunity to check that their comments have been
+> > >> addressed and we don't discover any new blocking issues.  Please send
+> > >> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
+> > >> interface and implementation.  Thanks!
+> > >>  
+> > > hi Alex and Kirti,
+> > > after porting to qemu v22 and kernel v22, it is found out that
+> > > it can not even pass basic live migration test with error like
+> > > 
+> > > "Failed to get dirty bitmap for iova: 0xca000 size: 0x3000 err: 22"
+> > >   
+> > 
+> > Thanks for testing Yan.
+> > I think last moment change in below cause this failure
+> > 
+> > https://lore.kernel.org/kvm/1589871178-8282-1-git-send-email-kwankhede@nvidia.com/
+> > 
+> >  > 	if (dma->iova > iova + size)
+> >  > 		break;  
+> > 
+> > Surprisingly with my basic testing with 2G sys mem QEMU didn't raise 
+> > abort on g_free, but I do hit this with large sys mem.
+> > With above change, that function iterated through next vfio_dma as well. 
+> > Check should be as below:
+> > 
+> > -               if (dma->iova > iova + size)
+> > +               if (dma->iova > iova + size -1)
+> 
+> 
+> Or just:
+> 
+> 	if (dma->iova >= iova + size)
+> 
+> Thanks,
+> Alex
+> 
+> 
+> >                          break;
+> > 
+> > Another fix is in QEMU.
+> > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04751.html
+> > 
+> >  > > +        range->bitmap.size = ROUND_UP(pages, 64) / 8;  
+> >  >
+> >  > ROUND_UP(npages/8, sizeof(u64))?
+> >  >  
+> > 
+> > If npages < 8, npages/8 is 0 and ROUND_UP(0, 8) returns 0.
+> > 
+> > Changing it as below
+> > 
+> > -        range->bitmap.size = ROUND_UP(pages / 8, sizeof(uint64_t));
+> > +        range->bitmap.size = ROUND_UP(pages, sizeof(__u64) * 
+> > BITS_PER_BYTE) /
+> > +                             BITS_PER_BYTE;
+> > 
+> > I'm updating patches with these fixes and Cornelia's suggestion soon.
+> > 
+> > Due to short of time I may not be able to address all the concerns 
+> > raised on previous versions of QEMU, I'm trying make QEMU side code 
+> > available for testing for others with latest kernel changes. Don't 
+> > worry, I will revisit comments on QEMU patches. Right now first priority 
+> > is to test kernel UAPI and prepare kernel patches for 5.8
+> > 
+>
+hi Kirti
+by updating kernel/qemu to v23, still met below two types of errors.
+just basic migration test.
+(the guest VM size is 2G for all reported bugs).
 
---Zi0sgQQBxRFxMTsj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+"Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
 
-On Thu, May 21, 2020 at 01:34:37AM +0200, Greg Kurz wrote:
-> On Mon, 18 May 2020 16:44:17 -0500
-> Reza Arbab <arbab@linux.ibm.com> wrote:
->=20
-> > Make the number of NUMA associativity reference points a
-> > machine-specific value, using the currently assumed default (two
-> > reference points). This preps the next patch to conditionally change it.
-> >=20
-> > Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
-> > ---
-> >  hw/ppc/spapr.c         | 6 +++++-
-> >  include/hw/ppc/spapr.h | 1 +
-> >  2 files changed, 6 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index c18eab0a2305..88b4a1f17716 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -889,10 +889,12 @@ static int spapr_dt_rng(void *fdt)
-> >  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-> >  {
-> >      MachineState *ms =3D MACHINE(spapr);
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(ms);
-> >      int rtas;
-> >      GString *hypertas =3D g_string_sized_new(256);
-> >      GString *qemu_hypertas =3D g_string_sized_new(256);
-> >      uint32_t refpoints[] =3D { cpu_to_be32(0x4), cpu_to_be32(0x4) };
-> > +    uint32_t nr_refpoints;
-> >      uint64_t max_device_addr =3D MACHINE(spapr)->device_memory->base +
-> >          memory_region_size(&MACHINE(spapr)->device_memory->mr);
-> >      uint32_t lrdr_capacity[] =3D {
-> > @@ -944,8 +946,9 @@ static void spapr_dt_rtas(SpaprMachineState *spapr,=
- void *fdt)
-> >                       qemu_hypertas->str, qemu_hypertas->len));
-> >      g_string_free(qemu_hypertas, TRUE);
-> > =20
-> > +    nr_refpoints =3D MIN(smc->nr_assoc_refpoints, ARRAY_SIZE(refpoints=
-));
->=20
-> Having the machine requesting more reference points than available
-> would clearly be a bug. I'd rather add an assert() than silently
-> clipping to the size of refpoints[].
+or 
 
-Actually, I think this "num reference points" thing is a false
-abstraction.  It's selecting a number of entries from a list of
-reference points that's fixed.  The number of things we could do
-simply by changing the machine property and not the array is pretty
-small.
+"qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
+qemu-system-x86_64-lm: error while loading state section id 49(vfio)
+qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
 
-I think it would be simpler to just have a boolean in the machine
-class.
 
-> >      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
-> > -                     refpoints, sizeof(refpoints)));
-> > +                     refpoints, nr_refpoints * sizeof(uint32_t)));
-> > =20
->=20
-> Size can be expressed without yet another explicit reference to the
-> uint32_t type:
->=20
-> nr_refpoints * sizeof(refpoints[0])
->=20
-> >      _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-> >                       maxdomains, sizeof(maxdomains)));
-> > @@ -4541,6 +4544,7 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
-> >      smc->linux_pci_probe =3D true;
-> >      smc->smp_threads_vsmt =3D true;
-> >      smc->nr_xirqs =3D SPAPR_NR_XIRQS;
-> > +    smc->nr_assoc_refpoints =3D 2;
->=20
-> When adding a new setting for the default machine type, we usually
-> take care of older machine types at the same time, ie. folding this
-> patch into the next one. Both patches are simple enough that it should
-> be okay and this would avoid this line to be touched again.
->=20
-> >      xfc->match_nvt =3D spapr_match_nvt;
-> >  }
-> > =20
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index e579eaf28c05..abaf9a92adc0 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -129,6 +129,7 @@ struct SpaprMachineClass {
-> >      bool linux_pci_probe;
-> >      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
-> >      hwaddr rma_limit;          /* clamp the RMA to this size */
-> > +    uint32_t nr_assoc_refpoints;
-> > =20
-> >      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
-> >                            uint64_t *buid, hwaddr *pio,=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Zi0sgQQBxRFxMTsj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7GDdEACgkQbDjKyiDZ
-s5IkHA/8CMFIMr3Wp+axNjKWt9UBahd8DqIMtKSa6HUvVzbskPOqC+XRRaFwkXyo
-p7JSXVjC7P0crPXiYgIVqTzgBhjx8/Qmb1TY0yZ0rgd5Dxzjg4KOUk7FbnEPWqOr
-2tqUzKAhF+McoGaI7qyouYvTIZlYUFR9pEypEyeJ5A/fv137yRkEUMp72AnLehPF
-k/NPOEbEE0RSrko97FKopEI9o2QYodlLgoO+TAgzk1Z58rMnIklt77yUNhr5JGly
-y8wNjlOU/WvcwmtyqWAcmOOpyNkSbJ3pm+y42rBKbCpHxeymkOKCyuMnkRWlEhYI
-tFQ2F11CgaNizlMbsAOnGAdyFRl7HyVW7cdaLH+LK5RzIVRE4LMIF3boOo6VMLCd
-ECZwBei0ddhhfdMCnQkDzSfTr34kxs/k7bctrfdgFiYwjmoH9kL4ljJo23ZC19iu
-dv5TVJ0s9lZijKCDB1tJ8lDmb3aLOVzEsibdqLsr2Cuej6w5UhMSTyksSW8Xqbfk
-4UBR5uF5sg4R5fb2DEmbomMdUG5932jn5eIvbGKCvB7P0auNFg0SpoaLEWRG09jo
-tV8ymTkf2FO5RFp+SbfJ2KwW1y4tX+eocDhWnRsADurANK/Zq+ilsAoR46grZ4ds
-VuDeFnRupX1BbRS+FdRuNk72lDB+HvbEZrajwQwOgcR3VYwwqtw=
-=xXKG
------END PGP SIGNATURE-----
-
---Zi0sgQQBxRFxMTsj--
+Thanks
+Yan
 
