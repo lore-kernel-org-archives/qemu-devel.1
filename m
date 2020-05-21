@@ -2,60 +2,60 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1220EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4583EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C751320738
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02E8220738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:46:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FSbn203R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C751320738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="knDP1MsA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E8220738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbc9r-0007w0-0D
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:46:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53280)
+	id 1jbcAH-0008Lg-N4
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:46:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7I-000341-Ii; Wed, 20 May 2020 23:43:32 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:36107)
+ id 1jbc7E-0002rw-C7; Wed, 20 May 2020 23:43:28 -0400
+Received: from ozlabs.org ([203.11.71.1]:52143)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7H-0003Wg-Gb; Wed, 20 May 2020 23:43:32 -0400
+ id 1jbc7C-0003Tt-8k; Wed, 20 May 2020 23:43:27 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49SFns27szz9sTg; Thu, 21 May 2020 13:43:13 +1000 (AEST)
+ id 49SFnr5r2Xz9sTR; Thu, 21 May 2020 13:43:12 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1590032593;
- bh=bf5Cd9xw2ZTvT2sR3eQKUWyajZbzGCNDJL88uOSTsxA=;
+ d=gibson.dropbear.id.au; s=201602; t=1590032592;
+ bh=ScMyXOHqlJVI3Y1EURo7w0uOiUqN2ce3gWfMmvqVEj8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FSbn203Rcy19lTP/Uh82Cy4AGqsnatY7iLqO1Uu8XUf+L14nn+MXwj7IzuNAJs8GW
- i3uJUx/g84fqSywOCIEW/9jbHGEcBeg8ccTaDTqgmW8US17FJnd6H0XVtsN3Zf5t6z
- HxpqCsnypeqML8EXHQMmBW/KfTN4Ivk8ZV66ZFVU=
+ b=knDP1MsAdW5AS+OF9SvJzk38ZzvnXZIHwzpMsGnn8Mrgpb6ONJSXQfLIS64r1ZVfa
+ QvFYVtVJGCVB9dMtxu5MO26mlnrNnEFfWVbJcr/uKzQ63eOjnl1kjP39kERMJwnx+Z
+ Ekprw22f8M9nnt/GzDOBfRKYi0e5tJU89B6rP4is=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, frankja@linux.ibm.com,
  dgilbert@redhat.com, pair@us.ibm.com
-Subject: [RFC v2 07/18] target/i386: sev: Remove redundant policy field
-Date: Thu, 21 May 2020 13:42:53 +1000
-Message-Id: <20200521034304.340040-8-david@gibson.dropbear.id.au>
+Subject: [RFC v2 04/18] target/i386: sev: Embed SEVState in SevGuestState
+Date: Thu, 21 May 2020 13:42:50 +1000
+Message-Id: <20200521034304.340040-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 23:43:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -84,57 +84,154 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SEVState::policy is set from the final value of the policy field in the
-parameter structure for the KVM_SEV_LAUNCH_START ioctl().  But, AFAICT
-that ioctl() won't ever change it from the original supplied value which
-comes from SevGuestState::policy.
+Currently SevGuestState contains only configuration information.  For
+runtime state another non-QOM struct SEVState is allocated separately.
 
-So, remove this field and just use SevGuestState::policy directly.
+Simplify things by instead embedding the SEVState structure in
+SevGuestState.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/i386/sev.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ target/i386/sev.c | 54 +++++++++++++++++++++++++----------------------
+ 1 file changed, 29 insertions(+), 25 deletions(-)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index d25af37136..4b261beaa7 100644
+index b6ed719fb5..b4ab9720d6 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -39,7 +39,6 @@ struct SEVState {
-     uint8_t api_major;
-     uint8_t api_minor;
-     uint8_t build_id;
--    uint32_t policy;
-     uint64_t me_mask;
+@@ -35,6 +35,22 @@
+ 
+ typedef struct SevGuestState SevGuestState;
+ 
++struct SEVState {
++    uint8_t api_major;
++    uint8_t api_minor;
++    uint8_t build_id;
++    uint32_t policy;
++    uint64_t me_mask;
++    uint32_t cbitpos;
++    uint32_t reduced_phys_bits;
++    uint32_t handle;
++    int sev_fd;
++    SevState state;
++    gchar *measurement;
++};
++
++typedef struct SEVState SEVState;
++
+ /**
+  * SevGuestState:
+  *
+@@ -48,6 +64,7 @@ typedef struct SevGuestState SevGuestState;
+ struct SevGuestState {
+     Object parent_obj;
+ 
++    /* configuration parameters */
+     char *sev_device;
+     uint32_t policy;
      uint32_t handle;
-     int sev_fd;
-@@ -397,7 +396,7 @@ sev_get_info(void)
-         info->api_major = sev_guest->state.api_major;
-         info->api_minor = sev_guest->state.api_minor;
-         info->build_id = sev_guest->state.build_id;
--        info->policy = sev_guest->state.policy;
-+        info->policy = sev_guest->policy;
-         info->state = sev_guest->state.state;
-         info->handle = sev_guest->state.handle;
+@@ -55,25 +72,11 @@ struct SevGuestState {
+     char *session_file;
+     uint32_t cbitpos;
+     uint32_t reduced_phys_bits;
+-};
+ 
+-struct SEVState {
+-    SevGuestState *sev_info;
+-    uint8_t api_major;
+-    uint8_t api_minor;
+-    uint8_t build_id;
+-    uint32_t policy;
+-    uint64_t me_mask;
+-    uint32_t cbitpos;
+-    uint32_t reduced_phys_bits;
+-    uint32_t handle;
+-    int sev_fd;
+-    SevState state;
+-    gchar *measurement;
++    /* runtime state */
++    SEVState state;
+ };
+ 
+-typedef struct SEVState SEVState;
+-
+ #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+ #define DEFAULT_SEV_DEVICE      "/dev/sev"
+ 
+@@ -506,12 +509,12 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
+ }
+ 
+ static int
+-sev_launch_start(SEVState *s)
++sev_launch_start(SevGuestState *sev)
+ {
++    SEVState *s = &sev->state;
+     gsize sz;
+     int ret = 1;
+     int fw_error, rc;
+-    SevGuestState *sev = s->sev_info;
+     struct kvm_sev_launch_start *start;
+     guchar *session = NULL, *dh_cert = NULL;
+ 
+@@ -686,6 +689,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+ void *
+ sev_guest_init(const char *id)
+ {
++    SevGuestState *sev;
+     SEVState *s;
+     char *devname;
+     int ret, fw_error;
+@@ -693,27 +697,27 @@ sev_guest_init(const char *id)
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
+ 
+-    sev_state = s = g_new0(SEVState, 1);
+-    s->sev_info = lookup_sev_guest_info(id);
+-    if (!s->sev_info) {
++    sev = lookup_sev_guest_info(id);
++    if (!sev) {
+         error_report("%s: '%s' is not a valid '%s' object",
+                      __func__, id, TYPE_SEV_GUEST);
+         goto err;
      }
-@@ -520,8 +519,7 @@ sev_launch_start(SevGuestState *sev)
  
-     start->handle = object_property_get_int(OBJECT(sev), "handle",
-                                             &error_abort);
--    start->policy = object_property_get_int(OBJECT(sev), "policy",
--                                            &error_abort);
-+    start->policy = sev->policy;
-     if (sev->session_file) {
-         if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
-             goto out;
-@@ -550,7 +548,6 @@ sev_launch_start(SevGuestState *sev)
-                             &error_abort);
-     sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
-     s->handle = start->handle;
--    s->policy = start->policy;
-     ret = 0;
++    sev_state = s = &sev->state;
+     s->state = SEV_STATE_UNINIT;
  
- out:
+     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
+     host_cbitpos = ebx & 0x3f;
+ 
+-    s->cbitpos = object_property_get_int(OBJECT(s->sev_info), "cbitpos", NULL);
++    s->cbitpos = object_property_get_int(OBJECT(sev), "cbitpos", NULL);
+     if (host_cbitpos != s->cbitpos) {
+         error_report("%s: cbitpos check failed, host '%d' requested '%d'",
+                      __func__, host_cbitpos, s->cbitpos);
+         goto err;
+     }
+ 
+-    s->reduced_phys_bits = object_property_get_int(OBJECT(s->sev_info),
++    s->reduced_phys_bits = object_property_get_int(OBJECT(sev),
+                                         "reduced-phys-bits", NULL);
+     if (s->reduced_phys_bits < 1) {
+         error_report("%s: reduced_phys_bits check failed, it should be >=1,"
+@@ -723,7 +727,7 @@ sev_guest_init(const char *id)
+ 
+     s->me_mask = ~(1UL << s->cbitpos);
+ 
+-    devname = object_property_get_str(OBJECT(s->sev_info), "sev-device", NULL);
++    devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
+     s->sev_fd = open(devname, O_RDWR);
+     if (s->sev_fd < 0) {
+         error_report("%s: Failed to open %s '%s'", __func__,
+@@ -754,7 +758,7 @@ sev_guest_init(const char *id)
+         goto err;
+     }
+ 
+-    ret = sev_launch_start(s);
++    ret = sev_launch_start(sev);
+     if (ret) {
+         error_report("%s: failed to create encryption context", __func__);
+         goto err;
 -- 
 2.26.2
 
