@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2077C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920B1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:07:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B68F20748
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:06:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50AFA20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 05:07:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="Q+6IlbCK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B68F20748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="RGHZT8x8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AFA20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbdPz-0004dZ-KT
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:06:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60032)
+	id 1jbdQC-0004rz-IN
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 01:07:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdK8-0003PU-Qy
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:53 -0400
-Received: from o1.dev.nutanix.com ([198.21.4.205]:50734)
+ id 1jbdKJ-0003gR-4p
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:01:03 -0400
+Received: from o1.dev.nutanix.com ([198.21.4.205]:58463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
- id 1jbdK7-0001Ha-SD
- for qemu-devel@nongnu.org; Thu, 21 May 2020 01:00:52 -0400
+ id 1jbdKH-0001Ia-R9
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 01:01:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
  h=from:subject:in-reply-to:references:to:cc:content-type:
  content-transfer-encoding;
- s=smtpapi; bh=90KP3EWUzYVQheSsrDuXWYxs8cTzEfUWVMG7tdurO8M=;
- b=Q+6IlbCKWOjJ0q9HqLUJuaB0ojrSjJXVxjVaeUcCeJ7zo74uLqfjdNlCiEI+FKW8QrNx
- uxn2Q1yNI5kN/+Sp8hsRN3cXDjSMaOcdseCJp23FiqeqgHsf9SdEZR9QJGW6IBgd4dJZ9m
- 6ePMjLCX4ky0uqqWk788vNDKs91bqdwuc=
+ s=smtpapi; bh=lgg31uEtMDopUvmpXDUsYGONCAL7eG0Q3eMW9ba+v58=;
+ b=RGHZT8x8fmbzhKb6JYJ+LkmxwFxCSt1tPjuipoMzJvvVXTTEPnZQrnhSFYs6B09P+Je4
+ UubpuXDV9kcxHOlaB+YqBSe4692O4FNnOEJufHFnrsKNyU1TWbcF1jNFaqgDQardIHwnv1
+ /+usYlqElBpmjr7ZbG6zoStXPJtYCmszk=
 Received: by filterdrecv-p3iad2-8ddf98858-lwgxm with SMTP id
- filterdrecv-p3iad2-8ddf98858-lwgxm-19-5EC60B01-11E
- 2020-05-21 05:00:49.894761049 +0000 UTC m=+4852399.132456611
+ filterdrecv-p3iad2-8ddf98858-lwgxm-19-5EC60B0B-E7
+ 2020-05-21 05:00:59.818794673 +0000 UTC m=+4852409.056490205
 Received: from localhost.localdomain.com (unknown)
  by ismtpd0026p1las1.sendgrid.net (SG) with ESMTP
- id LOkJMnJtQMCFMnpanl835g Thu, 21 May 2020 05:00:49.689 +0000 (UTC)
+ id VG9aOgbfRxipDFJ3nZk6Lg Thu, 21 May 2020 05:00:59.599 +0000 (UTC)
 From: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: [PATCH v4 07/10] Support ram slot configuration in libvhost-user
-Date: Thu, 21 May 2020 05:00:50 +0000 (UTC)
-Message-Id: <1588533678-23450-8-git-send-email-raphael.norwitz@nutanix.com>
+Subject: [PATCH v4 10/10] Lift max ram slots limit in libvhost-user
+Date: Thu, 21 May 2020 05:00:59 +0000 (UTC)
+Message-Id: <1588533678-23450-11-git-send-email-raphael.norwitz@nutanix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 References: <1588533678-23450-1-git-send-email-raphael.norwitz@nutanix.com>
 X-SG-EID: =?us-ascii?Q?YCLURHX+pjNDm1i7d69iKyMnQi=2FdvWah9veFa8nllaoUC0ScIWrCgiaWGu43Vg?=
- =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zfUi5BgBPYaI2xP0E?=
- =?us-ascii?Q?BiTyPX701jm1u73emrPKJwFZ823KKNFbrIHwWau?=
- =?us-ascii?Q?7RcNRNtr9TgRmfyWaouLWs+SSSdYxIEceT=2FFUUl?=
- =?us-ascii?Q?X3TQd9YwdU5+rJFvLiCOSwelhzoaTjAfQaksnmB?=
- =?us-ascii?Q?aS6eQB9IQxp9idINMJ29orq8hx7OoaWDL=2FoAt2J?=
- =?us-ascii?Q?lJFZGanHvRqe96PdZl6MQ=3D=3D?=
+ =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zSp3+RPqU4g3+UQTY?=
+ =?us-ascii?Q?OB1nSwmrKHZM0l7k4GYm8xmWEN5tH=2FMfTcSIBia?=
+ =?us-ascii?Q?Sz680lFOusuXuTzpDAylu2jwXl8dIhJwhIlU3Wb?=
+ =?us-ascii?Q?hH+4DEnC7f1AkUEp0Gh15xnGvaarfjE2FM7qJNt?=
+ =?us-ascii?Q?kO99npY21tUMUblQGGWnMG1A6MuBIrK5cScI=2FmZ?=
+ =?us-ascii?Q?9Uxidkgs6RS2wHLK7ccWg=3D=3D?=
 To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
@@ -97,79 +97,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The VHOST_USER_GET_MAX_MEM_SLOTS message allows a vhost-user backend to
-specify a maximum number of ram slots it is willing to support. This
-change adds support for libvhost-user to process this message. For now
-the backend will reply with 8 as the maximum number of regions
-supported.
+Historically, VMs with vhost-user devices could hot-add memory a maximum
+of 8 times. Now that the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS
+protocol feature has been added, VMs with vhost-user backends which
+support this new feature can support a configurable number of ram slots
+up to the maximum supported by the target platform.
 
-libvhost-user does not yet support the vhost-user protocol feature
-VHOST_USER_PROTOCOL_F_CONFIGIRE_MEM_SLOTS, so qemu should never
-send the VHOST_USER_GET_MAX_MEM_SLOTS message. Therefore this new
-functionality is not currently used.
+This change adds VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS support for
+backends built with libvhost-user, and increases the number of supported
+ram slots from 8 to 32.
+
+Memory hot-add, hot-remove and postcopy migration were tested with
+the vhost-user-bridge sample.
 
 Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 19 +++++++++++++++++++
- contrib/libvhost-user/libvhost-user.h |  1 +
- 2 files changed, 20 insertions(+)
+ contrib/libvhost-user/libvhost-user.c | 17 +++++++++--------
+ contrib/libvhost-user/libvhost-user.h | 15 +++++++++++----
+ 2 files changed, 20 insertions(+), 12 deletions(-)
 
 diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index cccfa22..9f039b7 100644
+index 386449b..b1e6072 100644
 --- a/contrib/libvhost-user/libvhost-user.c
 +++ b/contrib/libvhost-user/libvhost-user.c
-@@ -137,6 +137,7 @@ vu_request_to_string(unsigned int req)
-         REQ(VHOST_USER_SET_INFLIGHT_FD),
-         REQ(VHOST_USER_GPU_SET_SOCKET),
-         REQ(VHOST_USER_VRING_KICK),
-+        REQ(VHOST_USER_GET_MAX_MEM_SLOTS),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -1565,6 +1566,22 @@ vu_handle_vring_kick(VuDev *dev, VhostUserMsg *vmsg)
+@@ -269,7 +269,7 @@ have_userfault(void)
+ static bool
+ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+-    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
++    char control[CMSG_SPACE(VHOST_MEMORY_BASELINE_NREGIONS * sizeof(int))] = {};
+     struct iovec iov = {
+         .iov_base = (char *)vmsg,
+         .iov_len = VHOST_USER_HDR_SIZE,
+@@ -340,7 +340,7 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+     int rc;
+     uint8_t *p = (uint8_t *)vmsg;
+-    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
++    char control[CMSG_SPACE(VHOST_MEMORY_BASELINE_NREGIONS * sizeof(int))] = {};
+     struct iovec iov = {
+         .iov_base = (char *)vmsg,
+         .iov_len = VHOST_USER_HDR_SIZE,
+@@ -353,7 +353,7 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+     struct cmsghdr *cmsg;
+ 
+     memset(control, 0, sizeof(control));
+-    assert(vmsg->fd_num <= VHOST_MEMORY_MAX_NREGIONS);
++    assert(vmsg->fd_num <= VHOST_MEMORY_BASELINE_NREGIONS);
+     if (vmsg->fd_num > 0) {
+         size_t fdsize = vmsg->fd_num * sizeof(int);
+         msg.msg_controllen = CMSG_SPACE(fdsize);
+@@ -780,7 +780,7 @@ static bool
+ vu_rem_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
+     int i, j;
+     bool found = false;
+-    VuDevRegion shadow_regions[VHOST_MEMORY_MAX_NREGIONS] = {};
++    VuDevRegion shadow_regions[VHOST_USER_MAX_RAM_SLOTS] = {};
+     VhostUserMemoryRegion m = vmsg->payload.memreg.region, *msg_region = &m;
+ 
+     DPRINT("Removing region:\n");
+@@ -813,7 +813,7 @@ vu_rem_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
+ 
+     if (found) {
+         memcpy(dev->regions, shadow_regions,
+-               sizeof(VuDevRegion) * VHOST_MEMORY_MAX_NREGIONS);
++               sizeof(VuDevRegion) * VHOST_USER_MAX_RAM_SLOTS);
+         DPRINT("Successfully removed a region\n");
+         dev->nregions--;
+         vmsg_set_reply_u64(vmsg, 0);
+@@ -1394,7 +1394,8 @@ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
+                         1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD |
+-                        1ULL << VHOST_USER_PROTOCOL_F_REPLY_ACK;
++                        1ULL << VHOST_USER_PROTOCOL_F_REPLY_ACK |
++                        1ULL << VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS;
+ 
+     if (have_userfault()) {
+         features |= 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
+@@ -1732,14 +1733,14 @@ static bool vu_handle_get_max_memslots(VuDev *dev, VhostUserMsg *vmsg)
+ {
+     vmsg->flags = VHOST_USER_REPLY_MASK | VHOST_USER_VERSION;
+     vmsg->size  = sizeof(vmsg->payload.u64);
+-    vmsg->payload.u64 = VHOST_MEMORY_MAX_NREGIONS;
++    vmsg->payload.u64 = VHOST_USER_MAX_RAM_SLOTS;
+     vmsg->fd_num = 0;
+ 
+     if (!vu_message_write(dev, dev->sock, vmsg)) {
+         vu_panic(dev, "Failed to send max ram slots: %s\n", strerror(errno));
+     }
+ 
+-    DPRINT("u64: 0x%016"PRIx64"\n", (uint64_t) VHOST_MEMORY_MAX_NREGIONS);
++    DPRINT("u64: 0x%016"PRIx64"\n", (uint64_t) VHOST_USER_MAX_RAM_SLOTS);
+ 
      return false;
  }
- 
-+static bool vu_handle_get_max_memslots(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    vmsg->flags = VHOST_USER_REPLY_MASK | VHOST_USER_VERSION;
-+    vmsg->size  = sizeof(vmsg->payload.u64);
-+    vmsg->payload.u64 = VHOST_MEMORY_MAX_NREGIONS;
-+    vmsg->fd_num = 0;
-+
-+    if (!vu_message_write(dev, dev->sock, vmsg)) {
-+        vu_panic(dev, "Failed to send max ram slots: %s\n", strerror(errno));
-+    }
-+
-+    DPRINT("u64: 0x%016"PRIx64"\n", (uint64_t) VHOST_MEMORY_MAX_NREGIONS);
-+
-+    return false;
-+}
-+
- static bool
- vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -1649,6 +1666,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_set_inflight_fd(dev, vmsg);
-     case VHOST_USER_VRING_KICK:
-         return vu_handle_vring_kick(dev, vmsg);
-+    case VHOST_USER_GET_MAX_MEM_SLOTS:
-+        return vu_handle_get_max_memslots(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
 diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index f30394f..88ef40d 100644
+index f843971..844c37c 100644
 --- a/contrib/libvhost-user/libvhost-user.h
 +++ b/contrib/libvhost-user/libvhost-user.h
-@@ -97,6 +97,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_INFLIGHT_FD = 32,
-     VHOST_USER_GPU_SET_SOCKET = 33,
-     VHOST_USER_VRING_KICK = 35,
-+    VHOST_USER_GET_MAX_MEM_SLOTS = 36,
-     VHOST_USER_MAX
- } VhostUserRequest;
+@@ -28,7 +28,13 @@
  
+ #define VIRTQUEUE_MAX_SIZE 1024
+ 
+-#define VHOST_MEMORY_MAX_NREGIONS 8
++#define VHOST_MEMORY_BASELINE_NREGIONS 8
++
++/*
++ * Set a reasonable maximum number of ram slots, which will be supported by
++ * any architecture.
++ */
++#define VHOST_USER_MAX_RAM_SLOTS 32
+ 
+ typedef enum VhostSetConfigType {
+     VHOST_SET_CONFIG_TYPE_MASTER = 0,
+@@ -55,6 +61,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
+     VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
+     VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS = 14,
++    VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS = 15,
+ 
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+@@ -123,7 +130,7 @@ typedef struct VhostUserMemoryRegion {
+ typedef struct VhostUserMemory {
+     uint32_t nregions;
+     uint32_t padding;
+-    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
++    VhostUserMemoryRegion regions[VHOST_MEMORY_BASELINE_NREGIONS];
+ } VhostUserMemory;
+ 
+ typedef struct VhostUserMemRegMsg {
+@@ -190,7 +197,7 @@ typedef struct VhostUserMsg {
+         VhostUserInflight inflight;
+     } payload;
+ 
+-    int fds[VHOST_MEMORY_MAX_NREGIONS];
++    int fds[VHOST_MEMORY_BASELINE_NREGIONS];
+     int fd_num;
+     uint8_t *data;
+ } VU_PACKED VhostUserMsg;
+@@ -368,7 +375,7 @@ typedef struct VuDevInflightInfo {
+ struct VuDev {
+     int sock;
+     uint32_t nregions;
+-    VuDevRegion regions[VHOST_MEMORY_MAX_NREGIONS];
++    VuDevRegion regions[VHOST_USER_MAX_RAM_SLOTS];
+     VuVirtq *vq;
+     VuDevInflightInfo inflight_info;
+     int log_call_fd;
 -- 
 1.8.3.1
 
