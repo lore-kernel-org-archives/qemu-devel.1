@@ -2,85 +2,84 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A78C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 366C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82ED620671
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E54D620671
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 16:12:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L7km76KN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82ED620671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHVjP3Ac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54D620671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnlu-00021c-O4
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:10:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45240)
+	id 1jbnnk-0005Ri-3L
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 12:12:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbnhW-00029B-8V
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:05:42 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33996)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbnid-0004P9-Dx; Thu, 21 May 2020 12:06:51 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:45157)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jbnhU-0005wl-Jq
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:05:41 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w4so6671728oia.1
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:05:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jbnic-0006MN-4F; Thu, 21 May 2020 12:06:50 -0400
+Received: by mail-il1-x144.google.com with SMTP id b15so7556280ilq.12;
+ Thu, 21 May 2020 09:06:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=bT3gaOeZufGXXDWlU1SW7moyeQJ4r1NDiSe3lomWxgQ=;
- b=L7km76KNNRQyit0R7Fl6wyJy4mU32M2xxS3c1GCDhr8M6TqP6gmwf6CW1NZ4bk70GH
- X7Ucwm7wq6J6h1Ka6R1rSWCQypM6qAqOMLNQA1bewM/olFk8J5U6YYX7e6yWx8YBTe/D
- 5x2Q1TEGx/pLZ4dRE7Cl07efqMNRRVyREH4K2JKdqJsLZG2bLhcvzFFW7PQSXzfRU/cX
- /inJmtFSIe1Ulv8hy1JryAX8L642C+7S8uKsR01TDuyFwrNydmb34QYX8TuahmM4y8LY
- zF6p1QikWi3hKxvW3uyae3ZYDH4qYKkkzC48AcHySo0ys6BEMgzMKt65HfXjVRhWT+cw
- 2U3g==
+ :cc; bh=hVYeWESeCnMzkcM+Fh3zeAkSckNAl04eVjQ1OUPApI0=;
+ b=nHVjP3AcQg0LP8VE2rwdG6VoOsllBAYDwVQNIKI3B3VCP9yyVGLTv+112SnAgeKbmk
+ 30Ij3BfZftAqqbMY1cQdrKiI20IxFCmRa456yf4LeUw1en+KTL8lrvdA45fcyFIj8HSN
+ EOSdbAas+QcvMVkc0r7sStLSR21xC1jnhPjRnylZn9LeYmneh6F0b86Ge6HqAiXY7y6a
+ Ul4G65imAbpMLZjN20/gy4DN9M8ZpOfZ41ZRATWDtK2cyogFfQuEATSOVvJTS6A17QME
+ +0/54WuRZDO235Y73fES8XAfBBxVrb4sY00wpuQndLjOmCT23CKjSUYyF2gedQcSMGWQ
+ 4C/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=bT3gaOeZufGXXDWlU1SW7moyeQJ4r1NDiSe3lomWxgQ=;
- b=CHFzkUF26LyE5P5aPR1Xws37M8Z2u5Pi6PBJ6qTP2pvzL47Pd1QW2w8d6wq7ojrR9K
- 7pVg/r7o2+JFG50fU+qxDnYtV2NLxFPLdiA7v2VOy4fDshdqERoeRDcvx4rKsLej0bkS
- HxNxYfc4GA49W5CjXc8VmpRUIwbdpl8PniRirbKjRc6eBUJWG5hEz7776w8o2bSsaZL9
- LZKCu0pQr47UbcZfckUkQiZK8SENepLaqo3KVGq/LIuYhSGnu6mVJ1Wxl8vUIWtGgvXm
- 5tm1lpwtX053kZDWKyV+xPNazAhOct0vxwj24GLxb/PzjHRk2Ki4H+GJij2varyC32O1
- fzhw==
-X-Gm-Message-State: AOAM532v88dqv9JMRawKG20AFK2Q8NIsL6FklanyKQSWslYgp7D74PVO
- tyoZquKlv4t9zQN/w3oALEe2iZAMaEL9ndWqGxZBsg==
-X-Google-Smtp-Source: ABdhPJy2+n/En3kRVTL4Igt0+xAgs84gPMpbMGkbdWw2ZP0jMI7rFSKxLXuf48gFOOYgX3u6xLCg+hqLIsr3H3LzXXA=
-X-Received: by 2002:a05:6808:6c6:: with SMTP id
- m6mr5854979oih.163.1590077139195; 
- Thu, 21 May 2020 09:05:39 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=hVYeWESeCnMzkcM+Fh3zeAkSckNAl04eVjQ1OUPApI0=;
+ b=VHSOKgIaqyAtNejkVb3U518EfYxLTGjlpH+a4wJXUtk8pgG1/UBgQY568MozrM3fAm
+ AmgVbkp1tjlROtpq0V65VbFy4g3Bcc9AtRv3f8UKDG+jMr+ZqGOCY88+NSECBVZjqKDH
+ JRxfPS8XLMzpO+rxi6SlbaV+vPPzg9R0dgibUm2un0XsA0AnRxRKPUfAeC3x/Cxzkv3l
+ SIwRS+hLMolu4AZ2PfwpqaGOp0jfCCSFYBSGvWPThkJJ40PUuceg20BXLi+HCSW/el3D
+ mYfdcJDDLmqY4kYAZPPhJixOxcfFau5H8fvGBV2ysvidp6YiiOBAv6purVDhNUGUw9bu
+ 3j0w==
+X-Gm-Message-State: AOAM531Zx8foo372G5hZ9pK4J7VUKP/0ziOEyFbzZhOREMBLqkkIZYUu
+ zRvnhHUBGa6kbhQXR4aVansfnP2ZWw7FGtD/TyA=
+X-Google-Smtp-Source: ABdhPJxuuJ8g59+1nI4P6UuXSEAq+sJXigyCIT/ZivznOh/NFSt4hbkqTgEvdiUoE7nySOMtq2Chets+6CazVpXQMCw=
+X-Received: by 2002:a92:d087:: with SMTP id h7mr9822915ilh.227.1590077208538; 
+ Thu, 21 May 2020 09:06:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200518140309.5220-1-f4bug@amsat.org>
-In-Reply-To: <20200518140309.5220-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 May 2020 17:05:28 +0100
-Message-ID: <CAFEAcA9OyhO=EKy-7KC8hOWYN1QsnxYmyg83mSvGx5+J229-0Q@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] hw/arm: Replace hw_error() by qemu_log_mask()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+References: <925bdcd2b3536014306a8800975fb63592fd051a.1589489213.git.alistair.francis@wdc.com>
+ <mhng-8a09dc11-68b8-4e28-9b50-3fc5a52837e6@palmerdabbelt-glaptop1>
+In-Reply-To: <mhng-8a09dc11-68b8-4e28-9b50-3fc5a52837e6@palmerdabbelt-glaptop1>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 21 May 2020 08:57:52 -0700
+Message-ID: <CAKmqyKM7G+b0cZ2a0MGtqRCKc5WbCcAkTfzYfF+gbvYDyOMidA@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] sifive_e: Support the revB machine
+To: Palmer Dabbelt <palmer@dabbelt.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -95,34 +94,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 15:03, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
+On Wed, May 20, 2020 at 4:08 PM Palmer Dabbelt <palmer@dabbelt.com> wrote:
 >
-> When fuzzing the devices, we don't want the whole process to
-> exit calling hw_error().
-> Replace these calls by qemu_log_mask LOG_GUEST_ERROR/LOG_UNIMP
-> when possible.
+> On Thu, 14 May 2020 13:47:10 PDT (-0700), Alistair Francis wrote:
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/riscv/sifive_e.c         | 35 +++++++++++++++++++++++++++++++----
+> >  include/hw/riscv/sifive_e.h |  1 +
+> >  2 files changed, 32 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> > index 472a98970b..cb7818341b 100644
+> > --- a/hw/riscv/sifive_e.c
+> > +++ b/hw/riscv/sifive_e.c
+> > @@ -98,10 +98,14 @@ static void riscv_sifive_e_init(MachineState *machine)
+> >          memmap[SIFIVE_E_DTIM].base, main_mem);
+> >
+> >      /* Mask ROM reset vector */
+> > -    uint32_t reset_vec[2] = {
+> > -        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
+> > -        0x00028067,        /* 0x1004: jr      t0 */
+> > -    };
+> > +    uint32_t reset_vec[2];
+> > +
+> > +    if (s->revb) {
+> > +        reset_vec[0] = 0x200102b7;        /* 0x1000: lui     t0,0x20010 */
+> > +    } else {
+> > +        reset_vec[0] = 0x204002b7;        /* 0x1000: lui     t0,0x20400 */
+> > +    }
+> > +    reset_vec[1] = 0x00028067;        /* 0x1004: jr      t0 */
+> >
+> >      /* copy in the reset vector in little_endian byte order */
+> >      for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > @@ -115,8 +119,31 @@ static void riscv_sifive_e_init(MachineState *machine)
+> >      }
+> >  }
+> >
+> > +static bool sifive_e_machine_get_revb(Object *obj, Error **errp)
+> > +{
+> > +    SiFiveEState *s = RISCV_E_MACHINE(obj);
+> > +
+> > +    return s->revb;
+> > +}
+> > +
+> > +static void sifive_e_machine_set_revb(Object *obj, bool value, Error **errp)
+> > +{
+> > +    SiFiveEState *s = RISCV_E_MACHINE(obj);
+> > +
+> > +    s->revb = value;
+> > +}
+> > +
+> >  static void sifive_e_machine_instance_init(Object *obj)
+> >  {
+> > +    SiFiveEState *s = RISCV_E_MACHINE(obj);
+> > +
+> > +    s->revb = false;
+> > +    object_property_add_bool(obj, "revb", sifive_e_machine_get_revb,
+> > +                             sifive_e_machine_set_revb, NULL);
+> > +    object_property_set_description(obj, "revb",
+> > +                                    "Set on to tell QEMU that it should model "
+> > +                                    "the revB HiFive1 board",
+> > +                                    NULL);
+> >  }
+> >
+> >  static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
+> > diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+> > index 414992119e..0d3cd07fcc 100644
+> > --- a/include/hw/riscv/sifive_e.h
+> > +++ b/include/hw/riscv/sifive_e.h
+> > @@ -45,6 +45,7 @@ typedef struct SiFiveEState {
+> >
+> >      /*< public >*/
+> >      SiFiveESoCState soc;
+> > +    bool revb;
+> >  } SiFiveEState;
+> >
+> >  #define TYPE_RISCV_E_MACHINE MACHINE_TYPE_NAME("sifive_e")
 >
-> Since v1: Fixed uninitialized variable
->
-> Philippe Mathieu-Daud=C3=A9 (4):
->   hw/arm/integratorcp: Replace hw_error() by qemu_log_mask()
->   hw/arm/pxa2xx: Replace hw_error() by qemu_log_mask()
->   hw/char/xilinx_uartlite: Replace hw_error() by qemu_log_mask()
->   hw/timer/exynos4210_mct: Replace hw_error() by qemu_log_mask()
+> IIRC there are way more differences between the un-suffixed FE310 and the Rev
+> B, specifically the interrupt map is all different.
 
+The three IRQs that QEMU uses for the SiFive E (UART0, UART1 and GPIO)
+all seem to be the same.
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
+Alistair
 
