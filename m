@@ -2,63 +2,90 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3241DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D72C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D03562072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:07:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D03562072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6EAA2072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:08:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7DXx5oe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6EAA2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbi76-0003oL-0H
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
+	id 1jbi7d-0004fW-5c
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbi62-0002i9-Gg; Thu, 21 May 2020 06:06:38 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:41211)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbi60-0007o4-6T; Thu, 21 May 2020 06:06:38 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06436282|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.762254-0.00146154-0.236284;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbcegyD_1590055589; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbcegyD_1590055589)
- by smtp.aliyun-inc.com(10.147.43.230);
- Thu, 21 May 2020 18:06:30 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 11/62] target/riscv: vector widening integer add and
- subtract
-Date: Thu, 21 May 2020 17:43:22 +0800
-Message-Id: <20200521094413.10425-12-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbi6v-0003o0-D9
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:07:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58674
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbi6t-0007vf-Mq
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:07:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590055650;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=baT+4CJp4I0YAmggm/ipdIJMbUnP9gnMA/lxanJ+S30=;
+ b=C7DXx5oemy9ZnNsdPczELb/xR8NAXvlRRYwl8HgPj8utmcFIkxt8ArYgFMsAdZ9kDC4+/d
+ vjLurxecGN5ywHLVjVFSpqb9jvtS2xf//Z3RWhLhvduhPMIxFtYKY1FY3JGv93ERwVVMOs
+ EEcxcQqxtzRrvAla64r98BUoPM92U84=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-tU58GAEbMNSDRBHiaYtjdg-1; Thu, 21 May 2020 06:07:26 -0400
+X-MC-Unique: tU58GAEbMNSDRBHiaYtjdg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8425C8014D7;
+ Thu, 21 May 2020 10:07:25 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 34F0E2E188;
+ Thu, 21 May 2020 10:07:23 +0000 (UTC)
+Date: Thu, 21 May 2020 11:07:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Subject: Re: [PATCH] crypto: add "none" random provider
+Message-ID: <20200521100720.GC2211791@redhat.com>
+References: <20200520132022.6913-1-marmarek@invisiblethingslab.com>
 MIME-Version: 1.0
+In-Reply-To: <20200520132022.6913-1-marmarek@invisiblethingslab.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 04:44:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,428 +99,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   |  49 +++++++
- target/riscv/insn32.decode              |  16 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 186 ++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 111 ++++++++++++++
- 4 files changed, 362 insertions(+)
+On Wed, May 20, 2020 at 03:20:23PM +0200, Marek Marczykowski-Górecki wrote:
+> In case of not using random-number needing feature, it makes sense to
+> skip RNG init too. This is especially helpful when QEMU is sandboxed in
+> Stubdomain under Xen, where there is very little entropy so initial
+> getrandom() call delays the startup several seconds. In that setup, no
+> random bytes are needed at all.
+> 
+> Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+> ---
+>  configure            | 11 +++++++++++
+>  crypto/Makefile.objs |  3 ++-
+>  crypto/random-none.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 51 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/random-none.c
+> 
+> diff --git a/configure b/configure
+> index 26084fc53a..79a3affe70 100755
+> --- a/configure
+> +++ b/configure
+> @@ -509,6 +509,7 @@ libpmem=""
+>  default_devices="yes"
+>  plugins="no"
+>  fuzzing="no"
+> +rng_none="no"
+>  
+>  supported_cpu="no"
+>  supported_os="no"
+> @@ -1601,6 +1602,10 @@ for opt do
+>    ;;
+>    --gdb=*) gdb_bin="$optarg"
+>    ;;
+> +  --enable-rng-none) rng_none=yes
+> +  ;;
+> +  --disable-rng-none) rng_none=no
+> +  ;;
+>    *)
+>        echo "ERROR: unknown option $opt"
+>        echo "Try '$0 --help' for more information"
+> @@ -1894,6 +1899,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+>    debug-mutex     mutex debugging support
+>    libpmem         libpmem support
+>    xkbcommon       xkbcommon support
+> +  rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
+>  
+>  NOTE: The object files are built at the place where configure is launched
+>  EOF
+> @@ -6733,6 +6739,7 @@ echo "default devices   $default_devices"
+>  echo "plugin support    $plugins"
+>  echo "fuzzing support   $fuzzing"
+>  echo "gdb               $gdb_bin"
+> +echo "rng-none          $rng_none"
+>  
+>  if test "$supported_cpu" = "no"; then
+>      echo
+> @@ -7705,6 +7712,10 @@ if test "$edk2_blobs" = "yes" ; then
+>    echo "DECOMPRESS_EDK2_BLOBS=y" >> $config_host_mak
+>  fi
+>  
+> +if test "$rng_none" = "yes"; then
+> +  echo "CONFIG_RNG_NONE=y" >> $config_host_mak
+> +fi
+> +
+>  # use included Linux headers
+>  if test "$linux" = "yes" ; then
+>    mkdir -p linux-headers
+> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+> index c2a371b0b4..cdee92b4e5 100644
+> --- a/crypto/Makefile.objs
+> +++ b/crypto/Makefile.objs
+> @@ -35,5 +35,6 @@ crypto-obj-y += block-luks.o
+>  
+>  util-obj-$(CONFIG_GCRYPT) += random-gcrypt.o
+>  util-obj-$(if $(CONFIG_GCRYPT),n,$(CONFIG_GNUTLS)) += random-gnutls.o
+> -util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,y)) += random-platform.o
+> +util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,$(CONFIG_RNG_NONE))) += random-none.o
+> +util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,$(if $(CONFIG_RNG_NONE),n,y))) += random-platform.o
+>  util-obj-y += aes.o init.o
+> diff --git a/crypto/random-none.c b/crypto/random-none.c
+> new file mode 100644
+> index 0000000000..102f8a4dce
+> --- /dev/null
+> +++ b/crypto/random-none.c
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU Crypto "none" random number provider
+> + *
+> + * Copyright (c) 2020 Marek Marczykowski-Górecki
+> + *                      <marmarek@invisiblethingslab.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "crypto/random.h"
+> +#include "qapi/error.h"
+> +
+> +int qcrypto_random_init(Error **errp)
+> +{
+> +    return 0;
+> +}
+> +
+> +int qcrypto_random_bytes(void *buf,
+> +                         size_t buflen,
+> +                         Error **errp)
+> +{
+> +    error_setg(errp, "Random bytes not available with \"none\" rng");
+> +    return -1;
+> +}
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index f791f2dbc6..608704850a 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -294,3 +294,52 @@ DEF_HELPER_FLAGS_4(vec_rsubs8, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(vec_rsubs16, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(vec_rsubs32, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(vec_rsubs64, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_6(vwaddu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwaddu_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsubu_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwadd_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsub_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index d1034a0e61..4bdbfd16fa 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -284,6 +284,22 @@ vsub_vv         000010 . ..... ..... 000 ..... 1010111 @r_vm
- vsub_vx         000010 . ..... ..... 100 ..... 1010111 @r_vm
- vrsub_vx        000011 . ..... ..... 100 ..... 1010111 @r_vm
- vrsub_vi        000011 . ..... ..... 011 ..... 1010111 @r_vm
-+vwaddu_vv       110000 . ..... ..... 010 ..... 1010111 @r_vm
-+vwaddu_vx       110000 . ..... ..... 110 ..... 1010111 @r_vm
-+vwadd_vv        110001 . ..... ..... 010 ..... 1010111 @r_vm
-+vwadd_vx        110001 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsubu_vv       110010 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsubu_vx       110010 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsub_vv        110011 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsub_vx        110011 . ..... ..... 110 ..... 1010111 @r_vm
-+vwaddu_wv       110100 . ..... ..... 010 ..... 1010111 @r_vm
-+vwaddu_wx       110100 . ..... ..... 110 ..... 1010111 @r_vm
-+vwadd_wv        110101 . ..... ..... 010 ..... 1010111 @r_vm
-+vwadd_wx        110101 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b70ccccd2e..3b26d72c64 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -138,6 +138,14 @@ static bool vext_check_nf(DisasContext *s, uint32_t nf)
-     return (1 << s->lmul) * nf <= 8;
- }
- 
-+/*
-+ * The destination vector register group cannot overlap a source vector register
-+ * group of a different element width. (Section 11.2)
-+ */
-+static inline bool vext_check_overlap_group(int rd, int dlen, int rs, int slen)
-+{
-+    return ((rd >= rs + slen) || (rs >= rd + dlen));
-+}
- /* common translation macro */
- #define GEN_VEXT_TRANS(NAME, SEQ, ARGTYPE, OP, CHECK)      \
- static bool trans_##NAME(DisasContext *s, arg_##ARGTYPE *a)\
-@@ -1063,3 +1071,181 @@ static void tcg_gen_gvec_rsubi(unsigned vece, uint32_t dofs, uint32_t aofs,
- }
- 
- GEN_OPIVI_GVEC_TRANS(vrsub_vi, 0, vrsub_vx, rsubi)
-+
-+/* Vector Widening Integer Add/Subtract */
-+
-+/* OPIVV with WIDEN */
-+static bool opivv_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-+                                     1 << s->lmul) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+static bool do_opivv_widen(DisasContext *s, arg_rmrr *a,
-+                           gen_helper_gvec_4_ptr *fn,
-+                           bool (*checkfn)(DisasContext *, arg_rmrr *))
-+{
-+    if (checkfn(s, a)) {
-+        uint32_t data = 0;
-+        TCGLabel *over = gen_new_label();
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                           vreg_ofs(s, a->rs1),
-+                           vreg_ofs(s, a->rs2),
-+                           cpu_env, 0, s->vlen / 8,
-+                           data, fn);
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
-+
-+#define GEN_OPIVV_WIDEN_TRANS(NAME, CHECK) \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)       \
-+{                                                            \
-+    static gen_helper_gvec_4_ptr * const fns[3] = {          \
-+        gen_helper_##NAME##_b,                               \
-+        gen_helper_##NAME##_h,                               \
-+        gen_helper_##NAME##_w                                \
-+    };                                                       \
-+    return do_opivv_widen(s, a, fns[s->sew], CHECK);         \
-+}
-+
-+GEN_OPIVV_WIDEN_TRANS(vwaddu_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwadd_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwsubu_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwsub_vv, opivv_widen_check)
-+
-+/* OPIVX with WIDEN */
-+static bool opivx_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+static bool do_opivx_widen(DisasContext *s, arg_rmrr *a,
-+                           gen_helper_opivx *fn)
-+{
-+    if (opivx_widen_check(s, a)) {
-+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fn, s);
-+    }
-+    return true;
-+}
-+
-+#define GEN_OPIVX_WIDEN_TRANS(NAME) \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)       \
-+{                                                            \
-+    static gen_helper_opivx * const fns[3] = {               \
-+        gen_helper_##NAME##_b,                               \
-+        gen_helper_##NAME##_h,                               \
-+        gen_helper_##NAME##_w                                \
-+    };                                                       \
-+    return do_opivx_widen(s, a, fns[s->sew]);                \
-+}
-+
-+GEN_OPIVX_WIDEN_TRANS(vwaddu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwadd_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwsubu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwsub_vx)
-+
-+/* WIDEN OPIVV with WIDEN */
-+static bool opiwv_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-+                                     1 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+static bool do_opiwv_widen(DisasContext *s, arg_rmrr *a,
-+                           gen_helper_gvec_4_ptr *fn)
-+{
-+    if (opiwv_widen_check(s, a)) {
-+        uint32_t data = 0;
-+        TCGLabel *over = gen_new_label();
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                           vreg_ofs(s, a->rs1),
-+                           vreg_ofs(s, a->rs2),
-+                           cpu_env, 0, s->vlen / 8, data, fn);
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
-+
-+#define GEN_OPIWV_WIDEN_TRANS(NAME) \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)       \
-+{                                                            \
-+    static gen_helper_gvec_4_ptr * const fns[3] = {          \
-+        gen_helper_##NAME##_b,                               \
-+        gen_helper_##NAME##_h,                               \
-+        gen_helper_##NAME##_w                                \
-+    };                                                       \
-+    return do_opiwv_widen(s, a, fns[s->sew]);                \
-+}
-+
-+GEN_OPIWV_WIDEN_TRANS(vwaddu_wv)
-+GEN_OPIWV_WIDEN_TRANS(vwadd_wv)
-+GEN_OPIWV_WIDEN_TRANS(vwsubu_wv)
-+GEN_OPIWV_WIDEN_TRANS(vwsub_wv)
-+
-+/* WIDEN OPIVX with WIDEN */
-+static bool opiwx_widen_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-+            vext_check_reg(s, a->rd, true) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+static bool do_opiwx_widen(DisasContext *s, arg_rmrr *a,
-+                           gen_helper_opivx *fn)
-+{
-+    if (opiwx_widen_check(s, a)) {
-+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fn, s);
-+    }
-+    return false;
-+}
-+
-+#define GEN_OPIWX_WIDEN_TRANS(NAME) \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)       \
-+{                                                            \
-+    static gen_helper_opivx * const fns[3] = {               \
-+        gen_helper_##NAME##_b,                               \
-+        gen_helper_##NAME##_h,                               \
-+        gen_helper_##NAME##_w                                \
-+    };                                                       \
-+    return do_opiwx_widen(s, a, fns[s->sew]);                \
-+}
-+
-+GEN_OPIWX_WIDEN_TRANS(vwaddu_wx)
-+GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
-+GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
-+GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 6b321d3114..f2520332c8 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1016,3 +1016,114 @@ void HELPER(vec_rsubs64)(void *d, void *a, uint64_t b, uint32_t desc)
-         *(uint64_t *)(d + i) = b - *(uint64_t *)(a + i);
-     }
- }
-+
-+/* Vector Widening Integer Add/Subtract */
-+#define WOP_UUU_B uint16_t, uint8_t, uint8_t, uint16_t, uint16_t
-+#define WOP_UUU_H uint32_t, uint16_t, uint16_t, uint32_t, uint32_t
-+#define WOP_UUU_W uint64_t, uint32_t, uint32_t, uint64_t, uint64_t
-+#define WOP_SSS_B int16_t, int8_t, int8_t, int16_t, int16_t
-+#define WOP_SSS_H int32_t, int16_t, int16_t, int32_t, int32_t
-+#define WOP_SSS_W int64_t, int32_t, int32_t, int64_t, int64_t
-+#define WOP_WUUU_B  uint16_t, uint8_t, uint16_t, uint16_t, uint16_t
-+#define WOP_WUUU_H  uint32_t, uint16_t, uint32_t, uint32_t, uint32_t
-+#define WOP_WUUU_W  uint64_t, uint32_t, uint64_t, uint64_t, uint64_t
-+#define WOP_WSSS_B  int16_t, int8_t, int16_t, int16_t, int16_t
-+#define WOP_WSSS_H  int32_t, int16_t, int32_t, int32_t, int32_t
-+#define WOP_WSSS_W  int64_t, int32_t, int64_t, int64_t, int64_t
-+RVVCALL(OPIVV2, vwaddu_vv_b, WOP_UUU_B, H2, H1, H1, DO_ADD)
-+RVVCALL(OPIVV2, vwaddu_vv_h, WOP_UUU_H, H4, H2, H2, DO_ADD)
-+RVVCALL(OPIVV2, vwaddu_vv_w, WOP_UUU_W, H8, H4, H4, DO_ADD)
-+RVVCALL(OPIVV2, vwsubu_vv_b, WOP_UUU_B, H2, H1, H1, DO_SUB)
-+RVVCALL(OPIVV2, vwsubu_vv_h, WOP_UUU_H, H4, H2, H2, DO_SUB)
-+RVVCALL(OPIVV2, vwsubu_vv_w, WOP_UUU_W, H8, H4, H4, DO_SUB)
-+RVVCALL(OPIVV2, vwadd_vv_b, WOP_SSS_B, H2, H1, H1, DO_ADD)
-+RVVCALL(OPIVV2, vwadd_vv_h, WOP_SSS_H, H4, H2, H2, DO_ADD)
-+RVVCALL(OPIVV2, vwadd_vv_w, WOP_SSS_W, H8, H4, H4, DO_ADD)
-+RVVCALL(OPIVV2, vwsub_vv_b, WOP_SSS_B, H2, H1, H1, DO_SUB)
-+RVVCALL(OPIVV2, vwsub_vv_h, WOP_SSS_H, H4, H2, H2, DO_SUB)
-+RVVCALL(OPIVV2, vwsub_vv_w, WOP_SSS_W, H8, H4, H4, DO_SUB)
-+RVVCALL(OPIVV2, vwaddu_wv_b, WOP_WUUU_B, H2, H1, H1, DO_ADD)
-+RVVCALL(OPIVV2, vwaddu_wv_h, WOP_WUUU_H, H4, H2, H2, DO_ADD)
-+RVVCALL(OPIVV2, vwaddu_wv_w, WOP_WUUU_W, H8, H4, H4, DO_ADD)
-+RVVCALL(OPIVV2, vwsubu_wv_b, WOP_WUUU_B, H2, H1, H1, DO_SUB)
-+RVVCALL(OPIVV2, vwsubu_wv_h, WOP_WUUU_H, H4, H2, H2, DO_SUB)
-+RVVCALL(OPIVV2, vwsubu_wv_w, WOP_WUUU_W, H8, H4, H4, DO_SUB)
-+RVVCALL(OPIVV2, vwadd_wv_b, WOP_WSSS_B, H2, H1, H1, DO_ADD)
-+RVVCALL(OPIVV2, vwadd_wv_h, WOP_WSSS_H, H4, H2, H2, DO_ADD)
-+RVVCALL(OPIVV2, vwadd_wv_w, WOP_WSSS_W, H8, H4, H4, DO_ADD)
-+RVVCALL(OPIVV2, vwsub_wv_b, WOP_WSSS_B, H2, H1, H1, DO_SUB)
-+RVVCALL(OPIVV2, vwsub_wv_h, WOP_WSSS_H, H4, H2, H2, DO_SUB)
-+RVVCALL(OPIVV2, vwsub_wv_w, WOP_WSSS_W, H8, H4, H4, DO_SUB)
-+GEN_VEXT_VV(vwaddu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwaddu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwaddu_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwsubu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwsubu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwsubu_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwadd_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwadd_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwadd_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwsub_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwsub_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwsub_vv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwaddu_wv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwaddu_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwaddu_wv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwsubu_wv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwsubu_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwsubu_wv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwadd_wv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwadd_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwadd_wv_w, 4, 8, clearq)
-+GEN_VEXT_VV(vwsub_wv_b, 1, 2, clearh)
-+GEN_VEXT_VV(vwsub_wv_h, 2, 4, clearl)
-+GEN_VEXT_VV(vwsub_wv_w, 4, 8, clearq)
-+
-+RVVCALL(OPIVX2, vwaddu_vx_b, WOP_UUU_B, H2, H1, DO_ADD)
-+RVVCALL(OPIVX2, vwaddu_vx_h, WOP_UUU_H, H4, H2, DO_ADD)
-+RVVCALL(OPIVX2, vwaddu_vx_w, WOP_UUU_W, H8, H4, DO_ADD)
-+RVVCALL(OPIVX2, vwsubu_vx_b, WOP_UUU_B, H2, H1, DO_SUB)
-+RVVCALL(OPIVX2, vwsubu_vx_h, WOP_UUU_H, H4, H2, DO_SUB)
-+RVVCALL(OPIVX2, vwsubu_vx_w, WOP_UUU_W, H8, H4, DO_SUB)
-+RVVCALL(OPIVX2, vwadd_vx_b, WOP_SSS_B, H2, H1, DO_ADD)
-+RVVCALL(OPIVX2, vwadd_vx_h, WOP_SSS_H, H4, H2, DO_ADD)
-+RVVCALL(OPIVX2, vwadd_vx_w, WOP_SSS_W, H8, H4, DO_ADD)
-+RVVCALL(OPIVX2, vwsub_vx_b, WOP_SSS_B, H2, H1, DO_SUB)
-+RVVCALL(OPIVX2, vwsub_vx_h, WOP_SSS_H, H4, H2, DO_SUB)
-+RVVCALL(OPIVX2, vwsub_vx_w, WOP_SSS_W, H8, H4, DO_SUB)
-+RVVCALL(OPIVX2, vwaddu_wx_b, WOP_WUUU_B, H2, H1, DO_ADD)
-+RVVCALL(OPIVX2, vwaddu_wx_h, WOP_WUUU_H, H4, H2, DO_ADD)
-+RVVCALL(OPIVX2, vwaddu_wx_w, WOP_WUUU_W, H8, H4, DO_ADD)
-+RVVCALL(OPIVX2, vwsubu_wx_b, WOP_WUUU_B, H2, H1, DO_SUB)
-+RVVCALL(OPIVX2, vwsubu_wx_h, WOP_WUUU_H, H4, H2, DO_SUB)
-+RVVCALL(OPIVX2, vwsubu_wx_w, WOP_WUUU_W, H8, H4, DO_SUB)
-+RVVCALL(OPIVX2, vwadd_wx_b, WOP_WSSS_B, H2, H1, DO_ADD)
-+RVVCALL(OPIVX2, vwadd_wx_h, WOP_WSSS_H, H4, H2, DO_ADD)
-+RVVCALL(OPIVX2, vwadd_wx_w, WOP_WSSS_W, H8, H4, DO_ADD)
-+RVVCALL(OPIVX2, vwsub_wx_b, WOP_WSSS_B, H2, H1, DO_SUB)
-+RVVCALL(OPIVX2, vwsub_wx_h, WOP_WSSS_H, H4, H2, DO_SUB)
-+RVVCALL(OPIVX2, vwsub_wx_w, WOP_WSSS_W, H8, H4, DO_SUB)
-+GEN_VEXT_VX(vwaddu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwaddu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwaddu_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwsubu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwsubu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwsubu_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwadd_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwadd_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwadd_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwsub_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwsub_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwsub_vx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwaddu_wx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwaddu_wx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwaddu_wx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwsubu_wx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwsubu_wx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwsubu_wx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwadd_wx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwadd_wx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwadd_wx_w, 4, 8, clearq)
-+GEN_VEXT_VX(vwsub_wx_b, 1, 2, clearh)
-+GEN_VEXT_VX(vwsub_wx_h, 2, 4, clearl)
-+GEN_VEXT_VX(vwsub_wx_w, 4, 8, clearq)
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
+
+and queued.
+
+
+Regards,
+Daniel
 -- 
-2.23.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
