@@ -2,92 +2,94 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CE7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D47C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:13:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C67120759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC9920759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:13:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CZjevvvF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C67120759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcKaYluU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC9920759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbokn-0005OY-E5
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:13:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50250)
+	id 1jbolF-0006E7-PF
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:13:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJO-0004tf-Jc
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:50 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:36688)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jboK7-0006nx-7h
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:45:35 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41943)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJN-0006yJ-HY
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:50 -0400
-Received: by mail-qt1-x842.google.com with SMTP id v4so6015583qte.3
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wDuYpfs9QlEw4aXWAwthoPylqu8S5OXh9Q7CXYLnZi8=;
- b=CZjevvvF6bG4rCc0U5MLQJHndBYJxGCsV3rZ6cqVid5/gU7z5/OLRRXWDlHzJEYLKg
- MqGFVdFeTgG95hEhesAEUceMWkuoXakdW7it+cVZ5h69dHCvFwMaEQCPbg8A+5hKcNcG
- PlczMlUEeDA3YFl69KyA+c01SQjvMbmAqmEAuuP1JTv1CkCIoWySh1tT7TmCpzcSMX6O
- fkSzA7zgf284yCKefG6Rbg3scpsfGMtvtAKkyVXe/ImUy7A74ez1sljGsXCdO0VgXjpg
- 2makoZ+nIuJgc1D6ykPsxl33oXEG0s8hC33OOOi1A6I/Gtrj88YUtnh2EjaYIuwYH2oc
- uSHw==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jboK5-0007BQ-Ur
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:45:34 -0400
+Received: by mail-lj1-x241.google.com with SMTP id v16so9105581ljc.8
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=P8/ZRYeOG5B+jSgE1NVudAwxcAC9WImDYte2116gw7s=;
+ b=gcKaYluUiLW+iAouc4NoZ1VdeYd6HEryprONPJaBxjn/akCcTOKL7ZC2HpnyhZLYao
+ NnCrtd3RWmFleEypMRAt28GrGkVPzEKCPUb1Q2mzxJfgPhz++n9h/fKN8isYjXX/8UwI
+ WcKDwAYqEEGhGvl1I8culcdqeIBJMhBMvxWKaBQ0Vjxy6cGvm0X5d6llgIz68huTUt75
+ GlGlz2qozaqHKP13HClGtxsOoargJ0DisNB79cFffB2xfj3OV5jVHG80J34g4qi0M5Lg
+ rcx2weSfO1msVLM87zXZ+kFze28wSBe+co2EIQSfuYTsEoDkm/hHYJ0iN2CJKfXUoVdh
+ LvPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wDuYpfs9QlEw4aXWAwthoPylqu8S5OXh9Q7CXYLnZi8=;
- b=CcXS9E6BAx2Evo+4qB17bEaCJVlXU0IJaLwi9AQloC5fp4/8ndGnh9R2nlx7h4D2Sd
- ZFbVzl9Z1TXONOSSqGBxFpzp4VnT8meKwVa0if0dDmfYAuwyYhPXOrdmi96zpxXQuNpB
- 7ucfPCkMLeo3GXhHWGV6DUUNezCO7hKaAF0hFmH5Ev24tAx6pbE1T+0rEq/cVTZOB5/F
- T5rQcAew7IHNWOJEsgFiUvXiUbYBKsgDKdp08br86PvKjGplqAmjY6KYtXL+UkBL8LW5
- YIVD3EVREXoV8bokxX1sgFDjVaxtyhTvSAuejtzDSY9QCZko7HQaOWJImfBlv7MAlHm3
- KDQQ==
-X-Gm-Message-State: AOAM531CW0KuKDOgvyMwtQ/aeJa1MjiZcj+QlLST70KXo1NovrPs2DTw
- Nqusu2qsNQtKzbU6OM7QOXytv8Bw7fpl8Q==
-X-Google-Smtp-Source: ABdhPJy+ztiScICekgyUDMqsyocmXAcMSbF2lnIgx3oJ6lD6op6mruD+TTzT3uALuY/JD6U/qXWbKQ==
-X-Received: by 2002:ac8:393a:: with SMTP id s55mr11528006qtb.48.1590079488317; 
- Thu, 21 May 2020 09:44:48 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.47
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=P8/ZRYeOG5B+jSgE1NVudAwxcAC9WImDYte2116gw7s=;
+ b=LXTTUT1UTz6o69LN6AiWnjDFue2z6uUm5YlmI6wuROdBetxbnxz/ZWP2fFfdH5n+MY
+ pvAN45oab7SDZXXwNCB81cibwAvEWPJrr8THlBlhT7h0jbqYk5zrbOzDE3iAkWNdfwEj
+ YHatwuGbFb8eaopNj1RYkTSd/o5vOe6PvuZdIPSVYAGACLOz9vy8E+0XSeWahBqHP/zM
+ 1CpXnnsfxHvQYdlHaVSHFDIEYYzijeSWifODlixll5ssJ9lelNBlvmFaqV630VtSypBK
+ zX2zCRowaPVRPWFd3k73j2aFFORCe762y3ysmkWaWmMQ8Gcu3nvqSuelAzXOwOwLIi1H
+ uTQw==
+X-Gm-Message-State: AOAM532YyVP7vfJpD6+koSjfHyha6cU/jnhKrNOLbScBvMAKw4E8pXj+
+ IlhbE0c+0cAAaGj5muA2U8g=
+X-Google-Smtp-Source: ABdhPJzzwHUfZPa7mi/Pxpko7fk5CSneHB0ygTQTWkoQ2GVAX23V83munLa4xUA0cFcZNInxTNdZ8Q==
+X-Received: by 2002:a2e:1f02:: with SMTP id f2mr5380237ljf.156.1590079531338; 
+ Thu, 21 May 2020 09:45:31 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id a6sm957410ljj.125.2020.05.21.09.45.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:47 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 70/74] cpu: rename all_cpu_threads_idle to
- qemu_tcg_rr_all_cpu_threads_idle
-Date: Thu, 21 May 2020 12:40:07 -0400
-Message-Id: <20200521164011.638-71-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
+ Thu, 21 May 2020 09:45:30 -0700 (PDT)
+Date: Thu, 21 May 2020 18:45:13 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v9 14/74] microblaze: convert to helper_cpu_halted_set
+Message-ID: <20200521164513.GE5519@toto>
 References: <20200521164011.638-1-robert.foley@linaro.org>
+ <20200521164011.638-15-robert.foley@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
+In-Reply-To: <20200521164011.638-15-robert.foley@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -103,70 +105,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
- robert.foley@linaro.org, peter.puhov@linaro.org
+ qemu-devel@nongnu.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+On Thu, May 21, 2020 at 12:39:11PM -0400, Robert Foley wrote:
+> From: "Emilio G. Cota" <cota@braap.org>
+> 
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
 
-This function is only called from TCG rr mode, so add
-a prefix to mark this as well as an assertion.
 
-Reviewed-by: Alex BennÃ©e <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- cpus.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-diff --git a/cpus.c b/cpus.c
-index ff67fa9f5f..bcba0552bf 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -230,10 +230,12 @@ static bool cpu_thread_is_idle(CPUState *cpu)
-     return true;
- }
- 
--static bool all_cpu_threads_idle(void)
-+static bool qemu_tcg_rr_all_cpu_threads_idle(void)
- {
-     CPUState *cpu;
- 
-+    g_assert(qemu_is_tcg_rr());
-+
-     CPU_FOREACH(cpu) {
-         if (!cpu_thread_is_idle(cpu)) {
-             return false;
-@@ -641,7 +643,7 @@ void qemu_start_warp_timer(void)
-     }
- 
-     if (replay_mode != REPLAY_MODE_PLAY) {
--        if (!all_cpu_threads_idle()) {
-+        if (!qemu_tcg_rr_all_cpu_threads_idle()) {
-             return;
-         }
- 
-@@ -1300,7 +1302,7 @@ static void qemu_tcg_rr_wait_io_event(void)
- {
-     CPUState *cpu;
- 
--    while (all_cpu_threads_idle()) {
-+    while (qemu_tcg_rr_all_cpu_threads_idle()) {
-         stop_tcg_kick_timer();
-         qemu_cond_wait(first_cpu->halt_cond, &qemu_global_mutex);
-     }
-@@ -1656,7 +1658,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             atomic_mb_set(&cpu->exit_request, 0);
-         }
- 
--        if (use_icount && all_cpu_threads_idle()) {
-+        if (use_icount && qemu_tcg_rr_all_cpu_threads_idle()) {
-             /*
-              * When all cpus are sleeping (e.g in WFI), to avoid a deadlock
-              * in the main_loop, wake it up in order to start the warp timer.
--- 
-2.17.1
 
+> ---
+>  target/microblaze/translate.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index f6ff2591c3..c08a7f1d39 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1237,9 +1237,7 @@ static void dec_br(DisasContext *dc)
+>              LOG_DIS("sleep\n");
+>  
+>              t_sync_flags(dc);
+> -            tcg_gen_st_i32(tmp_1, cpu_env,
+> -                           -offsetof(MicroBlazeCPU, env)
+> -                           +offsetof(CPUState, halted));
+> +            gen_helper_cpu_halted_set(cpu_env, tmp_1);
+>              tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc + 4);
+>              gen_helper_raise_exception(cpu_env, tmp_hlt);
+>              tcg_temp_free_i32(tmp_hlt);
+> -- 
+> 2.17.1
+> 
 
