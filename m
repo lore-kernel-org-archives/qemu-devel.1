@@ -4,78 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE68BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:08:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E0420759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5A9020759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:08:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cKtTSVcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E0420759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CfujEWZn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A9020759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbofM-0002GX-J4
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:07:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
+	id 1jbofp-0002z1-RE
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:08:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJH-0004YG-3G
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:43 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:43435)
+ id 1jboIs-0003z0-Te
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:18 -0400
+Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:42555)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJF-0006l6-CD
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:42 -0400
-Received: by mail-qk1-x742.google.com with SMTP id i14so7816886qka.10
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:40 -0700 (PDT)
+ id 1jboIr-0006ct-Ve
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:18 -0400
+Received: by mail-qv1-xf43.google.com with SMTP id g20so3345197qvb.9
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=VF7BD2whUFR8MWRbhBIqKLqcFA5T5WPcm/utxP5IxZE=;
- b=cKtTSVcTuHFg4AgrSgyFw+NjxSSeQxb4iUmg9alZt9c42owUxVIqYidjp6XfGiUdI5
- h3/wEWpa8mFUoJrbDC2e2VK/E3vorawcAGDLnhCtANxr7OptRUtvGnXfYVRww7+OBHrU
- ycSufMA28vVlidWfKqP9PEfKp+WYuLf2n+H0w5DpQgzblvfy0fmm9jL2/EUB9kqo22ww
- vlb/Vuw4V1lXgkyDTv2IIHyNPlrF/0hnJCqk2RTpyIduaUJFN85b0eVaaVmDlLUuWAbn
- 8vDgWEDpF2Ol65IXhFbkLlwNj9MQISmqyvEENh3pP+8HhLUzU0IQPPN9X2wnhwDl+zYZ
- ZlLw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=cJAv+EbsefdW66yr8LjRtj+7g6Sr3jeK6hHxTVUkhJA=;
+ b=CfujEWZnCTXFPZ9auk2CPEj0Hxw0F4l/8hAAjB2gUlQOCOxDHMLLp1OGcX1W+lUngG
+ rfnOEA0I1hzQ1u0mYCUIlZMyARu4kLf2/d9VuJBzncz+Ta5isApzSg7VejYmuOTNDSPo
+ 1c8ZV6RYfBL9i9E6y80ILhxHRB3igsGM13ao2qJJEv/yUILzfwTPYNB8PFYv3QlviYtd
+ z7sul4WjYnIWwY6Yv5Scwx3SCZci7bFpvnuY2+EtIuJYr65bDUCcGRdoquQMHd3auBLs
+ 2q4dq6fmFXHFINABhKuK4ZFyuexO3Akq++Avwgqn+pKuQJjQqBCVaAwJaO1QiY0ART9i
+ +v5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=VF7BD2whUFR8MWRbhBIqKLqcFA5T5WPcm/utxP5IxZE=;
- b=ad0QZ9HzFC5XUUS+NQd5DYwWkvGvkI/ERtYEdKBZJrgFr4esX35TXsMSWPHcDGzX/V
- KEIEGSJK3l+lhQnC5ywgBCKpiDRVRU1wp7EYxlYDccuuma/tE7c5ktX/Xqr4Cpd3hxAT
- LJAB2DvkdVSXyY3aEo+HkEkONyFwNtGh1kB3A5xfU9E+gCIh9/MruYnfoF+7Q2ZWwIap
- CxIDreav/Epqt+bVeBUC3WKWtDPKy9C7lp6jmizewZyHOnlxcRLCvxNEcyssfgp5MF7+
- 9VAoyh/ovjNwWAkCbUEtkLqz/LbbRb+ETe9JAnWEQyO7H+zA9dsftbsJwKChDvfjjkwH
- SPwA==
-X-Gm-Message-State: AOAM533BuwWlS507EfihURL1hves0qwfXtKlfIrlwWIW5pBXPOGg0N/M
- b+ImxX6ymfYDOco/zHf5jGgULal4tp/0yA==
-X-Google-Smtp-Source: ABdhPJy/vBFlrhfn3FKIHC+iiqJkYk9iASmktnvneJiq6VgHPiGq/WU1W9kDqGd50MvSSe1vKSNfkA==
-X-Received: by 2002:a37:8d85:: with SMTP id p127mr9864351qkd.35.1590079480259; 
- Thu, 21 May 2020 09:44:40 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=cJAv+EbsefdW66yr8LjRtj+7g6Sr3jeK6hHxTVUkhJA=;
+ b=DVGz5PSL2JPuiMdrrJBFw01oH/ngG77LYPlxc+rScLHtjDbaz5NNP6lzDHR7vIDmeR
+ skB4jdPnyGGV9Wjotcv8BfZaQUZ9tIOZCsbIWE1XAVbXmyCok/oLsDcgM/WteVG1wxg3
+ cySPENf8gxAG2MywBZXX+UgRVXnCQ7e4pLNlUTR4IMtrUnYPfLN4rq/ZVi4caMX2zXM/
+ QGnNr+CibdDxO5L+OkNwVGo96Bhkj/UDTVbwTRr9KViQF3ukl45QGkhpgRpXPd2hNJco
+ H3RRj28ii0N4J64AGmI260cWvIXSTqP0sd98S/HB5PJDSRelIjcQXKo1wXHfNTGc/DNI
+ KeKQ==
+X-Gm-Message-State: AOAM531CgPdgLUCr12WhYzrXsjQrMY8JwXHrkxtlaX9ETPoskNOOUbZw
+ 0mzmHnPQHU+Hxy6FVgOC1JcrCMZRwWQLwg==
+X-Google-Smtp-Source: ABdhPJz2TSxG9laS5gW1TVM6nOt/7g+Xlz2FXHIZ/RIjKH8laIpAmAo8uN9iimexu69D7Q7VPboCGw==
+X-Received: by 2002:a0c:d981:: with SMTP id y1mr11099259qvj.64.1590079456735; 
+ Thu, 21 May 2020 09:44:16 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.39
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:39 -0700 (PDT)
+ Thu, 21 May 2020 09:44:16 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 64/74] ppc: convert to cpu_has_work_with_iothread_lock
-Date: Thu, 21 May 2020 12:40:01 -0400
-Message-Id: <20200521164011.638-65-robert.foley@linaro.org>
+Subject: [PATCH v9 46/74] sh4: convert to cpu_interrupt_request
+Date: Thu, 21 May 2020 12:39:43 -0400
+Message-Id: <20200521164011.638-47-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x742.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f43;
+ envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,118 +102,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: robert.foley@linaro.org, richard.henderson@linaro.org, cota@braap.org,
- qemu-ppc@nongnu.org, peter.puhov@linaro.org, alex.bennee@linaro.org
+ peter.puhov@linaro.org, alex.bennee@linaro.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Soon we will call cpu_has_work without the BQL.
-
-Cc: qemu-ppc@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-[RF: Converted new code related to POWER10]
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/ppc/translate_init.inc.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ target/sh4/cpu.c    | 2 +-
+ target/sh4/helper.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index e61ba39982..0aeddf3eef 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8539,6 +8539,8 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index 3c68021c56..18f3448183 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -44,7 +44,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
  
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     if (cpu_halted(cs)) {
-         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-@@ -8581,7 +8583,7 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
-     pcc->pcr_supported = PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER7;
-     pcc->check_pow = check_pow_nocheck;
--    cc->has_work = cpu_has_work_POWER7;
-+    cc->has_work_with_iothread_lock = cpu_has_work_POWER7;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-@@ -8701,6 +8703,8 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     if (cpu_halted(cs)) {
-         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-@@ -8751,7 +8755,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
-     pcc->pcr_supported = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER8;
-     pcc->check_pow = check_pow_nocheck;
--    cc->has_work = cpu_has_work_POWER8;
-+    cc->has_work_with_iothread_lock = cpu_has_work_POWER8;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-@@ -8901,6 +8905,8 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     if (cpu_halted(cs)) {
-         uint64_t psscr = env->spr[SPR_PSSCR];
- 
-@@ -8968,7 +8974,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                          PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER9;
-     pcc->check_pow = check_pow_nocheck;
--    cc->has_work = cpu_has_work_POWER9;
-+    cc->has_work_with_iothread_lock = cpu_has_work_POWER9;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-@@ -9117,6 +9123,7 @@ static bool cpu_has_work_POWER10(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-     if (cpu_halted(cs)) {
-         uint64_t psscr = env->spr[SPR_PSSCR];
- 
-@@ -9185,7 +9192,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
-                          PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER10;
-     pcc->check_pow = check_pow_nocheck;
--    cc->has_work = cpu_has_work_POWER10;
-+    cc->has_work_with_iothread_lock = cpu_has_work_POWER10;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-@@ -10655,6 +10662,8 @@ static bool ppc_cpu_has_work(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
+ static bool superh_cpu_has_work(CPUState *cs)
+ {
+-    return cs->interrupt_request & CPU_INTERRUPT_HARD;
++    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
  }
  
-@@ -10879,7 +10888,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = ppc_cpu_class_by_name;
-     pcc->parent_parse_features = cc->parse_features;
-     cc->parse_features = ppc_cpu_parse_featurestr;
--    cc->has_work = ppc_cpu_has_work;
-+    cc->has_work_with_iothread_lock = ppc_cpu_has_work;
-     cc->do_interrupt = ppc_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;
-     cc->dump_state = ppc_cpu_dump_state;
+ static void superh_cpu_reset(DeviceState *dev)
+diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+index 408478ce5d..1e32365c75 100644
+--- a/target/sh4/helper.c
++++ b/target/sh4/helper.c
+@@ -62,7 +62,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
+ {
+     SuperHCPU *cpu = SUPERH_CPU(cs);
+     CPUSH4State *env = &cpu->env;
+-    int do_irq = cs->interrupt_request & CPU_INTERRUPT_HARD;
++    int do_irq = cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+     int do_exp, irq_vector = cs->exception_index;
+ 
+     /* prioritize exceptions over interrupts */
 -- 
 2.17.1
 
