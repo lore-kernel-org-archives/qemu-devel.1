@@ -2,87 +2,61 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E95AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE91C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:34:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5EE42072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="st0EYVbc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5EE42072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A542C2072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:34:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A542C2072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbjSO-0006eI-5N
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42412)
+	id 1jbjTG-0007YU-Th
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:34:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jbjRk-0005bX-Bs
- for qemu-devel@nongnu.org; Thu, 21 May 2020 07:33:08 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43066)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jbjRi-00074Q-0U
- for qemu-devel@nongnu.org; Thu, 21 May 2020 07:33:08 -0400
-Received: by mail-lf1-x141.google.com with SMTP id c12so4240653lfc.10
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 04:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O0ofk45mBhkd/iPVmIzLPHgKLBfNxwP0/3vKM+icrNk=;
- b=st0EYVbcnEn3qQGTucl91UGlk36e+4T+mTRM5Qwy1G0W3AOn2EFHntdc4ni5ViVwht
- bZd+b3C52B7Tb7G3AyEhxCCN52vbCG07jHlkeZBjq+YALFYRNW0Rv9NAiYqzsY8yeUvF
- DO0xXRzo8bCHlPKAN+cok3MmxbQfULGcNVD/zboLUOKEVTwd044Lyneyqhd143FzIc2A
- sCWep8OpSxUofAoxssXqy9qakFjjCbJtoKK8xXyvInXoD5P7zLXna61x4+UIJE4/g+Cl
- KY/O5OgRGOMo2zC4AZddnZsWyoGSSYBBSoCHM1/G4XUX9ZKrBnP5n/s+Yqw72oElLBuF
- niBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O0ofk45mBhkd/iPVmIzLPHgKLBfNxwP0/3vKM+icrNk=;
- b=IdLfjalG7ftDExWumWzwN8HMzSi5sxcYexvDvaA8DjeAq2t9An8M1A0OHjg6VWdbOh
- OuZn3q/aKGeLSCUHQ8TWNcX8/EfstsMfGjh4UQXzmHKYznXV9A+2zFjsck3nRY4lEBe/
- m8apuCAfmOEJbve4fbDLriU24hWmPCwmOU+Gka46XNMn8lRmbQOzLeORhHKLjnnyzhic
- wtLRPOUH580TOgcpPkZ5/O8/i0N+3ft74Gp4PXlc59K++jvF4WEC8zf7VMOwH6JYlOja
- /Knl1XgcrX5HM9SDbPHF6aet9ge7LuLgT0Xz0/yVfsCgSQbY9XDhOE3q9r8E33i6Pg8K
- aXxA==
-X-Gm-Message-State: AOAM5338/vILvS84EjWROI6yQmqXINpTT8rA1K0/dUHT1XTDkXxxrEoB
- eq4KdiQ8/nWhBk0SalIVqYZunF9JdzJw87ENr30=
-X-Google-Smtp-Source: ABdhPJwCV+mpQc1/t6aPt3OFF2YRtHCvA9D4LcU0iAvcK0eBuwkqdfS2KI6p/Q5KJQtT8MrpWBZrW3MGwLJVd2GhL4Y=
-X-Received: by 2002:a19:987:: with SMTP id 129mr4854869lfj.8.1590060783656;
- Thu, 21 May 2020 04:33:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jbjRo-0005hn-Bh; Thu, 21 May 2020 07:33:12 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54243)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jbjRm-00074M-Vl; Thu, 21 May 2020 07:33:11 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0705393|-1; BR=01201311R161ec; CH=green;
+ DM=|OVERLOAD|false|; DS=SPAM|spam_blackmail|0.914495-2.54246e-05-0.08548;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16367; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HbeagZ4_1590060782; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HbeagZ4_1590060782)
+ by smtp.aliyun-inc.com(10.147.42.241);
+ Thu, 21 May 2020 19:33:02 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v8 54/62] target/riscv: vector iota instruction
+Date: Thu, 21 May 2020 17:44:05 +0800
+Message-Id: <20200521094413.10425-55-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
- <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
-In-Reply-To: <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Date: Thu, 21 May 2020 13:32:27 +0200
-Message-ID: <CALTWKrVGqVb1mjsaoxYm4Y1iQoXYwz7ToC7T6r2EDPp-_LO=LQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
-To: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, rth@twiddle.net, 
- ysato@users.sourceforge.jp
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,62 +70,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, stefanha@redhat.com
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 19, 2020 at 8:01 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 5/19/20 9:21 AM, Ahmed Karaman wrote:
-> > The issue arose because the page crossings check in use_goto_tb()
-> > function is required only in the system mode. Checking it in both
-> > modes causes an unnecessary overhead in the user mode.
->
-> It is not only required in system mode.
->
-> You can see failures in user-mode if you modify executable pages, or
-> change their permissions with mmap.  Such as if the guest program
-> contains a JIT.
->
->
-> r~
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 27 +++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 29 +++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+)
 
-Hi Mr. Richard,
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index ae93b6018d..90e6d31d78 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1103,3 +1103,8 @@ DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsbf_m, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsif_m, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsof_m, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b2bc6ab3dd..37756fa76d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -558,6 +558,7 @@ vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
+ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
++viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 8b646fdc0b..3dc1b35cb8 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2472,3 +2472,30 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ GEN_M_TRANS(vmsbf_m)
+ GEN_M_TRANS(vmsif_m)
+ GEN_M_TRANS(vmsof_m)
++
++/* Vector Iota Instruction */
++static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2, 1) &&
++        (a->vm != 0 || a->rd != 0)) {
++        uint32_t data = 0;
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        static gen_helper_gvec_3_ptr * const fns[4] = {
++            gen_helper_viota_m_b, gen_helper_viota_m_h,
++            gen_helper_viota_m_w, gen_helper_viota_m_d,
++        };
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           vreg_ofs(s, a->rs2), cpu_env, 0,
++                           s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 34a24e51b7..004d04c7d8 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4643,3 +4643,32 @@ void HELPER(vmsof_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
+ {
+     vmsetm(vd, v0, vs2, env, desc, ONLY_FIRST);
+ }
++
++/* Vector Iota Instruction */
++#define GEN_VEXT_VIOTA_M(NAME, ETYPE, H, CLEAR_FN)                        \
++void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
++                  uint32_t desc)                                          \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t sum = 0;                                                     \
++    int i;                                                                \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(i)) = sum;                                      \
++        if (vext_elem_mask(vs2, mlen, i)) {                               \
++            sum++;                                                        \
++        }                                                                 \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
++GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
++GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
++GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
+-- 
+2.23.0
 
-I've checked how the use_goto_tb() function is implemented in other
-targets, and it appears that they do the page crossings check in the
-system mode only.
-
-Below is an example from the arm64 target:
------------------------------------------------------------------------
-static inline bool use_goto_tb(DisasContext *s, int n, uint64_t dest)
-{
-  /* No direct tb linking with singlestep (either QEMU's or the ARM
-   * debug architecture kind) or deterministic io
-   */
-  if (s->base.singlestep_enabled || s->ss_active ||
-    (tb_cflags(s->base.tb) & CF_LAST_IO)) {
-    return false;
-  }
-
-#ifndef CONFIG_USER_ONLY
-  /* Only link tbs from inside the same guest page */
-  if ((s->base.tb->pc & TARGET_PAGE_MASK)!=(dest & TARGET_PAGE_MASK)) {
-    return false;
-  }
-#endif
-
-  return true;
-}
------------------------------------------------------------------------
-Please let me know what you think. Does this mean that there is a bug
-in this function for the other targets?
-That we have to do the page crossings check in both modes to avoid the
-user-mode failures that you have mentioned above?
-
-Regards,
-Ahmed Karaman
 
