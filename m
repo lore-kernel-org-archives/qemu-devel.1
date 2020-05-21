@@ -2,69 +2,62 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E042C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9586C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C432A207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 750742088E
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQYXwnih"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C432A207D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkR/DhpP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750742088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbq0s-0002to-0n
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:33:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35194)
+	id 1jbqGA-0004Wk-Jq
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:49:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpzT-0001lj-Iy
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:32:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51703
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbqFa-0003OC-HC
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:49:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52317
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpzP-0003Zj-F1
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:32:23 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbqFY-0007y1-Je
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:49:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590085938;
+ s=mimecast20190719; t=1590086939;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=E1VIJGiNolfJfmlv5dvOYZz4KbDa8Vq0IgHoHlnAiIU=;
- b=CQYXwnih1Ur04867lGi8Q0E2XwSh6cIUufRXfx6C2VvS/nj2UenN27C2DzF6+F05V0wTIi
- TareblEYWFZjH1YqR+3LxKt9BNO8fGqO58+uvIUkb7TkqElr5L5CIIMs1tgseIHKURWfPr
- D750lmbmzujr2R+MtrXUSpcQSSRxYtA=
+ bh=PfpQzelE5UEWvpVYK63cNvjMLTgVGg49Jdq+/K4QaAQ=;
+ b=WkR/DhpPhZSsdinN0Wa6izs/3Xt9junUNSfkh7k4CSBqMgiZLb+TGvdV1Axzl5BvqLAUNm
+ ISDJ9zUXVaMODsKDH61M5QPjQ2Mfxmp+GlxMI3YBJ+w4yKm/UDaGRMlHE7v/53QDN57FDW
+ 0EPFF6VpHc/zP+/B7ksq+UKbED2yZeg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-v8xsDs1-MNqWaGnN-nI3ZQ-1; Thu, 21 May 2020 14:32:16 -0400
-X-MC-Unique: v8xsDs1-MNqWaGnN-nI3ZQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-224-xOwrgl9kMw6-DPpOg1KqNQ-1; Thu, 21 May 2020 14:48:55 -0400
+X-MC-Unique: xOwrgl9kMw6-DPpOg1KqNQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D808805726;
- Thu, 21 May 2020 18:32:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54235EC1A1;
+ Thu, 21 May 2020 18:48:54 +0000 (UTC)
 Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4F1082A3E;
- Thu, 21 May 2020 18:32:11 +0000 (UTC)
-Subject: Re: [PATCH v4 9/9] iotests: rename and move 169 and 199 tests
-To: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20200515211505.3042-1-vsementsov@virtuozzo.com>
- <20200515211505.3042-10-vsementsov@virtuozzo.com>
- <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
- <20200519090709.GC7652@linux.fritz.box>
- <2dfeb643-bbb2-d50b-d14c-ea2db04aa3c5@virtuozzo.com>
- <20200519114107.GL7652@linux.fritz.box>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3926A54FCD;
+ Thu, 21 May 2020 18:48:39 +0000 (UTC)
+Subject: Re: [PATCH RFC 00/32] python/qemu: refactor as installable package
+To: qemu-devel@nongnu.org
+References: <20200514055403.18902-1-jsnow@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -140,18 +133,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <8ac73337-4d93-7916-dea3-e20d2895bcb6@redhat.com>
-Date: Thu, 21 May 2020 14:32:11 -0400
+Message-ID: <f77b8215-0483-1678-25f4-1d7aee8ef02b@redhat.com>
+Date: Thu, 21 May 2020 14:48:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200519114107.GL7652@linux.fritz.box>
+In-Reply-To: <20200514055403.18902-1-jsnow@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
@@ -175,99 +168,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ping, please give this series a look-over. It looks big, but the changes
+themselves are actually fairly tiny.
+
+Here's a TOC:
+
+Patch 1 moves files and renames import statements.
+Patches 2-3 do some basic delinting.
+Patches 4-5 do more basic delinting and add flake8/pylintrc cfg
+Patches 6-10 add setup.py, pipfile, a readme, etc.
+Patch 11 is a final bit of removing python2 isms.
+
+Patches 12-32 (!) are all mypy typing fixes, and I have broken these out
+in great care:
+
+Patches 12-30 all fix one mypy issue each with bite-sized refactors each.
+
+Patch 31 adds a mypy configuration to the package.
+
+Patch 32 is a giant patch that has __NO__ runtime side-effects, it JUST
+adds the remaining mypy annotations.
 
 
-On 5/19/20 7:41 AM, Kevin Wolf wrote:
-> Am 19.05.2020 um 13:32 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 19.05.2020 12:07, Kevin Wolf wrote:
->>> Am 18.05.2020 um 18:12 hat Thomas Huth geschrieben:
->>>> On 15/05/2020 23.15, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Rename bitmaps migration tests and move them to tests subdirectory to
->>>>> demonstrate new human-friendly test naming.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>> ---
->>>>>   tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test}   | 0
->>>>>   .../{199.out => tests/migrate-bitmaps-postcopy-test.out}          | 0
->>>>>   tests/qemu-iotests/{169 => tests/migrate-bitmaps-test}            | 0
->>>>>   tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out}    | 0
->>>>>   4 files changed, 0 insertions(+), 0 deletions(-)
->>>>>   rename tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test} (100%)
->>>>>   rename tests/qemu-iotests/{199.out => tests/migrate-bitmaps-postcopy-test.out} (100%)
->>>>>   rename tests/qemu-iotests/{169 => tests/migrate-bitmaps-test} (100%)
->>>>>   rename tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out} (100%)
->>>>>
->>>>> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
->>>>> similarity index 100%
->>>>> rename from tests/qemu-iotests/199
->>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
->>>>> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
->>>>> similarity index 100%
->>>>> rename from tests/qemu-iotests/199.out
->>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
->>>>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/tests/migrate-bitmaps-test
->>>>> similarity index 100%
->>>>> rename from tests/qemu-iotests/169
->>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test
->>>>> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/tests/migrate-bitmaps-test.out
->>>>> similarity index 100%
->>>>> rename from tests/qemu-iotests/169.out
->>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test.out
->>>>
->>>> I like the idea ... but the path name + file names get now quite long.
->>>> While you're at it, what about renaming the "qemu-iotests" directory to
->>>> just "iotests" or even just "io" now?
->>>
->>> Renames are always kind of painful. Do we have a real reason for the
->>> rename except that the paths feel a bit long subjectively?
->>>
->>> Of course, if we're renaming all files anyway, changing the directory
->>> name at the same time shouldn't give any additional pain, so it would be
->>> completely reasonable then. We're not renaming the test harness files,
->>> though, and even only two test cases in this patch.
->>>
->>> Maybe this final patch should stay RFC until we have the infrastructure
->>> in and then we can have a single series that moves all tests and also
->>> renames the directory? Maybe a not strictly necessary rename of the
->>> tooling would be bearable in the context of a mass rename of tests.
->>
->> I'm absolutely not hurrying about this thing. And actual aim of the
->> series is another. I even doubt that we will mass rename the tests:
->> who knows what they all test?) I don't.
-> 
-> Good point.
-> 
-> And conversely, there are a few test cases that I do know (like 026 030
-> 040 041 055) and probably wouldn't recognise for a while after a rename.
-> :-)
-> 
->> Still we may rename some tests, and we'll create new named tests which
->> is good enough.. OK, if I resend a new version, I'll add an RFC patch
->> on renaming the directory, up to maintainers, take it now or not :)
-> 
-> I guess a final patch to rename the directory as an RFC makes sense.
-> Then we can continue the discussion there and decide whether or not to
-> apply it without holding up the rest of the series.
-> 
-> I think I would be inclined to leave the name unchanged as long as we
-> don't have a real reason, but if people overwhelmingly think otherwise,
-> we can still rename.
-> 
+At the end of the series, you should find that mypy *strict*, flake8,
+and pylint all pass 100%.
 
-It's a pinch long, but it's not a big ordeal. I wouldn't object to
-.tests/io as long as all of the renames happened all at once.
-
-I'll admit to not having read the series, but I will miss the ability to
-specify ranges of tests. I'm not sure how that happens under the new
-proposal; but I think it's a strict improvement to give the tests human
-readable names in the filesystem.
+(Note: you MAY need specific versions of these tools to have them pass.
+The pipfile included will help you target the correct versions.)
 
 --js
+
+On 5/14/20 1:53 AM, John Snow wrote:
+> Hey, I got lost on my way to the store and I accidentally got 32 patches
+> that convert our python library into something that passes pylint,
+> flake8, and mypy --strict.
+> 
+> ...So, a few things:
+> 
+> 1. This is just an RFC. The actual design of these libraries really
+> needs adjusted to be more pythonic. In general this means less
+> Optional[T] return types and raising more exceptions. This could be
+> handled later, but we ought to address it before publishing, if we do.
+> 
+> 2. We still need to think carefully about how we package this, if we
+> even want to package it, what the license on the top-level package
+> should be, etc.
+> 
+> 3. We should consider how to version it. For now, I'm using a lockstep
+> versioning.
+> 
+> 4. You can install this package using pip3 or python3 setup.py to a
+> virtual environment or to your real one. From there, any python code in
+> the QEMU tree that imports these modules will work with no sys.path
+> hacking or custom PYTHONPATH exports.
+> 
+> 5. You don't have to install it, though. I left all of the usual hacks
+> in place in the rest of the tree so that everything will just keep
+> working exactly as-is for right now. It's just that you COULD install it.
+> 
+> 6. Here's a cool trick if you don't know about it yet:
+> 
+>> cd qemu/python/qemu
+>> pip3 install --user -e .
+> 
+> This will install the package in "develop" mode, which installs a
+> forwarder package. When you update your source tree, the installed
+> package stays "up to date" with the most recent edits.
+> 
+> Alright, have fun, stay safe!
+> 
+> John Snow (32):
+>   python/qemu: create qemu.lib module
+>   scripts/qmp: Fix shebang and imports
+>   python//machine.py: remove bare except
+>   python/qemu/lib: delint, add pylintrc
+>   python/qemu/lib: delint; add flake8 config
+>   python/qemu: formalize as package
+>   python/qemu: add README.rst
+>   python/qemu: Add Pipfile
+>   python/qemu: add pylint to Pipfile
+>   python/qemu: Add flake8 to Pipfile
+>   python/qemu/lib: remove Python2 style super() calls
+>   python/qemu/lib: fix socket.makefile() typing
+>   python/qemu/lib: Adjust traceback typing
+>   python//qmp.py: use True/False for non/blocking modes
+>   python//qmp.py: Define common types
+>   python//qmp.py: re-absorb MonitorResponseError
+>   python//qmp.py: Do not return None from cmd_obj
+>   python//qmp.py: add casts to JSON deserialization
+>   python//qmp.py: add QMPProtocolError
+>   python//qmp.py: assert sockfile is not None
+>   python//machine.py: remove logging configuration
+>   python//machine.py: Fix monitor address typing
+>   python//machine.py: reorder __init__
+>   python//machine.py: Don't modify state in _base_args()
+>   python//machine.py: Handle None events in event_wait
+>   python//machine.py: use qmp.command
+>   python//machine.py: Add _qmp access shim
+>   python//machine.py: fix _popen access
+>   python//qtest.py: Check before accessing _qtest
+>   python/qemu/lib: make 'args' style arguments immutable
+>   python/qemu: add mypy to Pipfile
+>   python/qemu/lib: Add mypy type annotations
+> 
+>  python/README.rst                         |   6 +
+>  python/qemu/README.rst                    |   8 +
+>  python/Pipfile                            |  14 +
+>  python/Pipfile.lock                       | 187 +++++++++++++
+>  python/qemu/__init__.py                   |  11 -
+>  python/qemu/lib/.flake8                   |   2 +
+>  python/qemu/lib/__init__.py               |  57 ++++
+>  python/qemu/{ => lib}/accel.py            |  17 +-
+>  python/qemu/{ => lib}/machine.py          | 320 +++++++++++++---------
+>  python/qemu/lib/pylintrc                  |  58 ++++
+>  python/qemu/{ => lib}/qmp.py              | 140 +++++++---
+>  python/qemu/lib/qtest.py                  | 160 +++++++++++
+>  python/qemu/qtest.py                      | 119 --------
+>  python/setup.py                           |  50 ++++
+>  scripts/device-crash-test                 |   2 +-
+>  scripts/qmp/qemu-ga-client                |   2 +-
+>  scripts/qmp/qmp                           |   4 +-
+>  scripts/qmp/qmp-shell                     |   2 +-
+>  scripts/qmp/qom-fuse                      |   4 +-
+>  scripts/qmp/qom-get                       |   6 +-
+>  scripts/qmp/qom-list                      |   4 +-
+>  scripts/qmp/qom-set                       |   6 +-
+>  scripts/qmp/qom-tree                      |   6 +-
+>  scripts/render_block_graph.py             |   5 +-
+>  scripts/simplebench/bench_block_job.py    |   4 +-
+>  tests/acceptance/avocado_qemu/__init__.py |   2 +-
+>  tests/acceptance/boot_linux.py            |   3 +-
+>  tests/acceptance/virtio_check_params.py   |   2 +-
+>  tests/acceptance/virtio_version.py        |   2 +-
+>  tests/migration/guestperf/engine.py       |   2 +-
+>  tests/qemu-iotests/235                    |   2 +-
+>  tests/qemu-iotests/iotests.py             |   2 +-
+>  tests/vm/basevm.py                        |   6 +-
+>  33 files changed, 881 insertions(+), 334 deletions(-)
+>  create mode 100644 python/README.rst
+>  create mode 100644 python/qemu/README.rst
+>  create mode 100644 python/Pipfile
+>  create mode 100644 python/Pipfile.lock
+>  delete mode 100644 python/qemu/__init__.py
+>  create mode 100644 python/qemu/lib/.flake8
+>  create mode 100644 python/qemu/lib/__init__.py
+>  rename python/qemu/{ => lib}/accel.py (86%)
+>  rename python/qemu/{ => lib}/machine.py (67%)
+>  create mode 100644 python/qemu/lib/pylintrc
+>  rename python/qemu/{ => lib}/qmp.py (70%)
+>  create mode 100644 python/qemu/lib/qtest.py
+>  delete mode 100644 python/qemu/qtest.py
+>  create mode 100755 python/setup.py
+> 
+
+-- 
+—js
 
 
