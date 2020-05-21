@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 700B4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B151C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:50:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33563206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0304F206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 12:50:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V018j6D5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33563206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gt4itLhm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0304F206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbkeQ-0003RT-ED
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 08:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50700)
+	id 1jbkeX-0003oR-5S
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 08:50:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbka5-0003bB-NS
- for qemu-devel@nongnu.org; Thu, 21 May 2020 08:45:49 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36673
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jbka3-0003X2-Rk
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 08:45:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31613
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbka2-00057Y-Gv
- for qemu-devel@nongnu.org; Thu, 21 May 2020 08:45:49 -0400
+ id 1jbka2-00057M-0Y
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 08:45:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1590065145;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nEfu+WKuLGTbcmW54phLurwiymXP59SyP07hImE7S0M=;
- b=V018j6D5fuYhOmU5fdnPFQ9deJZeEw2HhYZQbVPqa7AvmfXy/KtwcMkp96l7w0iD0bxLro
- lUxwYRMpgl70f0a/0ZiBK11OVAl3L6ir1g/G50HnHk9qXvE0eJrMefkTFlwa6Xm01IfB6B
- D7CFZDwpYmxs0TiZTarp9XMjbgTHUQ4=
+ bh=j4FdChKq6cAC1AvirjpOGLQBCc9XB8opK4v+ZgHbNbU=;
+ b=gt4itLhmbO/FTwOmyhkax2YP4wf6Bi/kFiyIQffHNif8wDsIV2vvQfWoKkbMU44MC9KJsp
+ GmicmmcNOeeLv+TrGz4hkfeX9SejXRYBrjnuDt+TX8ADv2PHxrBIuE60G3mmldMjMzzVkk
+ Zf18j6GNshdvqIRifcit144dMm6TA7U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-1FbnthhCOb-6x0L2Xwy6FA-1; Thu, 21 May 2020 08:45:41 -0400
-X-MC-Unique: 1FbnthhCOb-6x0L2Xwy6FA-1
+ us-mta-287-GKADqYn6NVaODDiJDgJH2Q-1; Thu, 21 May 2020 08:45:43 -0400
+X-MC-Unique: GKADqYn6NVaODDiJDgJH2Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 324F0800053;
- Thu, 21 May 2020 12:45:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75D96108BD0B;
+ Thu, 21 May 2020 12:45:42 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E475341E9;
- Thu, 21 May 2020 12:45:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E119A34209;
+ Thu, 21 May 2020 12:45:41 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/8] run-coverity-scan: add --no-update-tools option
-Date: Thu, 21 May 2020 08:45:32 -0400
-Message-Id: <20200521124535.5329-6-pbonzini@redhat.com>
+Subject: [PATCH v2 8/8] run-coverity-scan: support --update-tools-only --docker
+Date: Thu, 21 May 2020 08:45:35 -0400
+Message-Id: <20200521124535.5329-9-pbonzini@redhat.com>
 In-Reply-To: <20200521124535.5329-1-pbonzini@redhat.com>
 References: <20200521124535.5329-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -71,16 +71,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 04:44:45
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:44:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,113 +99,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide a quick way to skip building the container while we figure out how
-to get caching right.
+Just build the container when run-coverity-scan is invoked with
+--update-tools-only --docker.  This requires moving the "docker build"
+logic into the update_coverity_tools function.
+
+The only snag is that --update-tools-only --docker requires access to
+the dockerfile.  For now just report an error for --src-tarball, and
+"docker build" will fail if not in a source tree.  Another possibility
+could be to host our container images on a public registry, and use
+"FROM qemu:fedora" to make the Dockerfile small enough that it can be
+included directly in the run-coverity-scan script.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/coverity-scan/run-coverity-scan | 37 +++++++++++++++----------
- 1 file changed, 23 insertions(+), 14 deletions(-)
+ scripts/coverity-scan/run-coverity-scan | 39 +++++++++++++++----------
+ 1 file changed, 23 insertions(+), 16 deletions(-)
 
 diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-scan/run-coverity-scan
-index e926623b3b..bc9e12670b 100755
+index 8bff952bf5..03a791dec9 100755
 --- a/scripts/coverity-scan/run-coverity-scan
 +++ b/scripts/coverity-scan/run-coverity-scan
-@@ -33,6 +33,7 @@
- #   --docker-engine : specify the container engine to use (docker/podman/auto);
- #                     implies --docker
- #   --update-tools-only : update the cached copy of the tools, but don't run them
-+#   --no-update-tools : do not update the cached copy of the tools
- #   --tokenfile : file to read Coverity token from
- #   --version ver : specify version being analyzed (default: ask git)
- #   --description desc : specify description of this version (default: ask git)
-@@ -130,7 +131,7 @@ update_coverity_tools () {
+@@ -95,6 +95,18 @@ check_upload_permissions() {
+ }
  
- # Check user-provided environment variables and arguments
- DRYRUN=no
--UPDATE_ONLY=no
-+UPDATE=yes
- DOCKER=no
  
- while [ "$#" -ge 1 ]; do
-@@ -139,9 +140,13 @@ while [ "$#" -ge 1 ]; do
-             shift
-             DRYRUN=yes
-             ;;
-+        --no-update-tools)
-+            shift
-+            UPDATE=no
-+            ;;
-         --update-tools-only)
-             shift
--            UPDATE_ONLY=yes
-+            UPDATE=only
-             ;;
-         --version)
-             shift
-@@ -245,12 +250,12 @@ fi
++build_docker_image() {
++    # build docker container including the coverity-scan tools
++    echo "Building docker container..."
++    # TODO: This re-unpacks the tools every time, rather than caching
++    # and reusing the image produced by the COPY of the .tgz file.
++    # Not sure why.
++    tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
++                   -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
++                   --extra-files scripts/coverity-scan/run-coverity-scan \
++                                 "$COVERITY_TOOL_BASE"/coverity_tool.tgz
++}
++
+ update_coverity_tools () {
+     # Check for whether we need to download the Coverity tools
+     # (either because we don't have a copy, or because it's out of date)
+@@ -128,6 +140,11 @@ update_coverity_tools () {
+         fi
+     fi
+     rm -f coverity_tool.md5.new
++    cd "$SRCDIR"
++
++    if [ "$DOCKER" = yes ]; then
++        build_docker_image
++    fi
+ }
+ 
+ 
+@@ -252,15 +269,16 @@ fi
  PROJNAME=QEMU
  TARBALL=cov-int.tar.xz
  
--if [ "$UPDATE_ONLY" = yes ] && [ "$DOCKER" = yes ]; then
-+if [ "$UPDATE" = only ] && [ "$DOCKER" = yes ]; then
-     echo "Combining --docker and --update-only is not supported"
-     exit 1
- fi
- 
--if [ "$UPDATE_ONLY" = yes ]; then
-+if [ "$UPDATE" = only ]; then
+-if [ "$UPDATE" = only ] && [ "$DOCKER" = yes ]; then
+-    echo "Combining --docker and --update-only is not supported"
+-    exit 1
+-fi
+-
+ if [ "$UPDATE" = only ]; then
      # Just do the tools update; we don't need to check whether
      # we are in a source tree or have upload rights for this,
      # so do it before some of the command line and source tree checks.
-@@ -293,7 +298,6 @@ fi
- 
- # Run ourselves inside docker if that's what the user wants
- if [ "$DOCKER" = yes ]; then
--    # build docker container including the coverity-scan tools
-     # Put the Coverity token into a temporary file that only
-     # we have read access to, and then pass it to docker build
-     # using a volume.  A volume is enough for the token not to
-@@ -308,14 +312,17 @@ if [ "$DOCKER" = yes ]; then
++
++    if [ "$DOCKER" = yes ] && [ ! -z "$SRCTARBALL" ]; then
++        echo --update-tools-only --docker is incompatible with --src-tarball.
++        exit 1
++    fi
++
+     update_coverity_tools
+     exit 0
+ fi
+@@ -322,17 +340,6 @@ if [ "$DOCKER" = yes ]; then
      echo "Created temporary directory $SECRETDIR"
      SECRET="$SECRETDIR/token"
      echo "$COVERITY_TOKEN" > "$SECRET"
--    echo "Building docker container..."
--    # TODO: This re-downloads the tools every time, rather than
--    # caching and reusing the image produced with the downloaded tools.
--    # Not sure why.
--    tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
--                   -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
--                   -v "$SECRETDIR:/work" \
--                   --extra-files scripts/coverity-scan/run-coverity-scan
-+    if [ "$UPDATE" != no ]; then
-+        # build docker container including the coverity-scan tools
-+        echo "Building docker container..."
-+        # TODO: This re-downloads the tools every time, rather than
-+        # caching and reusing the image produced with the downloaded tools.
-+        # Not sure why.
-+        tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
-+                       -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
-+                       -v "$SECRETDIR:/work" \
-+                       --extra-files scripts/coverity-scan/run-coverity-scan
-+    fi
+-    if [ "$UPDATE" != no ]; then
+-        # build docker container including the coverity-scan tools
+-        echo "Building docker container..."
+-        # TODO: This re-unpacks the tools every time, rather than caching
+-        # and reusing the image produced by the COPY of the .tgz file.
+-        # Not sure why.
+-        tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
+-                       -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
+-                       --extra-files scripts/coverity-scan/run-coverity-scan \
+-                                     "$COVERITY_TOOL_BASE"/coverity_tool.tgz
+-    fi
      echo "Archiving sources to be analyzed..."
      ./scripts/archive-source.sh "$SECRETDIR/qemu-sources.tgz"
-     if [ "$DRYRUN" = yes ]; then
-@@ -350,7 +357,9 @@ fi
- 
- check_upload_permissions
- 
--update_coverity_tools
-+if [ "$UPDATE" != no ]; then
-+    update_coverity_tools
-+fi
- 
- TOOLBIN="$(cd "$COVERITY_TOOL_BASE" && echo $PWD/coverity_tool/cov-analysis-*/bin)"
- 
+     ARGS="--no-update-tools"
 -- 
 2.26.2
-
 
 
