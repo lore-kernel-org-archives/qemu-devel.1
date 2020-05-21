@@ -2,99 +2,92 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E01DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C3D6206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:31:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 103802072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 13:45:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kw8VCNZE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C3D6206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VsV+W3XO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103802072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jblI4-0003u7-Ck
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 09:31:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55778)
+	id 1jblVz-0007Uy-3x
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 09:45:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1jblGy-0002RZ-KJ
- for qemu-devel@nongnu.org; Thu, 21 May 2020 09:30:08 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54188
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1jblGx-0004Xa-IA
- for qemu-devel@nongnu.org; Thu, 21 May 2020 09:30:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590067806;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WWdxwdP7dHhrWME3XQ+jIY8tJN86esH97ipF+br3PdQ=;
- b=Kw8VCNZEIZACDM3GOgW8HLOrIhtCEsjP94aB1UQtFQQajrySgBuqy73zO0TQTW6m2M18i7
- px/5ga91hC1dXxtuU5VmWUtijonwETtdXyQnJeJO6amfEYr5S4/d+4OMVekLM3IaxC2m8i
- NMel9p3iu1ujH90PRhebNardRcT4N2Q=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283--Mc7MNV8PlK2rcj53ZZpPQ-1; Thu, 21 May 2020 09:29:59 -0400
-X-MC-Unique: -Mc7MNV8PlK2rcj53ZZpPQ-1
-Received: by mail-oi1-f197.google.com with SMTP id k23so3275852oiw.9
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 06:29:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jblV9-0006aF-Np
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 09:44:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33669)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jblV6-0007rg-O8
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 09:44:47 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l11so6756390wru.0
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 06:44:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=lTq7Rittvs5CSJ9BqKsSP/J4mW8dKIerh6Dp/vdtZbM=;
+ b=VsV+W3XO2FXDuCp21QY3m6pCmP1OmY/soWo5L3TiqfQ+mLPyFJ8OM2EeDRBsC/145y
+ ZfSjN7lJcjdpucqjStVDYzOUoSr4xlzdO3L6Js943x+3OGfJ5O42ESu9A7/BTxxCeWqX
+ i4O/I2aq2bEoevjgipbZgW24wRpnzbJxlR17IdudqQUsVCPYFbLANih6JPBAyJ39YiuC
+ rYCfhiva2nc+MKigEweP4IZ5X28oBArSDuZ2cwj0N7nXqxNvqXJ36fEbLRBrBo1hVwOL
+ DvY/kbzfRHfZKmwiYLuMf67zl9mU14AwaR/V3yZo2sUxEF16W6wzGUfIblC6dlZcRLvX
+ kq+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=WWdxwdP7dHhrWME3XQ+jIY8tJN86esH97ipF+br3PdQ=;
- b=C7693Cf0XaQ8L0d0XaQEiVsYSa6WBe9uMhCiy8mv3MPlNyG2bM0OcZDxVC7W9zQEcq
- KfbtSwWL7rI9Tx55lJnldwJ1ZNI3W+9oPrjPxqzqYSHmPN1sXwaY0fmLrWWwFVETDjMx
- OyZoBhb9FgedqeOCSrAHbN0s6vNFWgccbBaO1ZCFZay9l9NYXtzVOIKfJgJoQU9LZTh1
- 1z1reyP/vDcL8Xeri7k+vJrGoArBuOM3S4num8gb4oy1wzuNrcOfrdBSwhzRrb0k4Otp
- njyJvr/V+y9NXvVDfOe+FHprUw2J/uM37ugxcK4t/wMugU4g1QYDzwmU0Ww23cQDGVk/
- Eoew==
-X-Gm-Message-State: AOAM530FBXPoj/5GGc/yc3oXut/GTKbVtP/nQxREUyuog9G7ZHkuFafu
- 1196q9p3XWAvoTs1WriDmj84ggAjc74agOj83/e0TCGamB5xIFvxsq8t/0pC3tlgsIeHh0jpiUb
- kcRlncEbsh354QKqTS86vzsygTu6BVgE=
-X-Received: by 2002:aca:f18a:: with SMTP id p132mr7038209oih.56.1590067799023; 
- Thu, 21 May 2020 06:29:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxw6Tn1MvjCysY55V7mKqx52p5YBJWiJ7fAn+0cZKLU7RU7wBUJdeq4rbHQjjdj2nEQ6RQeRZFwCo++UynrAYQ=
-X-Received: by 2002:aca:f18a:: with SMTP id p132mr7038190oih.56.1590067798685; 
- Thu, 21 May 2020 06:29:58 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lTq7Rittvs5CSJ9BqKsSP/J4mW8dKIerh6Dp/vdtZbM=;
+ b=OibEYO6knur4QTwHi6eb1LUa7pFoicf3QMIBME+TGZLaULwGY8aVwKt395MF3HeJHs
+ H/LQ4TgIG0i+SdJWcIwHiy4gBn0gMAoiTV2DeIZVuLW1dfh3ZEUDwgkTyahPok0HOr7u
+ ZG05jyAqtnDcT7kJ8/citkDoVgg8SEWuZ7giSQBecXfG2jd+o/M5AoNhRbBchLkIoUiY
+ D+We5Q7a0gQmkFpGhnko9GgRuRkxIxJy6Dnf/7voL7bePhH9LmzBi+AoFauFBXHXhNtj
+ PwKeZt/9W5jbStTsD1fibiNGVRkvTf8e0eJLKLQECnN7CMvJF4+En4X7aWyhdl3fmT2S
+ +qRw==
+X-Gm-Message-State: AOAM531KWCNRG1M6Au8Ka1fzyKDI7KJ56fXvaAGuheGAZ2tVupAtZqnN
+ FJVuRlxjariiFxmZYw6YaNs=
+X-Google-Smtp-Source: ABdhPJwuueqRf1I/8NRzHlwUJ0YY2XkPVYe2vbBtu0RxcvTOpQ1RrHtbSua1I5NRTb6sraLq49+Cvg==
+X-Received: by 2002:a5d:684a:: with SMTP id o10mr8302745wrw.311.1590068683253; 
+ Thu, 21 May 2020 06:44:43 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id p7sm6452232wmc.24.2020.05.21.06.44.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 May 2020 06:44:42 -0700 (PDT)
+Date: Thu, 21 May 2020 14:44:40 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: Assertion failure through virtio_blk_req_complete
+Message-ID: <20200521134440.GJ251811@stefanha-x1.localdomain>
+References: <20200511040622.xus3eqvsxbjkfum2@mozz.bu.edu>
 MIME-Version: 1.0
-References: <20200520220118.1037094-1-eblake@redhat.com>
- <20200520220118.1037094-3-eblake@redhat.com>
- <CAMRbyytCZ5KuqPLXkv_kw1Fbgw-w05s0iApmhP69ev_q3VjOnA@mail.gmail.com>
- <295f514d-f4c8-551a-d828-77a70b4d6fa3@virtuozzo.com>
-In-Reply-To: <295f514d-f4c8-551a-d828-77a70b4d6fa3@virtuozzo.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Thu, 21 May 2020 16:29:42 +0300
-Message-ID: <CAMRbyyvrYmhh9OK+6-nBVs1wqbHruYTq7Stn8iBZ17a_V_4wkQ@mail.gmail.com>
-Subject: Re: [PATCH v5 2/5] qcow2: Expose bitmaps' size during measure
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=nsoffer@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 04:44:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AXxEqdD4tcVTjWte"
+Content-Disposition: inline
+In-Reply-To: <20200511040622.xus3eqvsxbjkfum2@mozz.bu.edu>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,87 +100,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 2:40 PM Vladimir Sementsov-Ogievskiy
-<vsementsov@virtuozzo.com> wrote:
->
-> 21.05.2020 02:00, Nir Soffer wrote:
-> > On Thu, May 21, 2020 at 1:01 AM Eric Blake <eblake@redhat.com> wrote:
-> >>
-> >> It's useful to know how much space can be occupied by qcow2 persistent
-> >> bitmaps, even though such metadata is unrelated to the guest-visible
-> >> data.  Report this value as an additional QMP field, present when
-> >> measuring an existing image and output format that both support
-> >> bitmaps.  Update iotest 178 and 190 to updated output, as well as new
-> >> coverage in 190 demonstrating non-zero values made possible with the
-> >> recently-added qemu-img bitmap command.
-> >>
-> >> On the command-line side, 'qemu-img measure' gains a new --bitmaps
-> >> flag.  When present, the bitmap size is rolled into the two existing
-> >> measures (or errors if either the source image or destination format
-> >> lacks bitmaps); when absent, there is never an error (for
-> >> back-compat), but the output will instead include a new line item for
-> >> bitmaps (which you would have to manually add), with that line being
-> >> omitted in the same cases where passing --bitmaps would error.
-> >
-> > Supporting 2 ways to measure, one by specifying --bitmaps, and another
-> > by adding bitmaps key is not a good idea. We really need one way.
-> >
-> > Each one has advantages. adding --bitmaps flag is consistent with
-> > "qemu-img convert"
-> > and future extensions that may require  new flag, and adding "bitmaps"
-> > key is consistent
-> > with "qmeu-img info", showing bitmaps when they exist.
-> >
-> > Adding a "bitmaps" key has an advantage that we can use it to test if q=
-emu-img
-> > supports measuring and copying bitmaps (since both features are expecte=
-d to
-> > be delivered at the same time). So we can avoid checking --help learn a=
-bout
-> > the capabilities.
-> >
-> > I'm ok with both options, can we have only one?
->
-> Hi! What are your scenarios? Are you using qemu-img by hand, or it is use=
-d from some management tool? For management tool, I'd recommend to use qmp =
-interface, which is a lot more strict, reliable and stable, and documented.=
- You just need to run qemu binary in stopped mode for it.
 
-The use case is oVirt - it is a management system but it uses qemu-img
-to perform various
-operations, like copying disks around. The specific use case is
-cloning qcow2 image chain
-from one server to another, or cloning on the same server.
+--AXxEqdD4tcVTjWte
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In the case of qcow2 images on logical volumes, we need to create a
-large enough  logical
-volume to copy an image, and for this we use "qemu-img measure". With
-the current patches
-we will be able to create large enough logical volume and copy the
-image data and the bitmps
-to the destination.
+On Mon, May 11, 2020 at 12:06:22AM -0400, Alexander Bulekov wrote:
+> Hello,
+> While fuzzing, I found an input that triggers an assertion through
+> virtio-blk.c:
+>=20
+> void address_space_unmap(AddressSpace *, void *, hwaddr, int, hwaddr): As=
+sertion `mr !=3D NULL' failed
+>=20
+> #8 0x7fa947707091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/=
+assert.c:101:3
+> #9 0x55ec68a73a97 in address_space_unmap exec.c:3619:9
+> #10 0x55ec6943ffab in dma_memory_unmap include/sysemu/dma.h:145:5
+> #11 0x55ec693e2df6 in virtqueue_unmap_sg hw/virtio/virtio.c:640:9
+> #12 0x55ec693e435b in virtqueue_fill hw/virtio/virtio.c:789:5
+> #13 0x55ec693e8cf0 in virtqueue_push hw/virtio/virtio.c:863:5
+> #14 0x55ec68ff73ce in virtio_blk_req_complete hw/block/virtio-blk.c:83:5
+> #15 0x55ec68ff037e in virtio_blk_handle_request hw/block/virtio-blk.c:671=
+:13
+> #16 0x55ec68fec4c0 in virtio_blk_handle_vq hw/block/virtio-blk.c:780:17
+> #17 0x55ec6901ae79 in virtio_blk_handle_output_do hw/block/virtio-blk.c:8=
+03:5
+> #18 0x55ec6901a336 in virtio_blk_handle_output hw/block/virtio-blk.c:819:5
+> #19 0x55ec694168f0 in virtio_queue_notify hw/virtio/virtio.c:2284:9
+> #20 0x55ec6b55abc5 in virtio_mmio_write hw/virtio/virtio-mmio.c:369:13
+> #21 0x55ec68d9e17b in memory_region_write_accessor memory.c:496:5
+>=20
+> I can reproduce it in a qemu 5.0 build using:
+> cat << EOF | qemu-system-i386 -M pc-q35-5.0 -M microvm,x-option-roms=3Dof=
+f,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=3Doff -nographic -device virtio-=
+blk-device,drive=3Dmydrive,scsi=3Dtrue -drive file=3Dnull-co://,id=3Dmydriv=
+e,if=3Dnone,format=3Draw -nographic -monitor none -display none -serial non=
+e -qtest stdio
+> write 0x1ba000b 0x12 0x01820040bf07f0ffffffffffff3328000101
+> write 0x1ba1003 0x2 0x0101
+> write 0xc0000e28 0x2c 0x000046dd000000000049dd00000000004cdd00000000004fd=
+d000000000052dd000000000055dd0000000000
+> EOF
+>=20
+> I also uploaded the above trace, in case the formatting is broken:
+>=20
+> curl https://paste.debian.net/plain/1146092 | qemu-system-i386 -M pc-q35-=
+5.0 -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Doff,rtc=
+=3Doff -nographic -device virtio-blk-device,drive=3Dmydrive,scsi=3Dtrue -dr=
+ive file=3Dnull-co://,id=3Dmydrive,if=3Dnone,format=3Draw -nographic -monit=
+or none -display none -serial none -qtest stdio
 
-qmp interface is nice but to use it we have to rewrite all the code
-using qemu-img to start qemu
-with the relevant disks and perform operation via qmp or via libvirt.
-This a huge rewrite and I'm
-not sure it's worth the effort.
+Thanks! I've found the root cause for this. Will send a patch.
 
-This approach also has limitations, for example using qemu-img we can
-copy disks in parallel on
-multiple hosts, while using libvirt and qemu will limit us to using
-one host since qemu takes locks
-that we control.
+Stefan
 
-Also using libvirt means that all new features take more time to
-complete since now we have
-a new layer between oVirt and qemu.
+--AXxEqdD4tcVTjWte
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7GhcgACgkQnKSrs4Gr
+c8gu1QgAif264/a972XHpIJu6OD5dOvTHsVQhI+anyYOSkTp1oZ3MtkGdi62A90Q
+rtuFUYV3/7yt0/K0uhjBw3C87WK/oyK8Ne1eOlZ4xQuvfXgIxXg9f0dPFwQiBKfj
+qs8gg75+EU6msxyshBZMOpp876s3T7y/kOgcPdXh96jQOGGijpxbIGuW2JSehIWD
+cMZGPS8qWmjc442/Hqgqt7J0dXXm51hHhGFbv7ri2SDhm4jujDdPvrCNA813iphY
+AaS2yD3JbmKnJ9fTC7Hy2RxLona1hvXvD0f7lOG8l0Qvmm5NadeVhQSSNZiZHN87
+JyPElZMoffcFw4XNYrDQtzdHOPp6cw==
+=lGfP
+-----END PGP SIGNATURE-----
+
+--AXxEqdD4tcVTjWte--
 
