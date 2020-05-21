@@ -2,90 +2,118 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2547AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288B2C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 22:08:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74612072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 21:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE016206F6
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 22:08:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SaD/lmKx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74612072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="oKfn9vwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE016206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbt6f-0001Gn-1H
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 17:52:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
+	id 1jbtMK-0005TV-VD
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 18:08:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbt66-00006G-B1
- for qemu-devel@nongnu.org; Thu, 21 May 2020 17:51:26 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58000
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jbt64-0004wd-D1
- for qemu-devel@nongnu.org; Thu, 21 May 2020 17:51:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590097882;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TjybcKmkvEPh8D1tKzbWO/d/SoEg/o9PbiEIgHbvDlY=;
- b=SaD/lmKxCrUniPlTbM/R0WupdCEAqy9Us9vPoqhXF+I8RY+kTd0FkYhMwZpUNjdo3A4tCB
- 4wt8TUtblKRgJHELS9mLTi7g956gwTsUPuhG1uPVX0XSgaSDlkkoSPHxdCC5dsX16Z3pTz
- CD0Z7RrT5DBOavfypKoS2y4nWPaAEKc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-PbH4wnAxNTOoV_vBnqwKrg-1; Thu, 21 May 2020 17:51:06 -0400
-X-MC-Unique: PbH4wnAxNTOoV_vBnqwKrg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0A968014D7
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 21:51:05 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 788CD7FCA8;
- Thu, 21 May 2020 21:51:05 +0000 (UTC)
-Subject: Re: [PATCH v3 2/2] net: Drop the NetLegacy structure, always use
- Netdev instead
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200518180103.32484-1-thuth@redhat.com>
- <20200518180103.32484-3-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <9a059691-b6b2-4315-8156-259baefaffa9@redhat.com>
-Date: Thu, 21 May 2020 16:51:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbtLH-0003rP-J2; Thu, 21 May 2020 18:07:07 -0400
+Received: from mail-eopbgr70104.outbound.protection.outlook.com
+ ([40.107.7.104]:17734 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jbtLF-0007vC-0p; Thu, 21 May 2020 18:07:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zt0aYiAvsHs5RBJF5ZdnHEPU5hdar25GsooZcSpQjevWtvNjN1d9N72nt0E0cS0jbzhg2rtcU7s1i2zQQHO6Hw8HjOsMoYkiPw/b9I5hYimJIf8LWgkPrFcdEhdczecC2Hz+D7H5OEEHjpM/JPirs1RqIwCMWYxqJ0tkwqmuD8YbkTywBVpWRasyoQZLFQoIUVO3YwQTBfEM5EN6E4nwMSV35D+s8WVdhPLhCTkSwAtDMeMIbqaMmWxTDpsapJJ7255owl7D9QG9L6O1EgylrV5DjX417BSGRgHVOKLnKFoGdCEQ/gWhQrjqRo4a4gWSiS8OtMj700mYJkORMR4YPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W5vKTrKGzADpU5P6dX4Gl/2vGohejsYVKPZxj7Pu32I=;
+ b=Kg2m4eLRQZbiEY+yFeEFATrAEGrBLKXP1VfmVxiNOBMnxzFvtjWstXVXduuZKCFadpdFi6HsccIRggS7hy6bhKdg6HoeQbBfvrRg76kmPRsvkpb2qnmnJyYdSFzuoft0WNG2VMl1ZxuKdHuTj7rAK9EcdFNY3T5fPr/Jowcfwqtd6aCbOqi8g7cFK8OsatNoY6ozUfSDt3cksfKTOKK43L9tbHw8iyBcHjst1QH+UK7s8ureoI6thdPo9FqspqII/4CillNCtP+qih7zRzhnOGrY6S0PVSzE5Ho8TuwZ7PiqQgkReA/rSKogkR0+VjdKf94xiX8WWotecmGKFJhi9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W5vKTrKGzADpU5P6dX4Gl/2vGohejsYVKPZxj7Pu32I=;
+ b=oKfn9vwkhuOBj9XXMbdjpXny9AYDX18UIafdYxZ7zEno2HZPzsJzGGMhjbXtSnE98lL9wLrW8isldofUpQlE/sx4z9PxAq9QiFrQilUpRJrEmgQVTuM14mhbXZ/HY34uLhnVJuRiv20rlYP6sLr58YL7/B21X4iPkiImMXyBrnQ=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5512.eurprd08.prod.outlook.com (2603:10a6:20b:de::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.24; Thu, 21 May
+ 2020 22:07:00 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.020; Thu, 21 May 2020
+ 22:07:00 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v4 0/6] fix migration with bitmaps and mirror
+Date: Fri, 22 May 2020 01:06:42 +0300
+Message-Id: <20200521220648.3255-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM3PR07CA0137.eurprd07.prod.outlook.com
+ (2603:10a6:207:8::23) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200518180103.32484-3-thuth@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (185.215.60.167) by
+ AM3PR07CA0137.eurprd07.prod.outlook.com (2603:10a6:207:8::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.12 via Frontend Transport; Thu, 21 May 2020 22:06:59 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.167]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ebd3b56d-f229-4932-e71b-08d7fdd34951
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5512:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5512F134CD604CBC92AA735AC1B70@AM7PR08MB5512.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:82;
+X-Forefront-PRVS: 041032FF37
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QcnVK1gvAdy8GiAGMZlC3gykp6a3JJD/F02BOC98GeCW3BIf5wUMQZpWOu2lfuVts3bGSEdfdJFUAs1XqaW+fXPsP0LVlQCFqsGsZExEgtTngqAFb8+ZjQQdWpMdKacBN0K8WqUAkDCJCCnA3Xd1Fk3lzOtkkXFVbNp76voM2c1P2x23vukkaYt9F/PR0d3dwigLgEXfzf1cMgO6DpduqXJIOwdnfqd7qoGwjM66chb7/aOhZOFflCBRZSVGmgnFkt1pm9c4tAiOnXjq/nPhYgwWip7z2VGdnQaraTlXMj8hdQz4a0GeDbNkP+sn6Una7mipSq8p7joIUtKDPuQ3vGWzzdz+YaPEea+Y1lWH2V2khVohmkWnsehktyNxRBJP
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(366004)(396003)(136003)(376002)(39840400004)(8676002)(6512007)(4744005)(186003)(26005)(6666004)(2906002)(7416002)(16526019)(316002)(6916009)(8936002)(6486002)(36756003)(6506007)(1076003)(107886003)(478600001)(4326008)(66556008)(66476007)(86362001)(5660300002)(66946007)(52116002)(2616005)(69590400007)(956004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: vdDIiB4z9q1rKzyzkVD0WeRy/4lWcWtqpz1xMnTP6Wac/Zic7g6nPAgkKWv2Rz7NVGnXX8XYa8en/BKRg31KKmNK8lnWt0US4qJlBv/BLJb+YzOCNxn8OXM8Dwji+7RhGAqjGkid30c+iiBOqCcfRdbK5yORwqvFIjBwumsXsq3+AJbFDOBO/ATWx7TQAUIZmuGm/CauTHOjsTKOzmZX5013EZ+BgxesXQnYCqK73fIKliuqPm3ISPGAkyNod3Xc+0e14MXzWyafNUJpKgH2yz3t2pXh10/WFqPZy/x+yl6nv8EuXT0dalIIZRYx4MuXBmMejCS0w/GQNMQaE+tuoxdpJ9GV4u1I93l4AOhnbQgbxqax9ztYJkx/Al6QNh0Tzg4ypkKKNmynUWrlAPdEcHx6kNqR0yJKGJOz7KvTTGnnCaJKfi/CgNk4d6T+mMkm5Wzt+ZTEsr0YKzKhc069jCe5ISjPMrGqQ+xTPFFrG8Xn8ZNYRom7Uel+kOe6BxBF
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebd3b56d-f229-4932-e71b-08d7fdd34951
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2020 22:07:00.8406 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0SvenhZqZ+YTZPHDyjPHvSSnD1NSy7eR5pwa7/mv4K8daHN9PscJqmmxAlCi9PWvkc353QPOi6WwaGFJLPGPt/+NmlFQYJu6SJgRfA/dyhE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5512
+Received-SPF: pass client-ip=40.107.7.104;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 18:07:01
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,44 +127,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/18/20 1:01 PM, Thomas Huth wrote:
-> Now that the "name" parameter is gone, there is hardly any difference
-> between NetLegacy and Netdev anymore, so we can drop NetLegacy and always
-> use Netdev to simplify the code quite a bit.
-> 
-> The only two differences that were really left between Netdev and NetLegacy:
-> 
-> 1) NetLegacy does not allow a "hubport" type. We can continue to block
->     this with a simple check in net_client_init1() for this type.
-> 
-> 2) The "id" parameter was optional in NetLegacy (and an internal id
->     was chosen via assign_name() during initialization), but it is mandatory
->     for Netdev. To avoid that the visitor code bails out here, we have to
->     add an internal id to the QemuOpts already earlier now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   Note: I did not rename the "is_netdev" parameter of the function (as
->   Eric suggested) - you really have to think of "-netdev" vs. "-net"
->   here and not about "Netdev" vs. "NetLegacy". But if this "is_netdev"
->   thing still confuses us in the future, we can still rename it with an
->   additional follow-up patch later instead.
+v4: (Max's patch marking filters as filters already in master)
+03: careful select child of filter, avoid crash 
+04: add Eric's r-b
+05-06: tweak error message, keep Andrey's r-b, add Eric's r-b
 
-Works for me. It still might be nice mentioning "-netdev" vs. "-net" in 
-the commit message (and the fact that "-net" was what was previously 
-using the legacy type).  But with the explanations you've given, the 
-code looks correct, and a commit message tweak does not change:
+Vladimir Sementsov-Ogievskiy (6):
+  migration/block-dirty-bitmap: refactor init_dirty_bitmap_migration
+  block/dirty-bitmap: add bdrv_has_named_bitmaps helper
+  migration/block-dirty-bitmap: fix bitmaps pre-blockdev migration
+    during mirror job
+  iotests: 194: test also migration of dirty bitmap
+  migration/block-dirty-bitmap: add_bitmaps_to_list: check disk name
+    once
+  migration/block-dirty-bitmap: forbid migration by generated node-name
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ include/block/dirty-bitmap.h   |   1 +
+ block/dirty-bitmap.c           |  13 ++++
+ migration/block-dirty-bitmap.c | 130 ++++++++++++++++++++++++---------
+ tests/qemu-iotests/194         |  14 +++-
+ tests/qemu-iotests/194.out     |   6 ++
+ 5 files changed, 127 insertions(+), 37 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
 
 
