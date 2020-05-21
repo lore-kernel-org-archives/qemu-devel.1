@@ -2,90 +2,90 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A34EAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95208C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BC9920671
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:40:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54E4120671
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 14:41:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UOUkO2OD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC9920671
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DnXJo4gj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E4120671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbmNM-0006yh-Ig
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 10:40:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35120)
+	id 1jbmOI-0008QO-He
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 10:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbmM9-0005cU-Sa
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:39:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38838
+ id 1jbmNb-0007Pi-Ls
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 10:41:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56978
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jbmM9-00018z-28
- for qemu-devel@nongnu.org; Thu, 21 May 2020 10:39:33 -0400
+ id 1jbmNa-0001VG-8k
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 10:41:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590071972;
+ s=mimecast20190719; t=1590072061;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gQvPt0KH/EupV9uXoHLGWw25lMWH0sf72C5amazinwk=;
- b=UOUkO2ODdYp86W/ApSFJM6dDg4LWACG1dKpgJshuD/Z2xZnKi/VOVGahOEvf2dVINx89Qu
- VkzDilPtm0bB6srf8paCFYWTTNNXTzupeh7efdbPjDznZHJZweE9pVLcvrAnjWv4BcDO+g
- XRvVKPk4nh1XdJB2W6gwbcc916ATMiw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-_s57nkseNbmA8xcz4F0N6Q-1; Thu, 21 May 2020 10:39:30 -0400
-X-MC-Unique: _s57nkseNbmA8xcz4F0N6Q-1
-Received: by mail-wr1-f72.google.com with SMTP id e1so518786wrm.3
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 07:39:30 -0700 (PDT)
+ bh=63tZ1S/XxcYup4/85gY+n1PB55HQiLXxW5r6TabZ8Eg=;
+ b=DnXJo4gjo4uOEWzNuZcYC0ZfV5aXLG2g33nqzTKBF+oIrk6+sQIcq3DXVVpGD8jyXLczR4
+ 85GVqc5RXBYfQAfldPwuyWstSoyeMFsx4jPLJrm6ehEsZPAMCyyYGRdHBbF4hKIPGNx+do
+ U12p1wJpMNL+zEv8BE0BzjFV2BupAfA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-DYcMLACfML2f6II2IvCknA-1; Thu, 21 May 2020 10:41:00 -0400
+X-MC-Unique: DYcMLACfML2f6II2IvCknA-1
+Received: by mail-wr1-f69.google.com with SMTP id f4so305319wrp.21
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 07:40:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=gQvPt0KH/EupV9uXoHLGWw25lMWH0sf72C5amazinwk=;
- b=HFs3kAIfRzbPFEGB+3muok2aA8jxapkTF4smnUE3JXmwkAnFOy8xwvpM3oNs7cHXcU
- O1wZnxnlEySTSv9WSjlNmYa/7ZWiPfJr6T6V/2eD723CzK0HRZiyYimAfAscidYx5rX5
- iliuV02ZgnhSGgNQU8ijGC+8AkvgOibkQgMtr1Zpw5WA7ep9tPH7vof+gW9Q8DJZ7Zga
- 0gadFhVgS8kTanjuOU8hIkOFVMwkeMU7hRZaJy3hIegjU0WwWY320r+ZLYRBNUhI5HxN
- k+CC+9UuzkmMyQ46Mq5Ua43U+P9N8b/bcz3wZShd0PPLFIrJ1bZpNWKAbGzjeRkt6p5+
- DQ7w==
-X-Gm-Message-State: AOAM530AsnGzKNL5XtvafRCGekwffmP0CXkZ4AKgYS8aR9Np4+4FrP2s
- I961asV3WXjs5GIMVSz+KarJoA9+mB8Ym3xCdgQ3PpMdm/ranF7mXqcw3L9urYVNMtYANu3QTfD
- My9yDYGO3f4KkpSk=
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr9117747wmb.22.1590071969338;
- Thu, 21 May 2020 07:39:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxe2YsX1ZffKV9gF0OL1vZzPKcAKIIgdYhJfoSaajowuWMqRyrbE1Yn8jVHeJKjVjbGnu9J2w==
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr9117734wmb.22.1590071969101;
- Thu, 21 May 2020 07:39:29 -0700 (PDT)
+ bh=63tZ1S/XxcYup4/85gY+n1PB55HQiLXxW5r6TabZ8Eg=;
+ b=gpig01yDmeFVO9skB6dOjHKHPCXdsb3OJXSm/qs6FEhY52AlpvDxLHZA9jCRVWSBL2
+ eJbWyDvgxI5hNRSVIYWhMpKugwaxXblbZ9l/fTJ11jC+LW1U1WY4nC0UjxlmnChJBpv7
+ WswERf+IS3PnN8bCaHAszO0Iky1lWUrwBYsCFkK8r0mXRtK01dOKb0XDumOjkHd8gE61
+ gIfmd3WwZ0iph0eLUke2Ugtv+9S2pSenyQctsIOdyFTtc+6qhtZ5gIXXY5ZXISlj4PzD
+ vtEKN3KywQvtIQZep3AY9ljH6YiaUq8c28fibsa+3RODJ0f/wkGb6uGHvYde5RVmjgRy
+ o+MQ==
+X-Gm-Message-State: AOAM532MWNaaEgulbuHCYx1UfQNNrKc+5E8sqA1COOyEEaBXwYasm0E7
+ Wlh9imcTA+6/Fza/vT0u71xLvW34MAhA8kLFRNxCtzkovyhGbj2MmglsMLOGEgeR47tichLysS2
+ BIYp+/aZ7N7GUVAQ=
+X-Received: by 2002:a5d:6401:: with SMTP id z1mr9482885wru.226.1590072056976; 
+ Thu, 21 May 2020 07:40:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxeMEzPsusOZht9DqRCOuYlIdd8vXViaBwpj/wrVLsNLhNSnLqfnz6zWNuoyfxt4yj+Ii4Whg==
+X-Received: by 2002:a5d:6401:: with SMTP id z1mr9482858wru.226.1590072056572; 
+ Thu, 21 May 2020 07:40:56 -0700 (PDT)
 Received: from [192.168.178.58] ([151.30.94.134])
- by smtp.gmail.com with ESMTPSA id s19sm2949984wmj.21.2020.05.21.07.39.28
+ by smtp.gmail.com with ESMTPSA id p17sm10732958wmi.3.2020.05.21.07.40.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 07:39:28 -0700 (PDT)
-Subject: Re: [PATCH] Makefile: Let the 'help' target list the helper targets
+ Thu, 21 May 2020 07:40:55 -0700 (PDT)
+Subject: Re: [PATCH v3] accel: Move Xen accelerator code under accel/xen/
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200423104345.5092-1-philmd@redhat.com>
+References: <20200508100222.7112-1-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f3e61d6b-0750-d1f3-dfd4-ca0d0e6f049f@redhat.com>
-Date: Thu, 21 May 2020 16:39:28 +0200
+Message-ID: <0ac2fab6-8c8f-f9c0-8fcf-57877a0284e3@redhat.com>
+Date: Thu, 21 May 2020 16:40:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200423104345.5092-1-philmd@redhat.com>
+In-Reply-To: <20200508100222.7112-1-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -101,7 +101,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,101 +114,412 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/04/20 12:43, Philippe Mathieu-Daudé wrote:
-> List the name of the helper targets when calling 'make help',
-> along with the tool targets:
+On 08/05/20 12:02, Philippe Mathieu-Daudé wrote:
+> This code is not related to hardware emulation.
+> Move it under accel/ with the other hypervisors.
 > 
->   $ make help
->   [...]
-> 
->   Helper targets:
->     fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper
->     scsi/qemu-pr-helper            - Build qemu-pr-helper
->     qemu-bridge-helper             - Build qemu-bridge-helper
->     vhost-user-gpu                 - Build vhost-user-gpu
->     virtiofsd                      - Build virtiofsd
-> 
->   Tools targets:
->     qemu-ga                        - Build qemu-ga tool
->     qemu-keymap                    - Build qemu-keymap tool
->     elf2dmp                        - Build elf2dmp tool
->     ivshmem-client                 - Build ivshmem-client tool
->     ivshmem-server                 - Build ivshmem-server tool
->     qemu-nbd                       - Build qemu-nbd tool
->     qemu-storage-daemon            - Build qemu-storage-daemon tool
->     qemu-img                       - Build qemu-img tool
->     qemu-io                        - Build qemu-io tool
->     qemu-edid                      - Build qemu-edid tool
-> 
+> Reviewed-by: Paul Durrant <paul@xen.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  configure | 5 +++--
->  Makefile  | 9 +++++++--
->  2 files changed, 10 insertions(+), 4 deletions(-)
+> We could also move the memory management functions from
+> hw/i386/xen/xen-hvm.c but it is not trivial.
 > 
-> diff --git a/configure b/configure
-> index 23b5e93752..caf880c38e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6374,7 +6374,7 @@ if test "$softmmu" = yes ; then
->    if test "$linux" = yes; then
->      if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
->        virtfs=yes
-> -      tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-> +      helpers="$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
->      else
->        if test "$virtfs" = yes; then
->          error_exit "VirtFS requires libcap-ng devel and libattr devel"
-> @@ -6389,7 +6389,7 @@ if test "$softmmu" = yes ; then
->        fi
->        mpath=no
->      fi
-> -    tools="$tools scsi/qemu-pr-helper\$(EXESUF)"
-> +    helpers="$helpers scsi/qemu-pr-helper\$(EXESUF)"
->    else
->      if test "$virtfs" = yes; then
->        error_exit "VirtFS is supported only on Linux"
-> @@ -7630,6 +7630,7 @@ else
->    QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
->  fi
+> v2: Use g_assert_not_reached() instead of abort()
+> v3: (quintela)
+>  - Do not expose xen_allowed
+>  - Do not abort in xen_hvm_modified_memory
+> ---
+>  include/exec/ram_addr.h                    |  2 +-
+>  include/hw/xen/xen.h                       | 11 -------
+>  include/sysemu/xen.h                       | 38 ++++++++++++++++++++++
+>  hw/xen/xen-common.c => accel/xen/xen-all.c |  8 +++++
+>  hw/acpi/piix4.c                            |  2 +-
+>  hw/i386/pc.c                               |  1 +
+>  hw/i386/pc_piix.c                          |  1 +
+>  hw/i386/pc_q35.c                           |  1 +
+>  hw/i386/xen/xen-hvm.c                      |  1 +
+>  hw/i386/xen/xen_platform.c                 |  1 +
+>  hw/isa/piix3.c                             |  1 +
+>  hw/pci/msix.c                              |  1 +
+>  migration/savevm.c                         |  2 +-
+>  softmmu/vl.c                               |  2 +-
+>  stubs/xen-hvm.c                            |  9 -----
+>  target/i386/cpu.c                          |  2 +-
+>  MAINTAINERS                                |  2 ++
+>  accel/Makefile.objs                        |  1 +
+>  accel/xen/Makefile.objs                    |  1 +
+>  hw/xen/Makefile.objs                       |  2 +-
+>  20 files changed, 63 insertions(+), 26 deletions(-)
+>  create mode 100644 include/sysemu/xen.h
+>  rename hw/xen/xen-common.c => accel/xen/xen-all.c (98%)
+>  create mode 100644 accel/xen/Makefile.objs
+> 
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 5e59a3d8d7..4e05292f91 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -21,7 +21,7 @@
 >  
-> +echo "HELPERS=$helpers" >> $config_host_mak
->  echo "TOOLS=$tools" >> $config_host_mak
->  echo "ROMS=$roms" >> $config_host_mak
->  echo "MAKE=$make" >> $config_host_mak
-> diff --git a/Makefile b/Makefile
-> index 8a9113e666..021a0cd491 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -336,9 +336,9 @@ $(call set-vpath, $(SRC_PATH))
->  LIBS+=-lz $(LIBS_TOOLS)
+>  #ifndef CONFIG_USER_ONLY
+>  #include "cpu.h"
+> -#include "hw/xen/xen.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/tcg.h"
+>  #include "exec/ramlist.h"
+>  #include "exec/ramblock.h"
+> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+> index 5ac1c6dc55..771dd447f2 100644
+> --- a/include/hw/xen/xen.h
+> +++ b/include/hw/xen/xen.h
+> @@ -20,13 +20,6 @@ extern uint32_t xen_domid;
+>  extern enum xen_mode xen_mode;
+>  extern bool xen_domid_restrict;
 >  
->  vhost-user-json-y =
-> -HELPERS-y =
-> +HELPERS-y = $(HELPERS)
+> -extern bool xen_allowed;
+> -
+> -static inline bool xen_enabled(void)
+> -{
+> -    return xen_allowed;
+> -}
+> -
+>  int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
+>  void xen_piix3_set_irq(void *opaque, int irq_num, int level);
+>  void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
+> @@ -39,10 +32,6 @@ void xenstore_store_pv_console_info(int i, struct Chardev *chr);
 >  
-> -HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = qemu-bridge-helper$(EXESUF)
-> +HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += qemu-bridge-helper$(EXESUF)
+>  void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
 >  
->  ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
->  HELPERS-y += vhost-user-gpu$(EXESUF)
-> @@ -1255,6 +1255,11 @@ endif
->  		$(foreach t, $(TARGET_DIRS), \
->  		$(call print-help-run,$(t)/all,Build for $(t));) \
->  		echo '')
-> +	@$(if $(HELPERS-y), \
-> +		echo 'Helper targets:'; \
-> +		$(foreach t, $(HELPERS-y), \
-> +		$(call print-help-run,$(t),Build $(shell basename $(t)));) \
-> +		echo '')
->  	@$(if $(TOOLS), \
->  		echo 'Tools targets:'; \
->  		$(foreach t, $(TOOLS), \
+> -void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> -                   struct MemoryRegion *mr, Error **errp);
+> -void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+> -
+>  void xen_register_framebuffer(struct MemoryRegion *mr);
+>  
+>  #endif /* QEMU_HW_XEN_H */
+> diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+> new file mode 100644
+> index 0000000000..1ca292715e
+> --- /dev/null
+> +++ b/include/sysemu/xen.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU Xen support
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef SYSEMU_XEN_H
+> +#define SYSEMU_XEN_H
+> +
+> +#ifdef CONFIG_XEN
+> +
+> +bool xen_enabled(void);
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+> +void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> +                   struct MemoryRegion *mr, Error **errp);
+> +#endif
+> +
+> +#else /* !CONFIG_XEN */
+> +
+> +#define xen_enabled() 0
+> +#ifndef CONFIG_USER_ONLY
+> +static inline void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+> +{
+> +    /* nothing */
+> +}
+> +static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> +                                 MemoryRegion *mr, Error **errp)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +#endif
+> +
+> +#endif /* CONFIG_XEN */
+> +
+> +#endif
+> diff --git a/hw/xen/xen-common.c b/accel/xen/xen-all.c
+> similarity index 98%
+> rename from hw/xen/xen-common.c
+> rename to accel/xen/xen-all.c
+> index a15070f7f6..4f22c53731 100644
+> --- a/hw/xen/xen-common.c
+> +++ b/accel/xen/xen-all.c
+> @@ -16,6 +16,7 @@
+>  #include "hw/xen/xen_pt.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/accel.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/runstate.h"
+>  #include "migration/misc.h"
+>  #include "migration/global_state.h"
+> @@ -31,6 +32,13 @@
+>      do { } while (0)
+>  #endif
+>  
+> +static bool xen_allowed;
+> +
+> +bool xen_enabled(void)
+> +{
+> +    return xen_allowed;
+> +}
+> +
+>  xc_interface *xen_xc;
+>  xenforeignmemory_handle *xen_fmem;
+>  xendevicemodel_handle *xen_dmod;
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 964d6f5990..daed273687 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/acpi/acpi.h"
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/xen.h"
+>  #include "qapi/error.h"
+>  #include "qemu/range.h"
+>  #include "exec/address-spaces.h"
+> @@ -41,7 +42,6 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "hw/acpi/memory_hotplug.h"
+>  #include "hw/acpi/acpi_dev_interface.h"
+> -#include "hw/xen/xen.h"
+>  #include "migration/vmstate.h"
+>  #include "hw/core/cpu.h"
+>  #include "trace.h"
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 97e345faea..1a599e1de9 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -56,6 +56,7 @@
+>  #include "sysemu/tcg.h"
+>  #include "sysemu/numa.h"
+>  #include "sysemu/kvm.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/qtest.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 3862e5120e..c00472b4c5 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -53,6 +53,7 @@
+>  #include "cpu.h"
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+> +#include "sysemu/xen.h"
+>  #ifdef CONFIG_XEN
+>  #include <xen/hvm/hvm_info_table.h>
+>  #include "hw/xen/xen_pt.h"
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 3349e38a4c..e929749d8e 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -36,6 +36,7 @@
+>  #include "hw/rtc/mc146818rtc.h"
+>  #include "hw/xen/xen.h"
+>  #include "sysemu/kvm.h"
+> +#include "sysemu/xen.h"
+>  #include "hw/kvm/clock.h"
+>  #include "hw/pci-host/q35.h"
+>  #include "hw/qdev-properties.h"
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 82ece6b9e7..041303a2fa 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -28,6 +28,7 @@
+>  #include "qemu/range.h"
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/xen-mapcache.h"
+>  #include "trace.h"
+>  #include "exec/address-spaces.h"
+> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+> index 0f7b05e5e1..a1492fdecd 100644
+> --- a/hw/i386/xen/xen_platform.c
+> +++ b/hw/i386/xen/xen_platform.c
+> @@ -33,6 +33,7 @@
+>  #include "hw/xen/xen-legacy-backend.h"
+>  #include "trace.h"
+>  #include "exec/address-spaces.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/module.h"
+> diff --git a/hw/isa/piix3.c b/hw/isa/piix3.c
+> index fd1c78879f..1a5267e19f 100644
+> --- a/hw/isa/piix3.c
+> +++ b/hw/isa/piix3.c
+> @@ -28,6 +28,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/xen/xen.h"
+> +#include "sysemu/xen.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index 29187898f2..2c7ead7667 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -19,6 +19,7 @@
+>  #include "hw/pci/msix.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/xen/xen.h"
+> +#include "sysemu/xen.h"
+>  #include "migration/qemu-file-types.h"
+>  #include "migration/vmstate.h"
+>  #include "qemu/range.h"
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index c00a6807d9..b979ea6e7f 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -28,7 +28,6 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/boards.h"
+> -#include "hw/xen/xen.h"
+>  #include "net/net.h"
+>  #include "migration.h"
+>  #include "migration/snapshot.h"
+> @@ -59,6 +58,7 @@
+>  #include "sysemu/replay.h"
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/xen.h"
+>  #include "qjson.h"
+>  #include "migration/colo.h"
+>  #include "qemu/bitmap.h"
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index afd2615fb3..0344e5fd2e 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -36,6 +36,7 @@
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/seccomp.h"
+>  #include "sysemu/tcg.h"
+> +#include "sysemu/xen.h"
+>  
+>  #include "qemu/error-report.h"
+>  #include "qemu/sockets.h"
+> @@ -178,7 +179,6 @@ static NotifierList exit_notifiers =
+>  static NotifierList machine_init_done_notifiers =
+>      NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
+>  
+> -bool xen_allowed;
+>  uint32_t xen_domid;
+>  enum xen_mode xen_mode = XEN_EMULATE;
+>  bool xen_domid_restrict;
+> diff --git a/stubs/xen-hvm.c b/stubs/xen-hvm.c
+> index b7d53b5e2f..6954a5b696 100644
+> --- a/stubs/xen-hvm.c
+> +++ b/stubs/xen-hvm.c
+> @@ -35,11 +35,6 @@ int xen_is_pirq_msi(uint32_t msi_data)
+>      return 0;
+>  }
+>  
+> -void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+> -                   Error **errp)
+> -{
+> -}
+> -
+>  qemu_irq *xen_interrupt_controller_init(void)
+>  {
+>      return NULL;
+> @@ -49,10 +44,6 @@ void xen_register_framebuffer(MemoryRegion *mr)
+>  {
+>  }
+>  
+> -void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+> -{
+> -}
+> -
+>  void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+>  {
+>  }
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 9c256ab159..f9b3ef1ef2 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -29,6 +29,7 @@
+>  #include "sysemu/reset.h"
+>  #include "sysemu/hvf.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/xen.h"
+>  #include "kvm_i386.h"
+>  #include "sev_i386.h"
+>  
+> @@ -54,7 +55,6 @@
+>  #include "hw/i386/topology.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "exec/address-spaces.h"
+> -#include "hw/xen/xen.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "hw/boards.h"
+>  #endif
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1f84e3ae2c..95ddddfb1d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -438,6 +438,7 @@ M: Paul Durrant <paul@xen.org>
+>  L: xen-devel@lists.xenproject.org
+>  S: Supported
+>  F: */xen*
+> +F: accel/xen/*
+>  F: hw/9pfs/xen-9p*
+>  F: hw/char/xen_console.c
+>  F: hw/display/xenfb.c
+> @@ -451,6 +452,7 @@ F: hw/i386/xen/
+>  F: hw/pci-host/xen_igd_pt.c
+>  F: include/hw/block/dataplane/xen*
+>  F: include/hw/xen/
+> +F: include/sysemu/xen.h
+>  F: include/sysemu/xen-mapcache.h
+>  
+>  Guest CPU Cores (HAXM)
+> diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+> index 17e5ac6061..ff72f0d030 100644
+> --- a/accel/Makefile.objs
+> +++ b/accel/Makefile.objs
+> @@ -2,4 +2,5 @@ common-obj-$(CONFIG_SOFTMMU) += accel.o
+>  obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
+>  obj-$(CONFIG_KVM) += kvm/
+>  obj-$(CONFIG_TCG) += tcg/
+> +obj-$(CONFIG_XEN) += xen/
+>  obj-y += stubs/
+> diff --git a/accel/xen/Makefile.objs b/accel/xen/Makefile.objs
+> new file mode 100644
+> index 0000000000..7482cfb436
+> --- /dev/null
+> +++ b/accel/xen/Makefile.objs
+> @@ -0,0 +1 @@
+> +obj-y += xen-all.o
+> diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> index 84df60a928..340b2c5096 100644
+> --- a/hw/xen/Makefile.objs
+> +++ b/hw/xen/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  # xen backend driver support
+> -common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
+> +common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-bus.o xen-bus-helper.o xen-backend.o
+>  
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
 > 
 
 Queued, thanks.
