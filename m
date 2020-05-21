@@ -2,99 +2,107 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA207C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71A2D207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:40:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 811A2207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:40:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnQcGBRO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A2D207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0yERlQk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 811A2207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnJR-0001p2-NL
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:40:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42190)
+	id 1jbnJU-0001xG-N7
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbnIR-0000WF-Rs
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:39:47 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35454)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbnIQ-0000O4-7D
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:39:47 -0400
-Received: by mail-pl1-x644.google.com with SMTP id q16so2983462plr.2
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 08:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CIa/ldRCSIu17qwKpnlSw1zjinXrFMV5J5NR4wmmfzA=;
- b=qnQcGBRO9lxPIG9VTtudL9bb9Gzh9LU2C7C8cLTeECMVrtJWg/Wr4tWjZvqrnnvQGc
- aRCSkrxYMqTBXL9ypqkmTLHETFf4NotJtp9iBLBjie2CIWIbNcJk+/0ffC0tkbbS0dw1
- 0WfQJ0rWG0BK9748/h7i9jjyYfc6z+h/LGMng5M86Y4t2QyJVKq6xRo6R9lQWerG8O82
- D2SOsgdQducV9p5FPz+TyBPTsOP1735dkK2KtHwP2Yr7vgTci8KcVXz+LWQxc/lMZWaR
- F1z0E9V6MQv1LvAtg3MbJy3G+D8+dcuYkjbucF/I5I8g/NMdYmib0E8HU0yaRif4V1p9
- fJUw==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbnId-0000iY-C9
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:39:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47380
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbnIc-0000Rm-NH
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:39:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590075598;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
+ b=Z0yERlQkHz3keNOTfblHY4i4ljfhUIYM5+uXdeKmEsz3EQVjciVmYT2GkNTUp9OWwx6CmP
+ C96RaCkpJAm6zxbu9cKb5zvAPX/89zRAAHp0ARLqZlBZWjPTJi+H62FBAuU/d0buP99J2K
+ hW4QOY4nDtXuOJKzjZXc+fZblkmDOSA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-gpDer4swMAWSp4PxUtYp4w-1; Thu, 21 May 2020 11:39:54 -0400
+X-MC-Unique: gpDer4swMAWSp4PxUtYp4w-1
+Received: by mail-wr1-f71.google.com with SMTP id c14so1919983wrm.15
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 08:39:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=CIa/ldRCSIu17qwKpnlSw1zjinXrFMV5J5NR4wmmfzA=;
- b=Nuets9PkGkY2y8Tbht1lpKhOLgGd+MjHZ0Mz4oW0G2iQRAWhIuGLy5+fYVICfZFBDg
- w8umwEwOEyzJPYyoGScit3vUriZb8jcWI+7NueOJqT6Ugn1HIlQ5ps1ACKvJo5qyrgNC
- Nq2FEN9j0wgZi4eHOqdYvSdxrAJuQL/+DNzSM8ax9j5ZboRgwz3O+YfB09yUHj0oS51d
- z4dY9XfGEPn80ClgxFjEm2ytAt6OAt3er8dy5njAK3/cLlUpAxOBBL5FEXBlNO/nJWRT
- Mg1AnBwWhxAd09VRyiVQVUM1P0m48bObH6zThrxJapGFdH8Va0Ru+LQtvoyraSmaAZnV
- okwQ==
-X-Gm-Message-State: AOAM5329ZyFkw56Yt/BaV1CaTCUvdvGwxn1TiUrQLtF/iD44ymuvQsJL
- aO1jTx+ZFBjnedDy842AmET8eQ==
-X-Google-Smtp-Source: ABdhPJxo0b/O4vbKnWKzZus3CSO2LQBqW/jpz6L9UikdugTk8DZ8+NZDqCXmgJgnf0XDN5Ad14Pjew==
-X-Received: by 2002:a17:90b:882:: with SMTP id
- bj2mr11124244pjb.186.1590075584355; 
- Thu, 21 May 2020 08:39:44 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id b29sm4970929pff.176.2020.05.21.08.39.43
+ bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
+ b=cOdrDM6GGlpbXD+qYwmDMk1Q7XLnC4gXNvJY3NRF8so2dRbMD1P7CIu1/nBGlP0KDq
+ doLtCeVx6UQMTd4h+HQ9KkIEjmNxtVQWOs4SYhtEKjyksMLgQ1rQLtZDrOp4cw4Cg+sE
+ 0733u7OxrPUHfh8HxaeClvBdvsCX8lwnA2AEBsl47ey9EyLrs3QEky2hOFPr9ZtA63yw
+ s21WO94L5gFyUixENl09h7Q/iNhLb6gxmWUCScuF9RLuIU0lyYsTavvYaVObKqs7YUsc
+ DsYpKeH665Il7WyQeF+t5UVFptkbLU+Qsr4hFymEtglTpbB5fZoOfA3wuaXsSG7EWZsO
+ DQEQ==
+X-Gm-Message-State: AOAM531/vNmkm+XZ7woHmY6VYWQLopepq/kRdqHcqDgfvOTD7VqXiW89
+ plrLRPm/itTtljzeTID5xJeZVwyy8DxadPQ8ApSyJ0NlCW2p9/o0faPTrL4IEE/Gwe6kY7klHwc
+ zSm9oEdmOJrnWC5Y=
+X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952474wmb.175.1590075593000; 
+ Thu, 21 May 2020 08:39:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfVFA16Vk7DH3k5Gli/MWqVyNwVg5WtcQ3TOTHXqa1Cxgchjm6mOUYuBDf5kB3v7fVX8NKYQ==
+X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952456wmb.175.1590075592732; 
+ Thu, 21 May 2020 08:39:52 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.160.154])
+ by smtp.gmail.com with ESMTPSA id v19sm6410774wml.43.2020.05.21.08.39.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 08:39:43 -0700 (PDT)
-Subject: Re: [PATCH v1 04/10] linux-user: completely re-write init_guest_space
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>
-References: <20200513175134.19619-1-alex.bennee@linaro.org>
- <20200513175134.19619-5-alex.bennee@linaro.org>
- <958a1d7e-305d-96f5-2e0c-f8a2dd53e1c0@redhat.com> <87eerdg0kx.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0fcdef39-2e6f-11db-121b-874805ff2518@linaro.org>
-Date: Thu, 21 May 2020 08:39:41 -0700
+ Thu, 21 May 2020 08:39:52 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 6/7] accel/kvm: Let KVM_EXIT_MMIO return error
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200518155308.15851-1-f4bug@amsat.org>
+ <20200518155308.15851-7-f4bug@amsat.org>
+ <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
+Date: Thu, 21 May 2020 17:39:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <87eerdg0kx.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,72 +115,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ kvm-devel <kvm@vger.kernel.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/21/20 1:21 AM, Alex Bennée wrote:
-> 
-> Thomas Huth <thuth@redhat.com> writes:
-> 
->> On 13/05/2020 19.51, Alex Bennée wrote:
->>> First we ensure all guest space initialisation logic comes through
->>> probe_guest_base once we understand the nature of the binary we are
->>> loading. The convoluted init_guest_space routine is removed and
->>> replaced with a number of pgb_* helpers which are called depending on
->>> what requirements we have when loading the binary.
->>>
->>> We first try to do what is requested by the host. Failing that we try
->>> and satisfy the guest requested base address. If all those options
->>> fail we fall back to finding a space in the memory map using our
->>> recently written read_self_maps() helper.
->>>
->>> There are some additional complications we try and take into account
->>> when looking for holes in the address space. We try not to go directly
->>> after the system brk() space so there is space for a little growth. We
->>> also don't want to have to use negative offsets which would result in
->>> slightly less efficient code on x86 when it's unable to use the
->>> segment offset register.
->>>
->>> Less mind-binding gotos and hopefully clearer logic throughout.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> Acked-by: Laurent Vivier <laurent@vivier.eu>
-> <snip>
->>> +    } else {
->>> +        if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
->>> +            error_report("%s: requires more virtual address space "
->>> +                         "than the host can provide (0x%" PRIx64 ")",
->>> +                         image_name, (uint64_t)guest_hiaddr - guest_base);
->>> +            exit(EXIT_FAILURE);
->>>          }
->>
->>  Hi Alex,
->>
->> this causes an error with newer versions of Clang:
->>
->> linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
->> long' > 18446744073709551615 is always false
->> [-Werror,-Wtautological-type-limit-compare]
->> 4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
->> 4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
->> 4687 1 error generated.
->>
->> Any ideas how to fix this?
-> 
-> I guess this check only makes sense when abi_ulong > uintptr_t or IOW 64
-> bit guests running on 32 bit hosts. We could just wrap that check in:
-> 
-> #if HOST_LONG_BITS == 32
-> 
-> #endif
+On 18/05/20 18:01, Peter Maydell wrote:
+> The "right" answer is that the kernel should enhance the KVM_EXIT_MMIO
+> API to allow userspace to say "sorry, you got a bus error on that
+> memory access the guest just tried" (which the kernel then has to
+> turn into an appropriate guest exception, or ignore, depending on
+> what the architecture requires.) You don't want to set ret to
+> non-zero here, because that will cause us to VM_STOP, and I
+> suspect that x86 at least is relying on the implict RAZ/WI
+> behaviour it currently gets.
 
-As I've suggested elsewhere, I think we should disable this warning on the
-command-line.
+Yes, it is.  It may even be already possible to inject the right
+exception (on ARM) through KVM_SET_VCPU_EVENTS or something like that, too.
 
-
-r~
+Paolo
 
 
