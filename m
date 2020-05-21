@@ -2,122 +2,87 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237C0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E95AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D68402072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5EE42072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wifHLVrG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68402072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="st0EYVbc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5EE42072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbjRj-0005D3-0n
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42334)
+	id 1jbjSO-0006eI-5N
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jbjQf-00040e-5L; Thu, 21 May 2020 07:32:01 -0400
-Received: from mail-eopbgr150108.outbound.protection.outlook.com
- ([40.107.15.108]:28387 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jbjQc-0006uS-Iy; Thu, 21 May 2020 07:32:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DquPg8ZG0hmC0D7paikWaAahIA/xI63jDAUUiXD/7O9PaSUY3zI4QHTmCtKbyeV0W8GJApfyAk7H/dV0b/mBS2GAfly4xMI+Xn7Gp6R1zP5qP3TiJOLByuYz/FUcmZItfoTxCw4wxzGFK+E2fnf65Ka2ogjLp00kOagb383quSgvNcFfPDf+O4eR6rCaIXA1f3cgWqQTe2xI+SK99KPCMjDhn3CiZ0TeiAh/A6TSP4hQ6xt1Nz0RN/Z01yX8gov39cI+QeJUSz61OASnPqVSzIiotBtMYZYzqjrP7RAxOkG2Azdh/qdDpoBWx47/jH0yunQmeY+xXyqkI7eVWEhL+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b7XWgsUE6tx31q/e7BnMN4r3sqeLteMtqbaZ+2qbBas=;
- b=NgYdxlOufSW6FVbTakIRvpMARmD18qKhwABvUGiNOgmYOSdivjUreFqFCeEyNz/ySp6j1bdezXoiswzZ+cz93tNawdEFeLc4uNVFiMbKesAXj3zEgS7XcrqQFnyGEJI41mK5NVX6Au8wLNFQOAStBcVjf/GzTpeMQyr+co+ineAaDWOAkxTLtCj751cX1WkJwCH8jaSaNyi+M6f+w/STIuOhr0Yun5FPcdbjEMRnHpT99o7Nwp3PrR6e6vE9bXJCdzEC8lgLLxS/xAPsRdM3zolGceXjSxsJe4sUKA+ywQfuSwshGH2bG9DxTEpiK604UAupOWqnNNKXxbxOZXwVIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b7XWgsUE6tx31q/e7BnMN4r3sqeLteMtqbaZ+2qbBas=;
- b=wifHLVrGfawReFfYrKknNI4aojVf0HSyWD6p5leoG3FfC5XXl00TpDVoel8QQzSa2Yuq9pFjffGt/Dnihm6qML+hp23EaNuIw25xzmvIcvOv8VXZJzuZWkPGTOOMwEkQK/8/lkZPrLpJ7Bm8vA5EXPSPQ4gBmECbKbin+9dVQ70=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5429.eurprd08.prod.outlook.com (2603:10a6:20b:107::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Thu, 21 May
- 2020 11:31:56 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.020; Thu, 21 May 2020
- 11:31:56 +0000
-Subject: Re: [PATCH v5 1/5] iotests: Fix test 178
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200520220118.1037094-1-eblake@redhat.com>
- <20200520220118.1037094-2-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <a2eb09cc-6a89-1604-47d5-5cdf87c07699@virtuozzo.com>
-Date: Thu, 21 May 2020 14:31:54 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200520220118.1037094-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0035.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::15) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jbjRk-0005bX-Bs
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 07:33:08 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43066)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jbjRi-00074Q-0U
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 07:33:08 -0400
+Received: by mail-lf1-x141.google.com with SMTP id c12so4240653lfc.10
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 04:33:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O0ofk45mBhkd/iPVmIzLPHgKLBfNxwP0/3vKM+icrNk=;
+ b=st0EYVbcnEn3qQGTucl91UGlk36e+4T+mTRM5Qwy1G0W3AOn2EFHntdc4ni5ViVwht
+ bZd+b3C52B7Tb7G3AyEhxCCN52vbCG07jHlkeZBjq+YALFYRNW0Rv9NAiYqzsY8yeUvF
+ DO0xXRzo8bCHlPKAN+cok3MmxbQfULGcNVD/zboLUOKEVTwd044Lyneyqhd143FzIc2A
+ sCWep8OpSxUofAoxssXqy9qakFjjCbJtoKK8xXyvInXoD5P7zLXna61x4+UIJE4/g+Cl
+ KY/O5OgRGOMo2zC4AZddnZsWyoGSSYBBSoCHM1/G4XUX9ZKrBnP5n/s+Yqw72oElLBuF
+ niBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O0ofk45mBhkd/iPVmIzLPHgKLBfNxwP0/3vKM+icrNk=;
+ b=IdLfjalG7ftDExWumWzwN8HMzSi5sxcYexvDvaA8DjeAq2t9An8M1A0OHjg6VWdbOh
+ OuZn3q/aKGeLSCUHQ8TWNcX8/EfstsMfGjh4UQXzmHKYznXV9A+2zFjsck3nRY4lEBe/
+ m8apuCAfmOEJbve4fbDLriU24hWmPCwmOU+Gka46XNMn8lRmbQOzLeORhHKLjnnyzhic
+ wtLRPOUH580TOgcpPkZ5/O8/i0N+3ft74Gp4PXlc59K++jvF4WEC8zf7VMOwH6JYlOja
+ /Knl1XgcrX5HM9SDbPHF6aet9ge7LuLgT0Xz0/yVfsCgSQbY9XDhOE3q9r8E33i6Pg8K
+ aXxA==
+X-Gm-Message-State: AOAM5338/vILvS84EjWROI6yQmqXINpTT8rA1K0/dUHT1XTDkXxxrEoB
+ eq4KdiQ8/nWhBk0SalIVqYZunF9JdzJw87ENr30=
+X-Google-Smtp-Source: ABdhPJwCV+mpQc1/t6aPt3OFF2YRtHCvA9D4LcU0iAvcK0eBuwkqdfS2KI6p/Q5KJQtT8MrpWBZrW3MGwLJVd2GhL4Y=
+X-Received: by 2002:a19:987:: with SMTP id 129mr4854869lfj.8.1590060783656;
+ Thu, 21 May 2020 04:33:03 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.167) by
- AM0PR10CA0035.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend
- Transport; Thu, 21 May 2020 11:31:55 +0000
-X-Originating-IP: [185.215.60.167]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 639c3910-465c-4fe8-fcfd-08d7fd7a9133
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5429:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB542931E02A321BCE1F727B05C1B70@AM7PR08MB5429.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:741;
-X-Forefront-PRVS: 041032FF37
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4OKssfyRyCnigTiUiQBqTpy5Tug8z9cw3tjgax76OHxZwmD+pnx7ZxU2TT156jYlopaXQJZ/lUXWb8W7iRepWYMNt4yGau27im2wj/mqVjzFYnGxg3BhTSwfzyjCIBGoQI88aYohF2crBrRFRr/+ukbdFMM9Ai9xMP9Mvr+0dhLY/NzpL2/OlFsy/KYtCV6dwoCTmXOXOw1ePWwDY0v7ldx0r/oe7U9prlrKtHWxrAFmJqPaNP5lkMhdkoaW1NKvkuI9ElulGzfKNQ7+Ze5lxgUsgEXHtDvW95TT7z0T57cRAUP8CCMJG0dA1N5isV1El/d+A+7t/ViqOqwEV6wbESXveXu2nixDYlKWHxKPO0Wg6OOAUWc2WmCpox9b6pC6
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39850400004)(396003)(346002)(136003)(366004)(376002)(478600001)(956004)(31686004)(6486002)(66556008)(52116002)(8676002)(66476007)(16526019)(186003)(2616005)(4744005)(26005)(86362001)(66946007)(5660300002)(36756003)(4326008)(31696002)(16576012)(8936002)(2906002)(316002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: MZp3HGHqevSz5otRIPpcA4htZYWjM0i2dC8+T+C1RhoeuGZfmoqRhDI+xlfD5P29ihWMhyh02IWrZYD6UXPGKoEv+K7nLAIp8UufTN6n8GRiaoV/Rw9BIe2URSsNWIkOqKxwgoftRY4fDjJuaMeaMFqARP0E242iOYAAZ+8UDjPdhDtvK7lREG8BuraSa6dbL8f/gpJm0CRgWqggcHFfgH1P1XyNstLkr0YkmNWzivCmXIrySqudVJpLLgWZZp8oXBU4o4F3D+y3zWAvMZDyu1bNJNvo3eqcvjPtuI/8aoiSn//WboOHaAMrtkVoz0fxSPRkUmMCfWiXY2oWukDmDlKP1rgmtAmbYrNt7AC5xpMSzkGHM7I2H19vA3jpRc82bcybNxzjkmot1Rm/hFYP95pV5v04gw5202wumTweyfB0Bh7LktJQjOUCYoWPb16YqC9yUTI0x+k60Sy7KXbvQZHog9IGDz062PvXbLzTNe7AKC9+ZClmh0MyZP1l8HYZ
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 639c3910-465c-4fe8-fcfd-08d7fd7a9133
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2020 11:31:56.1051 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rRuLqr8K62apdKqtIAUIZEDONjlzw4oRZm/DBMw/2XwJoc0+gs/XUGdmQpCxivZqcDn4kFhxeqChGsSszoCca9TxOqabW2HOaeAZUGDYO6A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5429
-Received-SPF: pass client-ip=40.107.15.108;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 07:31:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
+ <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
+In-Reply-To: <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Thu, 21 May 2020 13:32:27 +0200
+Message-ID: <CALTWKrVGqVb1mjsaoxYm4Y1iQoXYwz7ToC7T6r2EDPp-_LO=LQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
+To: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, rth@twiddle.net, 
+ ysato@users.sourceforge.jp
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -131,23 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.05.2020 01:01, Eric Blake wrote:
-> A recent change to qemu-img changed expected error message output, but
-> 178 takes long enough to execute that it does not get run by 'make
-> check' or './check -g quick'.
-> 
-> Fixes: 43d589b074
-> Signed-off-by: Eric Blake<eblake@redhat.com>
+On Tue, May 19, 2020 at 8:01 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 5/19/20 9:21 AM, Ahmed Karaman wrote:
+> > The issue arose because the page crossings check in use_goto_tb()
+> > function is required only in the system mode. Checking it in both
+> > modes causes an unnecessary overhead in the user mode.
+>
+> It is not only required in system mode.
+>
+> You can see failures in user-mode if you modify executable pages, or
+> change their permissions with mmap.  Such as if the guest program
+> contains a JIT.
+>
+>
+> r~
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Hi Mr. Richard,
 
--- 
-Best regards,
-Vladimir
+I've checked how the use_goto_tb() function is implemented in other
+targets, and it appears that they do the page crossings check in the
+system mode only.
+
+Below is an example from the arm64 target:
+-----------------------------------------------------------------------
+static inline bool use_goto_tb(DisasContext *s, int n, uint64_t dest)
+{
+  /* No direct tb linking with singlestep (either QEMU's or the ARM
+   * debug architecture kind) or deterministic io
+   */
+  if (s->base.singlestep_enabled || s->ss_active ||
+    (tb_cflags(s->base.tb) & CF_LAST_IO)) {
+    return false;
+  }
+
+#ifndef CONFIG_USER_ONLY
+  /* Only link tbs from inside the same guest page */
+  if ((s->base.tb->pc & TARGET_PAGE_MASK)!=(dest & TARGET_PAGE_MASK)) {
+    return false;
+  }
+#endif
+
+  return true;
+}
+-----------------------------------------------------------------------
+Please let me know what you think. Does this mean that there is a bug
+in this function for the other targets?
+That we have to do the page crossings check in both modes to avoid the
+user-mode failures that you have mentioned above?
+
+Regards,
+Ahmed Karaman
 
