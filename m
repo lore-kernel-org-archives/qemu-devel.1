@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E030C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF67FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0C0F20759
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9D020759
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:18:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MF8FyNqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C0F20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U+GT93lC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9D020759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbopm-0007b1-V2
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:18:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50144)
+	id 1jbopy-00087W-S5
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:18:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJA-0004Ns-EJ
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:37 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:45008)
+ id 1jboJG-0004Vu-9A
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:42 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:34331)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jboJ8-0006iT-4R
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:36 -0400
-Received: by mail-qk1-x743.google.com with SMTP id b6so7814837qkh.11
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:33 -0700 (PDT)
+ id 1jboJF-0006ke-98
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 12:44:41 -0400
+Received: by mail-qk1-x741.google.com with SMTP id 190so7918081qki.1
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:44:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NQ/BbjaNmbkm5KQOy7Vv4O17R/NYOg7qZF+hAsl6NgU=;
- b=MF8FyNqJb/RGFP/09QrjTIyVf34prruwqZ1AceBOSuOm48II948vnFxI3xzdmRnPzi
- DZ7vpfin3Nkm/cEGHA5V00jSHaM1SbzLyUgeh/y4kELaczI5vmcNnFTvDGPblHmyWgZM
- 2XVUUDlCEmzs6o5EB91D8YsjrT5tR2ijt0fVlWrDKNdTGEQMYZnpIS4ENx3zW5wZ8oB4
- zyrLZQRiBpOpJgRxh7kXQUgR81wTWAKlVYsTyGIcKbMZOtnZOBQ40kNvemJZk+zNfrMU
- UMioW8CgE4Q0pNRWwSOd96K4NEybvbsefSuVVpS8TYGQpGtLYrtdMs9oizX/pYXMdHkv
- c0gA==
+ bh=f6jTs4l1FUMMcryMnS/4lJD5Ni20LOW4nBzyszoy3L4=;
+ b=U+GT93lCYq8RuQBsNpW0FvQNeYBg/ZDm0UBcKUlTv6NGzMx5QowNjosWOW4Hh6fFBR
+ o5qDdlykIEaKgxcHDCZrh0HJ16sSegni6A1tRjV5ajlB8OSq/P9VYMlC97qb/fqIg3of
+ S0nXOoxsvgybjD9x4aHyL8bpD+6ECZ+AiciwPI+wF3l4jMmaNOVjkZIKKXOMOCvo7pMC
+ wD/EOQIucPF0VtHzaL9kiB1ZcSUCpn5DVo/M0XlXjCjoUXRSOay/HD30DSnsGFQmSGkv
+ UsihxjAu/dVejODKWx423p61s7tP4sKGJCz6oVCbzwZ3QkmTiXLwaMlKsr/dPAdTR3lu
+ uBwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=NQ/BbjaNmbkm5KQOy7Vv4O17R/NYOg7qZF+hAsl6NgU=;
- b=amixXc/iZmNttRfyb+aLIBYCS6Bte22NvMY3vQr9+4uJWEnYTvG6+NdWROzvAeqW7V
- FXFX3q/up+jgE1eKNxDxjuDul5gCtz88f9HUaQM/fLZp3FFow1DQZoQ7jQa67djwHXip
- YUZOfidS/Ow+lhcM8JGWHI56K6f55z8Iw9mJpaE3wxbiRz4379KLCSzLI+TPzCfP4bCK
- rfQMWOi59ghwgI63BGDHN+yNsMaMk8jmhQSINK9UmeO0DXD0aOW/KZsSNbXf6osohWTC
- 5JBZ0MYLd9n/DUbBQSooubr5PQpnGyQGIDfLjTuLcghDefV9UPAdoOgRMpspRBnGC8y0
- cU8A==
-X-Gm-Message-State: AOAM531W9e6UIWOsMuSHpW+G/FkXrLDHfprZA40NW4IGK9LHUhFVM0iM
- 2jgtdXBg6D+N9iARLHPgpHzS999eRaNBVA==
-X-Google-Smtp-Source: ABdhPJzeBkaDp+FqKVcdVk/W/8+ZVXtC1PPJ04dX03wXjgBff+z9ucLK+bNXteXW28K7hFHCFRtVSw==
-X-Received: by 2002:a05:620a:204e:: with SMTP id
- d14mr9451256qka.13.1590079472636; 
- Thu, 21 May 2020 09:44:32 -0700 (PDT)
+ bh=f6jTs4l1FUMMcryMnS/4lJD5Ni20LOW4nBzyszoy3L4=;
+ b=WBvvlwrGDB1Gx8EyMZzJkjDUmReYOXutqoCGeTSsUhU+HeOqsiPh5/rapK/2dnY+Si
+ YQebIMUPPhF+7cqAUj3S8A5xmQ7oLWQUKnHqZoCZHHNp2rGtsiLZOMmgMSLBfndV9IAG
+ /F+Z7kJPnuLgy1MWxPD00nx4O3KYYrWaVijlW8POLuYyy57tTBXPDHqkqjqnVWH9mFxn
+ VXp/Etoerx9pRbgZ0g3dRKWtp7MvvwPegym5QpTg6J4SnFNPQG2aLkDgd7SmEdil37r/
+ C7Y+WwLQprlW5wFlMS6hyncVC1cKLeYMYZuGmTTomvuQmk8VUJGA+tENA2aWS2sHxnM6
+ puOA==
+X-Gm-Message-State: AOAM533NlcToEzmcSqsNOJ8dnl3GbfsBQOTbkUa3CzsMmiGKgQREb5fb
+ +Npf5Ss+qhi8NOOKorv4oPR2EOs5d4J/NQ==
+X-Google-Smtp-Source: ABdhPJzs90Pwp95Q4YWsVV7Q0rqm4Bp7Xbmm0LmluS7V13wMY2eWTxpv/A7YYTYSJEJaQQV1CfDbRg==
+X-Received: by 2002:a05:620a:a83:: with SMTP id
+ v3mr10997896qkg.84.1590079478970; 
+ Thu, 21 May 2020 09:44:38 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1944:c530:655c:5583])
- by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.31
+ by smtp.gmail.com with ESMTPSA id x24sm5923829qth.57.2020.05.21.09.44.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 09:44:32 -0700 (PDT)
+ Thu, 21 May 2020 09:44:38 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 58/74] unicore32: convert to cpu_interrupt_request
-Date: Thu, 21 May 2020 12:39:55 -0400
-Message-Id: <20200521164011.638-59-robert.foley@linaro.org>
+Subject: [PATCH v9 63/74] cpu: introduce cpu_has_work_with_iothread_lock
+Date: Thu, 21 May 2020 12:40:00 -0400
+Message-Id: <20200521164011.638-64-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200521164011.638-1-robert.foley@linaro.org>
 References: <20200521164011.638-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x743.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x741.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,51 +102,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, richard.henderson@linaro.org, cota@braap.org,
- peter.puhov@linaro.org, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- alex.bennee@linaro.org
+Cc: richard.henderson@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+It will gain some users soon.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/unicore32/cpu.c     | 2 +-
- target/unicore32/softmmu.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ include/hw/core/cpu.h | 37 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index b27fb9689f..06bf4b4b63 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -27,7 +27,7 @@ static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 7bf7700630..9766477e62 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -26,6 +26,7 @@
+ #include "exec/memattrs.h"
+ #include "qapi/qapi-types-run-state.h"
+ #include "qemu/bitmap.h"
++#include "qemu/main-loop.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/queue.h"
+ #include "qemu/thread.h"
+@@ -82,6 +83,8 @@ struct TranslationBlock;
+  * @reset_dump_flags: #CPUDumpFlags to use for reset logging.
+  * @has_work: Callback for checking if there is work to do. Called with the
+  * CPU lock held.
++ * @has_work_with_iothread_lock: Callback for checking if there is work to do.
++ * Called with both the BQL and the CPU lock held.
+  * @do_interrupt: Callback for interrupt handling.
+  * @do_unaligned_access: Callback for unaligned access handling, if
+  * the target defines #TARGET_ALIGNED_ONLY.
+@@ -167,6 +170,7 @@ typedef struct CPUClass {
  
- static bool uc32_cpu_has_work(CPUState *cs)
+     int reset_dump_flags;
+     bool (*has_work)(CPUState *cpu);
++    bool (*has_work_with_iothread_lock)(CPUState *cpu);
+     void (*do_interrupt)(CPUState *cpu);
+     void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
+                                 MMUAccessType access_type,
+@@ -800,14 +804,41 @@ const char *parse_cpu_option(const char *cpu_option);
+ static inline bool cpu_has_work(CPUState *cpu)
  {
--    return cs->interrupt_request &
-+    return cpu_interrupt_request(cs) &
-         (CPU_INTERRUPT_HARD | CPU_INTERRUPT_EXITTB);
- }
+     CPUClass *cc = CPU_GET_CLASS(cpu);
++    bool has_cpu_lock = cpu_mutex_locked(cpu);
++    bool (*func)(CPUState *cpu);
+     bool ret;
  
-diff --git a/target/unicore32/softmmu.c b/target/unicore32/softmmu.c
-index cbdaa500b7..9660bd2a27 100644
---- a/target/unicore32/softmmu.c
-+++ b/target/unicore32/softmmu.c
-@@ -117,7 +117,7 @@ void uc32_cpu_do_interrupt(CPUState *cs)
-     /* The PC already points to the proper instruction.  */
-     env->regs[30] = env->regs[31];
-     env->regs[31] = addr;
--    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+    cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
++    /* some targets require us to hold the BQL when checking for work */
++    if (cc->has_work_with_iothread_lock) {
++        if (qemu_mutex_iothread_locked()) {
++            func = cc->has_work_with_iothread_lock;
++            goto call_func;
++        }
++
++        if (has_cpu_lock) {
++            /* avoid deadlock by acquiring the locks in order */
++            cpu_mutex_unlock(cpu);
++        }
++        qemu_mutex_lock_iothread();
++        cpu_mutex_lock(cpu);
++
++        ret = cc->has_work_with_iothread_lock(cpu);
++
++        qemu_mutex_unlock_iothread();
++        if (!has_cpu_lock) {
++            cpu_mutex_unlock(cpu);
++        }
++        return ret;
++    }
++
+     g_assert(cc->has_work);
+-    if (cpu_mutex_locked(cpu)) {
+-        return cc->has_work(cpu);
++    func = cc->has_work;
++ call_func:
++    if (has_cpu_lock) {
++        return func(cpu);
+     }
+     cpu_mutex_lock(cpu);
+-    ret = cc->has_work(cpu);
++    ret = func(cpu);
+     cpu_mutex_unlock(cpu);
+     return ret;
  }
- 
- static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
 -- 
 2.17.1
 
