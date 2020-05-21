@@ -7,47 +7,46 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE90C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F687C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4144920671
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4D9020671
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ft9gHqWi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4144920671
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Fu5vGs+i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4D9020671
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbcJc-0008Eh-FV
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53340)
+	id 1jbcKE-0001Cp-2q
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:56:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7N-0003Hd-9M; Wed, 20 May 2020 23:43:37 -0400
-Received: from ozlabs.org ([203.11.71.1]:55805)
+ id 1jbc7O-0003Jg-21; Wed, 20 May 2020 23:43:38 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45131 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7L-0003YF-UT; Wed, 20 May 2020 23:43:36 -0400
+ id 1jbc7M-0003YY-BQ; Wed, 20 May 2020 23:43:37 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49SFnt32ghz9sV9; Thu, 21 May 2020 13:43:14 +1000 (AEST)
+ id 49SFnv0Y7Hz9sVV; Thu, 21 May 2020 13:43:14 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1590032594;
- bh=RoNYjMOb+doFdnm8Dtz4iYwT7R/uzrYzxbbPkPOmRbk=;
+ d=gibson.dropbear.id.au; s=201602; t=1590032595;
+ bh=W558T0y4xrxfOwPQYmYtDO1muLcuKoHvSX6UyLLotaM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ft9gHqWiKKadAQA4Gb8zk/3KXA1XgTZaseI7ixaLwykCUNZpN3RPTnkJdqfvGCiXW
- xnTkR+pJMA+Dj81tRKBsuqZwBjWVeOmIeKsZ+Ibon0cnpHJkxhoyXj3ZFLBr12ez2u
- ll7AiGHm5wDAbOeyHTOEsMAw5thcTIsfcls9bqZ4=
+ b=Fu5vGs+iKEOzGWF/cnWDp+sxjuKBr2gNFHYge8LcUfqI1/VHBY7bTWyO+UPfmC8GH
+ feY/nu1w0t+nvrOmuDOl5kkcnSR0XDO7JCHgVkvDeQQOLZqPmvtuISABpwOiKeHcBu
+ x2KRYwntQ3xZXweSyYjweUmqLFIgZC0aoCThEeks=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, frankja@linux.ibm.com,
  dgilbert@redhat.com, pair@us.ibm.com
-Subject: [RFC v2 15/18] guest memory protection: Decouple kvm_memcrypt_*()
- helpers from KVM
-Date: Thu, 21 May 2020 13:43:01 +1000
-Message-Id: <20200521034304.340040-16-david@gibson.dropbear.id.au>
+Subject: [RFC v2 17/18] spapr: Added PEF based guest memory protection
+Date: Thu, 21 May 2020 13:43:03 +1000
+Message-Id: <20200521034304.340040-18-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
@@ -85,209 +84,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kvm_memcrypt_enabled() and kvm_memcrypt_encrypt_data() helper functions
-don't conceptually have any connection to KVM (although it's not possible
-in practice to use them without it).
+Some upcoming POWER machines have a system called PEF (Protected
+Execution Framework) which uses a small ultravisor to allow guests to
+run in a way that they can't be eavesdropped by the hypervisor.  The
+effect is roughly similar to AMD SEV, although the mechanisms are
+quite different.
 
-They also rely on looking at the global KVMState.  But the same information
-is available from the machine, and the only existing callers have natural
-access to the machine state.
+Most of the work of this is done between the guest, KVM and the
+ultravisor, with little need for involvement by qemu.  However qemu
+does need to tell KVM to allow secure VMs.
 
-Therefore, move and rename them to helpers in guest-memory-protection.h,
-taking an explicit machine parameter.
+Because the availability of secure mode is a guest visible difference
+which depends on havint the right hardware and firmware, we don't
+enable this by default.  In order to run a secure guest you need to
+create a "pef-guest" object and set the guest-memory-protection machine property to point to it.
+
+Note that this just *allows* secure guests, the architecture of PEF is
+such that the guest still needs to talk to the ultravisor to enter
+secure mode, so we can't know if the guest actually is secure until
+well after machine creation time.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- accel/kvm/kvm-all.c                    | 28 -------------------
- accel/stubs/kvm-stub.c                 | 10 -------
- hw/i386/pc_sysfw.c                     |  6 ++--
- include/exec/guest-memory-protection.h | 38 ++++++++++++++++++++++++++
- include/sysemu/kvm.h                   | 17 ------------
- 5 files changed, 42 insertions(+), 57 deletions(-)
+ target/ppc/Makefile.objs |  2 +-
+ target/ppc/pef.c         | 81 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+), 1 deletion(-)
+ create mode 100644 target/ppc/pef.c
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 3588adf1e1..1b10e94222 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -118,9 +118,6 @@ struct KVMState
-     KVMMemoryListener memory_listener;
-     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
- 
--    /* memory encryption */
--    GuestMemoryProtection *guest_memory_protection;
--
-     /* For "info mtree -f" to tell if an MR is registered in KVM */
-     int nr_as;
-     struct KVMAs {
-@@ -169,29 +166,6 @@ int kvm_get_max_memslots(void)
-     return s->nr_slots;
- }
- 
--bool kvm_memcrypt_enabled(void)
--{
--    if (kvm_state && kvm_state->guest_memory_protection) {
--        return true;
--    }
--
--    return false;
--}
--
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
--{
--    GuestMemoryProtection *gmpo = kvm_state->guest_memory_protection;
--
--    if (gmpo) {
--        GuestMemoryProtectionClass *gmpc =
--            GUEST_MEMORY_PROTECTION_GET_CLASS(gmpo);
--
--        return gmpc->encrypt_data(gmpo, ptr, len);
--    }
--
--    return 1;
--}
--
- /* Called with KVMMemoryListener.slots_lock held */
- static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
- {
-@@ -2110,8 +2084,6 @@ static int kvm_init(MachineState *ms)
-         if (ret < 0) {
-             goto err;
-         }
--
--        kvm_state->guest_memory_protection = ms->gmpo;
-     }
- 
-     ret = kvm_arch_init(ms, s);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 82f118d2df..78b3eef117 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -104,16 +104,6 @@ int kvm_on_sigbus(int code, void *addr)
-     return 1;
- }
- 
--bool kvm_memcrypt_enabled(void)
--{
--    return false;
--}
--
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
--{
--  return 1;
--}
--
- #ifndef CONFIG_USER_ONLY
- int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
- {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index b8d8ef59eb..9cef5f7780 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -38,6 +38,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/block/flash.h"
- #include "sysemu/kvm.h"
-+#include "exec/guest-memory-protection.h"
- 
- /*
-  * We don't have a theoretically justifiable exact lower bound on the base
-@@ -196,10 +197,11 @@ static void pc_system_flash_map(PCMachineState *pcms,
-             pc_isa_bios_init(rom_memory, flash_mem, size);
- 
-             /* Encrypt the pflash boot ROM */
--            if (kvm_memcrypt_enabled()) {
-+            if (guest_memory_protection_enabled(MACHINE(pcms))) {
-                 flash_ptr = memory_region_get_ram_ptr(flash_mem);
-                 flash_size = memory_region_size(flash_mem);
--                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
-+                ret = guest_memory_protection_encrypt(MACHINE(pcms),
-+                                                      flash_ptr, flash_size);
-                 if (ret) {
-                     error_report("failed to encrypt pflash rom");
-                     exit(1);
-diff --git a/include/exec/guest-memory-protection.h b/include/exec/guest-memory-protection.h
-index 3707b96515..7d959b4910 100644
---- a/include/exec/guest-memory-protection.h
-+++ b/include/exec/guest-memory-protection.h
-@@ -14,6 +14,7 @@
- #define QEMU_GUEST_MEMORY_PROTECTION_H
- 
- #include "qom/object.h"
-+#include "hw/boards.h"
- 
- typedef struct GuestMemoryProtection GuestMemoryProtection;
- 
-@@ -35,5 +36,42 @@ typedef struct GuestMemoryProtectionClass {
-     int (*encrypt_data)(GuestMemoryProtection *, uint8_t *, uint64_t);
- } GuestMemoryProtectionClass;
- 
-+/**
-+ * guest_memory_protection_enabled - return whether guest memory is
-+ *                                   protected from hypervisor access
-+ *                                   (with memory encryption or
-+ *                                   otherwise)
-+ * Returns: true guest memory is not directly accessible to qemu
-+ *          false guest memory is directly accessible to qemu
-+ */
-+static inline bool guest_memory_protection_enabled(MachineState *machine)
-+{
-+    return !!machine->gmpo;
-+}
-+
-+/**
-+ * guest_memory_protection_encrypt: encrypt the memory range to make
-+ *                                  it guest accessible
+diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+index e8fa18ce13..ac93b9700e 100644
+--- a/target/ppc/Makefile.objs
++++ b/target/ppc/Makefile.objs
+@@ -6,7 +6,7 @@ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
+ obj-$(TARGET_PPC64) += mmu-hash64.o mmu-book3s-v3.o compat.o
+ obj-$(TARGET_PPC64) += mmu-radix64.o
+ endif
+-obj-$(CONFIG_KVM) += kvm.o
++obj-$(CONFIG_KVM) += kvm.o pef.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ obj-y += dfp_helper.o
+ obj-y += excp_helper.o
+diff --git a/target/ppc/pef.c b/target/ppc/pef.c
+new file mode 100644
+index 0000000000..823daf3e9c
+--- /dev/null
++++ b/target/ppc/pef.c
+@@ -0,0 +1,81 @@
++/*
++ * PEF (Protected Execution Framework) for POWER support
 + *
-+ * Return: 1 failed to encrypt the range
-+ *         0 succesfully encrypted memory region
++ * Copyright David Gibson, Redhat Inc. 2020
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
 + */
-+static inline int guest_memory_protection_encrypt(MachineState *machine,
-+                                                  uint8_t *ptr, uint64_t len)
++
++#include "qemu/osdep.h"
++
++#define TYPE_PEF_GUEST "pef-guest"
++#define PEF_GUEST(obj)                                  \
++    OBJECT_CHECK(PefGuestState, (obj), TYPE_SEV_GUEST)
++
++typedef struct PefGuestState PefGuestState;
++
++/**
++ * PefGuestState:
++ *
++ * The PefGuestState object is used for creating and managing a PEF
++ * guest.
++ *
++ * # $QEMU \
++ *         -object pef-guest,id=pef0 \
++ *         -machine ...,guest-memory-protection=pef0
++ */
++struct PefGuestState {
++    Object parent_obj;
++};
++
++static Error *pef_mig_blocker;
++
++static int pef_kvm_init(GuestMemoryProtection *gmpo, Error **errp)
 +{
-+    GuestMemoryProtection *gmpo = machine->gmpo;
++    PefGuestState *pef = PEF_GUEST(gmpo);
 +
-+    if (gmpo) {
-+        GuestMemoryProtectionClass *gmpc =
-+            GUEST_MEMORY_PROTECTION_GET_CLASS(gmpo);
++    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
++        error_setg(errp,
++                   "KVM implementation does not support Secure VMs (is an ultravisor running?)");
++        return -1;
++    } else {
++        int ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
 +
-+        if (gmpc->encrypt_data) {
-+            return gmpc->encrypt_data(gmpo, ptr, len);
++        if (ret < 0) {
++            error_setg(errp,
++                       "Error enabling PEF with KVM");
++            return -1;
 +        }
 +    }
 +
-+    return 1;
++    return 0;
 +}
 +
- #endif /* QEMU_GUEST_MEMORY_PROTECTION_H */
- 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 3b2250471c..cfc4cee995 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -231,23 +231,6 @@ int kvm_destroy_vcpu(CPUState *cpu);
-  */
- bool kvm_arm_supports_user_irq(void);
- 
--/**
-- * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
-- *                        is enabled
-- * Returns: 1 memory encryption is enabled
-- *          0 memory encryption is disabled
-- */
--bool kvm_memcrypt_enabled(void);
--
--/**
-- * kvm_memcrypt_encrypt_data: encrypt the memory range
-- *
-- * Return: 1 failed to encrypt the range
-- *         0 succesfully encrypted memory region
-- */
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
--
--
- #ifdef NEED_CPU_H
- #include "cpu.h"
- 
++static void pef_guest_class_init(ObjectClass *oc, void *data)
++{
++    GuestMemoryProtectionClass *gmpc = GUEST_MEMORY_PROTECTION_CLASS(oc);
++
++    gmpc->kvm_init = pef_kvm_init;
++}
++
++static const TypeInfo pef_guest_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_PEF_GUEST,
++    .instance_size = sizeof(PefGuestState),
++    .class_init = pef_guest_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_GUEST_MEMORY_PROTECTION },
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void
++pef_register_types(void)
++{
++    type_register_static(&pef_guest_info);
++}
++
++type_init(pef_register_types);
 -- 
 2.26.2
 
