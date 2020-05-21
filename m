@@ -2,64 +2,66 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE032C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B1FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C6B320738
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:43:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6B320738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90F6020738
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:44:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ItLRJ9Kp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F6020738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbc7C-0002PA-Qb
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52440)
+	id 1jbc8Z-0005DY-Ob
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbc1r-00021O-KE
- for qemu-devel@nongnu.org; Wed, 20 May 2020 23:37:55 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:57270 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jbc7E-0002sp-O8; Wed, 20 May 2020 23:43:28 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52953)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jbc1q-0001t7-L5
- for qemu-devel@nongnu.org; Wed, 20 May 2020 23:37:55 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id BC244FF41CAC6E54E7D9;
- Thu, 21 May 2020 11:37:49 +0800 (CST)
-Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 21 May 2020 11:37:39 +0800
-From: Yubo Miao <miaoyubo@huawei.com>
-To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v8 5/8] acpi: Align the size to 128k
-Date: Thu, 21 May 2020 11:36:28 +0800
-Message-ID: <20200521033631.1605-6-miaoyubo@huawei.com>
-X-Mailer: git-send-email 2.24.1.windows.2
-In-Reply-To: <20200521033631.1605-1-miaoyubo@huawei.com>
-References: <20200521033631.1605-1-miaoyubo@huawei.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jbc7C-0003Tq-B2; Wed, 20 May 2020 23:43:28 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49SFnr3J0lz9sTK; Thu, 21 May 2020 13:43:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1590032592;
+ bh=b/ySedG6EPtDyWOrvJGyJDxoH9+NiT2I5+DDWgavmns=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=ItLRJ9KpIT0rlyJMStLLstOF0HYYFlpyWulI3c0dxJ8nha6BFpr+2qSz30UlBK9J3
+ O/S6/P0+q3njZeUxbKrDpW0b+h6cgXyUgbx4NAMpji/gA/ACJr0h4bEKlPFSf+YWDD
+ ESlGHcW8/1tsLgO7w1bsHou7vzvq/Pg/TOcY9IJY=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ dgilbert@redhat.com, pair@us.ibm.com
+Subject: [RFC v2 01/18] target/i386: sev: Remove unused QSevGuestInfoClass
+Date: Thu, 21 May 2020 13:42:47 +1000
+Message-Id: <20200521034304.340040-2-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.29]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=miaoyubo@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/20 23:37:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,75 +75,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, miaoyubo@huawei.com, imammedo@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If table size is changed between virt_acpi_build and
-virt_acpi_build_update, the table size would not be updated to
-UEFI, therefore, just align the size to 128kb, which is enough
-and same with x86. It would warn if 64k is not enough and the
-align size should be updated.
+This structure is nothing but an empty wrapper around the parent class,
+which by QOM conventions means we don't need it at all.
 
-Signed-off-by: Yubo Miao <miaoyubo@huawei.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/arm/virt-acpi-build.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ target/i386/sev.c      | 1 -
+ target/i386/sev_i386.h | 5 -----
+ 2 files changed, 6 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 14fcabd197..d0616738e5 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -57,6 +57,8 @@
- #include "hw/pci/pcie_host.h"
- #define ARM_SPI_BASE 32
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 51cdbe5496..2312510cf2 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -287,7 +287,6 @@ static const TypeInfo qsev_guest_info = {
+     .name = TYPE_QSEV_GUEST_INFO,
+     .instance_size = sizeof(QSevGuestInfo),
+     .instance_finalize = qsev_guest_finalize,
+-    .class_size = sizeof(QSevGuestInfoClass),
+     .class_init = qsev_guest_class_init,
+     .instance_init = qsev_guest_init,
+     .interfaces = (InterfaceInfo[]) {
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index 8ada9d385d..4f193642ac 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -41,7 +41,6 @@ extern char *sev_get_launch_measurement(void);
+ extern SevCapability *sev_get_capabilities(void);
  
-+#define ACPI_BUILD_TABLE_SIZE             0x20000
-+
- static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
- {
-     uint16_t i;
-@@ -885,6 +887,15 @@ struct AcpiBuildState {
-     bool patched;
- } AcpiBuildState;
+ typedef struct QSevGuestInfo QSevGuestInfo;
+-typedef struct QSevGuestInfoClass QSevGuestInfoClass;
  
-+static void acpi_align_size(GArray *blob, unsigned align)
-+{
-+    /*
-+     * Align size to multiple of given size. This reduces the chance
-+     * we need to change size in the future (breaking cross version migration).
-+     */
-+    g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
-+}
-+
- static
- void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
- {
-@@ -967,6 +978,20 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-         build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-     }
+ /**
+  * QSevGuestInfo:
+@@ -64,10 +63,6 @@ struct QSevGuestInfo {
+     uint32_t reduced_phys_bits;
+ };
  
-+    /*
-+     * The align size is 128, warn if 64k is not enough therefore
-+     * the align size could be resized.
-+     */
-+    if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
-+        warn_report("ACPI table size %u exceeds %d bytes,"
-+                    " migration may not work",
-+                    tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
-+        error_printf("Try removing CPUs, NUMA nodes, memory slots"
-+                     " or PCI bridges.");
-+    }
-+    acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
-+
-+
-     /* Cleanup memory that's no longer used. */
-     g_array_free(table_offsets, true);
- }
+-struct QSevGuestInfoClass {
+-    ObjectClass parent_class;
+-};
+-
+ struct SEVState {
+     QSevGuestInfo *sev_info;
+     uint8_t api_major;
 -- 
-2.19.1
-
+2.26.2
 
 
