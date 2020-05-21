@@ -2,61 +2,91 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 693CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5304C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C12D20721
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:11:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C12D20721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9D2F920721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:11:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULnwEn8K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D2F920721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbj6x-0008Ef-DE
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:11:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40012)
+	id 1jbj73-0008Pd-Pd
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbj6J-0007MD-Io; Thu, 21 May 2020 07:10:59 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:58443)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbj6I-00036b-E2; Thu, 21 May 2020 07:10:59 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1855397|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_regular_dialog|0.208831-0.00023773-0.790931;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbdjZ3Y_1590059454; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbdjZ3Y_1590059454)
- by smtp.aliyun-inc.com(10.147.40.44); Thu, 21 May 2020 19:10:54 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 43/62] target/riscv: vector floating-point/integer
- type-convert instructions
-Date: Thu, 21 May 2020 17:43:54 +0800
-Message-Id: <20200521094413.10425-44-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbj6M-0007SS-Uk
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 07:11:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43576
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbj6L-00037G-Ve
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 07:11:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590059460;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ci28TtFK3lFjprVMApphuuZzXBw+1EHJ4KiyZjNYQ/g=;
+ b=ULnwEn8KTWrgNHR5Y5gNLxa2ToPLPuXovooLBU6U/4qMomtmhtcGG3iijPToVgYgzT67cs
+ roHEGcyp2FTyAJcyIHaOT7vG+9VPlctf9zT4aB6K7lvm5/6xv3DJ/sfp0v/YJ3/79Nip3P
+ r3sUFG96nyx+dFwrOY5JAEY8B3UUic0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-Dfab77aGMBeN62Us-1HKYA-1; Thu, 21 May 2020 07:10:57 -0400
+X-MC-Unique: Dfab77aGMBeN62Us-1HKYA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E737A8018A7;
+ Thu, 21 May 2020 11:10:56 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B887560C81;
+ Thu, 21 May 2020 11:10:55 +0000 (UTC)
+Date: Thu, 21 May 2020 12:10:52 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+Subject: Re: [PATCH v3 2/3] crypto/linux_keyring: add 'secret_keyring' secret
+ object.
+Message-ID: <20200521111052.GF2211791@redhat.com>
+References: <20200518202804.3761-1-alex-krasikov@yandex-team.ru>
+ <20200518202804.3761-3-alex-krasikov@yandex-team.ru>
 MIME-Version: 1.0
+In-Reply-To: <20200518202804.3761-3-alex-krasikov@yandex-team.ru>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,114 +100,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   | 13 ++++++++++
- target/riscv/insn32.decode              |  4 +++
- target/riscv/insn_trans/trans_rvv.inc.c |  6 +++++
- target/riscv/vector_helper.c            | 33 +++++++++++++++++++++++++
- 4 files changed, 56 insertions(+)
+On Mon, May 18, 2020 at 11:28:03PM +0300, Alexey Krasikov wrote:
+> Add the ability for the secret object to obtain secret data from the
+> Linux in-kernel key managment and retention facility, as an extra option
+> to the existing ones: reading from a file or passing directly as a
+> string.
+> 
+> The secret is identified by the key serial number. The upper layers
+> need to instantiate the key and make sure the QEMU process has access
+> permissions to read it.
+> 
+> Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+> ---
+>  configure                       |  38 ++++++++
+>  crypto/Makefile.objs            |   1 +
+>  crypto/secret_keyring.c         | 148 ++++++++++++++++++++++++++++++++
+>  include/crypto/secret_keyring.h |  52 +++++++++++
+>  4 files changed, 239 insertions(+)
+>  create mode 100644 crypto/secret_keyring.c
+>  create mode 100644 include/crypto/secret_keyring.h
+> 
+> diff --git a/configure b/configure
+> index 0d69c360c0..1bae5ec0a1 100755
+> --- a/configure
+> +++ b/configure
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 21054cc957..05f8fb5ffc 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -998,3 +998,16 @@ DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
-+
-+DEF_HELPER_5(vfcvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_xu_f_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_d, void, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 14cb4e2e66..53562c6663 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -515,6 +515,10 @@ vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
- vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
- vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
- vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
-+vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
-+vfcvt_x_f_v     100010 . ..... 00001 001 ..... 1010111 @r2_vm
-+vfcvt_f_xu_v    100010 . ..... 00010 001 ..... 1010111 @r2_vm
-+vfcvt_f_x_v     100010 . ..... 00011 001 ..... 1010111 @r2_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index dfa2177331..6db460177d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2215,3 +2215,9 @@ static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
-     }
-     return false;
- }
-+
-+/* Single-Width Floating-Point/Integer Type-Convert Instructions */
-+GEN_OPFV_TRANS(vfcvt_xu_f_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_x_f_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_f_xu_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_f_x_v, opfv_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 018293570d..34b21c8deb 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4217,3 +4217,36 @@ void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2, \
- GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
- GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
- GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
-+
-+/* Single-Width Floating-Point/Integer Type-Convert Instructions */
-+/* vfcvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_h, OP_UU_H, H2, H2, float16_to_uint16)
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_w, OP_UU_W, H4, H4, float32_to_uint32)
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_d, OP_UU_D, H8, H8, float64_to_uint64)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_d, 8, 8, clearq)
-+
-+/* vfcvt.x.f.v vd, vs2, vm # Convert float to signed integer. */
-+RVVCALL(OPFVV1, vfcvt_x_f_v_h, OP_UU_H, H2, H2, float16_to_int16)
-+RVVCALL(OPFVV1, vfcvt_x_f_v_w, OP_UU_W, H4, H4, float32_to_int32)
-+RVVCALL(OPFVV1, vfcvt_x_f_v_d, OP_UU_D, H8, H8, float64_to_int64)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_d, 8, 8, clearq)
-+
-+/* vfcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to float. */
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_h, OP_UU_H, H2, H2, uint16_to_float16)
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_w, OP_UU_W, H4, H4, uint32_to_float32)
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_d, OP_UU_D, H8, H8, uint64_to_float64)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_d, 8, 8, clearq)
-+
-+/* vfcvt.f.x.v vd, vs2, vm # Convert integer to float. */
-+RVVCALL(OPFVV1, vfcvt_f_x_v_h, OP_UU_H, H2, H2, int16_to_float16)
-+RVVCALL(OPFVV1, vfcvt_f_x_v_w, OP_UU_W, H4, H4, int32_to_float32)
-+RVVCALL(OPFVV1, vfcvt_f_x_v_d, OP_UU_D, H8, H8, int64_to_float64)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_d, 8, 8, clearq)
+>  ##########################################
+>  # End of CC checks
+> @@ -6733,6 +6766,7 @@ echo "default devices   $default_devices"
+>  echo "plugin support    $plugins"
+>  echo "fuzzing support   $fuzzing"
+>  echo "gdb               $gdb_bin"
+> +echo "Linux keyring support $secret_keyring"
+
+Remove the word "support" here and vertically align the value
+with the line above, otherwise the configure output summary
+looks odd.
+
+With that fixed, 
+
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
+
+Regards,
+Daniel
 -- 
-2.23.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
