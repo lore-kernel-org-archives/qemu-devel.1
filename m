@@ -2,62 +2,91 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26029C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36864C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:44:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C79F9206F6
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:43:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79F9206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id EDEE5206F6
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:44:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBYTni1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDEE5206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbifl-00057v-25
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:43:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37336)
+	id 1jbigq-00069G-55
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:44:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbif5-0004OY-Fz; Thu, 21 May 2020 06:42:51 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:36861)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbif3-0006CE-Qo; Thu, 21 May 2020 06:42:50 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06436283|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.144939-0.000344041-0.854717;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbdAPvx_1590057764; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbdAPvx_1590057764) by smtp.aliyun-inc.com(10.147.40.7);
- Thu, 21 May 2020 18:42:44 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v8 29/62] target/riscv: vector narrowing fixed-point clip
- instructions
-Date: Thu, 21 May 2020 17:43:40 +0800
-Message-Id: <20200521094413.10425-30-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbigI-0005eP-97
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:44:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36145
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbigG-0006IE-WD
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 06:44:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590057843;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f3pH87xIq2jlvjOJb1ctZAs7/dK98Qqrq4rzf70bIiw=;
+ b=LBYTni1i4zKnoJ25e3PD3iW5WYJ3McV84+118Q2fwHJbdjZbxCbfbI6nWBvGlt3S9rrYdP
+ ASBvAodqubnGMEtFoWy67SZbtkpgwtwgGFavGhPSV2H0WbfB2ndUVed8+VzNQfJvuQ9dxn
+ JG6/PAl7rtuVmxb+S12R5GJ9u0SzkhY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-q3sv6YjZP7KSaRj5nmlcbA-1; Thu, 21 May 2020 06:43:52 -0400
+X-MC-Unique: q3sv6YjZP7KSaRj5nmlcbA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D184E19057A5;
+ Thu, 21 May 2020 10:43:51 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F69E6EA4A;
+ Thu, 21 May 2020 10:43:47 +0000 (UTC)
+Date: Thu, 21 May 2020 11:43:44 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH] virtiofsd: Use clone() and not unshare(), support non-root
+Message-ID: <20200521104344.GD2211791@redhat.com>
+References: <348d4774-bd5f-4832-bd7e-a21491fdac8d@www.fastmail.com>
+ <20200506191614.GR2743@work-vm>
+ <20200507092832.GA1104082@redhat.com>
+ <20200521101923.GF251811@stefanha-x1.localdomain>
 MIME-Version: 1.0
+In-Reply-To: <20200521101923.GF251811@stefanha-x1.localdomain>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,241 +99,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Colin Walters <walters@verbum.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   |  13 +++
- target/riscv/insn32.decode              |   6 +
- target/riscv/insn_trans/trans_rvv.inc.c |   8 ++
- target/riscv/vector_helper.c            | 141 ++++++++++++++++++++++++
- 4 files changed, 168 insertions(+)
+On Thu, May 21, 2020 at 11:19:23AM +0100, Stefan Hajnoczi wrote:
+> On Thu, May 07, 2020 at 10:28:32AM +0100, Daniel P. Berrangé wrote:
+> > If the person in the host launching virtiofsd is non-root, then
+> > user namespaces mean they can offer the guest the full range of
+> > POSIX APIs wrt access control & file ownership, since they're
+> > no longer restricted to their single host UID when inside the
+> > container.
+> 
+> What installs the uid_map/gid_map for virtiofsd?
+> 
+> My machine has /etc/subuid and /etc/subgid, but how would this come into
+> play with these patches applied?
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index f36f840714..7f7fdcb451 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -784,3 +784,16 @@ DEF_HELPER_6(vssra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vnclip_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 2ecac3d96d..8b898f9bad 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -437,6 +437,12 @@ vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
- vssra_vv        101011 . ..... ..... 000 ..... 1010111 @r_vm
- vssra_vx        101011 . ..... ..... 100 ..... 1010111 @r_vm
- vssra_vi        101011 . ..... ..... 011 ..... 1010111 @r_vm
-+vnclipu_vv      101110 . ..... ..... 000 ..... 1010111 @r_vm
-+vnclipu_vx      101110 . ..... ..... 100 ..... 1010111 @r_vm
-+vnclipu_vi      101110 . ..... ..... 011 ..... 1010111 @r_vm
-+vnclip_vv       101111 . ..... ..... 000 ..... 1010111 @r_vm
-+vnclip_vx       101111 . ..... ..... 100 ..... 1010111 @r_vm
-+vnclip_vi       101111 . ..... ..... 011 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 37752a75a3..a77c80c3c1 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1775,3 +1775,11 @@ GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
- GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
- GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
- GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
-+
-+/* Vector Narrowing Fixed-Point Clip Instructions */
-+GEN_OPIVV_NARROW_TRANS(vnclipu_vv)
-+GEN_OPIVV_NARROW_TRANS(vnclip_vv)
-+GEN_OPIVX_NARROW_TRANS(vnclipu_vx)
-+GEN_OPIVX_NARROW_TRANS(vnclip_vx)
-+GEN_OPIVI_NARROW_TRANS(vnclipu_vi, 1, vnclipu_vx)
-+GEN_OPIVI_NARROW_TRANS(vnclip_vi, 1, vnclip_vx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 00ee42ea83..502656d005 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -874,6 +874,12 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define WOP_SSU_B int16_t, int8_t, uint8_t, int16_t, uint16_t
- #define WOP_SSU_H int32_t, int16_t, uint16_t, int32_t, uint32_t
- #define WOP_SSU_W int64_t, int32_t, uint32_t, int64_t, uint64_t
-+#define NOP_SSS_B int8_t, int8_t, int16_t, int8_t, int16_t
-+#define NOP_SSS_H int16_t, int16_t, int32_t, int16_t, int32_t
-+#define NOP_SSS_W int32_t, int32_t, int64_t, int32_t, int64_t
-+#define NOP_UUU_B uint8_t, uint8_t, uint16_t, uint8_t, uint16_t
-+#define NOP_UUU_H uint16_t, uint16_t, uint32_t, uint16_t, uint32_t
-+#define NOP_UUU_W uint32_t, uint32_t, uint64_t, uint32_t, uint64_t
- 
- /* operation of two vector elements */
- typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-@@ -3008,6 +3014,7 @@ vssra64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-     res   = (a >> shift)  + round;
-     return res;
- }
-+
- RVVCALL(OPIVV2_RM, vssra_vv_b, OP_SSS_B, H1, H1, H1, vssra8)
- RVVCALL(OPIVV2_RM, vssra_vv_h, OP_SSS_H, H2, H2, H2, vssra16)
- RVVCALL(OPIVV2_RM, vssra_vv_w, OP_SSS_W, H4, H4, H4, vssra32)
-@@ -3025,3 +3032,137 @@ GEN_VEXT_VX_RM(vssra_vx_b, 1, 1, clearb)
- GEN_VEXT_VX_RM(vssra_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vssra_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_RM(vssra_vx_d, 8, 8, clearq)
-+
-+/* Vector Narrowing Fixed-Point Clip Instructions */
-+static inline int8_t
-+vnclip8(CPURISCVState *env, int vxrm, int16_t a, int8_t b)
-+{
-+    uint8_t round, shift = b & 0xf;
-+    int16_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT8_MAX) {
-+        env->vxsat = 0x1;
-+        return INT8_MAX;
-+    } else if (res < INT8_MIN) {
-+        env->vxsat = 0x1;
-+        return INT8_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline int16_t
-+vnclip16(CPURISCVState *env, int vxrm, int32_t a, int16_t b)
-+{
-+    uint8_t round, shift = b & 0x1f;
-+    int32_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT16_MAX) {
-+        env->vxsat = 0x1;
-+        return INT16_MAX;
-+    } else if (res < INT16_MIN) {
-+        env->vxsat = 0x1;
-+        return INT16_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline int32_t
-+vnclip32(CPURISCVState *env, int vxrm, int64_t a, int32_t b)
-+{
-+    uint8_t round, shift = b & 0x3f;
-+    int64_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT32_MAX) {
-+        env->vxsat = 0x1;
-+        return INT32_MAX;
-+    } else if (res < INT32_MIN) {
-+        env->vxsat = 0x1;
-+        return INT32_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+RVVCALL(OPIVV2_RM, vnclip_vv_b, NOP_SSS_B, H1, H2, H1, vnclip8)
-+RVVCALL(OPIVV2_RM, vnclip_vv_h, NOP_SSS_H, H2, H4, H2, vnclip16)
-+RVVCALL(OPIVV2_RM, vnclip_vv_w, NOP_SSS_W, H4, H8, H4, vnclip32)
-+GEN_VEXT_VV_RM(vnclip_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vnclip_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vnclip_vv_w, 4, 4, clearl)
-+
-+RVVCALL(OPIVX2_RM, vnclip_vx_b, NOP_SSS_B, H1, H2, vnclip8)
-+RVVCALL(OPIVX2_RM, vnclip_vx_h, NOP_SSS_H, H2, H4, vnclip16)
-+RVVCALL(OPIVX2_RM, vnclip_vx_w, NOP_SSS_W, H4, H8, vnclip32)
-+GEN_VEXT_VX_RM(vnclip_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vnclip_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vnclip_vx_w, 4, 4, clearl)
-+
-+static inline uint8_t
-+vnclipu8(CPURISCVState *env, int vxrm, uint16_t a, uint8_t b)
-+{
-+    uint8_t round, shift = b & 0xf;
-+    uint16_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT8_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT8_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline uint16_t
-+vnclipu16(CPURISCVState *env, int vxrm, uint32_t a, uint16_t b)
-+{
-+    uint8_t round, shift = b & 0x1f;
-+    uint32_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT16_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT16_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline uint32_t
-+vnclipu32(CPURISCVState *env, int vxrm, uint64_t a, uint32_t b)
-+{
-+    uint8_t round, shift = b & 0x3f;
-+    int64_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT32_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT32_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+RVVCALL(OPIVV2_RM, vnclipu_vv_b, NOP_UUU_B, H1, H2, H1, vnclipu8)
-+RVVCALL(OPIVV2_RM, vnclipu_vv_h, NOP_UUU_H, H2, H4, H2, vnclipu16)
-+RVVCALL(OPIVV2_RM, vnclipu_vv_w, NOP_UUU_W, H4, H8, H4, vnclipu32)
-+GEN_VEXT_VV_RM(vnclipu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vnclipu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vnclipu_vv_w, 4, 4, clearl)
-+
-+RVVCALL(OPIVX2_RM, vnclipu_vx_b, NOP_UUU_B, H1, H2, vnclipu8)
-+RVVCALL(OPIVX2_RM, vnclipu_vx_h, NOP_UUU_H, H2, H4, vnclipu16)
-+RVVCALL(OPIVX2_RM, vnclipu_vx_w, NOP_UUU_W, H4, H8, vnclipu32)
-+GEN_VEXT_VX_RM(vnclipu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vnclipu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vnclipu_vx_w, 4, 4, clearl)
+AFAICT, nothing is setting up the mapping, hence my question in the first
+review of this patch, that this patch seems incomplete.
+
+The subuid/subgid files are essentially just reserving a range of IDs
+for each user. Something then needs to read & honour those IDs.
+
+The rules on setting up a mapping are complex though, to avoid a user
+from creating a new user namespace, and defining a mapping that lets
+them elevate privileges to read files in the host they wouldn't otherwise
+be permitted to access.
+
+IIUC, applying the range of IDs from subuid/subgid will require the
+process defining the mapping to have CAP_SETUID *outside* the container.
+As an unprivileged host user, you won't have that, so I think the only
+thing you can do is setup a mapping for your own UID/GID, which would
+allow the container to read/write files owned by the host user that
+started it. That should be ok for virtiofsd's needs at least for simple
+file sharing. If virtiofsd needs to expose its full range of features
+though, something privileged in the host needs to setup a full mapping
+based on subuid/subgid
+
+BTW, "man user_namespaces" gives many more details on UID mapping
+rules.
+
+> What happens when an unprivileged user who is not listed in /etc/subuid
+> runs virtiofsd?
+
+The UID map inside the container will be empty, which should result in
+all files being remapped to (uid_t)-1 or whatever is shown in the
+/proc/sys/kernel/overflow{u,g}id files.
+
+So virtiofsd would not have any write access, and only have read access
+to files which have world-read bit set.  
+
+
+Regards,
+Daniel
 -- 
-2.23.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
