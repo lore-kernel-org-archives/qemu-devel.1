@@ -2,86 +2,62 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE89C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38650C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:13:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37DB62072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:12:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KaUqOXYt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DB62072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F40272072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 10:13:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F40272072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbiBN-000262-Ep
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33964)
+	id 1jbiCi-00043V-7D
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 06:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbi9G-0007Ih-Uy
- for qemu-devel@nongnu.org; Thu, 21 May 2020 06:09:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55586
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jbi9F-0008Fx-Cy
- for qemu-devel@nongnu.org; Thu, 21 May 2020 06:09:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590055796;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wNmxZddpo9v4KEslKYkUZW8wziwySozumPvd0hYx1fA=;
- b=KaUqOXYtnxo0ph70ekukRF+kQpKS7FW658mWPsFUCu/JMQUSUbaF7V/1gUlt1b43qQlaZS
- xOnImUbGKNf3lE+MaIM3dX08ulB+59O0WMJtfiufYJWR1urB6pIB9MMQE3/wRcekpmWIQh
- EXVRRt1f4Sya/wtei72gB/06SUW5gxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-5h7j7CIuNuulcRrQeTIUVA-1; Thu, 21 May 2020 06:09:55 -0400
-X-MC-Unique: 5h7j7CIuNuulcRrQeTIUVA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAA691853C6F;
- Thu, 21 May 2020 10:09:53 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD5341CA;
- Thu, 21 May 2020 10:09:40 +0000 (UTC)
-Date: Thu, 21 May 2020 12:09:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 16/22] microvm/acpi: add minimal acpi support
-Message-ID: <20200521120938.73189e83@redhat.com>
-In-Reply-To: <20200520132003.9492-17-kraxel@redhat.com>
-References: <20200520132003.9492-1-kraxel@redhat.com>
- <20200520132003.9492-17-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jbiBv-00038P-Rr; Thu, 21 May 2020 06:12:43 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43496)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jbiBr-0000OB-4P; Thu, 21 May 2020 06:12:42 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=0.06436282|-1; BR=01201311R101ee; CH=green;
+ DM=|CONTINUE|false|; DS=SPAM|spam_ad|0.886079-0.000789594-0.113131;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HbcYhHO_1590055951; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HbcYhHO_1590055951)
+ by smtp.aliyun-inc.com(10.147.41.143);
+ Thu, 21 May 2020 18:12:32 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v8 14/62] target/riscv: vector single-width bit shift
+ instructions
+Date: Thu, 21 May 2020 17:43:25 +0800
+Message-Id: <20200521094413.10425-15-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 05:19:14
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,374 +71,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, alistair.francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 May 2020 15:19:57 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 25 ++++++++
+ target/riscv/insn32.decode              |  9 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 52 ++++++++++++++++
+ target/riscv/vector_helper.c            | 79 +++++++++++++++++++++++++
+ 4 files changed, 165 insertions(+)
 
-> $subject says all.  Can be controlled using -M microvm,acpi=on/off.
-
-thanks for really nice and clean impl.
-There are a couple minor notes below, but otherwise
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/i386/acpi-microvm.h    |   6 ++
->  include/hw/i386/microvm.h |   9 ++
->  hw/i386/acpi-microvm.c    | 182 ++++++++++++++++++++++++++++++++++++++
->  hw/i386/microvm.c         |  37 ++++++++
->  hw/i386/Kconfig           |   1 +
->  hw/i386/Makefile.objs     |   1 +
->  6 files changed, 236 insertions(+)
->  create mode 100644 hw/i386/acpi-microvm.h
->  create mode 100644 hw/i386/acpi-microvm.c
-> 
-> diff --git a/hw/i386/acpi-microvm.h b/hw/i386/acpi-microvm.h
-> new file mode 100644
-> index 000000000000..6a6c2967102b
-> --- /dev/null
-> +++ b/hw/i386/acpi-microvm.h
-> @@ -0,0 +1,6 @@
-> +#ifndef HW_I386_ACPI_MICROVM_H
-> +#define HW_I386_ACPI_MICROVM_H
-> +
-> +void acpi_setup_microvm(void);
-> +
-> +#endif
-> diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-> index 2709306c4016..ebd7f49d5de8 100644
-> --- a/include/hw/i386/microvm.h
-> +++ b/include/hw/i386/microvm.h
-> @@ -24,12 +24,18 @@
->  
->  #include "hw/boards.h"
->  #include "hw/i386/x86.h"
-> +#include "hw/acpi/acpi_dev_interface.h"
->  
->  /* Platform virtio definitions */
->  #define VIRTIO_MMIO_BASE      0xc0000000
->  #define VIRTIO_NUM_TRANSPORTS 8
->  #define VIRTIO_CMDLINE_MAXLEN 64
->  
-> +#define GED_MMIO_BASE         0xc1000000
-> +#define GED_MMIO_BASE_MEMHP   (GED_MMIO_BASE + 0x100)
-> +#define GED_MMIO_BASE_REGS    (GED_MMIO_BASE + 0x200)
-> +#define GED_MMIO_IRQ          9
-> +
->  /* Machine type options */
->  #define MICROVM_MACHINE_PIT                 "pit"
->  #define MICROVM_MACHINE_PIC                 "pic"
-> @@ -58,6 +64,9 @@ typedef struct {
->      /* Machine state */
->      uint32_t virtio_irq_base;
->      bool kernel_cmdline_fixed;
-> +    Notifier machine_done;
-> +    Notifier powerdown_req;
-> +    AcpiDeviceIf *acpi_dev;
->  } MicrovmMachineState;
->  
->  #define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
-> diff --git a/hw/i386/acpi-microvm.c b/hw/i386/acpi-microvm.c
-> new file mode 100644
-> index 000000000000..d2dd024909cc
-> --- /dev/null
-> +++ b/hw/i386/acpi-microvm.c
-> @@ -0,0 +1,182 @@
-> +/* Support for generating ACPI tables and passing them to Guests
-> + *
-> + * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-> + * Copyright (C) 2006 Fabrice Bellard
-> + * Copyright (C) 2013 Red Hat Inc
-> + *
-> + * Author: Michael S. Tsirkin <mst@redhat.com>
-since you wrote it s/^^^/Gerd/
-
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +
-> +#include "exec/memory.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/bios-linker-loader.h"
-> +#include "hw/acpi/generic_event_device.h"
-> +#include "hw/acpi/utils.h"
-> +#include "hw/boards.h"
-> +#include "hw/i386/fw_cfg.h"
-> +#include "hw/i386/microvm.h"
-> +
-> +#include "acpi-common.h"
-> +#include "acpi-microvm.h"
-> +
-> +static void
-> +build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
-> +                   MicrovmMachineState *mms)
-> +{
-> +    X86MachineState *x86ms = X86_MACHINE(mms);
-> +    Aml *dsdt, *sb_scope, *scope, *pkg;
-> +    bool ambiguous;
-> +    Object *isabus;
-> +
-> +    isabus = object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous);
-> +    assert(isabus);
-> +    assert(!ambiguous);
-> +
-> +    dsdt = init_aml_allocator();
-> +
-> +    /* Reserve space for header */
-> +    acpi_data_push(dsdt->buf, sizeof(AcpiTableHeader));
-> +
-> +    sb_scope = aml_scope("_SB");
-> +    fw_cfg_add_acpi_dsdt(sb_scope, x86ms->fw_cfg);
-> +    isa_build_aml(ISA_BUS(isabus), sb_scope);
-> +    build_ged_aml(sb_scope, GED_DEVICE, HOTPLUG_HANDLER(mms->acpi_dev),
-> +                  GED_MMIO_IRQ, AML_SYSTEM_MEMORY, GED_MMIO_BASE);
-> +    acpi_dsdt_add_power_button(sb_scope);
-> +    aml_append(dsdt, sb_scope);
-> +
-> +    scope = aml_scope("\\");
-> +    pkg = aml_package(4);
-> +    aml_append(pkg, aml_int(5)); /* SLEEP_CONTROL_REG.SLP_TYP */
-> +    aml_append(pkg, aml_int(0)); /* ignored */
-> +    aml_append(pkg, aml_int(0)); /* reserved */
-> +    aml_append(pkg, aml_int(0)); /* reserved */
-> +    aml_append(scope, aml_name_decl("_S5", pkg));
-> +    aml_append(dsdt, scope);
-> +
-> +    /* copy AML table into ACPI tables blob and patch header there */
-> +    g_array_append_vals(table_data, dsdt->buf->data, dsdt->buf->len);
-> +    build_header(linker, table_data,
-> +        (void *)(table_data->data + table_data->len - dsdt->buf->len),
-> +        "DSDT", dsdt->buf->len, 5, NULL, NULL);
-> +    free_aml_allocator();
-> +}
-> +
-> +static void acpi_build_microvm(AcpiBuildTables *tables,
-> +                               MicrovmMachineState *mms)
-> +{
-> +    MachineState *machine = MACHINE(mms);
-> +    GArray *table_offsets;
-> +    GArray *tables_blob = tables->table_data;
-> +    unsigned dsdt, xsdt;
-> +    AcpiFadtData pmfadt = {
-> +        .rev = 5,
-> +        .minor_ver = 1,
-> +        .flags = ((1 << ACPI_FADT_F_HW_REDUCED_ACPI) |
-> +                  (1 << ACPI_FADT_F_RESET_REG_SUP)),
-> +        .sleep_ctl = {
-> +            .space_id = AML_AS_SYSTEM_MEMORY,
-> +            .bit_width = 8,
-> +            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_SLEEP_CTL,
-> +        },
-> +        .sleep_sts = {
-> +            .space_id = AML_AS_SYSTEM_MEMORY,
-> +            .bit_width = 8,
-> +            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_SLEEP_STS,
-> +        },
-> +        .reset_reg = {
-> +            .space_id = AML_AS_SYSTEM_MEMORY,
-> +            .bit_width = 8,
-> +            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_RESET,
-> +        },
-> +        .reset_val = ACPI_GED_RESET_VALUE,
-> +    };
-> +
-> +    table_offsets = g_array_new(false, true /* clear */,
-> +                                        sizeof(uint32_t));
-> +    bios_linker_loader_alloc(tables->linker,
-> +                             ACPI_BUILD_TABLE_FILE, tables_blob,
-> +                             64 /* Ensure FACS is aligned */,
-> +                             false /* high memory */);
-> +
-> +    dsdt = tables_blob->len;
-> +    build_dsdt_microvm(tables_blob, tables->linker, mms);
-> +
-> +    pmfadt.dsdt_tbl_offset = &dsdt;
-> +    pmfadt.xdsdt_tbl_offset = &dsdt;
-> +    acpi_add_table(table_offsets, tables_blob);
-> +    build_fadt(tables_blob, tables->linker, &pmfadt, NULL, NULL);
-> +
-> +    acpi_add_table(table_offsets, tables_blob);
-> +    acpi_build_madt(tables_blob, tables->linker, X86_MACHINE(machine),
-> +                    mms->acpi_dev, false);
-> +
-> +    xsdt = tables_blob->len;
-> +    build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-> +
-> +    /* RSDP is in FSEG memory, so allocate it separately */
-> +    {
-> +        AcpiRsdpData rsdp_data = {
-> +            .revision = 2,
-> +            .oem_id = ACPI_BUILD_APPNAME6,
-> +            .xsdt_tbl_offset = &xsdt,
-> +            .rsdt_tbl_offset = NULL,
-> +        };
-> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-> +    }
-> +
-> +    /* Cleanup memory that's no longer used. */
-> +    g_array_free(table_offsets, true);
-> +}
-> +
-> +static void acpi_build_no_update(void *build_opaque)
-> +{
-> +    /* nothing, microvm tables don't change at runtime */
-> +}
-> +
-> +void acpi_setup_microvm(void)
-> +{
-> +    MicrovmMachineState *mms = MICROVM_MACHINE(qdev_get_machine());
-> +    X86MachineState *x86ms = X86_MACHINE(mms);
-> +    AcpiBuildTables tables;
-> +
-> +    assert(x86ms->fw_cfg);
-> +
-> +    if (!x86_machine_is_acpi_enabled(x86ms)) {
-> +        return;
-> +    }
-> +
-> +    acpi_build_tables_init(&tables);
-> +    acpi_build_microvm(&tables, mms);
-> +
-> +    /* Now expose it all to Guest */
-> +    acpi_add_rom_blob(acpi_build_no_update, NULL,
-> +                      tables.table_data,
-> +                      ACPI_BUILD_TABLE_FILE,
-> +                      ACPI_BUILD_TABLE_MAX_SIZE);
-> +    acpi_add_rom_blob(acpi_build_no_update, NULL,
-> +                      tables.linker->cmd_blob,
-> +                      "etc/table-loader", 0);
-> +    acpi_add_rom_blob(acpi_build_no_update, NULL,
-> +                      tables.rsdp,
-> +                      ACPI_BUILD_RSDP_FILE, 0);
-> +
-> +    acpi_build_tables_cleanup(&tables, false);
-> +}
-> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-> index ea4460714a99..b38321112baa 100644
-> --- a/hw/i386/microvm.c
-> +++ b/hw/i386/microvm.c
-> @@ -26,6 +26,8 @@
->  #include "sysemu/cpus.h"
->  #include "sysemu/numa.h"
->  #include "sysemu/reset.h"
-> +#include "sysemu/runstate.h"
-> +#include "acpi-microvm.h"
->  
->  #include "hw/loader.h"
->  #include "hw/irq.h"
-> @@ -41,6 +43,8 @@
->  #include "hw/i386/e820_memory_layout.h"
->  #include "hw/i386/fw_cfg.h"
->  #include "hw/virtio/virtio-mmio.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/generic_event_device.h"
->  
->  #include "cpu.h"
->  #include "elf.h"
-> @@ -129,6 +133,17 @@ static void microvm_devices_init(MicrovmMachineState *mms)
->      }
->  
->      /* Optional and legacy devices */
-> +    if (x86_machine_is_acpi_enabled(x86ms)) {
-> +        DeviceState *dev = qdev_create(NULL, TYPE_ACPI_GED_X86);
-> +        qdev_prop_set_uint32(dev, "ged-event", ACPI_GED_PWR_DOWN_EVT);
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, GED_MMIO_BASE);
-> +        /* sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, GED_MMIO_BASE_MEMHP); */
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, GED_MMIO_BASE_REGS);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0,
-> +                           x86ms->gsi[GED_MMIO_IRQ]);
-> +        qdev_init_nofail(dev);
-> +        mms->acpi_dev = ACPI_DEVICE_IF(dev);
-considering all x86 machines have it, maybe move acpi_dev field to parent type?
-
-> +    }
->  
->      if (mms->pic == ON_OFF_AUTO_ON || mms->pic == ON_OFF_AUTO_AUTO) {
->          qemu_irq *i8259;
-> @@ -457,6 +472,23 @@ static void microvm_machine_set_auto_kernel_cmdline(Object *obj, bool value,
->      mms->auto_kernel_cmdline = value;
->  }
->  
-> +static void microvm_machine_done(Notifier *notifier, void *data)
-> +{
-> +    acpi_setup_microvm();
-pass MicrovmMachineState down to acpi_setup_microvm() the same way you are doing below?
-(and avoid qdev_get_machine() in acpi_setup_microvm())
-
-> +}
-> +
-> +static void microvm_powerdown_req(Notifier *notifier, void *data)
-> +{
-> +    MicrovmMachineState *mms = container_of(notifier, MicrovmMachineState,
-> +                                            powerdown_req);
-> +
-> +    if (mms->acpi_dev) {
-> +        Object *obj = OBJECT(mms->acpi_dev);
-> +        AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(obj);
-> +        adevc->send_event(mms->acpi_dev, ACPI_POWER_DOWN_STATUS);
-> +    }
-> +}
-> +
->  static void microvm_machine_initfn(Object *obj)
->  {
->      MicrovmMachineState *mms = MICROVM_MACHINE(obj);
-> @@ -471,6 +503,11 @@ static void microvm_machine_initfn(Object *obj)
->  
->      /* State */
->      mms->kernel_cmdline_fixed = false;
-> +
-> +    mms->machine_done.notify = microvm_machine_done;
-> +    qemu_add_machine_init_done_notifier(&mms->machine_done);
-> +    mms->powerdown_req.notify = microvm_powerdown_req;
-> +    qemu_register_powerdown_notifier(&mms->powerdown_req);
->  }
->  
->  static void microvm_class_init(ObjectClass *oc, void *data)
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index c93f32f6579d..be746bcb49eb 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -102,6 +102,7 @@ config MICROVM
->      select I8259
->      select MC146818RTC
->      select VIRTIO_MMIO
-> +    select ACPI_HW_REDUCED
->  
->  config X86_IOMMU
->      bool
-> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index 622739305882..bbb2fe78f3cd 100644
-> --- a/hw/i386/Makefile.objs
-> +++ b/hw/i386/Makefile.objs
-> @@ -19,3 +19,4 @@ obj-y += kvmvapic.o
->  obj-$(CONFIG_ACPI) += acpi-common.o
->  obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device_x86.o
->  obj-$(CONFIG_PC) += acpi-build.o
-> +obj-$(CONFIG_MICROVM) += acpi-microvm.o
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index ea4a4a6054..f96079bee5 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -401,3 +401,28 @@ DEF_HELPER_6(vxor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vsll_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 3ad6724632..f6d0f5aec5 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -320,6 +320,15 @@ vor_vi          001010 . ..... ..... 011 ..... 1010111 @r_vm
+ vxor_vv         001011 . ..... ..... 000 ..... 1010111 @r_vm
+ vxor_vx         001011 . ..... ..... 100 ..... 1010111 @r_vm
+ vxor_vi         001011 . ..... ..... 011 ..... 1010111 @r_vm
++vsll_vv         100101 . ..... ..... 000 ..... 1010111 @r_vm
++vsll_vx         100101 . ..... ..... 100 ..... 1010111 @r_vm
++vsll_vi         100101 . ..... ..... 011 ..... 1010111 @r_vm
++vsrl_vv         101000 . ..... ..... 000 ..... 1010111 @r_vm
++vsrl_vx         101000 . ..... ..... 100 ..... 1010111 @r_vm
++vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
++vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
++vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
++vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index d66e89631d..0a4f5fb119 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1373,3 +1373,55 @@ GEN_OPIVX_GVEC_TRANS(vxor_vx, xors)
+ GEN_OPIVI_GVEC_TRANS(vand_vi, 0, vand_vx, andi)
+ GEN_OPIVI_GVEC_TRANS(vor_vi, 0, vor_vx,  ori)
+ GEN_OPIVI_GVEC_TRANS(vxor_vi, 0, vxor_vx, xori)
++
++/* Vector Single-Width Bit Shift Instructions */
++GEN_OPIVV_GVEC_TRANS(vsll_vv,  shlv)
++GEN_OPIVV_GVEC_TRANS(vsrl_vv,  shrv)
++GEN_OPIVV_GVEC_TRANS(vsra_vv,  sarv)
++
++typedef void GVecGen2sFn32(unsigned, uint32_t, uint32_t, TCGv_i32,
++                           uint32_t, uint32_t);
++
++static inline bool
++do_opivx_gvec_shift(DisasContext *s, arg_rmrr *a, GVecGen2sFn32 *gvec_fn,
++                    gen_helper_opivx *fn)
++{
++    if (!opivx_check(s, a)) {
++        return false;
++    }
++
++    if (a->vm && s->vl_eq_vlmax) {
++        TCGv_i32 src1 = tcg_temp_new_i32();
++        TCGv tmp = tcg_temp_new();
++
++        gen_get_gpr(tmp, a->rs1);
++        tcg_gen_trunc_tl_i32(src1, tmp);
++        tcg_gen_extract_i32(src1, src1, 0, s->sew + 3);
++        gvec_fn(s->sew, vreg_ofs(s, a->rd), vreg_ofs(s, a->rs2),
++                src1, MAXSZ(s), MAXSZ(s));
++
++        tcg_temp_free_i32(src1);
++        tcg_temp_free(tmp);
++        return true;
++    }
++    return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fn, s);
++}
++
++#define GEN_OPIVX_GVEC_SHIFT_TRANS(NAME, SUF) \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                    \
++{                                                                         \
++    static gen_helper_opivx * const fns[4] = {                            \
++        gen_helper_##NAME##_b, gen_helper_##NAME##_h,                     \
++        gen_helper_##NAME##_w, gen_helper_##NAME##_d,                     \
++    };                                                                    \
++                                                                          \
++    return do_opivx_gvec_shift(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);    \
++}
++
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsll_vx,  shls)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsrl_vx,  shrs)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
++
++GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
++GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
++GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 57a780a24e..92ece7cae1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1315,3 +1315,82 @@ GEN_VEXT_VX(vxor_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vxor_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vxor_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vxor_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Bit Shift Instructions */
++#define DO_SLL(N, M)  (N << (M))
++#define DO_SRL(N, M)  (N >> (M))
++
++/* generate the helpers for shift instructions with two vector operators */
++#define GEN_VEXT_SHIFT_VV(NAME, TS1, TS2, HS1, HS2, OP, MASK, CLEAR_FN)   \
++void HELPER(NAME)(void *vd, void *v0, void *vs1,                          \
++                  void *vs2, CPURISCVState *env, uint32_t desc)           \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t esz = sizeof(TS1);                                           \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                              \
++    uint32_t i;                                                           \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        TS1 s1 = *((TS1 *)vs1 + HS1(i));                                  \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                                  \
++        *((TS1 *)vd + HS1(i)) = OP(s2, s1 & MASK);                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                              \
++}
++
++GEN_VEXT_SHIFT_VV(vsll_vv_b, uint8_t,  uint8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsll_vv_h, uint16_t, uint16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsll_vv_w, uint32_t, uint32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsll_vv_d, uint64_t, uint64_t, H8, H8, DO_SLL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsrl_vv_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsrl_vv_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsrl_vv_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsrl_vv_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsra_vv_b, uint8_t,  int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsra_vv_h, uint16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsra_vv_w, uint32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsra_vv_d, uint64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++/* generate the helpers for shift instructions with one vector and one scalar */
++#define GEN_VEXT_SHIFT_VX(NAME, TD, TS2, HD, HS2, OP, MASK, CLEAR_FN) \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1,                \
++        void *vs2, CPURISCVState *env, uint32_t desc)                 \
++{                                                                     \
++    uint32_t mlen = vext_mlen(desc);                                  \
++    uint32_t vm = vext_vm(desc);                                      \
++    uint32_t vl = env->vl;                                            \
++    uint32_t esz = sizeof(TD);                                        \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                          \
++    uint32_t i;                                                       \
++                                                                      \
++    for (i = 0; i < vl; i++) {                                        \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                    \
++            continue;                                                 \
++        }                                                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                              \
++        *((TD *)vd + HD(i)) = OP(s2, s1 & MASK);                      \
++    }                                                                 \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                          \
++}
++
++GEN_VEXT_SHIFT_VX(vsll_vx_b, uint8_t, int8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsll_vx_h, uint16_t, int16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsll_vx_w, uint32_t, int32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsll_vx_d, uint64_t, int64_t, H8, H8, DO_SLL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VX(vsrl_vx_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsrl_vx_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsrl_vx_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsrl_vx_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
+-- 
+2.23.0
 
 
