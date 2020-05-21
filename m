@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE5CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F1EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:12:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08DF02070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 272BE2070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 09:12:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQzEGohn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08DF02070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fRO9Hdn9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 272BE2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbhFX-0005EI-1o
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 05:12:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55526)
+	id 1jbhFu-0006Av-Ak
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 05:12:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jbhEg-00046q-1e
- for qemu-devel@nongnu.org; Thu, 21 May 2020 05:11:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49017
- helo=us-smtp-1.mimecast.com)
+ id 1jbhEy-0004Y3-1V
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 05:11:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34177
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jbhEf-0005JQ-42
- for qemu-devel@nongnu.org; Thu, 21 May 2020 05:11:29 -0400
+ id 1jbhEw-0005L6-N0
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 05:11:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590052287;
+ s=mimecast20190719; t=1590052306;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Kd60isijc7N93R5SBt36LCkpor0G13KGJpP9vjfXfyA=;
- b=WQzEGohn96wxZmQSYgiOgQR7IDwy5uBkCglM+km5ffjGqiTqAiGZk1xLSRRPRtkGbpTBLt
- dfzhy5ftSfWnntubrerwGt6N7Rck72qUPK01gsy9+NHtqGnGr5G5wmFIIPYFjtRaDAKBij
- vPQkyXFRoL8pl0e6yFs2/uZNjEYs9N4=
+ bh=1czAJ1x/IV6ed1bEr1v7sbxUSM/1M7JNSIvpPOu9AnM=;
+ b=fRO9Hdn9wN8cAZm5yWghbmZXS1qijaRC0FR6r2yGjNV0rjTJQtTAWTWi/O9GO7nD4wTxQr
+ OtaPH/1oKKUchZ9wq1fm1HP33tSrmbWmHA6DYbmzyBovlWbsxnzB307SJRbJnuJsb9HSmC
+ 1vPGiH5ijU7KJabUzkLpjUsbBdiZP2E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-dKprUG8KNtahSmXsp-dHDg-1; Thu, 21 May 2020 05:11:26 -0400
-X-MC-Unique: dKprUG8KNtahSmXsp-dHDg-1
+ us-mta-145-vYGYtdXmMUCtSkWSzXc-hQ-1; Thu, 21 May 2020 05:11:44 -0400
+X-MC-Unique: vYGYtdXmMUCtSkWSzXc-hQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0DD718CA274;
- Thu, 21 May 2020 09:11:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9D3218FF660;
+ Thu, 21 May 2020 09:11:42 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-113-56.ams2.redhat.com [10.36.113.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A8F2B5D9C9;
- Thu, 21 May 2020 09:11:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 088C45D9CA;
+ Thu, 21 May 2020 09:11:39 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH 1/9] hw/arm/smmu-common: Factorize some code in smmu_ptw_64()
-Date: Thu, 21 May 2020 11:10:51 +0200
-Message-Id: <20200521091059.9453-2-eric.auger@redhat.com>
+Subject: [PATCH 4/9] hw/arm/smmu: Introduce SMMUTLBEntry for PTW and IOTLB
+ value
+Date: Thu, 21 May 2020 11:10:54 +0200
+Message-Id: <20200521091059.9453-5-eric.auger@redhat.com>
 In-Reply-To: <20200521091059.9453-1-eric.auger@redhat.com>
 References: <20200521091059.9453-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -71,16 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:44:25
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 04:44:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,109 +102,199 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Page and block PTE decoding can share some code. Let's
-first handle table PTE and factorize some code shared by
-page and block PTEs.
+Introduce a specialized SMMUTLBEntry to store the result of
+the PTW and cache in the IOTLB. This structure extends the
+generic IOMMUTLBEntry struct with the level of the entry and
+the granule size.
+
+Those latter will be useful when implementing range invalidation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/arm/smmu-common.c | 51 ++++++++++++++++----------------------------
- 1 file changed, 18 insertions(+), 33 deletions(-)
+ include/hw/arm/smmu-common.h | 14 +++++++++++---
+ hw/arm/smmu-common.c         | 30 ++++++++++++++++--------------
+ hw/arm/smmuv3.c              | 10 +++++-----
+ 3 files changed, 32 insertions(+), 22 deletions(-)
 
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 7b9d2f0eb7..f6ee78e16c 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -52,6 +52,14 @@ typedef struct SMMUTransTableInfo {
+     uint8_t granule_sz;        /* granule page shift */
+ } SMMUTransTableInfo;
+ 
++struct SMMUTLBEntry {
++    IOMMUTLBEntry entry;
++    uint8_t level;
++    uint8_t granule;
++};
++
++typedef struct SMMUTLBEntry SMMUTLBEntry;
++
+ /*
+  * Generic structure populated by derived SMMU devices
+  * after decoding the configuration information and used as
+@@ -135,7 +143,7 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
+  * pair, according to @cfg translation config
+  */
+ int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+-             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
++             SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
+ 
+ /**
+  * select_tt - compute which translation table shall be used according to
+@@ -148,8 +156,8 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
+ 
+ #define SMMU_IOTLB_MAX_SIZE 256
+ 
+-IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
+-void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
++SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *entry);
+ uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
 diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index e13a5f4a7c..f2de2be527 100644
+index 3101043540..aa88b62efb 100644
 --- a/hw/arm/smmu-common.c
 +++ b/hw/arm/smmu-common.c
-@@ -186,12 +186,12 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+@@ -47,11 +47,11 @@ uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
+     return iova >> 12 | (uint64_t)(asid) << SMMU_IOTLB_ASID_SHIFT;
+ }
+ 
+-IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
++SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+                                  hwaddr iova)
+ {
+     uint64_t key = smmu_get_iotlb_key(cfg->asid, iova);
+-    IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
++    SMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
+ 
+     if (entry) {
+         cfg->iotlb_hits++;
+@@ -69,7 +69,7 @@ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+     return entry;
+ }
+ 
+-void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *new)
+ {
+     uint64_t *key = g_new0(uint64_t, 1);
+ 
+@@ -77,9 +77,9 @@ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
+         smmu_iotlb_inv_all(bs);
+     }
+ 
+-    *key = smmu_get_iotlb_key(cfg->asid, entry->iova);
+-    trace_smmu_iotlb_insert(cfg->asid, entry->iova);
+-    g_hash_table_insert(bs->iotlb, key, entry);
++    *key = smmu_get_iotlb_key(cfg->asid, new->entry.iova);
++    trace_smmu_iotlb_insert(cfg->asid, new->entry.iova);
++    g_hash_table_insert(bs->iotlb, key, new);
+ }
+ 
+ inline void smmu_iotlb_inv_all(SMMUState *s)
+@@ -199,7 +199,7 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova)
+  * @cfg: translation config
+  * @iova: iova to translate
+  * @perm: access type
+- * @tlbe: IOMMUTLBEntry (out)
++ * @tlbe: SMMUTLBEntry (out)
+  * @info: handle to an error info
+  *
+  * Return 0 on success, < 0 on error. In case of error, @info is filled
+@@ -209,7 +209,7 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova)
+  */
+ static int smmu_ptw_64(SMMUTransCfg *cfg,
+                        dma_addr_t iova, IOMMUAccessFlags perm,
+-                       IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
++                       SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+ {
+     dma_addr_t baseaddr, indexmask;
+     int stage = cfg->stage;
+@@ -229,8 +229,8 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+     baseaddr = extract64(tt->ttb, 0, 48);
+     baseaddr &= ~indexmask;
+ 
+-    tlbe->iova = iova;
+-    tlbe->addr_mask = (1 << granule_sz) - 1;
++    tlbe->entry.iova = iova;
++    tlbe->entry.addr_mask = (1 << granule_sz) - 1;
+ 
+     while (level <= 3) {
          uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
-         uint64_t mask = subpage_size - 1;
-         uint32_t offset = iova_level_offset(iova, inputsize, level, granule_sz);
--        uint64_t pte;
-+        uint64_t pte, gpa;
-         dma_addr_t pte_addr = baseaddr + offset * sizeof(pte);
-         uint8_t ap;
- 
-         if (get_pte(baseaddr, offset, &pte, info)) {
--                goto error;
-+            break;
-         }
-         trace_smmu_ptw_level(level, iova, subpage_size,
-                              baseaddr, offset, pte);
-@@ -199,58 +199,43 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
-         if (is_invalid_pte(pte) || is_reserved_pte(pte, level)) {
-             trace_smmu_ptw_invalid_pte(stage, level, baseaddr,
-                                        pte_addr, offset, pte);
--            info->type = SMMU_PTW_ERR_TRANSLATION;
--            goto error;
-+            break;
-         }
- 
--        if (is_page_pte(pte, level)) {
--            uint64_t gpa = get_page_pte_address(pte, granule_sz);
-+        if (is_table_pte(pte, level)) {
-+            ap = PTE_APTABLE(pte);
- 
--            ap = PTE_AP(pte);
-             if (is_permission_fault(ap, perm)) {
-                 info->type = SMMU_PTW_ERR_PERMISSION;
-                 goto error;
-             }
--
--            tlbe->translated_addr = gpa + (iova & mask);
--            tlbe->perm = PTE_AP_TO_PERM(ap);
-+            baseaddr = get_table_pte_address(pte, granule_sz);
-+            level++;
-+            continue;
-+        } else if (is_page_pte(pte, level)) {
-+            gpa = get_page_pte_address(pte, granule_sz);
-             trace_smmu_ptw_page_pte(stage, level, iova,
-                                     baseaddr, pte_addr, pte, gpa);
--            return 0;
--        }
--        if (is_block_pte(pte, level)) {
-+        } else {
-             uint64_t block_size;
--            hwaddr gpa = get_block_pte_address(pte, level, granule_sz,
--                                               &block_size);
--
--            ap = PTE_AP(pte);
--            if (is_permission_fault(ap, perm)) {
--                info->type = SMMU_PTW_ERR_PERMISSION;
--                goto error;
--            }
- 
-+            gpa = get_block_pte_address(pte, level, granule_sz,
-+                                        &block_size);
-             trace_smmu_ptw_block_pte(stage, level, baseaddr,
-                                      pte_addr, pte, iova, gpa,
-                                      block_size >> 20);
--
--            tlbe->translated_addr = gpa + (iova & mask);
--            tlbe->perm = PTE_AP_TO_PERM(ap);
--            return 0;
-         }
--
--        /* table pte */
--        ap = PTE_APTABLE(pte);
--
-+        ap = PTE_AP(pte);
-         if (is_permission_fault(ap, perm)) {
-             info->type = SMMU_PTW_ERR_PERMISSION;
+@@ -281,13 +281,15 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
              goto error;
          }
--        baseaddr = get_table_pte_address(pte, granule_sz);
--        level++;
-+
-+        tlbe->translated_addr = gpa + (iova & mask);
-+        tlbe->perm = PTE_AP_TO_PERM(ap);
-+        return 0;
+ 
+-        tlbe->translated_addr = gpa + (iova & mask);
+-        tlbe->perm = PTE_AP_TO_PERM(ap);
++        tlbe->entry.translated_addr = gpa + (iova & mask);
++        tlbe->entry.perm = PTE_AP_TO_PERM(ap);
++        tlbe->level = level;
++        tlbe->granule = granule_sz;
+         return 0;
      }
--
      info->type = SMMU_PTW_ERR_TRANSLATION;
--
  error:
-     tlbe->perm = IOMMU_NONE;
+-    tlbe->perm = IOMMU_NONE;
++    tlbe->entry.perm = IOMMU_NONE;
      return -EINVAL;
+ }
+ 
+@@ -303,7 +305,7 @@ error:
+  * return 0 on success
+  */
+ inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+-             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
++             SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+ {
+     if (!cfg->aa64) {
+         /*
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index cd2a2e7e14..db74d27add 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -626,7 +626,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     SMMUTranslationStatus status;
+     SMMUState *bs = ARM_SMMU(s);
+     uint64_t page_mask, aligned_addr;
+-    IOMMUTLBEntry *cached_entry = NULL;
++    SMMUTLBEntry *cached_entry = NULL;
+     SMMUTransTableInfo *tt;
+     SMMUTransCfg *cfg = NULL;
+     IOMMUTLBEntry entry = {
+@@ -676,7 +676,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+ 
+     cached_entry = smmu_iotlb_lookup(bs, cfg, aligned_addr);
+     if (cached_entry) {
+-        if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
++        if ((flag & IOMMU_WO) && !(cached_entry->entry.perm & IOMMU_WO)) {
+             status = SMMU_TRANS_ERROR;
+             if (event.record_trans_faults) {
+                 event.type = SMMU_EVT_F_PERMISSION;
+@@ -689,7 +689,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto epilogue;
+     }
+ 
+-    cached_entry = g_new0(IOMMUTLBEntry, 1);
++    cached_entry = g_new0(SMMUTLBEntry, 1);
+ 
+     if (smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info)) {
+         g_free(cached_entry);
+@@ -743,9 +743,9 @@ epilogue:
+     switch (status) {
+     case SMMU_TRANS_SUCCESS:
+         entry.perm = flag;
+-        entry.translated_addr = cached_entry->translated_addr +
++        entry.translated_addr = cached_entry->entry.translated_addr +
+                                     (addr & page_mask);
+-        entry.addr_mask = cached_entry->addr_mask;
++        entry.addr_mask = cached_entry->entry.addr_mask;
+         trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
+                                        entry.translated_addr, entry.perm);
+         break;
 -- 
 2.20.1
 
