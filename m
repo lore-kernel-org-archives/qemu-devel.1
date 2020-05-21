@@ -2,51 +2,52 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6929DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 448C4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:54:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26CD920721
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0067920721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 03:54:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XTpAIsFI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CD920721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="J76UE+l8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0067920721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbcH5-00040i-Cv
-	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:53:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
+	id 1jbcHT-0004gl-7C
+	for qemu-devel@archiver.kernel.org; Wed, 20 May 2020 23:54:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7J-000374-MY; Wed, 20 May 2020 23:43:33 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:39693)
+ id 1jbc7L-0003Dj-UE; Wed, 20 May 2020 23:43:35 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:39577)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jbc7I-0003Wv-5P; Wed, 20 May 2020 23:43:33 -0400
+ id 1jbc7K-0003Xs-Pw; Wed, 20 May 2020 23:43:35 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49SFns2x39z9sTd; Thu, 21 May 2020 13:43:13 +1000 (AEST)
+ id 49SFns6cHlz9sV6; Thu, 21 May 2020 13:43:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1590032593;
- bh=+6wORPXba/FHMuWdDdlY8yg4w9EvwoE0aoktBT1heY4=;
+ bh=nm9xB2V5R/0lVmUDvJmT+YhtEegXvU4xCUn008zu1Y0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=XTpAIsFI7q+M5+ao82y+YJsAqkvYesCjXshW160mqdR1noSQAf7IMLGYDSZQPBD6Z
- xT7K8payzDPaDc0Auz7il9JClDi1XZPZyCegrjY980TiN9CUjCLZTOm4Dl9fvwemF8
- vgVTxAohZs8Ftss9pVJon67zZUybVuFXaz4tAIs0=
+ b=J76UE+l8Q9zlvDFZqaaUtPjqUeTJjmI3FTmuPrNug7bZHMqfkVrajRLwYSd2DBlOf
+ ZP9UcfOGw4fCrdb/qBjBAR1yx6znI7e5nkptHh1km7squAu7TjCboLDJUA+0hlt3B8
+ +0IL111yZzXR9CWIWwNqwxJ+jZ/9kphyDwN3JQqw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, frankja@linux.ibm.com,
  dgilbert@redhat.com, pair@us.ibm.com
-Subject: [RFC v2 09/18] target/i386: sev: Unify SEVState and SevGuestState
-Date: Thu, 21 May 2020 13:42:55 +1000
-Message-Id: <20200521034304.340040-10-david@gibson.dropbear.id.au>
+Subject: [RFC v2 14/18] guest memory protection: Rework the
+ "memory-encryption" property
+Date: Thu, 21 May 2020 13:43:00 +1000
+Message-Id: <20200521034304.340040-15-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
@@ -56,12 +57,12 @@ Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, T_FILL_THIS_FORM_SHORT=0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,251 +85,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SEVState is contained with SevGuestState.  We've now fixed redundancies
-and name conflicts, so there's no real point to the nested structure.  Just
-move all the fields of SEVState into SevGuestState.
+Currently the "memory-encryption" property is only looked at once we get to
+kvm_init().  Although protection of guest memory from the hypervisor isn't
+something that could really ever work with TCG, it's not conceptually tied
+to the KVM accelerator.
 
-This eliminates the SEVState structure, which as a bonus removes the
-confusion with the SevState enum.
+In addition, the way the string property is resolved to an object is
+almost identical to how a QOM link property is handled.
+
+So, create a new "guest-memory-protection" link property which sets
+this QOM interface link directly in the machine.  For compatibility we
+keep the "memory-encryption" property, but now implemented in terms of
+the new property.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/i386/sev.c | 79 ++++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 45 deletions(-)
+ accel/kvm/kvm-all.c | 23 +++++++----------------
+ hw/core/machine.c   | 41 ++++++++++++++++++++++++++++++++++++-----
+ include/hw/boards.h |  4 +++-
+ 3 files changed, 46 insertions(+), 22 deletions(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 24e2dea9b8..d273174ad3 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -35,18 +35,6 @@
- 
- typedef struct SevGuestState SevGuestState;
- 
--struct SEVState {
--    uint8_t api_major;
--    uint8_t api_minor;
--    uint8_t build_id;
--    uint64_t me_mask;
--    int sev_fd;
--    SevState state;
--    gchar *measurement;
--};
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 5cf1a397e3..3588adf1e1 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2102,25 +2102,16 @@ static int kvm_init(MachineState *ms)
+      * if memory encryption object is specified then initialize the memory
+      * encryption context.
+      */
+-    if (ms->memory_encryption) {
+-        Object *obj = object_resolve_path_component(object_get_objects_root(),
+-                                                    ms->memory_encryption);
 -
--typedef struct SEVState SEVState;
+-        if (object_dynamic_cast(obj, TYPE_GUEST_MEMORY_PROTECTION)) {
+-            GuestMemoryProtection *gmpo = GUEST_MEMORY_PROTECTION(obj);
+-            GuestMemoryProtectionClass *gmpc =
+-                GUEST_MEMORY_PROTECTION_GET_CLASS(gmpo);
 -
- /**
-  * SevGuestState:
-  *
-@@ -70,7 +58,13 @@ struct SevGuestState {
+-            ret = gmpc->kvm_init(gmpo);
+-            if (ret < 0) {
+-                goto err;
+-            }
++    if (ms->gmpo) {
++        GuestMemoryProtectionClass *gmpc =
++            GUEST_MEMORY_PROTECTION_GET_CLASS(ms->gmpo);
  
-     /* runtime state */
-     uint32_t handle;
--    SEVState state;
-+    uint8_t api_major;
-+    uint8_t api_minor;
-+    uint8_t build_id;
-+    uint64_t me_mask;
-+    int sev_fd;
-+    SevState state;
-+    gchar *measurement;
- };
+-            kvm_state->guest_memory_protection = gmpo;
+-        } else {
+-            ret = -1;
++        ret = gmpc->kvm_init(ms->gmpo);
++        if (ret < 0) {
+             goto err;
+         }
++
++        kvm_state->guest_memory_protection = ms->gmpo;
+     }
  
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
-@@ -158,7 +152,7 @@ static bool
- sev_check_state(const SevGuestState *sev, SevState state)
+     ret = kvm_arch_init(ms, s);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index e75f0b73d0..88d699bceb 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -27,6 +27,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
++#include "exec/guest-memory-protection.h"
+ 
+ GlobalProperty hw_compat_5_0[] = {};
+ const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+@@ -419,16 +420,37 @@ static char *machine_get_memory_encryption(Object *obj, Error **errp)
  {
-     assert(sev);
--    return sev->state.state == state ? true : false;
-+    return sev->state == state ? true : false;
+     MachineState *ms = MACHINE(obj);
+ 
+-    return g_strdup(ms->memory_encryption);
++    if (ms->gmpo) {
++        return object_get_canonical_path_component(OBJECT(ms->gmpo));
++    }
++
++    return NULL;
  }
  
- static void
-@@ -167,9 +161,9 @@ sev_set_guest_state(SevGuestState *sev, SevState new_state)
-     assert(new_state < SEV_STATE__MAX);
-     assert(sev);
+ static void machine_set_memory_encryption(Object *obj, const char *value,
+                                         Error **errp)
+ {
+-    MachineState *ms = MACHINE(obj);
++    Object *gmpo =
++        object_resolve_path_component(object_get_objects_root(), value);
++
++    if (!gmpo) {
++        error_setg(errp, "No such memory encryption object '%s'", value);
++        return;
++    }
  
--    trace_kvm_sev_change_state(SevState_str(sev->state.state),
-+    trace_kvm_sev_change_state(SevState_str(sev->state),
-                                SevState_str(new_state));
--    sev->state.state = new_state;
-+    sev->state = new_state;
+-    g_free(ms->memory_encryption);
+-    ms->memory_encryption = g_strdup(value);
++    object_property_set_link(obj, gmpo, "guest-memory-protection", errp);
++}
++
++static void machine_check_guest_memory_protection(const Object *obj,
++                                                  const char *name,
++                                                  Object *new_target,
++                                                  Error **errp)
++{
++    /*
++     * So far the only constraint is that the target has the
++     * TYPE_GUEST_MEMORY_PROTECTION interface, and that's checked by
++     * the QOM core
++     */
  }
  
- static void
-@@ -368,7 +362,7 @@ sev_enabled(void)
- uint64_t
- sev_get_me_mask(void)
- {
--    return sev_guest ? sev_guest->state.me_mask : ~0;
-+    return sev_guest ? sev_guest->me_mask : ~0;
- }
+ static bool machine_get_nvdimm(Object *obj, Error **errp)
+@@ -849,6 +871,15 @@ static void machine_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "enforce-config-section",
+         "Set on to enforce configuration section migration");
  
- uint32_t
-@@ -392,11 +386,11 @@ sev_get_info(void)
-     info->enabled = sev_enabled();
- 
-     if (info->enabled) {
--        info->api_major = sev_guest->state.api_major;
--        info->api_minor = sev_guest->state.api_minor;
--        info->build_id = sev_guest->state.build_id;
-+        info->api_major = sev_guest->api_major;
-+        info->api_minor = sev_guest->api_minor;
-+        info->build_id = sev_guest->build_id;
-         info->policy = sev_guest->policy;
--        info->state = sev_guest->state.state;
-+        info->state = sev_guest->state;
-         info->handle = sev_guest->handle;
++    object_class_property_add_link(oc, "guest-memory-protection",
++                                   TYPE_GUEST_MEMORY_PROTECTION,
++                                   offsetof(MachineState, gmpo),
++                                   machine_check_guest_memory_protection,
++                                   OBJ_PROP_LINK_STRONG);
++    object_class_property_set_description(oc, "guest-memory-protection",
++        "Set guest memory protection object to use");
++
++    /* For compatibility */
+     object_class_property_add_str(oc, "memory-encryption",
+         machine_get_memory_encryption, machine_set_memory_encryption);
+     object_class_property_set_description(oc, "memory-encryption",
+@@ -1121,7 +1152,7 @@ void machine_run_board_init(MachineState *machine)
+         }
      }
  
-@@ -507,7 +501,6 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- static int
- sev_launch_start(SevGuestState *sev)
- {
--    SEVState *s = &sev->state;
-     gsize sz;
-     int ret = 1;
-     int fw_error, rc;
-@@ -535,7 +528,7 @@ sev_launch_start(SevGuestState *sev)
-     }
+-    if (machine->memory_encryption) {
++    if (machine->gmpo) {
+         /*
+          * With guest memory protection, the host can't see the real
+          * contents of RAM, so there's no point in it trying to merge
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 18815d9be2..19bf2c38fc 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -12,6 +12,8 @@
+ #include "qom/object.h"
+ #include "hw/core/cpu.h"
  
-     trace_kvm_sev_launch_start(start->policy, session, dh_cert);
--    rc = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-+    rc = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-     if (rc < 0) {
-         error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-                 __func__, ret, fw_error, fw_error_to_str(fw_error));
-@@ -566,7 +559,7 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-     update.uaddr = (__u64)(unsigned long)addr;
-     update.len = len;
-     trace_kvm_sev_launch_update_data(addr, len);
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-                     &update, &fw_error);
-     if (ret) {
-         error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-@@ -582,7 +575,6 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     SevGuestState *sev = sev_guest;
-     int ret, error;
-     guchar *data;
--    SEVState *s = &sev->state;
-     struct kvm_sev_launch_measure *measurement;
++typedef struct GuestMemoryProtection GuestMemoryProtection;
++
+ #define TYPE_MACHINE_SUFFIX "-machine"
  
-     if (!sev_check_state(sev, SEV_STATE_LAUNCH_UPDATE)) {
-@@ -592,7 +584,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     measurement = g_new0(struct kvm_sev_launch_measure, 1);
- 
-     /* query the measurement blob length */
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     measurement, &error);
-     if (!measurement->len) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -604,7 +596,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     measurement->uaddr = (unsigned long)data;
- 
-     /* get the measurement blob */
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     measurement, &error);
-     if (ret) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -615,8 +607,8 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     sev_set_guest_state(sev, SEV_STATE_LAUNCH_SECRET);
- 
-     /* encode the measurement value and emit the event */
--    s->measurement = g_base64_encode(data, measurement->len);
--    trace_kvm_sev_launch_measurement(s->measurement);
-+    sev->measurement = g_base64_encode(data, measurement->len);
-+    trace_kvm_sev_launch_measurement(sev->measurement);
- 
- free_data:
-     g_free(data);
-@@ -628,8 +620,8 @@ char *
- sev_get_launch_measurement(void)
- {
-     if (sev_guest &&
--        sev_guest->state.state >= SEV_STATE_LAUNCH_SECRET) {
--        return g_strdup(sev_guest->state.measurement);
-+        sev_guest->state >= SEV_STATE_LAUNCH_SECRET) {
-+        return g_strdup(sev_guest->measurement);
-     }
- 
-     return NULL;
-@@ -642,12 +634,11 @@ static Notifier sev_machine_done_notify = {
- static void
- sev_launch_finish(SevGuestState *sev)
- {
--    SEVState *s = &sev->state;
-     int ret, error;
-     Error *local_err = NULL;
- 
-     trace_kvm_sev_launch_finish();
--    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-     if (ret) {
-         error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
-                      __func__, ret, error, fw_error_to_str(error));
-@@ -683,7 +674,6 @@ void *
- sev_guest_init(const char *id)
- {
-     SevGuestState *sev;
--    SEVState *s;
-     char *devname;
-     int ret, fw_error;
-     uint32_t ebx;
-@@ -698,8 +688,7 @@ sev_guest_init(const char *id)
-     }
- 
-     sev_guest = sev;
--    s = &sev->state;
--    s->state = SEV_STATE_UNINIT;
-+    sev->state = SEV_STATE_UNINIT;
- 
-     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-     host_cbitpos = ebx & 0x3f;
-@@ -716,20 +705,20 @@ sev_guest_init(const char *id)
-         goto err;
-     }
- 
--    s->me_mask = ~(1UL << sev->cbitpos);
-+    sev->me_mask = ~(1UL << sev->cbitpos);
- 
-     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
--    s->sev_fd = open(devname, O_RDWR);
--    if (s->sev_fd < 0) {
-+    sev->sev_fd = open(devname, O_RDWR);
-+    if (sev->sev_fd < 0) {
-         error_report("%s: Failed to open %s '%s'", __func__,
-                      devname, strerror(errno));
-     }
-     g_free(devname);
--    if (s->sev_fd < 0) {
-+    if (sev->sev_fd < 0) {
-         goto err;
-     }
- 
--    ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
-+    ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
-                              &fw_error);
-     if (ret) {
-         error_report("%s: failed to get platform status ret=%d "
-@@ -737,12 +726,12 @@ sev_guest_init(const char *id)
-                      fw_error_to_str(fw_error));
-         goto err;
-     }
--    s->build_id = status.build;
--    s->api_major = status.api_major;
--    s->api_minor = status.api_minor;
-+    sev->build_id = status.build;
-+    sev->api_major = status.api_major;
-+    sev->api_minor = status.api_minor;
- 
-     trace_kvm_sev_init();
--    ret = sev_ioctl(s->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-     if (ret) {
-         error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
-                      __func__, ret, fw_error, fw_error_to_str(fw_error));
+ /* Machine class name that needs to be used for class-name-based machine
+@@ -277,7 +279,7 @@ struct MachineState {
+     bool suppress_vmdesc;
+     bool enforce_config_section;
+     bool enable_graphics;
+-    char *memory_encryption;
++    GuestMemoryProtection *gmpo;
+     char *ram_memdev_id;
+     /*
+      * convenience alias to ram_memdev_id backend memory region
 -- 
 2.26.2
 
