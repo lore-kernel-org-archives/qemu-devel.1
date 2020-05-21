@@ -2,92 +2,89 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7543C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CBAC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7767D207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:48:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C47BF207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="QuH1F56/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7767D207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbmX0639"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47BF207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnRK-0002dB-I0
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:48:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42782)
+	id 1jbnRe-0005HQ-14
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbnMy-0005K8-MA; Thu, 21 May 2020 11:44:28 -0400
-Received: from mout.web.de ([212.227.15.14]:44837)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jbnMx-00017L-K1; Thu, 21 May 2020 11:44:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590075860;
- bh=SUURXh4jypd9G2t/iEjlri3DZHpTTvKrsSOE5CS2etA=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=QuH1F56/zmjJIRDMiW62LMvbDzSKFcer5sKVn55HfGCbdI8aszF+Vs0SUa/qcXG5v
- 8+qsZCC+vYvCuCaj9S4LfiXaZn0oHfganSpIORrThl0IlFy3TfkawhBwuJ4zxoECxw
- 5DSOR3+xAjTvGDjI6GPMjx+r/kJ5OnzQa8e4HA8o=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.99]) by smtp.web.de (mrweb001
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MVtmK-1jZehA1VGa-00X3fw; Thu, 21
- May 2020 17:44:20 +0200
-Date: Thu, 21 May 2020 17:44:19 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v2 4/4] migration: Add yank feature
-Message-ID: <20200521174419.51909b9c@luklap>
-In-Reply-To: <b3ca78c3b4b8ad903ca2f70795fc38218802afc4.1590008051.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbnQy-0002yX-It
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:48:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23341
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jbnQx-0001x9-3P
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:48:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590076113;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=zBH8atWFDlPPOx7CdZcY6nT/3fT0D+F9IB0HdGBJsBU=;
+ b=MbmX0639Y6r4i4cSaUgVm6NF71w8wMWjhePtqCu/PB2tnZAMqnMv5rNRd4DQnqeJ4F6FQI
+ GalKvXFu21qCtqVDNt7LldEPDl+mfluriUHX6h6jffnL5dmn9um3mNvRDttxVm0TQnRCEG
+ Gze5reUugfcfaa9hC1VnviJ1k4uD9Kc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-xjRZlXfoMmyOOKY3hPeeqg-1; Thu, 21 May 2020 11:48:20 -0400
+X-MC-Unique: xjRZlXfoMmyOOKY3hPeeqg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C04C78018A5;
+ Thu, 21 May 2020 15:48:19 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B0ED90068;
+ Thu, 21 May 2020 15:48:09 +0000 (UTC)
+Date: Thu, 21 May 2020 16:48:06 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v2 1/4] Introduce yank feature
+Message-ID: <20200521154806.GI2211791@redhat.com>
 References: <cover.1590008051.git.lukasstraub2@web.de>
- <b3ca78c3b4b8ad903ca2f70795fc38218802afc4.1590008051.git.lukasstraub2@web.de>
+ <20005a15c708fbda983f9be602c55fc0b1979a18.1590008051.git.lukasstraub2@web.de>
+ <20200521150335.GO251811@stefanha-x1.localdomain>
+ <20200521174241.3b0a267f@luklap>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/6.rtzgeIehzpFDWvs_MAiMZ";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:izJdfGEdFTjjZHuVThWgyLDs0PD1FTcbLzIo7aE/IJv5ekYOAvr
- DiU5PFu1BRz3Fkt5ZABzUMCoUJjwjU6QwXxszrI3A+sdo0ZgogrEfYNXhMO+8z+s9bkqJKy
- yNY6JtFjFVGmj8HAOuIpQRcIlJ0bFcJBvlAY0tBfVWXCKfUlJTbVgMa0LMAz6/UwWc0d8A2
- ZT9M4OGPI3FGPUaRYK0Bw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8UfWLW+Foy8=:IZyD7RDuXGuVfsowebc/hD
- PtA4h0rj+OHhqibCAkcmQwaC8BVb+J08sidmfvzaj04QsUHuAinW0j4Rpxn0PYz9GLLqYinK0
- Hdw+AEoRZeuDGDYe6yDysOTvHyh3Ec3o1WpC1PhCg1eegEexdTXkBMz2QaIbkiL8q2vmh1QaD
- Y5cbda24ZAa50oTQH8fAfiiQafJMaN4Qpojz0LuqxMSs99YAlFe7dDFZgZbcwkqsNTePbp/uL
- vdHB+5aUIWd04gLctgKE2GehwPLiuSQqxzXZ5HBeRjVK6Pbp0wyR1hd9DYFNL2n7lnAZlbbO2
- ZyEGSdTVYVWvvH9U5UvD3VoEyxCo0NX0HNucqqhp5Y1sokP9sUrq/T/Ebmql/2Iqsd9zCGcHH
- diJziyYFGa7zse96cO8vLxM2M5C8FSbkMUwNktGmGHQ1zzfNotO8rPwexeoCplEOg1u9R8BqU
- 8l1kVc2HGAR/lioHf+7MwTkc4mt+mTzyKCFjfJWPlt62q0PQ9Uiw5f5uNT2d2uKxS/kha1G5V
- S3p0bG+Ja/OTVvWxI+42P+uRFFk6PY71/A3GQfk9OuX+eO3EPVdL1O6IQD1RGg+rfAXFkqCKc
- mUT0o9yj2+IYZdGrY59AI/s4Fwxww+R2VixYPzkEIKeRgnwBo+9YMqu3B6D9Jpoo6cPHD+bMk
- XFbsz/1CtVjp3C79yWTKP2H3aLDPMq7/afRjRJbkHg1iaUXJL3dVf0yk0KC7G/DbC/gjBckKo
- OrjeM8PIaSDGdPxy3hVu3750iTm8TbchQUR555fMkeoYhXew3LTLZNxcfZ6HeX87nCwbh28GT
- wRO2Zrcxz1KFNibQ7pRkLuer1aP5jcvh9orvWWvDcazQp/54+bzxgwmV4X0JY4cRYNK93IUFF
- jnHuhZN5TarcjEdur5nLSrLIKvl/PUmYwRTqnAVJvyVNFyxEg+7OQAe7zol1YDu5Cwf6YuO/E
- 2dTo0os74M4yvRfMGlTkR8PKmgUSdcyAog/+Yqck/huTV7W71xewxJ5vl6UJQ/57jjCJagzLS
- /08RX9nqwyGwy6XIV1en6gD7FfjARpCXmRMvPbZxJTXQ05ELOoORcA8tsSGwuLNe+V07KTMOV
- Gk79wKZIhsdzcu+yTco+fekC+rWhD63bAVMIxDBMCfHPEfx5VE3qHZ6xG34AQlrqSTyT6f3Os
- Zvs3UTGXzUY8gmqAAoiQ4/O7kYeh+2IV8HkJpkNw41g3dwbj82xmMJIKcBFA9nvaJ4IAG1Vx1
- kLw0m1e2S7cYo5ycF
-Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 11:44:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200521174241.3b0a267f@luklap>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,53 +97,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/6.rtzgeIehzpFDWvs_MAiMZ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 21, 2020 at 05:42:41PM +0200, Lukas Straub wrote:
+> On Thu, 21 May 2020 16:03:35 +0100
+> Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> 
+> > On Wed, May 20, 2020 at 11:05:39PM +0200, Lukas Straub wrote:
+> > > +void yank_generic_iochannel(void *opaque)
+> > > +{
+> > > +    QIOChannel *ioc = QIO_CHANNEL(opaque);
+> > > +
+> > > +    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
+> > > +}
+> > > +
+> > > +void qmp_yank(strList *instances, Error **errp)
+> > > +{
+> > > +    strList *tmp;
+> > > +    struct YankInstance *instance;
+> > > +    struct YankFuncAndParam *entry;
+> > > +
+> > > +    qemu_mutex_lock(&lock);
+> > > +    tmp = instances;
+> > > +    for (; tmp; tmp = tmp->next) {
+> > > +        instance = yank_find_instance(tmp->value);
+> > > +        if (!instance) {
+> > > +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> > > +                      "Instance '%s' not found", tmp->value);
+> > > +            qemu_mutex_unlock(&lock);
+> > > +            return;
+> > > +        }
+> > > +    }
+> > > +    tmp = instances;
+> > > +    for (; tmp; tmp = tmp->next) {
+> > > +        instance = yank_find_instance(tmp->value);
+> > > +        assert(instance);
+> > > +        QLIST_FOREACH(entry, &instance->yankfns, next) {
+> > > +            entry->func(entry->opaque);
+> > > +        }
+> > > +    }
+> > > +    qemu_mutex_unlock(&lock);
+> > > +}  
+> > 
+> > From docs/devel/qapi-code-gen.txt:
+> > 
+> >   An OOB-capable command handler must satisfy the following conditions:
+> > 
+> >   - It terminates quickly.
+> Check.
+> 
+> >   - It does not invoke system calls that may block.
+> brk/sbrk (malloc and friends):
+> The manpage doesn't say anything about blocking, but malloc is already used while handling the qmp command.
+> 
+> shutdown():
+> The manpage doesn't say anything about blocking, but this is already used in migration oob qmp commands.
 
-On Wed, 20 May 2020 23:05:50 +0200
-Lukas Straub <lukasstraub2@web.de> wrote:
+It just marks the socket state in local kernel side. It doesn't involve
+any blocking roundtrips over the wire, so this is fine.
 
-> Register yank functions on sockets to shut them down.
->=20
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> 
+> There are no other syscalls involved to my knowledge.
+> 
+> >   - It does not access guest RAM that may block when userfaultfd is
+> >     enabled for postcopy live migration.
+> Check.
+> 
+> >   - It takes only "fast" locks, i.e. all critical sections protected by
+> >     any lock it takes also satisfy the conditions for OOB command
+> >     handler code.
+> 
+> The lock in yank.c satisfies this requirement.
+> 
+> qio_channel_shutdown doesn't take any locks.
 
-Don't review this commit for now, I'll have to revamp it anyway.
+Agreed, I think the yank code is compliant with all the points
+listed above.
+
 
 Regards,
-Lukas Straub
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
---Sig_/6.rtzgeIehzpFDWvs_MAiMZ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7GodMACgkQNasLKJxd
-slgLbQ/9EpNXzi6dvLR5WOMv6TgS+T/QOubZ5f1XcQ/M6jSeesfUNAx+tvCSbPGS
-V06Uhuo+ZgVhGhXoMK6zNVPQaXNkWJnWmPC/fN7vQ7pqkdkjA9WB/MMzxJpAoLfK
-bQjHflikSbwcUQKUcqFJ/nF4wkibqt0hh2CEFZFI7468W//FaW9CnF3WzgJiJTOs
-izqnOvP9IVklkZLXU4Ljm7y2a0B18qvMJOQcLumEM9Zx7l0u9wUfMtduem4OcMP3
-S9u+wwRqagWgThwphHDUhDkTSJ+XPxSqJQISkLvT9jJju18xLiHkukzGJIXDL7ql
-RnEEnBC2Lo/1UBAYOJp/JKXC7RzsOkYZFmDe8gXhO/nWrD4tQycpY7lRu11M9NbP
-4A5rwgyiv5Wq3qUP2bkyEsKpNFoAEaZWzAXkWImOINDjmUDTfLmXGi9Jf0Jbjsgk
-0aK+ZWvtnRhw160Nf89aO7453FkV9HpnTTkoilofw1A0zxgSAtVegXvPpRLXs2n4
-QmtAoAv1JauSK5OuChhSO62jxZSfG8RghGeZrmMlacGwXLQKQI7NZdqytiGn3sqf
-s9y1BMSqUp4SB8O2utfxddbz0T16cYRs27gs8O06xlWJ4Y3sVSMDL5OJ2GObVexY
-vVrtdE7j3ZIebO3AoL819AJRazLtX8IzfAqurLBAUrsNpHJ30vU=
-=erQ5
------END PGP SIGNATURE-----
-
---Sig_/6.rtzgeIehzpFDWvs_MAiMZ--
 
