@@ -2,76 +2,76 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA95C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A659C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9932320826
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:30:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B942072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 17:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G4Eqelj7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9932320826
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mmkk+70z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B942072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbp22-0001ym-Pw
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:30:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51698)
+	id 1jbp3R-0004y7-40
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 13:32:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jboXu-00013Y-Qa
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:59:50 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44617)
+ id 1jbodM-0005P6-LW
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 13:05:28 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41059)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jboXt-00016Y-CB
- for qemu-devel@nongnu.org; Thu, 21 May 2020 12:59:50 -0400
-Received: by mail-ot1-x341.google.com with SMTP id f18so6016652otq.11
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 09:59:48 -0700 (PDT)
+ id 1jbodJ-0002cC-VY
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 13:05:28 -0400
+Received: by mail-oi1-x242.google.com with SMTP id 23so5591620oiq.8
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 10:05:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oHKmpJirg4EZoTKDF575j+PCYShCNB8Xm+6VogrN6FA=;
- b=G4Eqelj72FTUuEXOQDgLe1SoQH1v4Ua5qW0EWqZ8ULWhG3c+WQbKYZo9vWNniboF/O
- PHf/AznmoUJk2dltC+/ThYvTKdN2s2KCMvOvdvm3IynzPiHWaVvdnJtDJbrA/sP8meYV
- 7PLQ/AASuNRXviX1CLYakMauQGlHAdJQAI2kaOg71DTLeCS/I4hKPh12cLXEeaQPe9pD
- xImacx9JfiSZnZKMOtKD7tKRSohBwXDwW7s6WH6YQD7xOCPgEI6pzF8bb66tfI+KA137
- GCNO56iA69u6+YbumNJaMTh+ea3UKgUzg6d7RQg2915hK+Np+xka8RjaCv83PubIlRRk
- wvCg==
+ :cc; bh=pLFCIp0XFHZeGWDRfPEhCpc7Fs4qtKzYvjQ0W/FfaSM=;
+ b=Mmkk+70zD/89rdujcnneto7uMGa9SbFNBrB0DVeAfBxci8pcFW4tXDNWLhkiHkyRxH
+ ibercEhWtyj4XYbLkviAecFp5xjQKBU2qzTYSaRjJP9xE4aS2Q0PCP9hEmxT5RlBCsof
+ WkFI8YHURhitHTB8gUQSTNNKcdNt7kgL4PRH8aFgevV7TTdOdgvDXJBKuU6rXQZCBrt1
+ 4HrThCh/PAPzp+P6mGX4fGhYwWxxVcKxBACUCpAgc+aqi1/Q5B+/LecviO9L+wL9eHBh
+ YokVG5ENMQUoqAPZzdRdLInnzPz/+vaJ9cO5aruqr/Y3NFg0mgXfGZlWO5GAJHEuif7l
+ hlJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=oHKmpJirg4EZoTKDF575j+PCYShCNB8Xm+6VogrN6FA=;
- b=YgJxBJJWJV123hqA6teRfkufM3u+W2HTshguBIe4+t7FpeoBD6uJb7ttKVXINbgowg
- onH7PuB79h1DEi3J3kNarfpE5pb4+QRWUS1O6304+/MLTlawOwkdyS2sqChH8kFuiytX
- EW8pLP6VKLfQfZNn+k07Dr0ug15/uqzNlqOFwJo/kjm97NN0vqvZW6Jp2tyNPJrf0fsh
- /1Zh3/1THLY1n1GpPEKgGzUrmFBk2RSLWuu3tG2MX5wqLyVxpX+GZfgFR3HGRzei75Zk
- SzezugF9swvtsjkYjJo9+/865OE6v9i4pJjySOz9dwpf6lsYB9yh92GEDIevXMAgkHsn
- VTiQ==
-X-Gm-Message-State: AOAM530BhP9lxkfvRyN/EdsFzKHvFS9Z1tPrUcF4up2SRN5LN+11mjsc
- n0xjMi03/3AGU+8cMNh8Hcct3DvcA1D2MhbdNXsNsw==
-X-Google-Smtp-Source: ABdhPJwEhkexMKUINid9wuLNtB6fVpHfueW3m2e3kqUAv6oOy3z/6jMS/ZrHCXEdUezJ/NTgU5B3vAJW9sHvCYVF9mc=
-X-Received: by 2002:a05:6830:158b:: with SMTP id
- i11mr8016316otr.135.1590080387984; 
- Thu, 21 May 2020 09:59:47 -0700 (PDT)
+ bh=pLFCIp0XFHZeGWDRfPEhCpc7Fs4qtKzYvjQ0W/FfaSM=;
+ b=fqAiariQoiGjy3OsU6UYmWnk2qZ5di7SdsJm+Dps4sYHIVz721NYFpK67hUUdz7Qis
+ a80IA8Fue6bkf/kWaJhb7nZbpKf5bjgAsx8bGXhXoKuHc5aKePKPQ++INOF6lIhpNPWU
+ 9FZygTRrTUt10dchpGZxmEAXjB9JkaFtyh+rYkf2EEm4n0ox7jBFvrQf+fmnekEXd5jT
+ O/ipCU/qolS74EJZWlI34C4366wYgR+6Z1RA3b8B8CJSbP9wr9G11jYpZLoEfcq2OeO0
+ DwWVL7vnUXFLCDFNlxpHABcNez9WaQw112kzE3ZVryMYFnNEsc4idG33UAJRQWG2ZmW1
+ Hs6w==
+X-Gm-Message-State: AOAM531QZAIdEE1sJRQb+R/RcvCu8a4CMQATC8TViC2ZW2lzVQi5idsa
+ QES4u5mJJJP8uoPg7vBlFOa4Tu4dnBFo8AKAP4UxZg==
+X-Google-Smtp-Source: ABdhPJy/xi/VOmt0QhOBQzDsZYa2qxidP3k3XRG+uujHFRxjP/Hp8FbSRRA+KqmDpxicv90y0kVoRY+Fez1hLNJSVlI=
+X-Received: by 2002:aca:eb96:: with SMTP id j144mr6875001oih.48.1590080723816; 
+ Thu, 21 May 2020 10:05:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200519084904.1069-1-geert+renesas@glider.be>
-In-Reply-To: <20200519084904.1069-1-geert+renesas@glider.be>
+References: <20200518143014.20689-1-peter.maydell@linaro.org>
+In-Reply-To: <20200518143014.20689-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 May 2020 17:59:37 +0100
-Message-ID: <CAFEAcA9-wQ72_M+ZY+EbEgw1L9LVchBgpLivexFXVZ3HuCtcZg@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/virt: Fix PL061 node name and properties
-To: Geert Uytterhoeven <geert+renesas@glider.be>
+Date: Thu, 21 May 2020 18:05:12 +0100
+Message-ID: <CAFEAcA-X1MpWx-_Y_UwSyToZs+M2__vKj8tRSKEPMDq8t_M47w@mail.gmail.com>
+Subject: Re: [PATCH] linux-user/arm/signal.c: Drop TARGET_CONFIG_CPU_32
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,55 +93,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 May 2020 at 09:49, Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
-> Make the created node comply with the PL061 Device Tree bindings:
->   - Use generic node name "gpio" instead of "pl061",
->   - Add missing "#interrupt-cells" and "interrupt-controller"
->     properties.
-
-Where have these properties come from? They must be optional,
-because in the version of the binding documentation from Linux
-5.0 they're not described:
-https://elixir.bootlin.com/linux/v5.0/source/Documentation/devicetree/bindings/gpio/pl061-gpio.txt
-
-They seem to have magically appeared in kernel commit
-910f38bed9439e765f7e, which purports to only be a change
-of format from plain text to yaml but has added some
-extra properties and claimed them to be mandatory.
-
-Since the devicetree spec says that the interrupt-controller
-property "defines a node as an interrupt controller node"
-and a GPIO chip isn't an interrupt controller, this seems
-like some kind of error in the dtb binding. Maybe I'm
-missing something...
-
-What actually goes wrong if QEMU doesn't specify these
-properties?
-
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 7dc96abf72cf2b9a..99593d7bce4d85cb 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -818,13 +818,15 @@ static void create_gpio(const VirtMachineState *vms)
->                                       qdev_get_gpio_in(vms->gic, irq));
+On Mon, 18 May 2020 at 15:30, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
->      uint32_t phandle = qemu_fdt_alloc_phandle(vms->fdt);
-> -    nodename = g_strdup_printf("/pl061@%" PRIx64, base);
-> +    nodename = g_strdup_printf("/gpio@%" PRIx64, base);
+> The Arm signal-handling code has some parts ifdeffed with a
+> TARGET_CONFIG_CPU_32, which is always defined. This is a leftover
+> from when this code's structure was based on the Linux kernel
+> signal handling code, where it was intended to support 26-bit
+> Arm CPUs. The kernel dropped its CONFIG_CPU_32 in kernel commit
+> 4da8b8208eded0ba21e3 in 2009.
+>
+> QEMU has never had 26-bit CPU support and is unlikely to ever
+> add it; we certainly aren't going to support 26-bit Linux
+> binaries via linux-user mode. The ifdef is just unhelpful
+> noise, so remove it entirely.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
-Does the devicetree binding really mandate what the node name is?
-I thought that finding the right device was doe via the
-'compatible' string and the nodename could be whatever the
-device tree creator wanted.
 
-thanks
+
+Applied to target-arm.next, thanks.
+
 -- PMM
 
