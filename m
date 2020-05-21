@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF0FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AF5EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:05:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8C49206F6
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:03:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8C49206F6
+	by mail.kernel.org (Postfix) with ESMTPS id EE78B20721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 11:05:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE78B20721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbizK-0006SA-6b
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:03:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39262)
+	id 1jbj1A-0000uK-6q
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 07:05:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbiyb-0005d4-1r; Thu, 21 May 2020 07:03:01 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44756)
+ id 1jbj0X-00009b-SE; Thu, 21 May 2020 07:05:01 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45084)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jbiyZ-00018y-Es; Thu, 21 May 2020 07:03:00 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06457952|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0261419-9.53996e-05-0.973763;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03301; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HbdsBkk_1590058971; 
+ id 1jbj0V-0001TO-7Y; Thu, 21 May 2020 07:05:01 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06436282|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0354011-8.05315e-05-0.964518;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HbdydA5_1590059092; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HbdsBkk_1590058971)
- by smtp.aliyun-inc.com(10.147.42.253);
- Thu, 21 May 2020 19:02:51 +0800
+ fp:SMTPD_---.HbdydA5_1590059092)
+ by smtp.aliyun-inc.com(10.147.41.231);
+ Thu, 21 May 2020 19:04:52 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v8 39/62] target/riscv: vector floating-point sign-injection
+Subject: [PATCH v8 40/62] target/riscv: vector floating-point compare
  instructions
-Date: Thu, 21 May 2020 17:43:50 +0800
-Message-Id: <20200521094413.10425-40-zhiwei_liu@c-sky.com>
+Date: Thu, 21 May 2020 17:43:51 +0800
+Message-Id: <20200521094413.10425-41-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
 References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
@@ -79,168 +79,307 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   | 19 ++++++
- target/riscv/insn32.decode              |  6 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  8 +++
- target/riscv/vector_helper.c            | 85 +++++++++++++++++++++++++
- 4 files changed, 118 insertions(+)
+ target/riscv/helper.h                   |  37 +++++
+ target/riscv/insn32.decode              |  12 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  35 +++++
+ target/riscv/vector_helper.c            | 174 ++++++++++++++++++++++++
+ 4 files changed, 258 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 12d959ba0d..d6e7ce57be 100644
+index d6e7ce57be..bedd4d0114 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -934,3 +934,22 @@ DEF_HELPER_6(vfmin_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+@@ -953,3 +953,40 @@ DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 +
-+DEF_HELPER_6(vfsgnj_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 5ec5595e2c..ce2f497ed2 100644
+index ce2f497ed2..b0f1c54d53 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -494,6 +494,12 @@ vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
- vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
- vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
- vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnj_vv       001000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnj_vf       001000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
+@@ -500,6 +500,18 @@ vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
++vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
++vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
++vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
++vmfne_vf        011100 . ..... ..... 101 ..... 1010111 @r_vm
++vmflt_vv        011011 . ..... ..... 001 ..... 1010111 @r_vm
++vmflt_vf        011011 . ..... ..... 101 ..... 1010111 @r_vm
++vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
++vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
++vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
++vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
++vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
++vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index a1d6edb5a8..881bb73909 100644
+index 881bb73909..4a45c00ffb 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2131,3 +2131,11 @@ GEN_OPFVV_TRANS(vfmin_vv, opfvv_check)
- GEN_OPFVV_TRANS(vfmax_vv, opfvv_check)
- GEN_OPFVF_TRANS(vfmin_vf, opfvf_check)
- GEN_OPFVF_TRANS(vfmax_vf, opfvf_check)
+@@ -2139,3 +2139,38 @@ GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
+ GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
 +
-+/* Vector Floating-Point Sign-Injection Instructions */
-+GEN_OPFVV_TRANS(vfsgnj_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjn_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
-+GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
++/* Vector Floating-Point Compare Instructions */
++static bool opfvv_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            (s->sew != 0) &&
++            ((vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
++              vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul)) ||
++             (s->lmul == 0)));
++}
++
++GEN_OPFVV_TRANS(vmfeq_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfne_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmflt_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfle_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmford_vv, opfvv_cmp_check)
++
++static bool opfvf_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (s->sew != 0) &&
++            (vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul) ||
++             (s->lmul == 0)));
++}
++
++GEN_OPFVF_TRANS(vmfeq_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfne_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmflt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index a2c427b26c..3f01fdd83c 100644
+index 3f01fdd83c..92227228b7 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -3843,3 +3843,88 @@ RVVCALL(OPFVF2, vfmax_vf_d, OP_UUU_D, H8, H8, float64_maxnum)
- GEN_VEXT_VF(vfmax_vf_h, 2, 2, clearh)
- GEN_VEXT_VF(vfmax_vf_w, 4, 4, clearl)
- GEN_VEXT_VF(vfmax_vf_d, 8, 8, clearq)
+@@ -3928,3 +3928,177 @@ RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
+ GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
 +
-+/* Vector Floating-Point Sign-Injection Instructions */
-+static uint16_t fsgnj16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 15, a);
++/* Vector Floating-Point Compare Instructions */
++#define GEN_VEXT_CMP_VV_ENV(NAME, ETYPE, H, DO_OP)            \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
++                  CPURISCVState *env, uint32_t desc)          \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vm = vext_vm(desc);                              \
++    uint32_t vl = env->vl;                                    \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {            \
++            continue;                                         \
++        }                                                     \
++        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1,         \
++                           &env->fp_status));                 \
++    }                                                         \
++    for (; i < vlmax; i++) {                                  \
++        vext_set_elem_mask(vd, mlen, i, 0);                   \
++    }                                                         \
 +}
 +
-+static uint32_t fsgnj32(uint32_t a, uint32_t b, float_status *s)
++static uint8_t float16_eq_quiet(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return deposit64(b, 0, 31, a);
++    int compare = float16_compare_quiet(a, b, s);
++    return compare == float_relation_equal;
 +}
 +
-+static uint64_t fsgnj64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 63, a);
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_d, uint64_t, H8, float64_eq_quiet)
++
++#define GEN_VEXT_CMP_VF(NAME, ETYPE, H, DO_OP)                      \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
++                  CPURISCVState *env, uint32_t desc)                \
++{                                                                   \
++    uint32_t mlen = vext_mlen(desc);                                \
++    uint32_t vm = vext_vm(desc);                                    \
++    uint32_t vl = env->vl;                                          \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);              \
++    uint32_t i;                                                     \
++                                                                    \
++    for (i = 0; i < vl; i++) {                                      \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                          \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                  \
++            continue;                                               \
++        }                                                           \
++        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, (ETYPE)s1,        \
++                           &env->fp_status));                       \
++    }                                                               \
++    for (; i < vlmax; i++) {                                        \
++        vext_set_elem_mask(vd, mlen, i, 0);                         \
++    }                                                               \
 +}
 +
-+RVVCALL(OPFVV2, vfsgnj_vv_h, OP_UUU_H, H2, H2, H2, fsgnj16)
-+RVVCALL(OPFVV2, vfsgnj_vv_w, OP_UUU_W, H4, H4, H4, fsgnj32)
-+RVVCALL(OPFVV2, vfsgnj_vv_d, OP_UUU_D, H8, H8, H8, fsgnj64)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnj_vf_h, OP_UUU_H, H2, H2, fsgnj16)
-+RVVCALL(OPFVF2, vfsgnj_vf_w, OP_UUU_W, H4, H4, fsgnj32)
-+RVVCALL(OPFVF2, vfsgnj_vf_d, OP_UUU_D, H8, H8, fsgnj64)
-+GEN_VEXT_VF(vfsgnj_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnj_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnj_vf_d, 8, 8, clearq)
++GEN_VEXT_CMP_VF(vmfeq_vf_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_d, uint64_t, H8, float64_eq_quiet)
 +
-+static uint16_t fsgnjn16(uint16_t a, uint16_t b, float_status *s)
++static uint8_t vmfne16(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return deposit64(~b, 0, 15, a);
++    int compare = float16_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
 +}
 +
-+static uint32_t fsgnjn32(uint32_t a, uint32_t b, float_status *s)
++static uint8_t vmfne32(uint32_t a, uint32_t b, float_status *s)
 +{
-+    return deposit64(~b, 0, 31, a);
++    int compare = float32_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
 +}
 +
-+static uint64_t fsgnjn64(uint64_t a, uint64_t b, float_status *s)
++static uint8_t vmfne64(uint64_t a, uint64_t b, float_status *s)
 +{
-+    return deposit64(~b, 0, 63, a);
++    int compare = float64_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
 +}
 +
-+RVVCALL(OPFVV2, vfsgnjn_vv_h, OP_UUU_H, H2, H2, H2, fsgnjn16)
-+RVVCALL(OPFVV2, vfsgnjn_vv_w, OP_UUU_W, H4, H4, H4, fsgnjn32)
-+RVVCALL(OPFVV2, vfsgnjn_vv_d, OP_UUU_D, H8, H8, H8, fsgnjn64)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjn_vf_h, OP_UUU_H, H2, H2, fsgnjn16)
-+RVVCALL(OPFVF2, vfsgnjn_vf_w, OP_UUU_W, H4, H4, fsgnjn32)
-+RVVCALL(OPFVF2, vfsgnjn_vf_d, OP_UUU_D, H8, H8, fsgnjn64)
-+GEN_VEXT_VF(vfsgnjn_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjn_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjn_vf_d, 8, 8, clearq)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_d, uint64_t, H8, vmfne64)
++GEN_VEXT_CMP_VF(vmfne_vf_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VF(vmfne_vf_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VF(vmfne_vf_d, uint64_t, H8, vmfne64)
 +
-+static uint16_t fsgnjx16(uint16_t a, uint16_t b, float_status *s)
++static uint8_t float16_lt(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return deposit64(b ^ a, 0, 15, a);
++    int compare = float16_compare(a, b, s);
++    return compare == float_relation_less;
 +}
 +
-+static uint32_t fsgnjx32(uint32_t a, uint32_t b, float_status *s)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_d, uint64_t, H8, float64_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_d, uint64_t, H8, float64_lt)
++
++static uint8_t float16_le(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return deposit64(b ^ a, 0, 31, a);
++    int compare = float16_compare(a, b, s);
++    return compare == float_relation_less ||
++           compare == float_relation_equal;
 +}
 +
-+static uint64_t fsgnjx64(uint64_t a, uint64_t b, float_status *s)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_d, uint64_t, H8, float64_le)
++GEN_VEXT_CMP_VF(vmfle_vf_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VF(vmfle_vf_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VF(vmfle_vf_d, uint64_t, H8, float64_le)
++
++static uint8_t vmfgt16(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return deposit64(b ^ a, 0, 63, a);
++    int compare = float16_compare(a, b, s);
++    return compare == float_relation_greater;
 +}
 +
-+RVVCALL(OPFVV2, vfsgnjx_vv_h, OP_UUU_H, H2, H2, H2, fsgnjx16)
-+RVVCALL(OPFVV2, vfsgnjx_vv_w, OP_UUU_W, H4, H4, H4, fsgnjx32)
-+RVVCALL(OPFVV2, vfsgnjx_vv_d, OP_UUU_D, H8, H8, H8, fsgnjx64)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjx_vf_h, OP_UUU_H, H2, H2, fsgnjx16)
-+RVVCALL(OPFVF2, vfsgnjx_vf_w, OP_UUU_W, H4, H4, fsgnjx32)
-+RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
-+GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
++static uint8_t vmfgt32(uint32_t a, uint32_t b, float_status *s)
++{
++    int compare = float32_compare(a, b, s);
++    return compare == float_relation_greater;
++}
++
++static uint8_t vmfgt64(uint64_t a, uint64_t b, float_status *s)
++{
++    int compare = float64_compare(a, b, s);
++    return compare == float_relation_greater;
++}
++
++GEN_VEXT_CMP_VF(vmfgt_vf_h, uint16_t, H2, vmfgt16)
++GEN_VEXT_CMP_VF(vmfgt_vf_w, uint32_t, H4, vmfgt32)
++GEN_VEXT_CMP_VF(vmfgt_vf_d, uint64_t, H8, vmfgt64)
++
++static uint8_t vmfge16(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++static uint8_t vmfge32(uint32_t a, uint32_t b, float_status *s)
++{
++    int compare = float32_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++static uint8_t vmfge64(uint64_t a, uint64_t b, float_status *s)
++{
++    int compare = float64_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++GEN_VEXT_CMP_VF(vmfge_vf_h, uint16_t, H2, vmfge16)
++GEN_VEXT_CMP_VF(vmfge_vf_w, uint32_t, H4, vmfge32)
++GEN_VEXT_CMP_VF(vmfge_vf_d, uint64_t, H8, vmfge64)
++
++static uint8_t float16_unordered_quiet(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare_quiet(a, b, s);
++    return compare == float_relation_unordered;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmford_vv_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
 -- 
 2.23.0
 
