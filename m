@@ -2,88 +2,107 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7EEC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D85BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA04A2072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:55:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B6082072C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 15:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b++Qe2Wv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA04A2072C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MAiniqUV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6082072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbnXj-0005hS-VM
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:55:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43862)
+	id 1jbnYi-0006yR-Ga
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 11:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jbnVf-00039D-Mt
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:53:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50517
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbnXO-0005Ox-Bt
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:55:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38820
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jbnVd-0002lz-Vo
- for qemu-devel@nongnu.org; Thu, 21 May 2020 11:53:27 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jbnXL-0002vp-Gm
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 11:55:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590076404;
+ s=mimecast20190719; t=1590076510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GTysdw6w8yXj+o5SPKnl5d+bCoP94EqSPn+ZTpXwyNg=;
- b=b++Qe2WvV7pW48pLXLINU/2hpgHRz0kW74d5hyUsgCDLat0abUrUNQNzZKYIhi6xwQz2pJ
- dOVRBmeIfJQ2A2TE45NL0ourxQALhOulLnoUKQI3+3k29wHfKftz4BR+kOJFIsrQn5JWew
- r3B+i1+8DfMsPff19Hlv1Dr5mPCCk7k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-XeDgx7CFM9KmmFkkHCZNvQ-1; Thu, 21 May 2020 11:53:22 -0400
-X-MC-Unique: XeDgx7CFM9KmmFkkHCZNvQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB6858005AA;
- Thu, 21 May 2020 15:53:18 +0000 (UTC)
-Received: from work-vm (ovpn-113-115.ams2.redhat.com [10.36.113.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CD6816EA38;
- Thu, 21 May 2020 15:53:07 +0000 (UTC)
-Date: Thu, 21 May 2020 16:53:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH QEMU v23 10/18] vfio: Add load state functions to
- SaveVMHandlers
-Message-ID: <20200521155305.GI2752@work-vm>
-References: <1589999088-31477-1-git-send-email-kwankhede@nvidia.com>
- <1589999088-31477-11-git-send-email-kwankhede@nvidia.com>
+ bh=kvmqkTREPnIQgumN6Baa7AbQ9wZxRHSfBjzoTW7p+x4=;
+ b=MAiniqUVCtTS0Al2Nd6o9bCE0YddJ8RJpQBTtFoh7lUkAMiYJRO8Lc2yQGSXiAdLyXfoXc
+ UmD0vCDe9IQIFoIG47Kni9s65YPACudAqUGLZjqmGIViSJqQmHvFpHUk6RIRw9aDOXhNAl
+ 4a1aGUuD54w5Jg5HlvwNr2S7Zqw0OK4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-Cv7-vvD-OTqp2Yym-orGNg-1; Thu, 21 May 2020 11:55:05 -0400
+X-MC-Unique: Cv7-vvD-OTqp2Yym-orGNg-1
+Received: by mail-wm1-f72.google.com with SMTP id y20so806000wmi.8
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 08:55:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kvmqkTREPnIQgumN6Baa7AbQ9wZxRHSfBjzoTW7p+x4=;
+ b=pbUWPP2G4hkhYDVbTX71CY3Biky4VilY0Z7x2nl55kFj4YClhktZ6YbyhhaIUDBMZm
+ UoXc9ktieralvgmGvcc/O73aTKw270BDDCZeSqa9+GhoDoS/riahKNORJi5rl++PPRy8
+ Vg+l4k8HkRZHbRRYSwearyajL6XKrZMlYyHzINN5MX+BF365WMmpF5qWC97ldu+mlCsf
+ V6hOJTwiSmuRxb68AVw3aFoPijqW+JBju2jZrI+SH1HC0DKTVuJalY1nm15UHqqoYE40
+ scLI1zgeFZrYwRKLNsOvNnUYA1EgQ5NxiKG4tXa5FTJbAYIYiym5Z2O9r8ZYET2u3Mvc
+ UHyg==
+X-Gm-Message-State: AOAM5304rGTei+UouTqhfKArCynxnSPs4cP/msX/PtvVg909zXZjHpsd
+ Hhc40fqFV/JBVKo631903Z+/DPb6HXizuyh0Z1T8QL836J8/PF35iAKshO8z7t97wR3P+HbvI70
+ gOC21ekMBu8u5dR8=
+X-Received: by 2002:a05:600c:1403:: with SMTP id
+ g3mr10035419wmi.51.1590076504582; 
+ Thu, 21 May 2020 08:55:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzslmZ2AtJyMi4n+cHQ5y1VCo/CNiTHxCs1tL31fXoBKiyXhqwOuDV8U7dh6OSYCyak9Yv6Iw==
+X-Received: by 2002:a05:600c:1403:: with SMTP id
+ g3mr10035397wmi.51.1590076504377; 
+ Thu, 21 May 2020 08:55:04 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.160.154])
+ by smtp.gmail.com with ESMTPSA id s67sm7072415wmf.3.2020.05.21.08.55.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 May 2020 08:55:03 -0700 (PDT)
+Subject: Re: [PATCH] x86/cpu: Enable AVX512_VP2INTERSECT cpu feature
+To: Cathy Zhang <cathy.zhang@intel.com>, rth@twiddle.net, ehabkost@redhat.com
+References: <1586760758-13638-1-git-send-email-cathy.zhang@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9eb3a0ba-d695-1fb3-74ea-d69e45941506@redhat.com>
+Date: Thu, 21 May 2020 17:55:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1589999088-31477-11-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1586760758-13638-1-git-send-email-cathy.zhang@intel.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 06:06:22
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:44:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,262 +115,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> Sequence  during _RESUMING device state:
-> While data for this device is available, repeat below steps:
-> a. read data_offset from where user application should write data.
-> b. write data of data_size to migration region from data_offset.
-> c. write data_size which indicates vendor driver that data is written in
->    staging buffer.
+On 13/04/20 08:52, Cathy Zhang wrote:
+> AVX512_VP2INTERSECT compute vector pair intersection to a pair
+> of mask registers, which is introduced with intel Tiger Lake,
+> defining as CPUID.(EAX=7,ECX=0):EDX[bit 08].
 > 
-> For user, data is opaque. User should write data in the same order as
-> received.
+> Refer to the following release spec:
+> https://software.intel.com/sites/default/files/managed/c5/15/\
+> architecture-instruction-set-extensions-programming-reference.pdf
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
 > ---
->  hw/vfio/migration.c  | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events |   3 +
->  2 files changed, 183 insertions(+)
+>  target/i386/cpu.c | 2 +-
+>  target/i386/cpu.h | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index d90bd2296afd..b9bbe38e539c 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -270,6 +270,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
->      return qemu_file_get_error(f);
->  }
->  
-> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    uint64_t data;
-> +
-> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> +        int ret;
-> +
-> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
-> +        if (ret) {
-> +            error_report("%s: Failed to load device config space",
-> +                         vbasedev->name);
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    data = qemu_get_be64(f);
-> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> +        error_report("%s: Failed loading device config space, "
-> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
-> +        return -EINVAL;
-> +    }
-> +
-> +    trace_vfio_load_device_config_state(vbasedev->name);
-> +    return qemu_file_get_error(f);
-> +}
-> +
->  /* ---------------------------------------------------------------------- */
->  
->  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> @@ -439,12 +466,165 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->      return ret;
->  }
->  
-> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret = 0;
-> +
-> +    if (migration->region.mmaps) {
-> +        ret = vfio_region_mmap(&migration->region);
-> +        if (ret) {
-> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
-> +                         vbasedev->name, migration->region.nr,
-> +                         strerror(-ret));
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK,
-> +                                   VFIO_DEVICE_STATE_RESUMING);
-> +    if (ret) {
-> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
-> +    }
-> +    return ret;
-> +}
-> +
-> +static int vfio_load_cleanup(void *opaque)
-> +{
-> +    vfio_save_cleanup(opaque);
-> +    return 0;
-> +}
-> +
-> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret = 0;
-> +    uint64_t data, data_size;
-> +
-> +    data = qemu_get_be64(f);
-> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> +
-> +        trace_vfio_load_state(vbasedev->name, data);
-> +
-> +        switch (data) {
-> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
-> +        {
-> +            ret = vfio_load_device_config_state(f, opaque);
-> +            if (ret) {
-> +                return ret;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
-> +        {
-> +            data = qemu_get_be64(f);
-> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
-> +                return ret;
-> +            } else {
-> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
-> +                             vbasedev->name, data);
-> +                return -EINVAL;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
-> +        {
-> +            VFIORegion *region = &migration->region;
-> +            void *buf = NULL;
-> +            bool buffer_mmaped = false;
-> +            uint64_t data_offset = 0;
-> +
-> +            data_size = qemu_get_be64(f);
-> +            if (data_size == 0) {
-> +                break;
-> +            }
-> +
-> +            ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
-> +                        region->fd_offset +
-> +                        offsetof(struct vfio_device_migration_info,
-> +                        data_offset));
-> +            if (ret != sizeof(data_offset)) {
-> +                error_report("%s:Failed to get migration buffer data offset %d",
-> +                             vbasedev->name, ret);
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (region->mmaps) {
-> +                buf = find_data_region(region, data_offset, data_size);
-> +            }
-> +
-> +            buffer_mmaped = (buf != NULL) ? true : false;
-> +
-> +            if (!buffer_mmaped) {
-> +                buf = g_try_malloc0(data_size);
-> +                if (!buf) {
-> +                    error_report("%s: Error allocating buffer ", __func__);
-> +                    return -ENOMEM;
-> +                }
-> +            }
-> +
-> +            qemu_get_buffer(f, buf, data_size);
-> +
-> +            if (!buffer_mmaped) {
-> +                ret = pwrite(vbasedev->fd, buf, data_size,
-> +                             region->fd_offset + data_offset);
-> +                g_free(buf);
-> +
-> +                if (ret != data_size) {
-> +                    error_report("%s: Failed to set migration buffer %d",
-> +                                 vbasedev->name, ret);
-> +                    return -EINVAL;
-> +                }
-> +            }
-> +
-> +            ret = pwrite(vbasedev->fd, &data_size, sizeof(data_size),
-> +                         region->fd_offset +
-> +                       offsetof(struct vfio_device_migration_info, data_size));
-> +            if (ret != sizeof(data_size)) {
-> +                error_report("%s: Failed to set migration buffer data size %d",
-> +                             vbasedev->name, ret);
-> +                if (!buffer_mmaped) {
-> +                    g_free(buf);
-> +                }
-> +                return -EINVAL;
-> +            }
-> +
-> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
-> +                                              data_size);
-> +            break;
-> +        }
-> +
-> +        default:
-> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
-> +            return -EINVAL;
-> +        }
-> +
-> +        ret = qemu_file_get_error(f);
-> +        if (ret) {
-> +            return ret;
-> +        }
-
-You can probably omit this check and just do the one below; other than
-that:
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +        data = qemu_get_be64(f);
-> +        ret = qemu_file_get_error(f);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static SaveVMHandlers savevm_vfio_handlers = {
->      .save_setup = vfio_save_setup,
->      .save_cleanup = vfio_save_cleanup,
->      .save_live_pending = vfio_save_pending,
->      .save_live_iterate = vfio_save_iterate,
->      .save_live_complete_precopy = vfio_save_complete_precopy,
-> +    .load_setup = vfio_load_setup,
-> +    .load_cleanup = vfio_load_cleanup,
-> +    .load_state = vfio_load_state,
->  };
->  
->  /* ---------------------------------------------------------------------- */
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 9a1c5e17d97f..4a4bd3ba9a2a 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -157,3 +157,6 @@ vfio_save_device_config_state(const char *name) " (%s)"
->  vfio_save_pending(const char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible 0x%"PRIx64
->  vfio_save_iterate(const char *name, int data_size) " (%s) data_size %d"
->  vfio_save_complete_precopy(const char *name) " (%s)"
-> +vfio_load_device_config_state(const char *name) " (%s)"
-> +vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
-> +vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
-> -- 
-> 2.7.0
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 92fafa2..c8c95c3 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1078,7 +1078,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          .feat_names = {
+>              NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
+>              NULL, NULL, NULL, NULL,
+> -            NULL, NULL, "md-clear", NULL,
+> +            "avx512-vp2intersect", NULL, "md-clear", NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL /* pconfig */, NULL,
+>              NULL, NULL, NULL, NULL,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 576f309..5c34795 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -770,6 +770,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
+>  /* AVX512 Multiply Accumulation Single Precision */
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
+> +/* AVX512 Vector Pair Intersection to a Pair of Mask Registers */
+> +#define CPUID_7_0_EDX_AVX512_VP2INTERSECT (1U << 8)
+>  /* Speculation Control */
+>  #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
+>  /* Single Thread Indirect Branch Predictors */
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Queued, thanks.
+
+Paolo
 
 
