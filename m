@@ -2,62 +2,69 @@ Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C81C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E042C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADE34207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:22:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C432A207D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 18:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3X3LVyq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE34207D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQYXwnih"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C432A207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbppu-00051o-J7
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:22:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60740)
+	id 1jbq0s-0002to-0n
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 14:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpnZ-0002W1-4C
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:20:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59615
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpzT-0001lj-Iy
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:32:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51703
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpnY-0000qT-En
- for qemu-devel@nongnu.org; Thu, 21 May 2020 14:20:04 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jbpzP-0003Zj-F1
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 14:32:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590085202;
+ s=mimecast20190719; t=1590085938;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=MkGMPrYA1Z8wUGlS5YSYfzy7pLn7VSu4gf+fbw6MCy0=;
- b=g3X3LVyqEUzN2SOa28j29Ata64beULObKxfkqgbSXaSLs4dT497ujwO/0qNuln2S+iQ5DY
- zcTFp0WUe7nf4Hg2JXNueDG/vynh693b9Yee+J9yLjqojtooIdmb+esAZwZFhIN2462tMQ
- P5rNVg2QNznjVSMuEB7NkI5nmKSsEYA=
+ bh=E1VIJGiNolfJfmlv5dvOYZz4KbDa8Vq0IgHoHlnAiIU=;
+ b=CQYXwnih1Ur04867lGi8Q0E2XwSh6cIUufRXfx6C2VvS/nj2UenN27C2DzF6+F05V0wTIi
+ TareblEYWFZjH1YqR+3LxKt9BNO8fGqO58+uvIUkb7TkqElr5L5CIIMs1tgseIHKURWfPr
+ D750lmbmzujr2R+MtrXUSpcQSSRxYtA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-7MFT8ItbNpKil4vshwHnww-1; Thu, 21 May 2020 14:19:58 -0400
-X-MC-Unique: 7MFT8ItbNpKil4vshwHnww-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-104-v8xsDs1-MNqWaGnN-nI3ZQ-1; Thu, 21 May 2020 14:32:16 -0400
+X-MC-Unique: v8xsDs1-MNqWaGnN-nI3ZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78FBF91138;
- Thu, 21 May 2020 18:19:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D808805726;
+ Thu, 21 May 2020 18:32:14 +0000 (UTC)
 Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 749B26EA5A;
- Thu, 21 May 2020 18:19:56 +0000 (UTC)
-Subject: Re: cluster_size got from backup_calculate_cluster_size()
-To: Derek Su <dereksu@qnap.com>, qemu-devel <qemu-devel@nongnu.org>
-References: <7b96191b-2c16-7257-9ae3-50457bf82e27@qnap.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4F1082A3E;
+ Thu, 21 May 2020 18:32:11 +0000 (UTC)
+Subject: Re: [PATCH v4 9/9] iotests: rename and move 169 and 199 tests
+To: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20200515211505.3042-1-vsementsov@virtuozzo.com>
+ <20200515211505.3042-10-vsementsov@virtuozzo.com>
+ <6ad020e7-ed54-5bc8-0c70-9776dab903ac@redhat.com>
+ <20200519090709.GC7652@linux.fritz.box>
+ <2dfeb643-bbb2-d50b-d14c-ea2db04aa3c5@virtuozzo.com>
+ <20200519114107.GL7652@linux.fritz.box>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -133,18 +140,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <3d66b51e-7112-d368-1d86-b63637413abd@redhat.com>
-Date: Thu, 21 May 2020 14:19:55 -0400
+Message-ID: <8ac73337-4d93-7916-dea3-e20d2895bcb6@redhat.com>
+Date: Thu, 21 May 2020 14:32:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <7b96191b-2c16-7257-9ae3-50457bf82e27@qnap.com>
+In-Reply-To: <20200519114107.GL7652@linux.fritz.box>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 01:47:40
@@ -154,8 +161,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -168,86 +175,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: den@openvz.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/21/20 5:56 AM, Derek Su wrote:
-> Hi,
+On 5/19/20 7:41 AM, Kevin Wolf wrote:
+> Am 19.05.2020 um 13:32 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 19.05.2020 12:07, Kevin Wolf wrote:
+>>> Am 18.05.2020 um 18:12 hat Thomas Huth geschrieben:
+>>>> On 15/05/2020 23.15, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Rename bitmaps migration tests and move them to tests subdirectory to
+>>>>> demonstrate new human-friendly test naming.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>> ---
+>>>>>   tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test}   | 0
+>>>>>   .../{199.out => tests/migrate-bitmaps-postcopy-test.out}          | 0
+>>>>>   tests/qemu-iotests/{169 => tests/migrate-bitmaps-test}            | 0
+>>>>>   tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out}    | 0
+>>>>>   4 files changed, 0 insertions(+), 0 deletions(-)
+>>>>>   rename tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test} (100%)
+>>>>>   rename tests/qemu-iotests/{199.out => tests/migrate-bitmaps-postcopy-test.out} (100%)
+>>>>>   rename tests/qemu-iotests/{169 => tests/migrate-bitmaps-test} (100%)
+>>>>>   rename tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out} (100%)
+>>>>>
+>>>>> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+>>>>> similarity index 100%
+>>>>> rename from tests/qemu-iotests/199
+>>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
+>>>>> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+>>>>> similarity index 100%
+>>>>> rename from tests/qemu-iotests/199.out
+>>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
+>>>>> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/tests/migrate-bitmaps-test
+>>>>> similarity index 100%
+>>>>> rename from tests/qemu-iotests/169
+>>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test
+>>>>> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/tests/migrate-bitmaps-test.out
+>>>>> similarity index 100%
+>>>>> rename from tests/qemu-iotests/169.out
+>>>>> rename to tests/qemu-iotests/tests/migrate-bitmaps-test.out
+>>>>
+>>>> I like the idea ... but the path name + file names get now quite long.
+>>>> While you're at it, what about renaming the "qemu-iotests" directory to
+>>>> just "iotests" or even just "io" now?
+>>>
+>>> Renames are always kind of painful. Do we have a real reason for the
+>>> rename except that the paths feel a bit long subjectively?
+>>>
+>>> Of course, if we're renaming all files anyway, changing the directory
+>>> name at the same time shouldn't give any additional pain, so it would be
+>>> completely reasonable then. We're not renaming the test harness files,
+>>> though, and even only two test cases in this patch.
+>>>
+>>> Maybe this final patch should stay RFC until we have the infrastructure
+>>> in and then we can have a single series that moves all tests and also
+>>> renames the directory? Maybe a not strictly necessary rename of the
+>>> tooling would be bearable in the context of a mass rename of tests.
+>>
+>> I'm absolutely not hurrying about this thing. And actual aim of the
+>> series is another. I even doubt that we will mass rename the tests:
+>> who knows what they all test?) I don't.
 > 
-> The cluster_size got from backup_calculate_cluster_size(),
-> MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size), is 64K regardless
-> of the target image's cluster size.
+> Good point.
+> 
+> And conversely, there are a few test cases that I do know (like 026 030
+> 040 041 055) and probably wouldn't recognise for a while after a rename.
+> :-)
+> 
+>> Still we may rename some tests, and we'll create new named tests which
+>> is good enough.. OK, if I resend a new version, I'll add an RFC patch
+>> on renaming the directory, up to maintainers, take it now or not :)
+> 
+> I guess a final patch to rename the directory as an RFC makes sense.
+> Then we can continue the discussion there and decide whether or not to
+> apply it without holding up the rest of the series.
+> 
+> I think I would be inclined to leave the name unchanged as long as we
+> don't have a real reason, but if people overwhelmingly think otherwise,
+> we can still rename.
+> 
 
-Not regardless -- but it is using 64K as a minimum.
+It's a pinch long, but it's not a big ordeal. I wouldn't object to
+.tests/io as long as all of the renames happened all at once.
 
-> 
-> 
-> For example:
-> 
-> If the cluster size of source and target qcow2 images are both 16K, the
-> 64K from backup_calculate_cluster_size() results in unwanted copies of
-> clusters.
-> 
-> The behavior slows down the backup (block-copy) process when the
-> source image receives lots of rand writes.
-
-Are we talking about incremental, full, or top?
-
-> 
-> 
-> Is the following calculation reasonable for the above issue?
-> 
-> 
-> ```
-> static int64_t backup_calculate_cluster_size(BlockDriverState *target,
->                                              Error **errp)
-> {
->     ...
-> 
->     ret = bdrv_get_info(target, &bdi);
-> 
->     ...
-> 
->     return (bdi.cluster_size == 0 ?
->                 BACKUP_CLUSTER_SIZE_DEFAULT : cluster_size);
-> }
-> 
-> ```
-> 
-> Thanks.
-> Regards,
-> 
-> Derek
-> 
-
-
-Might be reasonable. When I made this the "default", it actually used to
-just be "hardcoded." We could continue in this direction and go all the
-way and turn it into a tune-able.
-
-I didn't think to make it lower than 64K because I was thinking about
-the linear, full backup case where cluster sizes that were too small
-might slow down the loop with too much metadata.
-
-(And the default qcow2 is 64K, so it seemed like a good choice at the time.)
-
-We could create a default-cluster-size tunable, perhaps. It's at 64K
-now, but perhaps you can override it down to 16 or lower. We could
-possibly treat a value of 0 as "no minimum; use the smallest common size."
-
-This is a separate issue entirely, but we may also wish to begin
-offering a cluster-size override directly. In the case that we know this
-value is unsafe, we reject the command. In the case that it's ambiguous
-due to lack of info, we can defer to the user's judgment. This would
-allow us to force the backup to run in cases where we presently abort
-out of fear.
-
-CCing Vladimir who has been working on the backup loop extensively.
+I'll admit to not having read the series, but I will miss the ability to
+specify ranges of tests. I'm not sure how that happens under the new
+proposal; but I think it's a strict improvement to give the tests human
+readable names in the filesystem.
 
 --js
 
