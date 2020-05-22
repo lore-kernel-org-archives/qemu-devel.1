@@ -2,83 +2,86 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E323C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 06:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D76FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 06:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 339A82073B
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 06:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAD492073B
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 06:51:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="mXkovfIH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 339A82073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="HaYq5IdI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAD492073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc1WW-0002Kz-4G
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 02:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38244)
+	id 1jc1Wf-0002QF-Pg
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 02:51:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jc1T7-0007Pd-Cq
- for qemu-devel@nongnu.org; Fri, 22 May 2020 02:47:45 -0400
-Received: from mout.web.de ([212.227.15.14]:40147)
+ id 1jc1TF-0007RP-9q
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 02:47:53 -0400
+Received: from mout.web.de ([212.227.17.12]:37377)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jc1T5-00015J-Oy
- for qemu-devel@nongnu.org; Fri, 22 May 2020 02:47:45 -0400
+ id 1jc1TC-00015j-A5
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 02:47:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590130048;
- bh=onX8+eQAJxthEvUbTQh20bjXAEdcEmN1bvH9zgAEgk0=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=mXkovfIHRFGlXVaKAeoySt22wXyq+RA0gr/UZS6CquKTxqVUwIOmMTdx7rX6TvgIt
- 0gWFIh6OnOguVxVYySJGCJeEuX6waJw1nyBi6C8KLUC2SirmlsiSoaqFYow1HFdx49
- ETYzriCwndzDMiPw1snCEa38r4ZVO++0fKvHPXaY=
+ s=dbaedf251592; t=1590130052;
+ bh=9du8DWISUXv/co/+RlUnUwDVAZYYzGQeRITtkUXSwE8=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=HaYq5IdI4rbTls14a/YlpFcFKYkMKYFLPsCHd3cloW4o1pv9lj1I6GSt80gaLde4i
+ Eos4IsRM8tHqKAYNROOQX6mAnfZ3mbc30W3KWFfazyqzc3P4VGlry8aTjSgMp5WYlO
+ dk2IsxFrlt9C3oXKZJCb5PwtOgomov+6CpYB4ze0=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.67]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0Lsvn8-1iviiw2I2s-012aXT; Fri, 22
- May 2020 08:47:28 +0200
-Date: Fri, 22 May 2020 08:47:19 +0200
+Received: from luklap ([89.247.255.67]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N0Icn-1inkV12ERb-00xFrV; Fri, 22
+ May 2020 08:47:32 +0200
+Date: Fri, 22 May 2020 08:47:31 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v6 0/6] colo-compare bugfixes
-Message-ID: <cover.1590129793.git.lukasstraub2@web.de>
+Subject: [PATCH v6 1/6] net/colo-compare.c: Create event_bh with the right
+ AioContext
+Message-ID: <b5be719bf9c438ad4dafdc2fdb4ed87159065e6b.1590129793.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1590129793.git.lukasstraub2@web.de>
+References: <cover.1590129793.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ftwkrz8Iz7lvwgX7Q9W0QH6";
+Content-Type: multipart/signed; boundary="Sig_/MO8b96LwUIXatbkxjnXy4Gi";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:NiUJLQpviNtbcszz/zj7SxLwwYxQadGVi3SZbxS2+fhAzunFEP9
- JJYbfeKM4XA5fAxsr7Gqe2+DPzT+fFY9Odg5lI8enPLMKrPKBCtvzRD5lhzdDAj3/Ko13Vs
- LO8qu8Ba9D3/EkLeFIc1rKef6FOfyes+1Etor+ykt4ldyPzFs6dpZRqdYiHooBCuFjn0RWS
- pV2Hd+yzmkWl9RVSv1xTw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4Vh5LKBqKjk=:Pe+cxeyifmUnolfg/QcEZW
- fGDA5MV3R6JI2E1Tec3WZ3rtYa/80bj09rDVTkP9ChTsfV9u6oKgM+DMlC2TtHZTLdw38itdL
- GOlowix9iFA04d6/rie6z/7l7uFGqBBzEiK3MirwmdVJK3+4yxyNQhM1GUOCg6Q/c12W+jKu0
- D7eRDNz1j1+wDYhT7qdXWhzTDBNCzs07wRWvpKMEEx0Qdo+zeLWtCH9UO0SJLX5jIamEveIcQ
- n198roUBY7GCoGlGHHH1oTDwEPO3udqDnyUKVrKRXnjP0piEhET6MeDXtO4GMdcXSoTbLGOhI
- 2Jpz43Oi0x58ItuuvkHs34kZXW4d3DhK/PTIWxm/pa+pYv1dB+CPV01U9rY7hjqNW2+lArJTm
- iBvbFdUG4cJ3PZo8coMkUjdoS6dus8kZNf5WO7oi6MTJr0T3PPOAgsuH11gF2+RdmRl3X+OiE
- ykU8quBmGPfZOAry5N11mNck5L1C8C+zquKaEA2rSm8bTcVlG6UJNwspYvkmH23bA2vOYdzgF
- 1tRsTzvchjrKztUQ7h8q3wFe8bETfn0gjB60A4Ln/qiMVYN6Hi5RS+6pZxlGFMfkIGii9vjkh
- XamF6jBCGecgmWQlNIDa5Lm9AoxSVE+ju7VLfrsKFlnjTq90iZsK3v7ZwqQg7gf0lvF1HJD/+
- pWEXBALRE8M0e72Xm4Kj0GI6wZ+x3JdaI/W48wqXumlKwg/ad3pV+IdUAUQLcKuTKyDNyqRYs
- nk1kPDedlDa7ezgFFYEBpYBD/hvNs56KxJYE8j9Lzbtb7+BCOA0FkDuh/hY9a2I63/mwWfJJA
- hPbPgwjEQ9jG/Tl8DO5x23YSU8axcAekWlXiR7uo7K09QN91Ks2kQYvtrkT9zEpE+VNOBSTxy
- MPPPmLVE+JwgGJfmVzT1e4HNzlnLfeZwQ6KE+Xpcadw0Q6ooJ6ZQBN9mSjBgyDENm5pc9ebZZ
- uVbrbEnPkucH8PhQ6H8WTxG8WJJ7/yem0TiUWL3xeeL0oo74lNyn09efkFxpxXvkUTEde/iOV
- dPx8fl9HeGiO+Y3YnMqSRhmGmUUZhVpUO2dbg+Zzna71+B5/MDS8tr4tk6g0vLkOWNhDwF/IQ
- bPpz1KJQbZAtCNFd9hA728qNR3Lxmh7hkVu0TimOxThYCoNPL2rRqrWQ40E5vk55xweegeVZQ
- kzuo1G9ga6S8qzKhRNXyicnAmQuBgYme71RI8pdwbEDRIPLd97aFcEhTwVLYr5oqrgnIRuXso
- bcOMdd2BMxL8MDst1
-Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:qDyJRU4nEHuSmr9xphLzWwYzPfTutEdFx6aKnuafChtbu08FEQg
+ 0ofvh+QdLshw+mYdZY0m+dSIWqDPoMBwHBNw8bzQ+qUBYqEodknTw04vdd7+sS9nPtS2GeO
+ ZKsdtQAX0bXnrCwCBAdijCNsrxbtKVxqGWQpHXYL2JZHo4JqFaiJKipK+jJMT69DqKJRI2A
+ uII9htBGojYZFji3rHx1Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XDbXcSwVikQ=:5BxO7ZtP/4w+FOICKTd2Pq
+ Y0i8ThmLuEICBCCcybB9F8yk4N5wSUeoZXBHzvD+4L3ryRDi/I4R9jzgdGZYv4LfL9va4FQXh
+ nph4Nd1UXt8Vf6Hd4miJVAjzQ7PXZMPt2rCDhtlH3PeaJO40mqZsdFUEsFJBLVpq+1YiMULoO
+ WPHZN/4UZ71OeMUGdYUzpAnNniouOfUo+J7ab47X5XoeZyNcx3qZD8RQbK5gpgymFFFgWQzVu
+ f7pOZkPdeifm3kZHpgAcBEHrjp0wFKdKE7jLGcDHICZOWmVDEmalhZBpKJfnu019cMbA0CGmA
+ Octm5N+nvPZMLuPhE4wJ9xGAu1V7bqFD8KJDAgAg4X+WmqybRsby4QUhVrkgwkIA6XmPmlSTk
+ I7XDdFKY5g8vVFi/FOY13Ht5ECmxBHyCmb1TvvwYUj1HCDWXVkDVeAd4MUXghmPzr7V3aBpVN
+ zAOnUK2rsJjM6c52+2xb/57EjETXttg0IPKxHMJKW1P0Z5ZczmfBnwVw22d31F25T1+5q8TPs
+ oDP7/ijqAb1pCssAa0XtHPPxK+Jcs+Dt8EpTdMGqSotIt65bxNb1y62nb9o+wpTGG/gJOhAFw
+ ikR4QrO/zCMk+IRH6XSWjq7ce4IvDhIn2mJT5SqcyF3RnxkBQGS9w4Wx3fWvahEPpO3ZeOpBd
+ ymYDugqQmVuqWd/xGNTgd1XvRHSp5kyooy7HS2ztZuzXJJ+X6QUvuc9Q8MoCEOjRq/Yi+6Iht
+ JjAIf8UqBTmn6s0TvawVl/kj9gazegwga04ej2X8p2vUzbExRN/+T1ry6LYZjrWRvoK//rCBr
+ KP9BwkfegB6D+vbe5c4A54a+n9LCbA+RbO9nXgbPDg8768GuR7gdm9/KzVcScqNU2H5cQIUme
+ cv1WGFvCbtLxbG0BLwnpbPqw+JLZP5L5M1a7t/A2/K0bLET7BCbTuuS2RvHE2JpUlnuaZNqjl
+ 0TKfKcg1iWT2S9rOGDY5grSEAAa4/jVH4JyXCT7xB0mrk8/7cojPbKpYAPGEJmK8zkuiVL7k4
+ fisXvjD8p5XBWiKtlz2AvudSlmmEJ/cOiVEpDD9lBmzf1tCFH9+z68aPzurZw7JFJcz1ysR1e
+ +hTZELKpAuKEI6Qfsx9sUMzMiYYMJh7EE6Kucd0KekwoOveNtcJfWh51E4jI6qki/Xkfzwo9L
+ RcFOu5WnOGImh8a1U3GPRHOf+v2DC0/uFS1Fu3AqfqR5u92vqrn+U57Wok1cPsFRopEOiaYHT
+ Rcedh6xCkYloUdDpE
+Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 02:47:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 02:47:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
@@ -86,7 +89,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,75 +110,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/ftwkrz8Iz7lvwgX7Q9W0QH6
+--Sig_/MO8b96LwUIXatbkxjnXy4Gi
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hello Everyone,
-Here are fixes for bugs that I found in my tests. I have tested this with my
-test suite and everything works fine.
+qemu_bh_new will set the bh to be executed in the main
+loop. This causes crashes as colo_compare_handle_event assumes
+that it has exclusive access the queues, which are also
+concurrently accessed in the iothread.
 
-Regards,
-Lukas Straub
+Create the bh with the AioContext of the iothread to fulfill
+these assumptions and fix the crashes. This is safe, because
+the bh already takes the appropriate locks.
 
-Version changes:
-v6:
- -don't touch softmmu/vl.c, use __contructor__ attribute instead
- -better wording
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Derek Su <dereksu@qnap.com>
+Tested-by: Derek Su <dereksu@qnap.com>
+---
+ net/colo-compare.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v5:
- -initialize and use notify_sendco only if notify_dev is set
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 10c0239f9d..1de4220fe2 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -890,6 +890,7 @@ static void colo_compare_handle_event(void *opaque)
 
-v4:
- -fix potential deadlock with notify_remote_frame
- -avoid malloc and memcpy in many cases
+ static void colo_compare_iothread(CompareState *s)
+ {
++    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
+     object_ref(OBJECT(s->iothread));
+     s->worker_context =3D iothread_get_g_main_context(s->iothread);
 
-v3:
- -fix checkpatch.pl error
+@@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState *s)
+     }
 
-v2:
- -better wording
- -fix performance-regression in patch 3 "net/colo-compare.c: Fix deadlock i=
-n compare_chr_send"
- -add more bugfixes
+     colo_compare_timer_init(s);
+-    s->event_bh =3D qemu_bh_new(colo_compare_handle_event, s);
++    s->event_bh =3D aio_bh_new(ctx, colo_compare_handle_event, s);
+ }
 
-Lukas Straub (6):
-  net/colo-compare.c: Create event_bh with the right AioContext
-  chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-  net/colo-compare.c: Fix deadlock in compare_chr_send
-  net/colo-compare.c: Only hexdump packets if tracing is enabled
-  net/colo-compare.c: Check that colo-compare is active
-  net/colo-compare.c: Correct ordering in complete and finalize
-
- chardev/char.c     |   7 +-
- net/colo-compare.c | 254 ++++++++++++++++++++++++++++++++++-----------
- net/colo.c         |   7 ++
- net/colo.h         |   1 +
- 4 files changed, 206 insertions(+), 63 deletions(-)
-
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
 --
 2.20.1
 
---Sig_/ftwkrz8Iz7lvwgX7Q9W0QH6
+
+--Sig_/MO8b96LwUIXatbkxjnXy4Gi
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7HdXcACgkQNasLKJxd
-sliKdxAAqw5Vec1DmeNK2384kTCKyrNGig9pYIup3XGJBjX6ZBeVm+8a35qqMsCF
-oeh/zpAW6JLB6oftXhibfvVobRfRW2YMw/Dhl56ZvVUPZQopE5GLLAHUhL1g/ceg
-TZJ6b6SickdT6yFOMgtzcmvk084miZo+VM/PRlLbEXPX9xY3SErUkvbf9YCx1Ule
-3sVnCqXMFuQJwWX18jdYiOudJ+9BFaS8l4iyOqia2oEVyQgvpSeNMXgH6MCWZ69f
-PrA/FjQ8GzNBuhZP9y3FmVLXuRjGy99DOhxmEDd7qN9CH5JIrPGYPZUzglF0dWNJ
-5g8RBPdVWNO6i4X1W/WfdnPUuxNrUuvVhRAgbMXji2shsMY+nJl6owE3WRyKns1n
-cD4tNsmYSJ+6sidYlVJsMiebYn/sLXgRTvkGxoZVkvhNGyCSf+TzxkPgt/YKqC0/
-NoBgzA6kiWxg6XN4ihUmmSo3fF8ycs5MWtTCm4ylr3jX3WWKx+aVezJBg2q4Cr2+
-PuLP/HmtNa4MslVGMLv2AQ5XGmLT8bsXW0YKuf9Mv1rkj86leDMNhwN1KTp0Nmp9
-2dHQpnk3Q2JXrzk6yN6bOAnJAJG8w6K7xEeTxZ8WnKW7cdWlazZaxSE0/DDSGoTt
-Cm8op9Nj36/VXDp3zfKu0jhpRDG+yOTS2ZT6IYuGMtR1TbJG5Pg=
-=Sv66
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7HdYMACgkQNasLKJxd
+sli+wA//UEVC3Y+QnihaSbM1m7xjVzkdQ91A58is+raoc13yXAlYmfmZB7RB4DLb
+BNpXurxciFs76Fe71/rJ/pwXMym+8AgWGENBU4FFdXxR2QrvujUhD/dHS0xeztt3
+69bZVxRhihrbund3+PwfuH9jVBaybDp6JsN6315JGOXfm3iGLGy7Z4RULIHnXA1U
+CKI5eVvEAPC2/n5vrXHgwD3RInWb5ele+8hH5+FXRnpD+8fL0d8RLQdWOceAiap3
+0J3LSUKP4fU/6ZQhEUz0My89ZIelR16cqwVA4Bd+D3ZMHkLBzGL2nCUYgZtyYIGi
+ByUr3VcxnYprdpOSxbf7zgNN1ZV3FuZBUnm/OJWscV7CvT+zUrq+YIpNb4r8eh7r
+CjHu4obkEnTg1EtppHd+vNlq2pTmW9qSq80OqRVUXbUDMMsnLTA0wPAseSkd3bDN
+8CfQ2kzqfUcB5YcUjzmNqQSaqFqXAWSXvR/5rX2DGIr4+CBJq4/rwrX++8ubFS5m
+FKX5SVwIcOYR4Lq6P3qMH02bORhpWcHrtokruKcHgQrp+vrmMK+Il8vOPaMNQ7BA
+NuykObEI+Z9AaL/MRHcGhqbApyGKBI0GeJ5GeBUTdrPWznsGuCJxVBeTFfghOSh9
+Pm5sqcmW5P3c8VCIWLt24mDKxQi1BXTxZjUKdnCgjp3Bm5Aw5xc=
+=rIU3
 -----END PGP SIGNATURE-----
 
---Sig_/ftwkrz8Iz7lvwgX7Q9W0QH6--
+--Sig_/MO8b96LwUIXatbkxjnXy4Gi--
 
