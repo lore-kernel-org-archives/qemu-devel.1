@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D31AFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AAF0C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:43:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 887402065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:43:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 348F92065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:43:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egZtI/ly"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 887402065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TMHgAY2n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348F92065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcAlV-00075e-Nw
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43010)
+	id 1jcAlq-0007i6-DD
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:43:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAh8-0007W5-HM
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:50 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35194
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAh0-00079Q-76
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42590
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAh7-0002Wu-Ks
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:50 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAgy-0002WX-T8
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590165528;
+ s=mimecast20190719; t=1590165520;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KqNAKdeyZY4N/WN8/VheKglAqudMynHtJmA2N/wtx2U=;
- b=egZtI/lyFEcjMjCtohMAEbIX7W+H1aJhwQOryJArNcTYMc3fcbuzRl+hXB6fhDurVdl9qL
- YwDHNllEkGnh0N6WbM0NCToe26GlQi/YPo1pFRztYYPEONsVFpk6oPOfKU78U2HNSaYvOl
- mQ748Yja1s3uCkHU2cqJCGMCSS4V4+o=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-rJ9-vjuwNJiCK8sMK6Q_lw-1; Fri, 22 May 2020 12:38:47 -0400
-X-MC-Unique: rJ9-vjuwNJiCK8sMK6Q_lw-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so4628681wrs.2
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:38:47 -0700 (PDT)
+ bh=TyEDe8wylZalxNMNSz6RpL3nleNnTxzk4iV0Jrd1pvo=;
+ b=TMHgAY2nHHoqN0Vfr28gvqoQfKFuK6FZJzLW45If5064z/lOEtMZr3gBwJblUAKx9RKFNs
+ tmqRC2yu2JjugMW9UCETf5JCd5cE3BqQcDOaPIFQX52dFJMBXICf63mmCYKNUYX9IIT3Ky
+ oVBSNVRu8jFsb4bl7tCxb60foe92c18=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-BQ5LFP8ZOXG6ApMLqrK8FA-1; Fri, 22 May 2020 12:38:38 -0400
+X-MC-Unique: BQ5LFP8ZOXG6ApMLqrK8FA-1
+Received: by mail-wr1-f72.google.com with SMTP id z10so4628429wrs.2
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:38:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KqNAKdeyZY4N/WN8/VheKglAqudMynHtJmA2N/wtx2U=;
- b=ayYt1Ea2Fu4jbjVFOEMFt2ZpQaauJEy+tLrlEAT4PafuPoYS/Glhlsgg8zWgn000nA
- +01j14PBZNPmpleeJTQNSHIfpmv/VNuksNgQS4mlNLc81Nwdu/dTgUTyALJR/h4tgoZU
- PlbAANMle64mnJ+4NzdXQXB7xLxP2KJC9dG2ph+zQwofANa3DeLTqWMAZ57bFYt4r+0P
- ioEJ/9Scp9YJZsClxbozV3W3Typcn64Qb272rEwFIMbonwnkw3kGrWmp/fyiLNKdxvlf
- lL2DTEqR6S2kErSR6ws/4/uxGXTor/B5NWE/tN+1WZSH5kNJIKam7bne/7yWQ48OdN9l
- NLeQ==
-X-Gm-Message-State: AOAM530in1trEZtwVSYZQcTB0qhBuPh8xk9E6nSX1qobqoANArrt9WKz
- UB0WC0Tz+XIkJ6iCGTXHE44XXSyLe4rbBTh1/Uj5anaPIAu7yGZhnkFIFh255WZYeWLWEGSEKnJ
- A9adgKjLhsLmqkN0=
-X-Received: by 2002:a1c:9cd5:: with SMTP id f204mr6918305wme.105.1590165526149; 
- Fri, 22 May 2020 09:38:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzWqp3YzehbkUiZ8TwUxgyRRR//DUuhBImcSYFEzd/qfM/etor216MtsEWf0aeuLa+gQ6nfyA==
-X-Received: by 2002:a1c:9cd5:: with SMTP id f204mr6918291wme.105.1590165525945; 
- Fri, 22 May 2020 09:38:45 -0700 (PDT)
+ bh=TyEDe8wylZalxNMNSz6RpL3nleNnTxzk4iV0Jrd1pvo=;
+ b=caTwVb2VP2rDkzNarpagRhQG5u4jvXfrKsZzeRgcgGhNsygrsaIGjVJJ/qOc9lFBql
+ Jxaf01kuBeYOGlqfDRyXwCXbMFouQ+y0JYsRtJrApWttRvsAV6oSw4WYwaTK5/dOgIZ9
+ YUz95q20dpJipYSVohhc9ogtFvyNgX25uwQ1sUAvQzLEWhYml5wZOrKMtMiyfnSIe5m3
+ GG6e3al0Dce97wCZfPOojy7A984mfQKHM65mqY75qTI6wztrKitCv3qZd9tuXPqEzMXl
+ GdSt0rSGiYVXQBwpz0HQnbl2UjyF1yWV2Je15JVtZyfOL9U5IiRPCRSQ7brf8OLnDXY6
+ Y0Fw==
+X-Gm-Message-State: AOAM531OR7EYMeXOdU/1enIlsXdzvG/DGqSKVPajAiy/bY2w/1j8Rsqm
+ 5eDqoSccfYSylywu7BJKnXA6SA/iU/y+KK5kYj6Faz4VDnwdzTF6jAe5ZljtRXyo+c3FkbS1JN2
+ Fd3XrH3l9q7LFysk=
+X-Received: by 2002:a5d:4388:: with SMTP id i8mr3978721wrq.299.1590165517241; 
+ Fri, 22 May 2020 09:38:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8FXz/JVDB9MMVFQ3tjpYR4CMOCWw1rnDbSv4zEloD6No26zJQRDPiyKG/cCZ/AvRACD7Itw==
+X-Received: by 2002:a5d:4388:: with SMTP id i8mr3978711wrq.299.1590165517039; 
+ Fri, 22 May 2020 09:38:37 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id p9sm9923994wrj.29.2020.05.22.09.38.45
+ by smtp.gmail.com with ESMTPSA id y185sm10167304wmy.11.2020.05.22.09.38.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 09:38:45 -0700 (PDT)
+ Fri, 22 May 2020 09:38:36 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/11] Makefile: Allow target-specific optional Kconfig
-Date: Fri, 22 May 2020 18:37:58 +0200
-Message-Id: <20200522163759.11480-11-philmd@redhat.com>
+Subject: [PATCH v4 08/11] accel/Kconfig: Extract accel selectors into their
+ own config
+Date: Fri, 22 May 2020 18:37:56 +0200
+Message-Id: <20200522163759.11480-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200522163759.11480-1-philmd@redhat.com>
 References: <20200522163759.11480-1-philmd@redhat.com>
@@ -118,35 +119,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow use of target-specific Kconfig file.
+Move the accel selectors from the global Kconfig.host to their
+own Kconfig file.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-v3: Use base-arch() to include TARGET_BASE_ARCH/Kconfig
----
- Makefile | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Makefile      | 1 +
+ Kconfig.host  | 7 -------
+ accel/Kconfig | 6 ++++++
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+ create mode 100644 accel/Kconfig
 
 diff --git a/Makefile b/Makefile
-index f8a45e1379..d5009cd304 100644
+index 7666f81e8a..648757f79a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -423,11 +423,13 @@ MINIKCONF_INPUTS = $(SRC_PATH)/Kconfig.host \
-                    $(SRC_PATH)/accel/Kconfig \
+@@ -419,6 +419,7 @@ MINIKCONF_ARGS = \
+     CONFIG_PVRDMA=$(CONFIG_PVRDMA)
+ 
+ MINIKCONF_INPUTS = $(SRC_PATH)/Kconfig.host \
++                   $(SRC_PATH)/accel/Kconfig \
                     $(SRC_PATH)/hw/Kconfig
  MINIKCONF_DEPS = $(MINIKCONF_INPUTS) \
--                 $(wildcard $(SRC_PATH)/hw/*/Kconfig)
-+                 $(wildcard $(SRC_PATH)/hw/*/Kconfig) \
-+                 $(wildcard $(SRC_PATH)/target/*/Kconfig)
- MINIKCONF = $(PYTHON) $(SRC_PATH)/scripts/minikconf.py
+                  $(wildcard $(SRC_PATH)/hw/*/Kconfig)
+diff --git a/Kconfig.host b/Kconfig.host
+index 55136e037d..a6d871c399 100644
+--- a/Kconfig.host
++++ b/Kconfig.host
+@@ -2,9 +2,6 @@
+ # down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
+ # these two need to be kept in sync.
  
- $(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIKCONF_DEPS) $(BUILD_DIR)/config-host.mak
- 	$(call quiet-command, $(MINIKCONF) $(MINIKCONF_ARGS) \
-+		$(wildcard $(SRC_PATH)/target/$(call base-arch, $(firstword $(subst -, ,$@)))/Kconfig) \
- 		> $@.tmp, "GEN", "$@.tmp")
- 	$(call quiet-command, if test -f $@; then \
- 	  if cmp -s $@.old $@; then \
+-config KVM
+-    bool
+-
+ config LINUX
+     bool
+ 
+@@ -31,10 +28,6 @@ config VHOST_KERNEL
+     bool
+     select VHOST
+ 
+-config XEN
+-    bool
+-    select FSDEV_9P if VIRTFS
+-
+ config VIRTFS
+     bool
+ 
+diff --git a/accel/Kconfig b/accel/Kconfig
+new file mode 100644
+index 0000000000..c21802bb49
+--- /dev/null
++++ b/accel/Kconfig
+@@ -0,0 +1,6 @@
++config KVM
++    bool
++
++config XEN
++    bool
++    select FSDEV_9P if VIRTFS
 -- 
 2.21.3
 
