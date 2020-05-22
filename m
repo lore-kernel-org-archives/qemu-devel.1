@@ -2,76 +2,91 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D8AC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701B5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:59:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0DC206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:36:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4170720723
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:59:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="lz9N0NIU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0DC206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OjEJfRJA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4170720723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc6uK-0003Nz-01
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 08:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
+	id 1jc7H2-0002FT-Dg
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 08:59:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jc6tX-0001wj-KK
- for qemu-devel@nongnu.org; Fri, 22 May 2020 08:35:23 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:49671)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jc6tW-0004p3-DE
- for qemu-devel@nongnu.org; Fri, 22 May 2020 08:35:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=JlcMcMulq2aImje6LWBEMdbdSP748cBCin6Y2JaLwM0=; b=lz9N0NIUH2x2vAAmTHpk3gyUDc
- Ud1U4z5rPiREc45dnApr+P7FLNuJ03oAuWSh6oILpRdqE+BIppa8WgCf+527Rd6QAewyCzi5LZxgk
- D5HE4dHR1RiFVD467aJcto38m0lHJifsuMQeHMfmpzgPUXvL3htKb7s78MVHuhQuNLoIYmIzlZVAE
- nv2VxdZhW+fCjRJhjwC4EPSfN8SoTNQ8S9+3udl8mK/8tnhZFB884W1zk3w3NUu5/IH5+PGb14Z7r
- 9iQ0ndw2nb8D/qCdlw9rfJM1HLNIAXi7+XxZ1RZO5zPvtinu20ex2WxohiICRQCY012M1uuSvAy70
- 9Eh76EYNVa/zFi+1xt+4leHHRGkiFIg3i3QQogJdnCkIr27cCNqZNnXlocXSr7vKGKBYpFoyaG8qT
- biXL009ANgws6D3MWJxDO03vjy49q3TdQ64ifBcPhamqtf0oYNw1xsb6lrbQstumvIY+Sud9X75tp
- 4WP+KTI77hpWakEwENsZ73lzPAtJds9u/i3cb2sr5tllzFMLinWIXzlKh9JV195/G9FiTHK5S06ne
- oO9b9oQFGAmLQF8NHMz6KyYkLwDjQ+HFebdCrLfgsxNlURPFrAABqWjL6fUT+dIhS0wOujl9ieiv6
- xrvJb8sTEokhmFuAcPbB69dtTXM/ozL2PGxK7bZgg=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, groug@kaod.org, paul@xen.org,
- anthony.perard@citrix.com, Stefano Stabellini <stefano.stabellini@xilinx.com>
-Subject: Re: [PATCH v2 1/3] Revert "9p: init_in_iov_from_pdu can truncate the
- size"
-Date: Fri, 22 May 2020 14:34:23 +0200
-Message-ID: <2043036.LDd4sAjz2a@silver>
-In-Reply-To: <20200521192627.15259-1-sstabellini@kernel.org>
-References: <alpine.DEB.2.21.2005211225030.27502@sstabellini-ThinkPad-T480s>
- <20200521192627.15259-1-sstabellini@kernel.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jc7GA-0001BV-N7
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 08:58:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42391
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jc7G9-00010Q-Iq
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 08:58:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590152324;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/C3uqZBJPPCkKnCTzF1Ee+D8f5IvukGqA0OWgnIzn5c=;
+ b=OjEJfRJAUJvlEWroDdsm/8kjmc/xsDF/D7XtuhyOd21LOZp6lZJqzxzbAxDyXDIxllskkr
+ l2MOG2BLQwI3JR5WFqeODLcFWxABBXPtSNT0OHgj5A559gMGlUhFiY28Ei41eRICT73FaZ
+ zk4ipKy2fye+hBuAuZuXxY5+6V9Wv8Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-qQnt2oFgN0e0ZkEj2Wu1ow-1; Fri, 22 May 2020 08:58:39 -0400
+X-MC-Unique: qQnt2oFgN0e0ZkEj2Wu1ow-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A450107ACCD;
+ Fri, 22 May 2020 12:58:38 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 949B66248F;
+ Fri, 22 May 2020 12:58:27 +0000 (UTC)
+Subject: Re: [PATCH v4 3/6] migration/block-dirty-bitmap: fix bitmaps
+ pre-blockdev migration during mirror job
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200521220648.3255-1-vsementsov@virtuozzo.com>
+ <20200521220648.3255-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <77ad0ab1-07c3-9b45-9f22-874fe29a4b70@redhat.com>
+Date: Fri, 22 May 2020 07:58:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 08:35:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+In-Reply-To: <20200521220648.3255-4-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 08:01:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,212 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
+ jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 21. Mai 2020 21:26:25 CEST Stefano Stabellini wrote:
-> From: Stefano Stabellini <stefano.stabellini@xilinx.com>
+On 5/21/20 5:06 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Important thing for bitmap migration is to select destination block
+> node to obtain the migrated bitmap.
 > 
-> This reverts commit 16724a173049ac29c7b5ade741da93a0f46edff7.
-> It causes https://bugs.launchpad.net/bugs/1877688.
+> Prepatch, on source we use bdrv_get_device_or_node_name() to identify
+> the node, and on target we do bdrv_lookup_bs.
+> bdrv_get_device_or_node_name() returns blk name only for direct
+> children of blk. So, bitmaps of direct children of blks are migrated by
+> blk name and others - by node name.
 > 
-> Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+> Old libvirt is unprepared to bitmap migration by node-name,
+> node-names are mostly auto-generated. So actually only migration by blk
+> name works for it.
+> 
+> Newer libvirt will use new interface (which will be added soon) to
+> specify node-mapping for bitmaps migration explicitly. Still, let's
+> improve the current behavior a bit.
+> 
+> Now, consider classic libvirt migrations assisted by mirror block job:
+> mirror block job inserts filter, so our source is not a direct child of
+> blk, and bitmaps are migrated by node-names. And this just doesn't work
+> with auto-generated node names.
+> 
+> Let's fix it by using blk-name even if some implicit filters are
+> inserted.
+> 
+> Note2: we, of course, can't skip filters and use blk name to migrate
+> bitmaps in filtered node by blk name for this blk if these filters have
+> named bitmaps which should be migrated.
+> 
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1652424
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
+>   migration/block-dirty-bitmap.c | 45 +++++++++++++++++++++++++++++++++-
+>   1 file changed, 44 insertions(+), 1 deletion(-)
 
-Actually already reviewed by me; no changes, so just to make it clear:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Thanks; I'm queuing this series through my bitmaps tree, and will send a 
+pull request probably on Monday.
 
->  hw/9pfs/9p.c               | 33 +++++++++++----------------------
->  hw/9pfs/9p.h               |  2 +-
->  hw/9pfs/virtio-9p-device.c | 11 ++++-------
->  hw/9pfs/xen-9p-backend.c   | 15 ++++++---------
->  4 files changed, 22 insertions(+), 39 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index a2a14b5979..d39bfee462 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -2102,29 +2102,22 @@ out_nofid:
->   * with qemu_iovec_destroy().
->   */
->  static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-> -                                    size_t skip, size_t *size,
-> +                                    size_t skip, size_t size,
->                                      bool is_write)
->  {
->      QEMUIOVector elem;
->      struct iovec *iov;
->      unsigned int niov;
-> -    size_t alloc_size = *size + skip;
-> 
->      if (is_write) {
-> -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov,
-> alloc_size); +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov,
-> &niov, size + skip); } else {
-> -        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov,
-> &alloc_size); -    }
-> -
-> -    if (alloc_size < skip) {
-> -        *size = 0;
-> -    } else {
-> -        *size = alloc_size - skip;
-> +        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size +
-> skip); }
-> 
->      qemu_iovec_init_external(&elem, iov, niov);
->      qemu_iovec_init(qiov, niov);
-> -    qemu_iovec_concat(qiov, &elem, skip, *size);
-> +    qemu_iovec_concat(qiov, &elem, skip, size);
->  }
-> 
->  static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-> @@ -2132,14 +2125,15 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU
-> *pdu, V9fsFidState *fidp, {
->      ssize_t err;
->      size_t offset = 7;
-> -    size_t read_count;
-> +    uint64_t read_count;
->      QEMUIOVector qiov_full;
-> 
->      if (fidp->fs.xattr.len < off) {
->          read_count = 0;
-> -    } else if (fidp->fs.xattr.len - off < max_count) {
-> -        read_count = fidp->fs.xattr.len - off;
->      } else {
-> +        read_count = fidp->fs.xattr.len - off;
-> +    }
-> +    if (read_count > max_count) {
->          read_count = max_count;
->      }
->      err = pdu_marshal(pdu, offset, "d", read_count);
-> @@ -2148,7 +2142,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu,
-> V9fsFidState *fidp, }
->      offset += err;
-> 
-> -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
-> +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
->      err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
->                      ((char *)fidp->fs.xattr.value) + off,
->                      read_count);
-> @@ -2277,11 +2271,9 @@ static void coroutine_fn v9fs_read(void *opaque)
->          QEMUIOVector qiov_full;
->          QEMUIOVector qiov;
->          int32_t len;
-> -        size_t size = max_count;
-> 
-> -        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, &size, false);
-> +        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count,
-> false); qemu_iovec_init(&qiov, qiov_full.niov);
-> -        max_count = size;
->          do {
->              qemu_iovec_reset(&qiov);
->              qemu_iovec_concat(&qiov, &qiov_full, count, qiov_full.size -
-> count); @@ -2532,7 +2524,6 @@ static void coroutine_fn v9fs_write(void
-> *opaque) int32_t len = 0;
->      int32_t total = 0;
->      size_t offset = 7;
-> -    size_t size;
->      V9fsFidState *fidp;
->      V9fsPDU *pdu = opaque;
->      V9fsState *s = pdu->s;
-> @@ -2545,9 +2536,7 @@ static void coroutine_fn v9fs_write(void *opaque)
->          return;
->      }
->      offset += err;
-> -    size = count;
-> -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &size, true);
-> -    count = size;
-> +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
->      trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
-> 
->      fidp = get_fid(pdu, fid);
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index dd1c6cb8d2..1b9e110605 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -436,7 +436,7 @@ struct V9fsTransport {
->      ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char
-> *fmt, va_list ap);
->      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-> -                                        unsigned int *pniov, size_t *size);
-> +                                        unsigned int *pniov, size_t size);
-> void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-> unsigned int *pniov, size_t size); void        (*push_and_notify)(V9fsPDU
-> *pdu);
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index e5b44977c7..36f3aa9352 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -147,22 +147,19 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
-> size_t offset, }
-> 
->  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-> -                                        unsigned int *pniov, size_t *size)
-> +                                        unsigned int *pniov, size_t size)
->  {
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
->      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
-> 
-> -    if (buf_size < P9_IOHDRSZ) {
-> +    if (buf_size < size) {
->          VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> 
->          virtio_error(vdev,
-> -                     "VirtFS reply type %d needs %zu bytes, buffer has %zu,
-> less than minimum", -                     pdu->id + 1, *size, buf_size);
-> -    }
-> -    if (buf_size < *size) {
-> -        *size = buf_size;
-> +                     "VirtFS reply type %d needs %zu bytes, buffer has
-> %zu", +                     pdu->id + 1, size, buf_size);
->      }
-> 
->      *piov = elem->in_sg;
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index f04caabfe5..fc197f6c8a 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -188,7 +188,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
-> static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
->                                            struct iovec **piov,
->                                            unsigned int *pniov,
-> -                                          size_t *size)
-> +                                          size_t size)
->  {
->      Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
->      Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-> @@ -198,19 +198,16 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
-> *pdu, g_free(ring->sg);
-> 
->      ring->sg = g_new0(struct iovec, 2);
-> -    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
-> +    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
-> 
->      buf_size = iov_size(ring->sg, num);
-> -    if (buf_size  < P9_IOHDRSZ) {
-> -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs "
-> -                      "%zu bytes, buffer has %zu, less than minimum\n", - 
->                     pdu->id + 1, *size, buf_size);
-> +    if (buf_size  < size) {
-> +        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
-> +                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
-> +                buf_size);
->          xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
->          xen_9pfs_disconnect(&xen_9pfs->xendev);
->      }
-> -    if (buf_size  < *size) {
-> -        *size = buf_size;
-> -    }
-> 
->      *piov = ring->sg;
->      *pniov = num;
 
-Best regards,
-Christian Schoenebeck
+> +
+> +        /* Skip filters without bitmaos */
 
+bitmaps - I'm touching that up
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
