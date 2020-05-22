@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A6CC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F34CDC433E1
 	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15E672070A
+	by mail.kernel.org (Postfix) with ESMTPS id C308E2070A
 	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EflvFJMn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15E672070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PIBtX2Kg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C308E2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcASW-0002fX-9A
+	id 1jcASW-0002gS-Un
 	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40462)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKZ-0003E9-39
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:31 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43261)
+ id 1jcAKb-0003Jr-Bb
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:33 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39705)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKX-0006G8-5y
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:30 -0400
-Received: by mail-pf1-x444.google.com with SMTP id v63so5393931pfb.10
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:28 -0700 (PDT)
+ id 1jcAKZ-0006GR-8s
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:32 -0400
+Received: by mail-pg1-x543.google.com with SMTP id w20so179973pga.6
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=kxh2o1V8iXkuJj8JRvzQtcAUGmlKoLZ53V+la2Fi9CI=;
- b=EflvFJMnpr9hfGwGwkLoT90GuXYL0WnbaWiKcadAupSoAPkuxPxNW9QyM/BF1Hml0U
- mX/OL0mCTzcp++Mr1/S3Yo6ElM8P8rpYBqLSgppjH/THbc2dw4+sEb0wW+Nx1ZIoSdcp
- cBU6oenpIQXKQqlGaLRWYbYyJ1UbjdqDfmI5gxRGLioPF/Hb9gXE22gEwpHhr5uRQDrH
- MouxUnm/XmfAP1nacc5/PPeOGQ1JYk3wGI6Lk3pylQ3HwkpkdQ1btimriCpspSrHtZBi
- owrRhdrVLrIg0HpIORotacOj10tEfxmV03k6/EWyk/RnPw+3xxJsbJha7V7J98ZTGrvl
- PuGg==
+ bh=sRbh5iLhIJgul14kcDJeTEj/XcHGk+PMKpVRoyVth+g=;
+ b=PIBtX2KghCulSwqtE4E+2lMTUvnCtv2kFXVft1HT72ud2AiuiPjQeh+WoHEYj3wduP
+ JUyXBazeEzx3DN9vJqFwIWgjNYXGoMKSd0q7AEbJ4zzklyLFgpoIApc538pW3WwSiwKG
+ V1ED0lM1E6tpCe6h3h7gbgq2JQsibfTItSglZ9xxd0w9PKrQzNZNSlSwr4O5wPm307Bq
+ G9Ca5NAx4+fWYon/N772t4WKnG2POFkg1krJ5gqcfW8zUBdN0wQ7Olq669k0GUGxugCa
+ /W0dEkFBM9FJ979mgOVEvZ+x4k69qR6E4YitFAK5YQIUoJiR1OQrwYWHWl3gr2HGh1b0
+ /Wjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=kxh2o1V8iXkuJj8JRvzQtcAUGmlKoLZ53V+la2Fi9CI=;
- b=S/Oi52KFV14Dk60klUCaS7yf4vM6ynHIA8mOk3jErhMPzBYkHM3tKgYCwvqmrAHYdv
- t8/SQmBxdYQIEw2GVCBLBxmfGpqG+vfs8KjYUOUiFpSQECWsd3Il8qx4cOV+0cXUeIA5
- vptQ4LY/OCTx2xCTuTtD7VIzq5bvQZHAjPgREFK1lmmb4Q0bDtAu3N7DWQtLALmYg8L3
- gO4QV4cPDzKvtFfWRmG/o98JW0iu5jf4T9Nef4T62vAzhZQSn4sswkIvQgabZmKyY803
- GdyS603tv/yVUPGErYkMXT6xDYQbTQv6wRjkoZ65xG5N6imihv2kKRANKuQ36k/50NQh
- BBjQ==
-X-Gm-Message-State: AOAM5317FGdp5I9gU58XB0gHw+FCNe3UNj8F+Fiwyn/vCUb4dLobDqiK
- 0bLGERCf5fAy4pGGPA/sGs4ZqK+gLZtlkg==
-X-Google-Smtp-Source: ABdhPJxxa8q1BvPVAb0Dfq2B3L4+SFf1kgZLZLM0P814nYfjSooeOlG+SsPMvcp4cCmCvioaenJwbw==
-X-Received: by 2002:a62:7f03:: with SMTP id a3mr4594490pfd.113.1590164108266; 
- Fri, 22 May 2020 09:15:08 -0700 (PDT)
+ bh=sRbh5iLhIJgul14kcDJeTEj/XcHGk+PMKpVRoyVth+g=;
+ b=HQe6mmFIXto2DqBirHzB/PDbBTYSuvMOEPExOaysh2JqvqAPqsIPYPtleqwWcdKmDw
+ FxbZmmcEdDcesNRrx5t366DoCBzCCjaRB0l0RqTz40703auoxJnaCWidbhQEiK3aJAas
+ llg59O7swA52XgT9gSBHQ/LbcfVueVrM/S9nLRJmAyBEqfwZXUF8bS05TV4z81OzsqrN
+ vnNxYg2JyEzf2HXqhFbvcBHfhfp4Z7TCd5d2EG+5Jo/2KkFr8BsIUi9R7FdX3+dFZrBD
+ vmNgUOGnAUFf5KxdEiOKrhSqh6RqgogBoDawxTuRGxY9HlZMYLTIqt7q0GBtSPS8a5pn
+ jWeQ==
+X-Gm-Message-State: AOAM533SUf4xBtd2XlRkWUzL6lFakoNJ0UlsF1Ufxthik+1tb/4qEIs4
+ ryMWHQGb4fnhYgCS5RWc3z68RkvSZtmYBw==
+X-Google-Smtp-Source: ABdhPJzB2duxHEauhLrjN8q6cAKEcesq2o6omT60tyUUDs27i+8CJApt/nk2nhaJ0jdlVmIcpd1AqQ==
+X-Received: by 2002:a05:6a00:46:: with SMTP id
+ i6mr4755152pfk.146.1590164129705; 
+ Fri, 22 May 2020 09:15:29 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:f1d9:5fce:c451:d2e2])
- by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.06
+ by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 09:15:07 -0700 (PDT)
+ Fri, 22 May 2020 09:15:29 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/19] qht: call qemu_spin_destroy for head buckets
-Date: Fri, 22 May 2020 12:07:41 -0400
-Message-Id: <20200522160755.886-6-robert.foley@linaro.org>
+Subject: [PATCH 15/19] qht: Fix tsan warnings.
+Date: Fri, 22 May 2020 12:07:51 -0400
+Message-Id: <20200522160755.886-16-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200522160755.886-1-robert.foley@linaro.org>
 References: <20200522160755.886-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=robert.foley@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,25 +104,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+For example:
+WARNING: ThreadSanitizer: data race (pid=23406)
+  Atomic read of size 4 at 0x7b100003e3c8 by thread T7:
+    #0 __tsan_atomic32_load <null> (qemu-system-aarch64+0x39a36c)
+    #1 qht_do_lookup util/qht.c:495:17 (qemu-system-aarch64+0xd82f7a)
+    #2 qht_lookup_custom util/qht.c:539:11 (qemu-system-aarch64+0xd82f7a)
+  Previous write of size 8 at 0x7b100003e3c8 by thread T6 (mutexes: write M166769147697783108, write M995435858420506688):
+    #0 posix_memalign <null> (qemu-system-aarch64+0x350dd1)
+    #1 qemu_try_memalign util/oslib-posix.c:189:11 (qemu-system-aarch64+0xd59317)
+    #2 qemu_memalign util/oslib-posix.c:205:27 (qemu-system-aarch64+0xd5943e)
+    #3 qht_insert__locked util/qht.c:583:9 (qemu-system-aarch64+0xd837c5)
 
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- util/qht.c | 1 +
- 1 file changed, 1 insertion(+)
+ util/qht.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/util/qht.c b/util/qht.c
-index aa51be3c52..67e5d5b916 100644
+index 67e5d5b916..739a53ced0 100644
 --- a/util/qht.c
 +++ b/util/qht.c
-@@ -348,6 +348,7 @@ static inline void qht_chain_destroy(const struct qht_bucket *head)
-     struct qht_bucket *curr = head->next;
-     struct qht_bucket *prev;
+@@ -69,6 +69,7 @@
+ #include "qemu/qht.h"
+ #include "qemu/atomic.h"
+ #include "qemu/rcu.h"
++#include "qemu/tsan.h"
  
-+    qemu_spin_destroy(&head->lock);
-     while (curr) {
-         prev = curr;
-         curr = curr->next;
+ //#define QHT_DEBUG
+ 
+@@ -580,10 +581,12 @@ static void *qht_insert__locked(const struct qht *ht, struct qht_map *map,
+         b = b->next;
+     } while (b);
+ 
++    TSAN_ANNOTATE_IGNORE_WRITES_BEGIN();
+     b = qemu_memalign(QHT_BUCKET_ALIGN, sizeof(*b));
+     memset(b, 0, sizeof(*b));
+     new = b;
+     i = 0;
++    TSAN_ANNOTATE_IGNORE_WRITES_END();
+     atomic_inc(&map->n_added_buckets);
+     if (unlikely(qht_map_needs_resize(map)) && needs_resize) {
+         *needs_resize = true;
 -- 
 2.17.1
 
