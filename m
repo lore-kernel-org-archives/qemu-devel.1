@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1F2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03374C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:47:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 470622072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76E462072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:47:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r0XxkTEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470622072C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ECNuVEcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E462072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbxhQ-0004D4-F8
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 22:46:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48316)
+	id 1jbxiA-0004xN-H5
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 22:47:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxWl-0003I1-07
- for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:15 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:55379)
+ id 1jbxWh-00036W-IH
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:11 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55378)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxWj-00059p-TP
- for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:14 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id k7so4289825pjs.5
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 19:35:13 -0700 (PDT)
+ id 1jbxWg-00058u-FP
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:11 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id k7so4289771pjs.5
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 19:35:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=d+UUwp78+6taEfLoHDVuHhWwS3335HTdwAKjJ5tb8QA=;
- b=r0XxkTEbcMCW0ZnPa0sMlqDv9tHIfFEg8RqPdRx1jDj5ttWO7sBThKtDd9vKrt2Whv
- isJ0v/9eZlZddUq4p5VIbz1APqMGJFsuZWepg29Iyxgdn/JB5hOoNhWAndrn0T2dHdky
- T66ifuDKiSKFXTGyEVk8ck1mTqOcbluWLJ7eN2PceTC31OxEHECLexmQePRHyXQlgFmh
- A4zze19ove2EDi5eFs8bwnuSr8rlkTo+3V1y1D4gPvBFW6rwIzu84McYiutmh+3sfGNX
- 7hRCN2iIaui+Ljzkh4C56B2EH0JPRxiJswCfzl8UCg+GyQvxMJHRld6IOMZ5DCpiIG4F
- yYEQ==
+ bh=Y21KcsvLFJXq/u9VH9lik1swR2hgaP1jOrA8QoTE+F4=;
+ b=ECNuVEcZAbPQPZxEjgGYqmY1EOgyTcS2pmNAfs8ZJcMHP/ftK0gbYbPgPPCps1PfE1
+ eLCzVaAcxyzXmswqa0IQNKeXMKdbERkhegKD6Uqmm8Hl1/fr8F4UfHqVIJp+lSS9xrLL
+ DLKVYDamgUw2k2Tb1pvRsN9i/ikTMT9OXfxnYFn4wyeVaUq+dhFEOMTqgBqA0p69szpg
+ 4hFl1488GrsZkojtEUBgv7lBQe1HZtUMMT1BfUndkL+qZwo02RjpwaSBf4OCeVyOY2o0
+ PImxTHMXHkVVBXgIKbG1v91iYbGrSHOq3HlI3kNAcMa5SPM9NOax3coU7J/vK4XAhtCg
+ 2zCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=d+UUwp78+6taEfLoHDVuHhWwS3335HTdwAKjJ5tb8QA=;
- b=gSHPa+7VjzfLCeX7Jy+1utzkpGm6opHdXoZBQksdSGBTPD9F4wtp7hf+DT9qFCFwUK
- zsXGGEgJnJ7mO4YCxRSed7p2gfx5j6pegE3I99pfmbE1eu3Vp72i0DM7ocP+oZ6BSv52
- LkTzXr73OpS23rGo8eB3LZEYQUI/LdhF4birALFVEEgf3AjmzNP/DoWTFNOMOwvWHrXf
- YCqeYL6r9h+CESGg4GZffih8UjdFKaMBjlO6wCROCJtzp9wii3P/vhuYcKhXQ4Yxfe85
- jL69iQHWWC+OJQUMHk7hnxAzCDUnPcNhqyERxDUglK4Ye4whsXH4719pMGqRBH7Cvpz8
- OJpg==
-X-Gm-Message-State: AOAM531DP2GR59WR1iOiW0lBThibijXaLv4IyNYPnzYzW0CyYr2DqFFU
- yhBcbpA205zfFV0VyIM2AnNKaMBKYUQ=
-X-Google-Smtp-Source: ABdhPJwvEoRjo7jc0b2csa2g68YVtYLlBldTEkS6j3kA74vOzU2StDFHqwaT/U9avF8TaYYUol130Q==
-X-Received: by 2002:a17:902:8303:: with SMTP id
- bd3mr12775649plb.217.1590114912196; 
- Thu, 21 May 2020 19:35:12 -0700 (PDT)
+ bh=Y21KcsvLFJXq/u9VH9lik1swR2hgaP1jOrA8QoTE+F4=;
+ b=KV5WvMw6uMHxCAR/m59s9zrFGgONBK3y53jzdcw4Fae7i0B3c0x9zczTHgh0V1VMFk
+ t2XseKAYbYFjmIs4ajuIHGOjefrsEc3LNSw0o/0+G0ZOqV9qCFLywOuElBZ6cslZXWhf
+ oYsIrcsK++d9ZlOsH/egrBUIuUlxJ8+1PJi41MACpCjWtVR3vFJ8IUtQ2YOE/pG5JMdC
+ Ct6agPSUqz9HPo3BNKCR2jUeBcf7Qqi4GHHMmCmaUwfihvaZzzZ9E7HwLKxoU6teLeWa
+ nma7acZV3mdGluzhe5GIQIwK8ODyVDD4xqOXJofpjN5avoEt7cd5BBoKREBF1OZsEwdY
+ 4QWg==
+X-Gm-Message-State: AOAM531h+Eg9YMDoUTFP37ELdd9Xk49rVEbrd+kiHfIK4MBYuACELIn8
+ BikHV1780PvYtiZK5JbFcOcoGm7f5I0=
+X-Google-Smtp-Source: ABdhPJxAQwznYPV6MAoBfMRQFrDmKEV+jXgKMF9phpFxo3XZSwyMOTNR648GTwsCOWFaw51OGzFghg==
+X-Received: by 2002:a17:902:328:: with SMTP id
+ 37mr13148955pld.35.1590114908766; 
+ Thu, 21 May 2020 19:35:08 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id gt10sm5443755pjb.30.2020.05.21.19.35.11
+ by smtp.gmail.com with ESMTPSA id gt10sm5443755pjb.30.2020.05.21.19.35.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 19:35:11 -0700 (PDT)
+ Thu, 21 May 2020 19:35:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 24/25] Remove return value from reginfo_dump
-Date: Thu, 21 May 2020 19:34:39 -0700
-Message-Id: <20200522023440.26261-25-richard.henderson@linaro.org>
+Subject: [PATCH v3 21/25] ppc64: Use uint64_t to represent double
+Date: Thu, 21 May 2020 19:34:36 -0700
+Message-Id: <20200522023440.26261-22-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200522023440.26261-1-richard.henderson@linaro.org>
 References: <20200522023440.26261-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,164 +106,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No uses actually checked the error indication.  Even if we wanted
-to check ferror on the stream, we should do that generically rather
-than per arch.
+We want to do exact bitwise comparisons of the data,
+not be held hostage to IEEE comparisons and NaNs.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h                 | 4 ++--
- risu_reginfo_aarch64.c | 8 +++-----
- risu_reginfo_arm.c     | 6 ++----
- risu_reginfo_i386.c    | 6 ++----
- risu_reginfo_m68k.c    | 6 ++----
- risu_reginfo_ppc64.c   | 6 ++----
- 6 files changed, 13 insertions(+), 23 deletions(-)
+ risu_reginfo_ppc64.h |  3 ++-
+ risu_reginfo_ppc64.c | 29 +++++++++--------------------
+ 2 files changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/risu.h b/risu.h
-index 99f0d8e..6eceb9f 100644
---- a/risu.h
-+++ b/risu.h
-@@ -120,8 +120,8 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc);
- /* return 1 if structs are equal, 0 otherwise. */
- int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);
+diff --git a/risu_reginfo_ppc64.h b/risu_reginfo_ppc64.h
+index 7f2c962..4b1d8bd 100644
+--- a/risu_reginfo_ppc64.h
++++ b/risu_reginfo_ppc64.h
+@@ -20,7 +20,8 @@ struct reginfo {
+     uint64_t nip;
+     uint64_t prev_addr;
+     gregset_t gregs;
+-    fpregset_t fpregs;
++    uint64_t fpregs[32];
++    uint64_t fpscr;
+     vrregset_t vrregs;
+ };
  
--/* print reginfo state to a stream, returns 1 on success, 0 on failure */
--int reginfo_dump(struct reginfo *ri, FILE * f);
-+/* print reginfo state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE *f);
- 
- /* reginfo_dump_mismatch: print mismatch details to a stream */
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
-diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-index b443745..64e0e8b 100644
---- a/risu_reginfo_aarch64.c
-+++ b/risu_reginfo_aarch64.c
-@@ -258,8 +258,8 @@ static void sve_dump_zreg_diff(FILE *f, int vq, const uint64_t *za,
- }
- #endif
- 
--/* reginfo_dump: print state to a stream, returns nonzero on success */
--int reginfo_dump(struct reginfo *ri, FILE * f)
-+/* reginfo_dump: print state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE * f)
- {
-     int i;
-     fprintf(f, "  faulting insn %08x\n", ri->faulting_insn);
-@@ -303,7 +303,7 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
-             sve_dump_preg(f, vq, p);
-             fprintf(f, "\n");
-         }
--        return !ferror(f);
-+        return;
-     }
- #endif
- 
-@@ -312,8 +312,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
-                 (uint64_t) (ri->simd.vregs[i] >> 64),
-                 (uint64_t) (ri->simd.vregs[i]));
-     }
--
--    return !ferror(f);
- }
- 
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
-diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-index ba1035e..09813c4 100644
---- a/risu_reginfo_arm.c
-+++ b/risu_reginfo_arm.c
-@@ -161,8 +161,8 @@ int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
-     return memcmp(r1, r2, sizeof(*r1)) == 0;    /* ok since we memset 0 */
- }
- 
--/* reginfo_dump: print the state to a stream, returns nonzero on success */
--int reginfo_dump(struct reginfo *ri, FILE *f)
-+/* reginfo_dump: print the state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE *f)
- {
-     int i;
-     if (ri->faulting_insn_size == 2) {
-@@ -179,8 +179,6 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
-                 i, (unsigned long long) ri->fpregs[i]);
-     }
-     fprintf(f, "  fpscr: %08x\n", ri->fpscr);
--
--    return !ferror(f);
- }
- 
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-index 57e4c00..37506fa 100644
---- a/risu_reginfo_i386.c
-+++ b/risu_reginfo_i386.c
-@@ -310,8 +310,8 @@ static char get_vecletter(uint64_t features)
-     }
- }
- 
--/* reginfo_dump: print state to a stream, returns nonzero on success */
--int reginfo_dump(struct reginfo *ri, FILE *f)
-+/* reginfo_dump: print state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE *f)
- {
-     uint64_t features;
-     int i, j, n, w;
-@@ -345,8 +345,6 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
-             fprintf(f, "  k%-5d: %016" PRIx64 "\n", i, ri->kregs[i]);
-         }
-     }
--
--    return !ferror(f);
- }
- 
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
-index 29edce9..38d7dd3 100644
---- a/risu_reginfo_m68k.c
-+++ b/risu_reginfo_m68k.c
-@@ -92,8 +92,8 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
-     return 1;
- }
- 
--/* reginfo_dump: print state to a stream, returns nonzero on success */
--int reginfo_dump(struct reginfo *ri, FILE *f)
-+/* reginfo_dump: print state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE *f)
- {
-     int i;
-     fprintf(f, "  pc            \e[1;101;37m0x%08x\e[0m\n", ri->pc);
-@@ -114,8 +114,6 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
-     }
- 
-     fprintf(f, "\n");
--
--    return !ferror(f);
- }
- 
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
 diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
-index e96dc48..134a152 100644
+index c80e387..9899b36 100644
 --- a/risu_reginfo_ppc64.c
 +++ b/risu_reginfo_ppc64.c
-@@ -112,8 +112,8 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
-     return 1;
- }
- 
--/* reginfo_dump: print state to a stream, returns nonzero on success */
--int reginfo_dump(struct reginfo *ri, FILE * f)
-+/* reginfo_dump: print state to a stream */
-+void reginfo_dump(struct reginfo *ri, FILE * f)
+@@ -45,6 +45,7 @@ int reginfo_size(struct reginfo *ri)
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
  {
      int i;
++
+     memset(ri, 0, sizeof(*ri));
  
-@@ -152,8 +152,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
-                 ri->vrregs.vrregs[i][0], ri->vrregs.vrregs[i][1],
-                 ri->vrregs.vrregs[i][2], ri->vrregs.vrregs[i][3]);
+     ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.regs->nip);
+@@ -54,16 +55,11 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+         ri->gregs[i] = uc->uc_mcontext.gp_regs[i];
      }
--
--    return !ferror(f);
- }
  
- void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+-    for (i = 0; i < NFPREG; i++) {
+-        ri->fpregs[i] = uc->uc_mcontext.fp_regs[i];
+-    }
++    memcpy(ri->fpregs, uc->uc_mcontext.fp_regs, 32 * sizeof(double));
++    ri->fpscr = uc->uc_mcontext.fp_regs[32];
+ 
+-    for (i = 0; i < 32; i++) {
+-        ri->vrregs.vrregs[i][0] = uc->uc_mcontext.v_regs->vrregs[i][0];
+-        ri->vrregs.vrregs[i][1] = uc->uc_mcontext.v_regs->vrregs[i][1];
+-        ri->vrregs.vrregs[i][2] = uc->uc_mcontext.v_regs->vrregs[i][2];
+-        ri->vrregs.vrregs[i][3] = uc->uc_mcontext.v_regs->vrregs[i][3];
+-    }
++    memcpy(ri->vrregs.vrregs, uc->uc_mcontext.v_regs->vrregs,
++           sizeof(ri->vrregs.vrregs[0]) * 32);
+     ri->vrregs.vscr = uc->uc_mcontext.v_regs->vscr;
+     ri->vrregs.vrsave = uc->uc_mcontext.v_regs->vrsave;
+ }
+@@ -91,10 +87,6 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
+     }
+ 
+     for (i = 0; i < 32; i++) {
+-        if (isnan(m->fpregs[i]) && isnan(a->fpregs[i])) {
+-            continue;
+-        }
+-
+         if (m->fpregs[i] != a->fpregs[i]) {
+             return 0;
+         }
+@@ -141,10 +133,10 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
+     fprintf(f, "\tdscr   : %16lx\n\n", ri->gregs[44]);
+ 
+     for (i = 0; i < 16; i++) {
+-        fprintf(f, "\tf%2d: %.4f\tf%2d: %.4f\n", i, ri->fpregs[i],
++        fprintf(f, "\tf%2d: %016lx\tf%2d: %016lx\n", i, ri->fpregs[i],
+                 i + 16, ri->fpregs[i + 16]);
+     }
+-    fprintf(f, "\tfpscr: %f\n\n", ri->fpregs[32]);
++    fprintf(f, "\tfpscr: %016lx\n\n", ri->fpscr);
+ 
+     for (i = 0; i < 32; i++) {
+         fprintf(f, "vr%02d: %8x, %8x, %8x, %8x\n", i,
+@@ -181,13 +173,10 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+     }
+ 
+     for (i = 0; i < 32; i++) {
+-        if (isnan(m->fpregs[i]) && isnan(a->fpregs[i])) {
+-            continue;
+-        }
+-
+         if (m->fpregs[i] != a->fpregs[i]) {
+             fprintf(f, "Mismatch: Register f%d\n", i);
+-            fprintf(f, "m: [%f] != a: [%f]\n", m->fpregs[i], a->fpregs[i]);
++            fprintf(f, "m: [%016lx] != a: [%016lx]\n",
++                    m->fpregs[i], a->fpregs[i]);
+         }
+     }
+ 
 -- 
 2.20.1
 
