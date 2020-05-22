@@ -2,58 +2,61 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=FROM_WSP_TRAIL,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=FROM_WSP_TRAIL,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192EEC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 988D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D738B206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D738B206DD
+	by mail.kernel.org (Postfix) with ESMTPS id 72D5A206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D5A206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc2hW-0002wL-W4
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 04:06:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44756)
+	id 1jc2hb-00037k-Kt
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 04:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jc2fV-0005qs-Ke
- for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:37 -0400
-Received: from mga17.intel.com ([192.55.52.151]:30272)
+ id 1jc2fa-00060l-A3
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:42 -0400
+Received: from mga17.intel.com ([192.55.52.151]:30270)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jc2fU-0006Tw-OV
- for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:37 -0400
-IronPort-SDR: EHGmuRXRzNhrw9/HoWiS1+YWStldh/YHAy6MCiHl6n/+i0CzCltQ6PUKSW3rcJJi/aNDutic6G
- BQzz1735UYfg==
+ id 1jc2fZ-0006To-HO
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:42 -0400
+IronPort-SDR: 7SKaAQ9jKbKnZ3j7FAghOJyZyD6WMFXqdMQYyEFMrAvLjcLh9MzCm0+iiig9Y8x2SVHK58uxgu
+ sTEF06/Hj7IA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 May 2020 01:04:34 -0700
-IronPort-SDR: E+OC3ShZm7B2ExWJrAuFQZKoy5LJnDM9C0MWflpi7BybGSQ47/ZVU9QzLp2R3SpDiKvcaB5IuY
- qmnUx6gwlLUQ==
+ 22 May 2020 01:04:40 -0700
+IronPort-SDR: 2YSK4ST1np/u3g9GkFD3COJ7S2pWVt6nyRvSzEvrw3/fI7gNGImunMZsDBWf5eYrZv+7hIYKku
+ m9kLXCrnWa5w==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,420,1583222400"; d="scan'208";a="467104538"
+X-IronPort-AV: E=Sophos;i="5.73,420,1583222400"; d="scan'208";a="467104559"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by fmsmga005.fm.intel.com with ESMTP; 22 May 2020 01:04:33 -0700
+ by fmsmga005.fm.intel.com with ESMTP; 22 May 2020 01:04:39 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>
-Subject: [PATCH V2 1/7] net/colo-compare.c: Create event_bh with the right
- AioContext
-Date: Fri, 22 May 2020 15:53:51 +0800
-Message-Id: <20200522075357.19883-2-chen.zhang@intel.com>
+Subject: [PATCH V2 4/7] net/colo-compare.c: Only hexdump packets if tracing is
+ enabled
+Date: Fri, 22 May 2020 15:53:54 +0800
+Message-Id: <20200522075357.19883-5-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200522075357.19883-1-chen.zhang@intel.com>
 References: <20200522075357.19883-1-chen.zhang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=192.55.52.151; envelope-from=chen.zhang@intel.com;
  helo=mga17.intel.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 04:04:33
@@ -85,45 +88,39 @@ Sender: "Qemu-devel"
 
 From: Lukas Straub <lukasstraub2@web.de>
 
-qemu_bh_new will set the bh to be executed in the main
-loop. This causes crashes as colo_compare_handle_event assumes
-that it has exclusive access the queues, which are also
-concurrently accessed in the iothread.
-
-Create the bh with the AioContext of the iothread to fulfill
-these assumptions and fix the crashes. This is safe, because
-the bh already takes the appropriate locks.
+Else the log will be flooded if there is a lot of network
+traffic.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Derek Su <dereksu@qnap.com>
-Tested-by: Derek Su <dereksu@qnap.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- net/colo-compare.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/colo-compare.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index c07e7c1c09..e557da70e5 100644
+index 62ecd38bb7..a609f499b9 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -890,6 +890,7 @@ static void colo_compare_handle_event(void *opaque)
+@@ -483,10 +483,12 @@ sec:
+         g_queue_push_head(&conn->primary_list, ppkt);
+         g_queue_push_head(&conn->secondary_list, spkt);
  
- static void colo_compare_iothread(CompareState *s)
- {
-+    AioContext *ctx = iothread_get_aio_context(s->iothread);
-     object_ref(OBJECT(s->iothread));
-     s->worker_context = iothread_get_g_main_context(s->iothread);
+-        qemu_hexdump((char *)ppkt->data, stderr,
+-                     "colo-compare ppkt", ppkt->size);
+-        qemu_hexdump((char *)spkt->data, stderr,
+-                     "colo-compare spkt", spkt->size);
++        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
++            qemu_hexdump((char *)ppkt->data, stderr,
++                        "colo-compare ppkt", ppkt->size);
++            qemu_hexdump((char *)spkt->data, stderr,
++                        "colo-compare spkt", spkt->size);
++        }
  
-@@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState *s)
+         colo_compare_inconsistency_notify(s);
      }
- 
-     colo_compare_timer_init(s);
--    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
-+    s->event_bh = aio_bh_new(ctx, colo_compare_handle_event, s);
- }
- 
- static char *compare_get_pri_indev(Object *obj, Error **errp)
 -- 
 2.17.1
 
