@@ -2,97 +2,98 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3639BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB35C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:39:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA95F20723
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:32:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 684D82054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:39:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tiOPHOWx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA95F20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxS31UK4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684D82054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcAai-0004DY-4K
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:32:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
+	id 1jcAhJ-0007HI-Go
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:39:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jcAa9-0003ne-8y
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:31:37 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:45822)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jcAa7-0000jL-Do
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:31:36 -0400
-Received: by mail-ej1-x641.google.com with SMTP id yc10so13647159ejb.12
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=QsSeKihwMe4diNyC+ByvdRSk1O1Gu6Hbw1XIX7lPDw8=;
- b=tiOPHOWxk0cwWMaHZ0vQiqnf/78WqkKFJiTT+gec6ZAS6pE78a43ArIQ7Mm+81EZDf
- zdXQ4zOtW6wwidwW4nC0Jv0smLy7A8+AN+5OwGvq0fI+RJ5jfiHZrKNasnwQHHL73V15
- 2c1bAzyU6qt090xqaOqmgc3lCvmTrWhGJQm0IQfue+m1cxlpShYwpN8FBB47NI9eDW6x
- aHbmyEO7tb+x4LipxtS0kVnf1oHJLZXhOuTaLpq5Bfx6idNLaJFwtogvrhgkOe9zu+ws
- AzMINIgUhdRYA7DkAF3vwvfalJNru4lUIZC8FnRMhBQxK2wvFOHkG6Da4s1mIY4nONKr
- kh5Q==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAgV-0006Ds-Vh
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24065
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcAgU-0002Qc-Gg
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:38:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590165488;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=G9X8uyPDhV16Hxow4Zcyx5aJejh0IiaqkWA79PUnMxc=;
+ b=LxS31UK4iKvLzkMBZoRs771BqIe6vFBD9wJVD46mn034KBScmGwswPYZKI9d020BjIwzOk
+ jDH3R8RC6w49C8SPKr/zL0yTydV8mIkTJotXX/QktNW9KQbBOo5INLLqREYmapN4szXoxz
+ 7LtTiMg/MhE+QcmvD5ZytBJcOElcmTw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-YbUAHDEWPVeyMnUZkuD0Ag-1; Fri, 22 May 2020 12:38:03 -0400
+X-MC-Unique: YbUAHDEWPVeyMnUZkuD0Ag-1
+Received: by mail-wr1-f69.google.com with SMTP id z5so4563881wrt.17
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:38:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=QsSeKihwMe4diNyC+ByvdRSk1O1Gu6Hbw1XIX7lPDw8=;
- b=tISAob9g15u6z1vavkha/dIiOZ77tuXWi26X4KOgGYo55RzHXGLiWo1VPjrvEOYk/C
- xAULRYwFy+BQFQLRmF4HUt0f8YCHrpBcOKIco1vZv0ZOu3brXOshm1fYqmOnGYJdpO39
- uZduuFKcG0DizTQFcjIDNpf90iOz1a6C+ZnKGFUAKVrG+bmkW/mywDSH3IzS/yjCL121
- RhhllRhTsA/As8NANlkFlPjsXrrRmRm2npCC8f4RWwnaAbqYIikJscRoiDmgQrC54Mf9
- 78yIfd5qrcfOfY81pR9oUKu/R13wzYmr1jSNUNK/VpLeyyO1U2EtJRWfUZmieA2lA2RA
- ozTg==
-X-Gm-Message-State: AOAM532T3QTw923VSMaKHHm2i676fTX7XmjF5I8A0ZHa+MpR9VAySpse
- ZRlMVGy1fm5JDs+D5HnhGy/UTg==
-X-Google-Smtp-Source: ABdhPJzZsiraxQE1uECfAhdufsEwaR3m71Np4vky+YIUMu3ooGJcUZyHHflBF019JXkQS7pI91Eqdw==
-X-Received: by 2002:a17:906:3943:: with SMTP id
- g3mr8607927eje.489.1590165093367; 
- Fri, 22 May 2020 09:31:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a18sm7584038edb.44.2020.05.22.09.31.31
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=G9X8uyPDhV16Hxow4Zcyx5aJejh0IiaqkWA79PUnMxc=;
+ b=L04kCVrpsr3MVIZUMH3tPPPiem0qxh3+eNoisgvcIdaIibjGao83uQ9F8x9cjlf9XI
+ tbT2dwxfj91z1OaTtMBlRVe9fIM6iFBXTTZN6yz66BaYbXc+DkLIYb2pWLfPQCl8s1h7
+ i8pP56++agLa2Q00d734WxG44nem9u0R4ykaboDZQWiXOZJ/h8uq1yxjiiayuhH0iVVG
+ T1gHOsnDPWgqGXydk+pGk2bNurIGziAPM11/VKSXohJU0umE3v+NqN7Vsn4IBIzlxDyK
+ SAHEK7FA5bDBw9r8m27qlfuwEPOsfhaFH+ckO81ikJpciwO2dVYQny9/dA2BRNk9MyvL
+ 9ntA==
+X-Gm-Message-State: AOAM531lplc2FUZdYAtpS1nhX9QNaWZN88gteqRSPAnvMwSlsTTYJV6s
+ expwpPxyX37PYdOTbEh2p87CGYAMKDNcxB5FwCOwjJ/I2n080RDoLkbDKobUTFg1PtXTuuZwYUa
+ 5o3DwnjmKz6Q5Ew4=
+X-Received: by 2002:adf:df0e:: with SMTP id y14mr4084103wrl.6.1590165481748;
+ Fri, 22 May 2020 09:38:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyr4hZHt+rmg+uNsJrDXDS/a5DePwQrrk3Ybf2cL4t0W71kyOSDGgVGesrA1NbZQA7dJguRYg==
+X-Received: by 2002:adf:df0e:: with SMTP id y14mr4084094wrl.6.1590165481552;
+ Fri, 22 May 2020 09:38:01 -0700 (PDT)
+Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id a12sm9688898wro.68.2020.05.22.09.38.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 09:31:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4552E1FF7E;
- Fri, 22 May 2020 17:31:31 +0100 (BST)
-References: <20200519132259.405-1-robert.foley@linaro.org>
- <20200519132259.405-13-robert.foley@linaro.org>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v7 12/12] tests/vm: Add workaround to consume console
-In-reply-to: <20200519132259.405-13-robert.foley@linaro.org>
-Date: Fri, 22 May 2020 17:31:31 +0100
-Message-ID: <87zha0c4nw.fsf@linaro.org>
+ Fri, 22 May 2020 09:38:00 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 00/11] accel: Allow targets to use Kconfig
+Date: Fri, 22 May 2020 18:37:48 +0200
+Message-Id: <20200522163759.11480-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:12:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,235 +106,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, Cleber Rosa <crosa@redhat.com>, philmd@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Missing review:
+- patch #4 'rules.mak: Add startwith rule'
+- patch #5 'rules.mak: Add base-arch rule'.
 
-Robert Foley <robert.foley@linaro.org> writes:
+This series include generic patches I took of the KVM/ARM
+specific series which will follow.
 
-I think you need to look at adding:
+- List orphan accelerators in MAINTAINERS
+- Add accel/Kconfig
+- Allow targets to use their how Kconfig
 
-[sendemail]
-	cccmd =3D scripts/get_maintainer.pl --nogit-fallback
+Since v3:
+- Fixed base-arch() rule (rth)
+- Dropped 'semihosting: Make the feature depend of TCG'
 
-to your .git/config to ensure maintainers get pinged when you touch
-their subsystems. Eduardo and Cleber CC'd=20
+Since v2:
+- Addressed Thomas review comments
+- Fixed problem when including TARGET instead of BASE_TARGET
 
-> The ConsoleSocket object provides a socket interface
-> which will consume all arriving characters on the
-> socket, but will provide those chars via recv() as
-> would a regular socket.
-> This is a workaround we found was needed since
-> there is a known issue where QEMU will hang waiting
-> for console characters to be consumed.
-> We also add the option of logging the console to a file.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-> ---
->  python/qemu/console_socket.py | 162 ++++++++++++++++++++++++++++++++++
->  python/qemu/machine.py        |  23 ++++-
->  tests/vm/Makefile.include     |   4 +
->  tests/vm/basevm.py            |  19 +++-
->  4 files changed, 202 insertions(+), 6 deletions(-)
->  create mode 100644 python/qemu/console_socket.py
->
-> diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-> new file mode 100644
-> index 0000000000..a1f74e60ac
-> --- /dev/null
-> +++ b/python/qemu/console_socket.py
-> @@ -0,0 +1,162 @@
-> +#!/usr/bin/env python3
-> +#
-> +# This python module implements a ConsoleSocket object which is
-> +# designed always drain the socket itself, and place
-> +# the bytes into a in memory buffer for later processing.
-> +#
-> +# Optionally a file path can be passed in and we will also
-> +# dump the characters to this file for debug.
-> +#
-> +# Copyright 2020 Linaro
-> +#
-> +# Authors:
-> +#  Robert Foley <robert.foley@linaro.org>
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +import asyncore
-> +import socket
-> +import threading
-> +import io
-> +import os
-> +import sys
-> +from collections import deque
-> +import time
-> +import traceback
+Since v1:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg689024.html
+- Drop HVF MAINTAINERS patch (merged elsewhere)
+- Kconfig-select SEMIHOSTING (bonzini)
+- Drop user-mode selection patches
+- consider m68k/nios2/xtensa/riscv (pm215)
+- reword Kconfig SEMIHOSTING description (pm215)
+- reset some of rth R-b tags
 
-Left over debug?
+Previous RFC for semihosting posted earlier:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg631218.html
 
-> +
-> +class ConsoleSocket(asyncore.dispatcher):
-> +
-> +    def __init__(self, address, file=3DNone):
-> +        self._recv_timeout_sec =3D 300
-> +        self._buffer =3D deque()
-> +        self._asyncore_thread =3D None
-> +        self._sock =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-> +        self._sock.connect(address)
-> +        self._logfile =3D None
-> +        if file:
-> +            self._logfile =3D open(file, "w")
-> +        asyncore.dispatcher.__init__(self, sock=3Dself._sock)
-> +        self._thread_start()
-> +        self._open =3D True
-> +
-> +    def _thread_start(self):
-> +        """Kick off a thread to wait on the asyncore.loop"""
-> +        if self._asyncore_thread is not None:
-> +            return
-> +        self._asyncore_thread =3D threading.Thread(target=3Dasyncore.loo=
-p,
-> +                                                 kwargs=3D{'timeout':1})
-> +        self._asyncore_thread.daemon =3D True
-> +        self._asyncore_thread.start()
-> +
-> +    def handle_close(self):
-> +        """redirect close to base class"""
-> +        # Call the base class close, but not self.close() since
-> +        # handle_close() occurs in the context of the thread which
-> +        # self.close() attempts to join.
-> +        asyncore.dispatcher.close(self)
-> +
-> +    def close(self):
-> +        """Close the base object and wait for the thread to terminate"""
-> +        if self._open:
-> +            self._open =3D False
-> +            asyncore.dispatcher.close(self)
-> +            if self._asyncore_thread is not None:
-> +                thread, self._asyncore_thread =3D self._asyncore_thread,=
- None
-> +                thread.join()
-> +            if self._logfile:
-> +                self._logfile.close()
-> +                self._logfile =3D None
-> +
-> +    def handle_read(self):
-> +        """process arriving characters into in memory _buffer"""
-> +        try:
-> +            data =3D asyncore.dispatcher.recv(self, 1)
-> +            # latin1 is needed since there are some chars
-> +            # we are receiving that cannot be encoded to utf-8
-> +            # such as 0xe2, 0x80, 0xA6.
-> +            string =3D data.decode("latin1")
-> +        except:
-> +            print("Exception seen.")
-> +            traceback.print_exc()
-> +            return
-> +        if self._logfile:
-> +            self._logfile.write("{}".format(string))
-> +            self._logfile.flush()
-> +        for c in string:
-> +            self._buffer.append(c)
-> +
-> +    def recv(self, n=3D1):
-> +        """Return chars from in memory buffer"""
-> +        start_time =3D time.time()
-> +        while len(self._buffer) < n:
-> +            time.sleep(0.1)
-> +            elapsed_sec =3D time.time() - start_time
-> +            if elapsed_sec > self._recv_timeout_sec:
-> +                raise socket.timeout
-> +        chars =3D ''.join([self._buffer.popleft() for i in range(n)])
-> +        # We choose to use latin1 to remain consistent with
-> +        # handle_read() and give back the same data as the user would
-> +        # receive if they were reading directly from the
-> +        # socket w/o our intervention.
-> +        return chars.encode("latin1")
-> +
-> +    def set_blocking(self):
-> +        """Maintain compatibility with socket API"""
-> +        pass
-> +
-> +    def settimeout(self, seconds):
-> +        """Set current timeout on recv"""
-> +        self._recv_timeout_sec =3D seconds
-> +
-> +class ByteBuffer(deque):
-> +    """Simple in memory buffer with read/write interface"""
-> +    def write(self, bytes):
-> +        for i in bytes:
-> +            self.append(i)
-> +    def read(self, n):
-> +        return ''.join([self.popleft() for i in range(n)])
-> +
-> +if __name__ =3D=3D '__main__':
+$ git backport-diff -u v3 -r v4
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-If the module is meant to be executable then you need to +x the file.
-However since 8f8fd9edba I think everything is meant to be doing things
-the pythonic way as a proper module. I'm not sure where unit tests for
-the modules are meant to sit in this case.
+001/11:[----] [--] 'MAINTAINERS: Fix KVM path expansion glob'
+002/11:[----] [--] 'MAINTAINERS: Add an 'overall' entry for accelerators'
+003/11:[----] [--] 'MAINTAINERS: Add an entry for the HAX accelerator'
+004/11:[down] 'rules.mak: Add startwith() rule'
+005/11:[0025] [FC] 'rules.mak: Add base-arch() rule'
+006/11:[----] [--] 'Makefile: Remove dangerous EOL trailing backslash'
+007/11:[----] [--] 'Makefile: Write MINIKCONF variables as one entry per line'
+008/11:[----] [--] 'accel/Kconfig: Extract accel selectors into their own config'
+009/11:[----] [--] 'accel/Kconfig: Add the TCG selector'
+010/11:[----] [--] 'Makefile: Allow target-specific optional Kconfig'
+011/11:[----] [--] 'accel/tcg: Add stub for probe_access()'
 
-> +    # Brief test to exercise the above code.
-> +    # The ConsoleSocket will ship some data to the server,
-> +    # the server will echo it back and the client will echo what it rece=
-ived.
-> +
-> +    # First remove the socket.
-> +    address =3D "./test_console_socket"
-> +    if os.path.exists(address):
-> +        os.unlink(address)
-> +
-> +    # Create the server side.
-> +    server_socket =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-> +    server_socket.bind(address)
-> +    server_socket.listen(1)
-> +
-> +    # Create the object we are trying to test.
-> +    console_socket =3D ConsoleSocket(address, file=3D"./logfile.txt")
-> +
-> +    # Generate some data and ship it over the socket.
-> +    send_data =3D ""
-> +    for i in range(10):
-> +        send_data +=3D "this is a test message {}\n".format(i)
-> +    console_socket.send(send_data.encode('latin1'))
-> +    connection, client_address =3D server_socket.accept()
-> +
-> +    # Process the data on the server and ship it back.
-> +    data =3D connection.recv(len(send_data))
-> +    print("server received: {}".format(data))
-> +    print("server: sending data back to the client")
-> +    connection.sendall(data)
-> +
-> +    # Client receives teh bytes and displays them.
+Supersedes: <20200521195911.19685-1-philmd@redhat.com>
 
-s/teh/the/
+Philippe Mathieu-Daudé (11):
+  MAINTAINERS: Fix KVM path expansion glob
+  MAINTAINERS: Add an 'overall' entry for accelerators
+  MAINTAINERS: Add an entry for the HAX accelerator
+  rules.mak: Add startwith() rule
+  rules.mak: Add base-arch() rule
+  Makefile: Remove dangerous EOL trailing backslash
+  Makefile: Write MINIKCONF variables as one entry per line
+  accel/Kconfig: Extract accel selectors into their own config
+  accel/Kconfig: Add the TCG selector
+  Makefile: Allow target-specific optional Kconfig
+  accel/tcg: Add stub for probe_access()
 
-> +    print("client: receiving bytes")
-> +    bytes =3D console_socket.recv(len(data))
-> +    recv_data =3D bytes.decode('latin1')
-> +    print("client received: {}".format(recv_data))
-> +    assert(recv_data =3D=3D send_data)
-> +    # Close console connection first, then close server.
-> +    console_socket.close()
-> +    connection.close()
-> +    server_socket.close()
-> +    print("test successful.")
-> +
+ Makefile               | 15 +++++++++++----
+ rules.mak              | 34 ++++++++++++++++++++++++++++++++++
+ accel/stubs/tcg-stub.c |  7 +++++++
+ Kconfig.host           |  7 -------
+ MAINTAINERS            | 19 ++++++++++++++++++-
+ accel/Kconfig          |  9 +++++++++
+ 6 files changed, 79 insertions(+), 12 deletions(-)
+ create mode 100644 accel/Kconfig
 
-I think in this case it might be worth splitting introducing the
-functionally into the python library from the actual usage of it in the
-wider machines.
+-- 
+2.21.3
 
-Otherwise it seems to work well enough for me. I'd like the proper
-python gurus to have a look over it though.
-
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
 
