@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C99DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 17:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339F7C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 17:33:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD594206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 17:33:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDEFD206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 17:33:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrrW2ZTx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD594206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuCItxMI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDEFD206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcBXb-0000oz-03
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 13:33:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47852)
+	id 1jcBXi-0001CF-50
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 13:33:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcBR3-0006BN-JM
- for qemu-devel@nongnu.org; Fri, 22 May 2020 13:26:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28033
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcBQt-0005ye-GM
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 13:26:07 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36327
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcBR1-0002ES-Bx
- for qemu-devel@nongnu.org; Fri, 22 May 2020 13:26:16 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcBQr-0002Az-RB
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 13:26:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590168374;
+ s=mimecast20190719; t=1590168364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PSd40Ze4XM2b/X382gY1wRiBudpttPKJ8TAR2241lwg=;
- b=XrrW2ZTx53ChDE4rH5U0AYqIjha9IS7skLPxYJMVvO/NaI7SLUmX8UFKXYeXj2nFPpHxSx
- LJ87UCRw57Bx+66cSVs7hQ1MWCYhm3kdO/MYVo57ZmkhDd9V4+h7nAdJIOEX7/TSjrLWSi
- 85ygdirMWacumV+YJDuFW1aIYqO2YGA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-miXhT13iPMKWFFOo_ALjLw-1; Fri, 22 May 2020 13:26:12 -0400
-X-MC-Unique: miXhT13iPMKWFFOo_ALjLw-1
-Received: by mail-wr1-f69.google.com with SMTP id d6so508207wrn.1
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 10:26:12 -0700 (PDT)
+ bh=njMVcw9nzb67by0KnDJJ20QJffO3+OPEhMt5z5q8uy0=;
+ b=NuCItxMIcAEpTineeNVzcOJzxvowhhQA+sSIBdcK29OtJ7fj9Vg+fDmV/qgXbmp5tRzIy4
+ rcuYIxw8mWU9osnWp55dkqR6NwiZcFq3+EWKNGguLvWuOZFhiYCSel61X3OK5+pl9MDwFd
+ DM9LkbsXu7QqdXKoBdRIk0wsGdSsOSY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-nDi3pFOONL253WaGctjbaw-1; Fri, 22 May 2020 13:26:03 -0400
+X-MC-Unique: nDi3pFOONL253WaGctjbaw-1
+Received: by mail-wr1-f70.google.com with SMTP id n9so4629374wru.20
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 10:26:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PSd40Ze4XM2b/X382gY1wRiBudpttPKJ8TAR2241lwg=;
- b=mEOHcs1vxTaMYXkBsTOIwYd/thipfOu58MYAYoU+xXCnQdGgf0PHMtXqXPZHSWkHCe
- KEo8wKGF3Vv9w+95ozO1qYqoWyB3cTvRcfWx9yP96T1ucjODTNV+9X+kVbaptGrN5GPT
- 2Ya9UCcUKRHy6/XymwPpOx8DlO0YG7qEtbB/EakGH32fL7FSQ4pmpehkQeef1voVMso9
- BvHb72sWF7avHfOEhOVipqUlC35OMPp6fd3gnvJiP99p/khVyhNTBjEDG/soW6xbeIS+
- wOsVRHytVjzbFC+aJP3TE3m+dcGbix0hroq/0/MAg8hsEI12vjTo6AADyN4ONFIOGnsF
- 3M7g==
-X-Gm-Message-State: AOAM533hWutaB4KwckGLCpUktahIjMTBT5UkxNpaLPGzXPUB3unBwWjT
- a5IGLW+u6cWYpUtUvE0nIEWoR47rE0LFjs+Q9uPgPEaZIEGDgx0cHhRfMLWsHLY2HIQh/kftrxi
- 0oyXHaHiLKiChY+Y=
-X-Received: by 2002:a5d:4dc9:: with SMTP id f9mr4128502wru.407.1590168371239; 
- Fri, 22 May 2020 10:26:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSSDT7mWCRgue/lCKohrU0T76EdQPrGYzEKzkRdy9U4PMJfPXzqLgEz/ZvOl8yqx15fixuLA==
-X-Received: by 2002:a5d:4dc9:: with SMTP id f9mr4128478wru.407.1590168371036; 
- Fri, 22 May 2020 10:26:11 -0700 (PDT)
+ bh=njMVcw9nzb67by0KnDJJ20QJffO3+OPEhMt5z5q8uy0=;
+ b=Zili8TGHWsK1g/iQrJbxJHUv4FRv3LkKQtlikt0QiJHowspldWOE5f4WpRh90JpQ2U
+ 6f6LPRoRr5rJIXEuqVHzJDyqy2w03EyVWBqeGl05QNvEl+3pXXDQjRbw3NhnfTN0tnmk
+ 7Z8aF+rAD+oTp0NCrH8GH5N2TzXefykvnInAOodSB1lzNdnR6fevw1fhWNcVRuMO2Bvn
+ D2V/NwylXYx/uAnimFc54nNLXme/Oceb6AQV7AC/i1V91jt6ipbev16RNsLSKMEyJQ4G
+ Q4xBFUjGov0tXavsLUCIPODRIFxO5NifbzorB9AHkkxWl4ZOmWVUM/8kt6E59JCjFkpV
+ 6r1w==
+X-Gm-Message-State: AOAM531A9F38nPvL+O7hMGvG4AikcowILyoZW/w2UvzEE8J1r4azxN2m
+ tETD9lJIFVdUJfSOXe0mtnFPmKKP4hwYVKkTwMmi4DPKaaCQyYyulvKnlZ9vW/aZZFLS8b/vfwL
+ cbhU4Q9IHBhoKkvI=
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr4295123wrx.54.1590168361859; 
+ Fri, 22 May 2020 10:26:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTWSYeq5PO/H81uw1oH1eRVrb4JRSLJ7bWz8JXtUZLG7fdkypR0KgHWeUhNA/fdldKY/EEVQ==
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr4295098wrx.54.1590168361652; 
+ Fri, 22 May 2020 10:26:01 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id v126sm11365914wma.9.2020.05.22.10.26.09
+ by smtp.gmail.com with ESMTPSA id 81sm10811338wme.16.2020.05.22.10.26.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 10:26:10 -0700 (PDT)
+ Fri, 22 May 2020 10:26:01 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/13] hw/core: Restrict CpuClass::get_crash_info() to
+Subject: [PATCH v4 10/13] target/i386: Restrict CpuClass::get_crash_info() to
  system-mode
-Date: Fri, 22 May 2020 19:25:09 +0200
-Message-Id: <20200522172510.25784-13-philmd@redhat.com>
+Date: Fri, 22 May 2020 19:25:07 +0200
+Message-Id: <20200522172510.25784-11-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200522172510.25784-1-philmd@redhat.com>
 References: <20200522172510.25784-1-philmd@redhat.com>
@@ -131,62 +133,56 @@ Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/core/cpu.h | 7 ++++++-
- hw/core/cpu.c         | 2 ++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ target/i386/cpu.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 07f7698155..497600c49e 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -490,6 +490,8 @@ bool cpu_paging_enabled(const CPUState *cpu);
- void cpu_get_memory_mapping(CPUState *cpu, MemoryMappingList *list,
-                             Error **errp);
- 
-+#if !defined(CONFIG_USER_ONLY)
-+
- /**
-  * cpu_write_elf64_note:
-  * @f: pointer to a function that writes memory to a file
-@@ -539,6 +541,8 @@ int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
-  */
- GuestPanicInformation *cpu_get_crash_info(CPUState *cpu);
- 
-+#endif /* !CONFIG_USER_ONLY */
-+
- /**
-  * CPUDumpFlags:
-  * @CPU_DUMP_CODE:
-@@ -632,7 +636,8 @@ static inline int cpu_asidx_from_attrs(CPUState *cpu, MemTxAttrs attrs)
-     }
-     return ret;
- }
--#endif
-+
-+#endif /* CONFIG_USER_ONLY */
- 
- /**
-  * cpu_list_add:
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 5284d384fb..f31ec48ee6 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -209,6 +209,7 @@ static bool cpu_common_exec_interrupt(CPUState *cpu, int int_req)
-     return false;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 7a4a8e3847..dd31c1de5f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6843,6 +6843,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
+     x86_cpu_register_bit_prop(cpu, name, w, bitnr);
  }
  
 +#if !defined(CONFIG_USER_ONLY)
- GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
+ static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
  {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-@@ -219,6 +220,7 @@ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
-     }
-     return res;
+     X86CPU *cpu = X86_CPU(cs);
+@@ -6886,6 +6887,7 @@ static void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
+                                      errp);
+     qapi_free_GuestPanicInformation(panic_info);
  }
++#endif /* !CONFIG_USER_ONLY */
+ 
+ static void x86_cpu_initfn(Object *obj)
+ {
+@@ -6932,8 +6934,10 @@ static void x86_cpu_initfn(Object *obj)
+                         x86_cpu_get_unavailable_features,
+                         NULL, NULL, NULL);
+ 
++#if !defined(CONFIG_USER_ONLY)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL);
 +#endif
  
- void cpu_dump_state(CPUState *cpu, FILE *f, int flags)
- {
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
+@@ -7245,7 +7249,6 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
+ #endif
+     cc->dump_state = x86_cpu_dump_state;
+-    cc->get_crash_info = x86_cpu_get_crash_info;
+     cc->set_pc = x86_cpu_set_pc;
+     cc->synchronize_from_tb = x86_cpu_synchronize_from_tb;
+     cc->gdb_read_register = x86_cpu_gdb_read_register;
+@@ -7256,6 +7259,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->asidx_from_attrs = x86_asidx_from_attrs;
+     cc->get_memory_mapping = x86_cpu_get_memory_mapping;
+     cc->get_phys_page_attrs_debug = x86_cpu_get_phys_page_attrs_debug;
++    cc->get_crash_info = x86_cpu_get_crash_info;
+     cc->write_elf64_note = x86_cpu_write_elf64_note;
+     cc->write_elf64_qemunote = x86_cpu_write_elf64_qemunote;
+     cc->write_elf32_note = x86_cpu_write_elf32_note;
 -- 
 2.21.3
 
