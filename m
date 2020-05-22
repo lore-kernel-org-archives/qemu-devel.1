@@ -2,90 +2,87 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BF5C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 21:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B61C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 21:34:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56E3F20723
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 21:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C70220723
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 21:34:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIK1pHvh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E3F20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O+4Nti1U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C70220723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcFJB-0004D7-EQ
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 17:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43356)
+	id 1jcFJO-0004XB-R7
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 17:34:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcFI8-0003Rc-GI
- for qemu-devel@nongnu.org; Fri, 22 May 2020 17:33:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52901
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcFI4-0008Ul-39
- for qemu-devel@nongnu.org; Fri, 22 May 2020 17:33:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590183193;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rNmW1dtOFZFiL12rM2ng33/5ZSrlUM4H4uxn+6m12vA=;
- b=KIK1pHvhnOKVnHEleKO7MNcYyURn6pfVVnmOaKqfteepZlwyM68uFb0UZLV3YbiJBKFSV5
- K8kLYN/BJlA5k3LiBpWEd5FkdS9m/WWsRWKqmZ9lG8dydrXCbtbur1blOAWqRiG9X+i1al
- xDRqoHWQSu46kw6m9jeFajA9q8xFTos=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-7Ka_OUrUND-rmE_IoSEZFA-1; Fri, 22 May 2020 17:33:07 -0400
-X-MC-Unique: 7Ka_OUrUND-rmE_IoSEZFA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 082531005512;
- Fri, 22 May 2020 21:33:06 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79A2E5D788;
- Fri, 22 May 2020 21:33:01 +0000 (UTC)
-Subject: Re: [PATCH v3 1/3] block/io: refactor coroutine wrappers
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200522161950.2839-1-vsementsov@virtuozzo.com>
- <20200522161950.2839-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <d3e7dbc9-ba3b-965d-726b-8a99007a8e08@redhat.com>
-Date: Fri, 22 May 2020 16:33:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcFIP-0003f3-Jm
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 17:33:37 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:46501)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcFIO-000099-DV
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 17:33:37 -0400
+Received: by mail-lf1-x141.google.com with SMTP id r125so7278107lff.13
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 14:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7JlkUZtCdNcp9FEiAbt/vaM6ONHQ2wi4161m9i3NjJU=;
+ b=O+4Nti1Ul5wQC5PosjsdTlbmQmW5I8B+4NUingiFCZiDZACAI2Y6u+BRH3BQkYrrNh
+ gFqwRg6lvJ9jwUidyDpAlJffMRqc6tbqJPyT5am9/w5oUqFdRjj42K+A/5QfmTMzxWET
+ WpPi6HjTiRewbtZvoPKnv29DoWdl8EPqo4LCC1lh/04eCV0OdqKiIVEPTy15+kLVa/+k
+ dX2TkO/a58Sd1z74udatn6RssgBnxDQlWodOOWghNppEId3TKf5hChNM+UrqJwqy0gVH
+ ewg3ne63ZFcuNH/YqHNFbgL3ZkjMfQQSxgVhgP0Vyk07mRWn2pMbMrpaA255iQk0h1OX
+ +wcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7JlkUZtCdNcp9FEiAbt/vaM6ONHQ2wi4161m9i3NjJU=;
+ b=oRGIPW6kq9KzekotsK9UJJ+oulCY+NGmB7MI9ND0RbyeKmhl8H0C1iSEOAJco4jO3B
+ PXTer4K595dVp4KbRUE/0Y+fIspVB9OqRVIU1frL9hjeA5hZnjN5DCSd6cr+AYGcTr2a
+ SzhT+kObyXuPh7+MVCusLMprgAo56rI0jAlQ9pkRgndyb1LicRA3MbSiqFoQWIcjJ9tk
+ GtdubwwYmh8/NRdbgfkJw2pKal/zFmbOCSLqkN/086YoFsd4WDW3/wa13ydbQR5UMmyc
+ 8i7giEfp/nircS9uH38SnpwdqmeYcaU0AJdJoiZF4wuBF1EiKSPw1d+FEAMxzKQBSK1R
+ 27tg==
+X-Gm-Message-State: AOAM5332v5L04NUsjyyQayiirfFRF4jZs3ChbrcLhqsJ1EicDPYAbWO/
+ esEMBya2FgUZZDhjxTkW6ymPs+PKu54SoOWmAO3h5w==
+X-Google-Smtp-Source: ABdhPJyJDvGNXvOx+XSDMfcFLKAVWUTcG2IfB9GFr8f/0IL7OclKGLwIoZQUH8i7l+/2GHXF/LPAMp8qFVqaUMYEDzc=
+X-Received: by 2002:a19:be11:: with SMTP id o17mr8260735lff.187.1590183214500; 
+ Fri, 22 May 2020 14:33:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200522161950.2839-2-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 17:33:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200522160755.886-1-robert.foley@linaro.org>
+ <20200522160755.886-19-robert.foley@linaro.org>
+ <CAFEAcA8gqM1vn4eV5XK-2qOQ47ugO9OsFWA_+MgRpO4Vb5JFOQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA8gqM1vn4eV5XK-2qOQ47ugO9OsFWA_+MgRpO4Vb5JFOQ@mail.gmail.com>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 22 May 2020 17:33:27 -0400
+Message-ID: <CAEyhzFsS3g-OQ0JzcDVfaaKAt9632XmKfzC0tfy0VmF_RRB2Og@mail.gmail.com>
+Subject: Re: [PATCH 18/19] target/arm: Fix tsan warning in cpu.c
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,84 +95,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- crosa@redhat.com, den@openvz.org
+Cc: Peter Puhov <peter.puhov@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Emilio G. Cota" <cota@braap.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/22/20 11:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Most of coroutine wrappers already follow this notation:
+On Fri, 22 May 2020 at 13:44, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 22 May 2020 at 17:15, Robert Foley <robert.foley@linaro.org> wrote:
+> >
+> > For example:
+> > WARNING: ThreadSanitizer: data race (pid=11134)
+> >   Atomic write of size 4 at 0x7bbc0000e0ac by main thread (mutexes: write M875):
+> >     #0 __tsan_atomic32_store <null> (qemu-system-aarch64+0x394d84)
+> >     #1 cpu_reset_interrupt hw/core/cpu.c:107:5 (qemu-system-aarch64+0x842f90)
+> >     #2 arm_cpu_set_irq target/arm/cpu.c (qemu-system-aarch64+0x615a55)
+> >
+> >   Previous read of size 4 at 0x7bbc0000e0ac by thread T7:
+> >     #0 arm_cpu_has_work target/arm/cpu.c:78:16 (qemu-system-aarch64+0x6178ba)
+> >     #1 cpu_has_work include/hw/core/cpu.h:700:12 (qemu-system-aarch64+0x68be2e)
+> >
+> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> > Cc: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > ---
+> >  target/arm/cpu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index 32bec156f2..cdb90582ee 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -75,7 +75,7 @@ static bool arm_cpu_has_work(CPUState *cs)
+> >      ARMCPU *cpu = ARM_CPU(cs);
+> >
+> >      return (cpu->power_state != PSCI_OFF)
+> > -        && cs->interrupt_request &
+> > +        && atomic_read(&cs->interrupt_request) &
+> >          (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
+> >           | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
+> >           | CPU_INTERRUPT_EXITTB);
+>
+> Every target's has_work function seems to access
+> cs->interrupt_request without using atomic_read() :
+> why does Arm need to do something special here?
+>
+> More generally, the only place that currently
+> uses atomic_read() on the interrupt_request field
+> is cpu_handle_interrupt(), so if this field needs
+> special precautions to access then a lot of code
+> needs updating.
 
-s/of/of our/
-s/notation/convention/
+TSan flagged this case as a potential data race. It does not mean
+necessarily that there is an issue here, just that two threads were
+accessing the data
+without TSan detecting the synchronization.  TSan gives a few options
+to silence the
+warning, such as changing the locking, making it atomic, or adding
+various types
+of annotations to tell TSan to ignore it.  So in this case we had a
+few options, such as
+to change it to atomic or to simply annotate it and silence it.
 
-> 
-> We have coroutine_fn bdrv_co_<something>(<normal argument list>), which
-> is the core functions, and wrapper, which does polling loope is called
-> bdrv_<something>(<same argument list>).
+We started our TSan testing using arm, and have been working to iron out the
+TSan warnings there, and there alone initially.  Assuming that we are OK
+with making this particular change, to silence the TSan warning,
+then certainly it is a good point that we need to consider changing the
+other places that access this field, since they will all see similar
+TSan warnings.
 
-We have 'coroutine_fn bdrv_co_<something>(<normal argument list>)' as 
-the core function, and a wrapper 'bdrv_<something>(<same argument 
-list>)' which does a polling loop.
+Of course if we are not OK with these changes to silence the TSan tool,
+that's OK too :).  In that case we can certainly just add an
+annotation either in the
+code or via our suppressions/blacklist and leave the code functionally
+unchanged.
 
-> 
-> The only outsiders are bdrv_prwv_co and bdrv_common_block_status_above
-
-s/are/are the/
-
-> wrappers. Let's refactor the to behave as the others, it simplifies
-
-s/the/them/
-
-> further conversion of coroutine wrappers.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/io.c | 61 +++++++++++++++++++++++++++++-------------------------
->   1 file changed, 33 insertions(+), 28 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 121ce17a49..bd00a70b47 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -900,28 +900,32 @@ typedef struct RwCo {
->       BdrvRequestFlags flags;
->   } RwCo;
->   
-> +static int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
-> +                                     QEMUIOVector *qiov, bool is_write,
-> +                                     BdrvRequestFlags flags)
-> +{
-> +    if (is_write) {
-> +        return bdrv_co_pwritev(child, offset, qiov->size, qiov, flags);
-> +    } else {
-> +        return bdrv_co_preadv(child, offset, qiov->size, qiov, flags);
-> +    }
-> +}
-> +
-
-If we're trying to avoid needless indirection, wouldn't it be simpler to 
-quit trying to slam reads and writes through a single prwv function that 
-then has to split back out, and instead make two separate coroutine 
-wrappers, one for just reads, and the other for just writes, without 
-having to mess with a 'bool is_write' parameter?
-
->   static void coroutine_fn bdrv_rw_co_entry(void *opaque)
->   {
-
-That is, should we have bdrv_co_preadv_entry and bdrv_co_pwritev_entry 
-instead of just one bdrv_rw_co_entry?
-
-At any rate, the renames done here are mechanical enough that if we make 
-further changes, it could be a separate commit.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Thanks & Regards,
+-Rob
+>
+> thanks
+> -- PMM
 
