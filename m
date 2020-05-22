@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9083C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 648B5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB026206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DA32206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 12:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VU6YLTQt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB026206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtWjAI/c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DA32206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc6lz-0002NE-To
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 08:27:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41630)
+	id 1jc6m2-0002Tu-32
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 08:27:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jc6kJ-00015t-Hq
- for qemu-devel@nongnu.org; Fri, 22 May 2020 08:25:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40734
- helo=us-smtp-1.mimecast.com)
+ id 1jc6kL-00019a-SH
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 08:25:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27649
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jc6kI-0002cA-EA
- for qemu-devel@nongnu.org; Fri, 22 May 2020 08:25:51 -0400
+ id 1jc6kK-0002cT-Jm
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 08:25:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590150349;
+ s=mimecast20190719; t=1590150351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Sg8iGobYcJLRYy7cpkwMAac/lbJFxgnD9DJhyPMEXQ0=;
- b=VU6YLTQtTJA0VGYySP3b6X+ULtfrTUFB6tvxRppEiI15lZc5RiVJjyQGsLGAuF3cujRl8Y
- OHBqgStayVlIcETBalXreq5QCYO592EZFX/JGIi36WBJZGGHlOtt2sXDYm1sLq63ue4vS1
- 34ncwjVqhq68slxPK+X0NTpWg8JJs88=
+ bh=EBBqIrjwLmRlKj8GHQsnVJV8Ka/DtTZDiJbzF2P/z04=;
+ b=VtWjAI/cb0FEOkDITBRyyTJva4d25Q/psZH9sPeeWxnOA3KWO1vfql6+z8rN1OcLnneyO+
+ o86HfBWAv4K4nKqydvJZt6ASanIQf+kWOhwQy+/PUnr6bnawj22wFPMxif9gO2ZJkDgInn
+ ASLJ0Z/23TYzODishg5QCtngDjY+pJQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-CB2b5LubMjS8uaXafjtMkw-1; Fri, 22 May 2020 08:25:47 -0400
-X-MC-Unique: CB2b5LubMjS8uaXafjtMkw-1
+ us-mta-220-XH3vk6tJNzS-GtaWnZwGNQ-1; Fri, 22 May 2020 08:25:50 -0400
+X-MC-Unique: XH3vk6tJNzS-GtaWnZwGNQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE5C6EC1A4;
- Fri, 22 May 2020 12:25:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 140678018A7;
+ Fri, 22 May 2020 12:25:49 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-114-19.ams2.redhat.com
  [10.36.114.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBC9E60CC0;
- Fri, 22 May 2020 12:25:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 331926106A;
+ Fri, 22 May 2020 12:25:46 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] virtio: add vhost-user-vsock base device
-Date: Fri, 22 May 2020 14:25:11 +0200
-Message-Id: <20200522122512.87413-3-sgarzare@redhat.com>
+Subject: [PATCH v2 3/3] virtio: add vhost-user-vsock-pci device
+Date: Fri, 22 May 2020 14:25:12 +0200
+Message-Id: <20200522122512.87413-4-sgarzare@redhat.com>
 In-Reply-To: <20200522122512.87413-1-sgarzare@redhat.com>
 References: <20200522122512.87413-1-sgarzare@redhat.com>
 MIME-Version: 1.0
@@ -71,16 +71,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 08:25:49
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 07:08:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,91 +101,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces a vhost-user device for vsock, using the
-vhost-vsock-common parent class.
+Add the PCI version of vhost-user-vsock
 
-The vhost-user-vsock device can be used to implement the virtio-vsock
-device emulation in user-space.
+Launch QEMU like this:
+
+  qemu -chardev socket,path=/tmp/vm.vsock,id=chr0 \
+       -device vhost-user-vsock-pci,chardev=chr0
 
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
-v1 -> v2:
-  - removed live migration code since vhost-user-vsock application built
-    with Cloud Hypervisor crates doesn't support VHOST_USER_PROTOCOL_F_LOG_SHMFD
-    so I'm not able to test this code [Stefan]
----
- configure                            |   3 +
- include/hw/virtio/vhost-user-vsock.h |  36 ++++++
- hw/virtio/vhost-user-vsock.c         | 181 +++++++++++++++++++++++++++
- hw/virtio/Makefile.objs              |   1 +
- 4 files changed, 221 insertions(+)
- create mode 100644 include/hw/virtio/vhost-user-vsock.h
- create mode 100644 hw/virtio/vhost-user-vsock.c
+ hw/virtio/vhost-user-vsock-pci.c | 84 ++++++++++++++++++++++++++++++++
+ hw/virtio/Makefile.objs          |  1 +
+ 2 files changed, 85 insertions(+)
+ create mode 100644 hw/virtio/vhost-user-vsock-pci.c
 
-diff --git a/configure b/configure
-index 2fc05c4465..b60ddbec41 100755
---- a/configure
-+++ b/configure
-@@ -7175,6 +7175,9 @@ if test "$vhost_crypto" = "yes" ; then
- fi
- if test "$vhost_vsock" = "yes" ; then
-   echo "CONFIG_VHOST_VSOCK=y" >> $config_host_mak
-+  if test "$vhost_user" = "yes" ; then
-+    echo "CONFIG_VHOST_USER_VSOCK=y" >> $config_host_mak
-+  fi
- fi
- if test "$vhost_kernel" = "yes" ; then
-   echo "CONFIG_VHOST_KERNEL=y" >> $config_host_mak
-diff --git a/include/hw/virtio/vhost-user-vsock.h b/include/hw/virtio/vhost-user-vsock.h
+diff --git a/hw/virtio/vhost-user-vsock-pci.c b/hw/virtio/vhost-user-vsock-pci.c
 new file mode 100644
-index 0000000000..4e128a4b9f
+index 0000000000..0a6847e6fc
 --- /dev/null
-+++ b/include/hw/virtio/vhost-user-vsock.h
-@@ -0,0 +1,36 @@
++++ b/hw/virtio/vhost-user-vsock-pci.c
+@@ -0,0 +1,84 @@
 +/*
-+ * Vhost-user vsock virtio device
-+ *
-+ * Copyright 2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#ifndef _QEMU_VHOST_USER_VSOCK_H
-+#define _QEMU_VHOST_USER_VSOCK_H
-+
-+#include "hw/virtio/vhost-vsock-common.h"
-+#include "hw/virtio/vhost-user.h"
-+#include "standard-headers/linux/virtio_vsock.h"
-+
-+#define TYPE_VHOST_USER_VSOCK "vhost-user-vsock-device"
-+#define VHOST_USER_VSOCK(obj) \
-+        OBJECT_CHECK(VHostUserVSock, (obj), TYPE_VHOST_USER_VSOCK)
-+
-+typedef struct {
-+    CharBackend chardev;
-+} VHostUserVSockConf;
-+
-+typedef struct {
-+    /*< private >*/
-+    VHostVSockCommon parent;
-+    VhostUserState vhost_user;
-+    VHostUserVSockConf conf;
-+    struct virtio_vsock_config vsockcfg;
-+
-+    /*< public >*/
-+} VHostUserVSock;
-+
-+#endif /* _QEMU_VHOST_USER_VSOCK_H */
-diff --git a/hw/virtio/vhost-user-vsock.c b/hw/virtio/vhost-user-vsock.c
-new file mode 100644
-index 0000000000..3534a39d62
---- /dev/null
-+++ b/hw/virtio/vhost-user-vsock.c
-@@ -0,0 +1,181 @@
-+/*
-+ * Vhost-user vsock virtio device
++ * Vhost-user vsock PCI Bindings
 + *
 + * Copyright 2020 Red Hat, Inc.
 + *
@@ -196,187 +133,90 @@ index 0000000000..3534a39d62
 +
 +#include "qemu/osdep.h"
 +
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
++#include "virtio-pci.h"
 +#include "hw/qdev-properties.h"
 +#include "hw/virtio/vhost-user-vsock.h"
 +
-+static const int user_feature_bits[] = {
-+    VIRTIO_F_VERSION_1,
-+    VIRTIO_RING_F_INDIRECT_DESC,
-+    VIRTIO_RING_F_EVENT_IDX,
-+    VIRTIO_F_NOTIFY_ON_EMPTY,
-+    VHOST_INVALID_FEATURE_BIT
++typedef struct VHostUserVSockPCI VHostUserVSockPCI;
++
++/*
++ * vhost-user-vsock-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_USER_VSOCK_PCI "vhost-user-vsock-pci-base"
++#define VHOST_USER_VSOCK_PCI(obj) \
++        OBJECT_CHECK(VHostUserVSockPCI, (obj), TYPE_VHOST_USER_VSOCK_PCI)
++
++struct VHostUserVSockPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserVSock vdev;
 +};
 +
-+static void vuv_get_config(VirtIODevice *vdev, uint8_t *config)
-+{
-+    VHostUserVSock *vsock = VHOST_USER_VSOCK(vdev);
++/* vhost-user-vsock-pci */
 +
-+    memcpy(config, &vsock->vsockcfg, sizeof(struct virtio_vsock_config));
-+}
-+
-+static int vuv_handle_config_change(struct vhost_dev *dev)
-+{
-+    VHostUserVSock *vsock = VHOST_USER_VSOCK(dev->vdev);
-+    int ret = vhost_dev_get_config(dev, (uint8_t *)&vsock->vsockcfg,
-+                                   sizeof(struct virtio_vsock_config));
-+    if (ret < 0) {
-+        error_report("get config space failed");
-+        return -1;
-+    }
-+
-+    virtio_notify_config(dev->vdev);
-+
-+    return 0;
-+}
-+
-+const VhostDevConfigOps vsock_ops = {
-+    .vhost_dev_config_notifier = vuv_handle_config_change,
-+};
-+
-+static void vuv_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-+
-+    if (!vdev->vm_running) {
-+        should_start = false;
-+    }
-+
-+    if (vvc->vhost_dev.started == should_start) {
-+        return;
-+    }
-+
-+    if (should_start) {
-+        int ret = vhost_vsock_common_start(vdev);
-+        if (ret < 0) {
-+            return;
-+        }
-+    } else {
-+        vhost_vsock_common_stop(vdev);
-+    }
-+}
-+
-+static uint64_t vuv_get_features(VirtIODevice *vdev,
-+                                 uint64_t features,
-+                                 Error **errp)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+
-+    return vhost_get_features(&vvc->vhost_dev, user_feature_bits, features);
-+}
-+
-+static const VMStateDescription vuv_vmstate = {
-+    .name = "vhost-user-vsock",
-+    .unmigratable = 1,
-+};
-+
-+static void vuv_device_realize(DeviceState *dev, Error **errp)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(dev);
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserVSock *vsock = VHOST_USER_VSOCK(dev);
-+    int ret;
-+
-+    if (!vsock->conf.chardev.chr) {
-+        error_setg(errp, "missing chardev");
-+        return;
-+    }
-+
-+    if (!vhost_user_init(&vsock->vhost_user, &vsock->conf.chardev, errp)) {
-+        return;
-+    }
-+
-+    vhost_vsock_common_realize(vdev, "vhost-user-vsock");
-+
-+    vhost_dev_set_config_notifier(&vvc->vhost_dev, &vsock_ops);
-+
-+    ret = vhost_dev_init(&vvc->vhost_dev, &vsock->vhost_user,
-+                         VHOST_BACKEND_TYPE_USER, 0);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "vhost_dev_init failed");
-+        goto err_virtio;
-+    }
-+
-+    ret = vhost_dev_get_config(&vvc->vhost_dev, (uint8_t *)&vsock->vsockcfg,
-+                               sizeof(struct virtio_vsock_config));
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "get config space failed");
-+        goto err_vhost_dev;
-+    }
-+
-+    return;
-+
-+err_vhost_dev:
-+    vhost_dev_cleanup(&vvc->vhost_dev);
-+err_virtio:
-+    vhost_vsock_common_unrealize(vdev);
-+    vhost_user_cleanup(&vsock->vhost_user);
-+    return;
-+}
-+
-+static void vuv_device_unrealize(DeviceState *dev)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(dev);
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserVSock *vsock = VHOST_USER_VSOCK(dev);
-+
-+    /* This will stop vhost backend if appropriate. */
-+    vuv_set_status(vdev, 0);
-+
-+    vhost_dev_cleanup(&vvc->vhost_dev);
-+
-+    vhost_vsock_common_unrealize(vdev);
-+
-+    vhost_user_cleanup(&vsock->vhost_user);
-+
-+}
-+
-+static Property vuv_properties[] = {
-+    DEFINE_PROP_CHR("chardev", VHostUserVSock, conf.chardev),
++static Property vhost_user_vsock_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void vuv_class_init(ObjectClass *klass, void *data)
++static void vhost_user_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostUserVSockPCI *dev = VHOST_USER_VSOCK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_vsock_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+
-+    device_class_set_props(dc, vuv_properties);
-+    dc->vmsd = &vuv_vmstate;
-+    vdc->realize = vuv_device_realize;
-+    vdc->unrealize = vuv_device_unrealize;
-+    vdc->get_features = vuv_get_features;
-+    vdc->get_config = vuv_get_config;
-+    vdc->set_status = vuv_set_status;
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_user_vsock_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    device_class_set_props(dc, vhost_user_vsock_pci_properties);
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_VSOCK;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_COMMUNICATION_OTHER;
 +}
 +
-+static const TypeInfo vuv_info = {
-+    .name = TYPE_VHOST_USER_VSOCK,
-+    .parent = TYPE_VHOST_VSOCK_COMMON,
-+    .instance_size = sizeof(VHostUserVSock),
-+    .class_init = vuv_class_init,
++static void vhost_user_vsock_pci_instance_init(Object *obj)
++{
++    VHostUserVSockPCI *dev = VHOST_USER_VSOCK_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_VSOCK);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_vsock_pci_info = {
++    .base_name             = TYPE_VHOST_USER_VSOCK_PCI,
++    .generic_name          = "vhost-user-vsock-pci",
++    .transitional_name     = "vhost-user-vsock-pci-transitional",
++    .non_transitional_name = "vhost-user-vsock-pci-non-transitional",
++    .instance_size = sizeof(VHostUserVSockPCI),
++    .instance_init = vhost_user_vsock_pci_instance_init,
++    .class_init    = vhost_user_vsock_pci_class_init,
 +};
 +
-+static void vuv_register_types(void)
++static void virtio_pci_vhost_register(void)
 +{
-+    type_register_static(&vuv_info);
++    virtio_pci_types_register(&vhost_user_vsock_pci_info);
 +}
 +
-+type_init(vuv_register_types)
++type_init(virtio_pci_vhost_register)
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index b1eeb44eac..dd42daedb1 100644
+index dd42daedb1..13e75f171f 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -18,6 +18,7 @@ common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pme
- obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
- obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-common.o vhost-vsock.o
-+obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-vsock-common.o vhost-user-vsock.o
+@@ -22,6 +22,7 @@ obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-vsock-common.o vhost-user-vsock.o
  
  ifeq ($(CONFIG_VIRTIO_PCI),y)
  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
++obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-user-vsock-pci.o
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+ obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
 -- 
 2.25.4
 
