@@ -2,72 +2,92 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2458C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56171C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:52:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ACBC2072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ACBC2072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECB62072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:52:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="fqAHCY4s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECB62072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbwqh-0004nq-QS
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 21:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45540)
+	id 1jbwrV-0006Le-AY
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 21:52:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbwq2-0003KI-Bg
- for qemu-devel@nongnu.org; Thu, 21 May 2020 21:51:06 -0400
-Resent-Date: Thu, 21 May 2020 21:51:06 -0400
-Resent-Message-Id: <E1jbwq2-0003KI-Bg@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jbwq0-0005hi-MS
- for qemu-devel@nongnu.org; Thu, 21 May 2020 21:51:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590112227; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ZmsM3LlZGI/HiPGa+dXA0YqKgC9fzgfVkMyaST7zdQk8vq9KHbjVREDeeoB/e3lwVUs3VG+3equsRG6vFQ/X8PXM4MwzU40JLcQJksXDVfPwqUAqZhrcBMTyHo4xocxNWLJipEYTwMokTMHMFK5slWjo0DRR4B49gkhLViYxan4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590112227;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WUrAZp56bxgcrJe1rzeF6CWyeoavfGAZwLbab3rP7AY=; 
- b=OVP4uhaekuiFM7x29WCz1qFYMq8Yq3EeTXmXyZ2Xazf+adI9lhat6UqbPEytV365T5jepvEnnXgwzFSox/t5Q1iTCuxKjsIpAjz2du1T4b6WHclxcsNKgBt1D2njI0ZBzA9SqgmcOYDYxu+ELchZRLItrlf8fN4XGAZfF8E9V/Y=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590112225535512.814736600939;
- Thu, 21 May 2020 18:50:25 -0700 (PDT)
-Message-ID: <159011222425.1576.2239862082893996188@45ef0f9c86ae>
-In-Reply-To: <cover.1590089984.git.balaton@eik.bme.hu>
-Subject: Re: [PATCH v2 0/7] Misc display/sm501 clean ups and fixes
+ (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jbwqY-0004t0-47
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 21:51:38 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:43905)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jbwqV-0005p9-A9
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 21:51:37 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id f4so4229877pgi.10
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 18:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=8MV40ObIwHeM+EHUMt8XD3Z7XgbtUo8DNIToRTif1qI=;
+ b=fqAHCY4sNqlRAihrhaKqP286d5d4YpLe+nl5X8igL0GyzkDa1IbidetkfuIm38StWR
+ mMDg/vJ2ewBfvM6zB5S8sgd2ub0Lqb1Dtt8tlGHBNMkVa6sFlBJaAV5HHSZS25tJzi5U
+ +KjcHiUaQ3LkJsRaBbPUmYUt39WUTQXgbFCwU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8MV40ObIwHeM+EHUMt8XD3Z7XgbtUo8DNIToRTif1qI=;
+ b=Xn4rrXknGgdvZdjblMWpJ/WKS/qv0D1ks6AgR7yEI3X/svMMAtH45tdIxS+Ox50chU
+ bNedws8TpOcUJkfOu8rTwPX0iYDg3rMM17V1rOxne+d0wqtFGCUHuaKG0T0RJu/SJfFU
+ sZbiXnIQDvQccSAov+hSHd2dT2Bz/VnuyW8BtGQ2NdnUrFnxyLNl3kgT90sp9dZUCddw
+ u6l6MZIB6UB0Tu9WTIcnkrRkWLCMydijbZoJtcCqfZZkZHUuqZInXiyyPyBAl1zgZv8w
+ Qes7DY9yR6DkqHKBY9r+xkZv2qciRSGXmBCB17Pz8uyl/dYAynVdU43VEuWDZRvIGHNp
+ M8eA==
+X-Gm-Message-State: AOAM532COuObZ35A3XQu6Y9zl9FlUC4kc7rYHsbP+YTiuL74OhBKR3Zp
+ Yr+8Uiliua3HN+Cg9ZSFHrRB/w==
+X-Google-Smtp-Source: ABdhPJwTkqzZ4wbxx840e9LEmsZfldJStVnVnFkqmeAlB9/gHncrRO/R2rGsolbwHZ1JL6yKF6tLEw==
+X-Received: by 2002:a65:6801:: with SMTP id l1mr11549948pgt.73.1590112293358; 
+ Thu, 21 May 2020 18:51:33 -0700 (PDT)
+Received: from Jing-Weide-MacBook-Pro-3.local
+ (202-39-79-13.HINET-IP.hinet.net. [202.39.79.13])
+ by smtp.gmail.com with ESMTPSA id w12sm3895103pjb.11.2020.05.21.18.51.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 May 2020 18:51:32 -0700 (PDT)
+Subject: Re: cluster_size got from backup_calculate_cluster_size()
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <7b96191b-2c16-7257-9ae3-50457bf82e27@qnap.com>
+ <3d66b51e-7112-d368-1d86-b63637413abd@redhat.com>
+ <fc69468b-10d8-9869-88f5-b6798cfc0835@virtuozzo.com>
+From: Derek Su <dereksu@qnap.com>
+Message-ID: <40aedbc3-8818-e58b-2247-b76f1d7b891b@qnap.com>
+Date: Fri, 22 May 2020 09:51:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: balaton@eik.bme.hu
-Date: Thu, 21 May 2020 18:50:25 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 21:51:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <fc69468b-10d8-9869-88f5-b6798cfc0835@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
+ envelope-from=dereksu@qnap.com; helo=mail-pg1-x52f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,52 +101,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mail@sebastianbauer.info, magnus.damm@gmail.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, aurelien@aurel32.net
+Cc: Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTkwMDg5OTg0Lmdp
-dC5iYWxhdG9uQGVpay5ibWUuaHUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGlvdGVzdC1xY293
-MjogMDM5CnNvY2tldF9hY2NlcHQgZmFpbGVkOiBSZXNvdXJjZSB0ZW1wb3JhcmlseSB1bmF2YWls
-YWJsZQoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzoz
-MDE6cXRlc3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBmYWlsZWQ6IChz
-LT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRl
-c3QvbGlicXRlc3QuYzoxNjY6IGtpbGxfcWVtdSgpIHRyaWVkIHRvIHRlcm1pbmF0ZSBRRU1VIHBy
-b2Nlc3MgYnV0IGVuY291bnRlcmVkIGV4aXQgc3RhdHVzIDEgKGV4cGVjdGVkIDApCkVSUk9SIC0g
-QmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5j
-OjMwMTpxdGVzdF9pbml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNzZXJ0aW9uIGZhaWxlZDog
-KHMtPmZkID49IDAgJiYgcy0+cW1wX2ZkID49IDApCm1ha2U6ICoqKiBbY2hlY2stcXRlc3QteDg2
-XzY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAg
-VEVTVCAgICBpb3Rlc3QtcWNvdzI6IDA0MApxZW11LXN5c3RlbS1hYXJjaDY0OiAtYWNjZWwga3Zt
-OiBpbnZhbGlkIGFjY2VsZXJhdG9yIGt2bQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJv
-cihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdb
-J3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3Rh
-bmNlLnV1aWQ9NDE2MDJkZjZjZmZjNDgxNmIzZWJhMGUzNzZjMTAwOTknLCAnLXUnLCAnMTAwMScs
-ICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdU
-QVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9Jywg
-Jy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAn
-Q0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUv
-cWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1vYXJ1ZzZmby9zcmMvZG9ja2VyLXNyYy4yMDIwLTA1LTIxLTIxLjM0
-LjIzLjg1NDk6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9x
-ZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIu
-CmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTQxNjAyZGY2Y2Zm
-YzQ4MTZiM2ViYTBlMzc2YzEwMDk5Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQpt
-YWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW9h
-cnVnNmZvL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJy
-b3IgMgoKcmVhbCAgICAxNm0wLjg3NnMKdXNlciAgICAwbTEwLjc4M3MKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1OTAwODk5ODQu
-Z2l0LmJhbGF0b25AZWlrLmJtZS5odS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On 2020/5/22 上午4:53, Vladimir Sementsov-Ogievskiy wrote:
+> 21.05.2020 21:19, John Snow wrote:
+>>
+>>
+>> On 5/21/20 5:56 AM, Derek Su wrote:
+>>> Hi,
+>>>
+>>> The cluster_size got from backup_calculate_cluster_size(),
+>>> MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size), is 64K regardless
+>>> of the target image's cluster size.
+>>
+>> Not regardless -- but it is using 64K as a minimum.
+
+Right, 64K is a minimum. Thanks for the correctness.
+
+>>
+>>>
+>>>
+>>> For example:
+>>>
+>>> If the cluster size of source and target qcow2 images are both 16K, the
+>>> 64K from backup_calculate_cluster_size() results in unwanted copies of
+>>> clusters.
+>>>
+>>> The behavior slows down the backup (block-copy) process when the
+>>> source image receives lots of rand writes.
+>>
+>> Are we talking about incremental, full, or top?
+
+Our use case is MIRROR_SYNC_MODE_NONE (only copy new writes from source 
+image to the target).
+
+>>
+>>>
+>>>
+>>> Is the following calculation reasonable for the above issue?
+>>>
+>>>
+>>> ```
+>>> static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+>>>                                               Error **errp)
+>>> {
+>>>      ...
+>>>
+>>>      ret = bdrv_get_info(target, &bdi);
+>>>
+>>>      ...
+>>>
+>>>      return (bdi.cluster_size == 0 ?
+>>>                  BACKUP_CLUSTER_SIZE_DEFAULT : cluster_size);
+>>> }
+>>>
+>>> ```
+>>>
+>>> Thanks.
+>>> Regards,
+>>>
+>>> Derek
+>>>
+>>
+>>
+>> Might be reasonable. When I made this the "default", it actually used to
+>> just be "hardcoded." We could continue in this direction and go all the
+>> way and turn it into a tune-able.
+>>
+>> I didn't think to make it lower than 64K because I was thinking about
+>> the linear, full backup case where cluster sizes that were too small
+>> might slow down the loop with too much metadata.
+> 
+> Yes, currently backup-loop is copying cluster-by-cluster, so if we allow 
+> clusters less than 64k, it may become slower (at least for full-backup). 
+> Still, my work about backup-performance is close to its end, and I hope, 
+> in 5.1 will be merged. One of effects is that backup copying loop may 
+> copy more than a cluster at once, so this problem will gone.
+> 
+> Keeping this in mind, I think we can allow smaller clusters now, as 
+> anyway, small clusters is a rare special case.
+> 
+>>
+>> (And the default qcow2 is 64K, so it seemed like a good choice at the 
+>> time.)
+>>
+>> We could create a default-cluster-size tunable, perhaps. It's at 64K
+>> now, but perhaps you can override it down to 16 or lower. We could
+>> possibly treat a value of 0 as "no minimum; use the smallest common 
+>> size."
+>>
+>> This is a separate issue entirely, but we may also wish to begin
+>> offering a cluster-size override directly. In the case that we know this
+>> value is unsafe, we reject the command. In the case that it's ambiguous
+>> due to lack of info, we can defer to the user's judgment. This would
+>> allow us to force the backup to run in cases where we presently abort
+>> out of fear.
+>>
+>> CCing Vladimir who has been working on the backup loop extensively.
+>>
+>> --js
+>>
+> 
+> 
+
+Yes. I agree with that the minimum 64K or larger is a good choice for 
+the linear and full backup choice.
+
+In the COLO application (https://wiki.qemu.org/Features/COLO), the 
+primary vm (PVM)'s write requests are replicated to the secondary 
+vm(SVM)'s secondary disk. The writes also trigger block copies copying 
+the old data on the secondary disk (source) to the hidden disk (target). 
+However, the checkpoint mechanism empties the hidden disk periodically, 
+so it is a endless backup (block-copy) process.
+
+If the PVM write requests are random 4K blocks, the block copy on SVM 
+becomes inefficient in the above use case.
+
+I conducted some performance tests.
+If the qcow2 cluster size 16K, compared with the 64K backup granularity 
+size, the 16K backup granularity size shows that the seq. write 
+performance decreases by 10% and the rand. write performance increases 
+by 40%.
+
+I think a tunable default-cluster-size seems good for such applications.
+
+Thanks.
+Regards,
+Derek
 
