@@ -2,92 +2,82 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4927BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3FCC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBE84206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:25:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZKRn1Mxd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE84206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 784B9206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:26:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784B9206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcDI4-00059I-25
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59846)
+	id 1jcDJ6-0006Er-NQ
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcDHP-0004ge-Dl
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:24:27 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38268)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcDIZ-0005nL-Vu
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:25:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43438)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcDHN-00081V-Gs
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:24:26 -0400
-Received: by mail-lj1-x244.google.com with SMTP id m18so14000498ljo.5
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 12:24:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=pB7G33MbbmjRXoKyui0VUUplhFhfexsVSp3+F8nH4ns=;
- b=ZKRn1MxdfOH5cshI+tpU813Gpk7K7GNXD0MtEMBMnZpQShlCigbU3Ihftl6VskgMl5
- Yrya+YGH1gG+F/Fx9ugnSslGLLIrhdaw1FTNnkVkoGHZBcamw679EonLowxfZeTqAbm0
- nigLshzUPavWVqPzuzoqmYnCWhCqAYDAVFIIz0OLj8KOfxMopcV0G5QYy55ybbbp60Gv
- 6OhStjyYn6331PpSs1ZkPQI3VSW3m3EDKdkHN+DHFMEK5J0pTI8eXX/BNJGq4m/ediyU
- dS1Tq+0051SEEegLpTFzOoESxmrZj+wgKg+JhkZqmCYO4tf0rBICWlfFYWHrao4nyqzR
- BNRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=pB7G33MbbmjRXoKyui0VUUplhFhfexsVSp3+F8nH4ns=;
- b=JfMrBTCpUGyaoHfgaKQ2inCmZd4P4az9qc+cQ+4Ic9LvcEmyZ34/vAn20cg40HvVB7
- n7hP5VYeAhvZI+gvOWmxmK5teXazU6XGkmQkHt5WjGfooy4N8J7P9FzOGjFwxg/Q4hIM
- elgzDqwCpfgkIcf7FXpHwioqMmoWN3LpZ4iT7q2Mp/+YxJyIyFz+yruOaXT7xtdGdMK4
- FjdlJyJ16DqlN2gYtyH4whFUhYBtskb/FuxqrR8LD9shz7+Dtj/9nwiaC+4g5n8JaoGy
- ssy3+WI0IXRGb9vN8cAwutn/Lsa1mIutDBIVt+562QjHbRRIck/fa5JvMXelYo2tk+or
- 0mIQ==
-X-Gm-Message-State: AOAM531L4/krwSWkZrIysBNCCPM8zagtScDX2VxCUE7lRZG6ndWYAJC4
- zvScV+pBfTejaBqh+tI4f7x1BVUAz3YIFzxgEYVQQg==
-X-Google-Smtp-Source: ABdhPJwb+gxiMWZy+Y8gcp7ornMiXhtJ++CDLJdeJkBplJud3i/YVrSc9uitvFqKPxsjyz33LQICd2YDSQtJMMAGJn0=
-X-Received: by 2002:a2e:b551:: with SMTP id a17mr5530534ljn.380.1590175463644; 
- Fri, 22 May 2020 12:24:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcDIY-0008Nf-Ny
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:25:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jcDIW-0008Gl-MT
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A5C372E8023
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:25:36 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200519132259.405-1-robert.foley@linaro.org>
- <20200519132259.405-10-robert.foley@linaro.org>
- <878shkdlvg.fsf@linaro.org>
-In-Reply-To: <878shkdlvg.fsf@linaro.org>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Fri, 22 May 2020 15:24:16 -0400
-Message-ID: <CAEyhzFtJC8zGm9fESE4k5Yvojk5Yvw8ey5ECz2c9S69s16j=UA@mail.gmail.com>
-Subject: Re: [PATCH v7 09/12] tests/vm: Added a new script for ubuntu.aarch64.
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=robert.foley@linaro.org; helo=mail-lj1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Date: Fri, 22 May 2020 19:18:26 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
+X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
+Message-ID: <87tv07dbi5.fsf@linaro.org>
+Subject: Re: [Bug 1880225] [NEW] Emulation of some arm programs fail with
+ "Assertion `have_guest_base' failed."
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7488a9935d9bc2d9094fa3dd66262751ec8d4e27
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 14:50:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,156 +86,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200522191826.dxKopvLXKF_eq_Qi3Tuuj9edcBouhbplCXmkt5u6uM0@z>
 
-On Fri, 22 May 2020 at 11:34, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+Aleksandar Markovic <1880225@bugs.launchpad.net> writes:
+
+> Public bug reported:
 >
+> This issue is observer with QEMU ToT, checked out around May 15th (but I
+> believe it is present in current master too), and wasn't present in QEMU
+> v5.0.0.
 >
-> Robert Foley <robert.foley@linaro.org> writes:
+> I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+>
+> Arm cross-compiler is a standard cross-compiler that comes with Debian-
+> based distributions, and gcc version is:
+>
+> $ arm-linux-gnueabi-gcc --version
+> arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+>
+> Compile this program with cross compiler:
+>
+> $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o toupper_string-
+> arm
+>
+> Emulation with QEMU v5.0.0 is correct, and gives expected output:
+>
+> $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
+rm
+> CONTROL RESULT: (toupper_string)
+>  nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
+lnmpapq
+>  NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
+LNMPAPQ
+>
+> While, in case of QEMU master it fails:
+>
+> $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
+arm
+> qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
+uest_base: Assertion `have_guest_base' failed.
+> Aborted
 <snip>
-> >
-> > +############################################
-> > +# efi-aarch64 probe
-> > +# Check for efi files needed by aarch64 VMs.
-> > +# By default we will use the efi included with QEMU.
-> > +# Allow user to override the path for efi also.
-> > +qemu_efi_aarch64=3D$PWD/pc-bios/edk2-aarch64-code.fd
->
-> as you only define this once there is no harm in just having a long line
-> bellow rather than running the potential confusion when looking at the
-> variables.
 
-OK, makes sense, will change to just go for the longer line.
+Works for me in our TCG tests on master:
 
-> > +for fd in $efi_aarch64_arg $qemu_efi_aarch64
-> > +do
-> > +    if test -f $fd; then
-> > +        efi_aarch64=3D$fd
-> > +        break
-> > +    fi
-> > +done
->
-> This only detects the pc-bios bundled version of edk on a directory
-> which has already been built. Maybe we need to do a straight forward:
->
->   if not test -f $efi_aarch64; then
->       if test -f $SRC/pc-bios/edk2-aarch64-code.fd.bz2; then
->           # valid after build
->           efi_aarch64=3D$PWD/pc-bios/edk2-aarch64-code.fd
->       else
->           efi_aarch64=3D""
->       fi
->   fi
->
-> what do you think?
+20:15:43 [alex@zen:~/l/q/b/user.static] review/aarch64-vms-v7|=E2=80=A6 + .=
+/arm-linux-user/qemu-arm ./tests/tcg/arm-linux-user/toupper
+CONTROL RESULT: (toupper_string)
+ nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorelln=
+mpapq
+ NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLORELLN=
+MPAPQ
 
-I agree.  The straight up if check is easier to read.  Will change to this.
+I have submitted a fix to the list that affected programs that couldn't
+see /proc/self/maps but I guess that isn't the case here.
 
-> <snip>
-> > +
-> > +    def build_image(self, img):
-> > +        os_img =3D self._download_with_cache(self.image_link)
-> > +        img_tmp =3D img + ".tmp"
-> > +        subprocess.check_call(["cp", "-f", os_img, img_tmp])
-> > +        subprocess.check_call(["qemu-img", "resize", img_tmp, "+50G"])
-> > +        ci_img =3D self.gen_cloud_init_iso()
-> > +
-> > +        self.boot(img_tmp, extra_args =3D ["-cdrom", ci_img])
-> > +        if self.debug:
-> > +            self.wait_boot()
-> > +        # First command we issue is fix for slow ssh login.
-> > +        self.wait_ssh(wait_root=3DTrue,
-> > +                      cmd=3D"chmod -x /etc/update-motd.d/*")
-> > +        # Wait for cloud init to finish
-> > +        self.wait_ssh(wait_root=3DTrue,
-> > +                      cmd=3D"ls /var/lib/cloud/instance/boot-finished"=
-)
-> > +        self.ssh_root("touch /etc/cloud/cloud-init.disabled")
-> > +        # Disable auto upgrades.
-> > +        # We want to keep the VM system state stable.
-> > +        self.ssh_root('sed -ie \'s/"1"/"0"/g\' /etc/apt/apt.conf.d/20a=
-uto-upgrades')
-> > +        # If the user chooses *not* to do the second phase,
-> > +        # then we will jump right to the graceful shutdown
-> > +        if self._config['install_cmds'] !=3D "":
-> > +            self.ssh_root("sync")
-> > +            # Shutdown and then boot it again.
-> > +            # Allows us to know for sure it is booting (not shutting d=
-own)
-> > +            # before we call wait_ssh().
-> > +            self.graceful_shutdown()
-> > +            self.boot(img_tmp)
-> > +            if self.debug:
-> > +                self.wait_boot()
-> > +            self.wait_ssh(wait_root=3DTrue)
-> > +            self.wait_ssh(wait_root=3DTrue, cmd=3D"locale")
->
-> Why do we need to shutdown before proceeding with the install commands?
-> I see ubuntu.i386 does it as well although with a slightly hackier
-> approach.
+-- =
 
-The reboot was carried over from the way i386 did things.
-I have a guess as to why the reboot is there, it is just after the
-install of cloud-initramfs-growroot, which does require a reboot.
-So I assume that we wanted to grow the root, reboot, and then
-begin installation of all the new packages.
+Alex Benn=C3=A9e
 
-However, at this point, it looks like even without installing that package,
-(with i386 or aarch64) the root is growing to fill the new size of the imag=
-e,
-so it seems that package and the reboot is no longer needed.
-Will plan to remove these as part of making build_image common
-(discussed below).
+-- =
 
-> > +            # The previous update sometimes doesn't survive a reboot, =
-so do it again
-> > +            self.ssh_root("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/so=
-urces.list")
-> > +
-> > +            # Issue the install commands.
-> > +            # This can be overriden by the user in the config .yml.
-> > +            install_cmds =3D self._config['install_cmds'].split(',')
-> > +            for cmd in install_cmds:
-> > +                self.ssh_root(cmd)
-> > +        self.graceful_shutdown()
-> > +        self.wait()
-> > +        os.rename(img_tmp, img)
-> > +        return 0
->
-> How come we are diverging from the ubuntu.i386 install here? You've
-> moved all the complications for aarch64 into a it's own handling so
-> these steps are almost but not quite the same. Couldn't the ubuntu
-> build_img code be common and then just have a slightly different set of
-> install commands?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880225
 
-I'm glad you brought this up.  I was noticing the commonality here especial=
-ly if
-we wanted to add another architecture of Ubuntu VM.
-For example, we brought up a ppc64 Ubuntu VM script the other day and it re=
-ally
-cried out for creating a common Ubuntu module here since most of the
-code is the same.
+Title:
+  Emulation of some arm programs fail with "Assertion `have_guest_base'
+  failed."
 
-As suggested, I will plan to create a common Ubuntu module here and share
-the build_img code, but have a different set of install commands.
+Status in QEMU:
+  New
 
-Thanks & Regards,
--Rob
+Bug description:
+  This issue is observer with QEMU ToT, checked out around May 15th (but
+  I believe it is present in current master too), and wasn't present in
+  QEMU v5.0.0.
 
->
-> > +
-> > +if __name__ =3D=3D "__main__":
-> > +    defaults =3D aarch64vm.get_config_defaults(UbuntuAarch64VM, DEFAUL=
-T_CONFIG)
-> > +    sys.exit(basevm.main(UbuntuAarch64VM, defaults))
->
->
-> --
-> Alex Benn=C3=A9e
+  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+
+  Arm cross-compiler is a standard cross-compiler that comes with
+  Debian-based distributions, and gcc version is:
+
+  $ arm-linux-gnueabi-gcc --version
+  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+
+  Compile this program with cross compiler:
+
+  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
+  toupper_string-arm
+
+  Emulation with QEMU v5.0.0 is correct, and gives expected output:
+
+  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
+rm
+  CONTROL RESULT: (toupper_string)
+   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
+lnmpapq
+   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
+LNMPAPQ
+
+  While, in case of QEMU master it fails:
+
+  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
+arm
+  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
+uest_base: Assertion `have_guest_base' failed.
+  Aborted
+
+  There are many other programs that exibit the same behavior. The
+  failure is arm-sprecific.
+
+  =
+
+  -----------------------------------------------------
+
+  source code: (let's call this file toupper_string.c) (similar file is
+  also in attachment)
+
+  =
+
+  #include <stdlib.h>
+  #include <string.h>
+  #include <stdio.h>
+  #include <unistd.h>
+
+  =
+
+  #define MAX_STRING_LENGHT              15
+  #define NUMBER_OF_RANDOM_STRINGS       100
+  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
+  #define MAX_NUMBER_OF_REPETITIONS      1000000000
+  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
+
+  /* Structure for keeping an array of strings */
+  struct StringStruct {
+      char chars[MAX_STRING_LENGHT + 1];
+  };
+
+  /**
+   * Sets characters of the given string to random small letters a-z.
+   * @param s String to get random characters.
+   * @len Length of the input string.
+   */
+  static void gen_random_string(char *chars, const int len)
+  {
+      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
+
+      for (size_t i =3D 0; i < len; i++) {
+          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
+      }
+      chars[len] =3D 0;
+  }
+
+  void main (int argc, char* argv[])
+  {
+      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
+      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
+];
+      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
+      int32_t option;
+
+      /* Parse command line options */
+      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
+          if (option =3D=3D 'n') {
+              int32_t user_number_of_repetitions =3D atoi(optarg);
+              /* Check if the value is a negative number */
+              if (user_number_of_repetitions < 1) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e a "
+                                  "negative number.\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is a string or zero */
+              if (user_number_of_repetitions =3D=3D 0) {
+                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
+\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is too large */
+              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e "
+                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
+ONS);
+                  exit(EXIT_FAILURE);
+              }
+              number_of_repetitions =3D user_number_of_repetitions;
+          } else {
+              exit(EXIT_FAILURE);
+          }
+      }
+
+      /* Create an array of strings with random content */
+      srand(1);
+      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
+      }
+
+      /* Perform uppercasing of a set of random strings multiple times */
+      for (size_t j =3D 0; j < number_of_repetitions; j++) {
+          /* Copy initial set of random strings to the set to be uppercased=
+ */
+          memcpy(strings_to_be_uppercased, random_strings,
+                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
+          /* Do actual changing case to uppercase */
+          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+              int k =3D 0;
+    =
+
+              while (strings_to_be_uppercased[i].chars[k]) { =
+
+                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
+
+                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
+                         &ch, 1);
+                  k++; =
+
+              } =
+
+          }
+      }
+
+      /* Control printing */
+      printf("CONTROL RESULT: (toupper_string)\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", random_strings[i].chars);
+      }
+      printf("\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", strings_to_be_uppercased[i].chars);
+      }
+      printf("\n");
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
 
