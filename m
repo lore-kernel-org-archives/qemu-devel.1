@@ -7,50 +7,49 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC00BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9291DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7505F206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:06:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7505F206DD
+	by mail.kernel.org (Postfix) with ESMTPS id 5ED4C206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 08:08:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ED4C206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc2hh-0003Oz-JV
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 04:06:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44776)
+	id 1jc2ir-0005fR-HL
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 04:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jc2fd-00069x-KP
- for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:45 -0400
+ id 1jc2fc-00066F-E5
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:44 -0400
 Received: from mga17.intel.com ([192.55.52.151]:30282)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jc2fc-0006Um-Ot
- for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:45 -0400
-IronPort-SDR: INdNCjF9paE6hFwq3jBRhWsMlRAQhe7mCkCrqRDncVUKPsX1rqBwkTitfIVxgJhzD2vZrSRAw4
- Vu1O5cC5l9WA==
+ id 1jc2fb-0006Um-Hm
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 04:04:44 -0400
+IronPort-SDR: A+fcJRGwxKsebmGZd2jQOrL4RA1NNdD2TNFlw19+rfDBBf0leR6SR3FvwFShmfN0n4LOuScriu
+ cfVVZVDakiIA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 May 2020 01:04:43 -0700
-IronPort-SDR: oqD34MHsnF+OvOH8PeeYeb4lhEysaQd3KHebdANXq9mUHzepcHxAdcWVvO0DV2EzJGtLIs3mZQ
- RZpTkI4pecWQ==
+ 22 May 2020 01:04:42 -0700
+IronPort-SDR: VUIKkc3nUK3vMV5TaqYDqnBFQ4op6BzmRQahRHyi1KQ9cvSQcboj8LotRiI1kM+mZudBh754n/
+ kBBlh4WmsnJA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,420,1583222400"; d="scan'208";a="467104569"
+X-IronPort-AV: E=Sophos;i="5.73,420,1583222400"; d="scan'208";a="467104563"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by fmsmga005.fm.intel.com with ESMTP; 22 May 2020 01:04:42 -0700
+ by fmsmga005.fm.intel.com with ESMTP; 22 May 2020 01:04:40 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>
-Subject: [PATCH V2 6/7] net/colo-compare.c: Correct ordering in complete and
- finalize
-Date: Fri, 22 May 2020 15:53:56 +0800
-Message-Id: <20200522075357.19883-7-chen.zhang@intel.com>
+Subject: [PATCH V2 5/7] net/colo-compare.c: Check that colo-compare is active
+Date: Fri, 22 May 2020 15:53:55 +0800
+Message-Id: <20200522075357.19883-6-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200522075357.19883-1-chen.zhang@intel.com>
 References: <20200522075357.19883-1-chen.zhang@intel.com>
@@ -85,95 +84,130 @@ Sender: "Qemu-devel"
 
 From: Lukas Straub <lukasstraub2@web.de>
 
-In colo_compare_complete, insert CompareState into net_compares
-only after everything has been initialized.
-In colo_compare_finalize, remove CompareState from net_compares
-before anything is deinitialized.
+If the colo-compare object is removed before failover and a
+checkpoint happens, qemu crashes because it tries to lock
+the destroyed event_mtx in colo_notify_compares_event.
+
+Fix this by checking if everything is initialized by
+introducing a new variable colo_compare_active which
+is protected by a new mutex colo_compare_mutex. The new mutex
+also protects against concurrent access of the net_compares
+list and makes sure that colo_notify_compares_event isn't
+active while we destroy event_mtx and event_complete_cond.
+
+With this it also is again possible to use colo without
+colo-compare (periodic mode) and to use multiple colo-compare
+for multiple network interfaces.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Tested-by: Lukas Straub <lukasstraub2@web.de>
 Reviewed-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- net/colo-compare.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+ net/colo-compare.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index c30dbfb6e6..ed1f3d0af0 100644
+index a609f499b9..c30dbfb6e6 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -1283,15 +1283,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+@@ -54,6 +54,8 @@ static NotifierList colo_compare_notifiers =
+ #define REGULAR_PACKET_CHECK_MS 3000
+ #define DEFAULT_TIME_OUT_MS 3000
+ 
++static QemuMutex colo_compare_mutex;
++static bool colo_compare_active;
+ static QemuMutex event_mtx;
+ static QemuCond event_complete_cond;
+ static int event_unhandled_count;
+@@ -906,6 +908,12 @@ static void check_old_packet_regular(void *opaque)
+ void colo_notify_compares_event(void *opaque, int event, Error **errp)
+ {
+     CompareState *s;
++    qemu_mutex_lock(&colo_compare_mutex);
++
++    if (!colo_compare_active) {
++        qemu_mutex_unlock(&colo_compare_mutex);
++        return;
++    }
+ 
+     qemu_mutex_lock(&event_mtx);
+     QTAILQ_FOREACH(s, &net_compares, next) {
+@@ -919,6 +927,7 @@ void colo_notify_compares_event(void *opaque, int event, Error **errp)
+     }
+ 
+     qemu_mutex_unlock(&event_mtx);
++    qemu_mutex_unlock(&colo_compare_mutex);
+ }
+ 
+ static void colo_compare_timer_init(CompareState *s)
+@@ -1274,7 +1283,14 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
                             s->vnet_hdr);
      }
  
--    qemu_mutex_lock(&colo_compare_mutex);
--    if (!colo_compare_active) {
--        qemu_mutex_init(&event_mtx);
--        qemu_cond_init(&event_complete_cond);
--        colo_compare_active = true;
--    }
--    QTAILQ_INSERT_TAIL(&net_compares, s, next);
--    qemu_mutex_unlock(&colo_compare_mutex);
--
-     s->out_sendco.s = s;
-     s->out_sendco.chr = &s->chr_out;
-     s->out_sendco.notify_remote_frame = false;
-@@ -1314,6 +1305,16 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-                                                       connection_destroy);
- 
-     colo_compare_iothread(s);
-+
 +    qemu_mutex_lock(&colo_compare_mutex);
 +    if (!colo_compare_active) {
 +        qemu_mutex_init(&event_mtx);
 +        qemu_cond_init(&event_complete_cond);
 +        colo_compare_active = true;
 +    }
-+    QTAILQ_INSERT_TAIL(&net_compares, s, next);
+     QTAILQ_INSERT_TAIL(&net_compares, s, next);
 +    qemu_mutex_unlock(&colo_compare_mutex);
-+
-     return;
- }
  
-@@ -1382,19 +1383,6 @@ static void colo_compare_finalize(Object *obj)
-     CompareState *s = COLO_COMPARE(obj);
-     CompareState *tmp = NULL;
+     s->out_sendco.s = s;
+     s->out_sendco.chr = &s->chr_out;
+@@ -1292,9 +1308,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
  
--    qemu_chr_fe_deinit(&s->chr_pri_in, false);
--    qemu_chr_fe_deinit(&s->chr_sec_in, false);
--    qemu_chr_fe_deinit(&s->chr_out, false);
--    if (s->notify_dev) {
--        qemu_chr_fe_deinit(&s->chr_notify_dev, false);
--    }
+     g_queue_init(&s->conn_list);
+ 
+-    qemu_mutex_init(&event_mtx);
+-    qemu_cond_init(&event_complete_cond);
 -
--    if (s->iothread) {
--        colo_compare_timer_del(s);
--    }
--
--    qemu_bh_delete(s->event_bh);
--
-     qemu_mutex_lock(&colo_compare_mutex);
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -1382,12 +1395,19 @@ static void colo_compare_finalize(Object *obj)
+ 
+     qemu_bh_delete(s->event_bh);
+ 
++    qemu_mutex_lock(&colo_compare_mutex);
      QTAILQ_FOREACH(tmp, &net_compares, next) {
          if (tmp == s) {
-@@ -1409,6 +1397,19 @@ static void colo_compare_finalize(Object *obj)
+             QTAILQ_REMOVE(&net_compares, s, next);
+             break;
+         }
      }
-     qemu_mutex_unlock(&colo_compare_mutex);
++    if (QTAILQ_EMPTY(&net_compares)) {
++        colo_compare_active = false;
++        qemu_mutex_destroy(&event_mtx);
++        qemu_cond_destroy(&event_complete_cond);
++    }
++    qemu_mutex_unlock(&colo_compare_mutex);
  
-+    qemu_chr_fe_deinit(&s->chr_pri_in, false);
-+    qemu_chr_fe_deinit(&s->chr_sec_in, false);
-+    qemu_chr_fe_deinit(&s->chr_out, false);
-+    if (s->notify_dev) {
-+        qemu_chr_fe_deinit(&s->chr_notify_dev, false);
-+    }
-+
-+    if (s->iothread) {
-+        colo_compare_timer_del(s);
-+    }
-+
-+    qemu_bh_delete(s->event_bh);
-+
      AioContext *ctx = iothread_get_aio_context(s->iothread);
      aio_context_acquire(ctx);
-     AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
+@@ -1415,15 +1435,18 @@ static void colo_compare_finalize(Object *obj)
+         object_unref(OBJECT(s->iothread));
+     }
+ 
+-    qemu_mutex_destroy(&event_mtx);
+-    qemu_cond_destroy(&event_complete_cond);
+-
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+     g_free(s->notify_dev);
+ }
+ 
++static void __attribute__((__constructor__)) colo_compare_init_globals(void)
++{
++    colo_compare_active = false;
++    qemu_mutex_init(&colo_compare_mutex);
++}
++
+ static const TypeInfo colo_compare_info = {
+     .name = TYPE_COLO_COMPARE,
+     .parent = TYPE_OBJECT,
 -- 
 2.17.1
 
