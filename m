@@ -2,82 +2,81 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D58C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 14:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68685C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 14:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A15B208B3
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 14:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33FBB206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 14:56:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pgWRDJDf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A15B208B3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ua/J4A4v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FBB206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc8u7-00033f-Rq
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 10:44:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58600)
+	id 1jc95r-0003bC-CV
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 10:56:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1jc8tX-0002X8-OF
- for qemu-devel@nongnu.org; Fri, 22 May 2020 10:43:31 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38668)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jc953-0001qT-8s
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 10:55:25 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:34272)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1jc8tW-0003x5-RM
- for qemu-devel@nongnu.org; Fri, 22 May 2020 10:43:31 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u12so5261029wmd.3
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 07:43:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jc952-0006QN-Au
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 10:55:24 -0400
+Received: by mail-wm1-x332.google.com with SMTP id g14so4571736wme.1
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 07:55:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=MzXM9ZTSVhAGl1xhNJfU6hscjoth3y+knm1AH12KcsM=;
- b=pgWRDJDfRcoJuttcwyI+yTrDi+pUBuIYkag0yzfHfVJRDe7+ItmXheyjCsci/z0fTf
- 6NMtSBP4Qn/0g9Sf4qdYCFuIanCsaELFi6AMw54xNnBBrbpnypnoCYrR6AulzUwVnGBL
- GSGFzZBx4o51lxomAvJIhcrNuw3BfeXGFSuCb3xKHI8xhyu+z+rZ063/hdTBpgYfM9qS
- NDLJKpcjnSGdGMvU3dIi4LFOiFV2EodTVFb4y7OMQWomNErTg7kREQqsLOtY7U9M25VB
- EUfXzF/0ulbFJh8wxKLOHkqwWgKlCnD4KQeAdd/LRtnY2ZQ0H7WpThTSyyOY260aXpug
- AFeA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F+XukQGVqGykAC1nJweUZyVkVXMChOdWscCcvUNho9w=;
+ b=Ua/J4A4vaHrJ+Wq7rqNCUCRqIeufd5A8X1PNG4SObRbkFuViphkTpGGeLhj9w1W2rf
+ 0ZaZ8ivajHkFiF6mihONBs0NVSK0CAD23ZVQDm/BdA7AbvIJEu/zFAxvLL8+WuYyGZ2+
+ ZjwPGzRxsD7379gw63uHsum3zEKu3F8cNilppOwwUucTKDiym95qOAdyhba41bcXFKoK
+ 2vUCFHBof5aj2R34nKgT1TSHViZTC9xDEE1vhh2G8YNO2/js49j5bamHIL3FivO9PG4X
+ vp+mN5P/nouVxgwI4jhJnjRa+h9Gi8h+6iRdRuzkxjpv7aGcy4GS7ZjaXogOWq0b27O2
+ /3QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=MzXM9ZTSVhAGl1xhNJfU6hscjoth3y+knm1AH12KcsM=;
- b=SCRnqL1IeR4vSZXLrDASwJlOPlS8MhqzeqHz3pIxGTO2WEGUc7GvB+BzSEk4rm6vLF
- BTO8H1Q3wWIrCBTCl1XeMyF0nzxnYJOxmDrHRfBJ7VdSDPtKTky62MMHGDDMeeS1TNMI
- TJMa1+JPobRmIwY9wpXlB8IN3UGxewicgsJCE+PjIediidZeFVL8JD387VgPLmQWwVjG
- aX7JzF2Frb4jcAxv4vzpRgZ3UQ3MsMQRX1GjKNxbeibVfHl7yT+D8nRdi+T+iW2t43+X
- dT4BrxogpxPNlJ4QQS15Xshs7K7skkddskHjBFe9H5iPlTD7/nmeR09DjLMnlXEVTI8F
- JLxQ==
-X-Gm-Message-State: AOAM532QJ5XS3nQ0KqvJNy4ZHm/p+o0BvHQNhFrH1hvcu2dKu6/L5SoO
- a+Hspv7/T8JFxeZml10cMsibbw==
-X-Google-Smtp-Source: ABdhPJwJIoGx3WbJsxwRXXSoySBvl82ysTudo0Do5Fujrx5b19YvDSz3ZTa3LlxNruWsRK65Q0lp7A==
-X-Received: by 2002:a1c:96d8:: with SMTP id y207mr6574623wmd.167.1590158608911; 
- Fri, 22 May 2020 07:43:28 -0700 (PDT)
-Received: from myrica ([2001:171b:226e:c200:c43b:ef78:d083:b355])
- by smtp.gmail.com with ESMTPSA id x5sm10154315wro.12.2020.05.22.07.43.26
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F+XukQGVqGykAC1nJweUZyVkVXMChOdWscCcvUNho9w=;
+ b=KSQi9YAJqZY9h2LsEz4fqIB7DOi7E4ZkqBBzbsZo6FIdMTmV76sxrEoF+yNC+pP3xL
+ E5+jNclZGqeljvLFPLrcebm71ew44UP2kmvSSHqIASQUytKbw+fH+8SDvDTUte0CvAsJ
+ XpUyWSaG4nw3hVrj+rDlsM+CGRceNrgl5FTtd6u5cGjrMxv2MGi7ikr6Geg/asaqbwjw
+ 2+4ygQKIo1AfiQIqycSPe+0i6ae/FCY3qF/VEdkL5mVLL/JF+lj8uKoJu2DW0kEBdXLV
+ bXgiaQlkV8FlF7AOjXwmkLWau04oK8kVy1S60O+eTCSBaKn1EXliS/JsdnX/wqVf6Q5z
+ 5kBg==
+X-Gm-Message-State: AOAM5339Gu05cs1rtNu2ocDMWSB2ET6xbrzWEFOjAL28eddutnkD9pcA
+ 9tMji4fWdX3q2uzHRKKxchCqEg==
+X-Google-Smtp-Source: ABdhPJyvDQCYMmJgpXe6ricfNRlAWyJKXDHd4zv5UpOMkLqEC/V5merIuF7brCY88EHsRDOyvsYTIQ==
+X-Received: by 2002:a7b:c932:: with SMTP id h18mr13305515wml.22.1590159322597; 
+ Fri, 22 May 2020 07:55:22 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id y8sm1100561wmc.37.2020.05.22.07.55.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 07:43:27 -0700 (PDT)
-Date: Fri, 22 May 2020 16:43:17 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 5/5] hw/arm/virt: Let the virtio-iommu bypass MSIs
-Message-ID: <20200522144317.GB3453945@myrica>
-References: <20200508173057.32215-1-eric.auger@redhat.com>
- <20200508173057.32215-6-eric.auger@redhat.com>
+ Fri, 22 May 2020 07:55:21 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 0/9] target/arm: Convert 2-reg-shift and 1-reg-imm Neon
+ insns to decodetree
+Date: Fri, 22 May 2020 15:55:11 +0100
+Message-Id: <20200522145520.6778-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200508173057.32215-6-eric.auger@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=jean-philippe@linaro.org; helo=mail-wm1-x341.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::332;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,118 +98,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, armbru@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- bbhushan2@marvell.com, eric.auger.pro@gmail.com
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 08, 2020 at 07:30:57PM +0200, Eric Auger wrote:
-> At the moment the virtio-iommu translates MSI transactions.
-> This behavior is inherited from ARM SMMU. The virt machine
-> code knows where the guest MSI doorbells are so we can easily
-> declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
-> setting the guest will not map MSIs through the IOMMU and those
-> transactions will be simply bypassed.
-> 
-> Depending on which MSI controller is in use (ITS or GICV2M),
-> we declare either:
-> - the ITS interrupt translation space (ITS_base + 0x10000),
->   containing the GITS_TRANSLATOR or
-> - The GICV2M single frame, containing the MSI_SETSP_NS register.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - Test which MSI controller is instantiated
-> - If GICV2M is in use, declare its doorbell as an MSI doorbell too
-> ---
->  include/hw/arm/virt.h |  6 ++++++
->  hw/arm/virt.c         | 18 ++++++++++++++++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 6d67ace76e..ad20cb6e15 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -96,6 +96,11 @@ typedef enum VirtIOMMUType {
->      VIRT_IOMMU_VIRTIO,
->  } VirtIOMMUType;
->  
-> +typedef enum VirtMSIControllerType {
-> +    VIRT_GICV2M,
-> +    VIRT_ITS,
-> +} VirtMSIControllerType;
+This patchset converts the Neon insns in the 2-register-and-shift-amount
+and 1-register-and-modified-immediate groups to decodetree.
 
-I think you need a third value for msi_controller == 0. If I instantiate a
-GICv3 without ITS at the moment the V2M region gets reserved. Not a big
-deal since MSIs aren't supported at all in this case, but it would be
-cleaner to skip any reservation.
+Changes since v1:
+ * old patch 1 is now in master
+ * patch 1, 2, 3, 4: create and use separate formats for each size of shift
+ * patch 5, 6, 7: use new @2reg_shrn_[dsh] formats and keep Q bit in the
+   per-insn decode rather than folding it into the format
+ * patch 8: use %neon_rshift_i5 in new @2reg_vcvt format
+ * patch 9: various changes
 
-Thanks,
-Jean
+Patches still needing review: 1, 5, 9.  (RTH: you might want to look over
+2 as well: I didn't use quite the same shift formats you suggested.)
 
-> +
->  typedef enum VirtGICType {
->      VIRT_GIC_VERSION_MAX,
->      VIRT_GIC_VERSION_HOST,
-> @@ -135,6 +140,7 @@ typedef struct {
->      OnOffAuto acpi;
->      VirtGICType gic_version;
->      VirtIOMMUType iommu;
-> +    VirtMSIControllerType msi_controller;
->      uint16_t virtio_iommu_bdf;
->      struct arm_boot_info bootinfo;
->      MemMapEntry *memmap;
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 634db0cfe9..d2dd07885b 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -602,6 +602,7 @@ static void create_its(VirtMachineState *vms)
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vms->memmap[VIRT_GIC_ITS].base);
->  
->      fdt_add_its_gic_node(vms);
-> +    vms->msi_controller = VIRT_ITS;
->  }
->  
->  static void create_v2m(VirtMachineState *vms)
-> @@ -622,6 +623,7 @@ static void create_v2m(VirtMachineState *vms)
->      }
->  
->      fdt_add_v2m_gic_node(vms);
-> +    vms->msi_controller = VIRT_GICV2M;
->  }
->  
->  static void create_gic(VirtMachineState *vms)
-> @@ -2136,8 +2138,24 @@ out:
->  static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->                                              DeviceState *dev, Error **errp)
->  {
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->          virt_memory_pre_plug(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
-> +        /* we declare a VIRTIO_IOMMU_RESV_MEM_T_MSI region */
-> +
-> +        if (vms->msi_controller == VIRT_ITS) {
-> +            /* GITS_TRANSLATER page */
-> +            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
-> +            qdev_prop_set_string(dev, "reserved-regions[0]",
-> +                                 "0x8090000, 0x809FFFF, 1");
-> +        } else if (vms->msi_controller == VIRT_GICV2M) {
-> +            /* MSI_SETSPI_NS page */
-> +            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
-> +            qdev_prop_set_string(dev, "reserved-regions[0]",
-> +                                 "0x8020000, 0x8020FFF, 1");
-> +        }
->      }
->  }
->  
-> -- 
-> 2.20.1
-> 
+thanks
+-- PMM
+
+Peter Maydell (9):
+  target/arm: Convert Neon VSHL and VSLI 2-reg-shift insn to decodetree
+  target/arm: Convert Neon VSHR 2-reg-shift insns to decodetree
+  target/arm: Convert Neon VSRA, VSRI, VRSHR, VRSRA 2-reg-shift insns to
+    decodetree
+  target/arm: Convert VQSHLU, VQSHL 2-reg-shift insns to decodetree
+  target/arm: Convert Neon narrowing shifts with op==8 to decodetree
+  target/arm: Convert Neon narrowing shifts with op==9 to decodetree
+  target/arm: Convert Neon VSHLL, VMOVL to decodetree
+  target/arm: Convert VCVT fixed-point ops to decodetree
+  target/arm: Convert Neon one-register-and-immediate insns to
+    decodetree
+
+ target/arm/neon-dp.decode       | 196 ++++++++++
+ target/arm/translate-neon.inc.c | 625 ++++++++++++++++++++++++++++++++
+ target/arm/translate.c          | 488 +------------------------
+ 3 files changed, 823 insertions(+), 486 deletions(-)
+
+-- 
+2.20.1
+
 
