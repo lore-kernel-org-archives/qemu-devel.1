@@ -2,91 +2,128 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CC6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7632C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E470205CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:16:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60A56205CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:16:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcPpL6ye"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E470205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBGni59k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A56205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc9Oz-00044g-G0
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:16:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33700)
+	id 1jc9Pb-00056U-Iq
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:16:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jc9Nx-0003H0-R9
- for qemu-devel@nongnu.org; Fri, 22 May 2020 11:14:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58148
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9Od-0003zI-V1
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:15:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34763
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jc9Nw-00022U-SI
- for qemu-devel@nongnu.org; Fri, 22 May 2020 11:14:57 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9Od-0002Ie-2K
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:15:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590160496;
+ s=mimecast20190719; t=1590160538;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pygucWuFaQBD7sZN54bwwioIVktyp3oelb8TGfMdeXs=;
- b=RcPpL6yeDIGLCKCYFKcUuJYZEPg4Tgb1IxyPrBFWfMhbv2OdBA/uTVWlmFswDpz0AD7lUh
- c9vTUdN1c+CaKKteDEtiG+rQrQqQlurdCSlesUgA1qwsZWq7osVEy/vWyb99H/qURjkOX5
- QJ5eJys8tbHTDQ4NUl93SImnCAMKgxU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-RsGcVkwuOC2ZCZl_ZOa1uA-1; Fri, 22 May 2020 11:14:47 -0400
-X-MC-Unique: RsGcVkwuOC2ZCZl_ZOa1uA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA7D1100CCC2;
- Fri, 22 May 2020 15:14:45 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EDB65C1D3;
- Fri, 22 May 2020 15:14:37 +0000 (UTC)
-Subject: Re: [PATCH v3 08/17] block/io: support int64_t bytes in
- bdrv_aligned_preadv()
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
- <20200430111033.29980-9-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <9143ff10-cba2-bcc2-c48c-eac73446b159@redhat.com>
-Date: Fri, 22 May 2020 10:14:36 -0500
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=bgwxBnm8VD+Y/kxKW7/OF/c/OhXh/FcLyD2iTqVqTJ8=;
+ b=YBGni59kksS5yPDeGTejEX+WzWSIddW594ejNWEWxMso3V10M5uYHyPPALDFpS1i7CxbS3
+ PtmMI6bC7wNZOgf0jY2NYxBYePxRQmKhttVXWuEiXSGkZd8Zrgxph2GzCUhI9ynBc7nzQB
+ 2FjGe2E1Fd4590szUS6bwoh7nVf2pec=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-19V73IlcMK-vJpmNqpN-Dw-1; Fri, 22 May 2020 11:15:36 -0400
+X-MC-Unique: 19V73IlcMK-vJpmNqpN-Dw-1
+Received: by mail-wm1-f72.google.com with SMTP id b138so1338560wmd.5
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 08:15:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=bgwxBnm8VD+Y/kxKW7/OF/c/OhXh/FcLyD2iTqVqTJ8=;
+ b=i6vzVS/M5DZp+urXtprisup3PSDJOh+Uxd0sGk7HV0/VGvtflkZaOMn2J20dTdwdSI
+ kWOSkfz6kBH2g6GJnYnmgEi0AbpqD89Hb8ApIqVr2DZPFBWZqa9E/RUW5V83fLCVmLJB
+ rIPyjzN8NPIep7Q49lxzbv/Oe+n/WX//xzcS6PVRed9s2BK9kq7VW7KGVx0dpAEzVrPp
+ 4dLlA7ZPMpGPzPtbfsGz7NiWnhxdw78X1PqHSbPBGxPNnOlLbHMQz/yyK+nOKifC0jIJ
+ WUyh+KCvbwFVFvldY43CtFe2IiREy4N+bRen3xc2dkMVG4Q9unc+td11kTjNM2lKD3AB
+ KM1Q==
+X-Gm-Message-State: AOAM530aCJEvYLs86A5JOcjibU8928t13J0mdUU0YNkhiHzz6EqGRRyT
+ mATKBX7PS5RsVaytF+fM3JRVFLO9MVPEXU/9qLlfkTLlgF0+Mf+E65hJ7C2E1F+1CfKPLjB+k7v
+ WYNDRxrExnySyZfA=
+X-Received: by 2002:a5d:40d2:: with SMTP id b18mr1546091wrq.131.1590160535598; 
+ Fri, 22 May 2020 08:15:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWRWgt4hKN9BR9l5oRJE0HSIwZzKGuRBNwKc9iewD/J/v1TtHDYT+PIxoYnE10EOY0ydbgyw==
+X-Received: by 2002:a5d:40d2:: with SMTP id b18mr1546051wrq.131.1590160535216; 
+ Fri, 22 May 2020 08:15:35 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id r9sm9719735wmg.47.2020.05.22.08.15.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 22 May 2020 08:15:34 -0700 (PDT)
+Subject: Re: [PATCH v3 09/11] rules.mak: Add base-arch() rule
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200521195911.19685-1-philmd@redhat.com>
+ <20200521195911.19685-10-philmd@redhat.com>
+ <ccd78343-795e-8874-e4f3-bb6861ea64f0@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <c96d1032-d702-c957-f85b-82ac4663c859@redhat.com>
+Date: Fri, 22 May 2020 17:15:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200430111033.29980-9-vsementsov@virtuozzo.com>
+In-Reply-To: <ccd78343-795e-8874-e4f3-bb6861ea64f0@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:12:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,134 +136,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- pavel.dovgaluk@ispras.ru, dillaman@redhat.com, qemu-devel@nongnu.org,
- sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com,
- den@openvz.org, sheepdog@lists.wpkg.org, stefanha@redhat.com,
- namei.unix@gmail.com, pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
+Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, qemu-riscv@nongnu.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Filippov <jcmvbkbc@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Michael Walle <michael@walle.cc>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/30/20 6:10 AM, Vladimir Sementsov-Ogievskiy wrote:
-> We are generally moving to int64_t for both offset and bytes parameters
-> on all io paths.
+On 5/22/20 6:24 AM, Richard Henderson wrote:
+> On 5/21/20 12:59 PM, Philippe Mathieu-Daudé wrote:
+>> +		$(if $(findstring risc,$1),risc,\
 > 
-> Main motivation is realization of 64-bit write_zeroes operation for
-> fast zeroing large disk chunks, up to the whole disk.
+> Eh?  riscv{32,64} vs openrisc.
+
+Nice catch, because with this patch openrisc builds with a riscv
+config-devices.h =)
+
 > 
-> We chose signed type, to be consistent with off_t (which is signed) and
-> with possibility for signed return type (where negative value means
-> error).
+>> +		$(if $(findstring x86,$1),i386,\
 > 
-> So, prepare bdrv_aligned_preadv() now.
+> Do we really not need an exact match for x86_64?
+
+OK.
+
 > 
-> Make byte variable in bdrv_padding_rmw_read() int64_t, as it defined
-> only to be passed to bdrv_aligned_preadv().
+>> +		$(if $(findstring aarch64,$1),arm,$1)))))))
 > 
-> Series: 64bit-block-status
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/io.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
+> Exact match?
+
+OK.
+
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 6990d8cabe..d336e4e691 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1250,16 +1250,17 @@ err:
->    * reads; any other features must be implemented by the caller.
->    */
->   static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-> -    BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
-> +    BdrvTrackedRequest *req, int64_t offset, int64_t bytes,
->       int64_t align, QEMUIOVector *qiov, size_t qiov_offset, int flags)
->   {
-
-Callers:
-
-bdrv_padding_rmw_read() - passes int64_t (uint64_t before this patch), 
-which in turn is bounded by request_alignment (still 32-bit) or 
-BdrvRequestPadding.buf_len (size_t, but also constrained by creation to 
-32-bit) - safe
-
-bdrv_do_preadv_part() - passes unsigned int - safe
-
-
->       BlockDriverState *bs = child->bs;
->       int64_t total_bytes, max_bytes;
->       int ret = 0;
-> -    uint64_t bytes_remaining = bytes;
-> +    int64_t bytes_remaining = bytes;
->       int max_transfer;
->   
->       assert(is_power_of_2(align));
-> +    assert(offset >= 0 && bytes >= 0);
-
-Use within the function:
-
-the new assertion added here does not check for whether offset+bytes is 
-positive; I would suggest we strengthen it to instead be:
-assert(offset >= 0 && (uint64_t) bytes <= INT64_MAX - offset);
-
-         ret = bdrv_is_allocated(bs, offset, bytes, &pnum);
-  - takes int64_t, safe
-
-         if (!ret || pnum != bytes) {
-             ret = bdrv_co_do_copy_on_readv(child, offset, bytes,
-                                            qiov, qiov_offset, flags);
-  - takes int64_t, safe
-
-     if (bytes <= max_bytes && bytes <= max_transfer) {
-         ret = bdrv_driver_preadv(bs, offset, bytes, qiov, qiov_offset, 0);
-  - takes int64_t, safe
-
->       assert((offset & (align - 1)) == 0);
->       assert((bytes & (align - 1)) == 0);
->       assert((bs->open_flags & BDRV_O_NO_IO) == 0);
-> @@ -1315,7 +1316,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
->       }
->   
->       while (bytes_remaining) {
-> -        int num;
-> +        int64_t num;
->   
->           if (max_bytes) {
->               num = MIN(bytes_remaining, MIN(max_bytes, max_transfer));
-
-  - safe, bounded by max_transfer which is <= INT_MAX earlier in the 
-function
-
-             ret = bdrv_driver_preadv(bs, offset + bytes - bytes_remaining,
-                                      num, qiov, bytes - 
-bytes_remaining, 0);
-  - takes int64_t, and num is capped by max_transfer - safe
-
-             ret = qemu_iovec_memset(qiov, bytes - bytes_remaining, 0,
-                                     bytes_remaining);
-  - takes size_t, risky for 32-bit platforms.  Works because we checked 
-that all our callers are still bounded by 32-bits, but we should 
-consider adding an assertion that bytes <= SIZE_MAX so that even when 
-our callers are updated in later patches, we know that we are still 
-fragmenting requests appropriately on 32-bit platforms
-
-> @@ -1416,7 +1417,7 @@ static int bdrv_padding_rmw_read(BdrvChild *child,
->       assert(req->serialising && pad->buf);
->   
->       if (pad->head || pad->merge_reads) {
-> -        uint64_t bytes = pad->merge_reads ? pad->buf_len : align;
-> +        int64_t bytes = pad->merge_reads ? pad->buf_len : align;
->   
->           qemu_iovec_init_buf(&local_qiov, pad->buf, bytes);
->   
 > 
-
-Preferably with the suggested assertions added,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> r~
+> 
 
 
