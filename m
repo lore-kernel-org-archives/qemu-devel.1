@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F83C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356BDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:37:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9AEE206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:36:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9AEE206D5
+	by mail.kernel.org (Postfix) with ESMTPS id 0191E206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:37:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0191E206D5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcDTB-0004bz-VC
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:36:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60982)
+	id 1jcDTz-0005iM-7s
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:37:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDS9-0003YP-8g
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44368)
+ id 1jcDSB-0003bc-N9
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44542)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDS8-0002Ed-1M
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:33 -0400
+ id 1jcDSA-0002G4-V8
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jcDS6-0000cO-4l
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:30 +0000
+ id 1jcDS9-0000cP-GU
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 12E002E8079
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:30 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6F4AF2E8076
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 May 2020 19:27:39 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
+Date: Fri, 22 May 2020 19:25:55 -0000
+From: Thomas Huth <1693649@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm testcase
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
-X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
-Message-Id: <159017566019.7699.4744405254561076074.launchpad@gac.canonical.com>
-Subject: [Bug 1880225] Re: Emulation of some arm programs fail with "Assertion
- `have_guest_base' failed."
+X-Launchpad-Bug-Commenters: paul-whooppee th-huth
+X-Launchpad-Bug-Reporter: Paul Goyette (paul-whooppee)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <149575946555.18286.18117412791023512529.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159017555604.7915.4013692688620158864.malone@gac.canonical.com>
+Subject: [Bug 1693649] Re: x86 pause misbehaves with -cpu haswell
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cbec22c30f9904975ff273695f9ad4ac8a1e7138
+X-Launchpad-Hash: fb8fd90c195c3a8c6787cdd234be4799385c8706
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 14:50:36
@@ -86,188 +85,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
+Reply-To: Bug 1693649 <1693649@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: testcase
+Ok, thanks for checking again! So I'm closing this ticket now.
+
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880225
+https://bugs.launchpad.net/bugs/1693649
 
 Title:
-  Emulation of some arm programs fail with "Assertion `have_guest_base'
-  failed."
+  x86 pause misbehaves with -cpu haswell
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  This issue is observer with QEMU ToT, checked out around May 15th (but
-  I believe it is present in current master too), and wasn't present in
-  QEMU v5.0.0.
+  Using qemu-2.9.0
 
-  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+  When booting NetBSD using '-cpu haswell -smp 4', the system fails to
+  initialize the additional CPUs.  It appears as though the "application
+  processor" enters routine x86_pause() but never returns.
 
-  Arm cross-compiler is a standard cross-compiler that comes with
-  Debian-based distributions, and gcc version is:
+  x86_pause() is simply two assembler instructions: 'pause; ret;'
 
-  $ arm-linux-gnueabi-gcc --version
-  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+  Replacing the routine with 'nop; nop; ret;' allows the system to
+  proceed, of course without the benefit of the pause instruction on
+  spin-loops!
 
-  Compile this program with cross compiler:
-
-  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
-  toupper_string-arm
-
-  Emulation with QEMU v5.0.0 is correct, and gives expected output:
-
-  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
-rm
-  CONTROL RESULT: (toupper_string)
-   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
-lnmpapq
-   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
-LNMPAPQ
-
-  While, in case of QEMU master it fails:
-
-  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
-uest_base: Assertion `have_guest_base' failed.
-  Aborted
-
-  There are many other programs that exibit the same behavior. The
-  failure is arm-sprecific.
-
-  =
-
-  -----------------------------------------------------
-
-  source code: (let's call this file toupper_string.c) (similar file is
-  also in attachment)
-
-  =
-
-  #include <stdlib.h>
-  #include <string.h>
-  #include <stdio.h>
-  #include <unistd.h>
-
-  =
-
-  #define MAX_STRING_LENGHT              15
-  #define NUMBER_OF_RANDOM_STRINGS       100
-  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
-  #define MAX_NUMBER_OF_REPETITIONS      1000000000
-  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
-
-  /* Structure for keeping an array of strings */
-  struct StringStruct {
-      char chars[MAX_STRING_LENGHT + 1];
-  };
-
-  /**
-   * Sets characters of the given string to random small letters a-z.
-   * @param s String to get random characters.
-   * @len Length of the input string.
-   */
-  static void gen_random_string(char *chars, const int len)
-  {
-      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
-
-      for (size_t i =3D 0; i < len; i++) {
-          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
-      }
-      chars[len] =3D 0;
-  }
-
-  void main (int argc, char* argv[])
-  {
-      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
-      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
-];
-      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
-      int32_t option;
-
-      /* Parse command line options */
-      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
-          if (option =3D=3D 'n') {
-              int32_t user_number_of_repetitions =3D atoi(optarg);
-              /* Check if the value is a negative number */
-              if (user_number_of_repetitions < 1) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e a "
-                                  "negative number.\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is a string or zero */
-              if (user_number_of_repetitions =3D=3D 0) {
-                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
-\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is too large */
-              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e "
-                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
-ONS);
-                  exit(EXIT_FAILURE);
-              }
-              number_of_repetitions =3D user_number_of_repetitions;
-          } else {
-              exit(EXIT_FAILURE);
-          }
-      }
-
-      /* Create an array of strings with random content */
-      srand(1);
-      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
-      }
-
-      /* Perform uppercasing of a set of random strings multiple times */
-      for (size_t j =3D 0; j < number_of_repetitions; j++) {
-          /* Copy initial set of random strings to the set to be uppercased=
- */
-          memcpy(strings_to_be_uppercased, random_strings,
-                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
-          /* Do actual changing case to uppercase */
-          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-              int k =3D 0;
-    =
-
-              while (strings_to_be_uppercased[i].chars[k]) { =
-
-                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
-
-                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
-                         &ch, 1);
-                  k++; =
-
-              } =
-
-          }
-      }
-
-      /* Control printing */
-      printf("CONTROL RESULT: (toupper_string)\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", random_strings[i].chars);
-      }
-      printf("\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", strings_to_be_uppercased[i].chars);
-      }
-      printf("\n");
-  }
+  Additionally, booting with '-cpu phenom -smp 4' also works, although
+  the system does seem confused about the type of CPU being used.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1693649/+subscriptions
 
