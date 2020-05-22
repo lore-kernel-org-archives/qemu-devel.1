@@ -2,98 +2,101 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 347B4C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 09:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ECCC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 10:07:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F144720723
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 09:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51618205CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 10:07:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xuloy9oC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F144720723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kv4+XnTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51618205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc4H8-0002lr-6K
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 05:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53982)
+	id 1jc4aV-00040Z-IX
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 06:07:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jc4GX-0002GZ-Qx; Fri, 22 May 2020 05:46:57 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34249)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jc4GW-0007cG-6z; Fri, 22 May 2020 05:46:57 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g12so8333978wrw.1;
- Fri, 22 May 2020 02:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6VOo3zCotFdbpokUud6waYxauSbsgfjI2O3WRMNQCf4=;
- b=Xuloy9oC/oWkTv+u4gJZmV/gkZT1zC8aL3sU0KdIWTzNjQJZnrDW3enPACmVfxygXJ
- +QQdMyowHuWniWviQ7Ix+yKaE5d0LH3fx+p23qK+9arXwvItfV6i+RyZs9H/E02TIB9g
- uMcYiUrOtVaOHzUcfJSFEHHMaraiiA8TCXcgVOW+pam7dNsE3h5EpxYLT4Rn3feyJUdI
- 1aM40242ZsJXlB98j+wDxD0wyNMbu+AWbogVIGjM5GLNeB8Ksl4bwJskWY4MUE2wl+5L
- M8KAXDxHB5mAtTfcEAg1ENLUcbBglF4Pi9kgayFwTiF8/fhTTc3g4jutQqvnj7YsnzDU
- MmtQ==
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jc4Zm-0003ZW-8X
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 06:06:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20361
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jc4Zj-0002jl-Qj
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 06:06:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590142005;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=dXZ8UtVTjPhRW/qkxoWSL3pyAiqLcgQTdNe1vty9BIs=;
+ b=Kv4+XnTcwAUDpXtulFUY+zpA9jmjkBZ0H1rf2+c1RjHAWn7ib/plwjgtz9paOc306EUM64
+ WzHgIhd1MWfBQUjL81rp5SM7XX47ErQtkYW99/8dlRC28QVjzbqaPUMfFt9MmrySiQkHBB
+ AAnzwguQgkxFAUdiE/1LWAr14TAHo4c=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-wcUed07QOJKj1glE9t9vfQ-1; Fri, 22 May 2020 06:06:43 -0400
+X-MC-Unique: wcUed07QOJKj1glE9t9vfQ-1
+Received: by mail-wr1-f72.google.com with SMTP id e14so4168234wrv.11
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 03:06:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6VOo3zCotFdbpokUud6waYxauSbsgfjI2O3WRMNQCf4=;
- b=j1HuERziaULqHxlZzRUYGVmq8xq03YbEOa09A3nl21iEQaOJFPriCi0bikzjlA2gQH
- QgmxDkC5SEWERBE+v47wpw7W8qv7gajaoIpVS1F8pUI6o6PUYQd7ls86NVsUz+rt9Jaf
- oDM5kPGNJEsP9XQeXvPdWC51wKKd8eA7UDnT0aD4VUKLS1lLSvCY7Uje1Z10hkG1XYy9
- OZpI27VRwN8q0EhY9jf+ZO5/x/ULYD3gVuW+PfCrDIYShekWraV2lkUa1+nosu+tBzU4
- N22dWxehmW7oLGNyM50ZQX0/9HHZBWwSXCyG1AgDgfWXMQIg9PrKDV8UOyDWDY8bPv/P
- OrLQ==
-X-Gm-Message-State: AOAM531DbJSa1DHG21dGAfeXt57HNdeH1x5OJ7NCN8o6jovG+TxrgmzN
- ZaUaLUOklpf9suiPOm/Q3lIac2ZbWck=
-X-Google-Smtp-Source: ABdhPJxInbsuKwk64tC8kByD/HzWPkllOs8Np23AEAtj377E+KCD1wnCMGFz4hnppdYXv0cWgobjvQ==
-X-Received: by 2002:adf:f102:: with SMTP id r2mr2602913wro.376.1590140813725; 
- Fri, 22 May 2020 02:46:53 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id n7sm9054929wro.94.2020.05.22.02.46.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 22 May 2020 02:46:52 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/virt: Fix PL061 node name and properties
-To: Peter Maydell <peter.maydell@linaro.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>
-References: <20200519084904.1069-1-geert+renesas@glider.be>
- <CAFEAcA9-wQ72_M+ZY+EbEgw1L9LVchBgpLivexFXVZ3HuCtcZg@mail.gmail.com>
- <CAMuHMdWrTbWTrLvMnX=60F+UqH6DJ9kDU1FZ5TnT2=mbah1yfg@mail.gmail.com>
- <CAFEAcA9TzPcWWiJNTQ=EZzsSVy5qTPz5DXTePGmXWBTxZg7i7w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2b14cde5-4e91-2f1a-95cd-13f051b10afa@amsat.org>
-Date: Fri, 22 May 2020 11:46:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=dXZ8UtVTjPhRW/qkxoWSL3pyAiqLcgQTdNe1vty9BIs=;
+ b=SJv8Lu2T+EjterLPA/i4NpCmzTHUZNjHX1HwdF8xZN1FqeM9NZg9jlspOz4Mst+QVR
+ 1lHx0ieRG9TRSHcocVY/vPHfaOSMh5+zDI2tgKRZOwwaoFtoKqLeOU2DNOhGY+4Ln+gI
+ z9OjSQu2MzBusBNCYxz7r/JHblbIG49EUDFGSi3zQQVx9GUQ3Z0CpVja8FM3nX+KkD1H
+ 1Ol6k4ZzQsHyebnZi+HBmHjCPzKgRC9idDjARs+PdkjaBBn0plwtfVN3VlTqpgqHrBCW
+ 4/Ta4/xnkyWCWGBDvfWhFGjYbbXWgTs25DW1w8qswpHbetuuUxYucxqeSfgCXwprhIoI
+ 0rig==
+X-Gm-Message-State: AOAM533rTdKr9FevtbvJKZ9CEURWoRu8ezkAONKLURAzsMvdWS4k+DXY
+ qsES3VgDAYfWPIQVVGTa33mTuKNp6OqAlVGBRXFkHL1hBjgEGS50pnTYKx9XJB9u9+zEalt0iTF
+ rgVHKOT441BLSAu0=
+X-Received: by 2002:adf:a396:: with SMTP id l22mr2703835wrb.76.1590142002560; 
+ Fri, 22 May 2020 03:06:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw1JuY/GwikxX/5z/8wZ0Vaqr+MF0dwArNgBD9wHjJ69qf6AOPPJiQ3DKg5Pk7CJ/Jqhw3JqA==
+X-Received: by 2002:adf:a396:: with SMTP id l22mr2703820wrb.76.1590142002334; 
+ Fri, 22 May 2020 03:06:42 -0700 (PDT)
+Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it.
+ [79.49.207.108])
+ by smtp.gmail.com with ESMTPSA id b65sm9623179wmc.30.2020.05.22.03.06.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 22 May 2020 03:06:41 -0700 (PDT)
+Date: Fri, 22 May 2020 12:06:39 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH 0/3] virtio: add vhost-user-vsock device
+Message-ID: <20200522100639.ikxgfoacggxkljo6@steredhat>
+References: <20200515152110.202917-1-sgarzare@redhat.com>
+ <20200521143559.GL251811@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9TzPcWWiJNTQ=EZzsSVy5qTPz5DXTePGmXWBTxZg7i7w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200521143559.GL251811@stefanha-x1.localdomain>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 02:24:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,66 +109,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Julio Montes <julio.montes@intel.com>,
+ Sebastien Boeuf <sebastien.boeuf@intel.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/22/20 11:30 AM, Peter Maydell wrote:
-> On Fri, 22 May 2020 at 09:29, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->> On Thu, May 21, 2020 at 6:59 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->>> On Tue, 19 May 2020 at 09:49, Geert Uytterhoeven
->>> <geert+renesas@glider.be> wrote:
->>>> Make the created node comply with the PL061 Device Tree bindings:
->>>>    - Use generic node name "gpio" instead of "pl061",
->>>>    - Add missing "#interrupt-cells" and "interrupt-controller"
->>>>      properties.
->>>
-[...]
->>> Since the devicetree spec says that the interrupt-controller
->>> property "defines a node as an interrupt controller node"
->>> and a GPIO chip isn't an interrupt controller, this seems
->>> like some kind of error in the dtb binding. Maybe I'm
->>> missing something...
->>
->> PL061 is an interrupt controller, as it can assert its interrupt output
->> based on activity on GPIO input lines.
+On Thu, May 21, 2020 at 03:35:59PM +0100, Stefan Hajnoczi wrote:
+> On Fri, May 15, 2020 at 05:21:07PM +0200, Stefano Garzarella wrote:
+> > This series add vhost-user-vsock base device and its PCI version
+> > (vhost-user-vsock-pci).
+> > The vhost-user-vsock device can be used to implement the virtio-vsock
+> > device emulation in user-space.
+> > An use case might be Kata, where they prefer to emulate devices
+> > in user-space.
 > 
-> By that logic the PL011 UART is an interrupt controller, because
-> it can assert its interrupt output based on activity on the serial
-> port input lines.
-
-Yes :)
-
-> A GPIO controller is not an interrupt controller inherently.
-> Maybe you can use it in a system design as an interrupt
-> controller if you want to, and in that system's dtb perhaps
-> it would make sense to label it as one, but the virt board's
-> PL061 is in no way an interrupt controller -- it's just a GPIO
-> controller.
+> Looks good.
 > 
->>> What actually goes wrong if QEMU doesn't specify these
->>> properties?
->>
->> It means that other devices that have their interrupt output connected
->> to a PL061 GPIO input won't work, as their driver in the guest OS cannot
->> find the interrupt.  Note that arm/virt.c currently doesn't instantiate
->> such devices.
+> My main concern is live migration. If it hasn't been tested, please
+> remove the live migration code.
 > 
-> OK. But why would we want to run an interrupt line through the GPIO
-> controller when we have a perfectly good interrupt controller in
-> the system already?
 
-This is sometimes done on embedded devices when all the INTC lines are 
-already wired. You'd use extra lines on free peripherals. Usually the 
-peripheral offer a limited GPIO mode as passthru interrupt, else you use 
-nasty hacks...
+Migration is not working:
 
-> 
-> It might be reasonable to add the properties now to avoid setting
-> a bear trap for ourselves in future; on the other hand if running
-> interrupt lines through the GPIO controller doesn't work then it
-> acts as a nudge to stop people adding devices that are wired
-> up in a weird way.
-[...]
+    QEMU 5.0.50 monitor - type 'help' for more information
+    (qemu) migrate -d tcp:0:3333
+    Error: Migration disabled: vhost-user backend lacks VHOST_USER_PROTOCOL_F_LOG_SHMFD feature.
+
+Thanks for pointing that out, I'll remove it in v2.
+
+Stefano
+
 
