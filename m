@@ -4,78 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC306C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A506C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86A922070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:22:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D7B12070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:22:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N2W5klQA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A922070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KkIZOsoP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7B12070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcAQw-0006pX-KF
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:22:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40442)
+	id 1jcAQz-00071n-6Q
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKW-0003Bo-PT
+ id 1jcAKV-0003AI-CQ
  for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:28 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42794)
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44546)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKV-0006Fb-0y
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:28 -0400
-Received: by mail-pf1-x444.google.com with SMTP id y18so5388902pfl.9
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:26 -0700 (PDT)
+ id 1jcAKT-0006FO-63
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:27 -0400
+Received: by mail-pg1-x541.google.com with SMTP id p30so5183675pgl.11
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RmwrC3sLLuRkvLN26zkcFirbGoGQYa0KIlDIjcwq1Ao=;
- b=N2W5klQADY+U2KyTIyrtrH2WNaG8WKXsoBq6Xhowpd6L48eQLDgZbu/RrQIRIgCGMK
- Rmn2ToDaewJL48Ir4W+XUFIQ9EUZC0PqpzUVJcofdAgLO0nrDUXuvvyqw3E/vJy2WBsx
- aI40QT1MZ91Zllwygdiaoh5+GUceOxLfUm659Y/AJdqQnz/DW/fdSTIemmkkweICIe1L
- CLyMKd0DrrLvyHsHqPQ7WTxptNFS+WrmLAuXyLTd1j1oc1HkD/EYqkAJSEr6wB4mo2Ze
- WO1Hch9QYkYvsAioGXtG8YjVBc/XLNJgojSRHX7P2HYR4bgURjYVpxoEM7EStKwCjApZ
- MSHQ==
+ bh=E2NUbUllh+KAafmECCEQXin5XBjgzmIjrK1tK+Jhx74=;
+ b=KkIZOsoPSxtyYHa4qo7TTlEhyFRe1hQt3UNu58y4mklHRa2rWYiB0J2aYP1+yUiHsC
+ HYWG+SlaK+uRBEYSzikdTAtW+3ZSjLJxFtIoX/OaOAfv9YSj5SwgIgWsfT6aUhbUW8as
+ 3sAnUnH8lTFSl9iwfwkzoELmBKAxB3Encr5RibxG0N1n9jMqe+J4lOawUj88oTwjK1HK
+ 7frTSAi1KOLYRC6rjAsmBC4RdxiHymYBd23EwjVqHm41VU2CNCFCWjfWQyMwzwssWHu5
+ dqDsOxgYFoiLkPviX8TNuKch6IkA+l6gKG7hjlKyQj8tRKVLwW0RAR4m510PcShLSukh
+ 9Bfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=RmwrC3sLLuRkvLN26zkcFirbGoGQYa0KIlDIjcwq1Ao=;
- b=ApVzKxoKq59ddE7u1R1/QUM6iENgmBBf1Wl4I5eFGIeojmeWI6qE5kn4qESL0ard7v
- S7FGVr/PMIU94ZdiUpjmQvONcxWKn0t7ekt6Yw9kXB1GWaLpociXjnQV1OSXEf2LuXhp
- 9Uh5DUPyK2ZpQ0zzjVIn/MFlOR/T/LISGMRbYTOdDVaRjmROcZ07tJOI6RlHM0LXCwMU
- f5x0J8Gs/SXpQsOwuACkZFfOGPc6UKazRUlfmog8gwT9vKy5moaigJc0k5ya4dLGA52f
- jXIICbHeDQ4NVHyZW2IjJ4uUj2TAXslsljziKBT9NnfIynbZeE8sMSFtdqmECcRqW45Q
- Yb6Q==
-X-Gm-Message-State: AOAM532vUE0BdGja9mhPAL6ylhll9NU/rkCszTGJWMGsIIJpifurLc6X
- oVXrdLHxwJ/WQWz4pPjHiNJJxvisNxnqWg==
-X-Google-Smtp-Source: ABdhPJxejFJfyZ68h+SYgdNQ8DHz0GvmK3i8D7h/UlhfwZlpEI8w8jNZBT6iAiBfAcXrjPH8h3NEbg==
-X-Received: by 2002:a62:1512:: with SMTP id 18mr4611082pfv.326.1590164125233; 
- Fri, 22 May 2020 09:15:25 -0700 (PDT)
+ bh=E2NUbUllh+KAafmECCEQXin5XBjgzmIjrK1tK+Jhx74=;
+ b=DtvAJvbNDcnOAryLMXracxiqNq3W9GSyIUQeoKJRZ1vEi4bTtV9W+KFUqzQTCD7P6i
+ aPSFOZ88xU3V4JVteg/LYyEcPPQmy1XqRS+2dTgGNQtcB4VAJoeCvI1ZCNH2TB1v/Z1e
+ rlGFDHLWK4ANwM0yqB8QeuV1Vd19awmKoykDKOhmAQNrWYJjd0x0Rk12l8o20IxYf+VU
+ 8DI76CAp97Y2B13dc39qfla1PO2qzUAWOw3X1L5V4HNCR4ptJVnn/FBB0yLAnpnKcS1K
+ bFGpRVn8by94oNwORd23xjo3HxR4uk/jDV2S3dlZjrX0UJmF1ABVZ8HvoIpZSTP1Eiz+
+ CxfQ==
+X-Gm-Message-State: AOAM530boVvJHCXBNqxZQDctaR9umQbUT20kfZ3FHtru1nx2kAcG01lZ
+ MGIgPM11AURdTZpuSJrdT6T96yGgUNrSpQ==
+X-Google-Smtp-Source: ABdhPJxSWGGajirmm6Ds/VeFTnZ+AJ33Vhht1mdP5l9A1jIZ7juEikAtmhzxfAm1ZzAeeVMO+4cxcg==
+X-Received: by 2002:a63:f59:: with SMTP id 25mr14173119pgp.420.1590164123073; 
+ Fri, 22 May 2020 09:15:23 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:f1d9:5fce:c451:d2e2])
- by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.23
+ by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 09:15:24 -0700 (PDT)
+ Fri, 22 May 2020 09:15:22 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 13/19] accel/tcg: Fixed tsan warnings.
-Date: Fri, 22 May 2020 12:07:49 -0400
-Message-Id: <20200522160755.886-14-robert.foley@linaro.org>
+Subject: [PATCH 12/19] configure: added tsan support for blacklist.
+Date: Fri, 22 May 2020 12:07:48 -0400
+Message-Id: <20200522160755.886-13-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200522160755.886-1-robert.foley@linaro.org>
 References: <20200522160755.886-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=robert.foley@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,144 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
- alex.bennee@linaro.org
+Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For example:
-WARNING: ThreadSanitizer: data race (pid=35425)
-  Write of size 4 at 0x7bbc000000ac by main thread (mutexes: write M875):
-    #0 cpu_reset_interrupt hw/core/cpu.c:107:28 (qemu-system-aarch64+0x843790)
-    #1 arm_cpu_set_irq target/arm/cpu.c (qemu-system-aarch64+0x616265)
-    #2 qemu_set_irq hw/core/irq.c:44:5 (qemu-system-aarch64+0x8462ca)
-  Previous atomic read of size 4 at 0x7bbc000000ac by thread T6:
-    #0 __tsan_atomic32_load <null> (qemu-system-aarch64+0x394c1c)
-    #1 cpu_handle_interrupt accel/tcg/cpu-exec.c:534:9 (qemu-system-aarch64+0x4b7e79)
-    #2 cpu_exec accel/tcg/cpu-exec.c:720:17 (qemu-system-aarch64+0x4b7e79)
-or
-WARNING: ThreadSanitizer: data race (pid=25425)
-  Read of size 8 at 0x7f8ad8e138d0 by thread T10:
-    #0 tb_lookup_cmp accel/tcg/cpu-exec.c:307:13 (qemu-system-aarch64+0x4ac4d2)
-    #1 qht_do_lookup util/qht.c:502:34 (qemu-system-aarch64+0xd05264)
-  Previous write of size 8 at 0x7f8ad8e138d0 by thread T15 (mutexes: write M728311726235541804):
-    #0 tb_link_page accel/tcg/translate-all.c:1625:26 (qemu-system-aarch64+0x4b0bf2)
-    #1 tb_gen_code accel/tcg/translate-all.c:1865:19 (qemu-system-aarch64+0x4b0bf2)
-    #2 tb_find accel/tcg/cpu-exec.c:407:14 (qemu-system-aarch64+0x4ad77c)
+Initially put several files into blacklist that were
+causing the most problems, namely bitops.c and bitmap.c.
 
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- accel/tcg/tcg-all.c       | 4 ++--
- accel/tcg/tcg-runtime.c   | 7 ++++++-
- accel/tcg/translate-all.c | 6 +++++-
- hw/core/cpu.c             | 2 +-
- 4 files changed, 14 insertions(+), 5 deletions(-)
+ configure                 | 3 ++-
+ tests/tsan/blacklist.tsan | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tsan/blacklist.tsan
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index 3b4fda5640..f94ea4c4b3 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -54,8 +54,8 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-     int old_mask;
-     g_assert(qemu_mutex_iothread_locked());
- 
--    old_mask = cpu->interrupt_request;
--    cpu->interrupt_request |= mask;
-+    old_mask = atomic_read(&cpu->interrupt_request);
-+    atomic_or(&cpu->interrupt_request, mask);
- 
-     /*
-      * If called from iothread context, wake the target cpu in
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 446465a09a..bd0cd77450 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -31,6 +31,7 @@
- #include "disas/disas.h"
- #include "exec/log.h"
- #include "tcg/tcg.h"
-+#include "qemu/tsan.h"
- 
- /* 32-bit helpers */
- 
-@@ -151,6 +152,7 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
-+    void *tc_ptr;
- 
-     tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, curr_cflags());
-     if (tb == NULL) {
-@@ -161,7 +163,10 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-                            TARGET_FMT_lx "/" TARGET_FMT_lx "/%#x] %s\n",
-                            cpu->cpu_index, tb->tc.ptr, cs_base, pc, flags,
-                            lookup_symbol(pc));
--    return tb->tc.ptr;
-+    TSAN_ANNOTATE_IGNORE_READS_BEGIN();
-+    tc_ptr = tb->tc.ptr;
-+    TSAN_ANNOTATE_IGNORE_READS_END();
-+    return tc_ptr;
- }
- 
- void HELPER(exit_atomic)(CPUArchState *env)
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 3fb71a1503..6c0e61994c 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -58,6 +58,7 @@
- #include "exec/log.h"
- #include "sysemu/cpus.h"
- #include "sysemu/tcg.h"
-+#include "qemu/tsan.h"
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
-@@ -1704,6 +1705,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         max_insns = 1;
-     }
- 
-+    TSAN_ANNOTATE_IGNORE_WRITES_BEGIN();
-  buffer_overflow:
-     tb = tcg_tb_alloc(tcg_ctx);
-     if (unlikely(!tb)) {
-@@ -1902,9 +1904,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         orig_aligned -= ROUND_UP(sizeof(*tb), qemu_icache_linesize);
-         atomic_set(&tcg_ctx->code_gen_ptr, (void *)orig_aligned);
-         tb_destroy(tb);
-+        TSAN_ANNOTATE_IGNORE_WRITES_END();
-         return existing_tb;
-     }
-     tcg_tb_insert(tb);
-+    TSAN_ANNOTATE_IGNORE_WRITES_END();
-     return tb;
- }
- 
-@@ -2409,7 +2413,7 @@ void dump_opcount_info(void)
- void cpu_interrupt(CPUState *cpu, int mask)
- {
-     g_assert(qemu_mutex_iothread_locked());
--    cpu->interrupt_request |= mask;
-+    atomic_or(&cpu->interrupt_request, mask);
-     atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
- }
- 
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 77703d62b7..6c16ccc426 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -104,7 +104,7 @@ void cpu_reset_interrupt(CPUState *cpu, int mask)
-     if (need_lock) {
-         qemu_mutex_lock_iothread();
-     }
--    cpu->interrupt_request &= ~mask;
-+    atomic_and(&cpu->interrupt_request, ~mask);
-     if (need_lock) {
-         qemu_mutex_unlock_iothread();
-     }
+diff --git a/configure b/configure
+index c95c54fb48..8a86a0638d 100755
+--- a/configure
++++ b/configure
+@@ -6306,7 +6306,8 @@ if test "$have_asan" = "yes"; then
+ fi
+ if test "$have_tsan" = "yes" ; then
+   if test "$have_tsan_iface_fiber" = "yes" ; then
+-    QEMU_CFLAGS="-fsanitize=thread $QEMU_CFLAGS"
++    QEMU_CFLAGS="-fsanitize=thread -fsanitize-blacklist="\
++	        "\$(SRC_PATH)/tests/tsan/blacklist.tsan $QEMU_CFLAGS"
+     QEMU_LDFLAGS="-fsanitize=thread $QEMU_LDFLAGS"
+   else
+     echo "Cannot enable TSAN due to missing fiber annotation interface."
+diff --git a/tests/tsan/blacklist.tsan b/tests/tsan/blacklist.tsan
+new file mode 100644
+index 0000000000..67dd809e96
+--- /dev/null
++++ b/tests/tsan/blacklist.tsan
+@@ -0,0 +1,5 @@
++# TSan is not happy about setting/getting of dirty bits,
++# for example, cpu_physical_memory_set_dirty_range,
++# and cpu_physical_memory_get_dirty.
++src:bitops.c
++src:bitmap.c
 -- 
 2.17.1
 
