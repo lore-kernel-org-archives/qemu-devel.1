@@ -2,92 +2,132 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C15C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF74C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:13:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 835162054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEA06205CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mmy7GoGJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 835162054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Io5PYxpI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA06205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc9CS-0007r1-MQ
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60056)
+	id 1jc9MW-0000iH-RA
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:13:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jc95E-0002Lc-Cn
- for qemu-devel@nongnu.org; Fri, 22 May 2020 10:55:36 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46135)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jc95C-0006UJ-Vf
- for qemu-devel@nongnu.org; Fri, 22 May 2020 10:55:35 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w7so10404687wre.13
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 07:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lPAwSc45qlxB/TZuoMmLjNjab6Fr/WrHf/LvzT8lOcU=;
- b=mmy7GoGJd3UdSMd0cwt5IgHP+aOnPdH1g2r0+KaAhEsDeo4Q5Hmuqv9SGze+tG38aM
- AJM6p6VvGR6BLSsim97m3yYzqXRRd6Gh6L2bq6+Th+yv3r5OxmLMZKr4yn8qMXCXxMbX
- dXeWr1NgJbRXeyCZyyBCvPby/zdFx6bd7omKpwnMoeQWd5xd7sdIsO4NWQZl+UcTe97X
- dmr/gKdnbzcjQNr/CYi1XkPRofcwDN6Hrq3ORxTcqRSXTdMYgapL6TR/ANLVyGpbdwvo
- EJho45x9qD9COsirBEXMsfLfWg7zGjEln/T/lSPVC8goeiWxlb+xIW9tGSEpYNpJF7VO
- TxEQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9L0-0007fr-NB
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:11:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41951
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9Kz-0001MC-Bz
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:11:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590160312;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=DLKf/Nb8XQKXuRpwhy1Ic949V2/xhEZGsSVSdMGGkZo=;
+ b=Io5PYxpIPb0tG4HlANW1qmfIKj5qE/CP8fcfw5pIpzpcZX8mEQe1CyimGqCXd2QdUBo2pq
+ xrFZfLqULhrLEr0ALnmE+Sogq+3wsSZ2EMvPAYr2YFWGF/Rx9X186+me6P+dAIeBeg9gq+
+ WRYQPAJaHJlTBbW+mU6avgSLzg1O03A=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-HLac_w5pPq2RFK_w3wIMrw-1; Fri, 22 May 2020 11:11:41 -0400
+X-MC-Unique: HLac_w5pPq2RFK_w3wIMrw-1
+Received: by mail-wr1-f71.google.com with SMTP id h6so3659407wrx.4
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 08:11:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lPAwSc45qlxB/TZuoMmLjNjab6Fr/WrHf/LvzT8lOcU=;
- b=LEp/tq8e7dz84YShO+57qdp+fyE4ivHhIOo4vXqBk4lYMRvGuOEVpJWdx4ZI0Xx0Sd
- 40GQjxkfbIZFDLUX/4gldP/nviHnZPlFdXr7LBtPfDHO/sRYA9NmlhDm5mApYG1uD9+b
- 0VIum7njzdNt6gAkonlwj4OCMSL3CF5Q0gs6IPFSJh8BBsrOyu+f8OoiVS6fnw1Gdpsl
- RbM9ibNdvARoUMDpb28Vtiq7Ie0DnZv/xViT6Ao99AsrGeFPTqNnIDxZHQ8ejV8nPNab
- hlkSbJqzLBvb6QRnrQEee19yiQWTBwFOYJ1yKTPaPU6l2KqGxgHEqF1FBhy7BJ2HkaZO
- 1UoA==
-X-Gm-Message-State: AOAM5332a4UlJWRjTGxfKqHgCiNME/hcK4bt4ILKZA3nUtLba5mfBmX2
- 91N2UBQUNG9g4T7uvuDRtJbltA==
-X-Google-Smtp-Source: ABdhPJzEhNnrNAtzfvuhaU0UNxxJIIi7Z44F/ArpoGpK9mCs53NG8JehpaXMEn3s5FCY6RqMtqEaJg==
-X-Received: by 2002:adf:e441:: with SMTP id t1mr4114328wrm.347.1590159333438; 
- Fri, 22 May 2020 07:55:33 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y8sm1100561wmc.37.2020.05.22.07.55.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 07:55:32 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 9/9] target/arm: Convert Neon one-register-and-immediate
- insns to decodetree
-Date: Fri, 22 May 2020 15:55:20 +0100
-Message-Id: <20200522145520.6778-10-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200522145520.6778-1-peter.maydell@linaro.org>
-References: <20200522145520.6778-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=DLKf/Nb8XQKXuRpwhy1Ic949V2/xhEZGsSVSdMGGkZo=;
+ b=NDbM78VvqeTQu80mBbecAZoQjCL2g0AdPA6oT8g6tpplxUXuzzZwXyj02Ny67VpLvL
+ O86OJmtX8VUKP5s6/R7ZuxhQGwmblAkw5C/2jeWQqd67EwYycZkTDDCROwUkLwyl5z/a
+ dQWXI4eikuVDhjMxEz8ASiuigZ/OvwDVjF9fAQmpIdzoWgxNe8VHrf2dBcVD4uRBa1uh
+ PmmG3TBLdImNoF5SECisd07uiKe2+RrIWzzIUE/6kesL3YH36DIP2ojjUbrGY/gipBDV
+ pDfrMCNoB+80P3b7oIE1wPIi/gZysGHXfFAeOs34XA8IFsTgSFPmqV1Pvwj1OuJh6lNx
+ 3yrQ==
+X-Gm-Message-State: AOAM531s67mN1dPCdfVJf4yPN+SN4yRCs/DbAheAgf6uZJNq1eSSO9c/
+ gFtMNawy6L0Rfv1fUzPlbF8s5f8KVow080bI6OnXtnpT/OObw9ZkgqXszMOct8mfQWUGNeV+sx3
+ SXcAUeBXUbDm1oF8=
+X-Received: by 2002:a05:6000:1244:: with SMTP id
+ j4mr3924155wrx.189.1590160300256; 
+ Fri, 22 May 2020 08:11:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwG/+d4+DE2m94dLkPBnJ8imYmfCgj/5Y0RX9tFdihAuvwLfHw6ddoYoAxZo5Q6JLvA7ucZJw==
+X-Received: by 2002:a05:6000:1244:: with SMTP id
+ j4mr3924113wrx.189.1590160299902; 
+ Fri, 22 May 2020 08:11:39 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id r3sm9455854wmh.48.2020.05.22.08.11.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 22 May 2020 08:11:39 -0700 (PDT)
+Subject: Re: [PATCH v3 11/11] hw/semihosting: Make the feature depend of TCG, 
+ and allow to disable it
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200521195911.19685-1-philmd@redhat.com>
+ <20200521195911.19685-12-philmd@redhat.com>
+ <36db7554-dcc0-6b8c-e7b7-628c105d8fc7@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <d7635637-2b34-fd4b-ee90-945c4c9fc9f3@redhat.com>
+Date: Fri, 22 May 2020 17:11:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <36db7554-dcc0-6b8c-e7b7-628c105d8fc7@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,294 +141,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, qemu-riscv@nongnu.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Filippov <jcmvbkbc@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Michael Walle <michael@walle.cc>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the insns in the one-register-and-immediate group to decodetree.
+On 5/22/20 6:26 AM, Richard Henderson wrote:
+> On 5/21/20 12:59 PM, Philippe Mathieu-Daudé wrote:
+>> +++ b/hw/semihosting/Kconfig
+>> @@ -1,3 +1,5 @@
+>>  
+>> +# default is 'n'
+>>  config SEMIHOSTING
+>> -       bool
+>> +    bool
+>> +    depends on TCG
+>> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
+>> new file mode 100644
+>> index 0000000000..035592dd86
+>> --- /dev/null
+>> +++ b/target/arm/Kconfig
+>> @@ -0,0 +1,2 @@
+>> +config SEMIHOSTING
+>> +    default y if TCG
+> 
+> Did you answer my question about replicating the TCG test?  If you did, I
+> missed it...
 
-In the new decode, our asimd_imm_const() function returns a 64-bit value
-rather than a 32-bit one, which means we don't need to treat cmode=14 op=1
-as a special case in the decoder (it is the only encoding where the two
-halves of the 64-bit value are different).
+Shortly before posting this series:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg705992.html
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/neon-dp.decode       |  22 ++++++
- target/arm/translate-neon.inc.c | 118 ++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 101 +--------------------------
- 3 files changed, 142 insertions(+), 99 deletions(-)
+There is indeed something wrong with this patch, but I'm not seeing it.
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index e217d51670d..1643d84e9c2 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -373,3 +373,25 @@ VCVT_SF_2sh      1111 001 0 1 . ...... .... 1110 0 . . 1 .... @2reg_vcvt
- VCVT_UF_2sh      1111 001 1 1 . ...... .... 1110 0 . . 1 .... @2reg_vcvt
- VCVT_FS_2sh      1111 001 0 1 . ...... .... 1111 0 . . 1 .... @2reg_vcvt
- VCVT_FU_2sh      1111 001 1 1 . ...... .... 1111 0 . . 1 .... @2reg_vcvt
-+
-+######################################################################
-+# 1-reg-and-modified-immediate grouping:
-+# 1111 001 i 1 D 000 imm:3 Vd:4 cmode:4 0 Q op 1 Vm:4
-+######################################################################
-+
-+&1reg_imm        vd q imm cmode op
-+
-+%asimd_imm_value 24:1 16:3 0:4
-+
-+@1reg_imm        .... ... . . . ... ... .... .... . q:1 . . .... \
-+                 &1reg_imm imm=%asimd_imm_value vd=%vd_dp
-+
-+# The cmode/op bits here decode VORR/VBIC/VMOV/VMNV, but
-+# not in a way we can conveniently represent in decodetree without
-+# a lot of repetition:
-+# VORR: op=0, (cmode & 1) && cmode < 12
-+# VBIC: op=1, (cmode & 1) && cmode < 12
-+# VMOV: everything else
-+# So we have a single decode line and check the cmode/op in the
-+# trans function.
-+Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 8d1c58eddc2..39c7e70373a 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -1817,3 +1817,121 @@ DO_FP_2SH(VCVT_SF, gen_helper_vfp_sltos)
- DO_FP_2SH(VCVT_UF, gen_helper_vfp_ultos)
- DO_FP_2SH(VCVT_FS, gen_helper_vfp_tosls_round_to_zero)
- DO_FP_2SH(VCVT_FU, gen_helper_vfp_touls_round_to_zero)
-+
-+static uint64_t asimd_imm_const(uint32_t imm, int cmode, int op)
-+{
-+    /*
-+     * Expand the encoded constant.
-+     * Note that cmode = 2,3,4,5,6,7,10,11,12,13 imm=0 is UNPREDICTABLE.
-+     * We choose to not special-case this and will behave as if a
-+     * valid constant encoding of 0 had been given.
-+     * cmode = 15 op = 1 must UNDEF; we assume decode has handled that.
-+     */
-+    switch (cmode) {
-+    case 0: case 1:
-+        /* no-op */
-+        break;
-+    case 2: case 3:
-+        imm <<= 8;
-+        break;
-+    case 4: case 5:
-+        imm <<= 16;
-+        break;
-+    case 6: case 7:
-+        imm <<= 24;
-+        break;
-+    case 8: case 9:
-+        imm |= imm << 16;
-+        break;
-+    case 10: case 11:
-+        imm = (imm << 8) | (imm << 24);
-+        break;
-+    case 12:
-+        imm = (imm << 8) | 0xff;
-+        break;
-+    case 13:
-+        imm = (imm << 16) | 0xffff;
-+        break;
-+    case 14:
-+        if (op) {
-+            /*
-+             * This is the only case where the top and bottom 32 bits
-+             * of the encoded constant differ.
-+             */
-+            uint64_t imm64 = 0;
-+            int n;
-+
-+            for (n = 0; n < 8; n++) {
-+                if (imm & (1 << n)) {
-+                    imm64 |= (0xffULL << (n * 8));
-+                }
-+            }
-+            return imm64;
-+        }
-+        imm |= (imm << 8) | (imm << 16) | (imm << 24);
-+        break;
-+    case 15:
-+        imm = ((imm & 0x80) << 24) | ((imm & 0x3f) << 19)
-+            | ((imm & 0x40) ? (0x1f << 25) : (1 << 30));
-+        break;
-+    }
-+    if (op) {
-+        imm = ~imm;
-+    }
-+    return dup_const(MO_32, imm);
-+}
-+
-+static bool do_1reg_imm(DisasContext *s, arg_1reg_imm *a,
-+                        GVecGen2iFn *fn)
-+{
-+    uint64_t imm;
-+    int reg_ofs, vec_size;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) && (a->vd & 0x10)) {
-+        return false;
-+    }
-+
-+    if (a->vd & a->q) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    reg_ofs = neon_reg_offset(a->vd, 0);
-+    vec_size = a->q ? 16 : 8;
-+    imm = asimd_imm_const(a->imm, a->cmode, a->op);
-+
-+    fn(MO_64, reg_ofs, reg_ofs, imm, vec_size, vec_size);
-+    return true;
-+}
-+
-+static void gen_VMOV_1r(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                        int64_t c, uint32_t oprsz, uint32_t maxsz)
-+{
-+    tcg_gen_gvec_dup_imm(MO_64, dofs, oprsz, maxsz, c);
-+}
-+
-+static bool trans_Vimm_1r(DisasContext *s, arg_1reg_imm *a)
-+{
-+    /* Handle decode of cmode/op here between VORR/VBIC/VMOV */
-+    GVecGen2iFn *fn;
-+
-+    if ((a->cmode & 1) && a->cmode < 12) {
-+        /* for op=1, the imm will be inverted, so BIC becomes AND. */
-+        fn = a->op ? tcg_gen_gvec_andi : tcg_gen_gvec_ori;
-+    } else {
-+        /* There is one unallocated cmode/op combination in this space */
-+        if (a->cmode == 15 && a->op == 1) {
-+            return false;
-+        }
-+        fn = gen_VMOV_1r;
-+    }
-+    return do_1reg_imm(s, a, fn);
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9cc44e6258e..20d07e99053 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5232,105 +5232,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         /* Three register same length: handled by decodetree */
-         return 1;
-     } else if (insn & (1 << 4)) {
--        if ((insn & 0x00380080) != 0) {
--            /* Two registers and shift: handled by decodetree */
--            return 1;
--        } else { /* (insn & 0x00380080) == 0 */
--            int invert, reg_ofs, vec_size;
--
--            if (q && (rd & 1)) {
--                return 1;
--            }
--
--            op = (insn >> 8) & 0xf;
--            /* One register and immediate.  */
--            imm = (u << 7) | ((insn >> 12) & 0x70) | (insn & 0xf);
--            invert = (insn & (1 << 5)) != 0;
--            /* Note that op = 2,3,4,5,6,7,10,11,12,13 imm=0 is UNPREDICTABLE.
--             * We choose to not special-case this and will behave as if a
--             * valid constant encoding of 0 had been given.
--             */
--            switch (op) {
--            case 0: case 1:
--                /* no-op */
--                break;
--            case 2: case 3:
--                imm <<= 8;
--                break;
--            case 4: case 5:
--                imm <<= 16;
--                break;
--            case 6: case 7:
--                imm <<= 24;
--                break;
--            case 8: case 9:
--                imm |= imm << 16;
--                break;
--            case 10: case 11:
--                imm = (imm << 8) | (imm << 24);
--                break;
--            case 12:
--                imm = (imm << 8) | 0xff;
--                break;
--            case 13:
--                imm = (imm << 16) | 0xffff;
--                break;
--            case 14:
--                imm |= (imm << 8) | (imm << 16) | (imm << 24);
--                if (invert) {
--                    imm = ~imm;
--                }
--                break;
--            case 15:
--                if (invert) {
--                    return 1;
--                }
--                imm = ((imm & 0x80) << 24) | ((imm & 0x3f) << 19)
--                      | ((imm & 0x40) ? (0x1f << 25) : (1 << 30));
--                break;
--            }
--            if (invert) {
--                imm = ~imm;
--            }
--
--            reg_ofs = neon_reg_offset(rd, 0);
--            vec_size = q ? 16 : 8;
--
--            if (op & 1 && op < 12) {
--                if (invert) {
--                    /* The immediate value has already been inverted,
--                     * so BIC becomes AND.
--                     */
--                    tcg_gen_gvec_andi(MO_32, reg_ofs, reg_ofs, imm,
--                                      vec_size, vec_size);
--                } else {
--                    tcg_gen_gvec_ori(MO_32, reg_ofs, reg_ofs, imm,
--                                     vec_size, vec_size);
--                }
--            } else {
--                /* VMOV, VMVN.  */
--                if (op == 14 && invert) {
--                    TCGv_i64 t64 = tcg_temp_new_i64();
--
--                    for (pass = 0; pass <= q; ++pass) {
--                        uint64_t val = 0;
--                        int n;
--
--                        for (n = 0; n < 8; n++) {
--                            if (imm & (1 << (n + pass * 8))) {
--                                val |= 0xffull << (n * 8);
--                            }
--                        }
--                        tcg_gen_movi_i64(t64, val);
--                        neon_store_reg64(t64, rd + pass);
--                    }
--                    tcg_temp_free_i64(t64);
--                } else {
--                    tcg_gen_gvec_dup_imm(MO_32, reg_ofs, vec_size,
--                                         vec_size, imm);
--                }
--            }
--        }
-+        /* Two registers and shift or reg and imm: handled by decodetree */
-+        return 1;
-     } else { /* (insn & 0x00800010 == 0x00800000) */
-         if (size != 3) {
-             op = (insn >> 8) & 0xf;
--- 
-2.20.1
+- semihosting only makes sense with TCG accelerator
+
+This is the "depends on TCG"
+
+- some targets (if built with TCG enabled) require semihosting
+
+This would be a per-target "select SEMIHOSTING if TCG"
+
+Another problem is some targets only require semihosting in system-mode;
+and this approach select it for both system/user modes.
+
+Paolo... help!
 
 
