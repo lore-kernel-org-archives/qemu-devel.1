@@ -2,161 +2,88 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCA7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 20:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0AEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 20:45:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05FD420723
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 20:41:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE51420723
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 20:45:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgdMHTfj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05FD420723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KTKiJYlU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE51420723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcETj-0001yy-5N
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 16:41:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38214)
+	id 1jcEYB-0003vh-Vp
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 16:45:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jcESj-00012L-A3
- for qemu-devel@nongnu.org; Fri, 22 May 2020 16:40:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44683
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jcESh-000629-8B
- for qemu-devel@nongnu.org; Fri, 22 May 2020 16:40:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590180008;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Sl9nsjN2BncOsOsxVTSgugJKNjYqHxeihpPx56Esm7g=;
- b=DgdMHTfjnVfv2oZyMFQWel1yiZ7vCGFkYxU47rfw5lv42bw7Ij6J0OQmQBxFbgJ02riHZ7
- bfd3F+4UunxE/OXWeNHThRuT0VpurQzkCvkZihhVm0Bi6L/O+sK54aeXJK+hkMuM/bpb1U
- 6wxbbqCNYH3EQ9rJlkj54bOSmsUxzrk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-7zthbk_OPgKfsV4-h3fdFA-1; Fri, 22 May 2020 16:39:58 -0400
-X-MC-Unique: 7zthbk_OPgKfsV4-h3fdFA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 991CB18FE861;
- Fri, 22 May 2020 20:39:57 +0000 (UTC)
-Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6D8FC105911D;
- Fri, 22 May 2020 20:39:56 +0000 (UTC)
-Subject: Re: Fwd: simple qemu command not working
-To: haris iqbal <haris.phnx@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
-References: <CAE_WKMwmOtR_zqUR-40Lv6Wrrm-ZBqTganHT_zF_m3tf2is7xA@mail.gmail.com>
- <CAE_WKMy-PY3qyTGDGvogXPXWgCZ-N_N_n-qEP9Rtk-UgROHx6g@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <fdb20a7c-9f08-c67d-cc81-f45cba79af05@redhat.com>
-Date: Fri, 22 May 2020 16:39:55 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcEXF-0002sA-Tf
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 16:44:53 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:41019)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcEXE-00078L-IH
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 16:44:53 -0400
+Received: by mail-lj1-x242.google.com with SMTP id v16so14283031ljc.8
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 13:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=LhiTtjgYd68iklkd2Tu469UiUxRPDvQtVuow9rEM/fc=;
+ b=KTKiJYlUc2EvI/eaUOlZTNpco3jN+/0UIhibmU9HIsfM9yRXRS+wbfl2IwignBNhmE
+ Jafh+6YTXft++t/YzbFxaeC4oeSjbCu2RaMmEVt6mVstHQF5awddChDewD0p/yi36u06
+ aP7+S/oIoEzWHMbe2mDIUVrRfD8bBxWfsEvEUVQGGY2UDuxcIDdY3uKBj0RtXE2rTZtw
+ ZxvBE7SwV3lVtGBsBi8tFNB2nTpEh8Dh5wfOVEFELyOA3lKfLULDtEL9iYSxNpRySLbO
+ oNJoyJXaF15SVE4mXQQMO0HZQgAsIEf5RJDO0cQaacDXZPComlKM5WM1UxEuroXtsO4B
+ LNNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=LhiTtjgYd68iklkd2Tu469UiUxRPDvQtVuow9rEM/fc=;
+ b=YzLA4NZvOvAe9CqExS2wQC6aDDAu8jqMazolEMclrA1R4VwzPTQhNAvh2MtTxK7Zi3
+ zaO2NYXxAeaZ21SGLWa5i7ob2s9qC0RbYr0gREQRBXXhsTVgQCXJVUz4mA2QLbw0H9FO
+ BxGJIQs3KLBvjlZJ3cysFdrzyO4skIESXZfoR6eNbXoyzTPeMbBs+hVToaoprfpzg6AJ
+ Tg0GFcyLjWvfqjgBxHBltPsjtw/dOmSm9OKyah0f7jneZuH/h3fGLjLsOf/swsmQmeFK
+ oL7nQodpRdLNtIndIr43fIBVJkrGAFfU9r8XLP67hxJC8WPVQPl232e/E1aLfwn2tlut
+ Jhgw==
+X-Gm-Message-State: AOAM530gAR6kInpMlwNGOISQ13zLNMX3uDLCzt0h/38EMCbaWzL0j/09
+ eR+zmaA/BhNxlWqdUdT3Tb/mxa469UBcQeR0+SuuGg==
+X-Google-Smtp-Source: ABdhPJx3ge2YKJmCAGgEB8czBmczJH8VMjnSMMh2ZdI6aBCUoiIHHyNQTv5S9DUqMcRW1FXbV+VZgOD0mqWGUbAzkzg=
+X-Received: by 2002:a2e:3c0b:: with SMTP id j11mr6637042lja.424.1590180290332; 
+ Fri, 22 May 2020 13:44:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAE_WKMy-PY3qyTGDGvogXPXWgCZ-N_N_n-qEP9Rtk-UgROHx6g@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200519132259.405-1-robert.foley@linaro.org>
+ <20200519132259.405-13-robert.foley@linaro.org>
+ <87zha0c4nw.fsf@linaro.org>
+In-Reply-To: <87zha0c4nw.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 22 May 2020 16:44:43 -0400
+Message-ID: <CAEyhzFt=bwj_-TU2Mj3ts6HwfTaC0Rj8e6UoOJcFCjPqHU9LqQ@mail.gmail.com>
+Subject: Re: [PATCH v7 12/12] tests/vm: Add workaround to consume console
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=robert.foley@linaro.org; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -170,120 +97,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc: Peter Puhov <peter.puhov@linaro.org>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 22 May 2020 at 12:31, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> I think you need to look at adding:
+>
+> [sendemail]
+>         cccmd =3D scripts/get_maintainer.pl --nogit-fallback
+>
+> to your .git/config to ensure maintainers get pinged when you touch
+> their subsystems. Eduardo and Cleber CC'd
 
 
-On 5/22/20 4:32 AM, haris iqbal wrote:
-> Hi,
-> 
-> I am having some trouble with spinning up a VM using qemu. The
-> description is below. Can someone please point me in the right
-> direction?
-> 
+Thanks for pointing this out!  We will definitely add it and use it.
+
+> > The ConsoleSocket object provides a socket interface
+> > which will consume all arriving characters on the
+> > socket, but will provide those chars via recv() as
+> > would a regular socket.
+> > This is a workaround we found was needed since
+> > there is a known issue where QEMU will hang waiting
+> > for console characters to be consumed.
+> > We also add the option of logging the console to a file.
+> >
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> > ---
+> >  python/qemu/console_socket.py | 162 ++++++++++++++++++++++++++++++++++
+> >  python/qemu/machine.py        |  23 ++++-
+> >  tests/vm/Makefile.include     |   4 +
+> >  tests/vm/basevm.py            |  19 +++-
+> >  4 files changed, 202 insertions(+), 6 deletions(-)
+> >  create mode 100644 python/qemu/console_socket.py
+> >
+> > diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket=
+.py
+<snip>
+> > +import traceback
+>
+> Left over debug?
+
+This is getting used here in a try except in handle_read, to display
+the exception information.
+
+<snip>
+> > +    def handle_read(self):
+> > +        """process arriving characters into in memory _buffer"""
+> > +        try:
+> > +            data =3D asyncore.dispatcher.recv(self, 1)
+> > +            # latin1 is needed since there are some chars
+> > +            # we are receiving that cannot be encoded to utf-8
+> > +            # such as 0xe2, 0x80, 0xA6.
+> > +            string =3D data.decode("latin1")
+> > +        except:
+> > +            print("Exception seen.")
+> > +            traceback.print_exc()
+> > +            return
+> > +        if self._logfile:
+> > +            self._logfile.write("{}".format(string))
+> > +            self._logfile.flush()
+> > +        for c in string:
+> > +            self._buffer.append(c)
+<snip>
+> > +if __name__ =3D=3D '__main__':
+>
+> If the module is meant to be executable then you need to +x the file.
+> However since 8f8fd9edba I think everything is meant to be doing things
+> the pythonic way as a proper module. I'm not sure where unit tests for
+> the modules are meant to sit in this case.
+
+That is a good point.  I see the other modules at this level do not have
+tests like this, so I am going to remove this for now, as I think it adds
+limited value at this point.
+>
+> > +    # Brief test to exercise the above code.
+> > +    # The ConsoleSocket will ship some data to the server,
+> > +    # the server will echo it back and the client will echo what it re=
+ceived.
+> > +
+> > +    # First remove the socket.
+> > +    address =3D "./test_console_socket"
+> > +    if os.path.exists(address):
+> > +        os.unlink(address)
+> > +
+> > +    # Create the server side.
+> > +    server_socket =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM=
+)
+> > +    server_socket.bind(address)
+> > +    server_socket.listen(1)
+> > +
+> > +    # Create the object we are trying to test.
+> > +    console_socket =3D ConsoleSocket(address, file=3D"./logfile.txt")
+> > +
+> > +    # Generate some data and ship it over the socket.
+> > +    send_data =3D ""
+> > +    for i in range(10):
+> > +        send_data +=3D "this is a test message {}\n".format(i)
+> > +    console_socket.send(send_data.encode('latin1'))
+> > +    connection, client_address =3D server_socket.accept()
+> > +
+> > +    # Process the data on the server and ship it back.
+> > +    data =3D connection.recv(len(send_data))
+> > +    print("server received: {}".format(data))
+> > +    print("server: sending data back to the client")
+> > +    connection.sendall(data)
+> > +
+> > +    # Client receives teh bytes and displays them.
+>
+> s/teh/the/
+>
+> > +    print("client: receiving bytes")
+> > +    bytes =3D console_socket.recv(len(data))
+> > +    recv_data =3D bytes.decode('latin1')
+> > +    print("client received: {}".format(recv_data))
+> > +    assert(recv_data =3D=3D send_data)
+> > +    # Close console connection first, then close server.
+> > +    console_socket.close()
+> > +    connection.close()
+> > +    server_socket.close()
+> > +    print("test successful.")
+> > +
+>
+> I think in this case it might be worth splitting introducing the
+> functionally into the python library from the actual usage of it in the
+> wider machines.
+
+OK, I'll split this out into a separate patch.
+
+Thanks & Regards,
+-Rob
+>
+> Otherwise it seems to work well enough for me. I'd like the proper
+> python gurus to have a look over it though.
+>
+> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
 > --
-> 
-> Regards
-> -Haris
-> 
-> 
-> ---------- Forwarded message ---------
-> From: haris iqbal <haris.phnx@gmail.com>
-> Date: Wed, May 20, 2020 at 5:10 PM
-> Subject: simple qemu command not working
-> To: <qemu-discuss@nongnu.org>
-> Cc: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> 
-> 
-> Hi,
-> 
-> I am trying to install ubuntu in one of the qcow2 images I have
-> created, using the below command
-> 
->     sudo qemu-system-x86_64 -enable-kvm -nographic -smp 8 -m 8G -cpu
-> qemu64 -cdrom ubuntu-19.10-live-server-amd64.iso -boot d
-> ubuntu-19.10-live-server-amd64.qcow2
-> 
-> First it spits out a warning, and then just hangs at "Initializing gfx code...".
-> 
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     qemu-system-x86_64: warning: host doesn't support requested
-> feature: CPUID.80000001H:ECX.svm [bit 2]
->     SeaBIOS (version 1.13.0-1ubuntu1)
-> 
-> 
->     iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+BFF8C9F0+BFECC9F0 CA00
-> 
-> 
-> 
->     Booting from DVD/CD...
-> 
->     ISOLINUX 6.04 20190226 ETCD Copyright (C) 1994-2015 H. Peter Anvin et al
->     Loading bootlogo...
-> 
->     Initializing gfx code...
-> 
-> I have searched a lot and got a number of solutions and possible
-> problems but none worked.
-> 
-> 1) Have tried with Ubuntu 20 also, but same error.
-> 
-> 2) VT-x not enabled.
-> 
-> It is enabled, `lscpu` shows
-> 
->     Virtualization:                  VT-x
->     Hypervisor vendor:               KVM
->     Flags: .. vmx ..
-> 
-> 3) Tried with `-cpu qemu64`. Did not work
-> 
-> 4) used `qemu-system-i386` instead of `qemu-system-x86_64`. But that
-> fails with a different error
-> 
->     This kernel requires an x86-64 CPU, but only detected an i686 CPU.
->     Unable to boot - please use a kernel appropriate for your CPU.
-> 
-> 5) I have asked the same question online, but no answers.
-> https://stackoverflow.com/questions/61864520/qemu-installating-ubuntu-through-iso-gets-stuck-shows-svm-cpu-bit-warning
-> 
-> 6) Have tried without the -nographics option, same story.
-> 
-> 7) I did find out that the "SVM" CPU bit corresponds to "AMD Secure
-> Virtual Machine", which confused me since my CPU is Haswell.
-> 
-> The host system on which I am running this command is an ubuntu.
-> I have tried this on 2 separate ubuntu machines, one running on
-> virtualbox as a VM with host OS windows 10.
-> The other also running on a virtualized hypervisor (not sure which
-> one), as a VM.
-> 
-
-So *both* the Ubuntu machines you've tried to run QEMU on are themselves
-virtual machines?
-
-You'll need to go all the way down to the baremetal level and enable
-nested KVM if that's your goal.
-
-For a HyperV root, I think there are similar steps you need to take to
-enable KVM inside a guest.
-
-For VirtualBox, I have no idea.
-
+> Alex Benn=C3=A9e
 
