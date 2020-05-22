@@ -2,83 +2,95 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E815C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B32C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45866206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45866206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BE333206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:10:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPxiZGUl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE333206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcCzn-0002JH-C4
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:06:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57984)
+	id 1jcD3h-0004oO-WE
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:10:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcCzE-0001gx-I8
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcCzD-0004hL-7L
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:05:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jcCzB-0005vG-A5
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:05:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4B0142E806F
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:05:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcD2w-00046h-Oq
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:09:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41409
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcD2v-0005Cj-E1
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:09:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590174567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NA8h4ox5OH4idwhdHeuzwRnjTWkGBWR55DC/umQVC8I=;
+ b=ZPxiZGUl9rs5ac8R/0NeLEQXLbv05R8qUPZenvVZadTL7m+6+m7zcjh/KTxTE/yd5MY/vt
+ MdaKOy1RKgR4cajd6vqUMuB/l1VZJ8imwbsbz0JcYE4pj2ef/KFsMMf/ZNtxryehjpU9uQ
+ nHS4Wqg9hOhuwNyaKJ4QbxjU92ud5/w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-bxYDEFl-MVmWmpCyKev7sg-1; Fri, 22 May 2020 15:09:20 -0400
+X-MC-Unique: bxYDEFl-MVmWmpCyKev7sg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F351107ACCD;
+ Fri, 22 May 2020 19:09:17 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BD1EF5C1D0;
+ Fri, 22 May 2020 19:09:08 +0000 (UTC)
+Subject: Re: [PATCH v3 02/17] block: use int64_t as bytes type in tracked
+ requests
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
+ <20200430111033.29980-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <80c7747c-20e5-03ec-d31c-69168ae07920@redhat.com>
+Date: Fri, 22 May 2020 14:09:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 May 2020 18:59:36 -0000
-From: felix <1878915@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: floppy io-uring
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: felix.von.s stefanha
-X-Launchpad-Bug-Reporter: felix (felix.von.s)
-X-Launchpad-Bug-Modifier: felix (felix.von.s)
-References: <158954872808.31513.13433748579796760766.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159017397642.806.16897512631461166648.malone@chaenomeles.canonical.com>
-Subject: [Bug 1878915] Re: util/fdmon-io_uring.c:95: get_sqe: Assertion `ret >
- 1' failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f9dc4aeb0222bed09971fd65d6aad3c18864e664
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 14:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <20200430111033.29980-3-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,71 +99,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878915 <1878915@bugs.launchpad.net>
+Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
+ pavel.dovgaluk@ispras.ru, dillaman@redhat.com, qemu-devel@nongnu.org,
+ sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com,
+ den@openvz.org, sheepdog@lists.wpkg.org, stefanha@redhat.com,
+ namei.unix@gmail.com, pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Confirming that I can no longer reproduce the bug with the latest master
-(ae3aa5da96f4ccf0c2a28851449d92db9fcfad71). I have not bisected the bug,
-though; at the moment I am not quite able to afford the time.
+On 4/30/20 6:10 AM, Vladimir Sementsov-Ogievskiy wrote:
+> We are generally moving to int64_t for both offset and bytes parameters
+> on all io paths.
+> 
+> Main motivation is realization of 64-bit write_zeroes operation for
+> fast zeroing large disk chunks, up to the whole disk.
+> 
+> We chose signed type, to be consistent with off_t (which is signed) and
+> with possibility for signed return type (where negative value means
+> error).
+> 
+> So, convert tracked requests now.
+> 
+> Series: 64bit-block-status
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
 
--- =
+>   static void tracked_request_begin(BdrvTrackedRequest *req,
+>                                     BlockDriverState *bs,
+>                                     int64_t offset,
+> -                                  uint64_t bytes,
+> +                                  int64_t bytes,
+>                                     enum BdrvTrackedRequestType type)
+>   {
+> -    assert(bytes <= INT64_MAX && offset <= INT64_MAX - bytes);
+> +    assert(offset >= 0 && bytes >= 0 &&
+> +           bytes <= INT64_MAX && offset <= INT64_MAX - bytes);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878915
+'bytes <= INT64_MAX' was previously a real runtime check, but is now a 
+tautology and therefore a dead branch; a picky compiler might complain. 
+This assert could be compressed to:
 
-Title:
-  util/fdmon-io_uring.c:95: get_sqe: Assertion `ret > 1' failed.
+assert(offset >= 0 && (uint64_t) bytes <= INT64_MAX - offset);
 
-Status in QEMU:
-  Fix Committed
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  qemu 5.0.0, liburing1 0.6-3, Linux 5.6.0-1-686-pae (Debian)
-
-  Stack trace:
-
-  Stack trace of thread 31002:
-  #0  0x00000000b7faf1cd __kernel_vsyscall (linux-gate.so.1 + 0x11cd)
-  #1  0x00000000b6c618e2 __libc_signal_restore_set (libc.so.6 + 0x348e2)
-  #2  0x00000000b6c4a309 __GI_abort (libc.so.6 + 0x1d309)
-  #3  0x00000000b6c4a1d1 __assert_fail_base (libc.so.6 + 0x1d1d1)
-  #4  0x00000000b6c59929 __GI___assert_fail (libc.so.6 + 0x2c929)
-  #5  0x0000000000ba80be get_sqe (qemu-system-i386 + 0x6d00be)
-  #6  0x0000000000ba80cb add_poll_add_sqe (qemu-system-i386 + 0x6d00cb)
-  #7  0x0000000000ba820c fill_sq_ring (qemu-system-i386 + 0x6d020c)
-  #8  0x0000000000ba7145 aio_poll (qemu-system-i386 + 0x6cf145)
-  #9  0x0000000000aede63 blk_prw (qemu-system-i386 + 0x615e63)
-  #10 0x0000000000aeef95 blk_pread (qemu-system-i386 + 0x616f95)
-  #11 0x00000000008abbfa fdctrl_transfer_handler (qemu-system-i386 + 0x3d3b=
-fa)
-  #12 0x0000000000906c3d i8257_channel_run (qemu-system-i386 + 0x42ec3d)
-  #13 0x00000000008ac119 fdctrl_start_transfer (qemu-system-i386 + 0x3d4119)
-  #14 0x00000000008ab233 fdctrl_write_data (qemu-system-i386 + 0x3d3233)
-  #15 0x0000000000708ae7 memory_region_write_accessor (qemu-system-i386 + 0=
-x230ae7)
-  #16 0x00000000007059e1 access_with_adjusted_size (qemu-system-i386 + 0x22=
-d9e1)
-  #17 0x000000000070b931 memory_region_dispatch_write (qemu-system-i386 + 0=
-x233931)
-  #18 0x00000000006a87a2 address_space_stb (qemu-system-i386 + 0x1d07a2)
-  #19 0x0000000000829216 helper_outb (qemu-system-i386 + 0x351216)
-  #20 0x00000000b06d9fdc n/a (n/a + 0x0)
-
-  Steps:
-
-  0. qemu-img create -f raw fda.img 3840K
-  1. mformat -i fda.img -n 48 -t 80 -h 2
-  2. qemu-system-i386 -fda fda.img -hda freedos.qcow2
-  3. Attempt to run 'dosfsck a:' in the guest
-
-  According to hw/block/fdc.c, a 3840K image should result in a virtual
-  floppy with a geometry of 48 sectors/track x 80 tracks x 2 sides.
-
-  The assert seems bogus either way.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878915/+subscriptions
 
