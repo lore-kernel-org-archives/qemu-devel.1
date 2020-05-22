@@ -2,82 +2,95 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3FCC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9320AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784B9206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:26:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784B9206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 492062068D
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:35:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwVCTR9r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 492062068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcDJ6-0006Er-NQ
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59966)
+	id 1jcDRz-0003DW-HS
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDIZ-0005nL-Vu
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:25:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43438)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDIY-0008Nf-Ny
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:25:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jcDIW-0008Gl-MT
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A5C372E8023
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:25:36 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcDRJ-0002Q3-FJ
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:34:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49228
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jcDRH-00025V-Rm
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:34:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590176077;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PdZciMLdiFXhQ/AZi14CkRXKAi15DYpBz+YoeH83t1U=;
+ b=cwVCTR9ryzBCZw4nHzf6tNgmHpmEtdEW8fwknxeaM9MLUhFlNMdU4n7IVQdiFAuK8Fxqj1
+ JaUIjMtjEBysta3MqCyM9CckXN+t6WgbDr2EpdfKn7x/Ek0Dig7BbIrEYBLVs6C9+1Q6B2
+ fM0BzbFdZPMeSSZo9bVX07JS+WIisP0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-9VBgICPWOJC6MWjshQik6w-1; Fri, 22 May 2020 15:34:33 -0400
+X-MC-Unique: 9VBgICPWOJC6MWjshQik6w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 523CB18B6423;
+ Fri, 22 May 2020 19:34:31 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 16A1678B3B;
+ Fri, 22 May 2020 19:34:23 +0000 (UTC)
+Subject: Re: [PATCH v3 09/17] block/io: support int64_t bytes in
+ bdrv_co_p{read,write}v_part()
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
+ <20200430111033.29980-10-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <9b0727d3-3142-ad18-f073-d567e7667e20@redhat.com>
+Date: Fri, 22 May 2020 14:34:23 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 May 2020 19:18:26 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
-X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
-Message-ID: <87tv07dbi5.fsf@linaro.org>
-Subject: Re: [Bug 1880225] [NEW] Emulation of some arm programs fail with
- "Assertion `have_guest_base' failed."
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7488a9935d9bc2d9094fa3dd66262751ec8d4e27
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 14:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <20200430111033.29980-10-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,244 +99,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
+Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
+ pavel.dovgaluk@ispras.ru, dillaman@redhat.com, qemu-devel@nongnu.org,
+ sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com,
+ den@openvz.org, sheepdog@lists.wpkg.org, stefanha@redhat.com,
+ namei.unix@gmail.com, pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200522191826.dxKopvLXKF_eq_Qi3Tuuj9edcBouhbplCXmkt5u6uM0@z>
 
-Aleksandar Markovic <1880225@bugs.launchpad.net> writes:
+On 4/30/20 6:10 AM, Vladimir Sementsov-Ogievskiy wrote:
+> We are generally moving to int64_t for both offset and bytes parameters
+> on all io paths.
+> 
+> Main motivation is realization of 64-bit write_zeroes operation for
+> fast zeroing large disk chunks, up to the whole disk.
+> 
+> We chose signed type, to be consistent with off_t (which is signed) and
+> with possibility for signed return type (where negative value means
+> error).
+> 
+> So, prepare bdrv_co_preadv_part() and bdrv_co_pwritev_part() and their
+> remaining dependencies now.
+> 
+> Series: 64bit-block-status
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   include/block/block_int.h |  4 ++--
+>   block/io.c                | 16 ++++++++--------
+>   block/trace-events        |  4 ++--
+>   3 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index c8daba608b..3c2a1d741a 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -975,13 +975,13 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+>       int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+>       BdrvRequestFlags flags);
+>   int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes,
+> +    int64_t offset, int64_t bytes,
+>       QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
+>   int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+>       int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+>       BdrvRequestFlags flags);
+>   int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes,
+> +    int64_t offset, int64_t bytes,
+>       QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
 
-> Public bug reported:
->
-> This issue is observer with QEMU ToT, checked out around May 15th (but I
-> believe it is present in current master too), and wasn't present in QEMU
-> v5.0.0.
->
-> I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
->
-> Arm cross-compiler is a standard cross-compiler that comes with Debian-
-> based distributions, and gcc version is:
->
-> $ arm-linux-gnueabi-gcc --version
-> arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
->
-> Compile this program with cross compiler:
->
-> $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o toupper_string-
-> arm
->
-> Emulation with QEMU v5.0.0 is correct, and gives expected output:
->
-> $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
-rm
-> CONTROL RESULT: (toupper_string)
->  nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
-lnmpapq
->  NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
-LNMPAPQ
->
-> While, in case of QEMU master it fails:
->
-> $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-> qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
-uest_base: Assertion `have_guest_base' failed.
-> Aborted
-<snip>
+Callers for these two functions:
 
-Works for me in our TCG tests on master:
+block-backend.c:blk_do_pwritev_part() - currently passes unsigned int
 
-20:15:43 [alex@zen:~/l/q/b/user.static] review/aarch64-vms-v7|=E2=80=A6 + .=
-/arm-linux-user/qemu-arm ./tests/tcg/arm-linux-user/toupper
-CONTROL RESULT: (toupper_string)
- nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorelln=
-mpapq
- NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLORELLN=
-MPAPQ
+filter-compress.c:compress_co_preadv_part() - passes uint64_t from 
+.bdrv_co_preadv_part, which in turn is called from:
+  - io.c:bdrv_driver_preadv() - callers analyzed earlier this series, 
+where we know we are currently capped at <2G
+  - qcow2-cluster.c:do_perform_cow_read() - passes size_t qiov->size, 
+but we further know qcow2 cow is limited to cluster size of 2M
+  - qcow2.c:qcow2_load_vmstate() - passes size_t qiov->size, tracing 
+whether that ever exceeds 32 bits (on 64-bit platforms) is harder
 
-I have submitted a fix to the list that affected programs that couldn't
-see /proc/self/maps but I guess that isn't the case here.
+filter-compress.c:compress_co_pwritev_part() - ditto, but for 
+.bdrv_co_pwritev_part, which in turn is called from:
+  - io.c:bdrv_driver_pwritev() - callers analyzed earlier this series, 
+where we know we are currently capped at <2G
+  - qcow2.c:qcow2_save_vmstate() - passes size_t qiov->size, tracing 
+whether that ever exceeds 32 bits (on 64-bit platforms) is harder
 
--- =
+io.c:bdrv_co_preadv() - currently passes unsigned int
 
-Alex Benn=C3=A9e
+io.c:bdrv_co_pwritev() - currently passes unsigned int
 
--- =
+qcow2.c:qcow2_co_preadv_task() - passes uint64_t from 
+qcow2_co_preadv_part(), which in turn is called from:
+  - .bdrv_co_preadv_part - analyzed above
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880225
+qcow2.c:qcow2_co_pwritev_task() - passes uint64_t from 
+qcow2_co_pwritev_part(), which in turn is called from:
+  - .bdrv_co_pwritev_part - analyzed above
+  - qcow2_co_truncate() - passes uint64_t but it is clamped to 1 
+cluster, at most 2M
 
-Title:
-  Emulation of some arm programs fail with "Assertion `have_guest_base'
-  failed."
+In summary, it looks like even with our new 64-bit bytes parameter, most 
+(all?) callers are still clamped to 32 bits.  But if we later relax 
+callers, we want to see how bytes is used within these functions.
 
-Status in QEMU:
-  New
+>   
+>   static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
+> diff --git a/block/io.c b/block/io.c
+> index d336e4e691..d7fd429345 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1488,7 +1488,7 @@ static void bdrv_padding_destroy(BdrvRequestPadding *pad)
+>    */
+>   static bool bdrv_pad_request(BlockDriverState *bs,
+>                                QEMUIOVector **qiov, size_t *qiov_offset,
+> -                             int64_t *offset, unsigned int *bytes,
+> +                             int64_t *offset, int64_t *bytes,
+>                                BdrvRequestPadding *pad)
+>   {
+>       if (!bdrv_init_padding(bs, *offset, *bytes, pad)) {
 
-Bug description:
-  This issue is observer with QEMU ToT, checked out around May 15th (but
-  I believe it is present in current master too), and wasn't present in
-  QEMU v5.0.0.
+Callers:
+bdrv_do_preadv_part() - adjusted to int64_t in this patch
+bdrv_do_pwritev_part() - adjusted to int64_t in this patch
 
-  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+Usage:
+     if (!bdrv_init_padding(bs, *offset, *bytes, pad)) {
+  - takes int64_t, but now has to be checked for 64-bit safety below
 
-  Arm cross-compiler is a standard cross-compiler that comes with
-  Debian-based distributions, and gcc version is:
+     qemu_iovec_init_extended(&pad->local_qiov, pad->buf, pad->head,
+                              *qiov, *qiov_offset, *bytes,
+                              pad->buf + pad->buf_len - pad->tail, 
+pad->tail);
+  - takes size_t, risky on 32-bit platforms if any of our callers ever 
+pass in a value larger than 32 bits.  I'd feel much better with an 
+assertion that bytes <= SIZE_MAX.
 
-  $ arm-linux-gnueabi-gcc --version
-  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+     *bytes += pad->head + pad->tail;
+  - corner-case risk of overflow for an image near 63-bit limits (nbdkit 
+can generate such an image, but real images do not tickle this); the 
+risk can be mitigated if we insist that no images are larger than 
+QEMU_ALIGN_DOWN(INT64_MAX, request_alignment), as we would be unable to 
+access the unaligned tail bytes of such an image
 
-  Compile this program with cross compiler:
 
-  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
-  toupper_string-arm
+bdrv_init_padding():
+     sum = pad->head + bytes + pad->tail;
+  - ouch: this sets 'size_t sum' to what has always been an int64_t 
+parameter, but which prior to this patch was initialized by callers 
+passing 32-bit values (with this patch, callers now pass in actual 
+int64_t).  But even pre-patch, there are values of bytes that fit in 32 
+bits but where this sum can overflow on 32-bit platforms, with that 
+potential overflow not changed here.  We need a separate patch to fix 
+this (sum needs to be int64_t), preferably earlier in the series. (patch 
+6/17 also mentioned bdrv_init_padding as needing a fix)
 
-  Emulation with QEMU v5.0.0 is correct, and gives expected output:
 
-  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
-rm
-  CONTROL RESULT: (toupper_string)
-   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
-lnmpapq
-   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
-LNMPAPQ
+> @@ -1515,7 +1515,7 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+>   
+>   /* To be called between exactly one pair of bdrv_inc/dec_in_flight() */
+>   static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes,
+> +    int64_t offset, int64_t bytes,
+>       QEMUIOVector *qiov, size_t qiov_offset,
+>       BdrvRequestFlags flags)
+>   {
 
-  While, in case of QEMU master it fails:
+Callers:
+bdrv_co_preadv_part() - adjusted this patch
+bdrv_rw_co_entry() called by bdrv_prwv_co called by:
+  - bdrv_pwrite_zeroes() - int bytes
+  - bdrv_pwritev() - size_t bytes from qiov
+  - bdrv_preadv() - size_t bytes from qiov
 
-  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
-uest_base: Assertion `have_guest_base' failed.
-  Aborted
+This fixes a latent issue where pre-patch callers could pass size_t and 
+suffer truncation on a 64-bit platform; but in practice we never tickled 
+that bug because of our insistence on <2G read/write.
 
-  There are many other programs that exibit the same behavior. The
-  failure is arm-sprecific.
+Usage:
 
-  =
+> @@ -1524,7 +1524,7 @@ static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
+>       BdrvRequestPadding pad;
+>       int ret;
+>   
+> -    trace_bdrv_co_preadv(bs, offset, bytes, flags);
+> +    trace_bdrv_co_preadv_part(bs, offset, bytes, flags);
+>   
+>       ret = bdrv_check_byte_request(bs, offset, bytes);
 
-  -----------------------------------------------------
+takes int64_t (patch 3/17 in this series), and ensures the transaction 
+is <2G for the rest of the function. If we ever relax 
+bdrv_check_byte_request, we also have to worry about:
 
-  source code: (let's call this file toupper_string.c) (similar file is
-  also in attachment)
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_READ);
+  - takes int64_t, audited earlier in this series
 
-  =
+     ret = bdrv_aligned_preadv(child, &req, offset, bytes,
+                               bs->bl.request_alignment,
+                               qiov, qiov_offset, flags);
+  - takes int64_t, audited earlier in this series
 
-  #include <stdlib.h>
-  #include <string.h>
-  #include <stdio.h>
-  #include <unistd.h>
 
-  =
+>       if (ret < 0) {
+> @@ -1562,7 +1562,7 @@ static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
+>   }
+>   
+>   int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes,
+> +    int64_t offset, int64_t bytes,
+>       QEMUIOVector *qiov, size_t qiov_offset,
+>       BdrvRequestFlags flags)
+>   {
 
-  #define MAX_STRING_LENGHT              15
-  #define NUMBER_OF_RANDOM_STRINGS       100
-  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
-  #define MAX_NUMBER_OF_REPETITIONS      1000000000
-  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
+Callers analyzed above, usage within the function:
 
-  /* Structure for keeping an array of strings */
-  struct StringStruct {
-      char chars[MAX_STRING_LENGHT + 1];
-  };
+     ret = bdrv_do_preadv_part(child, offset, bytes, qiov, qiov_offset, 
+flags);
+  - analyzed above
 
-  /**
-   * Sets characters of the given string to random small letters a-z.
-   * @param s String to get random characters.
-   * @len Length of the input string.
-   */
-  static void gen_random_string(char *chars, const int len)
-  {
-      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
+> @@ -1866,7 +1866,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+>   
+>   static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+>                                                   int64_t offset,
+> -                                                unsigned int bytes,
+> +                                                int64_t bytes,
+>                                                   BdrvRequestFlags flags,
+>                                                   BdrvTrackedRequest *req)
+>   {
 
-      for (size_t i =3D 0; i < len; i++) {
-          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
-      }
-      chars[len] =3D 0;
-  }
+Caller: bdrv_do_pwritev_part(), adjusted in this patch
 
-  void main (int argc, char* argv[])
-  {
-      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
-      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
-];
-      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
-      int32_t option;
+Usage:
+     padding = bdrv_init_padding(bs, offset, bytes, &pad);
+  - analyzed above
 
-      /* Parse command line options */
-      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
-          if (option =3D=3D 'n') {
-              int32_t user_number_of_repetitions =3D atoi(optarg);
-              /* Check if the value is a negative number */
-              if (user_number_of_repetitions < 1) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e a "
-                                  "negative number.\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is a string or zero */
-              if (user_number_of_repetitions =3D=3D 0) {
-                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
-\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is too large */
-              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e "
-                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
-ONS);
-                  exit(EXIT_FAILURE);
-              }
-              number_of_repetitions =3D user_number_of_repetitions;
-          } else {
-              exit(EXIT_FAILURE);
-          }
-      }
+         ret = bdrv_aligned_pwritev(child, req, offset, aligned_bytes, 
+align,
+                                    NULL, 0, flags);
+  - takes int64_t, audited earlier in the series
+         assert(align == pad.tail + bytes);
+  - changes from 'uint64_t == size_t + unsigned int' to 'uint64_t == 
+size_t + int64_t', but does not change in semantics
 
-      /* Create an array of strings with random content */
-      srand(1);
-      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
-      }
 
-      /* Perform uppercasing of a set of random strings multiple times */
-      for (size_t j =3D 0; j < number_of_repetitions; j++) {
-          /* Copy initial set of random strings to the set to be uppercased=
- */
-          memcpy(strings_to_be_uppercased, random_strings,
-                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
-          /* Do actual changing case to uppercase */
-          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-              int k =3D 0;
-    =
+> @@ -1941,7 +1941,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+>   
+>   /* To be called between exactly one pair of bdrv_inc/dec_in_flight() */
+>   static int coroutine_fn bdrv_do_pwritev_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes, QEMUIOVector *qiov, size_t qiov_offset,
+> +    int64_t offset, int64_t bytes, QEMUIOVector *qiov, size_t qiov_offset,
+>       BdrvRequestFlags flags)
+>   {
+>       BlockDriverState *bs = child->bs;
 
-              while (strings_to_be_uppercased[i].chars[k]) { =
+Callers:
+bdrv_co_pwritev_part() - adjusted this patch
+bdrv_do_pwrite_zeroes() - passes 'int'
+bdrv_rw_co_entry() analyzed above
 
-                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
+Usage:
 
-                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
-                         &ch, 1);
-                  k++; =
+> @@ -1950,7 +1950,7 @@ static int coroutine_fn bdrv_do_pwritev_part(BdrvChild *child,
+>       BdrvRequestPadding pad;
+>       int ret;
+>   
+> -    trace_bdrv_co_pwritev(child->bs, offset, bytes, flags);
+> +    trace_bdrv_co_pwritev_part(child->bs, offset, bytes, flags);
+>   
+>       if (!bs->drv) {
+>           return -ENOMEDIUM;
 
-              } =
+     ret = bdrv_check_byte_request(bs, offset, bytes);
+  - analyzed above; if we ever relax it, we must also worry about:
 
-          }
-      }
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_WRITE);
+  - analyzed above
 
-      /* Control printing */
-      printf("CONTROL RESULT: (toupper_string)\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", random_strings[i].chars);
-      }
-      printf("\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", strings_to_be_uppercased[i].chars);
-      }
-      printf("\n");
-  }
+         ret = bdrv_co_do_zero_pwritev(child, offset, bytes, flags, &req);
+  - analyzed above
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
+     if (bdrv_pad_request(bs, &qiov, &qiov_offset, &offset, &bytes, &pad)) {
+  - analyzed above
+
+     ret = bdrv_aligned_pwritev(child, &req, offset, bytes, align,
+                                qiov, qiov_offset, flags);
+  - takes int64_t, analyzed earlier this series
+
+
+> @@ -2009,7 +2009,7 @@ out:
+>   }
+>   
+>   int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+> -    int64_t offset, unsigned int bytes, QEMUIOVector *qiov, size_t qiov_offset,
+> +    int64_t offset, int64_t bytes, QEMUIOVector *qiov, size_t qiov_offset,
+>       BdrvRequestFlags flags)
+>   {
+>       int ret;
+
+Callers analzyed above, usage:
+
+     ret = bdrv_do_pwritev_part(child, offset, bytes, qiov, qiov_offset, 
+flags);
+  - analyzed above
+
+> diff --git a/block/trace-events b/block/trace-events
+> index 179b47bf63..dd367a9b19 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -11,8 +11,8 @@ blk_root_attach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
+>   blk_root_detach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
+>   
+>   # io.c
+> -bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+> -bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+> +bdrv_co_preadv_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
+> +bdrv_co_pwritev_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
+
+Interesting that the trace always took 64-bit numbers, but you are 
+renaming it to match the fact that they are now called from different 
+functions (since commit 1acc3466a2).  I'd feel better if 'flags' were 
+kept unsigned int, even though semantically it doesn't matter.
+
+>   bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
+>   bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %" PRId64 " bytes %" PRId64 " cluster_offset %" PRId64 " cluster_bytes %" PRId64
+>   bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
+> 
+
+I think if you fix bdrv_init_padding in a separate patch, then 
+everything else here is safe.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
