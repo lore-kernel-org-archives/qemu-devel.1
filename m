@@ -2,85 +2,84 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B10C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E47C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:40:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02C182072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:40:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 677962072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 02:40:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VYzFDTzE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C182072C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kf45REac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 677962072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbxbY-0006J5-7o
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 22:40:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48202)
+	id 1jbxbs-0006vF-Jc
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 22:40:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxWQ-0002ML-Vz
- for qemu-devel@nongnu.org; Thu, 21 May 2020 22:34:55 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45078)
+ id 1jbxWj-0003DT-M8
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:13 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxWP-00056d-U2
- for qemu-devel@nongnu.org; Thu, 21 May 2020 22:34:54 -0400
-Received: by mail-pl1-x643.google.com with SMTP id u22so3800107plq.12
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 19:34:53 -0700 (PDT)
+ id 1jbxWi-000596-5R
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 22:35:13 -0400
+Received: by mail-pl1-x642.google.com with SMTP id k22so3809188pls.10
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 19:35:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3G4PJj+ygy8yy6dNKzxkyDjb06D6oXBdXQgauyjKNKc=;
- b=VYzFDTzEPy0A2kxWMWYkLaRVXsZ//5tFKncxAGUD2ZuPjx+xpuwaOLVyCAtQXz4x6R
- GU5gN9YV3x7Ps2RlJHECsvuN6s0hzf6vVXOwRm0XV3Vy6tmfCD3TJ4sYc6b0auV3SXmB
- ltNs1MVKO6EasxaMRKzr+V6LTB0WX2hjEbgj+ceE81l2QHJ5gaqogLB72a6mIzXKZLg5
- rb+KG98p+9mZaU9mYK2iyQpyl3wIEZEi1O6Ef4CU6CS6df2Ht59HT2WWzrwsY4zhIq/T
- NLQ3+0z67jT76lybRHgvsYegfVVyIjeLzLYTpeoF1Hg/p9qdPjKuSMVSqEVufgVuAS2R
- +bWg==
+ bh=8z6nXPR7A7x3OYVICMe1JtjXlF4OZnzlzqVhe7En9iU=;
+ b=Kf45REacJKvbRslyMaI32TXHGeHT3x3QSle1TsHlTUfNL1UhF9ECVA0X8Yf/CR00tC
+ TZFITRRCE5XiDELUD1wK465OUGCl5vJaeXa3erJFXADPwdhEXIRqj4fgHYmvpCUTY6lQ
+ uNw/lC2KcvjFf2v8k7OsD+cu2hcFyv3VOQmsSFQToZPgpcLQCRVhg+ZkPFG2hoTQVbbE
+ V30kK7D/Cg7DQxBMMJjkRFtbOdFErepHdfniO7JuysVrdwWiYz9stK8ngF5aAC0kdZgO
+ wPhMzbq1dt7DtJw/YsoAz8Kgrj9hlL0eZC264mvrYMHXJcZxC2ZX+1JP3OlWL2+Ad4Jd
+ lrqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3G4PJj+ygy8yy6dNKzxkyDjb06D6oXBdXQgauyjKNKc=;
- b=O8ZM50MJvry9y/uG6xWrUBL0uIBM4y9Og6/lC29SI6OgTAI8duhCjhnAmyjlEh7orw
- J+OCgWisl6hLET2KbdoleF0KiBOvjVxnUDYu+ISE7osof75zg8NwvxheZR0xefDlgM5G
- xtRxiPU5n6Zuq1Suit2Iq9ZIS3Wxns04IHWyoN2cAQkLh/u8liuz7LILI+8ONZbxlJpb
- VvfqfrFeWakC7seCI5dyuffzCnRbwXK3/Q7lvbnMublxB2EO0DXrRgAlYVqFnUvILhtE
- H7N8wB2d4fnL+UrtEeF+bEWS5cDMFHhE26FROhoRxr0DiFdsILEWomJZCecAXzRKnJRo
- hK3Q==
-X-Gm-Message-State: AOAM530lY357J8keqYCkTxkzCJKbJJUxWeiBuHRgEoCOyMWMzfBAkFz0
- Y6heWq2z43Jzp9MhgjewXvpGt6talPU=
-X-Google-Smtp-Source: ABdhPJxFBBdYzijXj7TZFnL3HNltBPk4vblwyk7sEyKUZH8yKKdmEDbwLp7jV7ubIKSxP1pE0vhUzg==
-X-Received: by 2002:a17:90a:7087:: with SMTP id
- g7mr1902831pjk.70.1590114892095; 
- Thu, 21 May 2020 19:34:52 -0700 (PDT)
+ bh=8z6nXPR7A7x3OYVICMe1JtjXlF4OZnzlzqVhe7En9iU=;
+ b=n5AMX3TtouZVQCTzVSaDAuqbk0GYjmZrcpKCemlRuqbP0p3a35AF/RUEr+utNymjYk
+ tSMt9loxgvRIwXlzxvrwY+i/sB2sDNChMrLG505Fnn9ikKQ8XewHITyboxb7W0AQwQp/
+ 0XR/5fFuP+jiuJjerVzKw41ZZbWPin7L6HbhCMoxwb5fP6ZRTQwiufTnd0yvlodbeCxR
+ dIFQYs7juwQYGchGJiD1UYRoRV5/Z5APfr28BMnZtVj4pT+0A4UaexTbEUZBEg73rbLx
+ Ly2TN9RRHBrNSxjKjCWeLL5czfdfByXPgW6C9yg7ueJAYdC/PpU6wdrNE+tDYOcNU0ex
+ gtqQ==
+X-Gm-Message-State: AOAM531z55WaE6/3/mEAbqN225VAQzRuo6w4leMc87B7HUBOnCJxpSZg
+ kKzJnYNHg6I5U4GwhX1GkD/UO72GVRw=
+X-Google-Smtp-Source: ABdhPJyJSSfUBT3jNI89cvSh2MPmdvSXca3SETUZieY7LSHUaBVYHGMPNsDcVM2jEMGAbqgnYLgX0w==
+X-Received: by 2002:a17:902:82c9:: with SMTP id
+ u9mr12390775plz.179.1590114909988; 
+ Thu, 21 May 2020 19:35:09 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id gt10sm5443755pjb.30.2020.05.21.19.34.51
+ by smtp.gmail.com with ESMTPSA id gt10sm5443755pjb.30.2020.05.21.19.35.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 May 2020 19:34:51 -0700 (PDT)
+ Thu, 21 May 2020 19:35:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/25] Add enum RisuResult
-Date: Thu, 21 May 2020 19:34:23 -0700
-Message-Id: <20200522023440.26261-9-richard.henderson@linaro.org>
+Subject: [PATCH v3 22/25] Standardize reginfo_dump_mismatch printing
+Date: Thu, 21 May 2020 19:34:37 -0700
+Message-Id: <20200522023440.26261-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200522023440.26261-1-richard.henderson@linaro.org>
 References: <20200522023440.26261-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,245 +106,314 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Formalize the random set of numbers into an enum.  Doing this
-makes it easy to see that one of the responses in
-recv_and_compare_register_info was inconsistent.
+Hoist the "master vs apprentice" label to apprentice(), since
+we will want different labels for dumping.  Remove all of the
+"mismatch" text from reginfo_dump_mismatch -- just print "vs".
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- risu.h    | 25 +++++++++++++++++--------
- reginfo.c | 32 ++++++++++++++++----------------
- risu.c    | 18 +++++++++---------
- 3 files changed, 42 insertions(+), 33 deletions(-)
+ risu.h                 |  4 ++--
+ risu.c                 |  1 +
+ risu_reginfo_aarch64.c | 12 +++++-------
+ risu_reginfo_arm.c     | 18 ++++++++---------
+ risu_reginfo_i386.c    |  6 +-----
+ risu_reginfo_m68k.c    | 23 +++++++---------------
+ risu_reginfo_ppc64.c   | 44 ++++++++++++++++++------------------------
+ 7 files changed, 44 insertions(+), 64 deletions(-)
 
 diff --git a/risu.h b/risu.h
-index a7aa929..e6d07eb 100644
+index bdb70c1..99f0d8e 100644
 --- a/risu.h
 +++ b/risu.h
-@@ -57,6 +57,14 @@ typedef enum {
-     OP_COMPAREMEM = 4,
- } RisuOp;
+@@ -123,8 +123,8 @@ int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);
+ /* print reginfo state to a stream, returns 1 on success, 0 on failure */
+ int reginfo_dump(struct reginfo *ri, FILE * f);
  
-+/* Result of operation */
-+typedef enum {
-+    RES_OK = 0,
-+    RES_END,
-+    RES_MISMATCH,
-+    RES_BAD_IO,
-+} RisuResult;
-+
- /* The memory block should be this long */
- #define MEMBLOCKLEN 8192
+-/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
++/* reginfo_dump_mismatch: print mismatch details to a stream */
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
  
-@@ -82,20 +90,21 @@ typedef struct {
-  */
- typedef int (*write_fn) (void *ptr, size_t bytes);
- typedef int (*read_fn) (void *ptr, size_t bytes);
--typedef void (*respond_fn) (int response);
-+typedef void (*respond_fn) (RisuResult response);
- 
--/* Send the register information from the struct ucontext down the socket.
-- * Return the response code from the master.
-+/*
-+ * Send the register information from the struct ucontext down the socket.
-  * NB: called from a signal handler.
-  */
--int send_register_info(write_fn write_fn, void *uc);
-+RisuResult send_register_info(write_fn write_fn, void *uc);
- 
--/* Read register info from the socket and compare it with that from the
-- * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
-+/*
-+ * Read register info from the socket and compare it with that from the
-+ * ucontext.
-  * NB: called from a signal handler.
-  */
--int recv_and_compare_register_info(read_fn read_fn,
--                                   respond_fn respond, void *uc);
-+RisuResult recv_and_compare_register_info(read_fn read_fn,
-+                                          respond_fn respond, void *uc);
- 
- /* Print a useful report on the status of the last comparison
-  * done in recv_and_compare_register_info(). This is called on
-diff --git a/reginfo.c b/reginfo.c
-index 2d67c93..b909a1f 100644
---- a/reginfo.c
-+++ b/reginfo.c
-@@ -21,7 +21,7 @@ uint8_t apprentice_memblock[MEMBLOCKLEN];
- static int mem_used;
- static int packet_mismatch;
- 
--int send_register_info(write_fn write_fn, void *uc)
-+RisuResult send_register_info(write_fn write_fn, void *uc)
- {
-     struct reginfo ri;
-     trace_header_t header;
-@@ -34,7 +34,7 @@ int send_register_info(write_fn write_fn, void *uc)
-     header.pc = get_pc(&ri);
-     header.risu_op = op;
-     if (write_fn(&header, sizeof(header)) != 0) {
--        return -1;
-+        return RES_BAD_IO;
-     }
- 
-     switch (op) {
-@@ -46,10 +46,10 @@ int send_register_info(write_fn write_fn, void *uc)
-          * (b) end of test (c) a non-risuop UNDEF
-          */
-         if (write_fn(&ri, reginfo_size()) != 0) {
--            return -1;
-+            return RES_BAD_IO;
-         }
-         /* For OP_TEST_END, force return 1 to exit. */
--        return op == OP_TESTEND;
-+        return op == OP_TESTEND ? RES_END : RES_OK;
-     case OP_SETMEMBLOCK:
-         memblock = (void *)(uintptr_t)get_reginfo_paramreg(&ri);
-         break;
-@@ -63,7 +63,7 @@ int send_register_info(write_fn write_fn, void *uc)
-     default:
-         abort();
-     }
--    return 0;
-+    return RES_OK;
- }
- 
- /* Read register info from the socket and compare it with that from the
-@@ -74,10 +74,10 @@ int send_register_info(write_fn write_fn, void *uc)
-  * that says whether it is register or memory data, so if the two
-  * sides get out of sync then we will fail obscurely.
-  */
--int recv_and_compare_register_info(read_fn read_fn,
--                                   respond_fn resp_fn, void *uc)
-+RisuResult recv_and_compare_register_info(read_fn read_fn,
-+                                          respond_fn resp_fn, void *uc)
- {
--    int resp = 0;
-+    RisuResult resp = RES_OK;
-     trace_header_t header;
-     RisuOp op;
- 
-@@ -85,18 +85,18 @@ int recv_and_compare_register_info(read_fn read_fn,
-     op = get_risuop(&master_ri);
- 
-     if (read_fn(&header, sizeof(header)) != 0) {
--        return -1;
-+        return RES_BAD_IO;
-     }
- 
-     if (header.risu_op != op) {
-         /* We are out of sync */
--        resp = 2;
-+        resp = RES_BAD_IO;
-         resp_fn(resp);
-         return resp;
-     }
- 
-     /* send OK for the header */
--    resp_fn(0);
-+    resp_fn(RES_OK);
- 
-     switch (op) {
-     case OP_COMPARE:
-@@ -107,12 +107,12 @@ int recv_and_compare_register_info(read_fn read_fn,
-          */
-         if (read_fn(&apprentice_ri, reginfo_size())) {
-             packet_mismatch = 1;
--            resp = 2;
-+            resp = RES_BAD_IO;
-         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
-             /* register mismatch */
--            resp = 2;
-+            resp = RES_MISMATCH;
-         } else if (op == OP_TESTEND) {
--            resp = 1;
-+            resp = RES_END;
-         }
-         resp_fn(resp);
-         break;
-@@ -127,10 +127,10 @@ int recv_and_compare_register_info(read_fn read_fn,
-         mem_used = 1;
-         if (read_fn(apprentice_memblock, MEMBLOCKLEN)) {
-             packet_mismatch = 1;
--            resp = 2;
-+            resp = RES_BAD_IO;
-         } else if (memcmp(memblock, apprentice_memblock, MEMBLOCKLEN) != 0) {
-             /* memory mismatch */
--            resp = 2;
-+            resp = RES_MISMATCH;
-         }
-         resp_fn(resp);
-         break;
+ /* return size of reginfo */
+ int reginfo_size(struct reginfo *ri);
 diff --git a/risu.c b/risu.c
-index ab17c71..7b14f72 100644
+index 1c096a8..f613fa9 100644
 --- a/risu.c
 +++ b/risu.c
-@@ -69,7 +69,7 @@ int write_trace(void *ptr, size_t bytes)
-     return (res == bytes) ? 0 : 1;
+@@ -449,6 +449,7 @@ static int apprentice(void)
+         reginfo_dump(&ri[MASTER], stderr);
+         fprintf(stderr, "apprentice reginfo:\n");
+         reginfo_dump(&ri[APPRENTICE], stderr);
++        fprintf(stderr, "mismatch detail (master : apprentice):\n");
+         reginfo_dump_mismatch(&ri[MASTER], &ri[APPRENTICE], stderr);
+         return EXIT_FAILURE;
+ 
+diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
+index fb8e11a..b443745 100644
+--- a/risu_reginfo_aarch64.c
++++ b/risu_reginfo_aarch64.c
+@@ -316,15 +316,15 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
+     return !ferror(f);
  }
  
--void respond_sock(int r)
-+void respond_sock(RisuResult r)
+-/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
  {
-     send_response_byte(comm_fd, r);
+     int i;
+-    fprintf(f, "mismatch detail (master : apprentice):\n");
++
+     if (m->faulting_insn != a->faulting_insn) {
+-        fprintf(f, "  faulting insn mismatch %08x vs %08x\n",
++        fprintf(f, "  faulting insn: %08x vs %08x\n",
+                 m->faulting_insn, a->faulting_insn);
+     }
++
+     for (i = 0; i < 31; i++) {
+         if (m->regs[i] != a->regs[i]) {
+             fprintf(f, "  X%-2d    : %016" PRIx64 " vs %016" PRIx64 "\n",
+@@ -383,7 +383,7 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+                 sve_dump_preg_diff(f, vq, pm, pa);
+             }
+         }
+-        return !ferror(f);
++        return;
+     }
+ #endif
+ 
+@@ -398,6 +398,4 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+                     (uint64_t) a->simd.vregs[i]);
+         }
+     }
+-
+-    return !ferror(f);
  }
-@@ -98,11 +98,11 @@ int read_trace(void *ptr, size_t bytes)
-     return (res == bytes) ? 0 : 1;
+diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+index 202120b..ba1035e 100644
+--- a/risu_reginfo_arm.c
++++ b/risu_reginfo_arm.c
+@@ -183,32 +183,33 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
+     return !ferror(f);
  }
  
--void respond_trace(int r)
-+void respond_trace(RisuResult r)
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
  {
-     switch (r) {
--    case 0: /* test ok */
--    case 1: /* end of test */
-+    case RES_OK:
-+    case RES_END:
-         break;
-     default:
-         /* mismatch - if tracing we need to report, otherwise barf */
-@@ -115,7 +115,7 @@ void respond_trace(int r)
+     int i;
+-    fprintf(f, "mismatch detail (master : apprentice):\n");
  
- static void master_sigill(int sig, siginfo_t *si, void *uc)
+     if (m->faulting_insn_size != a->faulting_insn_size) {
+-        fprintf(f, "  faulting insn size mismatch %d vs %d\n",
++        fprintf(f, "  faulting insn size: %d vs %d\n",
+                 m->faulting_insn_size, a->faulting_insn_size);
+     } else if (m->faulting_insn != a->faulting_insn) {
+         if (m->faulting_insn_size == 2) {
+-            fprintf(f, "  faulting insn mismatch %04x vs %04x\n",
++            fprintf(f, "  faulting insn: %04x vs %04x\n",
+                     m->faulting_insn, a->faulting_insn);
+         } else {
+-            fprintf(f, "  faulting insn mismatch %08x vs %08x\n",
++            fprintf(f, "  faulting insn: %08x vs %08x\n",
+                     m->faulting_insn, a->faulting_insn);
+         }
+     }
++
+     for (i = 0; i < 16; i++) {
+         if (m->gpreg[i] != a->gpreg[i]) {
+-            fprintf(f, "  r%d: %08x vs %08x\n", i, m->gpreg[i],
+-                    a->gpreg[i]);
++            fprintf(f, "  r%d: %08x vs %08x\n", i, m->gpreg[i], a->gpreg[i]);
+         }
+     }
++
+     if (m->cpsr != a->cpsr) {
+         fprintf(f, "  cpsr: %08x vs %08x\n", m->cpsr, a->cpsr);
+     }
++
+     for (i = 0; i < 32; i++) {
+         if (m->fpregs[i] != a->fpregs[i]) {
+             fprintf(f, "  d%d: %016llx vs %016llx\n", i,
+@@ -216,9 +217,8 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+                     (unsigned long long) a->fpregs[i]);
+         }
+     }
++
+     if (m->fpscr != a->fpscr) {
+         fprintf(f, "  fpscr: %08x vs %08x\n", m->fpscr, a->fpscr);
+     }
+-
+-    return !ferror(f);
+ }
+diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
+index e9730be..57e4c00 100644
+--- a/risu_reginfo_i386.c
++++ b/risu_reginfo_i386.c
+@@ -349,14 +349,12 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
+     return !ferror(f);
+ }
+ 
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
  {
--    int r;
-+    RisuResult r;
-     signal_count++;
+     int i, j, n, w;
+     uint64_t features;
+     char r;
  
-     if (trace) {
-@@ -125,7 +125,7 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
+-    fprintf(f, "Mismatch (master v apprentice):\n");
+-
+     for (i = 0; i < NGREG; i++) {
+         if (m->gregs[i] != a->gregs[i]) {
+             assert(regname[i]);
+@@ -399,6 +397,4 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+                     i, m->kregs[i], a->kregs[i]);
+         }
+     }
+-
+-    return !ferror(f);
+ }
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+index 4c25e77..29edce9 100644
+--- a/risu_reginfo_m68k.c
++++ b/risu_reginfo_m68k.c
+@@ -118,13 +118,12 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
+     return !ferror(f);
+ }
+ 
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+ {
+     int i;
+ 
+     if (m->gregs[R_PS] != a->gregs[R_PS]) {
+-        fprintf(f, "Mismatch: Register PS\n");
+-        fprintf(f, "master: [%x] - apprentice: [%x]\n",
++        fprintf(f, "    PS: %08x vs %08x\n",
+                 m->gregs[R_PS], a->gregs[R_PS]);
      }
  
-     switch (r) {
--    case 0:
-+    case RES_OK:
-         /* match OK */
-         advance_pc(uc);
-         return;
-@@ -137,7 +137,7 @@ static void master_sigill(int sig, siginfo_t *si, void *uc)
- 
- static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
- {
--    int r;
-+    RisuResult r;
-     signal_count++;
- 
-     if (trace) {
-@@ -147,11 +147,11 @@ static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+@@ -133,22 +132,18 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+             continue;
+         }
+         if (m->gregs[i] != a->gregs[i]) {
+-            fprintf(f, "Mismatch: Register %c%d\n", i < 8 ? 'D' : 'A',
+-                    i % 8);
+-            fprintf(f, "master: [%x] - apprentice: [%x]\n", m->gregs[i],
+-                    a->gregs[i]);
++            fprintf(f, "    %c%d: %08x vs %08x\n",
++                    i < 8 ? 'D' : 'A', i % 8, m->gregs[i], a->gregs[i]);
+         }
      }
  
-     switch (r) {
--    case 0:
-+    case RES_OK:
-         /* match OK */
-         advance_pc(uc);
-         return;
--    case 1:
-+    case RES_END:
-         /* end of test */
-         exit(EXIT_SUCCESS);
-     default:
+     if (m->fpregs.f_pcr != a->fpregs.f_pcr) {
+-        fprintf(f, "Mismatch: Register FPCR\n");
+-        fprintf(f, "m: [%04x] != a: [%04x]\n",
++        fprintf(f, "  FPCR: %04x vs %04x\n",
+                 m->fpregs.f_pcr, a->fpregs.f_pcr);
+     }
+ 
+     if (m->fpregs.f_psr != a->fpregs.f_psr) {
+-        fprintf(f, "Mismatch: Register FPSR\n");
+-        fprintf(f, "m: [%08x] != a: [%08x]\n",
++        fprintf(f, "  FPSR: %04x vs %04x\n",
+                 m->fpregs.f_psr, a->fpregs.f_psr);
+     }
+ 
+@@ -156,14 +151,10 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+         if (m->fpregs.f_fpregs[i][0] != a->fpregs.f_fpregs[i][0] ||
+             m->fpregs.f_fpregs[i][1] != a->fpregs.f_fpregs[i][1] ||
+             m->fpregs.f_fpregs[i][2] != a->fpregs.f_fpregs[i][2]) {
+-            fprintf(f, "Mismatch: Register FP%d\n", i);
+-            fprintf(f, "m: [%08x %08x %08x] != a: [%08x %08x %08x]\n",
++            fprintf(f, "   FP%d: %08x%08x%08x vs %08x%08x%08x\n", i,
+                     m->fpregs.f_fpregs[i][0], m->fpregs.f_fpregs[i][1],
+                     m->fpregs.f_fpregs[i][2], a->fpregs.f_fpregs[i][0],
+                     a->fpregs.f_fpregs[i][1], a->fpregs.f_fpregs[i][2]);
+         }
+     }
+-
+-
+-    return !ferror(f);
+ }
+diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
+index 9899b36..e96dc48 100644
+--- a/risu_reginfo_ppc64.c
++++ b/risu_reginfo_ppc64.c
+@@ -27,6 +27,15 @@
+ const struct option * const arch_long_opts;
+ const char * const arch_extra_help;
+ 
++static const char * const greg_names[NGREG] = {
++    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
++    "r8",  "r9", "r10", "r11", "r12", "r13", "r14", "r15",
++   "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
++   "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
++   [XER] = "xer",
++   [CCR] = "ccr",
++};
++
+ void process_arch_opt(int opt, const char *arg)
+ {
+     abort();
+@@ -147,35 +156,21 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
+     return !ferror(f);
+ }
+ 
+-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
++void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+ {
+     int i;
+-    for (i = 0; i < 32; i++) {
+-        if (i == 1 || i == 13) {
+-            continue;
++
++    for (i = 0; i < NGREG; i++) {
++        if (greg_names[i] != NULL && m->gregs[i] != a->gregs[i]) {
++            fprintf(f, "%6s: %016lx vs %016lx\n",
++                    greg_names[i], m->gregs[i], a->gregs[i]);
+         }
+-
+-        if (m->gregs[i] != a->gregs[i]) {
+-            fprintf(f, "Mismatch: Register r%d\n", i);
+-            fprintf(f, "master: [%lx] - apprentice: [%lx]\n",
+-                    m->gregs[i], a->gregs[i]);
+-        }
+-    }
+-
+-    if (m->gregs[XER] != a->gregs[XER]) {
+-        fprintf(f, "Mismatch: XER\n");
+-        fprintf(f, "m: [%lx] != a: [%lx]\n", m->gregs[XER], a->gregs[XER]);
+-    }
+-
+-    if (m->gregs[CCR] != a->gregs[CCR]) {
+-        fprintf(f, "Mismatch: Cond. Register\n");
+-        fprintf(f, "m: [%lx] != a: [%lx]\n", m->gregs[CCR], a->gregs[CCR]);
+     }
+ 
+     for (i = 0; i < 32; i++) {
+         if (m->fpregs[i] != a->fpregs[i]) {
+-            fprintf(f, "Mismatch: Register f%d\n", i);
+-            fprintf(f, "m: [%016lx] != a: [%016lx]\n",
++            fprintf(f, "%*s%d: %016lx vs %016lx\n",
++                    6 - (i < 10 ? 1 : 2), "f", i,
+                     m->fpregs[i], a->fpregs[i]);
+         }
+     }
+@@ -186,13 +181,12 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+             m->vrregs.vrregs[i][2] != a->vrregs.vrregs[i][2] ||
+             m->vrregs.vrregs[i][3] != a->vrregs.vrregs[i][3]) {
+ 
+-            fprintf(f, "Mismatch: Register vr%d\n", i);
+-            fprintf(f, "m: [%x, %x, %x, %x] != a: [%x, %x, %x, %x]\n",
++            fprintf(f, "%*s%d: %08x%08x%08x%08x vs %08x%08x%08x%08x\n",
++                    6 - (i < 10 ? 1 : 2), "vr", i,
+                     m->vrregs.vrregs[i][0], m->vrregs.vrregs[i][1],
+                     m->vrregs.vrregs[i][2], m->vrregs.vrregs[i][3],
+                     a->vrregs.vrregs[i][0], a->vrregs.vrregs[i][1],
+                     a->vrregs.vrregs[i][2], a->vrregs.vrregs[i][3]);
+         }
+     }
+-    return !ferror(f);
+ }
 -- 
 2.20.1
 
