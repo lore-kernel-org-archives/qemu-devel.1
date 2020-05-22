@@ -2,86 +2,85 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AF8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 07:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 07:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C2282065C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 07:01:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AD9C2072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 07:07:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="MftmjxVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2282065C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Sig4kNgE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AD9C2072C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc1gX-0004He-KA
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 03:01:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38268)
+	id 1jc1mA-0001fZ-OA
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 03:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jc1TN-0007UW-GV
- for qemu-devel@nongnu.org; Fri, 22 May 2020 02:48:01 -0400
-Received: from mout.web.de ([212.227.17.12]:37177)
+ id 1jc1TS-0007Vk-94
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 02:48:06 -0400
+Received: from mout.web.de ([212.227.17.11]:56815)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jc1TL-00016I-GL
- for qemu-devel@nongnu.org; Fri, 22 May 2020 02:48:01 -0400
+ id 1jc1TQ-00016h-FW
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 02:48:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590130060;
- bh=A0nODjFo6KWPTkquLJJac83giA5N9yaIoEj+gjJApoo=;
+ s=dbaedf251592; t=1590130068;
+ bh=6t3gKbi3BYQQYPWCApOdko0vUfgjwHXmi7x4ro7HDkU=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=MftmjxVImSczz8h74HC/VoWjQAzxl2dIg1L66ta2rjjU3QVvfG+uiEeeREHZw6CvB
- +JyKevS2q8uFuAxjfnh8/KVVlspifFFUG7z+R4eqdMBWMSUm4XiZoJatKee3eRqB29
- QCGcUOzartfZkW1yXAW5MzzhwDAERN/aThtBQBHU=
+ b=Sig4kNgErcY9WAL2hbZWdpxzdxlF/D4Yg1vJRQESHW1mYZmnuAqhBG8EHg5R/T/6Y
+ p7a/YFkq1v3zN0O8gagU+4lSq1/n+HLM5jwaWCY6/AwR7YRE4uYFKRtYFCg4P+XjOs
+ LyFx/BZ1KOJZjrzXYKUASGOtHzziX2R0XHtBa+80=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.67]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MeBDG-1jPIJ81EPW-00PtjY; Fri, 22
- May 2020 08:47:40 +0200
-Date: Fri, 22 May 2020 08:47:38 +0200
+Received: from luklap ([89.247.255.67]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0M6V5b-1ir3sm3KRP-00yTGv; Fri, 22
+ May 2020 08:47:47 +0200
+Date: Fri, 22 May 2020 08:47:45 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v6 3/6] net/colo-compare.c: Fix deadlock in compare_chr_send
-Message-ID: <bb0ea691445193d44228ff0732d533264ba047d0.1590129793.git.lukasstraub2@web.de>
+Subject: [PATCH v6 5/6] net/colo-compare.c: Check that colo-compare is active
+Message-ID: <3291bc9d7372e2b50c517efd92404ae5437e65fb.1590129793.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1590129793.git.lukasstraub2@web.de>
 References: <cover.1590129793.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/2CfJDgicf8fCwhXILbT2bM/";
+Content-Type: multipart/signed; boundary="Sig_/VDK6llwDvmHOglbuy8K_skv";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:43PcfcYO3Hpqzkfu3gu8XeKuXm6lu1WuIGums3nXmKW6sgiLcgh
- jEeNszt1QwBgZ5xokS78Ju+fsnwpCICYvJRJdt5UOiUkTNHk6WryZiZaEokcrDuZXo3lkUl
- BIjnlybr1bhf1hdg+0vw50QiDDbClNx1b+OXGdcck0edZMTLbxddnOphFgzygs6Rd10pe5r
- eSId1EY31RUZBgb8sPFrw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Jc3DtTlEx3Y=:yhVn3HU4zRL/m6GnuV86/S
- PMtPuiSTwVs8ORFFXUeBAUIy4M3qI6Iu9Oj7N1g0jS97eTXh/iCbovKhE3IFBeG7Nz5DkdjBr
- lOUHZqMY1RRE0cRuvObYlqVa9pGQqWMHXVVo7m9tuSoXZ6Omfta0rn5I3fXx0vEaXRHcqaEv6
- AmKwrwX/xreIN7Q1WDUU5YGiPCS4tZrgL82Am6gKwT2SkNo28XZQ4hMXzSbbVq0bcTz+agOab
- yEu07NN2nsrEqsNerLkxCSl0zVtxvPwXMl7V/AkKO8yGWuvlS1ngy/oSo0As1SqQTfVDWhOg8
- PtWn7ISdlycxTkrGz+/DsTlphfRvOUd0ifT3mtAz3DDBcDI+9lbw5cRZUgRIk+U2f2JXDT9Ly
- W7T2HfSe4bkBEkmllN8EqguiUIvrlQaIPRRkRXCJ+EvmL2HscLVLDPrip3CcR7lSqLrmA76wA
- mnV1rz1KagoLjM33wmlpP/E3Tv2S0EexOEDCBqf7D2EYYGJjXqAqZg9XV4PHlSIXZz+Rx3WPN
- /fWyYnH/jYE1l1lj+pQoO2AaMWqj2UQ8rgGBH0GxF2xMX9esr+zHk+ICFgBTHhAHfGWsINfCn
- uPDwNigPXymyFAIHYB1W2Y1tc3rhL77Vxp1AjNSJtJxsYeRc7RPZrnMkUBoR85aobte3sdeMb
- R5tWl4U6PTQWX0WmeEbewJRnSq/bcZw2kRm78hqWObyDcLoQGs5/Gxxv8vbFFoChA3P9LXaQd
- wjpp0lfLvPhReAYLuD7yZYeSVk1QCDATRu+tW3csPHhAn6S8pLhcECiwXpITapsWmCW1cEXWM
- kRsjPYGO6u9MI3oV/ddgDZ7m+qhbRWSxTSHvUqRRaQCXbE8AHYZc7ij7kgWn5t5vUZBiqL2KF
- dZYtFd1KtjvY5OBa9IihDbmapxGVhY1/2AqnQAC52jzgRUxncFSe1T0TRnIpq3dkQKgX9CGgZ
- L3RPzqW51NC7hdY2rGYshSjF8X69qC5DlbBEKUdTJFg6HDg8u90rwlXP3XSPjHW9ajHBsFLxF
- V3gEWWh/VTVqcL7iwpmqRVBugPaFPAg3R5ZCeyunlmC7YPrNOD7Q5zefdF8O4F6RKSDNy9M6e
- VZllrytNDv18FbyUytb55ojwqB3RI3iW6SaQCpxGQOpM7EtiVna7WjmPh2Csd3jcvcu3r4pNv
- 58GtkSqcg2Nd+EsJIt9spKU8vWVhyzBOxIRxuquz3qvnqtyFdSJNMOda0niO7vtvNQB7wci0R
- FwwZYj2iZAn/ihEyv
-Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:P3iRCobE8CgAsFIuNa6GbaiiA/TLO+hNQNxgTumrOKFBSO08WER
+ qHZqVRFq85E7EBgJqygr593V45kKlOr42OeKc4tDQu3n+7JiqDp84/94k25x7qvaEea8bi9
+ guu1lPabLQgCbPa1NpqL2MwvtJbr1+BHYpAPqT1OtR780J9IoHuJwymx0ZzW2rEJ9Yv9L2H
+ apCuW6XxxoDiE+JgHgT1Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DDJpM3iBj+k=:rJmF2R7y9UczoiNFOi25l3
+ ocQyNqGWly0o5wrypZbaWwngj2s1fv9amIVWmG6QAUhm2SEN43Efdyhlb5WFhjrwmePtt7+I8
+ SQ20LyTaql2uudaf2D+KghgtYAhb+KxWmvN7BxKrSs0aBcHBG7BSgLEqzTPFkgfC4XqV8lvzz
+ loVpYDuRJBH004UiZeZylYSK7zUasQ3Hjyl3i48YwxBlYBa7iGGqWX9KWEAIWsp9HamFA+ug7
+ AM/kN7XvC/BC2K2p+VNxBjUvYOyy7EnvNTcRQ+z/8HiYfNl4mwKHK3Hh9BcylrXV7CrNXR/26
+ PGy7/LZK2HKgOqr2GDZRuMesRzgWrwMVk1Qe7G4R7U8ZPoagPWxhvN5LM+/TgYkLJNiv4LzwG
+ x76XeUl+a//CwFQdW5i9bwWm+8rtGKq5WEYpIOUSiVgrQxXeM544DvE1gOif5Bwype33WFhKk
+ 7AcJ2E+YmUoKeB/kyK0o0QXHBYRKTfuTGUWa3StyJmDgaVcZfH6HPFl21F1h7VgNF642DKA3H
+ ftzi/4XOcLjWvd8p2zO/q1gFAhjZkr7v8k6gN0Z4LO7jO79cpJglvhg/FeDPSs0RJ5P46Iovs
+ TaHV+40/j0IxRjQX/PwOafmHcDf76kE67qnRS1+FwSRO8ecH9be/stBk6BnsUAgSpwh4YopSP
+ Gf7NeyRRZ9Sqd2UgmjYbFmVLP5AD1t3yDDyrykMQUcLTh7EtjxV1QKEBlVW8PJH0+YM0jSDUr
+ yVsnKDEIqjZXqraWoTCOWFrWdkRWG476fxvFzx2wnfRZZE21erR4pbcJ4Q66MXIlEMV8u/asG
+ q7KVqHStbHDGsu5hYs8+bfCVa2b6KHR5GLXCIm1u4qB5JKzXLuElBi7U1ybmDTHpgVlDV7Ugy
+ Ml23qKdlh7L4XYhzx7WOfs6R3KpXu0/qJLyQzlI+Sn43SEsC4dPPOtL8jHUFg2qpF9ccXwjpt
+ LK0sHhKLdEeQdtoWvZbARJH+7waASBRKs3nrOw6y00xOczKtB4X4WR1xwxCn69O9CPJY0UikI
+ Oenrlkv2oMO///13ie7NSikirvR2daiGzl7x7fwqxkkVkD3HAZC6DMmmgzOPwy8SFCRDIeiJ7
+ P+kVa/8+pcPJ85SWXnxVTvrHbP6cItElArjVQ0OzBbMJWvlN+fu2Z1EV6UHJ12gevdPNhPNNi
+ KrNf+vUYhhnw4BiLK+bspcKbCZARk2a1R3P/gHc7tKY9ar3M5V23UhOn2U3nNbRBMYDIPLVlZ
+ kRoSLzAqMxZYitNVi
+Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 02:47:49
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 02:48:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
@@ -89,8 +88,8 @@ X-Spam_bar: --
 X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,409 +109,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/2CfJDgicf8fCwhXILbT2bM/
+--Sig_/VDK6llwDvmHOglbuy8K_skv
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-The chr_out chardev is connected to a filter-redirector
-running in the main loop. qemu_chr_fe_write_all might block
-here in compare_chr_send if the (socket-)buffer is full.
-If another filter-redirector in the main loop want's to
-send data to chr_pri_in it might also block if the buffer
-is full. This leads to a deadlock because both event loops
-get blocked.
+If the colo-compare object is removed before failover and a
+checkpoint happens, qemu crashes because it tries to lock
+the destroyed event_mtx in colo_notify_compares_event.
 
-Fix this by converting compare_chr_send to a coroutine and
-putting the packets in a send queue.
+Fix this by checking if everything is initialized by
+introducing a new variable colo_compare_active which
+is protected by a new mutex colo_compare_mutex. The new mutex
+also protects against concurrent access of the net_compares
+list and makes sure that colo_notify_compares_event isn't
+active while we destroy event_mtx and event_complete_cond.
+
+With this it also is again possible to use colo without
+colo-compare (periodic mode) and to use multiple colo-compare
+for multiple network interfaces.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Tested-by: Zhang Chen <chen.zhang@intel.com>
+Tested-by: Lukas Straub <lukasstraub2@web.de>
 ---
- net/colo-compare.c | 193 ++++++++++++++++++++++++++++++++++-----------
- net/colo.c         |   7 ++
- net/colo.h         |   1 +
- 3 files changed, 156 insertions(+), 45 deletions(-)
+ net/colo-compare.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 1de4220fe2..e47c8c6049 100644
+index 7886444cdf..64d2453450 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -32,6 +32,9 @@
- #include "migration/migration.h"
- #include "util.h"
+@@ -54,6 +54,8 @@ static NotifierList colo_compare_notifiers =3D
+ #define REGULAR_PACKET_CHECK_MS 3000
+ #define DEFAULT_TIME_OUT_MS 3000
 
-+#include "block/aio-wait.h"
-+#include "qemu/coroutine.h"
-+
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
-@@ -77,6 +80,23 @@ static int event_unhandled_count;
-  *                    |packet  |  |packet  +    |packet  | |packet  +
-  *                    +--------+  +--------+    +--------+ +--------+
-  */
-+
-+typedef struct SendCo {
-+    Coroutine *co;
-+    struct CompareState *s;
-+    CharBackend *chr;
-+    GQueue send_list;
-+    bool notify_remote_frame;
-+    bool done;
-+    int ret;
-+} SendCo;
-+
-+typedef struct SendEntry {
-+    uint32_t size;
-+    uint32_t vnet_hdr_len;
-+    uint8_t *buf;
-+} SendEntry;
-+
- typedef struct CompareState {
-     Object parent;
-
-@@ -91,6 +111,8 @@ typedef struct CompareState {
-     SocketReadState pri_rs;
-     SocketReadState sec_rs;
-     SocketReadState notify_rs;
-+    SendCo out_sendco;
-+    SendCo notify_sendco;
-     bool vnet_hdr;
-     uint32_t compare_timeout;
-     uint32_t expired_scan_cycle;
-@@ -124,10 +146,11 @@ enum {
-
-
- static int compare_chr_send(CompareState *s,
--                            const uint8_t *buf,
-+                            uint8_t *buf,
-                             uint32_t size,
-                             uint32_t vnet_hdr_len,
--                            bool notify_remote_frame);
-+                            bool notify_remote_frame,
-+                            bool zero_copy);
-
- static bool packet_matches_str(const char *str,
-                                const uint8_t *buf,
-@@ -145,7 +168,7 @@ static void notify_remote_frame(CompareState *s)
-     char msg[] =3D "DO_CHECKPOINT";
-     int ret =3D 0;
-
--    ret =3D compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
-+    ret =3D compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, fals=
-e);
-     if (ret < 0) {
-         error_report("Notify Xen COLO-frame failed");
-     }
-@@ -272,12 +295,13 @@ static void colo_release_primary_pkt(CompareState *s,=
- Packet *pkt)
-                            pkt->data,
-                            pkt->size,
-                            pkt->vnet_hdr_len,
--                           false);
-+                           false,
-+                           true);
-     if (ret < 0) {
-         error_report("colo send primary packet failed");
-     }
-     trace_colo_compare_main("packet same and release packet");
--    packet_destroy(pkt, NULL);
-+    packet_destroy_partial(pkt, NULL);
- }
-
- /*
-@@ -699,65 +723,115 @@ static void colo_compare_connection(void *opaque, vo=
-id *user_data)
-     }
- }
-
--static int compare_chr_send(CompareState *s,
--                            const uint8_t *buf,
--                            uint32_t size,
--                            uint32_t vnet_hdr_len,
--                            bool notify_remote_frame)
-+static void coroutine_fn _compare_chr_send(void *opaque)
++static QemuMutex colo_compare_mutex;
++static bool colo_compare_active;
+ static QemuMutex event_mtx;
+ static QemuCond event_complete_cond;
+ static int event_unhandled_count;
+@@ -906,6 +908,12 @@ static void check_old_packet_regular(void *opaque)
+ void colo_notify_compares_event(void *opaque, int event, Error **errp)
  {
-+    SendCo *sendco =3D opaque;
-+    CompareState *s =3D sendco->s;
-     int ret =3D 0;
--    uint32_t len =3D htonl(size);
-
--    if (!size) {
--        return 0;
--    }
-+    while (!g_queue_is_empty(&sendco->send_list)) {
-+        SendEntry *entry =3D g_queue_pop_tail(&sendco->send_list);
-+        uint32_t len =3D htonl(entry->size);
-
--    if (notify_remote_frame) {
--        ret =3D qemu_chr_fe_write_all(&s->chr_notify_dev,
--                                    (uint8_t *)&len,
--                                    sizeof(len));
--    } else {
--        ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
-(len));
--    }
-+        ret =3D qemu_chr_fe_write_all(sendco->chr, (uint8_t *)&len, sizeof=
-(len));
-
--    if (ret !=3D sizeof(len)) {
--        goto err;
--    }
-+        if (ret !=3D sizeof(len)) {
-+            g_free(entry->buf);
-+            g_slice_free(SendEntry, entry);
-+            goto err;
-+        }
-
--    if (s->vnet_hdr) {
--        /*
--         * We send vnet header len make other module(like filter-redirecto=
-r)
--         * know how to parse net packet correctly.
--         */
--        len =3D htonl(vnet_hdr_len);
-+        if (!sendco->notify_remote_frame && s->vnet_hdr) {
-+            /*
-+             * We send vnet header len make other module(like filter-redir=
-ector)
-+             * know how to parse net packet correctly.
-+             */
-+            len =3D htonl(entry->vnet_hdr_len);
-
--        if (!notify_remote_frame) {
--            ret =3D qemu_chr_fe_write_all(&s->chr_out,
-+            ret =3D qemu_chr_fe_write_all(sendco->chr,
-                                         (uint8_t *)&len,
-                                         sizeof(len));
+     CompareState *s;
++    qemu_mutex_lock(&colo_compare_mutex);
 +
-+            if (ret !=3D sizeof(len)) {
-+                g_free(entry->buf);
-+                g_slice_free(SendEntry, entry);
-+                goto err;
-+            }
-         }
-
--        if (ret !=3D sizeof(len)) {
-+        ret =3D qemu_chr_fe_write_all(sendco->chr,
-+                                    (uint8_t *)entry->buf,
-+                                    entry->size);
-+
-+        if (ret !=3D entry->size) {
-+            g_free(entry->buf);
-+            g_slice_free(SendEntry, entry);
-             goto err;
-         }
-+
-+        g_free(entry->buf);
-+        g_slice_free(SendEntry, entry);
-     }
-
-+    sendco->ret =3D 0;
-+    goto out;
-+
-+err:
-+    while (!g_queue_is_empty(&sendco->send_list)) {
-+        SendEntry *entry =3D g_queue_pop_tail(&sendco->send_list);
-+        g_free(entry->buf);
-+        g_slice_free(SendEntry, entry);
-+    }
-+    sendco->ret =3D ret < 0 ? ret : -EIO;
-+out:
-+    sendco->co =3D NULL;
-+    sendco->done =3D true;
-+    aio_wait_kick();
-+}
-+
-+static int compare_chr_send(CompareState *s,
-+                            uint8_t *buf,
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len,
-+                            bool notify_remote_frame,
-+                            bool zero_copy)
-+{
-+    SendCo *sendco;
-+    SendEntry *entry;
-+
-     if (notify_remote_frame) {
--        ret =3D qemu_chr_fe_write_all(&s->chr_notify_dev,
--                                    (uint8_t *)buf,
--                                    size);
-+        sendco =3D &s->notify_sendco;
-     } else {
--        ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
-+        sendco =3D &s->out_sendco;
-     }
-
--    if (ret !=3D size) {
--        goto err;
-+    if (!size) {
-+        return 0;
-     }
-
--    return 0;
-+    entry =3D g_slice_new(SendEntry);
-+    entry->size =3D size;
-+    entry->vnet_hdr_len =3D vnet_hdr_len;
-+    if (zero_copy) {
-+        entry->buf =3D buf;
-+    } else {
-+        entry->buf =3D g_malloc(size);
-+        memcpy(entry->buf, buf, size);
-+    }
-+    g_queue_push_head(&sendco->send_list, entry);
-+
-+    if (sendco->done) {
-+        sendco->co =3D qemu_coroutine_create(_compare_chr_send, sendco);
-+        sendco->done =3D false;
-+        qemu_coroutine_enter(sendco->co);
-+        if (sendco->done) {
-+            /* report early errors */
-+            return sendco->ret;
-+        }
++    if (!colo_compare_active) {
++        qemu_mutex_unlock(&colo_compare_mutex);
++        return;
 +    }
 
--err:
--    return ret < 0 ? ret : -EIO;
-+    /* assume success */
-+    return 0;
+     qemu_mutex_lock(&event_mtx);
+     QTAILQ_FOREACH(s, &net_compares, next) {
+@@ -919,6 +927,7 @@ void colo_notify_compares_event(void *opaque, int event=
+, Error **errp)
+     }
+
+     qemu_mutex_unlock(&event_mtx);
++    qemu_mutex_unlock(&colo_compare_mutex);
  }
 
- static int compare_chr_can_read(void *opaque)
-@@ -1063,6 +1137,7 @@ static void compare_pri_rs_finalize(SocketReadState *=
-pri_rs)
-                          pri_rs->buf,
-                          pri_rs->packet_len,
-                          pri_rs->vnet_hdr_len,
-+                         false,
-                          false);
-     } else {
-         /* compare packet in the specified connection */
-@@ -1093,7 +1168,7 @@ static void compare_notify_rs_finalize(SocketReadStat=
-e *notify_rs)
-     if (packet_matches_str("COLO_USERSPACE_PROXY_INIT",
-                            notify_rs->buf,
-                            notify_rs->packet_len)) {
--        ret =3D compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
-+        ret =3D compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, =
-false);
-         if (ret < 0) {
-             error_report("Notify Xen COLO-frame INIT failed");
-         }
-@@ -1199,6 +1274,20 @@ static void colo_compare_complete(UserCreatable *uc,=
+ static void colo_compare_timer_init(CompareState *s)
+@@ -1274,7 +1283,14 @@ static void colo_compare_complete(UserCreatable *uc,=
  Error **errp)
+                            s->vnet_hdr);
+     }
 
-     QTAILQ_INSERT_TAIL(&net_compares, s, next);
-
-+    s->out_sendco.s =3D s;
-+    s->out_sendco.chr =3D &s->chr_out;
-+    s->out_sendco.notify_remote_frame =3D false;
-+    s->out_sendco.done =3D true;
-+    g_queue_init(&s->out_sendco.send_list);
-+
-+    if (s->notify_dev) {
-+        s->notify_sendco.s =3D s;
-+        s->notify_sendco.chr =3D &s->chr_notify_dev;
-+        s->notify_sendco.notify_remote_frame =3D true;
-+        s->notify_sendco.done =3D true;
-+        g_queue_init(&s->notify_sendco.send_list);
++    qemu_mutex_lock(&colo_compare_mutex);
++    if (!colo_compare_active) {
++        qemu_mutex_init(&event_mtx);
++        qemu_cond_init(&event_complete_cond);
++        colo_compare_active =3D true;
 +    }
-+
+     QTAILQ_INSERT_TAIL(&net_compares, s, next);
++    qemu_mutex_unlock(&colo_compare_mutex);
+
+     s->out_sendco.s =3D s;
+     s->out_sendco.chr =3D &s->chr_out;
+@@ -1292,9 +1308,6 @@ static void colo_compare_complete(UserCreatable *uc, =
+Error **errp)
+
      g_queue_init(&s->conn_list);
 
-     qemu_mutex_init(&event_mtx);
-@@ -1225,8 +1314,9 @@ static void colo_flush_packets(void *opaque, void *us=
-er_data)
-                          pkt->data,
-                          pkt->size,
-                          pkt->vnet_hdr_len,
--                         false);
--        packet_destroy(pkt, NULL);
-+                         false,
-+                         true);
-+        packet_destroy_partial(pkt, NULL);
-     }
-     while (!g_queue_is_empty(&conn->secondary_list)) {
-         pkt =3D g_queue_pop_head(&conn->secondary_list);
-@@ -1301,10 +1391,23 @@ static void colo_compare_finalize(Object *obj)
+-    qemu_mutex_init(&event_mtx);
+-    qemu_cond_init(&event_complete_cond);
+-
+     s->connection_track_table =3D g_hash_table_new_full(connection_key_has=
+h,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -1386,12 +1399,19 @@ static void colo_compare_finalize(Object *obj)
+
+     qemu_bh_delete(s->event_bh);
+
++    qemu_mutex_lock(&colo_compare_mutex);
+     QTAILQ_FOREACH(tmp, &net_compares, next) {
+         if (tmp =3D=3D s) {
+             QTAILQ_REMOVE(&net_compares, s, next);
+             break;
          }
      }
-
-+    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
-+    aio_context_acquire(ctx);
-+    AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
-+    if (s->notify_dev) {
-+        AIO_WAIT_WHILE(ctx, !s->notify_sendco.done);
++    if (QTAILQ_EMPTY(&net_compares)) {
++        colo_compare_active =3D false;
++        qemu_mutex_destroy(&event_mtx);
++        qemu_cond_destroy(&event_complete_cond);
 +    }
-+    aio_context_release(ctx);
-+
-     /* Release all unhandled packets after compare thead exited */
-     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+    AIO_WAIT_WHILE(NULL, !s->out_sendco.done);
++    qemu_mutex_unlock(&colo_compare_mutex);
 
-     g_queue_clear(&s->conn_list);
-+    g_queue_clear(&s->out_sendco.send_list);
-+    if (s->notify_dev) {
-+        g_queue_clear(&s->notify_sendco.send_list);
-+    }
+     AioContext *ctx =3D iothread_get_aio_context(s->iothread);
+     aio_context_acquire(ctx);
+@@ -1419,15 +1439,18 @@ static void colo_compare_finalize(Object *obj)
+         object_unref(OBJECT(s->iothread));
+     }
 
-     if (s->connection_track_table) {
-         g_hash_table_destroy(s->connection_track_table);
-diff --git a/net/colo.c b/net/colo.c
-index 8196b35837..a6c66d829a 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -185,6 +185,13 @@ void packet_destroy(void *opaque, void *user_data)
-     g_slice_free(Packet, pkt);
+-    qemu_mutex_destroy(&event_mtx);
+-    qemu_cond_destroy(&event_complete_cond);
+-
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+     g_free(s->notify_dev);
  }
 
-+void packet_destroy_partial(void *opaque, void *user_data)
++static void __attribute__((__constructor__)) colo_compare_init_globals(voi=
+d)
 +{
-+    Packet *pkt =3D opaque;
-+
-+    g_slice_free(Packet, pkt);
++    colo_compare_active =3D false;
++    qemu_mutex_init(&colo_compare_mutex);
 +}
 +
- /*
-  * Clear hashtable, stop this hash growing really huge
-  */
-diff --git a/net/colo.h b/net/colo.h
-index 679314b1ca..573ab91785 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -102,5 +102,6 @@ bool connection_has_tracked(GHashTable *connection_trac=
-k_table,
- void connection_hashtable_reset(GHashTable *connection_track_table);
- Packet *packet_new(const void *data, int size, int vnet_hdr_len);
- void packet_destroy(void *opaque, void *user_data);
-+void packet_destroy_partial(void *opaque, void *user_data);
-
- #endif /* NET_COLO_H */
+ static const TypeInfo colo_compare_info =3D {
+     .name =3D TYPE_COLO_COMPARE,
+     .parent =3D TYPE_OBJECT,
 --
 2.20.1
 
 
---Sig_/2CfJDgicf8fCwhXILbT2bM/
+--Sig_/VDK6llwDvmHOglbuy8K_skv
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIyBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7HdYoACgkQNasLKJxd
-sljsTg/3WyKdl0Bi4CE0MTpIIT3NSX9+AbVtknXo5wkavHQMeiwEBwszkP5S/7Cu
-AuP0HKGU17TYCQuaejaedo1Sq+icEEUEw68S1yftDyXXBkiyFHvjyuL0u538ULMS
-YKlTOh3XOaQcNsR57hwLNGv7Joytov47LsGhHrgqn8U2WRS9EIbgFqkcguutf+FH
-IGsywiO6zs4uppWiUAlYKu320/Iyz4TqrG4KrMzxIMdJYK9hxEwCJNIvAJmuFPS6
-e7NUhXiWWMJ4hGvR+dHtN8VjQ/NIeSMCjtxQqTF/ZjZ/B1PGFsxa+oEKe24Y5kXs
-KZZONs75uaxMQdJ5BOs3ptif6wFtlSZWgiKfZYV4RcocG4Tgq8Iq+HzPwpiuGvDv
-xiI21C+MMjlM+4MfUAdFS4A75xjRXDwGc9S2GATZdS48Nch2cEYiE4ZfuxEebkkH
-L+1Fcibbxuyx5q7iKrVlxCQkDnxhq8AZ6DVFZSwMZf0AI42ioRzWrsqUutLr5BiQ
-qrmaZMPV9Of9Blbr2XlPWgswNuI587EyS1wvRadaMTJFRtdhKp2OEqCFs+iTZ6GI
-Q3RsD43z9BMd4K6m7y2B7C8O9G8TgR5AaO7dpNj/5SOtfhzo+LHu5DuXXM3+W/pl
-vHdYAScj/W4wvtz8Apb+3egkU4SBGDfF0m1U4Msa2XhBFJDGZQ==
-=kFyr
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7HdZEACgkQNasLKJxd
+slh1yhAAueAL2doLnzy7gd1EYmb4FFVcTptfz21Sh7HPgPlNG6tBkXSuIIntLgO1
+nZg/MNk1J5NFt5jaV2yBlcRmhg2zcIIyWQNe07Y5hhnF+UrzWN4SpnxAgP5anwQ8
+auHUG6/GDeFOTJzmYyNevBtX4u20XRgR1IuMy19F8S9IQBI3kemJjif1Bvy9/z37
+WbQu9dm59Kuo/QErsfAxFv3DbR1DYnalvZMfWIMGlIElHCPgSGrFha3A0GmDGJ07
+tJXFPxM4ZvX+lT/3mjXOQmkNOKKbvSXM4z0/czjXr2RkbIwtVQU9MXDUswsXncXG
+YhKZAbr0x4Nv/I3FgLqbOtT01SxhHy59NnOg9t1Sg2QYjEogdco9FZa3444mPhQk
+IF9tBX4ij5BOYRjQbMZRA+NFIFg74vN2Y/oIXYKs6aJ09LrQx7WQXZVIbGSFSpkw
+XRWGFaubbNeO6Qh8UuBJkg7zLv1F3aVkhODhyFujz3Fsi1Z9qpBz9LzPM+pjobGI
+rCgQixCL/pitczal50d1BaSRvlgy8YUu1epoS7MJoH+KIBBqkmpcFhs/1P4XqF/u
+XBNcl9HRJrzRaZXSRMlO5ljc78H9GH491MqHzhyiGjNUGIVp0cEweWYJkTnv9OzV
+wHJmzER/hcLP/5dBVKTmA4jb0kb9RWH+PruDcuKg17h1JaOO/0g=
+=5CGg
 -----END PGP SIGNATURE-----
 
---Sig_/2CfJDgicf8fCwhXILbT2bM/--
+--Sig_/VDK6llwDvmHOglbuy8K_skv--
 
