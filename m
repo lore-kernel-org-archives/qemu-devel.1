@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D025C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 05:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D546C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 05:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17E4B2073B
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 05:27:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E4B2073B
+	by mail.kernel.org (Postfix) with ESMTPS id 24061206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 05:35:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24061206BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc0D9-0007QF-A3
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 01:27:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60408)
+	id 1jc0L2-0007Mt-8N
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 01:35:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jc0Bi-0005sU-3S
- for qemu-devel@nongnu.org; Fri, 22 May 2020 01:25:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58006)
+ id 1jc0Gd-0003PX-2m
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 01:30:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58222)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jc0Bh-0003BP-94
- for qemu-devel@nongnu.org; Fri, 22 May 2020 01:25:41 -0400
+ id 1jc0Gc-0004g9-4K
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 01:30:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jc0Bf-0004oo-NZ
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 05:25:39 +0000
+ id 1jc0Ga-00050k-Dt
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 05:30:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id ACF812E806E
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 05:25:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 67B8A2E8029
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 05:30:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 May 2020 05:19:19 -0000
-From: Thomas Huth <1693649@bugs.launchpad.net>
+Date: Fri, 22 May 2020 05:22:18 -0000
+From: cliff chen <1879425@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -50,19 +50,19 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paul-whooppee th-huth
-X-Launchpad-Bug-Reporter: Paul Goyette (paul-whooppee)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <149575946555.18286.18117412791023512529.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159012475963.7477.6476241369082913120.malone@gac.canonical.com>
-Subject: [Bug 1693649] Re: x86 pause misbehaves with -cpu haswell
+X-Launchpad-Bug-Commenters: cliffchen th-huth
+X-Launchpad-Bug-Reporter: cliff chen (cliffchen)
+X-Launchpad-Bug-Modifier: cliff chen (cliffchen)
+References: <158985197617.30924.14122012304587735670.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159012493865.907.16920809286269680482.malone@chaenomeles.canonical.com>
+Subject: [Bug 1879425] Re: The thread of "CPU 0 /KVM" keeping 99.9%CPU
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 586b8413c1a0f6c4bed2db16b2213ce15c23a064
+X-Launchpad-Hash: d6c13ed0d86fc63b926c78cc239891d11f2b2445
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 21:50:42
@@ -85,45 +85,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1693649 <1693649@bugs.launchpad.net>
+Reply-To: Bug 1879425 <1879425@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can you still reproduce this issue with the latest version of QEMU
-(currently 5.0)?
+Hi Thomas,
+Do you have any quick suggestion before report it on CentOS?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+thanks
+Cliff
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1693649
+https://bugs.launchpad.net/bugs/1879425
 
 Title:
-  x86 pause misbehaves with -cpu haswell
+  The thread of "CPU 0 /KVM" keeping 99.9%CPU
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Using qemu-2.9.0
+  Hi Expert:
 
-  When booting NetBSD using '-cpu haswell -smp 4', the system fails to
-  initialize the additional CPUs.  It appears as though the "application
-  processor" enters routine x86_pause() but never returns.
+  The VM is hung here after (2, or 3, or 5 and the longest time is 10 hours=
+) by qemu-kvm.
+  Notes:
+  for VM:
+  =C2=A0=C2=A0OS: RHEL8.1
+  =C2=A0=C2=A0CPU: 1
+  =C2=A0=C2=A0MEM:4G
+  For qemu-kvm(host kernel RHEL7):
+  =C2=A0=C2=A01) version:
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/usr/libexec/qemu-kvm -version
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QEMU emulator version 2.10.0(qemu-kvm-ev-2.=
+10.0-21.el7_5.4.1)
+  =C2=A0=C2=A02) once the issue is occurred, the CPU of "CPU0 /KVM" is more=
+ than 99% by com "top -p VM_pro_ID"
+  =C2=A0=C2=A0=C2=A0=C2=A0PID  UDER   PR NI RES   S  % CPU %MEM  TIME+    C=
+OMMAND
+  872067   qemu   20 0  1.6g  R   99.9  0.6  37:08.87 CPU 0/KVM
+  =C2=A0=C2=A03) use "pstack 493307" and below is function trace
+  Thread 1 (Thread 0x7f2572e73040 (LWP 872067)):
+  #0  0x00007f256cad8fcf in ppoll () from /lib64/libc.so.6
+  #1  0x000055ff34bdf4a9 in qemu_poll_ns ()
+  #2  0x000055ff34be02a8 in main_loop_wait ()
+  #3  0x000055ff348bfb1a in main ()
+  =C2=A0=C2=A04) use strace "strace -tt -ff -p 872067 -o cfx" and below log=
+ keep printing
+  21:24:02.977833 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
+ 0 (Timeout)
+  21:24:02.977918 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 911447}, NULL, 8=
+) =3D 0 (Timeout)
+  21:24:02.978945 ppoll([{fd=3D4, events=3DPOLLIN}, {fd=3D6, events=3DPOLLI=
+N}, {fd=3D8, events=3DPOLLIN}, {fd=3D9, events=3DPOLLIN}, {fd=3D80, events=
+=3DPOLLIN}, {fd=3D82, events=3DPOLLIN}, {fd=3D84, events=3DPOLLIN}, {fd=3D1=
+15, events=3DPOLLIN}, {fd=3D121, events=3DPOLLIN}], 9, {0, 0}, NULL, 8) =3D=
+ 0 (Timeout)
+  Therefore, I think the thread "CPU 0/KVM" is in tight loop.
+  =C2=A0=C2=A05) use reset can recover this issue. however, it will reoccur=
+red again.
+  Current work around is increase one CPU for this VM, then issue is gone.
 
-  x86_pause() is simply two assembler instructions: 'pause; ret;'
-
-  Replacing the routine with 'nop; nop; ret;' allows the system to
-  proceed, of course without the benefit of the pause instruction on
-  spin-loops!
-
-  Additionally, booting with '-cpu phenom -smp 4' also works, although
-  the system does seem confused about the type of CPU being used.
+  thanks
+  Cliff
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1693649/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1879425/+subscriptions
 
