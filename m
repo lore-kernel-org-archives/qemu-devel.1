@@ -2,89 +2,89 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23669C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 03:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A5DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 03:04:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D761B207D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 03:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C556207D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 03:04:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="utn3yIUx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D761B207D8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ycVbGSEN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C556207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbxxo-0003BO-3N
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 23:03:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49726)
+	id 1jbxyj-00042Q-F0
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 23:04:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxwJ-0001GA-6T
- for qemu-devel@nongnu.org; Thu, 21 May 2020 23:01:39 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:39187)
+ id 1jbxwl-0002E5-M5
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 23:02:07 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44768)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jbxwI-0002tA-BD
- for qemu-devel@nongnu.org; Thu, 21 May 2020 23:01:38 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id n15so4366835pjt.4
- for <qemu-devel@nongnu.org>; Thu, 21 May 2020 20:01:37 -0700 (PDT)
+ id 1jbxwk-0002yw-4W
+ for qemu-devel@nongnu.org; Thu, 21 May 2020 23:02:07 -0400
+Received: by mail-pg1-x541.google.com with SMTP id p30so4293870pgl.11
+ for <qemu-devel@nongnu.org>; Thu, 21 May 2020 20:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7jg+6ng0lQ2weQOBmMds6QSOC4i/EupgASW2YZ6ch+0=;
- b=utn3yIUxsO4BnVfqX0jXEMC86XUBs56Xj5ZBQfGJfG3MedGxYkRRJ2sJK+2FCaBVU2
- eLg5z3bSKV54i4ukDTUXIhZ7EPp8BDy5x8YMXJ7PwypD0olm/0ncqpc631Ok649m9Gw8
- W/5iwhhEqDrnA/7zDPqHHOLdirvu0H08XskgqhIPiBHLVAomA3yq6OzrtBC7JnbT7DL8
- LC8gcWv4Ueiq13sMLoE0iCH5X2cL35SLm86gWdi0PqgTDG0DiFYD8c46Iigr4mfhtG/P
- srQkhHOAr6z/YKp/PSccD6fWkYnmCZe312JBC3XNNOOw/O4DmuTeyCp08JWvz430ukB+
- lNjg==
+ bh=jBFcQkdt7ugXdzCzgVoVWf2iAP2CLTFTZix8fB+Dgo0=;
+ b=ycVbGSENvilNAYCR/pXgXaqmCrWRi6RdUjLoreKK3va7LzHzg4WzxKeIqfmQfmGluY
+ wstFv0uSoiuk+FtIyqjdgw78uysTKFbb2ffdA082lKLNZkcl9XJvM1D+R2k+lJFWCJBE
+ pfF6DuNGyuhCCrQeCVx0w4bsakQ93dgLZncToH05yCozzNnoIBmwVgktkI6FPlOnC7gl
+ 4JWLwHTPqjdZP+aG+tdhQrqZfcREPvZzAwGKMmpSwYEei7ZvjHIff/9xxf2TSkPWdG5j
+ vzgrzV+bLtZPo16LP9rFXni816QHFrH5/mOvUjI5If/X7uNVsxOh+vCxECgrWzhMeARk
+ +wLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=7jg+6ng0lQ2weQOBmMds6QSOC4i/EupgASW2YZ6ch+0=;
- b=DgQ+QuJeGeOFoJIfQxONlr7ATtwUE/zIS5DfQP59ztpYDJNnQchQuCq71b7x3sx7aK
- ydRGUXzNggrLSsnm10cQ/ncMjR5eScweNdjuxGU1EY79xruon5z86nxz4xRjh6/9kVVI
- AVXzo+zDNK5KvMNYlLI1B4+TC8cEjuMWgEWtiMbBCGSlFfPQ00WcWx7ZcrXm/3ZICbiO
- eu4uT/W00RyHhS53YKf5XcTW18e8WxH2jQ13UhZ+9zCnfqhiHzhH+JPnNE43TyV+rSos
- Qf8wPZNIRmmZhMg3JmetAGqKwbfb9n2xyAoZce0p55Q+eu4p1puR0wXqMcYps+LhjecH
- utHw==
-X-Gm-Message-State: AOAM532L4PTylvNeLrVfGp6TbIv7SDzhIttX2RIXWXRJ/sM9xkKwtpfu
- N7P4yfcyFjjNYLDSMPbUxeRHNcAr1LQ=
-X-Google-Smtp-Source: ABdhPJx+bz2YoAC4FZKWT0QD0tnDeNG8Kj42rNuQ+yESXbkghLXn++94mvQHO9Sy2kUc7jftRYY2VA==
-X-Received: by 2002:a17:902:aa4b:: with SMTP id
- c11mr12784930plr.211.1590116497109; 
- Thu, 21 May 2020 20:01:37 -0700 (PDT)
+ bh=jBFcQkdt7ugXdzCzgVoVWf2iAP2CLTFTZix8fB+Dgo0=;
+ b=ARIjFvP2fnsYbcEXHltBAdQFYr3PILGhiP6Qq5BVk8KbJb1GQqXQAWO35EU21R/mH2
+ R0AHsA1lj+0UqX05gYZZ7kLEmiKbHu8t5L9uTDYdvWaLFbBoEnFSLp6H86kYHMQ1pPfQ
+ iqZssL5DtzfPcnF57+lZGAhXeMmw+jRKjkjY0p3FIH2etpRdBki05fU2ZCqYhmvI1+Jz
+ lW6FnJxWJ8W1pOXc5IvXWFyPf3aUouc/NgM/o7VXq7jnzJAxRHwQpiDxoMPBiDMqA/+Y
+ hipf9lJAtVy+j91tCQYlDAvPHSKV6RGQgHGoCaN0FRkM7fFKpVcuP0k6/mTwqU0tF5cs
+ izHA==
+X-Gm-Message-State: AOAM533oXv1jlNw3DR3qIvmd18kM6t9LHZA1cmaVlMWtcnOkNwC5ed0Z
+ nlWddnmdWyTkASUdeINz5zXmaA==
+X-Google-Smtp-Source: ABdhPJzyX2ENJ708T6m7AafF111qJOLamumO+O+GF/gyDHlsdzudf9jdalte/BwGjhcvl6o/SKLTvg==
+X-Received: by 2002:a62:5ac5:: with SMTP id o188mr1837613pfb.37.1590116524660; 
+ Thu, 21 May 2020 20:02:04 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 10sm5407624pfx.138.2020.05.21.20.01.36
+ by smtp.gmail.com with ESMTPSA id 131sm5074925pgf.49.2020.05.21.20.02.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 May 2020 20:01:36 -0700 (PDT)
-Subject: Re: [PATCH v1 09/15] tests/docker: add debian11 base image
+ Thu, 21 May 2020 20:02:04 -0700 (PDT)
+Subject: Re: [PATCH v1 10/15] tests/docker: use a gcc-10 based image for arm64
+ tests
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20200520140541.30256-1-alex.bennee@linaro.org>
- <20200520140541.30256-10-alex.bennee@linaro.org>
+ <20200520140541.30256-11-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5d7aad11-0133-7cdf-0cd3-764b9a5fd0bb@linaro.org>
-Date: Thu, 21 May 2020 20:01:34 -0700
+Message-ID: <612763ac-f669-c2e5-a50f-2d218fdc5dcc@linaro.org>
+Date: Thu, 21 May 2020 20:02:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200520140541.30256-10-alex.bennee@linaro.org>
+In-Reply-To: <20200520140541.30256-11-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,15 +113,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/20/20 7:05 AM, Alex Bennée wrote:
-> We won't use this for building QEMU but we do need newer GCC's and
-> binutils for building some of our test cases.
+> As we enable newer features that we want to test on arm64 targets we
+> need newer compilers. Split off a new debian-arm64-test-cross image
+> which we can use to build these new tests.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  tests/docker/Makefile.include            |  2 +-
->  tests/docker/dockerfiles/debian11.docker | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+), 1 deletion(-)
->  create mode 100644 tests/docker/dockerfiles/debian11.docker
+>  tests/docker/Makefile.include                       |  2 ++
+>  .../dockerfiles/debian-arm64-test-cross.docker      | 13 +++++++++++++
+>  tests/tcg/configure.sh                              |  4 ++--
+>  3 files changed, 17 insertions(+), 2 deletions(-)
+>  create mode 100644 tests/docker/dockerfiles/debian-arm64-test-cross.docker
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
