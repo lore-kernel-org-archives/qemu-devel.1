@@ -2,81 +2,92 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356BDC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B13FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:45:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0191E206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0191E206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E728F20723
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 19:45:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q5iSKve0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E728F20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcDTz-0005iM-7s
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60990)
+	id 1jcDbn-0001RA-3i
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 15:45:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDSB-0003bc-N9
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44542)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcDb5-00009R-8s
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:44:47 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:42015)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcDSA-0002G4-V8
- for qemu-devel@nongnu.org; Fri, 22 May 2020 15:35:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jcDS9-0000cP-GU
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6F4AF2E8076
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 19:35:33 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jcDb4-0003qT-2J
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 15:44:46 -0400
+Received: by mail-lf1-x143.google.com with SMTP id x27so7162400lfg.9
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 12:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=YwQCbfcoMoCJQKPHHhOEc/8HeG8au22CdYSO7DOc4N4=;
+ b=Q5iSKve0u05GwLwDgEUv21sSTHUI4zY1sS3dSwmOHxI0vO+Ojihz7qapxJge0HATJO
+ M7hFOs2V987NKp4uk+ClYG89Ww5dxpaO6ZyTAfiFp82QSru2IsOnEpqqhCFdgZRTZQbK
+ XeJ6UK/8oLJ72I8tgRCUXUHXZ0NEbA0fF5kKmsPBw7cWWKySOcod5EL460b58yEbFTAQ
+ L9jzux4/oGMs9qboSPyebfgk+FmNnm/hu+mhAFO/2NLfUrGIeCZjr/k9YAt4uRT2qNHU
+ VcOIQfr6ciX36wwiI7NzTlQ44aKbrNgl6X+gu+xzHTS78AtLcAZjrjrlPnJW0eIOXaUl
+ OxUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=YwQCbfcoMoCJQKPHHhOEc/8HeG8au22CdYSO7DOc4N4=;
+ b=Jq3ha4K7WKj/ZzFV1lu6FNN6f8s6B5Wd8hg6VwNz/zT10cRHjQCFhwe/fWn9B/X5Ob
+ /WtzfZJP+F3qiWhKsLeJW8Kd+GoqLmBfJ5MQpCfJxRGauKGvx2N6DcO7dDEAwxJj4e36
+ Vh5kuyupNCQZDen1WgtTBNqnIieD3LC0axX+SjUZ7FX0oJ/7ISfuMsOXSA3NdJHl3sjS
+ sdhdq9xA8HmvnAJfjxp3MaEevsnkguRx9q+HLY1ZWdcDdGiSZb/Tq5GYWE9RZeJ0cmVe
+ OPYYZdv5jaz224wIHZ3XKtBZkP9gNAV0hyR8x3YVfqHO9os1qRkdoQypQPns5dCEDfOr
+ a+9Q==
+X-Gm-Message-State: AOAM530Y+57uZMCPO3TVsR/8o+gC9aH6HMhlAMyejDIKJSVT1DLhW9Fz
+ EbRrmKRjWMasJgbqvUrn+/6QkyDrwuiI4IGgcBdiDA==
+X-Google-Smtp-Source: ABdhPJytH6AqQBA+YEPHdmDcVQYsZGXA36H/aokm3KWJ6WEz26IjrT49AvQd4fhmYsKKLeptwrfh4Eb0ET840Np9XNg=
+X-Received: by 2002:ac2:5cd1:: with SMTP id f17mr7680786lfq.4.1590176683906;
+ Fri, 22 May 2020 12:44:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200519132259.405-1-robert.foley@linaro.org>
+ <20200519132259.405-11-robert.foley@linaro.org>
+ <87367sdkoz.fsf@linaro.org>
+In-Reply-To: <87367sdkoz.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 22 May 2020 15:44:37 -0400
+Message-ID: <CAEyhzFvRGOJU94V2+S-GxryqT23DRKVbK_CzTwJ3sOAiEx=kjQ@mail.gmail.com>
+Subject: Re: [PATCH v7 10/12] tests/vm: Added a new script for centos.aarch64.
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 May 2020 19:25:55 -0000
-From: Thomas Huth <1693649@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paul-whooppee th-huth
-X-Launchpad-Bug-Reporter: Paul Goyette (paul-whooppee)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <149575946555.18286.18117412791023512529.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159017555604.7915.4013692688620158864.malone@gac.canonical.com>
-Subject: [Bug 1693649] Re: x86 pause misbehaves with -cpu haswell
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fb8fd90c195c3a8c6787cdd234be4799385c8706
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 14:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,44 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1693649 <1693649@bugs.launchpad.net>
+Cc: Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ok, thanks for checking again! So I'm closing this ticket now.
+On Fri, 22 May 2020 at 11:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> > centos.aarch64 creates a CentOS 8 image.
+> > Also added a new kickstart script used to build the centos.aarch64 imag=
+e.
+> >
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> > ---
+> <snip>
+> > --- /dev/null
+> > +++ b/tests/vm/centos.aarch64
+> > @@ -0,0 +1,227 @@
+> > +#!/usr/bin/env python3
+> > +#
+> > +# Centos aarch64 image
+> > +#
+> > +# Copyright 2020 Linaro
+> > +#
+> > +# Authors:
+> > +#  Robert Foley <robert.foley@linaro.org>
+> > +#  Originally based on ubuntu.aarch64
+> > +#
+> > +# This code is licensed under the GPL version 2 or later.  See
+> > +# the COPYING file in the top-level directory.
+> > +#
+> > +
+> > +import os
+> > +import sys
+> > +import subprocess
+> > +import basevm
+> > +import time
+> > +import traceback
+>
+> left over debug?
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+This traceback is getting used as part of a try, except, here in
+wait_for_shutdown() to print out the exception info.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1693649
-
-Title:
-  x86 pause misbehaves with -cpu haswell
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Using qemu-2.9.0
-
-  When booting NetBSD using '-cpu haswell -smp 4', the system fails to
-  initialize the additional CPUs.  It appears as though the "application
-  processor" enters routine x86_pause() but never returns.
-
-  x86_pause() is simply two assembler instructions: 'pause; ret;'
-
-  Replacing the routine with 'nop; nop; ret;' allows the system to
-  proceed, of course without the benefit of the pause instruction on
-  spin-loops!
-
-  Additionally, booting with '-cpu phenom -smp 4' also works, although
-  the system does seem confused about the type of CPU being used.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1693649/+subscriptions
+Thanks & Regards,
+-Rob
+>
+> <snip>
+>
+> Otherwise:
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> --
+> Alex Benn=C3=A9e
 
