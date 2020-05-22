@@ -2,87 +2,83 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF74C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD467C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:14:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA06205CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81514205CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 15:14:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Io5PYxpI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA06205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aDpb7mhS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81514205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jc9MW-0000iH-RA
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:13:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33366)
+	id 1jc9N6-0001hW-H1
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 11:14:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9L0-0007fr-NB
- for qemu-devel@nongnu.org; Fri, 22 May 2020 11:11:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41951
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9M1-00009c-U8
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:12:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27231
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9Kz-0001MC-Bz
- for qemu-devel@nongnu.org; Fri, 22 May 2020 11:11:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jc9M1-0001hn-3P
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 11:12:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590160312;
+ s=mimecast20190719; t=1590160376;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DLKf/Nb8XQKXuRpwhy1Ic949V2/xhEZGsSVSdMGGkZo=;
- b=Io5PYxpIPb0tG4HlANW1qmfIKj5qE/CP8fcfw5pIpzpcZX8mEQe1CyimGqCXd2QdUBo2pq
- xrFZfLqULhrLEr0ALnmE+Sogq+3wsSZ2EMvPAYr2YFWGF/Rx9X186+me6P+dAIeBeg9gq+
- WRYQPAJaHJlTBbW+mU6avgSLzg1O03A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-HLac_w5pPq2RFK_w3wIMrw-1; Fri, 22 May 2020 11:11:41 -0400
-X-MC-Unique: HLac_w5pPq2RFK_w3wIMrw-1
-Received: by mail-wr1-f71.google.com with SMTP id h6so3659407wrx.4
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 08:11:41 -0700 (PDT)
+ bh=esPhA5uPa52ZkKLU+VzHjUqOZ2ccRyG0jIhcXa9X9os=;
+ b=aDpb7mhSfNGCEfCoQEkoBFJ/JhzAiWpS5E0lATtEk5mU8UocFsPYg/8pkGLn3hr5K7cQXb
+ R5f8E9eTmKeG3QnrRymQwIRZ8iWsBB7lNxZL7ikh/jXnMLHTVfPcNCActWfispA3GsfEpS
+ DBRuQTaEiuCYj1kbmpF3tGUCuNxsovQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-x93QalW4Mg2TU46u3eHXDw-1; Fri, 22 May 2020 11:12:52 -0400
+X-MC-Unique: x93QalW4Mg2TU46u3eHXDw-1
+Received: by mail-wr1-f69.google.com with SMTP id d16so4494263wrv.18
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 08:12:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=DLKf/Nb8XQKXuRpwhy1Ic949V2/xhEZGsSVSdMGGkZo=;
- b=NDbM78VvqeTQu80mBbecAZoQjCL2g0AdPA6oT8g6tpplxUXuzzZwXyj02Ny67VpLvL
- O86OJmtX8VUKP5s6/R7ZuxhQGwmblAkw5C/2jeWQqd67EwYycZkTDDCROwUkLwyl5z/a
- dQWXI4eikuVDhjMxEz8ASiuigZ/OvwDVjF9fAQmpIdzoWgxNe8VHrf2dBcVD4uRBa1uh
- PmmG3TBLdImNoF5SECisd07uiKe2+RrIWzzIUE/6kesL3YH36DIP2ojjUbrGY/gipBDV
- pDfrMCNoB+80P3b7oIE1wPIi/gZysGHXfFAeOs34XA8IFsTgSFPmqV1Pvwj1OuJh6lNx
- 3yrQ==
-X-Gm-Message-State: AOAM531s67mN1dPCdfVJf4yPN+SN4yRCs/DbAheAgf6uZJNq1eSSO9c/
- gFtMNawy6L0Rfv1fUzPlbF8s5f8KVow080bI6OnXtnpT/OObw9ZkgqXszMOct8mfQWUGNeV+sx3
- SXcAUeBXUbDm1oF8=
-X-Received: by 2002:a05:6000:1244:: with SMTP id
- j4mr3924155wrx.189.1590160300256; 
- Fri, 22 May 2020 08:11:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwG/+d4+DE2m94dLkPBnJ8imYmfCgj/5Y0RX9tFdihAuvwLfHw6ddoYoAxZo5Q6JLvA7ucZJw==
-X-Received: by 2002:a05:6000:1244:: with SMTP id
- j4mr3924113wrx.189.1590160299902; 
- Fri, 22 May 2020 08:11:39 -0700 (PDT)
+ bh=esPhA5uPa52ZkKLU+VzHjUqOZ2ccRyG0jIhcXa9X9os=;
+ b=b4Ssuqvp1wvI+Jcj6OAFvU+5LsAdT2mIi5QBbKEqWOgrG7nn2CqgLjwtyxxxsxshk3
+ vEPAuFGuQXTUD+aUXrs7p+KJsKYb7a+gjWRPbHpSkkRpIhRkV6TRITUmRJd8dybcsWaS
+ 59pvur/KYzscG2u+GLVGqycCgbCfXVPW7xaT8I8YWegrGw7i/Nfnjfiwxz4Yc/5l3fZl
+ 7TNlMLzqbvWUP14NiCLpa0LL3vSPU+VGI5P9dCuVUCypgFSTUsXvFIdYM1PlPUOLP4nw
+ WZDayurBxXzSc81IX2aUaLM3tbtEqeMZOroDVx3dmmw8cdO5kj1EppmdBvx8fk/x/bJt
+ Sa9A==
+X-Gm-Message-State: AOAM532AisIyeW0rX/4Ln8lheXaLM35uGefhwsHCjh/UD6H0uIjQb/8+
+ JJZtacQ6GvtybqkCd1Vs29rfGROoG5Kdr6DGkXQ1Nh6EQQmFrESm3yTq4OkDYPYx8RXES5VFJaB
+ X3lIkVM7k0ttmxAU=
+X-Received: by 2002:a7b:c205:: with SMTP id x5mr14437135wmi.135.1590160371351; 
+ Fri, 22 May 2020 08:12:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwSXgJaVmQVhbh5oua1UP9kTbA0+y5AKSl1+bMKoEgJMWuZ7Lr9XCnTkvWj3JjYiOen6+l5lg==
+X-Received: by 2002:a7b:c205:: with SMTP id x5mr14437106wmi.135.1590160371130; 
+ Fri, 22 May 2020 08:12:51 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id r3sm9455854wmh.48.2020.05.22.08.11.38
+ by smtp.gmail.com with ESMTPSA id n13sm9570037wrs.2.2020.05.22.08.12.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 22 May 2020 08:11:39 -0700 (PDT)
+ Fri, 22 May 2020 08:12:50 -0700 (PDT)
 Subject: Re: [PATCH v3 11/11] hw/semihosting: Make the feature depend of TCG, 
  and allow to disable it
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 References: <20200521195911.19685-1-philmd@redhat.com>
  <20200521195911.19685-12-philmd@redhat.com>
- <36db7554-dcc0-6b8c-e7b7-628c105d8fc7@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -107,28 +103,28 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <d7635637-2b34-fd4b-ee90-945c4c9fc9f3@redhat.com>
-Date: Fri, 22 May 2020 17:11:37 +0200
+Message-ID: <7e59175e-86f7-98f8-392b-929796ec877a@redhat.com>
+Date: Fri, 22 May 2020 17:12:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <36db7554-dcc0-6b8c-e7b7-628c105d8fc7@linaro.org>
+In-Reply-To: <20200521195911.19685-12-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 11:11:51
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 08:01:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,57 +140,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
  Thomas Huth <thuth@redhat.com>, qemu-riscv@nongnu.org,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
- Max Filippov <jcmvbkbc@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- Palmer Dabbelt <palmer@dabbelt.com>, Michael Walle <michael@walle.cc>,
+ Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>,
+ qemu-arm@nongnu.org, Palmer Dabbelt <palmer@dabbelt.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Alistair Francis <Alistair.Francis@wdc.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/22/20 6:26 AM, Richard Henderson wrote:
-> On 5/21/20 12:59 PM, Philippe Mathieu-Daudé wrote:
->> +++ b/hw/semihosting/Kconfig
->> @@ -1,3 +1,5 @@
->>  
->> +# default is 'n'
->>  config SEMIHOSTING
->> -       bool
->> +    bool
->> +    depends on TCG
->> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
->> new file mode 100644
->> index 0000000000..035592dd86
->> --- /dev/null
->> +++ b/target/arm/Kconfig
->> @@ -0,0 +1,2 @@
->> +config SEMIHOSTING
->> +    default y if TCG
+On 5/21/20 9:59 PM, Philippe Mathieu-Daudé wrote:
+> The semihosting feature is only meaningful when using TCG.
 > 
-> Did you answer my question about replicating the TCG test?  If you did, I
-> missed it...
+> Do not enable it by default, and let the few targets requiring
+> it to manually select it.
+> The targets restricted to TCG that previously selected it
+> (see commit 16932bb761e52c2 'introduce CONFIG_SEMIHOSTING')
+> are left unmodified; however the selection is moved to the
+> target Kconfig.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> v3: Fixed odd hidden \xC2 UTF-8 chars:
+> 
+> Traceback (most recent call last):
+>   File "qemu/scripts/minikconf.py", line 355, in parse_file
+>     self.src = fp.read()
+> UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position 21: ordinal not in range(128)
+> ---
+>  default-configs/arm-softmmu.mak         | 1 -
+>  default-configs/lm32-softmmu.mak        | 2 --
+>  default-configs/m68k-softmmu.mak        | 2 --
+>  default-configs/mips-softmmu-common.mak | 3 ---
+>  default-configs/nios2-softmmu.mak       | 2 --
+>  default-configs/xtensa-softmmu.mak      | 2 --
+>  hw/semihosting/Kconfig                  | 4 +++-
+>  target/arm/Kconfig                      | 2 ++
+>  target/lm32/Kconfig                     | 2 ++
+>  target/m68k/Kconfig                     | 2 ++
+>  target/mips/Kconfig                     | 2 ++
+>  target/nios2/Kconfig                    | 2 ++
+>  target/riscv/Kconfig                    | 2 ++
+>  target/xtensa/Kconfig                   | 2 ++
+>  14 files changed, 17 insertions(+), 13 deletions(-)
+>  create mode 100644 target/arm/Kconfig
+>  create mode 100644 target/lm32/Kconfig
+>  create mode 100644 target/m68k/Kconfig
+>  create mode 100644 target/mips/Kconfig
+>  create mode 100644 target/nios2/Kconfig
+>  create mode 100644 target/riscv/Kconfig
+>  create mode 100644 target/xtensa/Kconfig
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 8fc09a4a51..f6044f1121 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -40,6 +40,5 @@ CONFIG_MICROBIT=y
+>  CONFIG_FSL_IMX25=y
+>  CONFIG_FSL_IMX7=y
+>  CONFIG_FSL_IMX6UL=y
+> -CONFIG_SEMIHOSTING=y
+>  CONFIG_ALLWINNER_H3=y
+>  CONFIG_ACPI_APEI=y
+> diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-softmmu.mak
+> index 115b3e34c9..6d259665d6 100644
+> --- a/default-configs/lm32-softmmu.mak
+> +++ b/default-configs/lm32-softmmu.mak
+> @@ -4,8 +4,6 @@
+>  #
+>  #CONFIG_MILKYMIST_TMU2=n        # disabling it actually causes compile-time failures
+>  
+> -CONFIG_SEMIHOSTING=y
+> -
+>  # Boards:
+>  #
+>  CONFIG_LM32=y
+> diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
+> index 6629fd2aa3..4fef4bd731 100644
+> --- a/default-configs/m68k-softmmu.mak
+> +++ b/default-configs/m68k-softmmu.mak
+> @@ -1,7 +1,5 @@
+>  # Default configuration for m68k-softmmu
+>  
+> -CONFIG_SEMIHOSTING=y
+> -
+>  # Boards:
+>  #
+>  CONFIG_AN5206=y
+> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+> index da29c6c0b2..6c0904b200 100644
+> --- a/default-configs/mips-softmmu-common.mak
+> +++ b/default-configs/mips-softmmu-common.mak
+> @@ -1,8 +1,5 @@
+>  # Common mips*-softmmu CONFIG defines
+>  
+> -# CONFIG_SEMIHOSTING is always required on this architecture
+> -CONFIG_SEMIHOSTING=y
+> -
+>  CONFIG_ISA_BUS=y
+>  CONFIG_PCI=y
+>  CONFIG_PCI_DEVICES=y
+> diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
+> index 1bc4082ea9..e130d024e6 100644
+> --- a/default-configs/nios2-softmmu.mak
+> +++ b/default-configs/nios2-softmmu.mak
+> @@ -1,7 +1,5 @@
+>  # Default configuration for nios2-softmmu
+>  
+> -CONFIG_SEMIHOSTING=y
+> -
+>  # Boards:
+>  #
+>  CONFIG_NIOS2_10M50=y
+> diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+> index 4fe1bf00c9..49e4c9da88 100644
+> --- a/default-configs/xtensa-softmmu.mak
+> +++ b/default-configs/xtensa-softmmu.mak
+> @@ -1,7 +1,5 @@
+>  # Default configuration for Xtensa
+>  
+> -CONFIG_SEMIHOSTING=y
+> -
+>  # Boards:
+>  #
+>  CONFIG_XTENSA_SIM=y
+> diff --git a/hw/semihosting/Kconfig b/hw/semihosting/Kconfig
+> index efe0a30734..30befcdd21 100644
+> --- a/hw/semihosting/Kconfig
+> +++ b/hw/semihosting/Kconfig
+> @@ -1,3 +1,5 @@
+>  
+> +# default is 'n'
+>  config SEMIHOSTING
+> -       bool
+> +    bool
+> +    depends on TCG
+> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
+> new file mode 100644
+> index 0000000000..035592dd86
+> --- /dev/null
+> +++ b/target/arm/Kconfig
+> @@ -0,0 +1,2 @@
+> +config SEMIHOSTING
+> +    default y if TCG
 
-Shortly before posting this series:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg705992.html
+This patch is incorrect, because previously the feature was selected for
+system-mode only, and now it is selected in user-mode too.
 
-There is indeed something wrong with this patch, but I'm not seeing it.
-
-- semihosting only makes sense with TCG accelerator
-
-This is the "depends on TCG"
-
-- some targets (if built with TCG enabled) require semihosting
-
-This would be a per-target "select SEMIHOSTING if TCG"
-
-Another problem is some targets only require semihosting in system-mode;
-and this approach select it for both system/user modes.
-
-Paolo... help!
+[...]
 
 
