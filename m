@@ -1,101 +1,89 @@
-Return-Path: <SRS0=QiA4=7D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB804C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 23:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0679DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8171F207F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 May 2020 23:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8171F207F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8844207D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 01:34:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s/r7TLqX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8844207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jbuLG-0005wq-N3
-	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 19:11:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34296)
+	id 1jbwa8-0003nu-W7
+	for qemu-devel@archiver.kernel.org; Thu, 21 May 2020 21:34:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jbuKh-0005LG-59; Thu, 21 May 2020 19:10:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19900)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jbuKg-0002t4-2v; Thu, 21 May 2020 19:10:34 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04LN2ouX098143; Thu, 21 May 2020 19:10:24 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3160mhbptf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 21 May 2020 19:10:23 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04LN4Q89012033;
- Thu, 21 May 2020 23:10:23 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 313x17w1rw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 21 May 2020 23:10:23 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
- [9.57.199.108])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04LNAMlA39584254
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 May 2020 23:10:22 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E8A29B205F;
- Thu, 21 May 2020 23:10:21 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 767D3B2064;
- Thu, 21 May 2020 23:10:21 +0000 (GMT)
-Received: from arbab-vm.localdomain (unknown [9.160.19.51])
- by b01ledav003.gho.pok.ibm.com (Postfix) with SMTP;
- Thu, 21 May 2020 23:10:21 +0000 (GMT)
-Received: from arbab-vm (localhost [IPv6:::1])
- by arbab-vm.localdomain (Postfix) with ESMTP id D49A21003FE;
- Thu, 21 May 2020 18:10:18 -0500 (CDT)
-Date: Thu, 21 May 2020 18:10:18 -0500
-From: Reza Arbab <arbab@linux.ibm.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 1/2] spapr: Add associativity reference point count to
- machine info
-Message-ID: <20200521231018.guehu24sndz7lzfl@arbab-vm>
-Organization: IBM Linux Technology Center
-References: <20200518214418.18248-1-arbab@linux.ibm.com>
- <20200521013437.5da898fb@bahia.lan>
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jbwZc-0003Mz-7v; Thu, 21 May 2020 21:34:08 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:39278)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jbwZb-0002iE-Hf; Thu, 21 May 2020 21:34:07 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id r128so3817785ybc.6;
+ Thu, 21 May 2020 18:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=RnIhCUeWyYFnMVWHyaW9l1v+Q0ux+BQflBD9CarHsdI=;
+ b=s/r7TLqXJ1rdxV0kEZ/El4OUOUwLjTh0hrxrRl8Z0OQcR8MSbOQVq9/2zQNTQ2p4FN
+ azUdiQl3I20s1HkSWXXF8voZQrm4uSuN5RxtJ6z3snvpPiSY7AkdwMz45KQ/KlFF2e29
+ +5egr3PVjlptrnUVVkKUlrq0rCv+Rf46mp15rkq0DZkRFsT7HENb47spat7e2dzhUSEB
+ qubojL4nJ5+iyPlQfeueYQe6QBHnDG2yEWTiu1hZGB54TJir2NIZvUEPHQlfYWCrw1xf
+ sLDx0RdTQqPFlpI2T5sLaRa5iwQ3k1LCC2i3GO37GAI+Jbt0XPWSSQKGytkmF0rd+rAd
+ DCIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=RnIhCUeWyYFnMVWHyaW9l1v+Q0ux+BQflBD9CarHsdI=;
+ b=dM++IhKsqswiVE9aGU9qKF1d1asWEzctneEVN9gCEv5GZ50dou0vWLSG9TS+MP1v/t
+ fAFdigEvdKnOPwADh2yVAbsbdHE3Ng7LfbpJ+peKBiHbFjBC3DzezCY4sWyb6aZbjVXY
+ iOp5p9KiXZms/UY9waTkWttInEvaI2dfGigARNLTgY59qCYoxLZjVZb8MVG5UnbQSQJ6
+ 0ciWRYBQZjY7qPN2y6Ni6jR7EyBOPDAbd8cSK96KYw4ctysEvsC4zRqh49te10wndo//
+ V4zgNZXXFYMZ3Ilf8B3yYp6rJEQOPHMC7+PldrZqQkHHj1eNDDJH1qkmtSmpsyLnWGrF
+ jgKg==
+X-Gm-Message-State: AOAM533re1+wJrLwUNZUItRTiV1Kz264kw1J3PAe9yscSJi64xucHyve
+ lk3Cjtxat34rfw3prxvOE/mjDdfvxhqjgooTYW0=
+X-Google-Smtp-Source: ABdhPJxidqW3Fnpucfpii/Cv/OcRdQQHHU2SlWbN0bPW0U5m8l5b1DLBErTRKddYJR3NjTJWCh7iiGeuP9Ylf7dDnjI=
+X-Received: by 2002:a25:1045:: with SMTP id 66mr21756569ybq.314.1590111245994; 
+ Thu, 21 May 2020 18:34:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200521013437.5da898fb@bahia.lan>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-21_16:2020-05-21,
- 2020-05-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- lowpriorityscore=0 suspectscore=5 phishscore=0 adultscore=0
- impostorscore=0 mlxscore=0 spamscore=0 clxscore=1011 mlxlogscore=999
- priorityscore=1501 cotscore=-2147483648 bulkscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005210173
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=arbab@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/21 19:10:30
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+References: <cover.1588878640.git.alistair.francis@wdc.com>
+ <3033d22bf6385fc24a990c0e096696eea552c51d.1588878640.git.alistair.francis@wdc.com>
+In-Reply-To: <3033d22bf6385fc24a990c0e096696eea552c51d.1588878640.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Fri, 22 May 2020 09:33:54 +0800
+Message-ID: <CAEUhbmXawoSc5NRJBZuzOxksWzBKDL37UfY8icmnBzSZbT=fyA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] hw/riscv: spike: Remove deprecated ISA specific
+ machines
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,58 +96,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 01:34:37AM +0200, Greg Kurz wrote:
->On Mon, 18 May 2020 16:44:17 -0500
->Reza Arbab <arbab@linux.ibm.com> wrote:
->> @@ -944,8 +946,9 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->>                       qemu_hypertas->str, qemu_hypertas->len));
->>      g_string_free(qemu_hypertas, TRUE);
->>
->> +    nr_refpoints = MIN(smc->nr_assoc_refpoints, ARRAY_SIZE(refpoints));
+On Fri, May 8, 2020 at 3:21 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
 >
->Having the machine requesting more reference points than available
->would clearly be a bug. I'd rather add an assert() than silently
->clipping to the size of refpoints[].
-
-I'll rework nr_assoc_refpoints into a bool as David suggested.  
-Struggling for a name at the moment, but I'll think on it.
-
->>      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
->> -                     refpoints, sizeof(refpoints)));
->> +                     refpoints, nr_refpoints * sizeof(uint32_t)));
->>
+> The ISA specific Spike machines have  been deprecated in QEMU since 4.1,
+> let's finally remove them.
 >
->Size can be expressed without yet another explicit reference to the
->uint32_t type:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/riscv/spike.c         | 217 ---------------------------------------
+>  include/hw/riscv/spike.h |   6 +-
+>  2 files changed, 2 insertions(+), 221 deletions(-)
 >
->nr_refpoints * sizeof(refpoints[0])
 
-Will do.
+[snip]
 
->> @@ -4541,6 +4544,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->>      smc->linux_pci_probe = true;
->>      smc->smp_threads_vsmt = true;
->>      smc->nr_xirqs = SPAPR_NR_XIRQS;
->> +    smc->nr_assoc_refpoints = 2;
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> index dc770421bc..b98cfea0e4 100644
+> --- a/include/hw/riscv/spike.h
+> +++ b/include/hw/riscv/spike.h
+> @@ -39,11 +39,9 @@ enum {
+>  };
 >
->When adding a new setting for the default machine type, we usually
->take care of older machine types at the same time, ie. folding this
->patch into the next one. Both patches are simple enough that it should
->be okay and this would avoid this line to be touched again.
+>  #if defined(TARGET_RISCV32)
+> -#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+> -#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+> +#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_SIFIVE_U34
+>  #elif defined(TARGET_RISCV64)
+> -#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV64GCSU_V1_09_1
+> -#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV64GCSU_V1_10_0
+> +#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_SIFIVE_U54
+>  #endif
 
-No problem. I'll squash the patches together and work in that PHB compat 
-property as well. 
+On a second thought, I think we should not use the SIFIVE CPU type
+here for Spike.
 
-Thanks for your feedback!
+It should use the one that is used by 'virt', eg: TYPE_RISCV_CPU_BASE{32,64=
+}
 
--- 
-Reza Arbab
+Regards,
+Bin
 
