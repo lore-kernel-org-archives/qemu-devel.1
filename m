@@ -2,121 +2,96 @@ Return-Path: <SRS0=muh1=7E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AF5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3639BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB9B620723
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA95F20723
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZE+f34Kk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9B620723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tiOPHOWx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA95F20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcAVX-00018B-5j
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:26:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40930)
+	id 1jcAai-0004DY-4K
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jcAP5-0003vP-KL; Fri, 22 May 2020 12:20:11 -0400
-Received: from mail-eopbgr140117.outbound.protection.outlook.com
- ([40.107.14.117]:21575 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jcAP3-0006pe-RL; Fri, 22 May 2020 12:20:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hfvDOxtlFVoaMl2mte7xldoZnoyy76YAXPfD+ZIzKoNBkE5ZuZn839+d4NrC2VIiW79O3bQrRn/2NPqI/ooKnEG7USMNVwFqsRBIbFSn0tHLicipHZIgXDyMoa7KlrXiGdrNPZHC+23xk7IGnNIs68Jz/zuvWEiGTE3z7PMZ9caf4yBspgl968DjTkFbCjHrUXQ/qJ09HpY7TYJHQ8qMYviwtjGBCkpxYO+dP8LIQEYZHzVeJRWAp/FZBT5mrJwluabfJ/NcjdnLEUIWEyc+6J2ju5stNx6pXhcnWPLlqju3PAeQC0fQ7MmjtbfHIN3UtNNzweXt2j0d7N6fHNJhqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dYWMp5HDECVRQT2SDRnh8CeuAXhijPwO86etutOHcgQ=;
- b=mggaKng/GTL4X8O8mn0sSTS7fsVtPga/6etNlNnwBNTmKgEfntx+vn4QmaeMHnM+QvxHAiMioIBi668bPhBwJnHqYM4nakLeghxM9O8sK6kDly3t5J4oP1/rRzfPjq3+++hOBqEOs+5noKvn8n86AtgJwRNBq2RwFnN9OasXGiwl7zknF+qOa3pEYriIBz5zWpL+XFqcZPUHXNfVmiEdugVu2Sec207iqdskyLfXI0eyzS3o36yMsoiJ071IjqMdICwlxrQynRIqe1hVHfzucvOWHYVLKoye/1JuQWiPV5IfP0BVI8H4D1Ev2283his9rzb/SzcLLHe0mjwUjKShPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dYWMp5HDECVRQT2SDRnh8CeuAXhijPwO86etutOHcgQ=;
- b=ZE+f34Kk1K3mVIkRj35lyxjxxT5UE+o0Fb/5KbwtDXuHsh5GNIPTFH8npVkozse9EhBQFetCrQ9CSQmILKB32/grmb1MIW2Cra2fZeiSgxhRaDMkUVrUR0gQ2tGQcRQ7o+yyvFa7f94v9GjlA359JY0NVxqtC0ydWZfOdoQBzEc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VI1PR08MB2813.eurprd08.prod.outlook.com (2603:10a6:802:1b::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 22 May
- 2020 16:20:06 +0000
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::2c53:d56b:77ba:8aac]) by VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::2c53:d56b:77ba:8aac%6]) with mapi id 15.20.3021.027; Fri, 22 May 2020
- 16:20:06 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 3/3] block: generate coroutine-wrapper code
-Date: Fri, 22 May 2020 19:19:50 +0300
-Message-Id: <20200522161950.2839-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200522161950.2839-1-vsementsov@virtuozzo.com>
-References: <20200522161950.2839-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR01CA0177.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:aa::46) To VI1PR08MB5503.eurprd08.prod.outlook.com
- (2603:10a6:803:137::19)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jcAa9-0003ne-8y
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:31:37 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:45822)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jcAa7-0000jL-Do
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:31:36 -0400
+Received: by mail-ej1-x641.google.com with SMTP id yc10so13647159ejb.12
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=QsSeKihwMe4diNyC+ByvdRSk1O1Gu6Hbw1XIX7lPDw8=;
+ b=tiOPHOWxk0cwWMaHZ0vQiqnf/78WqkKFJiTT+gec6ZAS6pE78a43ArIQ7Mm+81EZDf
+ zdXQ4zOtW6wwidwW4nC0Jv0smLy7A8+AN+5OwGvq0fI+RJ5jfiHZrKNasnwQHHL73V15
+ 2c1bAzyU6qt090xqaOqmgc3lCvmTrWhGJQm0IQfue+m1cxlpShYwpN8FBB47NI9eDW6x
+ aHbmyEO7tb+x4LipxtS0kVnf1oHJLZXhOuTaLpq5Bfx6idNLaJFwtogvrhgkOe9zu+ws
+ AzMINIgUhdRYA7DkAF3vwvfalJNru4lUIZC8FnRMhBQxK2wvFOHkG6Da4s1mIY4nONKr
+ kh5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=QsSeKihwMe4diNyC+ByvdRSk1O1Gu6Hbw1XIX7lPDw8=;
+ b=tISAob9g15u6z1vavkha/dIiOZ77tuXWi26X4KOgGYo55RzHXGLiWo1VPjrvEOYk/C
+ xAULRYwFy+BQFQLRmF4HUt0f8YCHrpBcOKIco1vZv0ZOu3brXOshm1fYqmOnGYJdpO39
+ uZduuFKcG0DizTQFcjIDNpf90iOz1a6C+ZnKGFUAKVrG+bmkW/mywDSH3IzS/yjCL121
+ RhhllRhTsA/As8NANlkFlPjsXrrRmRm2npCC8f4RWwnaAbqYIikJscRoiDmgQrC54Mf9
+ 78yIfd5qrcfOfY81pR9oUKu/R13wzYmr1jSNUNK/VpLeyyO1U2EtJRWfUZmieA2lA2RA
+ ozTg==
+X-Gm-Message-State: AOAM532T3QTw923VSMaKHHm2i676fTX7XmjF5I8A0ZHa+MpR9VAySpse
+ ZRlMVGy1fm5JDs+D5HnhGy/UTg==
+X-Google-Smtp-Source: ABdhPJzZsiraxQE1uECfAhdufsEwaR3m71Np4vky+YIUMu3ooGJcUZyHHflBF019JXkQS7pI91Eqdw==
+X-Received: by 2002:a17:906:3943:: with SMTP id
+ g3mr8607927eje.489.1590165093367; 
+ Fri, 22 May 2020 09:31:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a18sm7584038edb.44.2020.05.22.09.31.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 22 May 2020 09:31:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4552E1FF7E;
+ Fri, 22 May 2020 17:31:31 +0100 (BST)
+References: <20200519132259.405-1-robert.foley@linaro.org>
+ <20200519132259.405-13-robert.foley@linaro.org>
+User-agent: mu4e 1.4.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v7 12/12] tests/vm: Add workaround to consume console
+In-reply-to: <20200519132259.405-13-robert.foley@linaro.org>
+Date: Fri, 22 May 2020 17:31:31 +0100
+Message-ID: <87zha0c4nw.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.182) by
- AM0PR01CA0177.eurprd01.prod.exchangelabs.com (2603:10a6:208:aa::46) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.24 via Frontend
- Transport; Fri, 22 May 2020 16:20:05 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.182]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c4645a6c-de35-4a4f-020c-08d7fe6bfd72
-X-MS-TrafficTypeDiagnostic: VI1PR08MB2813:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB28135849FA56B5E8EF203A5EC1B40@VI1PR08MB2813.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-Forefront-PRVS: 04111BAC64
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bqNxCp5ZIDnSGnuATsHFvp0ISpIKwij3+K4X9JiYoYj67Uhnb7Qj7oXZYWeC9zgjQ/l8J2/gDlsRyKOVs2cQtivhrh4wRP+V1yxp85oEQ+HBnH1pi62zj4bV2u22IpVxyu4IWPGLNpPrg8XLpBrpBfvsk7COTkqmMLsiUJEkhxsKA8MSCBBO58STiaEn1pMi8hGrGMXQNU6qBEgxyhUXypYPg20740RORL8TeAC0K5Fs8H9KE+Feg0D1pMlDORszM4HXFu7q+aTgnV/ta2ofOTAQTYfYmauMM8e1Jqj8kQXaMbgsCwysRwxO8K8yTw/fYorFi6HS7of9dyy9VcTqT8qZ5VA+GVuaGfRHTZekMjaPtnHXe+2d9hSCsACzEzVnxMiZSkOwa9T29fu3jtquWwjuiZi+kstEEoDW42iFTc3y1NX4IVnlv0W0/9mAsrLHk2+Hhx/suEHOfLTLurZI6Wg4cLFiVw40LCcuh4oEgRAs2G0Xs03FzCDH3a2N/poxgFfXG88xKqes7NSOSLqv2Pb14hqGXAdVZ3NWYVJSwLtxwVsgeI04e96vbFHvfTclkAEhLrxWZ4vEO4QgpjUtbtmD2xPv7cd+4S+HiE30gbA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(136003)(396003)(366004)(39840400004)(186003)(30864003)(1076003)(52116002)(26005)(6486002)(16526019)(2906002)(5660300002)(86362001)(8676002)(69590400007)(6916009)(4326008)(66556008)(6506007)(36756003)(478600001)(107886003)(316002)(66946007)(8936002)(6666004)(66476007)(6512007)(2616005)(956004)(2004002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eu24u6hFOWlh0G2chUa4gdzoQfEZBJKKu3x0U4UNNXugFl/kCFQkKPDVOnfnQdIjANfWeF5TmFb7Du3oc2dHuPfRhXHgQWH2AuVPjUyaOq53FVTti3uKTurJ0QkjNIu3zvQUm0nuEEP//3tfAXLJtsGo7BfWcsyRuxTYKJm/C623QfegsIMWenLdzYLsCNuNOIHKu8dwm7bAuRlaJZb8oioDb9b6yv+x7+oYXoOqCaf5EqvKEmbSX4nWV0qWWBEbAVbbc6w2YdLE0uAOgW/NJ0ocRhVtecVdx/MVfvGyPdIMtBCIPjKj48ZLtMsLN8ktyYDnp5DATQvZIfioll1HNqxrNpJ9wx+dF89cGEv7DUgVI9WDsziQD1PC5dULagUBTJAhGM2pJ0PennftOxzANyEVfERmE1m2yc40OigAMW1D1gnzNfA+7+EkoYc1eKXEd+YUutn4gNLgMCs0TDNtOnjznLSL5f7Tz1uJe70xmyU=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4645a6c-de35-4a4f-020c-08d7fe6bfd72
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2020 16:20:06.5806 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZZoIbA048RYykZauyuC2uO6z0EJ9FQACTIiOLcfNN8WHIW+ZLhTZkAxNyB9tXl88cJKVubqc5oLndqi5h2yODm9HcBLO4pwHXYrn4GW5544=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB2813
-Received-SPF: pass client-ip=40.107.14.117;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 12:20:04
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 5
-X-Spam_score: 0.5
-X-Spam_bar: /
-X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, RCVD_IN_SBL_CSS=3.335,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=alex.bennee@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -130,833 +105,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- ehabkost@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, crosa@redhat.com, den@openvz.org
+Cc: peter.puhov@linaro.org, Cleber Rosa <crosa@redhat.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have a very frequent pattern of creating coroutine from function
-with several arguments:
 
-  - create structure to pack parameters
-  - create _entry function to call original function taking parameters
-    from struct
-  - do different magic to handle completion: set ret to NOT_DONE or
-    EINPROGRESS, use separate bool for void functions
-  - fill the struct and create coroutine from _entry function and this
-    struct as a parameter
-  - do coroutine enter and BDRV_POLL_WHILE loop
+Robert Foley <robert.foley@linaro.org> writes:
 
-Let's reduce code duplication. Here:
+I think you need to look at adding:
 
-Functional part (BDRV_POLL_WHILE loop, aio_wait_kick()) moved to
-(non-generated) block/block-gen.h
+[sendemail]
+	cccmd =3D scripts/get_maintainer.pl --nogit-fallback
 
-Mechanical part (arguments packing, different kind of needed wrappers)
-are generated from template by scripts/coroutine-wrapper.py to
-resulting file block/block-gen.c
+to your .git/config to ensure maintainers get pinged when you touch
+their subsystems. Eduardo and Cleber CC'd=20
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- Makefile                             |   6 +
- block/block-gen.h                    |  30 ++++
- block/coroutines.h                   |   7 +-
- include/block/block.h                |  17 +-
- include/block/generated-co-wrapper.h |  11 ++
- block.c                              |  70 --------
- block/io.c                           | 260 ---------------------------
- block/Makefile.objs                  |   1 +
- scripts/coroutine-wrapper.py         | 169 +++++++++++++++++
- 9 files changed, 232 insertions(+), 339 deletions(-)
- create mode 100644 block/block-gen.h
- create mode 100644 include/block/generated-co-wrapper.h
- create mode 100755 scripts/coroutine-wrapper.py
+> The ConsoleSocket object provides a socket interface
+> which will consume all arriving characters on the
+> socket, but will provide those chars via recv() as
+> would a regular socket.
+> This is a workaround we found was needed since
+> there is a known issue where QEMU will hang waiting
+> for console characters to be consumed.
+> We also add the option of logging the console to a file.
+>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> ---
+>  python/qemu/console_socket.py | 162 ++++++++++++++++++++++++++++++++++
+>  python/qemu/machine.py        |  23 ++++-
+>  tests/vm/Makefile.include     |   4 +
+>  tests/vm/basevm.py            |  19 +++-
+>  4 files changed, 202 insertions(+), 6 deletions(-)
+>  create mode 100644 python/qemu/console_socket.py
+>
+> diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
+> new file mode 100644
+> index 0000000000..a1f74e60ac
+> --- /dev/null
+> +++ b/python/qemu/console_socket.py
+> @@ -0,0 +1,162 @@
+> +#!/usr/bin/env python3
+> +#
+> +# This python module implements a ConsoleSocket object which is
+> +# designed always drain the socket itself, and place
+> +# the bytes into a in memory buffer for later processing.
+> +#
+> +# Optionally a file path can be passed in and we will also
+> +# dump the characters to this file for debug.
+> +#
+> +# Copyright 2020 Linaro
+> +#
+> +# Authors:
+> +#  Robert Foley <robert.foley@linaro.org>
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +import asyncore
+> +import socket
+> +import threading
+> +import io
+> +import os
+> +import sys
+> +from collections import deque
+> +import time
+> +import traceback
 
-diff --git a/Makefile b/Makefile
-index 40e4f7677b..67b1c7852f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -159,6 +159,8 @@ generated-files-$(CONFIG_TRACE_UST) += trace-ust-all.c
- 
- generated-files-y += module_block.h
- 
-+GENERATED_FILES += block/block-gen.c
-+
- TRACE_HEADERS = trace-root.h $(trace-events-subdirs:%=%/trace.h)
- TRACE_SOURCES = trace-root.c $(trace-events-subdirs:%=%/trace.c)
- TRACE_DTRACE =
-@@ -175,6 +177,10 @@ generated-files-y += $(TRACE_SOURCES)
- generated-files-y += $(BUILD_DIR)/trace-events-all
- generated-files-y += .git-submodule-status
- 
-+COROUTINE_HEADERS = include/block/block.h block/coroutines.h
-+block/block-gen.c: $(COROUTINE_HEADERS) $(SRC_PATH)/scripts/coroutine-wrapper.py
-+	$(call quiet-command, cat $(COROUTINE_HEADERS) | $(SRC_PATH)/scripts/coroutine-wrapper.py > $@,"GEN","$(TARGET_DIR)$@")
-+
- trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
- 
- tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-diff --git a/block/block-gen.h b/block/block-gen.h
-new file mode 100644
-index 0000000000..79762cdda9
---- /dev/null
-+++ b/block/block-gen.h
-@@ -0,0 +1,30 @@
-+#ifndef BLOCK_BLOCK_GEN_H
-+#define BLOCK_BLOCK_GEN_H
-+
-+#include "block/block_int.h"
-+
-+/* This function is called at the end of generated coroutine entries. */
-+static inline void bdrv_poll_co__on_exit(void)
-+{
-+    aio_wait_kick();
-+}
-+
-+/* Base structure for argument packing structures */
-+typedef struct BdrvPollCo {
-+    BlockDriverState *bs;
-+    bool in_progress;
-+    int ret;
-+    Coroutine *co; /* Keep pointer here for debugging */
-+} BdrvPollCo;
-+
-+static inline int bdrv_poll_co(BdrvPollCo *s)
-+{
-+    assert(!qemu_in_coroutine());
-+
-+    bdrv_coroutine_enter(s->bs, s->co);
-+    BDRV_POLL_WHILE(s->bs, s->in_progress);
-+
-+    return s->ret;
-+}
-+
-+#endif /* BLOCK_BLOCK_GEN_H */
-diff --git a/block/coroutines.h b/block/coroutines.h
-index 23ea6fd5b3..6eb32ac387 100644
---- a/block/coroutines.h
-+++ b/block/coroutines.h
-@@ -2,6 +2,7 @@
- #define BLOCK_COROUTINES_INT_H
- 
- #include "block/block_int.h"
-+#include "block/generated-co-wrapper.h"
- 
- int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-                                BdrvCheckResult *res, BdrvCheckMode fix);
-@@ -10,7 +11,7 @@ void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
- int coroutine_fn
- bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
-              bool is_write, BdrvRequestFlags flags);
--int
-+int generated_co_wrapper
- bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
-           bool is_write, BdrvRequestFlags flags);
- 
-@@ -23,7 +24,7 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-                                   int64_t *pnum,
-                                   int64_t *map,
-                                   BlockDriverState **file);
--int
-+int generated_co_wrapper
- bdrv_common_block_status_above(BlockDriverState *bs,
-                                BlockDriverState *base,
-                                bool want_zero,
-@@ -36,7 +37,7 @@ bdrv_common_block_status_above(BlockDriverState *bs,
- int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read);
--int
-+int generated_co_wrapper
- bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                 bool is_read);
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 25e299605e..aed6ffcc4f 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -9,6 +9,7 @@
- #include "block/dirty-bitmap.h"
- #include "block/blockjob.h"
- #include "qemu/hbitmap.h"
-+#include "block/generated-co-wrapper.h"
- 
- /* block.c */
- typedef struct BlockDriver BlockDriver;
-@@ -398,8 +399,9 @@ void bdrv_refresh_filename(BlockDriverState *bs);
- int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
-                                   PreallocMode prealloc, BdrvRequestFlags flags,
-                                   Error **errp);
--int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
--                  PreallocMode prealloc, BdrvRequestFlags flags, Error **errp);
-+int generated_co_wrapper
-+bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
-+              PreallocMode prealloc, BdrvRequestFlags flags, Error **errp);
- 
- int64_t bdrv_nb_sectors(BlockDriverState *bs);
- int64_t bdrv_getlength(BlockDriverState *bs);
-@@ -441,7 +443,8 @@ typedef enum {
-     BDRV_FIX_ERRORS   = 2,
- } BdrvCheckMode;
- 
--int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
-+int generated_co_wrapper bdrv_check(BlockDriverState *bs, BdrvCheckResult *res,
-+                                    BdrvCheckMode fix);
- 
- /* The units of offset and total_work_size may be chosen arbitrarily by the
-  * block driver; total_work_size may change during the course of the amendment
-@@ -464,12 +467,13 @@ void bdrv_aio_cancel_async(BlockAIOCB *acb);
- int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf);
- 
- /* Invalidate any cached metadata used by image formats */
--void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
-+void generated_co_wrapper bdrv_invalidate_cache(BlockDriverState *bs,
-+                                                Error **errp);
- void bdrv_invalidate_cache_all(Error **errp);
- int bdrv_inactivate_all(void);
- 
- /* Ensure contents are flushed to disk.  */
--int bdrv_flush(BlockDriverState *bs);
-+int generated_co_wrapper bdrv_flush(BlockDriverState *bs);
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
- int bdrv_flush_all(void);
- void bdrv_close_all(void);
-@@ -484,7 +488,8 @@ void bdrv_drain_all(void);
-     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
-                    cond); })
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
-+int generated_co_wrapper bdrv_pdiscard(BdrvChild *child, int64_t offset,
-+                                       int64_t bytes);
- int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
- int bdrv_has_zero_init_1(BlockDriverState *bs);
- int bdrv_has_zero_init(BlockDriverState *bs);
-diff --git a/include/block/generated-co-wrapper.h b/include/block/generated-co-wrapper.h
-new file mode 100644
-index 0000000000..80a5433af4
---- /dev/null
-+++ b/include/block/generated-co-wrapper.h
-@@ -0,0 +1,11 @@
-+#ifndef BLOCK_GENERATED_CO_WRAPPER_H
-+#define BLOCK_GENERATED_CO_WRAPPER_H
-+
-+/*
-+ * generated_co_wrapper
-+ * Function specifier, which does nothing but marking functions to be
-+ * generated by scripts/coroutine-wrapper.py
-+ */
-+#define generated_co_wrapper
-+
-+#endif /* BLOCK_GENERATED_CO_WRAPPER_H */
-diff --git a/block.c b/block.c
-index 7f06e82880..c1132ab323 100644
---- a/block.c
-+++ b/block.c
-@@ -4640,43 +4640,6 @@ int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-     return bs->drv->bdrv_co_check(bs, res, fix);
- }
- 
--typedef struct CheckCo {
--    BlockDriverState *bs;
--    BdrvCheckResult *res;
--    BdrvCheckMode fix;
--    int ret;
--} CheckCo;
--
--static void coroutine_fn bdrv_check_co_entry(void *opaque)
--{
--    CheckCo *cco = opaque;
--    cco->ret = bdrv_co_check(cco->bs, cco->res, cco->fix);
--    aio_wait_kick();
--}
--
--int bdrv_check(BlockDriverState *bs,
--               BdrvCheckResult *res, BdrvCheckMode fix)
--{
--    Coroutine *co;
--    CheckCo cco = {
--        .bs = bs,
--        .res = res,
--        .ret = -EINPROGRESS,
--        .fix = fix,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_check_co_entry(&cco);
--    } else {
--        co = qemu_coroutine_create(bdrv_check_co_entry, &cco);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, cco.ret == -EINPROGRESS);
--    }
--
--    return cco.ret;
--}
--
- /*
-  * Return values:
-  * 0        - success
-@@ -5721,39 +5684,6 @@ void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp)
-     }
- }
- 
--typedef struct InvalidateCacheCo {
--    BlockDriverState *bs;
--    Error **errp;
--    bool done;
--} InvalidateCacheCo;
--
--static void coroutine_fn bdrv_invalidate_cache_co_entry(void *opaque)
--{
--    InvalidateCacheCo *ico = opaque;
--    bdrv_co_invalidate_cache(ico->bs, ico->errp);
--    ico->done = true;
--    aio_wait_kick();
--}
--
--void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
--{
--    Coroutine *co;
--    InvalidateCacheCo ico = {
--        .bs = bs,
--        .done = false,
--        .errp = errp
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_invalidate_cache_co_entry(&ico);
--    } else {
--        co = qemu_coroutine_create(bdrv_invalidate_cache_co_entry, &ico);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, !ico.done);
--    }
--}
--
- void bdrv_invalidate_cache_all(Error **errp)
- {
-     BlockDriverState *bs;
-diff --git a/block/io.c b/block/io.c
-index f5b6ce3bf6..f9700cc897 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -892,15 +892,6 @@ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-     return 0;
- }
- 
--typedef struct RwCo {
--    BdrvChild *child;
--    int64_t offset;
--    QEMUIOVector *qiov;
--    bool is_write;
--    int ret;
--    BdrvRequestFlags flags;
--} RwCo;
--
- int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
-                               QEMUIOVector *qiov, bool is_write,
-                               BdrvRequestFlags flags)
-@@ -912,43 +903,6 @@ int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
-     }
- }
- 
--static void coroutine_fn bdrv_rw_co_entry(void *opaque)
--{
--    RwCo *rwco = opaque;
--
--    rwco->ret = bdrv_co_prwv(rwco->child, rwco->offset, rwco->qiov,
--                             rwco->is_write, rwco->flags);
--    aio_wait_kick();
--}
--
--/*
-- * Process a vectored synchronous request using coroutines
-- */
--int bdrv_prwv(BdrvChild *child, int64_t offset,
--              QEMUIOVector *qiov, bool is_write,
--              BdrvRequestFlags flags)
--{
--    Coroutine *co;
--    RwCo rwco = {
--        .child = child,
--        .offset = offset,
--        .qiov = qiov,
--        .is_write = is_write,
--        .ret = NOT_DONE,
--        .flags = flags,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_rw_co_entry(&rwco);
--    } else {
--        co = qemu_coroutine_create(bdrv_rw_co_entry, &rwco);
--        bdrv_coroutine_enter(child->bs, co);
--        BDRV_POLL_WHILE(child->bs, rwco.ret == NOT_DONE);
--    }
--    return rwco.ret;
--}
--
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags)
- {
-@@ -2223,20 +2177,6 @@ int bdrv_flush_all(void)
-     return result;
- }
- 
--
--typedef struct BdrvCoBlockStatusData {
--    BlockDriverState *bs;
--    BlockDriverState *base;
--    bool want_zero;
--    int64_t offset;
--    int64_t bytes;
--    int64_t *pnum;
--    int64_t *map;
--    BlockDriverState **file;
--    int ret;
--    bool done;
--} BdrvCoBlockStatusData;
--
- int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
-                                                 bool want_zero,
-                                                 int64_t offset,
-@@ -2488,56 +2428,6 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-     return ret;
- }
- 
--/* Coroutine wrapper for bdrv_block_status_above() */
--static void coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
--{
--    BdrvCoBlockStatusData *data = opaque;
--
--    data->ret = bdrv_co_common_block_status_above(data->bs, data->base,
--                                                  data->want_zero,
--                                                  data->offset, data->bytes,
--                                                  data->pnum, data->map,
--                                                  data->file);
--    data->done = true;
--    aio_wait_kick();
--}
--
--/*
-- * Synchronous wrapper around bdrv_co_block_status_above().
-- *
-- * See bdrv_co_block_status_above() for details.
-- */
--int bdrv_common_block_status_above(BlockDriverState *bs,
--                                   BlockDriverState *base,
--                                   bool want_zero, int64_t offset,
--                                   int64_t bytes, int64_t *pnum,
--                                   int64_t *map,
--                                   BlockDriverState **file)
--{
--    Coroutine *co;
--    BdrvCoBlockStatusData data = {
--        .bs = bs,
--        .base = base,
--        .want_zero = want_zero,
--        .offset = offset,
--        .bytes = bytes,
--        .pnum = pnum,
--        .map = map,
--        .file = file,
--        .done = false,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_block_status_above_co_entry(&data);
--    } else {
--        co = qemu_coroutine_create(bdrv_block_status_above_co_entry, &data);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, !data.done);
--    }
--    return data.ret;
--}
--
- int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
-                             int64_t offset, int64_t bytes, int64_t *pnum,
-                             int64_t *map, BlockDriverState **file)
-@@ -2631,14 +2521,6 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-     return 0;
- }
- 
--typedef struct BdrvVmstateCo {
--    BlockDriverState    *bs;
--    QEMUIOVector        *qiov;
--    int64_t             pos;
--    bool                is_read;
--    int                 ret;
--} BdrvVmstateCo;
--
- int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read)
-@@ -2664,34 +2546,6 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-     return ret;
- }
- 
--static void coroutine_fn bdrv_co_rw_vmstate_entry(void *opaque)
--{
--    BdrvVmstateCo *co = opaque;
--    co->ret = bdrv_co_rw_vmstate(co->bs, co->qiov, co->pos, co->is_read);
--    aio_wait_kick();
--}
--
--int bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                    bool is_read)
--{
--    if (qemu_in_coroutine()) {
--        return bdrv_co_rw_vmstate(bs, qiov, pos, is_read);
--    } else {
--        BdrvVmstateCo data = {
--            .bs         = bs,
--            .qiov       = qiov,
--            .pos        = pos,
--            .is_read    = is_read,
--            .ret        = -EINPROGRESS,
--        };
--        Coroutine *co = qemu_coroutine_create(bdrv_co_rw_vmstate_entry, &data);
--
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, data.ret == -EINPROGRESS);
--        return data.ret;
--    }
--}
--
- int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size)
- {
-@@ -2767,20 +2621,6 @@ void bdrv_aio_cancel_async(BlockAIOCB *acb)
- /**************************************************************/
- /* Coroutine block device emulation */
- 
--typedef struct FlushCo {
--    BlockDriverState *bs;
--    int ret;
--} FlushCo;
--
--
--static void coroutine_fn bdrv_flush_co_entry(void *opaque)
--{
--    FlushCo *rwco = opaque;
--
--    rwco->ret = bdrv_co_flush(rwco->bs);
--    aio_wait_kick();
--}
--
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
- {
-     int current_gen;
-@@ -2893,40 +2733,6 @@ early_exit:
-     return ret;
- }
- 
--int bdrv_flush(BlockDriverState *bs)
--{
--    Coroutine *co;
--    FlushCo flush_co = {
--        .bs = bs,
--        .ret = NOT_DONE,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_flush_co_entry(&flush_co);
--    } else {
--        co = qemu_coroutine_create(bdrv_flush_co_entry, &flush_co);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, flush_co.ret == NOT_DONE);
--    }
--
--    return flush_co.ret;
--}
--
--typedef struct DiscardCo {
--    BdrvChild *child;
--    int64_t offset;
--    int64_t bytes;
--    int ret;
--} DiscardCo;
--static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
--{
--    DiscardCo *rwco = opaque;
--
--    rwco->ret = bdrv_co_pdiscard(rwco->child, rwco->offset, rwco->bytes);
--    aio_wait_kick();
--}
--
- int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
-                                   int64_t bytes)
- {
-@@ -3041,28 +2847,6 @@ out:
-     return ret;
- }
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
--{
--    Coroutine *co;
--    DiscardCo rwco = {
--        .child = child,
--        .offset = offset,
--        .bytes = bytes,
--        .ret = NOT_DONE,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_pdiscard_co_entry(&rwco);
--    } else {
--        co = qemu_coroutine_create(bdrv_pdiscard_co_entry, &rwco);
--        bdrv_coroutine_enter(child->bs, co);
--        BDRV_POLL_WHILE(child->bs, rwco.ret == NOT_DONE);
--    }
--
--    return rwco.ret;
--}
--
- int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
- {
-     BlockDriver *drv = bs->drv;
-@@ -3460,47 +3244,3 @@ out:
- 
-     return ret;
- }
--
--typedef struct TruncateCo {
--    BdrvChild *child;
--    int64_t offset;
--    bool exact;
--    PreallocMode prealloc;
--    BdrvRequestFlags flags;
--    Error **errp;
--    int ret;
--} TruncateCo;
--
--static void coroutine_fn bdrv_truncate_co_entry(void *opaque)
--{
--    TruncateCo *tco = opaque;
--    tco->ret = bdrv_co_truncate(tco->child, tco->offset, tco->exact,
--                                tco->prealloc, tco->flags, tco->errp);
--    aio_wait_kick();
--}
--
--int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
--                  PreallocMode prealloc, BdrvRequestFlags flags, Error **errp)
--{
--    Coroutine *co;
--    TruncateCo tco = {
--        .child      = child,
--        .offset     = offset,
--        .exact      = exact,
--        .prealloc   = prealloc,
--        .flags      = flags,
--        .errp       = errp,
--        .ret        = NOT_DONE,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_truncate_co_entry(&tco);
--    } else {
--        co = qemu_coroutine_create(bdrv_truncate_co_entry, &tco);
--        bdrv_coroutine_enter(child->bs, co);
--        BDRV_POLL_WHILE(child->bs, tco.ret == NOT_DONE);
--    }
--
--    return tco.ret;
--}
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 3635b6b4c1..05e4d033c1 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -45,6 +45,7 @@ block-obj-y += crypto.o
- block-obj-y += aio_task.o
- block-obj-y += backup-top.o
- block-obj-y += filter-compress.o
-+block-obj-y += block-gen.o
- common-obj-y += monitor/
- 
- block-obj-y += stream.o
-diff --git a/scripts/coroutine-wrapper.py b/scripts/coroutine-wrapper.py
-new file mode 100755
-index 0000000000..cd9eefbe28
---- /dev/null
-+++ b/scripts/coroutine-wrapper.py
-@@ -0,0 +1,169 @@
-+#!/usr/bin/env python3
-+#
-+# Generate coroutine wrappers for block subsystem.
-+#
-+# Copyright (c) 2020 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import re
-+from typing import List, Iterator
-+
-+header = """/*
-+ * File is generated by scripts/coroutine-wrapper.py
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/coroutines.h"
-+#include "block/block-gen.h"
-+"""
-+
-+template = """
-+/*
-+ * Wrappers for $name$
-+ */
-+
-+typedef struct $struct_name$ {
-+    BdrvPollCo poll_state;
-+    $fields$
-+} $struct_name$;
-+
-+static void coroutine_fn $name$_entry(void *opaque)
-+{
-+    $struct_name$ *s = opaque;
-+
-+    $assign_ret$$name$($args_from_s$);
-+
-+    s->poll_state.in_progress = false;
-+
-+    bdrv_poll_co__on_exit();
-+}
-+
-+$ret_type$ $wrapper_name$($args_def$)
-+{
-+    if (qemu_in_coroutine()) {
-+        $do_return$$name$($arg_names$);
-+    } else {
-+        $struct_name$ s = {
-+            .poll_state.bs = $bs$,
-+            .poll_state.in_progress = true,
-+
-+            $initializers$
-+        };
-+
-+        s.poll_state.co = qemu_coroutine_create($name$_entry, &s);
-+
-+        $do_return$bdrv_poll_co(&s.poll_state);
-+    }
-+}
-+"""
-+
-+# We want to use python string.format() formatter, which uses curly brackets
-+# as separators. But it's not comfortable with C. So, we used dollars instead,
-+# and now is the time to escape curly brackets and convert dollars.
-+template = template.replace('{', '{{').replace('}', '}}')
-+template = re.sub(r'\$(\w+)\$', r'{\1}', template)
-+
-+
-+class ParamDecl:
-+    param_re = re.compile(r'(?P<decl>'
-+                          r'(?P<type>.*[ *])'
-+                          r'(?P<name>[a-z][a-z0-9_]*)'
-+                          r')')
-+
-+    def __init__(self, param_decl: str) -> None:
-+        m = self.param_re.match(param_decl.strip())
-+        self.decl = m.group('decl')
-+        self.type = m.group('type')
-+        self.name = m.group('name')
-+
-+
-+class FuncDecl:
-+    def __init__(self, return_type: str, name: str, args: str) -> None:
-+        self.return_type = return_type.strip()
-+        self.name = name.strip()
-+        self.args: List[ParamDecl] = []
-+        self.args = [ParamDecl(arg) for arg in args.split(',')]
-+
-+    def get_args_decl(self) -> str:
-+        return ', '.join(arg.decl for arg in self.args)
-+
-+    def get_arg_names(self) -> str:
-+        return ', '.join(arg.name for arg in self.args)
-+
-+    def gen_struct_fields(self) -> str:
-+        return '\n    '.join(f'{arg.decl};' for arg in self.args)
-+
-+    def gen_struct_initializers(self, indent: int) -> str:
-+        sep = '\n' + ' ' * indent
-+        return sep.join(f'.{a.name} = {a.name},' for a in self.args)
-+
-+
-+# Match wrappers declaration, with generated_co_wrapper mark
-+func_decl_re = re.compile(r'^(?P<return_type>(int|void))'
-+                          r'\s*generated_co_wrapper\s*'
-+                          r'(?P<wrapper_name>[a-z][a-z0-9_]*)'
-+                          r'\((?P<args>[^)]*)\);$', re.MULTILINE)
-+
-+
-+def func_decl_iter(text: str) -> Iterator:
-+    for m in func_decl_re.finditer(text):
-+        yield FuncDecl(return_type=m.group('return_type'),
-+                       name=m.group('wrapper_name'),
-+                       args=m.group('args'))
-+
-+
-+def struct_name(func_name: str) -> str:
-+    """some_function_name -> SomeFunctionName"""
-+    words = func_name.split('_')
-+    words = [w[0].upper() + w[1:] for w in words]
-+    return ''.join(words)
-+
-+
-+def make_wrapper(func: FuncDecl) -> str:
-+    assert func.name.startswith('bdrv_')
-+    co_name = 'bdrv_co_' + func.name[5:]
-+
-+    has_ret = func.return_type != 'void'
-+
-+    params = {
-+        'name': co_name,
-+        'do_return': 'return ' if has_ret else '',
-+        'assign_ret': 's->poll_state.ret = ' if has_ret else '',
-+        'struct_name': struct_name(co_name),
-+        'wrapper_name': func.name,
-+        'ret_type': func.return_type,
-+        'args_def': func.get_args_decl(),
-+        'arg_names': func.get_arg_names(),
-+        'fields': func.gen_struct_fields(),
-+        'initializers': func.gen_struct_initializers(12),
-+        'args_from_s': ', '.join(f's->{a.name}' for a in func.args),
-+    }
-+
-+    if func.args[0].type == 'BlockDriverState *':
-+        params['bs'] = 'bs'
-+    else:
-+        assert func.args[0].type == 'BdrvChild *'
-+        params['bs'] = 'child->bs'
-+
-+    return template.format(**params)
-+
-+
-+if __name__ == '__main__':
-+    import sys
-+
-+    print(header)
-+    for func in func_decl_iter(sys.stdin.read()):
-+        print(make_wrapper(func))
--- 
-2.21.0
+Left over debug?
 
+> +
+> +class ConsoleSocket(asyncore.dispatcher):
+> +
+> +    def __init__(self, address, file=3DNone):
+> +        self._recv_timeout_sec =3D 300
+> +        self._buffer =3D deque()
+> +        self._asyncore_thread =3D None
+> +        self._sock =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+> +        self._sock.connect(address)
+> +        self._logfile =3D None
+> +        if file:
+> +            self._logfile =3D open(file, "w")
+> +        asyncore.dispatcher.__init__(self, sock=3Dself._sock)
+> +        self._thread_start()
+> +        self._open =3D True
+> +
+> +    def _thread_start(self):
+> +        """Kick off a thread to wait on the asyncore.loop"""
+> +        if self._asyncore_thread is not None:
+> +            return
+> +        self._asyncore_thread =3D threading.Thread(target=3Dasyncore.loo=
+p,
+> +                                                 kwargs=3D{'timeout':1})
+> +        self._asyncore_thread.daemon =3D True
+> +        self._asyncore_thread.start()
+> +
+> +    def handle_close(self):
+> +        """redirect close to base class"""
+> +        # Call the base class close, but not self.close() since
+> +        # handle_close() occurs in the context of the thread which
+> +        # self.close() attempts to join.
+> +        asyncore.dispatcher.close(self)
+> +
+> +    def close(self):
+> +        """Close the base object and wait for the thread to terminate"""
+> +        if self._open:
+> +            self._open =3D False
+> +            asyncore.dispatcher.close(self)
+> +            if self._asyncore_thread is not None:
+> +                thread, self._asyncore_thread =3D self._asyncore_thread,=
+ None
+> +                thread.join()
+> +            if self._logfile:
+> +                self._logfile.close()
+> +                self._logfile =3D None
+> +
+> +    def handle_read(self):
+> +        """process arriving characters into in memory _buffer"""
+> +        try:
+> +            data =3D asyncore.dispatcher.recv(self, 1)
+> +            # latin1 is needed since there are some chars
+> +            # we are receiving that cannot be encoded to utf-8
+> +            # such as 0xe2, 0x80, 0xA6.
+> +            string =3D data.decode("latin1")
+> +        except:
+> +            print("Exception seen.")
+> +            traceback.print_exc()
+> +            return
+> +        if self._logfile:
+> +            self._logfile.write("{}".format(string))
+> +            self._logfile.flush()
+> +        for c in string:
+> +            self._buffer.append(c)
+> +
+> +    def recv(self, n=3D1):
+> +        """Return chars from in memory buffer"""
+> +        start_time =3D time.time()
+> +        while len(self._buffer) < n:
+> +            time.sleep(0.1)
+> +            elapsed_sec =3D time.time() - start_time
+> +            if elapsed_sec > self._recv_timeout_sec:
+> +                raise socket.timeout
+> +        chars =3D ''.join([self._buffer.popleft() for i in range(n)])
+> +        # We choose to use latin1 to remain consistent with
+> +        # handle_read() and give back the same data as the user would
+> +        # receive if they were reading directly from the
+> +        # socket w/o our intervention.
+> +        return chars.encode("latin1")
+> +
+> +    def set_blocking(self):
+> +        """Maintain compatibility with socket API"""
+> +        pass
+> +
+> +    def settimeout(self, seconds):
+> +        """Set current timeout on recv"""
+> +        self._recv_timeout_sec =3D seconds
+> +
+> +class ByteBuffer(deque):
+> +    """Simple in memory buffer with read/write interface"""
+> +    def write(self, bytes):
+> +        for i in bytes:
+> +            self.append(i)
+> +    def read(self, n):
+> +        return ''.join([self.popleft() for i in range(n)])
+> +
+> +if __name__ =3D=3D '__main__':
+
+If the module is meant to be executable then you need to +x the file.
+However since 8f8fd9edba I think everything is meant to be doing things
+the pythonic way as a proper module. I'm not sure where unit tests for
+the modules are meant to sit in this case.
+
+> +    # Brief test to exercise the above code.
+> +    # The ConsoleSocket will ship some data to the server,
+> +    # the server will echo it back and the client will echo what it rece=
+ived.
+> +
+> +    # First remove the socket.
+> +    address =3D "./test_console_socket"
+> +    if os.path.exists(address):
+> +        os.unlink(address)
+> +
+> +    # Create the server side.
+> +    server_socket =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+> +    server_socket.bind(address)
+> +    server_socket.listen(1)
+> +
+> +    # Create the object we are trying to test.
+> +    console_socket =3D ConsoleSocket(address, file=3D"./logfile.txt")
+> +
+> +    # Generate some data and ship it over the socket.
+> +    send_data =3D ""
+> +    for i in range(10):
+> +        send_data +=3D "this is a test message {}\n".format(i)
+> +    console_socket.send(send_data.encode('latin1'))
+> +    connection, client_address =3D server_socket.accept()
+> +
+> +    # Process the data on the server and ship it back.
+> +    data =3D connection.recv(len(send_data))
+> +    print("server received: {}".format(data))
+> +    print("server: sending data back to the client")
+> +    connection.sendall(data)
+> +
+> +    # Client receives teh bytes and displays them.
+
+s/teh/the/
+
+> +    print("client: receiving bytes")
+> +    bytes =3D console_socket.recv(len(data))
+> +    recv_data =3D bytes.decode('latin1')
+> +    print("client received: {}".format(recv_data))
+> +    assert(recv_data =3D=3D send_data)
+> +    # Close console connection first, then close server.
+> +    console_socket.close()
+> +    connection.close()
+> +    server_socket.close()
+> +    print("test successful.")
+> +
+
+I think in this case it might be worth splitting introducing the
+functionally into the python library from the actual usage of it in the
+wider machines.
+
+Otherwise it seems to work well enough for me. I'd like the proper
+python gurus to have a look over it though.
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
