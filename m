@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1381C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE0CFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:19:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE6A720679
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EB5720663
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 May 2020 16:19:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oYEvkOCJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6A720679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WHSPHQjy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB5720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcANj-0008Et-Qx
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:18:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40354)
+	id 1jcAOZ-00026e-Np
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 12:19:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKI-0002rP-AA
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:14 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34113)
+ id 1jcAKZ-0003GA-V0
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:32 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40166)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jcAKH-00068Z-2l
- for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:13 -0400
-Received: by mail-pf1-x442.google.com with SMTP id z64so881534pfb.1
- for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:12 -0700 (PDT)
+ id 1jcAKY-0006GA-NT
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 12:15:31 -0400
+Received: by mail-pl1-x641.google.com with SMTP id t16so4573855plo.7
+ for <qemu-devel@nongnu.org>; Fri, 22 May 2020 09:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=JYiXtqj6gRVqxuRODQQz1eMSRJbQ7+uu1VT7LzsetPI=;
- b=oYEvkOCJGliRXZ0zkgt/2z4gEHerit/8rwZVg00ncJ2XoANaDewSsNkRNlIUq89HZP
- Kn6Jco/Le7N32URl4/LaGQqY6TNDu0UhwNV/N2yJtcjk/WrXRIOCch/LFMOPn+jl+fJ7
- Cvq/XWmpvVOOyENH2NzgJNBF5GIG9uDwHbWaebC0r/IcQLWspcVUej6ctspFANilNjpS
- glRjG0ekFTBYu82W166JXjBwdctBmG/giTENNIkbA7MTSfLr73YT4oqAScXUopnTSe8x
- xsn8avxqns6JOEh39xBG68GaBO5eO6XspgTG+u/q+zIl6EcPmBdYnubXlxpSMcgImvKy
- F8lQ==
+ bh=hhjHkZsuPQqpn5j1/wPu9TPYOQurYS1uCjZTE9jPves=;
+ b=WHSPHQjyqPfkzx7W+A894tHes/HkqL5TUFS5Hj6vTkvKkXpW9L4MW55REOjg5JhSWk
+ SdOcmNelEvU5zmmI0Y1wmOsFg3HijE7su3DitGIbdPwBdfyfUWc1n4Qfkco4B9WOHOkM
+ /oZjjHwdzYqWBU3+SRAGvK9cgZlRLQjBuvQfs0bbAPKeclO5CutnSS89wJcQy76miFxb
+ mnvlzxOnJ8HZylKa9IKqRbMj4R53lVBWz/0aBENrJeGdfGSJeY2S8M4H0vl1NB+Z1v/j
+ CvrUsoqfLMuutzahVqHsyjKggQnPqI84rX0FeMHeCbLWgRnqU4DT26BimQ18ol9qPAV1
+ tM2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=JYiXtqj6gRVqxuRODQQz1eMSRJbQ7+uu1VT7LzsetPI=;
- b=A38tQb+f34GyH6p1DxsM4huFi3GEKEZ0dyNWBNDYXC9KCec3kRyNjYUDeE535z38li
- lhPEHy5dlBt5fUxczyXEEZSS8lrSNRFvhUVqPIsUGPGwFp7IXZU7fV1U1xJOwaFOoFo7
- MuKO/ukn41HYILOe7WX4tsitZAC2Q3AmR8AT2dS1vxh99Mv3tntqgD2N3ToctwKmaIW0
- CcmqQyjMEXnuw6fFj/MF7gvhjqkYq21kjsIuaB/7zYG36vm2L79ECYcKO40YtGmZfkfC
- QN4NNWmPHQI9rI02lEvo+4xPW8QjBQbMva4cDRxVD8gQYOvg96WNjPTCN9oluk9yVDJf
- 53Rw==
-X-Gm-Message-State: AOAM531PMGY3Ywd32iyOJJHAChOIPZlbtkJx3DCA8cXtR7RUxzn7HjfW
- rOdqkoMp7rjSRdIM5rNYrbV5fx9JeYYryg==
-X-Google-Smtp-Source: ABdhPJzPg+7Mb52mPLK33MwR4NS+FW4JwBoR7aokwnTMGbFqzPdJWjrMYnFZxOqf8QE8Wk4JH7DjHg==
-X-Received: by 2002:a62:1957:: with SMTP id 84mr4544208pfz.54.1590164110282;
- Fri, 22 May 2020 09:15:10 -0700 (PDT)
+ bh=hhjHkZsuPQqpn5j1/wPu9TPYOQurYS1uCjZTE9jPves=;
+ b=hBxtymA0m1tZcVScZylq9HviVBjiGjRXPI6Vw3L98hcYJlJbVmJRhXfugf+ZnzxOzO
+ hNOQTBjKNBUK6BXw8qLqCcJ7yZ4GXicBIPif6kqg71Vs0tCGct8FvN3QNF+CSE4slR1p
+ wUqyy+VBONY7ugW2f2d08kUQN8fkA3xNWr8hhR2HE66P0U3IdZOSfz/Ezp3xvrLkQ75M
+ x1g6tNZIdieyONuaS9R5GtezAfFrW7TQJAchYc2/k+7M7eQ/lkjB9QLnDCxWKsXWzrqi
+ beoYSoN/5+2WNoTtKA301WtqLxiHarDPa96T+A+XjZtPXnkvPexoEl2KFPNvKqYDW8yG
+ pUiw==
+X-Gm-Message-State: AOAM532bcjs+5znm3j9GlfwDScKiSfdzV4HzfxcKqnNgBGYPyrfLgc8k
+ 0NpiE6W9qWCIlZ0tPyIu/6HbhdEO4bF75Q==
+X-Google-Smtp-Source: ABdhPJxS6O5pF1E7y2oFN4vEouVrNICucVS+qcpof41rMFRCukUh1HQqPbDyCANC34mHd/M2XSUBlg==
+X-Received: by 2002:a17:90a:1217:: with SMTP id
+ f23mr5114019pja.150.1590164127476; 
+ Fri, 22 May 2020 09:15:27 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:f1d9:5fce:c451:d2e2])
- by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.08
+ by smtp.gmail.com with ESMTPSA id y75sm7255428pfb.212.2020.05.22.09.15.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 09:15:09 -0700 (PDT)
+ Fri, 22 May 2020 09:15:26 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/19] tcg: call qemu_spin_destroy for tb->jmp_lock
-Date: Fri, 22 May 2020 12:07:42 -0400
-Message-Id: <20200522160755.886-7-robert.foley@linaro.org>
+Subject: [PATCH 14/19] util/async: Fixed tsan warnings
+Date: Fri, 22 May 2020 12:07:50 -0400
+Message-Id: <20200522160755.886-15-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200522160755.886-1-robert.foley@linaro.org>
 References: <20200522160755.886-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=robert.foley@linaro.org; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=robert.foley@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,138 +98,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
- robert.foley@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, robert.foley@linaro.org, cota@braap.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, peter.puhov@linaro.org,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+For example:
+  Atomic write of size 8 at 0x7b4800113c28 by main thread (mutexes: write M30):
+    #0 __tsan_atomic64_exchange <null> (qemu-system-aarch64+0x386f85)
+    #1 aio_bh_poll util/async.c:146:5 (qemu-system-aarch64+0xcd1f61)
+    #2 aio_dispatch util/aio-posix.c:380:5 (qemu-system-aarch64+0xcd8abb)
+    #3 aio_ctx_dispatch util/async.c:298:5 (qemu-system-aarch64+0xcd31b0)
+    #4 g_main_context_dispatch <null> (libglib-2.0.so.0+0x4c416)
+    #5 qemu_main_loop softmmu/vl.c:1664:9 (qemu-system-aarch64+0x5cc6d6)
+    #6 main softmmu/main.c:49:5 (qemu-system-aarch64+0xc62857)
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+  Previous read of size 8 at 0x7b4800113c28 by thread T3 (mutexes: write M81):
+    #0 aio_bh_enqueue util/async.c:81:9 (qemu-system-aarch64+0xcd2267)
+    #1 qemu_bh_schedule util/async.c:181:5 (qemu-system-aarch64+0xcd2267)
+    #2 worker_thread util/thread-pool.c:113:9 (qemu-system-aarch64+0xcd473c)
+    #3 qemu_thread_start util/qemu-thread-posix.c:519:9 (qemu-system-aarch64+0xcde280)
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
-[RF: Minor changes to fix some checkpatch errors]
 ---
- accel/tcg/translate-all.c | 10 +++++++++-
- include/tcg/tcg.h         |  3 ++-
- tcg/tcg.c                 | 19 ++++++++++++++++---
- 3 files changed, 27 insertions(+), 5 deletions(-)
+ util/async.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 42ce1dfcff..3708aab36b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -384,6 +384,11 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-     return 0;
- }
+diff --git a/util/async.c b/util/async.c
+index 1319eee3bc..51e306bf0c 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -33,6 +33,7 @@
+ #include "block/raw-aio.h"
+ #include "qemu/coroutine_int.h"
+ #include "trace.h"
++#include "qemu/tsan.h"
  
-+static void tb_destroy(TranslationBlock *tb)
-+{
-+    qemu_spin_destroy(&tb->jmp_lock);
-+}
-+
- bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
- {
-     TranslationBlock *tb;
-@@ -413,6 +418,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
-                 /* one-shot translation, invalidate it immediately */
-                 tb_phys_invalidate(tb, -1);
-                 tcg_tb_remove(tb);
-+                tb_destroy(tb);
+ /***********************************************************/
+ /* bottom halves (can be seen as timers which expire ASAP) */
+@@ -76,10 +77,12 @@ static void aio_bh_enqueue(QEMUBH *bh, unsigned new_flags)
+      * 2. ctx is loaded before the callback has a chance to execute and bh
+      *    could be freed.
+      */
++    TSAN_ANNOTATE_IGNORE_WRITES_BEGIN();
+     old_flags = atomic_fetch_or(&bh->flags, BH_PENDING | new_flags);
+     if (!(old_flags & BH_PENDING)) {
+         QSLIST_INSERT_HEAD_ATOMIC(&ctx->bh_list, bh, next);
+     }
++    TSAN_ANNOTATE_IGNORE_WRITES_END();
+ 
+     aio_notify(ctx);
+ }
+@@ -143,7 +146,9 @@ int aio_bh_poll(AioContext *ctx)
+     BHListSlice *s;
+     int ret = 0;
+ 
++    TSAN_ANNOTATE_IGNORE_WRITES_BEGIN();
+     QSLIST_MOVE_ATOMIC(&slice.bh_list, &ctx->bh_list);
++    TSAN_ANNOTATE_IGNORE_WRITES_END();
+     QSIMPLEQ_INSERT_TAIL(&ctx->bh_slice_list, &slice, next);
+ 
+     while ((s = QSIMPLEQ_FIRST(&ctx->bh_slice_list))) {
+@@ -280,14 +285,16 @@ aio_ctx_check(GSource *source)
+     aio_notify_accept(ctx);
+ 
+     QSLIST_FOREACH_RCU(bh, &ctx->bh_list, next) {
+-        if ((bh->flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
++        if ((atomic_read(&bh->flags) & (BH_SCHEDULED | BH_DELETED))
++             == BH_SCHEDULED) {
+             return true;
+         }
+     }
+ 
+     QSIMPLEQ_FOREACH(s, &ctx->bh_slice_list, next) {
+         QSLIST_FOREACH_RCU(bh, &s->bh_list, next) {
+-            if ((bh->flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
++            if ((atomic_read(&bh->flags) & (BH_SCHEDULED | BH_DELETED))
++                 == BH_SCHEDULED) {
+                 return true;
              }
-             r = true;
          }
-@@ -1230,7 +1236,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
-     page_flush_tb();
- 
--    tcg_region_reset_all();
-+    tcg_region_reset_all(tb_destroy);
-     /* XXX: flush processor icache at this point if cache flush is
-        expensive */
-     atomic_mb_set(&tb_ctx.tb_flush_count, tb_ctx.tb_flush_count + 1);
-@@ -1886,6 +1892,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- 
-         orig_aligned -= ROUND_UP(sizeof(*tb), qemu_icache_linesize);
-         atomic_set(&tcg_ctx->code_gen_ptr, (void *)orig_aligned);
-+        tb_destroy(tb);
-         return existing_tb;
-     }
-     tcg_tb_insert(tb);
-@@ -2235,6 +2242,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-             tb_phys_invalidate(tb->orig_tb, -1);
-         }
-         tcg_tb_remove(tb);
-+        tb_destroy(tb);
-     }
- 
-     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
-diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index c48bd76b0a..2c5997e14e 100644
---- a/include/tcg/tcg.h
-+++ b/include/tcg/tcg.h
-@@ -815,8 +815,9 @@ void *tcg_malloc_internal(TCGContext *s, int size);
- void tcg_pool_reset(TCGContext *s);
- TranslationBlock *tcg_tb_alloc(TCGContext *s);
- 
-+typedef void (*tb_destroy_func)(TranslationBlock *tb);
- void tcg_region_init(void);
--void tcg_region_reset_all(void);
-+void tcg_region_reset_all(tb_destroy_func tb_destroy);
- 
- size_t tcg_code_size(void);
- size_t tcg_code_capacity(void);
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index a2268d9db0..2680968683 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -502,7 +502,16 @@ size_t tcg_nb_tbs(void)
-     return nb_tbs;
- }
- 
--static void tcg_region_tree_reset_all(void)
-+static gboolean tcg_region_tree_traverse(gpointer k, gpointer v, gpointer data)
-+{
-+    TranslationBlock *tb = v;
-+    tb_destroy_func tb_destroy = data;
-+
-+    tb_destroy(tb);
-+    return FALSE;
-+}
-+
-+static void tcg_region_tree_reset_all(tb_destroy_func tb_destroy)
- {
-     size_t i;
- 
-@@ -510,6 +519,10 @@ static void tcg_region_tree_reset_all(void)
-     for (i = 0; i < region.n; i++) {
-         struct tcg_region_tree *rt = region_trees + i * tree_size;
- 
-+        if (tb_destroy != NULL) {
-+            g_tree_foreach(rt->tree, tcg_region_tree_traverse, tb_destroy);
-+        }
-+
-         /* Increment the refcount first so that destroy acts as a reset */
-         g_tree_ref(rt->tree);
-         g_tree_destroy(rt->tree);
-@@ -586,7 +599,7 @@ static inline bool tcg_region_initial_alloc__locked(TCGContext *s)
- }
- 
- /* Call from a safe-work context */
--void tcg_region_reset_all(void)
-+void tcg_region_reset_all(tb_destroy_func tb_destroy)
- {
-     unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
-     unsigned int i;
-@@ -603,7 +616,7 @@ void tcg_region_reset_all(void)
-     }
-     qemu_mutex_unlock(&region.lock);
- 
--    tcg_region_tree_reset_all();
-+    tcg_region_tree_reset_all(tb_destroy);
- }
- 
- #ifdef CONFIG_USER_ONLY
 -- 
 2.17.1
 
