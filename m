@@ -2,98 +2,97 @@ Return-Path: <SRS0=y3lU=7F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E980C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 20:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C9FBC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 20:35:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68B0420727
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 20:31:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01A5A20727
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 20:35:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dbdof5Wj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68B0420727
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLov8+8O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01A5A20727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcany-0003FG-KD
-	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 16:31:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60076)
+	id 1jcarK-0004oH-64
+	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 16:35:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcamr-0002Ia-72
- for qemu-devel@nongnu.org; Sat, 23 May 2020 16:30:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41775
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcaql-0004OR-7S
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 16:34:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31749
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcamp-0004Gr-LE
- for qemu-devel@nongnu.org; Sat, 23 May 2020 16:30:28 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcaqk-0004p9-Bm
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 16:34:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590265825;
+ s=mimecast20190719; t=1590266069;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=nGcad5pWFYfjZmglb3DNBIiOXHIWoo7uoa/PGC96jUE=;
- b=Dbdof5WjuOsEXEm+UNOgFYN4/mcRn8jsihKdpTnuzCIMo2NIXcsWs7XV5lMROHO0AgXxMW
- A51RrxaRbu5fJ1qmKAiiq2sTkQeUsu7+FmRxxnfVnAKJF+/BHCfUvlK4p4gjQ6G+skLPDT
- 5gajxqIuUPpC2TwU5NZxhxG+hd7DgBI=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-Ak_hhMYCOhmd1xisy6v1qw-1; Sat, 23 May 2020 16:30:22 -0400
-X-MC-Unique: Ak_hhMYCOhmd1xisy6v1qw-1
-Received: by mail-qt1-f198.google.com with SMTP id g8so15658198qtc.22
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 13:30:22 -0700 (PDT)
+ bh=ii96JHZeWU7/nhs9XbEalD4DaA2KuKVPxyUYhuiCcEg=;
+ b=SLov8+8O0kmYoPdq+DioS/JkKkHUWfIENrERztknRsxeOYsKEO1wwQq0vUmrxtXPoAR9+J
+ 7VibDadyqaacH6rX7aB+tURMPOdaXF0TDiusvLe6H4eECLXYrdv4Y9rcMg4WEo+Un/PmOD
+ xtwi9g2AQpcm5RWGa32YFAYFYKFxtP8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-zy-_1RLPNLy2NbqzaQLxFQ-1; Sat, 23 May 2020 16:34:27 -0400
+X-MC-Unique: zy-_1RLPNLy2NbqzaQLxFQ-1
+Received: by mail-qv1-f69.google.com with SMTP id l1so11891431qvy.20
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 13:34:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=nGcad5pWFYfjZmglb3DNBIiOXHIWoo7uoa/PGC96jUE=;
- b=gC6WOCqEb1dLve8SHke1VfdlN02ffr/sjNL/wIdXoQDt+Uu5mGiBD+LuzID4wHKfDF
- o6zbXr9dgpef3o9CoO5EShQZCumD7opz5pox+SWwKRb0d34we+p/XsW/Z6Xgdu/bRkKI
- fu5SVYQZCYqEKieCp3fRRTicwgBqhAHQz/JOl3ZIIAFaQFinCW6HjU3Wv69G8U0kQCnY
- u5fBqWh08JzJ1wndIFVwnsKTbLahmsXEL5sFEbL0H/Jrtfww41WW1OwyPRIPJgpQaRhG
- VYTflKcZXxAxmxuhlal1smCwGr6+cN1DyPrwu9U/NoA3v6ngU93u6deHyoGj578Jmu0P
- D2kQ==
-X-Gm-Message-State: AOAM531uBfMnfcCYUTZfRIPeIWirxagU3Mf5CuYiYPUKy70Gk0kE7FOL
- MRJO95SAcyYSRmISup4wlMnko8ZZCmEED9HksEKUShJuaHm3VmFr1vbjObKnMqkS+tranhPUqz3
- 22yJ1vYa28KP/+9E=
-X-Received: by 2002:ac8:4088:: with SMTP id p8mr9444896qtl.119.1590265821589; 
- Sat, 23 May 2020 13:30:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7kMlkvwlAJiVUKY+kwwLPtPrh5aHk37KwWVnLzOh0SHWdsQLzXrrmgGkwVs4ccCMTMsg7cA==
-X-Received: by 2002:ac8:4088:: with SMTP id p8mr9444883qtl.119.1590265821380; 
- Sat, 23 May 2020 13:30:21 -0700 (PDT)
+ bh=ii96JHZeWU7/nhs9XbEalD4DaA2KuKVPxyUYhuiCcEg=;
+ b=qwvaeNMTIAb6KRiyqj5OufI1UW21pVmhS8xrinijn4Bwb4O/nHjZK6B9QTwgecbjTr
+ pVSb2X8pckS3fQa7A2PtzFuRcHtvxbJUPYv+XIzYvudDa9b8+cyUMupa2QVSk70q6/oU
+ 6uuAqMS1XOUlXPo1IO06bWfpnD+FLhlz+816LW5iqxqHCgTXGyvRCIwN5UMchhVQhUMc
+ uYd9zZkzIg09fndcb6s2htUnC9kwQYnHT5qS+5Bzsib55/H5t6ONB4R3jbsDvbs0PVV/
+ K+LUnn6Ony16hswKVaf2gPiqC4HqNsQ/qeFpAMBZ5hW8q25AIXmBKaSIBoCvZz5qxbSq
+ 1evA==
+X-Gm-Message-State: AOAM531TMklM8rOhr/9s2gU6nUS+Z8J2wqQsVXdvmeoj2npY3rAWaEkN
+ ZXu/4PKVAhtxBOVLGvUaTyzZT+PYbbrZ5eDnFZg+FFgdLk3GGZP/LwF8ja1Ei71dfEEFN6RpEiN
+ IDKTIxp0pU/bFtys=
+X-Received: by 2002:ac8:7106:: with SMTP id z6mr11416028qto.310.1590266066816; 
+ Sat, 23 May 2020 13:34:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyDHOm1/1N3jRgxfTARJYP7YvJ992flHmKRpbS4S7TVVzFcNWhnouf8BnwodpQ8WJPCBEC+4g==
+X-Received: by 2002:ac8:7106:: with SMTP id z6mr11416014qto.310.1590266066613; 
+ Sat, 23 May 2020 13:34:26 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id 70sm7270064qkk.10.2020.05.23.13.30.19
+ by smtp.gmail.com with ESMTPSA id u41sm12138514qte.28.2020.05.23.13.34.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 23 May 2020 13:30:20 -0700 (PDT)
-Date: Sat, 23 May 2020 16:30:18 -0400
+ Sat, 23 May 2020 13:34:25 -0700 (PDT)
+Date: Sat, 23 May 2020 16:34:24 -0400
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 0/8] memory: Sanity checks memory transaction when
- releasing BQL
-Message-ID: <20200523203018.GJ766834@xz-x1>
-References: <20200421162108.594796-1-peterx@redhat.com>
+Subject: Re: [PATCH] pci: Display PCI IRQ pin in "info pci"
+Message-ID: <20200523203424.GK766834@xz-x1>
+References: <20200317195908.283800-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200421162108.594796-1-peterx@redhat.com>
+In-Reply-To: <20200317195908.283800-1-peterx@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=peterx@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/23 16:30:25
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/23 16:34:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,26 +105,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 21, 2020 at 12:21:00PM -0400, Peter Xu wrote:
-> This is a continuous work of previous discussion on memory transactions [1].
-> It should be helpful to fail QEMU far earlier if there's misuse of BQL against
-> the QEMU memory model.
+On Tue, Mar 17, 2020 at 03:59:08PM -0400, Peter Xu wrote:
+> Sometimes it would be good to be able to read the pin number along
+> with the IRQ number allocated.  Since we'll dump the IRQ number, no
+> reason to not dump the pin information.  For example, the vfio-pci
+> device will overwrite the pin with the hardware pin number.  It would
+> be nice to know the pin number of one assigned device from QMP/HMP.
 > 
-> One example is run_on_cpu() during memory commit.  That'll work previously, but
-> it'll fail with very strange errors (like KVM ioctl failure due to memslot
-> already existed, and it's not guaranteed to trigger constantly).  Now it'll
-> directly fail when run_on_cpu() is called.
-> 
-> Please have a look, thanks.
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg03205.html
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> CC: Julia Suvorova <jusual@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Still think it as something good to have...  Any comments?  Thanks,
+Ping?
 
 -- 
 Peter Xu
