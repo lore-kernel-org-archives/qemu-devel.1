@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F289C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6239BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DE9C2070A
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 270062070A
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:17:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoXg+N7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE9C2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCMHRiA3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270062070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcZd2-0008D6-Bn
-	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 15:16:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55120)
+	id 1jcZe5-00026k-Dg
+	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 15:17:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcZcE-0006pm-7O
- for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:26 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40069)
+ id 1jcZcC-0006nW-TM
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35513)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcZcD-0000ac-HV
- for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:25 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j16so1110264wrb.7
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 12:15:25 -0700 (PDT)
+ id 1jcZcC-0000aV-42
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:24 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x14so8170275wrp.2
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 12:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3/P/RORFvG7UdbIPFf45C1Qd+GHf2aIOo5B6nteH460=;
- b=SoXg+N7DAPMypoBC0pnAmDlZpaQrNZB1Ouxv8y/HYodRu9HyaAc6ersGG04ww27FxQ
- DeDMDtFy1eTZuNJ79VnoyymBFa0GpvI4TSdAC9HO6RIousuYwq8/ghc0TpcJMzzSYh4n
- Wb/+ErcX/3eIrEeRtgjgq0mtOyOCkY11ph8L/ZF/80eeRVmiVvof4xv29Ju+/p5iT8RO
- j+1Tbe0XhXuibH1eeKVM/qwnf32colP4DPSiA94j1+OjXqEg107jtS7bj1Yr+PakqGtg
- viJCWFcocxD4v0tKjHACTirNJflHwZ3Vr0cPmH9Wnm0dxbkEabjz0j2f91nSbda99UtI
- ifTw==
+ bh=MuUd/xx1QteafhtU3bgpxtQqiUIGOCgMcYmDgBe3utQ=;
+ b=WCMHRiA3oSImtgwSJmErKS/nRdIiBxoxP7waiHk4/8enyv/RTqhhg4QZXXhpwrJJWT
+ I8KOGfk3GY+fjN+8mm2ikn2lqNAgGA3WXhRGADfyANUWK9NVKnS49yuJFIGuWk59phe6
+ +skDt9/dHkeLXssCOXu7OV1Qi0RFqNvbWBibJsteo+aRJVG/Cyv2vdxKK1oSBuA052oP
+ 1wZJWvgd9HYTSEJGcU7X0E6oE2L6W0/J4Qwv13XEF3fMgfH+Vp1wb9LPGfNxPNqOo3c8
+ 8kqD1ynPZ5GLn+7jR5vgdVEznw7dTC+P8RYmfqzfHOlEH7y2Gps5tJQiBGyGkupeLdIW
+ YvQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=3/P/RORFvG7UdbIPFf45C1Qd+GHf2aIOo5B6nteH460=;
- b=BA2uPTjLpswfq8hh49WfSE3HZBLKg3ZRzhEI/cqGQIQ/smXbBxUYzxYfe+Mr6p4bI0
- vH8OhBzUYiq7HRn1y3bIPpIUF+LnTQfq/pnmKn6HeYJ4qEcP/YBvfj1OMespBnnwWvi7
- /fYCyjmXWZjD8b75vMVP8NMa/3GrAsruIq5ATNkEJtdPZW26qNqtd5iVIKtGJLZaKZyO
- 0Nxjvqs9uJMX5Ks4lcYiuG4619vmsGFV0iMOhBt+FOA6HAbsd8Gc87x7a4HfiNx1tg+E
- 8WOr64yrOwqQIQ32/dFcImUx2BsCC5UhBTXzWUhdtlNELbgj5pahHvC8H49wh+pPXObh
- 1MvQ==
-X-Gm-Message-State: AOAM530Os9Zl94elBqd0hLly/6vT9QivU6MCcQBN1dPNvaUJidQk1Hak
- r5ZZIDQhvXMImksOHzmncDU=
-X-Google-Smtp-Source: ABdhPJx88ks8u8aGQCwmP/F6yHx0VR5LfBXmdnGI4ewYtoxCh8rWoqvDmaxGJS8wpt3T5uUjvyQHXQ==
-X-Received: by 2002:a5d:62c2:: with SMTP id o2mr8033540wrv.51.1590261324195;
- Sat, 23 May 2020 12:15:24 -0700 (PDT)
+ bh=MuUd/xx1QteafhtU3bgpxtQqiUIGOCgMcYmDgBe3utQ=;
+ b=ouZYVDvDcrbz6HE/2WxQIy9xUQ7hxOiJZ+uJJfNlBtTWhLiKT9wEEkSFScxiZqu5Nr
+ 5n77CnT+C3ygWQ6tNWHGGZqXNbDld1+PtdqDZi0xp9o/3CRkfm5rO5WUs/U82W9lbc25
+ GBmDS7LZd7Re3I5pAzBF751Hd51RYbb8aZBsJee1alrh1KjFa8MtAOQ767rIhgEtjx8q
+ NP2FR+ADYIwU9LEz6d+MKg7gDz1psjew74YzI99HQbeFVNxllepEls4AE6YhgXAgfXjq
+ pRRI+gYpAnd9UPV/2WctMXquKWaS555aa/N0QNZYHzM7wFPp8izRfqrx61+3cdK7Wlhf
+ 8PBg==
+X-Gm-Message-State: AOAM533ch5n6iI0g6dBX/6j4sE2m7a7Dka9wuHPWxj1y9T2uQOHidLbB
+ YEi2mZU+FR2QFG4f0VmmiSA=
+X-Google-Smtp-Source: ABdhPJxsp0qrr0R9QwaYleVmXEpo7+FU2DsVA389XcX9RSH4Sy1ut00UtoplSAQmIBFYCgBnIzCblQ==
+X-Received: by 2002:a5d:608d:: with SMTP id w13mr8155313wrt.298.1590261322897; 
+ Sat, 23 May 2020 12:15:22 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id y185sm13370681wmy.11.2020.05.23.12.15.23
+ by smtp.gmail.com with ESMTPSA id y185sm13370681wmy.11.2020.05.23.12.15.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 23 May 2020 12:15:23 -0700 (PDT)
+ Sat, 23 May 2020 12:15:22 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
  Richard Henderson <rth@twiddle.net>, Sven Schnelle <svens@stackframe.org>
-Subject: [PATCH 3/3] hw/display/artist: Check offset in block_move to avoid
- buffer over-read
-Date: Sat, 23 May 2020 21:15:17 +0200
-Message-Id: <20200523191517.23684-4-f4bug@amsat.org>
+Subject: [PATCH 2/3] hw/display/artist: Refactor artist_rop8() to avoid buffer
+ over-run
+Date: Sat, 23 May 2020 21:15:16 +0200
+Message-Id: <20200523191517.23684-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200523191517.23684-1-f4bug@amsat.org>
 References: <20200523191517.23684-1-f4bug@amsat.org>
@@ -113,37 +113,145 @@ Sender: "Qemu-devel"
 
 Invalid I/O writes can craft an offset out of the vram_buffer
 range.
+Instead of passing an unsafe pointer to artist_rop8(), pass the
+vram_buffer and the offset. We can now check if the offset is
+in range before accessing it.
 
 We avoid:
 
   Program terminated with signal SIGSEGV, Segmentation fault.
-  519                 artist_rop8(s, buf, dst + column, buf->data[src + column]);
+  284             *dst &= ~plane_mask;
   (gdb) bt
-  #0  0x000055fa83b05e0a in block_move (s=0x55fa8647e510, source_x=0, source_y=0, dest_x=255, dest_y=-5, width=22, height=16705) at hw/display/artist.c:519
-  #1  0x000055fa83b071da in artist_reg_write (opaque=0x55fa8647e510, addr=1051392, val=16777211, size=4) at hw/display/artist.c:954
+  #0  0x000056367b2085c0 in artist_rop8 (s=0x56367d38b510, dst=0x7f9f972fffff <error: Cannot access memory at address 0x7f9f972fffff>, val=0 '\000') at hw/display/artist.c:284
+  #1  0x000056367b209325 in draw_line (s=0x56367d38b510, x1=-20480, y1=-1, x2=0, y2=17920, update_start=true, skip_pix=-1, max_pix=-1) at hw/display/artist.c:646
 
 Reported-by: LLVM libFuzzer
+Buglink: https://bugs.launchpad.net/qemu/+bug/1880326
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/artist.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/display/artist.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
 diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 6f61b85a24..320e3c5050 100644
+index 3c2550f6db..6f61b85a24 100644
 --- a/hw/display/artist.c
 +++ b/hw/display/artist.c
-@@ -513,6 +513,11 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
-         dst = dest_x + ((line + dest_y) * buf->width);
+@@ -273,11 +273,20 @@ static artist_rop_t artist_get_op(ARTISTState *s)
+     return (s->image_bitmap_op >> 8) & 0xf;
+ }
  
-         for (column = startcolumn; column != endcolumn; column += columnincr) {
-+            if ((int)src + column < 0 || src + column >= buf->size) {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "block_move src:%d column:%d\n", src, column);
-+                continue; /* FIXME */
-+            }
+-static void artist_rop8(ARTISTState *s, uint8_t *dst, uint8_t val)
++static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
++                        int offset, uint8_t val)
+ {
+-
+     const artist_rop_t op = artist_get_op(s);
+-    uint8_t plane_mask = s->plane_mask & 0xff;
++    uint8_t plane_mask;
++    uint8_t *dst;
++
++    if (offset < 0 || offset >= buf->size) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "rop8 offset:%d bufsize:%u\n", offset, buf->size);
++        return;
++    }
++    dst = buf->data + offset;
++    plane_mask = s->plane_mask & 0xff;
+ 
+     switch (op) {
+     case ARTIST_ROP_CLEAR:
+@@ -381,7 +390,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+         }
+ 
+         for (i = 0; i < pix_count; i++) {
+-            artist_rop8(s, p + offset + pix_count - 1 - i,
++            artist_rop8(s, buf, offset + pix_count - 1 - i,
+                         (data & 1) ? (s->plane_mask >> 24) : 0);
+             data >>= 1;
+         }
+@@ -398,7 +407,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+         for (i = 3; i >= 0; i--) {
+             if (!(s->image_bitmap_op & 0x20000000) ||
+                 s->vram_bitmask & (1 << (28 + i))) {
+-                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
++                artist_rop8(s, buf, offset + 3 - i, data8[ROP8OFF(i)]);
+             }
+         }
+         memory_region_set_dirty(&buf->mr, offset, 3);
+@@ -426,10 +435,10 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+             if (!(s->image_bitmap_op & 0x20000000) ||
+                 (vram_bitmask & mask)) {
+                 if (data & mask) {
+-                    artist_rop8(s, p + offset + i, s->fg_color);
++                    artist_rop8(s, buf, offset + i, s->fg_color);
+                 } else {
+                     if (!(s->image_bitmap_op & 0x10000002)) {
+-                        artist_rop8(s, p + offset + i, s->bg_color);
++                        artist_rop8(s, buf, offset + i, s->bg_color);
+                     }
+                 }
+             }
+@@ -507,7 +516,7 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
              if (dst + column > buf->size || src + column > buf->size) {
                  continue;
              }
+-            artist_rop8(s, buf->data + dst + column, buf->data[src + column]);
++            artist_rop8(s, buf, dst + column, buf->data[src + column]);
+         }
+     }
+ 
+@@ -548,7 +557,7 @@ static void fill_window(ARTISTState *s, int startx, int starty,
+         offset = y * s->width;
+ 
+         for (x = startx; x < startx + width; x++) {
+-            artist_rop8(s, buf->data + offset + x, color);
++            artist_rop8(s, buf, offset + x, color);
+         }
+     }
+     artist_invalidate_lines(buf, starty, height);
+@@ -561,7 +570,6 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+     uint8_t color;
+     int dx, dy, t, e, x, y, incy, diago, horiz;
+     bool c1;
+-    uint8_t *p;
+ 
+     trace_artist_draw_line(x1, y1, x2, y2);
+ 
+@@ -630,16 +638,18 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+     color = artist_get_color(s);
+ 
+     do {
++        int ofs;
++
+         if (c1) {
+-            p = buf->data + x * s->width + y;
++            ofs = x * s->width + y;
+         } else {
+-            p = buf->data + y * s->width + x;
++            ofs = y * s->width + x;
+         }
+ 
+         if (skip_pix > 0) {
+             skip_pix--;
+         } else {
+-            artist_rop8(s, p, color);
++            artist_rop8(s, buf, ofs, color);
+         }
+ 
+         if (e > 0) {
+@@ -773,10 +783,10 @@ static void font_write16(ARTISTState *s, uint16_t val)
+     for (i = 0; i < 16; i++) {
+         mask = 1 << (15 - i);
+         if (val & mask) {
+-            artist_rop8(s, buf->data + offset + i, color);
++            artist_rop8(s, buf, offset + i, color);
+         } else {
+             if (!(s->image_bitmap_op & 0x20000000)) {
+-                artist_rop8(s, buf->data + offset + i, s->bg_color);
++                artist_rop8(s, buf, offset + i, s->bg_color);
+             }
+         }
+     }
 -- 
 2.21.3
 
