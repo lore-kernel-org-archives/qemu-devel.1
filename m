@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C779C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 23:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D75AC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 23:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6778320735
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 23:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0B0D20735
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 23:23:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxbeeTMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6778320735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="at+ZL/yh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B0D20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcdUB-0003hB-Iv
-	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 19:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45188)
+	id 1jcdUG-0003t8-0m
+	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 19:23:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcdRf-0006tQ-Gc
- for qemu-devel@nongnu.org; Sat, 23 May 2020 19:20:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31136
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcdRj-000718-Dq
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 19:20:51 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46757
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcdRe-0000P5-M2
- for qemu-devel@nongnu.org; Sat, 23 May 2020 19:20:47 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcdRi-0000PS-DF
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 19:20:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590276046;
+ s=mimecast20190719; t=1590276049;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZWuKxqHpTHrg9vNDgSvtlSiGvO4lTbyQf2mpVceh26Y=;
- b=BxbeeTMQF1a2xSwrElNVNTbIz6Vz523MhouSpEStZwFDxBkn0uVADBx4hbrQeYN/NQnJYE
- YXELD/NDjcACu1/xYXrh+MbbpJ/+KyQnrQorbK/neXHk39ZAnzn6ivhlK7Y5qqeEc5uU9v
- sD3xhyJK+ZDzxRUsSguPTGowG0/KxWQ=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-GpL6XNN8Pn6QwpFKifHthQ-1; Sat, 23 May 2020 19:20:44 -0400
-X-MC-Unique: GpL6XNN8Pn6QwpFKifHthQ-1
-Received: by mail-qt1-f200.google.com with SMTP id 19so15963253qtp.8
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 16:20:44 -0700 (PDT)
+ bh=fyC6BJYd3YQUjPLW81KbGf3YMkvz3sGMDhhWO/zcegg=;
+ b=at+ZL/yhzcGjSn70b2hJskK93+CvTC2A9XN1179hyEL8k2vK6eqITJumBhLu9+u6WnUCH+
+ 6sY5tVL2DegEalhTWwc2aiol7bI7l+i62m9YFiTDA25rD4L4Tp40uVfCBUd3ZzvNfD2kn9
+ WinZ0TkKhWvlj9T68rmqTnsW1wKn5XY=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-i8QvEX1CPk-6oCdXZ520Qg-1; Sat, 23 May 2020 19:20:47 -0400
+X-MC-Unique: i8QvEX1CPk-6oCdXZ520Qg-1
+Received: by mail-qv1-f72.google.com with SMTP id q10so14159293qvs.16
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 16:20:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZWuKxqHpTHrg9vNDgSvtlSiGvO4lTbyQf2mpVceh26Y=;
- b=YHj/a4gdfhEl1F2lDT4A/W4tir+bWI3DtFgpHjUmPUyb/rZPW6h4pjZvHgL1eavP2t
- LaACZIGNZj9VOnIHEITkBfaZ9eYpdgOOLdHoDfFGdLe+Hl/bbCK4N4QQ032P9tZfXn6V
- gtp+RdLEYU/eii3TB9tgFjPcoYJqKcS+iYtrxJSy0ihTAlBsyRfpXTl2fM7nGvCVLRjB
- v/jHHH8mZd8Ji1nNQmD63O1Lz3mTXz153dmDWPX9FGqV0MCHXAOFjMm9QqXfwhpoOxBw
- Bn0nZwaGpkLDowMh5W3VJHGpFuIf8dBQCo5ibvk05HAZF3vr/gfAJIDXleyVv6x/64c+
- CEGQ==
-X-Gm-Message-State: AOAM532wX9vB53R9n0ykn6FcI/2wH70zQ1HH04YBsHQuqjffYsz+Mt2y
- nTSWpZdcZUKn9ZxpRTQk4bjUV514EPhPE4sXhiorkVYA7Zo9neFJaIJqPoLBnzu4Wz9TPoA5aF1
- mrZv1lM8VVvVSPxs=
-X-Received: by 2002:a37:a949:: with SMTP id s70mr614400qke.111.1590276043647; 
- Sat, 23 May 2020 16:20:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJygS5o3xF5CKmnHw37C6T1jF25S7GLCcJ78nmO6rTD1dm3nysTeM7J1xR4LmOAvJLjRQOFGwg==
-X-Received: by 2002:a37:a949:: with SMTP id s70mr614384qke.111.1590276043426; 
- Sat, 23 May 2020 16:20:43 -0700 (PDT)
+ bh=fyC6BJYd3YQUjPLW81KbGf3YMkvz3sGMDhhWO/zcegg=;
+ b=E1INS17fWv5crmx6ZAxKJQunYJND11/RuYCZJqh6ylNjNThRf+t8uYJc2ZO7go+wSD
+ jR+zd4tCmmqt9WihC/QCdkItwOmQ07B6MYZkobMja2lPt6rCWbdhIE7t1q+AjE6JZbRr
+ tgcRYE+A2Lu5icrUc5DZIneala92sL4/sFbVX73sd74gaw0JpBTt7+8AzphzRJ/RoHMI
+ PXFnrlUj0Lq35/HnDCpPgOcyvTG0PCET2TA1L1+y2NDbPH/tlolJGXjU+1EIn4E4/BDH
+ OH65VfHEfLrR5HtYxcLBwQk5egKYMW3FLEOeZLziGRTkrORg97SVe83TrRm7eiMUC9ju
+ XPWA==
+X-Gm-Message-State: AOAM531UDUoYU2aqnWCPiM+gBcoMNwmx97iiQJHE95TC0Xms69JajgQU
+ 5o+C38BPPbrxsymYKxOrsLHMRt1mKLih3KBYJVu+zCyQj7XbCmo3WfQjyf3WkQeTMNI/VMrNE11
+ ZJK7bzC3basNkI0w=
+X-Received: by 2002:ac8:6b8a:: with SMTP id z10mr21500111qts.373.1590276046730; 
+ Sat, 23 May 2020 16:20:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyBytkOqZEShEDNildFKH8HUTD2KeQo+90MvCIPY7BzU0aoDmVWNquq9bzERsE56bkeg6a9nw==
+X-Received: by 2002:ac8:6b8a:: with SMTP id z10mr21500100qts.373.1590276046483; 
+ Sat, 23 May 2020 16:20:46 -0700 (PDT)
 Received: from xz-x1.hitronhub.home ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id m33sm11974235qtb.88.2020.05.23.16.20.42
+ by smtp.gmail.com with ESMTPSA id m33sm11974235qtb.88.2020.05.23.16.20.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 23 May 2020 16:20:42 -0700 (PDT)
+ Sat, 23 May 2020 16:20:45 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC v3 03/11] KVM: Fixup kvm_log_clear_one_slot() ioctl return
- check
-Date: Sat, 23 May 2020 19:20:27 -0400
-Message-Id: <20200523232035.1029349-4-peterx@redhat.com>
+Subject: [PATCH RFC v3 05/11] KVM: Create the KVMSlot dirty bitmap on flag
+ changes
+Date: Sat, 23 May 2020 19:20:29 -0400
+Message-Id: <20200523232035.1029349-6-peterx@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200523232035.1029349-1-peterx@redhat.com>
 References: <20200523232035.1029349-1-peterx@redhat.com>
@@ -86,16 +86,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=peterx@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/23 18:49:37
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/23 19:20:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,36 +115,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-kvm_vm_ioctl() handles the errno trick already for ioctl() on
-returning -1 for errors.  Fix this.
+Previously we have two places that will create the per KVMSlot dirty
+bitmap:
+
+  1. When a newly created KVMSlot has dirty logging enabled,
+  2. When the first log_sync() happens for a memory slot.
+
+The 2nd case is lazy-init, while the 1st case is not (which is a fix
+of what the 2nd case missed).
+
+To do explicit initialization of dirty bitmaps, what we're missing is
+to create the dirty bitmap when the slot changed from not-dirty-track
+to dirty-track.  Do that in kvm_slot_update_flags().
+
+With that, we can safely remove the 2nd lazy-init.
+
+This change will be needed for kvm dirty ring because kvm dirty ring
+does not use the log_sync() interface at all.
+
+Also move all the pre-checks into kvm_slot_init_dirty_bitmap().
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- accel/kvm/kvm-all.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ accel/kvm/kvm-all.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d06cc04079..6e015aa2d4 100644
+index 6bdb7909cc..5b626af2a7 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -699,14 +699,13 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
-     d.num_pages = bmap_npages;
-     d.slot = mem->slot | (as_id << 16);
+@@ -165,6 +165,8 @@ static QemuMutex kml_slots_lock;
+ #define kvm_slots_lock()  qemu_mutex_lock(&kml_slots_lock)
+ #define kvm_slots_unlock()  qemu_mutex_unlock(&kml_slots_lock)
  
--    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) == -1) {
--        ret = -errno;
-+    ret = kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d);
-+    if (ret) {
-         error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=%d, "
-                      "start=0x%"PRIx64", size=0x%"PRIx32", errno=%d",
-                      __func__, d.slot, (uint64_t)d.first_page,
-                      (uint32_t)d.num_pages, ret);
-     } else {
--        ret = 0;
-         trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
++static void kvm_slot_init_dirty_bitmap(KVMSlot *mem);
++
+ int kvm_get_max_memslots(void)
+ {
+     KVMState *s = KVM_STATE(current_accel());
+@@ -455,6 +457,7 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+         return 0;
      }
  
++    kvm_slot_init_dirty_bitmap(mem);
+     return kvm_set_user_memory_region(kml, mem, false);
+ }
+ 
+@@ -539,8 +542,12 @@ static int kvm_get_dirty_pages_log_range(MemoryRegionSection *section,
+ #define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
+ 
+ /* Allocate the dirty bitmap for a slot  */
+-static void kvm_memslot_init_dirty_bitmap(KVMSlot *mem)
++static void kvm_slot_init_dirty_bitmap(KVMSlot *mem)
+ {
++    if (!(mem->flags & KVM_MEM_LOG_DIRTY_PAGES) || mem->dirty_bmap) {
++        return;
++    }
++
+     /*
+      * XXX bad kernel interface alert
+      * For dirty bitmap, kernel allocates array of size aligned to
+@@ -591,11 +598,6 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
+             goto out;
+         }
+ 
+-        if (!mem->dirty_bmap) {
+-            /* Allocate on the first log_sync, once and for all */
+-            kvm_memslot_init_dirty_bitmap(mem);
+-        }
+-
+         d.dirty_bitmap = mem->dirty_bmap;
+         d.slot = mem->slot | (kml->as_id << 16);
+         if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
+@@ -1125,14 +1127,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+         mem->start_addr = start_addr;
+         mem->ram = ram;
+         mem->flags = kvm_mem_flags(mr);
+-
+-        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+-            /*
+-             * Reallocate the bmap; it means it doesn't disappear in
+-             * middle of a migrate.
+-             */
+-            kvm_memslot_init_dirty_bitmap(mem);
+-        }
++        kvm_slot_init_dirty_bitmap(mem);
+         err = kvm_set_user_memory_region(kml, mem, true);
+         if (err) {
+             fprintf(stderr, "%s: error registering slot: %s\n", __func__,
 -- 
 2.26.2
 
