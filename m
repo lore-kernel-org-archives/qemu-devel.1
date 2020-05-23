@@ -2,100 +2,83 @@ Return-Path: <SRS0=y3lU=7F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1CCC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 07:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4696C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 07:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16E1C2071C
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 07:41:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="US+Td759"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16E1C2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 749A12071C
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 07:46:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749A12071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcOmH-0001xm-B3
-	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 03:41:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60590)
+	id 1jcOro-0003zf-OD
+	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 03:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jcOlj-0001Tv-SB
- for qemu-devel@nongnu.org; Sat, 23 May 2020 03:40:31 -0400
-Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:37027)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcOqq-0003ZE-2B
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 03:45:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33044)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jcOli-0006bz-O5
- for qemu-devel@nongnu.org; Sat, 23 May 2020 03:40:31 -0400
-Received: by mail-ed1-x531.google.com with SMTP id l25so11027264edj.4
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 00:40:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=hlYL9T7F9kvacV1f/5nuEoE9+UWF48TmJmWOs/xVlcI=;
- b=US+Td759dc+jUUvYsv3qtCNPuUjNlp2eb6CRD+uzzGbR24wSlQkL28JU7iYwOYHXmC
- gYmmZaZy1ygyDAf00hXmljH+jcUfpdXaJJzov9h58VeT5F+ZkEVVo2NuOlR9S2QaSj1n
- V2ZWAKrwkHANvIMAU/mBNbPub3ezEOUxhrUeKtBaOjE7z2FOue7joyJPJQjpVbUr8kBC
- LKI5QdHPIjg0gz3HR2D5OIe/1f1CpiMW9/VMQ0vQMq+56b1bkGSaMbt4BckYbsY1dsEv
- i0XrWaGG7x4oGXTph8ZR0w1lhCcTDveFZmvPmYb2z3GDqFtwH40pyFfOEhoPFt/nhppT
- nKSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=hlYL9T7F9kvacV1f/5nuEoE9+UWF48TmJmWOs/xVlcI=;
- b=h55vsoznT+rtTpQhiyRVceeEAYr0SkmjFOKM4RayTM/8nWQJIWV/3LWtGYJXcjhNiK
- W3n3RwoyhMD7oupNVxou5TTgQiVDzyzpfNIC36UBlhA5K0Vf8gqy79TRg9+WQRD2jZK2
- wRpliJXeEcjz/2yfeEkMUAiltP3xWkLqmx0N+SQQXVtU+lxZ4Zhl72CzSz6m55Q/Y9Aw
- 6A6nYqd+FctDFIYk/70iRCziuULApJiFu1EaLTDOU0DOonoUGMvoYBuQSlDnJNE3/9J7
- TC4qnnAbuj/fxr8OxBBotec3ffhYMG7URZtV2lqENpCcteUjm0MQQaZOOkHFGtenNUyV
- oiew==
-X-Gm-Message-State: AOAM532iaXeyxEb+Gwfb3jOLEx9t2iY/XQwbnjph3u9RSteLHCxYO/g5
- 2VY4nWhfySOxtkBhsSmJxeIsKpwTPMI=
-X-Google-Smtp-Source: ABdhPJy/8Z9QFcAE2kNzHU/C2nBc6215WWDGKwzZlZv1V/cYHmIV8UrpmH0C42NqtNKF+aYpArgwBg==
-X-Received: by 2002:a50:9f66:: with SMTP id b93mr5802786edf.376.1590219629108; 
- Sat, 23 May 2020 00:40:29 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b13sm9350890edw.50.2020.05.23.00.40.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 23 May 2020 00:40:27 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E23B21FF7E;
- Sat, 23 May 2020 08:40:26 +0100 (BST)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcOqo-0007hV-OU
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 03:45:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jcOqm-0001bV-1f
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 07:45:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0B5172E806E
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 07:45:44 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 23 May 2020 07:40:26 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
+X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
  <159019649466.20452.12164074661904513625.malone@soybean.canonical.com>
-User-agent: mu4e 1.4.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Bug 1880225 <1880225@bugs.launchpad.net>
+Message-ID: <87lfljrted.fsf@linaro.org>
 Subject: Re: [Bug 1880225] Re: Emulation of some arm programs fail with
  "Assertion `have_guest_base' failed."
-In-reply-to: <159019649466.20452.12164074661904513625.malone@soybean.canonical.com>
-Date: Sat, 23 May 2020 08:40:26 +0100
-Message-ID: <87lfljrted.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::531;
- envelope-from=alex.bennee@linaro.org; helo=mail-ed1-x531.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4f4bf913ecb3794ab5a674f999886539525f976b
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/23 03:45:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,11 +87,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
+Message-ID: <20200523074026.d0VHfqgJK7J3XfDLRoETQyXHBqaPc9aDxn9jlkkAFPY@z>
 
 Aleksandar Markovic <1880225@bugs.launchpad.net> writes:
 
@@ -118,6 +101,185 @@ Aleksandar Markovic <1880225@bugs.launchpad.net> writes:
 Ahh - OK that makes sense. I'll see if I can replicate.
 
 
---=20
+-- =
+
 Alex Benn=C3=A9e
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880225
+
+Title:
+  Emulation of some arm programs fail with "Assertion `have_guest_base'
+  failed."
+
+Status in QEMU:
+  New
+
+Bug description:
+  This issue is observer with QEMU ToT, checked out around May 15th (but
+  I believe it is present in current master too), and wasn't present in
+  QEMU v5.0.0.
+
+  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+
+  Arm cross-compiler is a standard cross-compiler that comes with
+  Debian-based distributions, and gcc version is:
+
+  $ arm-linux-gnueabi-gcc --version
+  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+
+  Compile this program with cross compiler:
+
+  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
+  toupper_string-arm
+
+  Emulation with QEMU v5.0.0 is correct, and gives expected output:
+
+  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
+rm
+  CONTROL RESULT: (toupper_string)
+   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
+lnmpapq
+   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
+LNMPAPQ
+
+  While, in case of QEMU master it fails:
+
+  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
+arm
+  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
+uest_base: Assertion `have_guest_base' failed.
+  Aborted
+
+  There are many other programs that exibit the same behavior. The
+  failure is arm-sprecific.
+
+  =
+
+  -----------------------------------------------------
+
+  source code: (let's call this file toupper_string.c) (similar file is
+  also in attachment)
+
+  =
+
+  #include <stdlib.h>
+  #include <string.h>
+  #include <stdio.h>
+  #include <unistd.h>
+
+  =
+
+  #define MAX_STRING_LENGHT              15
+  #define NUMBER_OF_RANDOM_STRINGS       100
+  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
+  #define MAX_NUMBER_OF_REPETITIONS      1000000000
+  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
+
+  /* Structure for keeping an array of strings */
+  struct StringStruct {
+      char chars[MAX_STRING_LENGHT + 1];
+  };
+
+  /**
+   * Sets characters of the given string to random small letters a-z.
+   * @param s String to get random characters.
+   * @len Length of the input string.
+   */
+  static void gen_random_string(char *chars, const int len)
+  {
+      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
+
+      for (size_t i =3D 0; i < len; i++) {
+          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
+      }
+      chars[len] =3D 0;
+  }
+
+  void main (int argc, char* argv[])
+  {
+      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
+      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
+];
+      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
+      int32_t option;
+
+      /* Parse command line options */
+      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
+          if (option =3D=3D 'n') {
+              int32_t user_number_of_repetitions =3D atoi(optarg);
+              /* Check if the value is a negative number */
+              if (user_number_of_repetitions < 1) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e a "
+                                  "negative number.\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is a string or zero */
+              if (user_number_of_repetitions =3D=3D 0) {
+                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
+\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is too large */
+              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e "
+                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
+ONS);
+                  exit(EXIT_FAILURE);
+              }
+              number_of_repetitions =3D user_number_of_repetitions;
+          } else {
+              exit(EXIT_FAILURE);
+          }
+      }
+
+      /* Create an array of strings with random content */
+      srand(1);
+      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
+      }
+
+      /* Perform uppercasing of a set of random strings multiple times */
+      for (size_t j =3D 0; j < number_of_repetitions; j++) {
+          /* Copy initial set of random strings to the set to be uppercased=
+ */
+          memcpy(strings_to_be_uppercased, random_strings,
+                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
+          /* Do actual changing case to uppercase */
+          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+              int k =3D 0;
+    =
+
+              while (strings_to_be_uppercased[i].chars[k]) { =
+
+                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
+
+                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
+                         &ch, 1);
+                  k++; =
+
+              } =
+
+          }
+      }
+
+      /* Control printing */
+      printf("CONTROL RESULT: (toupper_string)\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", random_strings[i].chars);
+      }
+      printf("\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", strings_to_be_uppercased[i].chars);
+      }
+      printf("\n");
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
 
