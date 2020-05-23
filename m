@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A84B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 01:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFDC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 01:41:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEE9206DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 01:21:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEE9206DD
+	by mail.kernel.org (Postfix) with ESMTPS id 46F9720727
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 01:41:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F9720727
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcIqn-0000F6-G4
-	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 21:21:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39380)
+	id 1jcJAK-00007d-GZ
+	for qemu-devel@archiver.kernel.org; Fri, 22 May 2020 21:41:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcIqA-0007r2-7G
- for qemu-devel@nongnu.org; Fri, 22 May 2020 21:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35740)
+ id 1jcJ9b-0007kX-IU
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 21:40:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36924)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jcIq9-0000jO-2p
- for qemu-devel@nongnu.org; Fri, 22 May 2020 21:20:41 -0400
+ id 1jcJ9a-0004lu-B8
+ for qemu-devel@nongnu.org; Fri, 22 May 2020 21:40:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jcIq7-0001Y7-AY
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 01:20:39 +0000
+ id 1jcJ9Y-0002nv-LK
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 01:40:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1F57C2E8079
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 01:20:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 81A212E805B
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 01:40:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 23 May 2020 01:14:54 -0000
+Date: Sat, 23 May 2020 01:31:04 -0000
 From: Aleksandar Markovic <1880225@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
 X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
 X-Launchpad-Bug-Modifier: Aleksandar Markovic (aleksandar-markovic)
 References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
-Message-Id: <159019649466.20452.12164074661904513625.malone@soybean.canonical.com>
+Message-Id: <159019746444.1613.3499186008223895262.malone@chaenomeles.canonical.com>
 Subject: [Bug 1880225] Re: Emulation of some arm programs fail with "Assertion
  `have_guest_base' failed."
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 47a277b9cf179b9facb42d10dfbff1167c7d3dcb
+X-Launchpad-Hash: 4fe997d9e354a3dcfd0e29875c7a28a36ab58a75
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/22 21:15:38
@@ -91,8 +91,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just want to stress once again that the test was performed on a 32-bit
-Intel host.
+It appear that there is no problem on Intel 64-bit hosts.
+
+Perhaps the problem is manifested on all 32-bit hosts. I currently don't
+have access to any other 320bit host due to remote work.
+
+The arm is the only target were I noticed this happens. I checked hppa,
+mips, mipsel, m68k, ppc, and sh4, they ae all fine,  with the same
+program/example, on the same 32-bit Intel host. I did not checked other
+target except those I just mentioned.
 
 -- =
 
