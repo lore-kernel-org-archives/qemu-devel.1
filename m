@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F05C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F289C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 698AA2070A
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DE9C2070A
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 May 2020 19:16:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gbKNzZ+Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 698AA2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoXg+N7D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE9C2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcZcy-00084W-JA
-	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 15:16:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55112)
+	id 1jcZd2-0008D6-Bn
+	for qemu-devel@archiver.kernel.org; Sat, 23 May 2020 15:16:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcZcB-0006mK-JF
- for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42023)
+ id 1jcZcE-0006pm-7O
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:26 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40069)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcZcA-0000aM-UD
- for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s8so13519020wrt.9
- for <qemu-devel@nongnu.org>; Sat, 23 May 2020 12:15:22 -0700 (PDT)
+ id 1jcZcD-0000ac-HV
+ for qemu-devel@nongnu.org; Sat, 23 May 2020 15:15:25 -0400
+Received: by mail-wr1-x441.google.com with SMTP id j16so1110264wrb.7
+ for <qemu-devel@nongnu.org>; Sat, 23 May 2020 12:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AdMpyqTCFlk39vXTmF2j6XEmuS3qX56Iy8h4IChD2rE=;
- b=gbKNzZ+YyBvYcTEK48o3NQh141E3nP6RlZfweMi3pVm5hn9ZUr5+dIQdp4OZBfikll
- 4agcifFJlMVtxMnIfLJE/6BdFwXWuSnyPWZRcDRPDb0Lg1sf9pCxrxdtxF12gZLNMxmb
- kCBnKaP72RJkB7tOhKVe7/kODlb3hEVT+qknve45oN5895fNQXORlCQ6UikE9Mai+tDN
- TuVC9CFE8uGSvXPwJk1tJA5o47dbRvktFoQDOCtYfrsf59b3+YRTbmR+2SpSMSVQgJkf
- wcvRM9LdWqxWRT20vYTd6PJ3gTa0LIgb33/qQZh5BNFQkRyVZ5lv25Cd3weZZEG8bR4W
- 22Hw==
+ bh=3/P/RORFvG7UdbIPFf45C1Qd+GHf2aIOo5B6nteH460=;
+ b=SoXg+N7DAPMypoBC0pnAmDlZpaQrNZB1Ouxv8y/HYodRu9HyaAc6ersGG04ww27FxQ
+ DeDMDtFy1eTZuNJ79VnoyymBFa0GpvI4TSdAC9HO6RIousuYwq8/ghc0TpcJMzzSYh4n
+ Wb/+ErcX/3eIrEeRtgjgq0mtOyOCkY11ph8L/ZF/80eeRVmiVvof4xv29Ju+/p5iT8RO
+ j+1Tbe0XhXuibH1eeKVM/qwnf32colP4DPSiA94j1+OjXqEg107jtS7bj1Yr+PakqGtg
+ viJCWFcocxD4v0tKjHACTirNJflHwZ3Vr0cPmH9Wnm0dxbkEabjz0j2f91nSbda99UtI
+ ifTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=AdMpyqTCFlk39vXTmF2j6XEmuS3qX56Iy8h4IChD2rE=;
- b=T/7co12lTsuINAiI5UrCi51t1guZjWUWOUz+uVwOetrUM+BKxHO9DOlI3fx1QJYu7e
- qy4+wPa+2F81ELdVqvbTTavEJlqM+Qr+Sxxr/n/4Vmpqph0kULudMvx3TQRV0gvv4M5J
- 0v/X5VO6hn4YbUmhFOS1euNJuu9RQ4MA0rpb0+rFlgkPY+tS0n7igN1VpnyPRq4qkr5s
- Vc1KrWueQ+EqRrBQR/62uuXJdE7tcsZi1vaI0gA2KGcGV9TEEtV5gk9KqV1E3PZ8jhr3
- yponC+H6TFCnfcP1seWpA5LhLnXJBTF5G/r9YXG+zuTI5Cqd0nrN3UGbqSq42GOBszUN
- giMA==
-X-Gm-Message-State: AOAM531uJ6N672q/uaEV1tGdSc1EzKYigxt+FCjWkAAV8ySHCFhxnoOQ
- /C3SpKdIJG1l7R/TpA4BqJI=
-X-Google-Smtp-Source: ABdhPJyMpW3LrrN+PrjNd1oKVioCjlnbdpHrQ7cz4jbLOIvuB+BlupyCaf+QggOnwjyld/XjJFerxw==
-X-Received: by 2002:adf:f990:: with SMTP id f16mr2840152wrr.311.1590261321821; 
- Sat, 23 May 2020 12:15:21 -0700 (PDT)
+ bh=3/P/RORFvG7UdbIPFf45C1Qd+GHf2aIOo5B6nteH460=;
+ b=BA2uPTjLpswfq8hh49WfSE3HZBLKg3ZRzhEI/cqGQIQ/smXbBxUYzxYfe+Mr6p4bI0
+ vH8OhBzUYiq7HRn1y3bIPpIUF+LnTQfq/pnmKn6HeYJ4qEcP/YBvfj1OMespBnnwWvi7
+ /fYCyjmXWZjD8b75vMVP8NMa/3GrAsruIq5ATNkEJtdPZW26qNqtd5iVIKtGJLZaKZyO
+ 0Nxjvqs9uJMX5Ks4lcYiuG4619vmsGFV0iMOhBt+FOA6HAbsd8Gc87x7a4HfiNx1tg+E
+ 8WOr64yrOwqQIQ32/dFcImUx2BsCC5UhBTXzWUhdtlNELbgj5pahHvC8H49wh+pPXObh
+ 1MvQ==
+X-Gm-Message-State: AOAM530Os9Zl94elBqd0hLly/6vT9QivU6MCcQBN1dPNvaUJidQk1Hak
+ r5ZZIDQhvXMImksOHzmncDU=
+X-Google-Smtp-Source: ABdhPJx88ks8u8aGQCwmP/F6yHx0VR5LfBXmdnGI4ewYtoxCh8rWoqvDmaxGJS8wpt3T5uUjvyQHXQ==
+X-Received: by 2002:a5d:62c2:: with SMTP id o2mr8033540wrv.51.1590261324195;
+ Sat, 23 May 2020 12:15:24 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id y185sm13370681wmy.11.2020.05.23.12.15.20
+ by smtp.gmail.com with ESMTPSA id y185sm13370681wmy.11.2020.05.23.12.15.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 23 May 2020 12:15:21 -0700 (PDT)
+ Sat, 23 May 2020 12:15:23 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
  Richard Henderson <rth@twiddle.net>, Sven Schnelle <svens@stackframe.org>
-Subject: [PATCH 1/3] hw/display/artist: Check offset in draw_line to avoid
- buffer over-run
-Date: Sat, 23 May 2020 21:15:15 +0200
-Message-Id: <20200523191517.23684-2-f4bug@amsat.org>
+Subject: [PATCH 3/3] hw/display/artist: Check offset in block_move to avoid
+ buffer over-read
+Date: Sat, 23 May 2020 21:15:17 +0200
+Message-Id: <20200523191517.23684-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200523191517.23684-1-f4bug@amsat.org>
 References: <20200523191517.23684-1-f4bug@amsat.org>
@@ -117,53 +117,33 @@ range.
 We avoid:
 
   Program terminated with signal SIGSEGV, Segmentation fault.
-  284             *dst &= ~plane_mask;
+  519                 artist_rop8(s, buf, dst + column, buf->data[src + column]);
   (gdb) bt
-  #0  0x000055d5dccdc5c0 in artist_rop8 (s=0x55d5defee510, dst=0x7f8e84ed8216 <error: Cannot access memory at address 0x7f8e84ed8216>, val=0 '\000') at hw/display/artist.c:284
-  #1  0x000055d5dccdcf83 in fill_window (s=0x55d5defee510, startx=22, starty=5674, width=65, height=5697) at hw/display/artist.c:551
-  #2  0x000055d5dccddfb9 in artist_reg_write (opaque=0x55d5defee510, addr=1051140, val=4265537, size=4) at hw/display/artist.c:902
-  #3  0x000055d5dcb42a7c in memory_region_write_accessor (mr=0x55d5defeea10, addr=1051140, value=0x7ffe57db08c8, size=4, shift=0, mask=4294967295, attrs=...) at memory.c:483
+  #0  0x000055fa83b05e0a in block_move (s=0x55fa8647e510, source_x=0, source_y=0, dest_x=255, dest_y=-5, width=22, height=16705) at hw/display/artist.c:519
+  #1  0x000055fa83b071da in artist_reg_write (opaque=0x55fa8647e510, addr=1051392, val=16777211, size=4) at hw/display/artist.c:954
 
 Reported-by: LLVM libFuzzer
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/artist.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/display/artist.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 6261bfe65b..3c2550f6db 100644
+index 6f61b85a24..320e3c5050 100644
 --- a/hw/display/artist.c
 +++ b/hw/display/artist.c
-@@ -557,7 +557,7 @@ static void fill_window(ARTISTState *s, int startx, int starty,
- static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-                       bool update_start, int skip_pix, int max_pix)
- {
--    struct vram_buffer *buf;
-+    struct vram_buffer *buf = &s->vram_buffer[ARTIST_BUFFER_AP];
-     uint8_t color;
-     int dx, dy, t, e, x, y, incy, diago, horiz;
-     bool c1;
-@@ -565,6 +565,12 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+@@ -513,6 +513,11 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
+         dst = dest_x + ((line + dest_y) * buf->width);
  
-     trace_artist_draw_line(x1, y1, x2, y2);
- 
-+    if (x1 * y1 >= buf->size || x2 * y2 >= buf->size) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "draw_line (%d,%d) (%d,%d)\n", x1, y1, x2, y2);
-+        return;
-+    }
-+
-     if (update_start) {
-         s->vram_start = (x2 << 16) | y2;
-     }
-@@ -622,7 +628,6 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-     x = x1;
-     y = y1;
-     color = artist_get_color(s);
--    buf = &s->vram_buffer[ARTIST_BUFFER_AP];
- 
-     do {
-         if (c1) {
+         for (column = startcolumn; column != endcolumn; column += columnincr) {
++            if ((int)src + column < 0 || src + column >= buf->size) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "block_move src:%d column:%d\n", src, column);
++                continue; /* FIXME */
++            }
+             if (dst + column > buf->size || src + column > buf->size) {
+                 continue;
+             }
 -- 
 2.21.3
 
