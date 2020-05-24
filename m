@@ -2,102 +2,81 @@ Return-Path: <SRS0=Dt9u=7G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A3AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 21:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F048C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 22:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF8B207FB
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 21:58:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="burMxYP9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF8B207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7662C2076C
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 22:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7662C2076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcydk-00079Y-Oa
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 17:58:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49422)
+	id 1jcyl4-0002LU-Kq
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 18:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcycX-0006JI-ME
- for qemu-devel@nongnu.org; Sun, 24 May 2020 17:57:26 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54295)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcykX-0001rw-Ip
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 18:05:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48264)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcycX-00077V-0f
- for qemu-devel@nongnu.org; Sun, 24 May 2020 17:57:25 -0400
-Received: by mail-wm1-x343.google.com with SMTP id h4so13716292wmb.4
- for <qemu-devel@nongnu.org>; Sun, 24 May 2020 14:57:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TWQ3+or2RRhTWhxm4VTX9bqSveuuL2t7PhyX6jhqZHI=;
- b=burMxYP9D29NvWW3twM6ZVDmihRMtHQQC8niS42cfKEdNT7ww6qeVxtKemlDJLgbsR
- JrWBoa0h5/lcxq/96eNx82eCyu+lhyRrzSBQuthLmu146osKR+D1TyQbHO17rAF8Swyh
- PRr/0j2BnOUxc+P0odx8g1238xcPjz7gPKmNjrd8gO/0dHfZ4ReUwHN172k599KfQU9h
- u2GV5kEw++NPZqHyWcTsbDWyszNBX3+NAIW3nGV0fYCUZnMxvcZK45Lj2Le8cUVY5qn/
- kucNVy5XTIXdgz+NNy2G4i81cB83+EtiJE3WoRdmeAAWfEt8CkKYb9yHIWDG6EQyN+M8
- WT8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TWQ3+or2RRhTWhxm4VTX9bqSveuuL2t7PhyX6jhqZHI=;
- b=Bivp27p8RNXD6BdoHlDQWBh/lY7bz7Way+LrzsBKD6wnzo67lJGrMK0WLmegIYVLqG
- D5XRy3nQsGEtWThuI1wQTbAUG482jDShxbvEnGCbCkHMDYNhzmLluf90zRZVpOJnO5Zv
- iT1pecbVrq7HcZabvuxlr74csM9AsfKSY+sSpTnhAGHaZE+ws9ldUMftOo789y08Q2l7
- ik/M/wLmPoJWYmUPTxaMYnbg5UflH6GGLjN7LuDS6iwYEk9ImErxa/w/OxCudlP88k8B
- /i3RP3QWPbiHwUX9HnQL5KU2tUOlNeVPVHrT8mlNL6qQE3UQa6CMp7BqZOV5SdZTbcCH
- j+PA==
-X-Gm-Message-State: AOAM5313Yf7qNTKK8apdxU9blWz8Ayc/CclAv24/yH59bPCIaAg/F7ZV
- Su43GkA15PGszWrWZAqLO7I=
-X-Google-Smtp-Source: ABdhPJw4mohShTLum8956Pai1Wzd+X0DsFZSyFy4rBBEoxhlOtrvH3lbAZrjr95Pym0mxrlYvBHQ1w==
-X-Received: by 2002:a1c:3d83:: with SMTP id k125mr12995537wma.61.1590357443742; 
- Sun, 24 May 2020 14:57:23 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id s15sm15969916wro.80.2020.05.24.14.57.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 24 May 2020 14:57:23 -0700 (PDT)
-Subject: Re: [PATCH] qemu-plugin.h: add missing include <stddef.h> to define
- size_t
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-References: <20200524202427.951784-1-cota@braap.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c72d1b13-5647-c691-d80d-2362f1abb306@amsat.org>
-Date: Sun, 24 May 2020 23:57:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jcykW-0000Bv-8j
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 18:05:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jcykT-0004GJ-Ti
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 22:05:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DE8392E807D
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 22:05:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200524202427.951784-1-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 24 May 2020 21:57:21 -0000
+From: BALATON Zoltan <1810000@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: balaton-4 benquike th-huth
+X-Launchpad-Bug-Reporter: PH (benquike)
+X-Launchpad-Bug-Modifier: BALATON Zoltan (balaton-4)
+References: <154603590627.5548.1380267988808710453.malonedeb@wampee.canonical.com>
+Message-Id: <159035744156.1842.16776636825826676221.malone@chaenomeles.canonical.com>
+Subject: [Bug 1810000] Re: qemu system emulator crashed with the attachment of
+ usb-bt-dongle device
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6f28353f6164daca77c19b9f9f234b87c4e1fce8
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 18:05:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -106,30 +85,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1810000 <1810000@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/24/20 10:24 PM, Emilio G. Cota wrote:
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/qemu/qemu-plugin.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-> index 89ed579f55..bab8b0d4b3 100644
-> --- a/include/qemu/qemu-plugin.h
-> +++ b/include/qemu/qemu-plugin.h
-> @@ -12,6 +12,7 @@
->  
->  #include <inttypes.h>
->  #include <stdbool.h>
-> +#include <stddef.h>
->  
->  /*
->   * For best performance, build the plugin with -fvisibility=hidden so that
-> 
+This issue has nothing to do with bluetooth rather something with xhci. I'v=
+e got the same error while trying to pass through a usb device to a Windows=
+ VM, once the guest driver is loaded in the the assert fires so probably it=
+'s trying to send something that's not handled correctly. A similar (same?)=
+ issue is also mentioned in this bug tracker: =
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D849884
+
+For me it happens with both qemu-xhci and nec-usb-xhci
+
+Here are some debug infos I could gather, not sure if it helps:
+
+qemu-system-x86_64: hw/usb/core.c:591: usb_packet_copy: Assertion `p->actua=
+l_length + bytes <=3D iov->size' failed.
+(gdb) bt
+#0  0x00007ffff6b85a7a in raise () at /lib64/libc.so.6
+#1  0x00007ffff6b6e524 in abort () at /lib64/libc.so.6
+#2  0x00007ffff6b6e40f in _nl_load_domain.cold.0 () at /lib64/libc.so.6
+#3  0x00007ffff6b7a9a2 in  () at /lib64/libc.so.6
+#4  0x0000555555bd1c93 in usb_packet_copy (p=3D0x7fff680fc8f8, ptr=3D0x5555=
+5772d63c, bytes=3D5) at hw/usb/core.c:591
+#5  0x0000555555bd10ba in usb_generic_async_ctrl_complete (s=3D0x55555772d5=
+50, p=3D0x7fff680fc8f8) at hw/usb/core.c:332
+#6  0x0000555555c0dc54 in usb_host_req_complete_ctrl (xfer=3D0x7fff681a6430=
+) at hw/usb/host-libusb.c:416
+#7  0x00007ffff7c68082 in  () at /lib64/libusb-1.0.so.0
+#8  0x00007ffff7c6bd1a in  () at /lib64/libusb-1.0.so.0
+#9  0x00007ffff7c6daa8 in  () at /lib64/libusb-1.0.so.0
+#10 0x00007ffff7c67a28 in  () at /lib64/libusb-1.0.so.0
+#11 0x00007ffff7c68b13 in libusb_handle_events_timeout_completed () at /lib=
+64/libusb-1.0.so.0
+#12 0x0000555555c0d4a6 in usb_host_handle_fd (opaque=3D0x5555568eeb70) at h=
+w/usb/host-libusb.c:226
+#13 0x0000555555e2099c in aio_dispatch_handler (ctx=3D0x555556614530, node=
+=3D0x5555570c06c0) at util/aio-posix.c:339
+[...]
+(gdb) up
+#4  0x0000555555bd1c93 in usb_packet_copy (p=3D0x7fff680fc8f8, ptr=3D0x5555=
+5772d63c, bytes=3D5) at hw/usb/core.c:591
+591	    assert(p->actual_length + bytes <=3D iov->size);
+(gdb) list
+586	void usb_packet_copy(USBPacket *p, void *ptr, size_t bytes)
+587	{
+588	    QEMUIOVector *iov =3D p->combined ? &p->combined->iov : &p->iov;
+589	=
+
+590	    assert(p->actual_length >=3D 0);
+591	    assert(p->actual_length + bytes <=3D iov->size);
+(gdb) p/x *p
+$3 =3D {pid =3D 0x69, id =3D 0x1a20f5c0, ep =3D 0x55555772e650, stream =3D =
+0x0,
+     iov =3D {iov =3D 0x7fff680fc200, niov =3D 0x0, {{nalloc =3D 0x1, local=
+_iov =3D {iov_base =3D 0x0, iov_len =3D 0x0}}, {__pad =3D {
+     0x1, 0x0 <repeats 11 times>}, size =3D 0x0}}}, parameter =3D 0x500000f=
+000680, short_not_ok =3D 0x0, int_req =3D 0x1,
+     status =3D 0x0, actual_length =3D 0x0, state =3D 0x3, combined =3D 0x0,
+     queue =3D {tqe_next =3D 0x0, tqe_circ =3D {tql_next =3D 0x0, tql_prev =
+=3D 0x55555772e668}},
+     combined_entry =3D {tqe_next =3D 0x0, tqe_circ =3D {tql_next =3D 0x0, =
+tql_prev =3D 0x0}}}
+
+
+** Bug watch added: Debian Bug tracker #849884
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D849884
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810000
+
+Title:
+  qemu system emulator crashed with the attachment of usb-bt-dongle
+  device
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am testing usb-bt-dongle device on xchi host controller, and found
+  that the qemu crashed directly with an assertion failer.
+
+  Here is the information to reproduce the crash:
+
+  Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
+  System emulator: qemu-x86_64
+  VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_am=
+d64_desktop.qcow2
+  CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enabl=
+e-kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
+
+  Error message:
+
+  qemu-system-x86_64: /build/qemu-
+  Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592: usb_packet_copy: Assertion
+  `p->actual_length + bytes <=3D iov->size' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810000/+subscriptions
 
