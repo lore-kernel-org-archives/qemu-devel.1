@@ -4,74 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6F3C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 11:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4630EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 11:06:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65C462077D
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 11:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B12A2077D
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 11:06:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EkO6Ujx9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65C462077D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lo3lQdKe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B12A2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcoRO-00061B-Dn
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 07:05:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56890)
+	id 1jcoSB-0007EG-76
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 07:06:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcoNo-0002iN-5F; Sun, 24 May 2020 07:01:32 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51018)
+ id 1jcoNl-0002dp-3w; Sun, 24 May 2020 07:01:29 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43389)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jcoNn-0007mL-3W; Sun, 24 May 2020 07:01:31 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v19so7148339wmj.0;
- Sun, 24 May 2020 04:01:30 -0700 (PDT)
+ id 1jcoNk-0007ln-7p; Sun, 24 May 2020 07:01:28 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i15so14536749wrx.10;
+ Sun, 24 May 2020 04:01:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=plkhAnUXiFwBad9mwWbwN/wJIwOw8aPJV1mi75fwVbY=;
- b=EkO6Ujx9gljaDSm7NHH7ni6gMS8Bf6TS7kABBNCViXaDkDjC5k0xBvD5VZ9oBfiW4m
- 995FWyd1Oo6Nlt6yxObOBDGGV7dgeVPwGKDOrikps8PKCasL2A+70MAwBeKmMRGfI61W
- 8auVSDWH7dOzFf8h+UMg0kA82y4DaPD3Dj6jkb/IJ0dN2IqlibtWbxU3SjDOZWZI1cOE
- 9tFw84B+XyPAnsDPwwCORAk4huXYHT2TowW63iloTgNLFJy4qcAGcMrCcTEz4FVZgmS+
- g/2I0FFt2NExh/IlIBhPgMycxhygWpl5jnWuoXSjR+5U2iLZyEHPn3ZaBnEEanUp9JCZ
- fhRA==
+ bh=cAS9vKi2N/HAp/t/0K9X49WNII1M7/uVCyjiDB52u+M=;
+ b=lo3lQdKe8TFpxIRIkqXBrjp4OBAQh5+3+uxNafsm/rR7iIx2eVdslobgev+I5n9+ps
+ zoLnFI1gGZoEinXkJoCwPR0hB5xX6g39hUFkRYRzaFJOXvxf3zQ6n76ZJEIFr35extP5
+ XSvhOFtKPUapkfxCQYYV7BfoJ0nV0dGkB8emVQyTi3QKHo2qTZvDxGsW+bvaRebwR95O
+ ZtJ19v6O/ypyMNKjhg1qe7ilKZTbnASqGAPDkiEX5cbn1ulyRKJc8Ef4nUMQcf5V6AIN
+ WIuRGkIu4MGTOZLcrSQfYYuJ/8Dn0PlHOog8SsI2EyR+OA2yxJG5KnezIXvlS6ddhWxG
+ uzaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=plkhAnUXiFwBad9mwWbwN/wJIwOw8aPJV1mi75fwVbY=;
- b=Gry//7WiD4G8Wj+S+ENkcVU1kb2FnKYpWtG3e/T5Mlvk7BkDK4MVNx1adon1N/UrHS
- xKNajbJR+WWHUTg4A/IzO4GqH85/zEYORcmo/Q6He2NwW42bn1G2LrSTsvL3F8p4SbnD
- SDJYetQ644LuptQ94iTUmD5XjunlK8DE2Xg7c2kHiDAL1B3tDlrJZABRIA/2GcAP4uRY
- rK9+n+E5dLvE7e65RGoZqO1qn2n4RPQ6AfQkP5XTLe6HYKWICm+086HJPfY1l83aFHDz
- KI3k6q55+h1WXxsTCBI05qtMPOHZ9wDZJTcKNwgXYYHowgZ6naL7PHa4XzNB8BJIODlY
- mCjQ==
-X-Gm-Message-State: AOAM531vCJcun0uMTHcDQNgwZK2360Y1UmAR//hV4GKLmgfswioWM726
- CzlFZ1WvI8JOkctd7SsYQJtOuK87eV8=
-X-Google-Smtp-Source: ABdhPJwCR5o9Vbm4g2PadiG0M/QH2XWp9grEDf37ANt2ptSGdRhiKK+HdpbFPPAT4ethddQJIyZ11A==
-X-Received: by 2002:a05:600c:2146:: with SMTP id
- v6mr21602864wml.142.1590318088845; 
- Sun, 24 May 2020 04:01:28 -0700 (PDT)
+ bh=cAS9vKi2N/HAp/t/0K9X49WNII1M7/uVCyjiDB52u+M=;
+ b=Dxy0qpKUzlljo399CHns7J6m8VDqQRUOypHIBqiXfuw7pkXJvI+MoJ3To/InwQVZSJ
+ jT+h1++VVdKRAcQ0S4Yy3k38dJ0C2u7bb5orbI3/Cai6akUaH+nbqdw1CJ4cvHrwts17
+ NqkKaXVYOTLvf4tkPvmyAPJonMpGiWw+1IYlst6MLzdznEP9anUMt/B6w8uBLF1/EbjE
+ UzgTtgDHwS/69ccwheGcn+RISlPoecuiRwdKsNTfk4htkkABdWg6c+ZX6p2NPmeQFXem
+ ZoVJ5ll/BfVXaAe3+40UECr+Ru45z2nO3OOYxfyexcy7q19lUZnbPdqvIdPmtzhSNDJ9
+ oFGw==
+X-Gm-Message-State: AOAM531nYwVC5SfwMoIFVb0JdafmgymGOp15RDpiuEaOLKq+tEwpRTeJ
+ XBoEkCJeCMsCCiW7Xgo+bFeLDi9ZUbA=
+X-Google-Smtp-Source: ABdhPJwOSKNIQrq+4JyXAHkTCsw1WxiJFLhAXmiXwecpskUzlhVtgbSnYzxJSlkmdaRivgIPusj5cQ==
+X-Received: by 2002:a5d:5449:: with SMTP id w9mr10883881wrv.106.1590318086193; 
+ Sun, 24 May 2020 04:01:26 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id r3sm14321555wmh.48.2020.05.24.04.01.27
+ by smtp.gmail.com with ESMTPSA id r3sm14321555wmh.48.2020.05.24.04.01.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 May 2020 04:01:28 -0700 (PDT)
+ Sun, 24 May 2020 04:01:25 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] hw/display/cirrus_vga: Convert debug printf() to trace
- event
-Date: Sun, 24 May 2020 13:01:21 +0200
-Message-Id: <20200524110121.12686-5-f4bug@amsat.org>
+Subject: [PATCH 2/4] hw/display/cirrus_vga: Use qemu_log_mask(UNIMP) instead
+ of debug printf
+Date: Sun, 24 May 2020 13:01:19 +0200
+Message-Id: <20200524110121.12686-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200524110121.12686-1-f4bug@amsat.org>
 References: <20200524110121.12686-1-f4bug@amsat.org>
@@ -79,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,68 +108,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the final bit of DEBUG_BITBLT to a tracepoint.
+Replace some debug printf() calls by qemu_log_mask(LOG_UNIMP),
+and add a new one in cirrus_linear_bitblt_read().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/cirrus_vga.c | 24 ++++++++++--------------
- hw/display/trace-events |  1 +
- 2 files changed, 11 insertions(+), 14 deletions(-)
+ hw/display/cirrus_vga.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 76e2dc5bb6..92c197cdde 100644
+index 33ccdde000..f9f837b850 100644
 --- a/hw/display/cirrus_vga.c
 +++ b/hw/display/cirrus_vga.c
-@@ -53,7 +53,6 @@
-  */
- 
- //#define DEBUG_CIRRUS
--//#define DEBUG_BITBLT
- 
- /***************************************
-  *
-@@ -950,19 +949,16 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
-     s->cirrus_blt_dstaddr &= s->cirrus_addr_mask;
-     s->cirrus_blt_srcaddr &= s->cirrus_addr_mask;
- 
+@@ -35,6 +35,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/module.h"
+ #include "qemu/units.h"
++#include "qemu/log.h"
+ #include "sysemu/reset.h"
+ #include "qapi/error.h"
+ #include "trace.h"
+@@ -905,9 +906,8 @@ static int cirrus_bitblt_cputovideo(CirrusVGAState * s)
+ static int cirrus_bitblt_videotocpu(CirrusVGAState * s)
+ {
+     /* XXX */
 -#ifdef DEBUG_BITBLT
--    printf("rop=0x%02x mode=0x%02x modeext=0x%02x w=%d h=%d dpitch=%d spitch=%d daddr=0x%08x saddr=0x%08x writemask=0x%02x\n",
--           blt_rop,
--           s->cirrus_blt_mode,
--           s->cirrus_blt_modeext,
--           s->cirrus_blt_width,
--           s->cirrus_blt_height,
--           s->cirrus_blt_dstpitch,
--           s->cirrus_blt_srcpitch,
--           s->cirrus_blt_dstaddr,
--           s->cirrus_blt_srcaddr,
--           s->vga.gr[0x2f]);
+-    printf("cirrus: bitblt (video to cpu) is not implemented yet\n");
 -#endif
-+    trace_vga_cirrus_bitblt_start(blt_rop,
-+                                  s->cirrus_blt_mode,
-+                                  s->cirrus_blt_modeext,
-+                                  s->cirrus_blt_width,
-+                                  s->cirrus_blt_height,
-+                                  s->cirrus_blt_dstpitch,
-+                                  s->cirrus_blt_srcpitch,
-+                                  s->cirrus_blt_dstaddr,
-+                                  s->cirrus_blt_srcaddr,
-+                                  s->vga.gr[0x2f]);
++    qemu_log_mask(LOG_UNIMP,
++                  "cirrus: bitblt (video to cpu) is not implemented\n");
+     return 0;
+ }
  
-     switch (s->cirrus_blt_mode & CIRRUS_BLTMODE_PIXELWIDTHMASK) {
-     case CIRRUS_BLTMODE_PIXELWIDTH8:
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 96bbf600f4..6bfc53973f 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -134,6 +134,7 @@ vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
- vga_cirrus_write_gr(uint8_t index, uint8_t val) "GR addr 0x%02x, val 0x%02x"
-+vga_cirrus_bitblt_start(uint8_t blt_rop, uint8_t blt_mode, uint8_t blt_modeext, int blt_width, int blt_height, int blt_dstpitch, int blt_srcpitch, uint32_t blt_dstaddr, uint32_t blt_srcaddr, uint8_t gr_val) "rop=0x%02x mode=0x%02x modeext=0x%02x w=%d h=%d dpitch=%d spitch=%d daddr=0x%08"PRIx32" saddr=0x%08"PRIx32" writemask=0x%02x"
+@@ -989,9 +989,8 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
+ 	 cirrus_blt_mode & (CIRRUS_BLTMODE_MEMSYSSRC |
+ 			    CIRRUS_BLTMODE_MEMSYSDEST))
+ 	== (CIRRUS_BLTMODE_MEMSYSSRC | CIRRUS_BLTMODE_MEMSYSDEST)) {
+-#ifdef DEBUG_BITBLT
+-	printf("cirrus: bitblt - memory-to-memory copy is requested\n");
+-#endif
++        qemu_log_mask(LOG_UNIMP,
++                      "cirrus: bitblt - memory-to-memory copy requested\n");
+ 	goto bitblt_ignore;
+     }
  
- # sii9022.c
- sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+@@ -2412,6 +2411,9 @@ static uint64_t cirrus_linear_bitblt_read(void *opaque,
+ 
+     /* XXX handle bitblt */
+     (void)s;
++    qemu_log_mask(LOG_UNIMP,
++                  "cirrus: linear bitblt is not implemented\n");
++
+     return 0xff;
+ }
+ 
 -- 
 2.21.3
 
