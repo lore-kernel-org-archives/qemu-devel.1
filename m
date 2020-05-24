@@ -2,79 +2,132 @@ Return-Path: <SRS0=Dt9u=7G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF46C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 04:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64049C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 10:21:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 500212073B
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 04:21:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500212073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 298F22077D
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 10:21:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeSNC3yN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 298F22077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jci8d-0001jD-D8
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 00:21:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
+	id 1jcnlL-0005Vk-Al
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 06:21:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jci7s-0000xy-K5
- for qemu-devel@nongnu.org; Sun, 24 May 2020 00:20:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47138)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jci7q-0005Zg-JP
- for qemu-devel@nongnu.org; Sun, 24 May 2020 00:20:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jci7o-0001HY-DI
- for <qemu-devel@nongnu.org>; Sun, 24 May 2020 04:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 616ED2E8052
- for <qemu-devel@nongnu.org>; Sun, 24 May 2020 04:20:36 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcnkl-000551-HT
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 06:21:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38249
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jcnkg-0001c1-MD
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 06:21:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590315664;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=AvnijKzGXQOW5GBXx+hJrxkJ7cEgN2jA8BnHoZAskOg=;
+ b=KeSNC3yNNxzCAII1B6+ClqepA+Bp4nCCiCnLueBO/6zZQV2yY5qo7kd26vazZ3F2lCbe4k
+ a8PvUDf62UgButjeav+0/SJ8F4C6M82zepgrxV31VksJ5S8q3BjnIF604vqNIr2xljW15r
+ 7JtCF9h/aLbW79/L7LtREoRsk1jkK5Q=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-ngTVa8qVM1yBrDNcpegCjw-1; Sun, 24 May 2020 06:21:02 -0400
+X-MC-Unique: ngTVa8qVM1yBrDNcpegCjw-1
+Received: by mail-wr1-f71.google.com with SMTP id w4so1111174wrl.13
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 03:21:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=AvnijKzGXQOW5GBXx+hJrxkJ7cEgN2jA8BnHoZAskOg=;
+ b=PNDSJZUMMXbuBMjCigivzs1uqHyok5VH4yAILnxEDfmaJReF+K8nBi+8Ky2pnENktR
+ T12W2CKdmv7+Zqw1TOK/yAtJx+mCk04K6l/5QQSIwZlOBNIpw69hry0Woenq181s+/G+
+ j4URczWp/OwXxxoAZ6p/mticMexmZENNF7O2nHjXRHsyylEJ2bVhg/9R4Cq6THRtZpMI
+ u9xqSeCs6J/LtwKuzGcFpmbB6QbT4c3vmKF+x+WJnf4jgym4pDGbGKu98ufW742W7ThP
+ kJh4pXi+R7iIWBxHh/4r+AcCljwdjvSfFvPo7KD3E4Spz9sIcaRxqICSefcq2LsRmtGL
+ EhBw==
+X-Gm-Message-State: AOAM532qSf15P5Z9AdyJHzlvBjusTU7TLnBUAQlRuAswebuPTa0mVwOI
+ NBFOwoAti1kun5N41L1uzy8uBYScdubZEIb2EhSk0zCgnWKRzb4iH+MST0HapWrSv9hJmTztCDI
+ h5RzV4ApSRUU5oV4=
+X-Received: by 2002:a1c:22d7:: with SMTP id i206mr40836wmi.186.1590315661619; 
+ Sun, 24 May 2020 03:21:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxF/dJegdiFcOF9B1TwSrG+vP41ME+XZPve1mpQBF4Imo6T+F3zsjFWHA4TWpPuaXSA6N3gGQ==
+X-Received: by 2002:a1c:22d7:: with SMTP id i206mr40822wmi.186.1590315661337; 
+ Sun, 24 May 2020 03:21:01 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id l204sm4721813wmf.19.2020.05.24.03.20.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 24 May 2020 03:21:00 -0700 (PDT)
+Subject: Re: [PATCH 02/19] cpu: convert queued work to a QSIMPLEQ
+To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+References: <20200522160755.886-1-robert.foley@linaro.org>
+ <20200522160755.886-3-robert.foley@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <c9800478-e184-32ad-6cec-3f8ad4e3bed1@redhat.com>
+Date: Sun, 24 May 2020 12:20:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 24 May 2020 04:12:15 -0000
-From: Alexander Bulekov <1880355@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <159029353528.907.11982786579949073896.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1880355] [NEW] Length restrictions for fw_cfg_dma_transfer?
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0d8324ef564810016ad34a55ebede69c168b3bda
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 00:20:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200522160755.886-3-robert.foley@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 06:21:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,143 +136,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880355 <1880355@bugs.launchpad.net>
+Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 5/22/20 6:07 PM, Robert Foley wrote:
+> From: "Emilio G. Cota" <cota@braap.org>
+> 
+> Instead of open-coding it.
 
-For me, this takes close to 3 minutes at 100% CPU:
-echo "outl 0x518 0x9596ffff" | ./i386-softmmu/qemu-system-i386 -M q35 -m 32=
- -nographic -accel qtest -monitor none -serial none -qtest stdio
+Please use a full sentence (repeating the patch subject):
 
-#0  phys_page_find (d=3D0x606000035d80, addr=3D136728041144404) at /exec.c:=
-338
-#1  address_space_lookup_region (d=3D0x606000035d80, addr=3D136728041144404=
-, resolve_subpage=3Dtrue) at /exec.c:363
-#2  address_space_translate_internal (d=3D0x606000035d80, addr=3D1367280411=
-44404, xlat=3D0x7fff1fc0d070, plen=3D0x7fff1fc0d090, resolve_subpage=3Dtrue=
-) at /exec.c:382
-#3  flatview_do_translate (fv=3D0x606000035d20, addr=3D136728041144404, xla=
-t=3D0x7fff1fc0d070, plen_out=3D0x7fff1fc0d090, page_mask_out=3D0x0, is_writ=
-e=3Dtrue, is_mmio=3Dtrue, target_as=3D0x7fff1fc0ce10, attrs=3D...)
-    pment/qemu/exec.c:520
-#4  flatview_translate (fv=3D0x606000035d20, addr=3D136728041144404, xlat=
-=3D0x7fff1fc0d070, plen=3D0x7fff1fc0d090, is_write=3Dtrue, attrs=3D...) at =
-/exec.c:586
-#5  flatview_write_continue (fv=3D0x606000035d20, addr=3D136728041144404, a=
-ttrs=3D..., ptr=3D0x7fff1fc0d660, len=3D172, addr1=3D136728041144400, l=3D1=
-72, mr=3D0x557fd54e77e0 <io_mem_unassigned>)
-    pment/qemu/exec.c:3160
-#6  flatview_write (fv=3D0x606000035d20, addr=3D136728041144064, attrs=3D..=
-., buf=3D0x7fff1fc0d660, len=3D512) at /exec.c:3177
-#7  address_space_write (as=3D0x557fd54e7a00 <address_space_memory>, addr=
-=3D136728041144064, attrs=3D..., buf=3D0x7fff1fc0d660, len=3D512) at /exec.=
-c:3271
-#8  dma_memory_set (as=3D0x557fd54e7a00 <address_space_memory>, addr=3D1367=
-28041144064, c=3D0 '\000', len=3D1378422272) at /dma-helpers.c:31
-#9  fw_cfg_dma_transfer (s=3D0x61a000001e80) at /hw/nvram/fw_cfg.c:400
-#10 fw_cfg_dma_mem_write (opaque=3D0x61a000001e80, addr=3D4, value=3D429494=
-0309, size=3D4) at /hw/nvram/fw_cfg.c:467
-#11 memory_region_write_accessor (mr=3D0x61a000002200, addr=3D4, value=3D0x=
-7fff1fc0e3d0, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D...) at /memo=
-ry.c:483
-#12 access_with_adjusted_size (addr=3D4, value=3D0x7fff1fc0e3d0, size=3D4, =
-access_size_min=3D1, access_size_max=3D8, access_fn=3D0x557fd2288c80 <memor=
-y_region_write_accessor>, mr=3D0x61a000002200, attrs=3D...)
-    pment/qemu/memory.c:539
-#13 memory_region_dispatch_write (mr=3D0x61a000002200, addr=3D4, data=3D429=
-4940309, op=3DMO_32, attrs=3D...) at /memory.c:1476
-#14 flatview_write_continue (fv=3D0x606000035f00, addr=3D1304, attrs=3D...,=
- ptr=3D0x7fff1fc0ec40, len=3D4, addr1=3D4, l=3D4, mr=3D0x61a000002200) at /=
-exec.c:3137
-#15 flatview_write (fv=3D0x606000035f00, addr=3D1304, attrs=3D..., buf=3D0x=
-7fff1fc0ec40, len=3D4) at /exec.c:3177
-#16 address_space_write (as=3D0x557fd54e7bc0 <address_space_io>, addr=3D130=
-4, attrs=3D..., buf=3D0x7fff1fc0ec40, len=3D4) at /exec.c:3271
+"Convert queued work to a QSIMPLEQ instead of open-coding it."
 
+(Not all email clients display the subject preceding the content).
 
-It looks like fw_cfg_dma_transfer gets the address(136728041144064) and len=
-gth(1378422272) for the read from the value provided as input 4294940309 (0=
-xFFFF9695) which lands in pcbios. Should there be any limits on the length =
-of guest-memory that fw_cfg should populate?
-Found by libfuzzer
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> 
+> While at it, make sure that all accesses to the list are
+> performed while holding the list's lock.
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> ---
+>  cpus-common.c         | 25 ++++++++-----------------
+>  cpus.c                | 14 ++++++++++++--
+>  hw/core/cpu.c         |  1 +
+>  include/hw/core/cpu.h |  6 +++---
+>  4 files changed, 24 insertions(+), 22 deletions(-)
+> 
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 55d5df8923..210fc7fc39 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -97,7 +97,7 @@ void cpu_list_remove(CPUState *cpu)
+>  }
+>  
+>  struct qemu_work_item {
+> -    struct qemu_work_item *next;
+> +    QSIMPLEQ_ENTRY(qemu_work_item) node;
+>      run_on_cpu_func func;
+>      run_on_cpu_data data;
+>      bool free, exclusive, done;
+> @@ -106,13 +106,7 @@ struct qemu_work_item {
+>  static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+>  {
+>      qemu_mutex_lock(&cpu->work_mutex);
+> -    if (cpu->queued_work_first == NULL) {
+> -        cpu->queued_work_first = wi;
+> -    } else {
+> -        cpu->queued_work_last->next = wi;
+> -    }
+> -    cpu->queued_work_last = wi;
+> -    wi->next = NULL;
+> +    QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+>      wi->done = false;
+>      qemu_mutex_unlock(&cpu->work_mutex);
+>  
+> @@ -306,17 +300,14 @@ void process_queued_cpu_work(CPUState *cpu)
+>  {
+>      struct qemu_work_item *wi;
+>  
+> -    if (cpu->queued_work_first == NULL) {
+> +    qemu_mutex_lock(&cpu->work_mutex);
+> +    if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+> +        qemu_mutex_unlock(&cpu->work_mutex);
+>          return;
+>      }
+> -
+> -    qemu_mutex_lock(&cpu->work_mutex);
+> -    while (cpu->queued_work_first != NULL) {
+> -        wi = cpu->queued_work_first;
+> -        cpu->queued_work_first = wi->next;
+> -        if (!cpu->queued_work_first) {
+> -            cpu->queued_work_last = NULL;
+> -        }
+> +    while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
+> +        wi = QSIMPLEQ_FIRST(&cpu->work_list);
+> +        QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+>          qemu_mutex_unlock(&cpu->work_mutex);
+>          if (wi->exclusive) {
+>              /* Running work items outside the BQL avoids the following deadlock:
+> diff --git a/cpus.c b/cpus.c
+> index 5670c96bcf..af44027549 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -97,9 +97,19 @@ bool cpu_is_stopped(CPUState *cpu)
+>      return cpu->stopped || !runstate_is_running();
+>  }
+>  
+> +static inline bool cpu_work_list_empty(CPUState *cpu)
+> +{
+> +    bool ret;
+> +
+> +    qemu_mutex_lock(&cpu->work_mutex);
+> +    ret = QSIMPLEQ_EMPTY(&cpu->work_list);
+> +    qemu_mutex_unlock(&cpu->work_mutex);
+> +    return ret;
+> +}
+> +
+>  static bool cpu_thread_is_idle(CPUState *cpu)
+>  {
+> -    if (cpu->stop || cpu->queued_work_first) {
+> +    if (cpu->stop || !cpu_work_list_empty(cpu)) {
+>          return false;
+>      }
+>      if (cpu_is_stopped(cpu)) {
+> @@ -1498,7 +1508,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>              cpu = first_cpu;
+>          }
+>  
+> -        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+> +        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
+>  
+>              atomic_mb_set(&tcg_current_rr_cpu, cpu);
+>              current_cpu = cpu;
+> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+> index 5284d384fb..77703d62b7 100644
+> --- a/hw/core/cpu.c
+> +++ b/hw/core/cpu.c
+> @@ -368,6 +368,7 @@ static void cpu_common_initfn(Object *obj)
+>      cpu->nr_threads = 1;
+>  
+>      qemu_mutex_init(&cpu->work_mutex);
+> +    QSIMPLEQ_INIT(&cpu->work_list);
+>      QTAILQ_INIT(&cpu->breakpoints);
+>      QTAILQ_INIT(&cpu->watchpoints);
+>  
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index 07f7698155..d78ff1d165 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -331,8 +331,8 @@ struct qemu_work_item;
+>   * @opaque: User data.
+>   * @mem_io_pc: Host Program Counter at which the memory was accessed.
+>   * @kvm_fd: vCPU file descriptor for KVM.
+> - * @work_mutex: Lock to prevent multiple access to queued_work_*.
+> - * @queued_work_first: First asynchronous work pending.
+> + * @work_mutex: Lock to prevent multiple access to @work_list.
+> + * @work_list: List of pending asynchronous work.
+>   * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+>   *                        to @trace_dstate).
+>   * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
+> @@ -376,7 +376,7 @@ struct CPUState {
+>      sigjmp_buf jmp_env;
+>  
+>      QemuMutex work_mutex;
+> -    struct qemu_work_item *queued_work_first, *queued_work_last;
+> +    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+>  
+>      CPUAddressSpace *cpu_ases;
+>      int num_ases;
+> 
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880355
-
-Title:
-  Length restrictions for fw_cfg_dma_transfer?
-
-Status in QEMU:
-  New
-
-Bug description:
-  For me, this takes close to 3 minutes at 100% CPU:
-  echo "outl 0x518 0x9596ffff" | ./i386-softmmu/qemu-system-i386 -M q35 -m =
-32 -nographic -accel qtest -monitor none -serial none -qtest stdio
-
-  #0  phys_page_find (d=3D0x606000035d80, addr=3D136728041144404) at /exec.=
-c:338
-  #1  address_space_lookup_region (d=3D0x606000035d80, addr=3D1367280411444=
-04, resolve_subpage=3Dtrue) at /exec.c:363
-  #2  address_space_translate_internal (d=3D0x606000035d80, addr=3D13672804=
-1144404, xlat=3D0x7fff1fc0d070, plen=3D0x7fff1fc0d090, resolve_subpage=3Dtr=
-ue) at /exec.c:382
-  #3  flatview_do_translate (fv=3D0x606000035d20, addr=3D136728041144404, x=
-lat=3D0x7fff1fc0d070, plen_out=3D0x7fff1fc0d090, page_mask_out=3D0x0, is_wr=
-ite=3Dtrue, is_mmio=3Dtrue, target_as=3D0x7fff1fc0ce10, attrs=3D...)
-      pment/qemu/exec.c:520
-  #4  flatview_translate (fv=3D0x606000035d20, addr=3D136728041144404, xlat=
-=3D0x7fff1fc0d070, plen=3D0x7fff1fc0d090, is_write=3Dtrue, attrs=3D...) at =
-/exec.c:586
-  #5  flatview_write_continue (fv=3D0x606000035d20, addr=3D136728041144404,=
- attrs=3D..., ptr=3D0x7fff1fc0d660, len=3D172, addr1=3D136728041144400, l=
-=3D172, mr=3D0x557fd54e77e0 <io_mem_unassigned>)
-      pment/qemu/exec.c:3160
-  #6  flatview_write (fv=3D0x606000035d20, addr=3D136728041144064, attrs=3D=
-..., buf=3D0x7fff1fc0d660, len=3D512) at /exec.c:3177
-  #7  address_space_write (as=3D0x557fd54e7a00 <address_space_memory>, addr=
-=3D136728041144064, attrs=3D..., buf=3D0x7fff1fc0d660, len=3D512) at /exec.=
-c:3271
-  #8  dma_memory_set (as=3D0x557fd54e7a00 <address_space_memory>, addr=3D13=
-6728041144064, c=3D0 '\000', len=3D1378422272) at /dma-helpers.c:31
-  #9  fw_cfg_dma_transfer (s=3D0x61a000001e80) at /hw/nvram/fw_cfg.c:400
-  #10 fw_cfg_dma_mem_write (opaque=3D0x61a000001e80, addr=3D4, value=3D4294=
-940309, size=3D4) at /hw/nvram/fw_cfg.c:467
-  #11 memory_region_write_accessor (mr=3D0x61a000002200, addr=3D4, value=3D=
-0x7fff1fc0e3d0, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D...) at /me=
-mory.c:483
-  #12 access_with_adjusted_size (addr=3D4, value=3D0x7fff1fc0e3d0, size=3D4=
-, access_size_min=3D1, access_size_max=3D8, access_fn=3D0x557fd2288c80 <mem=
-ory_region_write_accessor>, mr=3D0x61a000002200, attrs=3D...)
-      pment/qemu/memory.c:539
-  #13 memory_region_dispatch_write (mr=3D0x61a000002200, addr=3D4, data=3D4=
-294940309, op=3DMO_32, attrs=3D...) at /memory.c:1476
-  #14 flatview_write_continue (fv=3D0x606000035f00, addr=3D1304, attrs=3D..=
-., ptr=3D0x7fff1fc0ec40, len=3D4, addr1=3D4, l=3D4, mr=3D0x61a000002200) at=
- /exec.c:3137
-  #15 flatview_write (fv=3D0x606000035f00, addr=3D1304, attrs=3D..., buf=3D=
-0x7fff1fc0ec40, len=3D4) at /exec.c:3177
-  #16 address_space_write (as=3D0x557fd54e7bc0 <address_space_io>, addr=3D1=
-304, attrs=3D..., buf=3D0x7fff1fc0ec40, len=3D4) at /exec.c:3271
-
-  =
-
-  It looks like fw_cfg_dma_transfer gets the address(136728041144064) and l=
-ength(1378422272) for the read from the value provided as input 4294940309 =
-(0xFFFF9695) which lands in pcbios. Should there be any limits on the lengt=
-h of guest-memory that fw_cfg should populate?
-  Found by libfuzzer
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880355/+subscriptions
 
