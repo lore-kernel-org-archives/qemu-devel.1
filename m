@@ -2,97 +2,85 @@ Return-Path: <SRS0=Dt9u=7G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C08C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 13:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B026CC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 13:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E9120787
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 13:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70D30207FB
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 13:28:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdscoEYV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E9120787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UNxaD2c8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D30207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcqMA-0008Ox-3A
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 09:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37932)
+	id 1jcqfv-0006Sg-KS
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 09:28:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcqKk-0007Sq-GX
- for qemu-devel@nongnu.org; Sun, 24 May 2020 09:06:30 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45673
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jcqKi-0002U3-Ee
- for qemu-devel@nongnu.org; Sun, 24 May 2020 09:06:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590325586;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Rd44ezU6wtG9fEan0ofSgiZlCR/26n83j5jaO4x3hCQ=;
- b=GdscoEYVwS1BoZypdtNJOeQBOpoFqoIm/bUcFWv6IU4g8VVf9zfv/jin9DK6T3vO1QSIE5
- xo3cQoeTmh1UbQs/Wy2yJTngSJOQPYpZzauW4+BBVZYPfwzzAq0liD8WrgpqLif11e7O4n
- /EPdmZ5bqEXvhpWjGNJptxmxpKA+/lY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-6QtmfvNuNbmYHhkPGXHWOg-1; Sun, 24 May 2020 09:06:25 -0400
-X-MC-Unique: 6QtmfvNuNbmYHhkPGXHWOg-1
-Received: by mail-qv1-f71.google.com with SMTP id dm14so15206744qvb.7
- for <qemu-devel@nongnu.org>; Sun, 24 May 2020 06:06:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jcqf2-0005g3-G4
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 09:27:28 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40699)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jcqf1-0005hd-Gb
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 09:27:28 -0400
+Received: by mail-oi1-x243.google.com with SMTP id v128so13942836oia.7
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 06:27:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TdGCLAkPEtn9FVvx/hEI+xO1c5a8MG1ZLDpElMnNnjk=;
+ b=UNxaD2c8qV84hWmlfEEF4CYb0Z70GZ4uUzDk02jHpR+0MQd7djIB2jnSR0VVyKImKD
+ sjmHybvIUVjKsilpYDGa+hnkPqLLCv5avlbvL27EJ0wSG80zmhCcJr3LBCD3PKmc/SiJ
+ WHr03jgNkO8BD7arIXlB4V69bg1w9HnXs1NvmNvWHBaYv0vN5SIS0ZHT9ZkKejWJoC8K
+ GkZ+AeX+LKKjp6O6mEbxan0/aJ9DSwIWJIqRXYCZ4163WjVZz0QmwA7B4FcLKmHz+EHd
+ D2Crc81afPC3bWPNVjdv/X6r3Y6fHvJab3TG8o/k3tACmkN1rWO4AwNmP851Hi9anxNB
+ t13g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Rd44ezU6wtG9fEan0ofSgiZlCR/26n83j5jaO4x3hCQ=;
- b=JFZKGwksVil8PjqY7pgZZqpO8kugY1BSZtIENw8DINCbsAi8MwYAEVLtV6fDFQ1yuv
- qLwx1StOBR4GFjUnjOMLBSlDnhGFd/wHFzSBA5u0nnuXmgRoQn58mO9BJWrsyssOav/h
- vMWjaWhc5+IM+abKS4zqucAaBOfdmcVhHpm/uZqzPcFLGdq5NBLNWeQom97uC2PfXfjU
- q2RApS2G1Prs0acKG9rry6qvU4wcFlhtD4dNrId5EImccZXcjPEF6O6wXSfAB75nffzK
- amfvruXIG/Dui5d27j4cfeeoTDtH3h8JyLp/A5P3UKrkz7BjmMVcwYUHsq/OHfTFEuDH
- icUw==
-X-Gm-Message-State: AOAM531ugDIxVcUlfzcPWLpK0ai52jWKEOojsz7u22LVz3WuCsw6zbQJ
- 1GYJllyOS/+4zC2wJfHI3a+7ipi25qNb8DnH7I2zFKfLF3HQZrC3I/SCXcJwofbdv/Uy8D+c59P
- sgBMFG8DSCoBdx9s=
-X-Received: by 2002:a0c:aa4c:: with SMTP id e12mr11472446qvb.12.1590325584461; 
- Sun, 24 May 2020 06:06:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwFEO5eOwi1GqEET+RO1F1Cw3I00hagMXrBxJa5ZZOrgTflXPzsbFDfDrcy6e8U0xA9f9cGPA==
-X-Received: by 2002:a0c:aa4c:: with SMTP id e12mr11472436qvb.12.1590325584226; 
- Sun, 24 May 2020 06:06:24 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id a62sm5708512qkg.71.2020.05.24.06.06.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 May 2020 06:06:23 -0700 (PDT)
-Date: Sun, 24 May 2020 09:06:20 -0400
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH RFC v3 00/11] KVM: Dirty ring support (QEMU part)
-Message-ID: <20200524130620.GA1055987@xz-x1>
-References: <20200523232035.1029349-1-peterx@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TdGCLAkPEtn9FVvx/hEI+xO1c5a8MG1ZLDpElMnNnjk=;
+ b=qC5aCBGfeyacsYj0l7dy+L/blUvoHITQLhSAe62ZAFsRyXAe+WMDZ47qsMOSTMOZDE
+ 1vkDzE1z+mvTGZKotEymAmBXBs/yVtkWFPZOPrS3Z2RhbwPfSGNYsVbp6vXkyOaybakR
+ OCtW6RRjvHx+rgSQH2S2XImbE8q/A8ex4ZT561e0dey7MqV3StUB+nEiDO/CnvTehhvS
+ ZSrlUs3d9ymuoSSthR0LwkTqiNQ1ltojMEdY/2YY8k57C1kgFqy0itpAncwZpi0yghlj
+ TyKtmYUtuDf5hlMwMOmqziw86iQxBIoab7nF1LUogXsiS6SZNwXLHfWrFc6U4m8Lsduk
+ FCEA==
+X-Gm-Message-State: AOAM530HMtcKOcrLQWVq/yBKFAJPS2z/IyZGQ/CPF5CXSG4kNtpydfFI
+ 2AOzx+HGHTJjbmg/RKMyIj+yQ87PbBqKkjJTYUbocg==
+X-Google-Smtp-Source: ABdhPJyRY5oPpvgL1qRSmLEi0TO3H4cU0bTxW7iDUS7ZnYicgoHitpvPXdVrzj0kF3zwNgIb2Js+z0G149xTLmS5/C4=
+X-Received: by 2002:a54:469a:: with SMTP id k26mr3482104oic.163.1590326845233; 
+ Sun, 24 May 2020 06:27:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200523232035.1029349-1-peterx@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 06:46:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200523232035.1029349-1-peterx@redhat.com>
+ <20200523232035.1029349-2-peterx@redhat.com>
+In-Reply-To: <20200523232035.1029349-2-peterx@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 24 May 2020 14:27:14 +0100
+Message-ID: <CAFEAcA9jq6UbaZAT-itF5Kswy1YSAocKa8mVVh0hNF7DuLGBqA@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 01/11] linux-headers: Update
+To: Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,21 +94,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, May 23, 2020 at 07:20:24PM -0400, Peter Xu wrote:
-> I kept the dirty sync in kvm_set_phys_mem() for kvmslot removals, left a
-> comment on the known issue about strict dirty sync so we can fix it someday in
-> the future together with dirty log and dirty ring.
+On Sun, 24 May 2020 at 00:21, Peter Xu <peterx@redhat.com> wrote:
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Side note: patch 3,5-8 should not be RFC material at all - they either fixes
-existing issues or clean code up.  Please conside to review/merge them first
-even before the rest of the patches.  Thanks,
+Header updates should always include the upstream
+kernel commit against which you ran the scripts/update-linux-headers.sh
+script, please.
 
--- 
-Peter Xu
+ linux-headers/asm-x86/kvm.h |  1 +
+ linux-headers/linux/kvm.h   | 53 +++++++++++++++++++++++++++++++++++++
 
+Are these really the only files which had changes? It looks
+a suspiciously short list...
+
+thanks
+-- PMM
 
