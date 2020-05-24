@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1832C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 16:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42922C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 16:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC0892065F
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 16:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 129E32073B
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 16:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSEtAGWq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0892065F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wmxx7/09"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 129E32073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jctnw-0004vl-Uu
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 12:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54070)
+	id 1jctrF-0006ue-9R
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 12:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jctnH-00042n-1v; Sun, 24 May 2020 12:48:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51892)
+ id 1jctqV-0006IG-U9; Sun, 24 May 2020 12:51:31 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45724)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jctnG-0007BK-B9; Sun, 24 May 2020 12:48:10 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u13so4640336wml.1;
- Sun, 24 May 2020 09:48:09 -0700 (PDT)
+ id 1jctqV-0007gH-2l; Sun, 24 May 2020 12:51:31 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c3so10789988wru.12;
+ Sun, 24 May 2020 09:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=d+AFOFh8gCQwnWPlMSLulMjA1GT+eEiX+AJqYwO+CG4=;
- b=RSEtAGWqAndGpdCQxoIr7cxn6G8UYZkzzjuDJ3LzMjrgXAY/NPFSqjULUvmN9fNpCa
- doquZseoZz5i0hLoOgb45Sh6ox7PjaeS7qT6g1VMMYG859b65sgN8PXboemh8EfveiJc
- vsTywHVsksxd0KW0fsmwqoNB0vOJfY9/JVNzeF6I7M74o8/6+FJi+TMEWk2byjR5rqvQ
- tFc41eqS1gysgD/UMA5Z2jZslIgnb3jzFkiqP3nCRxMKrbI2wjLoTDKUiKmbs2CrL2Do
- 0J7o28qkOHQh8+oiVolY75V1KKcf2f2RvrjJi0KA4M/jOMvvzSgAokElcHmrlMZnoxLd
- 85SA==
+ bh=A5eA3fxA5I4ePu0JOBPPzSYvNnOc3wYRHkvM98rYLYw=;
+ b=Wmxx7/09bXydbBHx2rl23xn3p3t8BsJdlIY73HQt026N03cq/wRW2ow0kARH82M2HT
+ MCop+RWNZonu0gm+xfTUi/DDCAejsHmVGmZx518ru1daEpni9IOqV0TcplPTILdAxj4p
+ 2YpfPXR+4Iw5vrDj070O0wiqoyr78nKbRvQMzJVjvK7sxkG9OQmZ7m44lGc6NdHLXxqu
+ oEIp0ab2xPr5deIKtuyQPNqEo3zq5kPNcwSXMXo6rfH9DhNxVh8mClR62SnA4EOijCDz
+ FiaAttrBsYXzO5PYGPX0tRohjeq3ELQ16+gSii2Z0EoriSScId4ukJEWnEft9u5NIfhE
+ Q9fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=d+AFOFh8gCQwnWPlMSLulMjA1GT+eEiX+AJqYwO+CG4=;
- b=tnJjEGpCzOQY3Zbk+p/ZdXffnJNmyiv2ZO+pv0xRJr7oeZS5jkCgRpDo5h7QxGoAkD
- KcDqWXO9oxcmc1wxsmBLn7JV8mSOmaTLy+5Pk2CwbwMvARbMLGtm8oJx8ZFqaw2nAAx9
- HWQY8LHuxg5/LbrFjxcui3u7TwkiPwvAamzFs4ooi1ark2Y5eb0EkRKvN1ULdQUKyNlj
- qIlGLiMsH08SQsPgz6Epx/CDqA9juP5jtTXByu22vgk7V2JqTpE7+V8AuHOuTIJYyDFL
- c2U0Rcy2EPv7DkRfSq0V7k/OyVH0BC3SuGzdIddHoziQie+4mF2vszQJw2uYntkTsb1r
- 71iA==
-X-Gm-Message-State: AOAM5326T5RXZ/fb2/qhPPGaCf3CnUj8/lZZcTBkCym3/w4qC/EGelVa
- dkcUpnTVUfXD542X+v39Z9vYOpckynM=
-X-Google-Smtp-Source: ABdhPJySVzDiJ0xFvvDt+W0uVgMpLntaPLbybphhuVJtwr1ypjInUvwpPvV9eKAGw2iKf0+VhJiFXQ==
-X-Received: by 2002:a7b:c741:: with SMTP id w1mr21641668wmk.63.1590338888293; 
- Sun, 24 May 2020 09:48:08 -0700 (PDT)
+ bh=A5eA3fxA5I4ePu0JOBPPzSYvNnOc3wYRHkvM98rYLYw=;
+ b=a7OJe3E1Y+SzEeKJWaWfOzyzmek0UDdWyvWc/K+RhX4P+SJZtMj2RImlIgGEFzj0fD
+ vn9pwBWpT/+hh5nPOyYvMLIF8x5iASzke7SQUkJ56qeBc0MsoNaeoUshc4Olc0YqLH2c
+ 4iJplToBwwYh+wJmxYL4Qt4OWhsjpXCpq45Grrm7k0bxtgaGyrALXwS5/HHP5UDfpUYe
+ SdhRdq6pxVPVM1fVj1gpF3PdWnjHxfsk52p18f8ZGbwAVLbz25BnwNAvrljFeS7InOcs
+ o5pFf39XGXRkj2GJy7x02qOHUSfNB1otK94tSdqkqSR7YGGP3sAomDRteGqo7gmr/a/y
+ IjTg==
+X-Gm-Message-State: AOAM533LjK1vr7wGYoyybY8AF+JiYGUXEoPv3f7br3XzeA1L1oInLS7A
+ ycF7npVSestINRnriQekUZMHZz3XkiA=
+X-Google-Smtp-Source: ABdhPJzEF93AKx2SLN9aDAtEBZfewUfCrmOfY1csZ2oHTHijp2wuofJIP1EIGSit393fO7Y3db0VnA==
+X-Received: by 2002:a05:6000:12c2:: with SMTP id
+ l2mr11228431wrx.133.1590339088792; 
+ Sun, 24 May 2020 09:51:28 -0700 (PDT)
 Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id 37sm15540478wrk.61.2020.05.24.09.48.07
+ by smtp.gmail.com with ESMTPSA id z206sm3125552wmg.30.2020.05.24.09.51.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 May 2020 09:48:07 -0700 (PDT)
+ Sun, 24 May 2020 09:51:28 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/isa/apm: Convert debug printf()s to trace events
-Date: Sun, 24 May 2020 18:48:06 +0200
-Message-Id: <20200524164806.12658-1-f4bug@amsat.org>
+Subject: [PATCH] hw/nvram/mac_nvram: Convert debug printf()s to trace events
+Date: Sun, 24 May 2020 18:51:26 +0200
+Message-Id: <20200524165126.13920-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -99,74 +100,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-ppc@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "Michael S. Tsirkin" <mst@redhat.com>
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert APM_DPRINTF() to trace events and remove ifdef'ry.
+Convert NVR_DPRINTF() to trace events and remove ifdef'ry.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/isa/apm.c        | 15 +++++----------
- hw/isa/trace-events |  4 ++++
- 2 files changed, 9 insertions(+), 10 deletions(-)
+ hw/nvram/mac_nvram.c  | 17 +++--------------
+ hw/nvram/trace-events |  4 ++++
+ 2 files changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/hw/isa/apm.c b/hw/isa/apm.c
-index 6300b1ba7a..bce266b957 100644
---- a/hw/isa/apm.c
-+++ b/hw/isa/apm.c
-@@ -24,14 +24,8 @@
- #include "hw/isa/apm.h"
- #include "hw/pci/pci.h"
+diff --git a/hw/nvram/mac_nvram.c b/hw/nvram/mac_nvram.c
+index ff5db03e6b..beec1c4e4d 100644
+--- a/hw/nvram/mac_nvram.c
++++ b/hw/nvram/mac_nvram.c
+@@ -30,18 +30,9 @@
  #include "migration/vmstate.h"
+ #include "qemu/cutils.h"
+ #include "qemu/module.h"
 +#include "trace.h"
+ #include <zlib.h>
  
--//#define DEBUG
+-/* debug NVR */
+-//#define DEBUG_NVR
 -
--#ifdef DEBUG
--# define APM_DPRINTF(format, ...)       printf(format, ## __VA_ARGS__)
+-#ifdef DEBUG_NVR
+-#define NVR_DPRINTF(fmt, ...)                                   \
+-    do { printf("NVR: " fmt , ## __VA_ARGS__); } while (0)
 -#else
--# define APM_DPRINTF(format, ...)       do { } while (0)
+-#define NVR_DPRINTF(fmt, ...)
 -#endif
+-
+ #define DEF_SYSTEM_SIZE 0xc10
  
- /* fixed I/O location */
- #define APM_STS_IOPORT  0xb3
-@@ -41,8 +35,8 @@ static void apm_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
- {
-     APMState *apm = opaque;
-     addr &= 1;
--    APM_DPRINTF("apm_ioport_writeb addr=0x%" HWADDR_PRIx
--                " val=0x%02" PRIx64 "\n", addr, val);
-+
-+    trace_apm_io_write(addr, val);
-     if (addr == 0) {
-         apm->apmc = val;
+ /* macio style NVRAM device */
+@@ -51,9 +42,8 @@ static void macio_nvram_writeb(void *opaque, hwaddr addr,
+     MacIONVRAMState *s = opaque;
  
-@@ -65,7 +59,8 @@ static uint64_t apm_ioport_readb(void *opaque, hwaddr addr, unsigned size)
-     } else {
-         val = apm->apms;
-     }
--    APM_DPRINTF("apm_ioport_readb addr=0x%" HWADDR_PRIx " val=0x%02x\n", addr, val);
-+    trace_apm_io_read(addr, val);
-+
-     return val;
+     addr = (addr >> s->it_shift) & (s->size - 1);
++    trace_macio_nvram_write(addr, value);
+     s->data[addr] = value;
+-    NVR_DPRINTF("writeb addr %04" HWADDR_PRIx " val %" PRIx64 "\n",
+-                addr, value);
  }
  
-diff --git a/hw/isa/trace-events b/hw/isa/trace-events
-index 202f8938e7..3544c6213c 100644
---- a/hw/isa/trace-events
-+++ b/hw/isa/trace-events
-@@ -9,3 +9,7 @@ superio_create_ide(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x,
- # pc87312.c
- pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
- pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
+ static uint64_t macio_nvram_readb(void *opaque, hwaddr addr,
+@@ -64,8 +54,7 @@ static uint64_t macio_nvram_readb(void *opaque, hwaddr addr,
+ 
+     addr = (addr >> s->it_shift) & (s->size - 1);
+     value = s->data[addr];
+-    NVR_DPRINTF("readb addr %04" HWADDR_PRIx " val %" PRIx32 "\n",
+-                addr, value);
++    trace_macio_nvram_read(addr, value);
+ 
+     return value;
+ }
+diff --git a/hw/nvram/trace-events b/hw/nvram/trace-events
+index 0dea9260ce..e023193295 100644
+--- a/hw/nvram/trace-events
++++ b/hw/nvram/trace-events
+@@ -13,3 +13,7 @@ fw_cfg_add_string(uint16_t key_value, const char *key_name, const char *value) "
+ fw_cfg_add_i16(uint16_t key_value, const char *key_name, uint16_t value) "key 0x%04" PRIx16 " '%s', value 0x%" PRIx16
+ fw_cfg_add_i32(uint16_t key_value, const char *key_name, uint32_t value) "key 0x%04" PRIx16 " '%s', value 0x%" PRIx32
+ fw_cfg_add_i64(uint16_t key_value, const char *key_name, uint64_t value) "key 0x%04" PRIx16 " '%s', value 0x%" PRIx64
 +
-+# apm.c
-+apm_io_read(uint8_t addr, uint8_t val) "read addr=0x%x val=0x%02x"
-+apm_io_write(uint8_t addr, uint8_t val) "write addr=0x%x val=0x%02x"
++# mac_nvram.c
++macio_nvram_read(uint32_t addr, uint8_t val) "read addr=0x%04"PRIx32" val=0x%02x"
++macio_nvram_write(uint32_t addr, uint8_t val) "write addr=0x%04"PRIx32" val=0x%02x"
 -- 
 2.21.3
 
