@@ -2,86 +2,71 @@ Return-Path: <SRS0=Dt9u=7G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA42C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 20:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65057C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 21:17:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A95D2076C
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 20:25:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="HsR7cd+W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A95D2076C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38F942076C
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 21:17:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F942076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcxB9-0002Gb-Ka
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 16:25:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42096)
+	id 1jcxzT-00056l-Er
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 17:17:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jcxAd-0001pf-4s
- for qemu-devel@nongnu.org; Sun, 24 May 2020 16:24:31 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37537)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jcxAc-0000P3-AI
- for qemu-devel@nongnu.org; Sun, 24 May 2020 16:24:30 -0400
-Received: by mail-qk1-x741.google.com with SMTP id b27so5932680qka.4
- for <qemu-devel@nongnu.org>; Sun, 24 May 2020 13:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7u6xV8y57rSEgwmSwQhBGOWV2pFQ90H+qLntmV/ayQo=;
- b=HsR7cd+Wu1zkbt17trhOJhtKnBRYxRNdLz5Y3uV/ylLnyi6vpi/wSpwZufGmp6LWt8
- FYZF/bFjjrL26ZMeMYzpJKtjv4Wkf0zt4ENJaixr8Ptqg8iTusAP4uqtSOmn3KCa2fz2
- XPHimYYgW+6sRlxz6XLVan4ZrqQCBPp7uazUS1w6U12piT3M3RISLS+eP8OS+LJxo0ki
- 8rypiEkFm6/rJoF9Zou2xH2q/A3p8oqPX+sEL1HkOpr/6ptA/2D3f5Vc836Y6Ejp6fYU
- zDSlcbrvFUMKyuIORIvNlKks3QgY492N92PW2V/WvcHPu3vutywD/d7aFJcTy5ZtBw6o
- ltFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7u6xV8y57rSEgwmSwQhBGOWV2pFQ90H+qLntmV/ayQo=;
- b=F5qYAQlloqrTwM9HWXVAQNyw+fVp7f0kgrpfvPUOXC9zp1IQ2dYmObrzH/r6x2iVh1
- yGI89hmm+whewjWqXe4n6cyicqCzbYSeLXNAlWfekdw3xfMywU0/V1tiiJF9koJaW/3F
- QOVK25efvtX5I7cW1J63I+7NRMwRnYUDfPDdPc/I0zIRTzlOhgnObUAt3yYWtkr8uqQh
- vKA/3y6GomjLqQN8l+nc6qTii1VBclRTSzs/jdUUDiIlRT9MI7BmN5SSZWuLbfrA1fTI
- gU0e1zdRdxk+3e/ihhMbOV7tduhb314K/OQ1MYQM7uUs+d4Ua7z08ZoUhb6P+YHqGdC1
- 4ITw==
-X-Gm-Message-State: AOAM531d2E6GeHkK2P858DAyuueuYuBAGWKOtCQzP1MYcf9gxWXPyf9I
- 2oGSydEm9JgjbbzDVLTdPZCuGK5eDts=
-X-Google-Smtp-Source: ABdhPJz13r3QWKpcw5DBOgyOqdD8+ZAN+fYk9lt1baTzydQwv9L3UfeXwpZLlt3K0VcqQkUtsQxDtA==
-X-Received: by 2002:ae9:eb08:: with SMTP id b8mr11900469qkg.381.1590351868373; 
- Sun, 24 May 2020 13:24:28 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id m7sm13060152qti.6.2020.05.24.13.24.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 May 2020 13:24:27 -0700 (PDT)
-From: "Emilio G. Cota" <cota@braap.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] qemu-plugin.h: add missing include <stddef.h> to define size_t
-Date: Sun, 24 May 2020 16:24:27 -0400
-Message-Id: <20200524202427.951784-1-cota@braap.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jcxyx-0004ZS-Ns; Sun, 24 May 2020 17:16:31 -0400
+Resent-Date: Sun, 24 May 2020 17:16:31 -0400
+Resent-Message-Id: <E1jcxyx-0004ZS-Ns@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21772)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jcxyv-0000Ji-QU; Sun, 24 May 2020 17:16:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590354976; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ZljZe6dgFLCekNce5c+iF+m5itha6iDad4ihcjIyNBaf8E12Ht3gG1RFuOi5qTrTtdIKSXNQDBQtJlb3f2UxDqRQlCB/IMD6FvEnyBmuY04C4vauHW95mo516bzKjCKSZ3K2y3puZwKyqdNhrtzwZ+qkwDL+DqdynHoXiFJF7oM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590354976;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=4OdeMSxgOE+kPa1FovXoLPWOTz9KdU3TT24b1E/QTDE=; 
+ b=kUj4y4LF1Kvfv6/58LVU2hoCNxJZHk+ngPhGGyPDxPbKQjeMjjiMnVy7do61ykXAFhK4BUThNtP3ypFY80ijqomVCYHZACAeePDbE5a6M6gu4GQQePLOm9gqzQAFQs6uPFmt6zSOo7y85tfOejxpoxVdalo9geW1teAOCBeiwLw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1590354974595921.812265468479;
+ Sun, 24 May 2020 14:16:14 -0700 (PDT)
+Message-ID: <159035497298.27266.11303032089691456121@45ef0f9c86ae>
+In-Reply-To: <cover.1590344541.git.lukasstraub2@web.de>
+Subject: Re: [PATCH v3 0/4] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::741;
- envelope-from=cota@braap.org; helo=mail-qk1-x741.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: lukasstraub2@web.de
+Date: Sun, 24 May 2020 14:16:14 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 17:16:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,29 +80,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
+ quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/qemu/qemu-plugin.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index 89ed579f55..bab8b0d4b3 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -12,6 +12,7 @@
- 
- #include <inttypes.h>
- #include <stdbool.h>
-+#include <stddef.h>
- 
- /*
-  * For best performance, build the plugin with -fvisibility=hidden so that
--- 
-2.25.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTkwMzQ0NTQxLmdp
+dC5sdWthc3N0cmF1YjJAd2ViLmRlLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCm1pZ3JhdGlvbi9xZW11LWZpbGUt
+Y2hhbm5lbC5vOiBJbiBmdW5jdGlvbiBgY2hhbm5lbF9jbG9zZSc6Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy9taWdyYXRpb24vcWVtdS1maWxlLWNoYW5uZWwuYzoxMTA6IHVuZGVmaW5lZCByZWZlcmVuY2Ug
+dG8gYHlhbmtfZ2VuZXJpY19pb2NoYW5uZWwnCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24v
+cWVtdS1maWxlLWNoYW5uZWwuYzoxMTA6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHlhbmtfdW5y
+ZWdpc3Rlcl9mdW5jdGlvbicKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3Rh
+dHVzCiAgTElOSyAgICB0ZXN0cy90ZXN0LWN1dGlscwptYWtlOiAqKiogW3Rlc3RzL3Rlc3Qtdm1z
+dGF0ZV0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgog
+IFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMDEKICBURVNUICAgIGlvdGVzdC1xY293MjogMDAyCi0t
+LQpOb3QgcnVuOiAyNTkKRmFpbHVyZXM6IDI2NwpGYWlsZWQgMSBvZiAxMTkgaW90ZXN0cwptYWtl
+OiAqKiogW2NoZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxCm1ha2U6ICoqKiB3YWl0
+OiBObyBjaGlsZCBwcm9jZXNzZXMuICBTdG9wLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwg
+bGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxt
+b2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
+cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
+ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1kYjQ4M2UxYTdi
+Mzc0ZWQ4YTljZjM1MjhhZDIzNTdiMicsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0Jywg
+J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
+ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
+ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
+L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hl
+Oi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00
+Z21uY2FiYi9zcmMvZG9ja2VyLXNyYy4yMDIwLTA1LTI0LTE3LjA0LjA3LjI0ODA0Oi92YXIvdG1w
+L3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1x
+dWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9
+bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1kYjQ4M2UxYTdiMzc0ZWQ4YTljZjM1MjhhZDIz
+NTdiMgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBk
+aXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00Z21uY2FiYi9zcmMnCm1ha2U6
+ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTJt
+NS4xMzBzCnVzZXIgICAgMG04LjA4MnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1OTAzNDQ1NDEuZ2l0Lmx1a2Fzc3RyYXViMkB3
+ZWIuZGUvdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
 
