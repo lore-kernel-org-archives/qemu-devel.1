@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AFEC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 15:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04EC7C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 15:08:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83771206D5
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 15:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C11E220826
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 May 2020 15:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XMyrJaH4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83771206D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DaWfFOqS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C11E220826
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jcsDs-0004Ry-NM
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 11:07:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45868)
+	id 1jcsEK-0004vp-UY
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 11:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jcs02-00037X-AQ; Sun, 24 May 2020 10:53:14 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:37967)
+ id 1jcs01-00036V-VX; Sun, 24 May 2020 10:53:13 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:38069)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jcrzy-0002lU-DG; Sun, 24 May 2020 10:53:13 -0400
+ id 1jcrzy-0002lt-CF; Sun, 24 May 2020 10:53:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=uMSNfuA2S8NkneqRVDi3oow07lOfWgFh5Rz5YXTcmCg=; 
- b=XMyrJaH4b/vRAcnA3nxkARfDUUOkLvJk94++Fn28z+F2vdC4ISHzskAff3NLBPMSXRmERjbmCZk2NInWPErrbzMQvyPTvLLx3OBl12VuiwCjwlkfOBMzOe6YDaY8boMZPOFDkx4WelAJwzR+53H/cenNXLZR73wJoBN/jag32HkVheHdpBieM8p5u0U9xiftMY0nUh+dwuTjVij3MGO2TUeBk2cCMQpHR5e2k0ZLXhGQq7eY+fLR4tMBsk9Jz4HPVlTfQRWL7oxsUGIe8SJDkVBXC2PJoCggPNZLVcRuyZ2Wkvg9/u/cd7pBS+3kdgQPVkxSFSA+fJ8hZ6aTTcqLyA==;
+ bh=VM/l5Zr2yE+YJDPCCI/z23hervw4AluXjgu6TqCtgN8=; 
+ b=DaWfFOqSWF0MIKS9UrvOn4Dr3enzYg87iFkYt3OOh0ki2Be7hm2ajarXMb1byz2QLz5Ehg0g56TFgUxs0GtOqMggNaX3UfuAD08kXx0Zf1MhMr/0hbgYPibZ7d4EfgG+51TZ5AiMAygJH4o4jTsZiqDOCAjJp4/GQbRBXJumW7l8fM3bEn0pgBjetpBVzk2sY7R3MYDj2dNpxHJNb3zxzoE93WrfBufBoWZXl0651FLHPSsXvEePefDCcG+oPbDxjms7vBrZaBqtHEPVlAJX6hsUQPgpEJYdG8hm0oBxvGqOb2fu22mmYiUpkHYWXd05v7yuFdMqb8l+5l6xoVFSLg==;
 Received: from [81.0.38.199] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jcrzF-0007GV-LZ; Sun, 24 May 2020 16:52:25 +0200
+ id 1jcrzF-0007Gg-Sm; Sun, 24 May 2020 16:52:26 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jcryu-0005KE-Rz; Sun, 24 May 2020 16:52:04 +0200
+ id 1jcryv-0005KS-3L; Sun, 24 May 2020 16:52:05 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 08/32] qcow2: Add dummy has_subclusters() function
-Date: Sun, 24 May 2020 16:51:28 +0200
-Message-Id: <98663537d719dd24e755926ce46b190f5e31ab5d.1590331741.git.berto@igalia.com>
+Subject: [PATCH v6 15/32] qcow2: Add qcow2_get_subcluster_range_type()
+Date: Sun, 24 May 2020 16:51:35 +0200
+Message-Id: <1a2ca24ad22d0c14d1c6cb05f5ab4db7444a7161.1590331741.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1590331741.git.berto@igalia.com>
 References: <cover.1590331741.git.berto@igalia.com>
@@ -84,39 +84,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used by the qcow2 code to check if an image has
-subclusters or not.
+There are situations in which we want to know how many contiguous
+subclusters of the same type there are in a given cluster. This can be
+done by simply iterating over the subclusters and repeatedly calling
+qcow2_get_subcluster_type() for each one of them.
 
-At the moment this simply returns false. Once all patches needed for
-subcluster support are ready then QEMU will be able to create and
-read images with subclusters and this function will return the actual
-value.
+However once we determined the type of a subcluster we can check the
+rest efficiently by counting the number of adjacent ones (or zeroes)
+in the bitmap. This is what this function does.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block/qcow2-cluster.c | 51 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index afee84f41f..f41bfd743f 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -510,6 +510,12 @@ typedef enum QCow2MetadataOverlap {
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 8b2fc550b7..32dc6e75e3 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -375,6 +375,57 @@ fail:
+     return ret;
+ }
  
- #define INV_OFFSET (-1ULL)
- 
-+static inline bool has_subclusters(BDRVQcow2State *s)
++/*
++ * For a given L2 entry, count the number of contiguous subclusters of
++ * the same type starting from @sc_from. Compressed clusters are
++ * treated as if they were divided into subclusters of size
++ * s->subcluster_size.
++ *
++ * Return the number of contiguous subclusters and set @type to the
++ * subcluster type.
++ *
++ * If the L2 entry is invalid return -errno and set @type to
++ * QCOW2_SUBCLUSTER_INVALID.
++ */
++G_GNUC_UNUSED
++static int qcow2_get_subcluster_range_type(BlockDriverState *bs,
++                                           uint64_t l2_entry,
++                                           uint64_t l2_bitmap,
++                                           unsigned sc_from,
++                                           QCow2SubclusterType *type)
 +{
-+    /* FIXME: Return false until this feature is complete */
-+    return false;
++    BDRVQcow2State *s = bs->opaque;
++    uint32_t val;
++
++    *type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_from);
++
++    if (*type == QCOW2_SUBCLUSTER_INVALID) {
++        return -EINVAL;
++    } else if (!has_subclusters(s) || *type == QCOW2_SUBCLUSTER_COMPRESSED) {
++        return s->subclusters_per_cluster - sc_from;
++    }
++
++    switch (*type) {
++    case QCOW2_SUBCLUSTER_NORMAL:
++        val = l2_bitmap | QCOW_OFLAG_SUB_ALLOC_RANGE(0, sc_from);
++        return cto32(val) - sc_from;
++
++    case QCOW2_SUBCLUSTER_ZERO_PLAIN:
++    case QCOW2_SUBCLUSTER_ZERO_ALLOC:
++        val = (l2_bitmap | QCOW_OFLAG_SUB_ZERO_RANGE(0, sc_from)) >> 32;
++        return cto32(val) - sc_from;
++
++    case QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN:
++    case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC:
++        val = ((l2_bitmap >> 32) | l2_bitmap)
++            & ~QCOW_OFLAG_SUB_ALLOC_RANGE(0, sc_from);
++        return ctz32(val) - sc_from;
++
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
- static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
-                                     int idx)
- {
+ /*
+  * Checks how many clusters in a given L2 slice are contiguous in the image
+  * file. As soon as one of the flags in the bitmask stop_flags changes compared
 -- 
 2.20.1
 
