@@ -2,82 +2,85 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68399C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69045C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 385E72073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3523F2075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:44:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iR/dKYXq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 385E72073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtAXYBuU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3523F2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdDNO-00039Y-AE
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:42:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44294)
+	id 1jdDOm-0004pc-ES
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:44:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdDM8-0001ux-8y
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:41:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43077
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdDM3-0001tt-6O
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:41:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25126
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdDM3-0007RL-UF
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:41:25 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdDLz-0007Qm-IN
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:41:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590414082;
+ s=mimecast20190719; t=1590414077;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=CZFF84l0iUwSzLyDvAMI2cO8lypmN4/CpXNTu68sWkU=;
- b=iR/dKYXq38PxslDn3kNXjeRmNuiox9MPFXlaLUH8hjTNL7U071QG2VqTr7u4JsoHyVgEPp
- SXH+sZA8NUw5l4reXcDLm83tBgwXp7lKdMd3rmW9IUB2Vih4f5lQZXOM8e2FLHT6qDw/7b
- Wt4Xugk3cRBe8GAdENdJ2Cf4dYUYtEo=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1M1GFbHHMj+MaupwJ/9+115Cq3FYdjazHLDdk6KMsyg=;
+ b=WtAXYBuUhi652lJu6JeK/y5McDqMvsIB4k8im7+9AwO9r4ineIEaSiCMHObEHmdTen/IPX
+ 0jn0f1Bhw3URjDWexa8SGsvP7kEIiCKMn8OX9/qaWXh4QRcA3foQ3KnHEzDbs+ltq2JvYT
+ Cz/DfXMZfRhgYa5yFO6WUzBqezV0gJE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-L3ZSbq3zNdiKHD01_xgeaw-1; Mon, 25 May 2020 09:41:21 -0400
-X-MC-Unique: L3ZSbq3zNdiKHD01_xgeaw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-324-hWG5mvbpPRKZF1s6XbiCbw-1; Mon, 25 May 2020 09:41:16 -0400
+X-MC-Unique: hWG5mvbpPRKZF1s6XbiCbw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E82C18FF660;
- Mon, 25 May 2020 13:41:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 336378014D7;
+ Mon, 25 May 2020 13:41:15 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
  [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF52E2E020;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 004EC5C241;
  Mon, 25 May 2020 13:41:02 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 7DCD416E16; Mon, 25 May 2020 15:41:01 +0200 (CEST)
+ id 862081753B; Mon, 25 May 2020 15:41:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] microvm: memory config tweaks
-Date: Mon, 25 May 2020 15:40:58 +0200
-Message-Id: <20200525134101.24740-1-kraxel@redhat.com>
+Subject: [PATCH 1/3] microvm: use 2G split unconditionally
+Date: Mon, 25 May 2020 15:40:59 +0200
+Message-Id: <20200525134101.24740-2-kraxel@redhat.com>
+In-Reply-To: <20200525134101.24740-1-kraxel@redhat.com>
+References: <20200525134101.24740-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:55:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 02:40:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,26 +102,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With more microvm memory config tweaks split this into its owns series,
-the microvm acpi patch series is already big enough ...
+Looks like the logic was copied over from q35.
 
-take care,
-  Gerd
+q35 does this for backward compatibility, there is no reason to do this
+on microvm though.  So split @ 2G unconditionally.
 
-Gerd Hoffmann (3):
-  microvm: use 2G split unconditionally
-  microvm: drop max-ram-below-4g support
-  x86: move max-ram-below-4g to pc
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/i386/microvm.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
- include/hw/i386/pc.h  |  2 ++
- include/hw/i386/x86.h |  4 ----
- hw/i386/microvm.c     | 35 +-------------------------------
- hw/i386/pc.c          | 46 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/pc_piix.c     | 10 +++++-----
- hw/i386/pc_q35.c      | 10 +++++-----
- hw/i386/x86.c         | 46 -------------------------------------------
- 7 files changed, 59 insertions(+), 94 deletions(-)
-
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 937db10ae6a5..44c08f8a5ab0 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -170,23 +170,9 @@ static void microvm_memory_init(MicrovmMachineState *mms)
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+     MemoryRegion *system_memory = get_system_memory();
+     FWCfgState *fw_cfg;
+-    ram_addr_t lowmem;
++    ram_addr_t lowmem = 0x80000000; /* 2G */
+     int i;
+ 
+-    /*
+-     * Check whether RAM fits below 4G (leaving 1/2 GByte for IO memory
+-     * and 256 Mbytes for PCI Express Enhanced Configuration Access Mapping
+-     * also known as MMCFG).
+-     * If it doesn't, we need to split it in chunks below and above 4G.
+-     * In any case, try to make sure that guest addresses aligned at
+-     * 1G boundaries get mapped to host addresses aligned at 1G boundaries.
+-     */
+-    if (machine->ram_size >= 0xb0000000) {
+-        lowmem = 0x80000000;
+-    } else {
+-        lowmem = 0xb0000000;
+-    }
+-
+     /*
+      * Handle the machine opt max-ram-below-4g.  It is basically doing
+      * min(qemu limit, user limit).
 -- 
 2.18.4
 
