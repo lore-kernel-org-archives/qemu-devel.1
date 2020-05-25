@@ -7,80 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E12AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D4DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:15:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BC4520878
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C9D20723
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f43K6+SH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC4520878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LScRIRrk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C9D20723
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdEnm-0005j2-Dh
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54162)
+	id 1jdEpG-0007SK-Tg
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:15:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEh7-0005ct-Dn
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59740
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEhR-00060h-Kc
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55474
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEh6-0006jC-6l
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:13 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEhQ-0006lT-1h
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590419231;
+ s=mimecast20190719; t=1590419250;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3Fp5IE9q19WHuKjT5ra7LTNsYPjlLKFjw0nHzkRyPE4=;
- b=f43K6+SHjGBI6iqPtPQHnjNdZUgIRK2UpABCk27f/Z4y6mEFBzRjmwS9Er0H5hR+pCwkxO
- dQ0XsGKPiUnZdfO216bESUSDo+Unm1OFIGCeVjWyEeuoRmw78ST/UIZTbq+XHCJenGgkYf
- v8ke/TUuITfz6PD+u+FnyK6FS/5M3yk=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-0xxLQKKWMf21ioPBFcAS5g-1; Mon, 25 May 2020 11:07:10 -0400
-X-MC-Unique: 0xxLQKKWMf21ioPBFcAS5g-1
-Received: by mail-ej1-f69.google.com with SMTP id nw19so6424756ejb.10
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 08:07:09 -0700 (PDT)
+ bh=jzY0Zi9W4LdLuqEd5SDPILPIqLHrl6uTPzfQWotzWik=;
+ b=LScRIRrkjK67npQmwyPGIRgtEuhl5DVkAYSHUewX7PI915dz4IvJyXuOnlP8Yi8TQNG/yZ
+ YZHihpyoXRwEKzAgsLNM/j6uM3jhqjVKNJFq2HkvHMlCmvjVvIvJKcCq1rhshiM87AcRYe
+ G7sYltGN6X2OnSmeKdCkMNPFQNG2mKI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-Am5Ly--lP8CYL8y4Yx4V9g-1; Mon, 25 May 2020 11:07:29 -0400
+X-MC-Unique: Am5Ly--lP8CYL8y4Yx4V9g-1
+Received: by mail-ej1-f72.google.com with SMTP id bo19so2894503ejb.0
+ for <qemu-devel@nongnu.org>; Mon, 25 May 2020 08:07:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3Fp5IE9q19WHuKjT5ra7LTNsYPjlLKFjw0nHzkRyPE4=;
- b=tiuQWqLZKX8B4OM4YdXqybz1jkmi2xGUKqdbrjnIpz8ZStOeB3oeJZY/sbgLxVCnIg
- D81ewCikxw+XFXmCnT9wExYr7HxiTRRM/yqvPbDcAezCSxTeblKD/5hVDVZkr58vMwT/
- iAD4bjDg0sHXTSXh7SDsXAy5ZXhGc+DH5E8k4SQe09zAgSH8gMHPasY793zsJG4/uodx
- DS4Hjykds0pgXWEjk25ZENTxtrq0b15+/HIqmEXJq9bMWmKdlWH8kt/pydQM/7wJwzdJ
- Fx5BVjrPVFotKoNWWraAZpQkwSC+yex3EuXhBd/CmrvVOU6OLqQOTy6VkSrJRlVrHriw
- dpBw==
-X-Gm-Message-State: AOAM5330wGFOd9de/dqYXn7Sf++e2Gwg1bOe1RJgRs88EsyFN8gIyzzo
- JDzFd2u9PFrJaGklmLO2wkV/cZ5dIKSKfPqedTTM/I4y5nJe1zEcqJm4Hei+jc36RnTajw98z0F
- uausk9K2acvjqct4=
-X-Received: by 2002:a17:906:dbef:: with SMTP id
- yd15mr18783542ejb.5.1590419228466; 
- Mon, 25 May 2020 08:07:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyc8pIVgB8O+RO+G/FzpLrcqAuivVA+aLfJMVWW2XdLBbHOawNds7BqVTA222UcCOw6X2lDEA==
-X-Received: by 2002:a17:906:dbef:: with SMTP id
- yd15mr18783506ejb.5.1590419228178; 
- Mon, 25 May 2020 08:07:08 -0700 (PDT)
+ bh=jzY0Zi9W4LdLuqEd5SDPILPIqLHrl6uTPzfQWotzWik=;
+ b=hshXrpqx2qxJq7zUTqEYqyTC6q930y0KuYMXZqVVf17RGtJlg3hfEQq3She0UcIY/J
+ 0k5axF3mLE+5HiUH/i8zAt0rw4W/P2jJd8rwMDXaFbIvLgLe19Xz1CUuJ3Dp2P+u5tAm
+ fN8HeY6atBZ0V7xn01xR4s69qEcxLKDzfx98nnHWi/YcJmqn9MaCZWQShmq7snkbZeBr
+ rGFSm2gROZdsjTpEUxX4rr8W+dH5HxE3yPXYLLtP99abQ0WjKKK09STrr7m4tuTNLjL/
+ U3Vl9qOgiHsFOPiaZ6OZHWGTj+u2a6sTxOZTWZ/R4SXMgq83I3tO3fCcx2RmNQUJ0vqU
+ CxjA==
+X-Gm-Message-State: AOAM530T28e3/22CMFEe5+5kLbiiqp6u8ThndAxJAVccxdCtT/lblr0J
+ wzLFo4nLefHzC9iGh9KEUS8nyXq16xGsgJrQF6XmvRm4lcPw7uXNwBb94NiNDY2xLvWFkmK7eXs
+ 3QjnTqyzc5qjLAuw=
+X-Received: by 2002:aa7:db4a:: with SMTP id n10mr15872719edt.11.1590419246900; 
+ Mon, 25 May 2020 08:07:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7Y5ycO7FJSq/p+tdTdtlrMuLAnL8w5xb1miKZz3vITdkhWsGqffRKPud3DAqxaubOmrR2oA==
+X-Received: by 2002:aa7:db4a:: with SMTP id n10mr15872661edt.11.1590419246412; 
+ Mon, 25 May 2020 08:07:26 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id zk10sm15742658ejb.9.2020.05.25.08.07.06
+ by smtp.gmail.com with ESMTPSA id i6sm14394964ejh.4.2020.05.25.08.07.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 25 May 2020 08:07:07 -0700 (PDT)
+ Mon, 25 May 2020 08:07:25 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/9] qapi/misc: Restrict balloon-related commands to
- machine code
-Date: Mon, 25 May 2020 17:06:35 +0200
-Message-Id: <20200525150640.30879-5-philmd@redhat.com>
+Subject: [PATCH v3 7/9] qapi/misc: Restrict ACPI commands to machine code
+Date: Mon, 25 May 2020 17:06:38 +0200
+Message-Id: <20200525150640.30879-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200525150640.30879-1-philmd@redhat.com>
 References: <20200525150640.30879-1-philmd@redhat.com>
@@ -127,273 +124,403 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- qapi/machine.json          | 90 ++++++++++++++++++++++++++++++++++++++
- qapi/misc.json             | 90 --------------------------------------
- include/sysemu/balloon.h   |  2 +-
- balloon.c                  |  2 +-
- hw/virtio/virtio-balloon.c |  2 +-
- monitor/hmp-cmds.c         |  1 +
- 6 files changed, 94 insertions(+), 93 deletions(-)
+ qapi/machine.json                    | 154 +++++++++++++++++++++++++++
+ qapi/misc.json                       | 154 ---------------------------
+ include/hw/acpi/acpi_dev_interface.h |   2 +-
+ hw/acpi/core.c                       |   2 +-
+ hw/acpi/cpu.c                        |   2 +-
+ hw/acpi/memory_hotplug.c             |   2 +-
+ 6 files changed, 158 insertions(+), 158 deletions(-)
 
 diff --git a/qapi/machine.json b/qapi/machine.json
-index ca7d58f0c9..ae42d69495 100644
+index 7420c4f5ee..04b124be67 100644
 --- a/qapi/machine.json
 +++ b/qapi/machine.json
-@@ -921,3 +921,93 @@
-   'data': 'NumaOptions',
-   'allow-preconfig': true
- }
+@@ -1061,3 +1061,157 @@
+ ##
+ { 'event': 'BALLOON_CHANGE',
+   'data': { 'actual': 'int' } }
 +
 +##
-+# @balloon:
++# @AcpiTableOptions:
 +#
-+# Request the balloon driver to change its balloon size.
++# Specify an ACPI table on the command line to load.
 +#
-+# @value: the target logical size of the VM in bytes
-+#         We can deduce the size of the balloon using this formula:
-+#            logical_vm_size = vm_ram_size - balloon_size
-+#         From it we have: balloon_size = vm_ram_size - @value
++# At most one of @file and @data can be specified. The list of files specified
++# by any one of them is loaded and concatenated in order. If both are omitted,
++# @data is implied.
 +#
-+# Returns: - Nothing on success
-+#          - If the balloon driver is enabled but not functional because the KVM
-+#            kernel module cannot support it, KvmMissingCap
-+#          - If no balloon device is present, DeviceNotActive
++# Other fields / optargs can be used to override fields of the generic ACPI
++# table header; refer to the ACPI specification 5.0, section 5.2.6 System
++# Description Table Header. If a header field is not overridden, then the
++# corresponding value from the concatenated blob is used (in case of @file), or
++# it is filled in with a hard-coded value (in case of @data).
 +#
-+# Notes: This command just issues a request to the guest.  When it returns,
-+#        the balloon size may not have changed.  A guest can change the balloon
-+#        size independent of this command.
++# String fields are copied into the matching ACPI member from lowest address
++# upwards, and silently truncated / NUL-padded to length.
 +#
-+# Since: 0.14.0
++# @sig: table signature / identifier (4 bytes)
++#
++# @rev: table revision number (dependent on signature, 1 byte)
++#
++# @oem_id: OEM identifier (6 bytes)
++#
++# @oem_table_id: OEM table identifier (8 bytes)
++#
++# @oem_rev: OEM-supplied revision number (4 bytes)
++#
++# @asl_compiler_id: identifier of the utility that created the table
++#                   (4 bytes)
++#
++# @asl_compiler_rev: revision number of the utility that created the
++#                    table (4 bytes)
++#
++# @file: colon (:) separated list of pathnames to load and
++#        concatenate as table data. The resultant binary blob is expected to
++#        have an ACPI table header. At least one file is required. This field
++#        excludes @data.
++#
++# @data: colon (:) separated list of pathnames to load and
++#        concatenate as table data. The resultant binary blob must not have an
++#        ACPI table header. At least one file is required. This field excludes
++#        @file.
++#
++# Since: 1.5
++##
++{ 'struct': 'AcpiTableOptions',
++  'data': {
++    '*sig':               'str',
++    '*rev':               'uint8',
++    '*oem_id':            'str',
++    '*oem_table_id':      'str',
++    '*oem_rev':           'uint32',
++    '*asl_compiler_id':   'str',
++    '*asl_compiler_rev':  'uint32',
++    '*file':              'str',
++    '*data':              'str' }}
++
++##
++# @MEM_UNPLUG_ERROR:
++#
++# Emitted when memory hot unplug error occurs.
++#
++# @device: device name
++#
++# @msg: Informative message
++#
++# Since: 2.4
 +#
 +# Example:
 +#
-+# -> { "execute": "balloon", "arguments": { "value": 536870912 } }
-+# <- { "return": {} }
-+#
-+# With a 2.5GiB guest this command inflated the ballon to 3GiB.
++# <- { "event": "MEM_UNPLUG_ERROR"
++#      "data": { "device": "dimm1",
++#                "msg": "acpi: device unplug for unsupported device"
++#      },
++#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
 +#
 +##
-+{ 'command': 'balloon', 'data': {'value': 'int'} }
++{ 'event': 'MEM_UNPLUG_ERROR',
++  'data': { 'device': 'str', 'msg': 'str' } }
 +
 +##
-+# @BalloonInfo:
++# @ACPISlotType:
 +#
-+# Information about the guest balloon device.
-+#
-+# @actual: the logical size of the VM in bytes
-+#          Formula used: logical_vm_size = vm_ram_size - balloon_size
-+#
-+# Since: 0.14.0
-+#
++# @DIMM: memory slot
++# @CPU: logical CPU slot (since 2.7)
 +##
-+{ 'struct': 'BalloonInfo', 'data': {'actual': 'int' } }
++{ 'enum': 'ACPISlotType', 'data': [ 'DIMM', 'CPU' ] }
 +
 +##
-+# @query-balloon:
++# @ACPIOSTInfo:
 +#
-+# Return information about the balloon device.
++# OSPM Status Indication for a device
++# For description of possible values of @source and @status fields
++# see "_OST (OSPM Status Indication)" chapter of ACPI5.0 spec.
 +#
-+# Returns: - @BalloonInfo on success
-+#          - If the balloon driver is enabled but not functional because the KVM
-+#            kernel module cannot support it, KvmMissingCap
-+#          - If no balloon device is present, DeviceNotActive
++# @device: device ID associated with slot
 +#
-+# Since: 0.14.0
++# @slot: slot ID, unique per slot of a given @slot-type
++#
++# @slot-type: type of the slot
++#
++# @source: an integer containing the source event
++#
++# @status: an integer containing the status code
++#
++# Since: 2.1
++##
++{ 'struct': 'ACPIOSTInfo',
++  'data'  : { '*device': 'str',
++              'slot': 'str',
++              'slot-type': 'ACPISlotType',
++              'source': 'int',
++              'status': 'int' } }
++
++##
++# @query-acpi-ospm-status:
++#
++# Return a list of ACPIOSTInfo for devices that support status
++# reporting via ACPI _OST method.
++#
++# Since: 2.1
 +#
 +# Example:
 +#
-+# -> { "execute": "query-balloon" }
-+# <- { "return": {
-+#          "actual": 1073741824,
-+#       }
-+#    }
++# -> { "execute": "query-acpi-ospm-status" }
++# <- { "return": [ { "device": "d1", "slot": "0", "slot-type": "DIMM", "source": 1, "status": 0},
++#                  { "slot": "1", "slot-type": "DIMM", "source": 0, "status": 0},
++#                  { "slot": "2", "slot-type": "DIMM", "source": 0, "status": 0},
++#                  { "slot": "3", "slot-type": "DIMM", "source": 0, "status": 0}
++#    ]}
 +#
 +##
-+{ 'command': 'query-balloon', 'returns': 'BalloonInfo' }
++{ 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
 +
 +##
-+# @BALLOON_CHANGE:
++# @ACPI_DEVICE_OST:
 +#
-+# Emitted when the guest changes the actual BALLOON level. This value is
-+# equivalent to the @actual field return by the 'query-balloon' command
++# Emitted when guest executes ACPI _OST method.
 +#
-+# @actual: the logical size of the VM in bytes
-+#          Formula used: logical_vm_size = vm_ram_size - balloon_size
++# @info: OSPM Status Indication
 +#
-+# Note: this event is rate-limited.
-+#
-+# Since: 1.2
++# Since: 2.1
 +#
 +# Example:
 +#
-+# <- { "event": "BALLOON_CHANGE",
-+#      "data": { "actual": 944766976 },
-+#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
++# <- { "event": "ACPI_DEVICE_OST",
++#      "data": { "device": "d1", "slot": "0",
++#                "slot-type": "DIMM", "source": 1, "status": 0 } }
 +#
 +##
-+{ 'event': 'BALLOON_CHANGE',
-+  'data': { 'actual': 'int' } }
++{ 'event': 'ACPI_DEVICE_OST',
++     'data': { 'info': 'ACPIOSTInfo' } }
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 446fc8ff83..26b5115638 100644
+index 49ca97f712..ecceba9d32 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -186,65 +186,6 @@
- { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'],
-   'allow-preconfig': true }
+@@ -1000,64 +1000,6 @@
+ ##
+ { 'command': 'query-fdsets', 'returns': ['FdsetInfo'] }
  
 -##
--# @BalloonInfo:
+-# @AcpiTableOptions:
 -#
--# Information about the guest balloon device.
+-# Specify an ACPI table on the command line to load.
 -#
--# @actual: the logical size of the VM in bytes
--#          Formula used: logical_vm_size = vm_ram_size - balloon_size
+-# At most one of @file and @data can be specified. The list of files specified
+-# by any one of them is loaded and concatenated in order. If both are omitted,
+-# @data is implied.
 -#
--# Since: 0.14.0
+-# Other fields / optargs can be used to override fields of the generic ACPI
+-# table header; refer to the ACPI specification 5.0, section 5.2.6 System
+-# Description Table Header. If a header field is not overridden, then the
+-# corresponding value from the concatenated blob is used (in case of @file), or
+-# it is filled in with a hard-coded value (in case of @data).
 -#
+-# String fields are copied into the matching ACPI member from lowest address
+-# upwards, and silently truncated / NUL-padded to length.
+-#
+-# @sig: table signature / identifier (4 bytes)
+-#
+-# @rev: table revision number (dependent on signature, 1 byte)
+-#
+-# @oem_id: OEM identifier (6 bytes)
+-#
+-# @oem_table_id: OEM table identifier (8 bytes)
+-#
+-# @oem_rev: OEM-supplied revision number (4 bytes)
+-#
+-# @asl_compiler_id: identifier of the utility that created the table
+-#                   (4 bytes)
+-#
+-# @asl_compiler_rev: revision number of the utility that created the
+-#                    table (4 bytes)
+-#
+-# @file: colon (:) separated list of pathnames to load and
+-#        concatenate as table data. The resultant binary blob is expected to
+-#        have an ACPI table header. At least one file is required. This field
+-#        excludes @data.
+-#
+-# @data: colon (:) separated list of pathnames to load and
+-#        concatenate as table data. The resultant binary blob must not have an
+-#        ACPI table header. At least one file is required. This field excludes
+-#        @file.
+-#
+-# Since: 1.5
 -##
--{ 'struct': 'BalloonInfo', 'data': {'actual': 'int' } }
--
--##
--# @query-balloon:
--#
--# Return information about the balloon device.
--#
--# Returns: - @BalloonInfo on success
--#          - If the balloon driver is enabled but not functional because the KVM
--#            kernel module cannot support it, KvmMissingCap
--#          - If no balloon device is present, DeviceNotActive
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-balloon" }
--# <- { "return": {
--#          "actual": 1073741824,
--#       }
--#    }
--#
--##
--{ 'command': 'query-balloon', 'returns': 'BalloonInfo' }
--
--##
--# @BALLOON_CHANGE:
--#
--# Emitted when the guest changes the actual BALLOON level. This value is
--# equivalent to the @actual field return by the 'query-balloon' command
--#
--# @actual: the logical size of the VM in bytes
--#          Formula used: logical_vm_size = vm_ram_size - balloon_size
--#
--# Note: this event is rate-limited.
--#
--# Since: 1.2
--#
--# Example:
--#
--# <- { "event": "BALLOON_CHANGE",
--#      "data": { "actual": 944766976 },
--#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
--#
--##
--{ 'event': 'BALLOON_CHANGE',
--  'data': { 'actual': 'int' } }
+-{ 'struct': 'AcpiTableOptions',
+-  'data': {
+-    '*sig':               'str',
+-    '*rev':               'uint8',
+-    '*oem_id':            'str',
+-    '*oem_table_id':      'str',
+-    '*oem_rev':           'uint32',
+-    '*asl_compiler_id':   'str',
+-    '*asl_compiler_rev':  'uint32',
+-    '*file':              'str',
+-    '*data':              'str' }}
 -
  ##
- # @PciMemoryRange:
+ # @CommandLineParameterType:
  #
-@@ -753,37 +694,6 @@
+@@ -1250,102 +1192,6 @@
  ##
- { 'command': 'inject-nmi' }
+ { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
  
 -##
--# @balloon:
+-# @MEM_UNPLUG_ERROR:
 -#
--# Request the balloon driver to change its balloon size.
+-# Emitted when memory hot unplug error occurs.
 -#
--# @value: the target logical size of the VM in bytes
--#         We can deduce the size of the balloon using this formula:
--#            logical_vm_size = vm_ram_size - balloon_size
--#         From it we have: balloon_size = vm_ram_size - @value
+-# @device: device name
 -#
--# Returns: - Nothing on success
--#          - If the balloon driver is enabled but not functional because the KVM
--#            kernel module cannot support it, KvmMissingCap
--#          - If no balloon device is present, DeviceNotActive
+-# @msg: Informative message
 -#
--# Notes: This command just issues a request to the guest.  When it returns,
--#        the balloon size may not have changed.  A guest can change the balloon
--#        size independent of this command.
--#
--# Since: 0.14.0
+-# Since: 2.4
 -#
 -# Example:
 -#
--# -> { "execute": "balloon", "arguments": { "value": 536870912 } }
--# <- { "return": {} }
--#
--# With a 2.5GiB guest this command inflated the ballon to 3GiB.
+-# <- { "event": "MEM_UNPLUG_ERROR"
+-#      "data": { "device": "dimm1",
+-#                "msg": "acpi: device unplug for unsupported device"
+-#      },
+-#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
 -#
 -##
--{ 'command': 'balloon', 'data': {'value': 'int'} }
+-{ 'event': 'MEM_UNPLUG_ERROR',
+-  'data': { 'device': 'str', 'msg': 'str' } }
+-
+-##
+-# @ACPISlotType:
+-#
+-# @DIMM: memory slot
+-# @CPU: logical CPU slot (since 2.7)
+-##
+-{ 'enum': 'ACPISlotType', 'data': [ 'DIMM', 'CPU' ] }
+-
+-##
+-# @ACPIOSTInfo:
+-#
+-# OSPM Status Indication for a device
+-# For description of possible values of @source and @status fields
+-# see "_OST (OSPM Status Indication)" chapter of ACPI5.0 spec.
+-#
+-# @device: device ID associated with slot
+-#
+-# @slot: slot ID, unique per slot of a given @slot-type
+-#
+-# @slot-type: type of the slot
+-#
+-# @source: an integer containing the source event
+-#
+-# @status: an integer containing the status code
+-#
+-# Since: 2.1
+-##
+-{ 'struct': 'ACPIOSTInfo',
+-  'data'  : { '*device': 'str',
+-              'slot': 'str',
+-              'slot-type': 'ACPISlotType',
+-              'source': 'int',
+-              'status': 'int' } }
+-
+-##
+-# @query-acpi-ospm-status:
+-#
+-# Return a list of ACPIOSTInfo for devices that support status
+-# reporting via ACPI _OST method.
+-#
+-# Since: 2.1
+-#
+-# Example:
+-#
+-# -> { "execute": "query-acpi-ospm-status" }
+-# <- { "return": [ { "device": "d1", "slot": "0", "slot-type": "DIMM", "source": 1, "status": 0},
+-#                  { "slot": "1", "slot-type": "DIMM", "source": 0, "status": 0},
+-#                  { "slot": "2", "slot-type": "DIMM", "source": 0, "status": 0},
+-#                  { "slot": "3", "slot-type": "DIMM", "source": 0, "status": 0}
+-#    ]}
+-#
+-##
+-{ 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
+-
+-##
+-# @ACPI_DEVICE_OST:
+-#
+-# Emitted when guest executes ACPI _OST method.
+-#
+-# @info: OSPM Status Indication
+-#
+-# Since: 2.1
+-#
+-# Example:
+-#
+-# <- { "event": "ACPI_DEVICE_OST",
+-#      "data": { "device": "d1", "slot": "0",
+-#                "slot-type": "DIMM", "source": 1, "status": 0 } }
+-#
+-##
+-{ 'event': 'ACPI_DEVICE_OST',
+-     'data': { 'info': 'ACPIOSTInfo' } }
 -
  ##
- # @human-monitor-command:
+ # @ReplayMode:
  #
-diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
-index aea0c44985..b3de4b92b9 100644
---- a/include/sysemu/balloon.h
-+++ b/include/sysemu/balloon.h
-@@ -15,7 +15,7 @@
- #define QEMU_BALLOON_H
+diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
+index a2a12af9b9..a1b63d51db 100644
+--- a/include/hw/acpi/acpi_dev_interface.h
++++ b/include/hw/acpi/acpi_dev_interface.h
+@@ -1,7 +1,7 @@
+ #ifndef ACPI_DEV_INTERFACE_H
+ #define ACPI_DEV_INTERFACE_H
  
- #include "exec/cpu-common.h"
 -#include "qapi/qapi-types-misc.h"
 +#include "qapi/qapi-types-machine.h"
- 
- typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target);
- typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
-diff --git a/balloon.c b/balloon.c
-index f104b42961..ee9c59252d 100644
---- a/balloon.c
-+++ b/balloon.c
-@@ -30,7 +30,7 @@
- #include "sysemu/balloon.h"
- #include "trace-root.h"
+ #include "qom/object.h"
+ #include "hw/boards.h"
+ #include "hw/qdev-core.h"
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index 45cbed49ab..4f8d90f50b 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -27,7 +27,7 @@
  #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-machine.h"
- #include "qapi/qmp/qerror.h"
- 
- static QEMUBalloonEvent *balloon_event_fn;
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 065cd450f1..ec3aac1e80 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -24,7 +24,7 @@
- #include "hw/virtio/virtio-balloon.h"
- #include "exec/address-spaces.h"
+ #include "qapi/opts-visitor.h"
+ #include "qapi/qapi-events-run-state.h"
+-#include "qapi/qapi-visit-misc.h"
++#include "qapi/qapi-visit-machine.h"
+ #include "qemu/error-report.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index 3d6a500fb7..532d8a6e4b 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -3,7 +3,7 @@
+ #include "migration/vmstate.h"
+ #include "hw/acpi/cpu.h"
  #include "qapi/error.h"
 -#include "qapi/qapi-events-misc.h"
 +#include "qapi/qapi-events-machine.h"
- #include "qapi/visitor.h"
  #include "trace.h"
- #include "qemu/error-report.h"
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 9c61e769ca..376590c073 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -32,6 +32,7 @@
- #include "qapi/qapi-commands-block.h"
- #include "qapi/qapi-commands-char.h"
- #include "qapi/qapi-commands-control.h"
-+#include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-migration.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-net.h"
+ #include "sysemu/numa.h"
+ 
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index 8d2e82240f..aa454f5cb2 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -7,7 +7,7 @@
+ #include "migration/vmstate.h"
+ #include "trace.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-events-misc.h"
++#include "qapi/qapi-events-machine.h"
+ 
+ #define MEMORY_SLOTS_NUMBER          "MDNR"
+ #define MEMORY_HOTPLUG_IO_REGION     "HPMR"
 -- 
 2.21.3
 
