@@ -2,59 +2,90 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A823C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE52C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FB6420723
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:29:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB6420723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96ECC20787
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:32:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HreIQBAy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96ECC20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdBIh-0001AK-Bt
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57524)
+	id 1jdBL0-0003M7-K1
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jdB99-00021M-8S
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:19:56 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:54930)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdB98-0008Qp-7g
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:19:55 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 40915CD466;
- Mon, 25 May 2020 14:19:53 +0300 (MSK)
-Subject: [PATCH 9/9] tests/acceptance: Linux boot test for record/replay
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdBHZ-0007z4-UM; Mon, 25 May 2020 07:28:39 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:53773)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdBHY-0001h5-DE; Mon, 25 May 2020 07:28:37 -0400
+Received: by mail-wm1-x332.google.com with SMTP id l26so856008wme.3;
+ Mon, 25 May 2020 04:28:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8or0Jt1EOa4HRL3qYrPJ2szYMkUXx13MFz/tHwUyMew=;
+ b=HreIQBAyjC1oLr2Saez0nDxlNXi7c4/ZQ8T3xKZWIbsER2nkpxL7iHenvN4n9vAUi+
+ GwdkHvmhXrFswoYgYwC2cBdMSOdNGlx4BTUmVLtUuo2RVbJe8TjdT1ZGsGpEd+CQkuAu
+ IBbd+luJHCUQHAI/0UNyS0TgksHmZVV6eSow+Q7T1Jy6ubWIAC07eGKp1mqHLCPc2FPd
+ bdG5r+jl6PmnnQX1PPMAQY/zYSrY4Qo27BDgOcdeHUd0ZUdzXH6leuu7//jtzs3cLCZ7
+ 0MU2gH4vwYx4q/KLWEjJoo+FrRuIY4TW8PR27J4lahNVyaK2I6t1OjHGTcLqKoJ+jmTo
+ YF6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=8or0Jt1EOa4HRL3qYrPJ2szYMkUXx13MFz/tHwUyMew=;
+ b=Wbg1B9sopvybiR1PEgmZi60zqIgov1CrMgtjaTvRIhKoIhzyqHAWu7ItCZ3EUUxiyI
+ m6s8EEaHHaWXC5TGcbJYhc3w7buBAGfLIctl0orv83BO0me81J7EgpRbs0KQzSOS6EBW
+ qU8MS0xOeUMecSZksSAauCPvxxHUMfNflEetVZ9lp/s8EExHn9efvtecqu0vyrsS0gVL
+ /7JHRK80LKzx+aHqEyohw0M3t5e/ejShqrGC3sf+z+wXJgSwU5zPdt5zy5VQn4Dmo2sW
+ uPdsn5M15paq4CNTG50QT6TsERoGSfztcA31Z/FvJxQHGfv0hfvz92SbdkH4o7A27M04
+ VHgQ==
+X-Gm-Message-State: AOAM531g6f5A8p21Xxr98a/ZW+KenOtnf9Vs9q/7JxpofZI9HoO0/WmS
+ 4alQGD4zfOqsJbPndOIOiwgyBy2RJdQ=
+X-Google-Smtp-Source: ABdhPJw4ufyliGA5gLQfdRqqMe3yVfyCvCUfmsqVg+rkFA3i9+vyvMk8YZyrpwhiet9S8PlRx5p2fw==
+X-Received: by 2002:a1c:dc05:: with SMTP id t5mr26061736wmg.112.1590406114001; 
+ Mon, 25 May 2020 04:28:34 -0700 (PDT)
+Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id x17sm17849039wrp.71.2020.05.25.04.28.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 25 May 2020 04:28:33 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 25 May 2020 14:19:53 +0300
-Message-ID: <159040559302.2615.18392869399102145442.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
-References: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+Subject: [PATCH v2] hw/display/cg3: Convert debug printf()s to trace events
+Date: Mon, 25 May 2020 13:28:31 +0200
+Message-Id: <20200525112831.12697-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: softfail client-ip=83.149.199.45;
- envelope-from=Pavel.Dovgaluk@gmail.com; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 07:19:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 17
-X-Spam_score: 1.7
-X-Spam_bar: +
-X-Spam_report: (1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, FROM_WORDY=1,
- NML_ADSP_CUSTOM_MED=0.9, SPF_SOFTFAIL=0.665, T_FILL_THIS_FORM_SHORT=0.01,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::332;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x332.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -68,191 +99,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru,
- crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a test for record/replay, which boots Linux
-image from the disk and interacts with the network.
-The idea and code of this test is borrowed from boot_linux.py
-However, currently record/replay works only for x86_64,
-therefore other tests were excluded.
+Convert DPRINTF() to trace events and remove ifdef'ry.
 
-Each test consists of the following phases:
- - downloading the disk image
- - recording the execution
- - replaying the execution
-
-Replay does not validates the output, but waits until QEMU
-finishes the execution. This is reasonable, because
-QEMU usually hangs when replay goes wrong.
-
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS                      |    1 
- tests/acceptance/replay_linux.py |  140 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 141 insertions(+)
- create mode 100644 tests/acceptance/replay_linux.py
+v2: Order addr/val/size (Mark review)
+---
+ hw/display/cg3.c        | 14 ++++----------
+ hw/display/trace-events |  4 ++++
+ 2 files changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e9a9ce4f66..97f066a9b2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2498,6 +2498,7 @@ F: include/sysemu/replay.h
- F: docs/replay.txt
- F: stubs/replay.c
- F: tests/acceptance/replay_kernel.py
-+F: tests/acceptance/replay_linux.py
+diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+index f7f1c199ce..7cbe6e56ff 100644
+--- a/hw/display/cg3.c
++++ b/hw/display/cg3.c
+@@ -35,6 +35,7 @@
+ #include "hw/qdev-properties.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
++#include "trace.h"
  
- IOVA Tree
- M: Peter Xu <peterx@redhat.com>
-diff --git a/tests/acceptance/replay_linux.py b/tests/acceptance/replay_linux.py
-new file mode 100644
-index 0000000000..08eedb23ef
---- /dev/null
-+++ b/tests/acceptance/replay_linux.py
-@@ -0,0 +1,140 @@
-+# Record/replay test that boots a complete Linux system via a cloud image
-+#
-+# Copyright (c) 2020 ISP RAS
-+#
-+# Author:
-+#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
+ /* Change to 1 to enable debugging */
+ #define DEBUG_CG3 0
+@@ -63,12 +64,6 @@
+ #define CG3_VRAM_SIZE 0x100000
+ #define CG3_VRAM_OFFSET 0x800000
+ 
+-#define DPRINTF(fmt, ...) do { \
+-    if (DEBUG_CG3) { \
+-        printf("CG3: " fmt , ## __VA_ARGS__); \
+-    } \
+-} while (0)
+-
+ #define TYPE_CG3 "cgthree"
+ #define CG3(obj) OBJECT_CHECK(CG3State, (obj), TYPE_CG3)
+ 
+@@ -195,7 +190,8 @@ static uint64_t cg3_reg_read(void *opaque, hwaddr addr, unsigned size)
+         val = 0;
+         break;
+     }
+-    DPRINTF("read %02x from reg %" HWADDR_PRIx "\n", val, addr);
++    trace_cg3_read(addr, val, size);
 +
-+import os
+     return val;
+ }
+ 
+@@ -206,9 +202,7 @@ static void cg3_reg_write(void *opaque, hwaddr addr, uint64_t val,
+     uint8_t regval;
+     int i;
+ 
+-    DPRINTF("write %" PRIx64 " to reg %" HWADDR_PRIx " size %d\n",
+-            val, addr, size);
+-
++    trace_cg3_write(addr, val, size);
+     switch (addr) {
+     case CG3_REG_BT458_ADDR:
+         s->dac_index = val;
+diff --git a/hw/display/trace-events b/hw/display/trace-events
+index e6e22bef88..47b2b168ae 100644
+--- a/hw/display/trace-events
++++ b/hw/display/trace-events
+@@ -151,3 +151,7 @@ artist_vram_write(unsigned int size, uint64_t addr, uint64_t val) "%u 0x%"PRIx64
+ artist_fill_window(unsigned int start_x, unsigned int start_y, unsigned int width, unsigned int height, uint32_t op, uint32_t ctlpln) "start=%ux%u length=%ux%u op=0x%08x ctlpln=0x%08x"
+ artist_block_move(unsigned int start_x, unsigned int start_y, unsigned int dest_x, unsigned int dest_y, unsigned int width, unsigned int height) "source %ux%u -> dest %ux%u size %ux%u"
+ artist_draw_line(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y) "%ux%u %ux%u"
 +
-+from avocado_qemu import Test, BUILD_DIR
-+
-+from avocado.utils import cloudinit
-+from avocado.utils import network
-+from avocado.utils import vmimage
-+from avocado.utils import datadrainer
-+from avocado.utils.path import find_command
-+
-+class ReplayLinux(Test):
-+    """
-+    Boots a Linux system, checking for a successful initialization
-+    """
-+
-+    timeout = 1800
-+    chksum = None
-+    hdd = 'ide-hd'
-+    cd = 'ide-cd'
-+    bus = ''
-+
-+    def setUp(self):
-+        super(ReplayLinux, self).setUp()
-+        self.prepare_boot()
-+        self.prepare_cloudinit()
-+
-+    def vm_add_disk(self, vm, path, id, device):
-+        bus_string = ''
-+        if self.bus != '':
-+            bus_string = ',bus=%s.%d' % (self.bus, id,)
-+        vm.add_args('-drive', 'file=%s,snapshot,id=disk%s,if=none' % (path, id))
-+        vm.add_args('-drive', 'driver=blkreplay,id=disk%s-rr,if=none,image=disk%s' % (id, id))
-+        vm.add_args('-device', '%s,drive=disk%s-rr%s' % (device, id, bus_string))
-+
-+    def prepare_boot(self):
-+        self.log.debug('Looking for and selecting a qemu-img binary to be '
-+                       'used to create the bootable snapshot image')
-+        # If qemu-img has been built, use it, otherwise the system wide one
-+        # will be used.  If none is available, the test will cancel.
-+        qemu_img = os.path.join(BUILD_DIR, 'qemu-img')
-+        if not os.path.exists(qemu_img):
-+            qemu_img = find_command('qemu-img', False)
-+        if qemu_img is False:
-+            self.cancel('Could not find "qemu-img", which is required to '
-+                        'create the bootable image')
-+        vmimage.QEMU_IMG = qemu_img
-+
-+        self.log.info('Downloading/preparing boot image')
-+        # Fedora 31 only provides ppc64le images
-+        image_arch = self.arch
-+        if image_arch == 'ppc64':
-+            image_arch = 'ppc64le'
-+        try:
-+            self.boot = vmimage.get(
-+                'fedora', arch=image_arch, version='31',
-+                checksum=self.chksum,
-+                algorithm='sha256',
-+                cache_dir=self.cache_dirs[0],
-+                snapshot_dir=self.workdir)
-+        except:
-+            self.cancel('Failed to download/prepare boot image')
-+
-+    def prepare_cloudinit(self):
-+        self.log.info('Preparing cloudinit image')
-+        try:
-+            self.cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
-+            self.phone_home_port = network.find_free_port()
-+            cloudinit.iso(self.cloudinit_iso, self.name,
-+                          username='root',
-+                          password='password',
-+                          # QEMU's hard coded usermode router address
-+                          phone_home_host='10.0.2.2',
-+                          phone_home_port=self.phone_home_port)
-+        except Exception:
-+            self.cancel('Failed to prepared cloudinit image')
-+
-+    def launch_and_wait(self, record, args, shift):
-+        vm = self.get_vm()
-+        vm.add_args('-smp', '1')
-+        vm.add_args('-m', '1024')
-+        vm.add_args('-object', 'filter-replay,id=replay,netdev=hub0port0')
-+        vm.add_args(*args)
-+        self.vm_add_disk(vm, self.boot.path, 0, self.hdd)
-+        self.vm_add_disk(vm, self.cloudinit_iso, 1, self.cd)
-+        if record:
-+            mode = 'record'
-+        else:
-+            mode = 'replay'
-+        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s' %
-+                    (shift, mode, os.path.join(self.workdir, 'replay.bin')))
-+
-+        vm.set_console()
-+        vm.launch()
-+        console_drainer = datadrainer.LineLogger(vm.console_socket.fileno(),
-+                                                 logger=self.log.getChild('console'),
-+                                                 stop_check=(lambda : not vm.is_running()))
-+        console_drainer.start()
-+        if record:
-+            self.log.info('VM launched, waiting for boot confirmation from guest')
-+            cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), self.name)
-+            vm.shutdown()
-+        else:
-+            self.log.info('VM launched, waiting the recorded execution to be replayed')
-+            vm.wait()
-+
-+    def run_rr(self, args=(), shift=7):
-+        self.launch_and_wait(True, args, shift)
-+        self.launch_and_wait(False, args, shift)
-+
-+class ReplayLinuxX8664(ReplayLinux):
-+    """
-+    :avocado: tags=arch:x86_64
-+    """
-+    bus = 'ide'
-+
-+    chksum = 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c5c27a0'
-+
-+    def test_pc_i440fx(self):
-+        """
-+        :avocado: tags=machine:pc
-+        :avocado: tags=accel:tcg
-+        """
-+        self.run_rr(shift=1)
-+
-+    def test_pc_q35(self):
-+        """
-+        :avocado: tags=machine:q35
-+        :avocado: tags=accel:tcg
-+        """
-+        self.run_rr(shift=3)
++# cg3.c
++cg3_read(uint32_t addr, uint32_t val, unsigned size) "read addr:0x%06"PRIx32" val:0x%08"PRIx32" size:%u"
++cg3_write(uint32_t addr, uint32_t val, unsigned size) "write addr:0x%06"PRIx32" val:0x%08"PRIx32" size:%u"
+-- 
+2.21.3
 
 
