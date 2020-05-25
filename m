@@ -2,87 +2,128 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B3CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 12:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A67DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD7492073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 12:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70D052071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JgOCApKu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD7492073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nbjqtzlf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D052071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdCZU-00032Z-Le
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 08:51:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38952)
+	id 1jdCvS-0001ki-J2
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:13:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jdCYR-0002PP-JJ
- for qemu-devel@nongnu.org; Mon, 25 May 2020 08:50:07 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jdCYP-00070B-KR
- for qemu-devel@nongnu.org; Mon, 25 May 2020 08:50:07 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w4so15954534oia.1
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 05:50:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CAKnaon9zo5ntl1jqDwL6CfW5kbbWJSVcRaKtg/ySyQ=;
- b=JgOCApKuQ5Qaj0/XqM0V/D84RhyKhBf7DLvj6tsHdM/fnqM9CJ+3uXAQVlOkNXIHkq
- UucoJllB61JiWiCxPoLuWb5b6WYHCTLEWb9RC3T8Oflh91hB5ERh/qruo9Sm8lUvJLyb
- +87yrqRKF0ppOYAqcgHdeG+xk6IMo2kKgJzKhXf532HTn/uV5FbTwWaVLrivMSAWxx3u
- 14NFUvotzAG0fnDHXIx1bDc7jY5TVocbEa9K96f7nVO9wUsBIkYvmeaIbVqOsYZIhaII
- EzPnw1Bq/unZ/IMib1pefn01JL7F17thlk8jQyIgUfSeXC9s9o3/vW4L99F30gt0YGrk
- 002w==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdCuo-0001EC-NR
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:13:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38550
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdCun-0003Fj-Nb
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:13:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590412392;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=6Asb8qh3vzfVJ8VsVryFQmM6PWVGQrwTaZUO4GFR6AE=;
+ b=NbjqtzlfLP8EvmfSC9ACKyudsA+w8ip/lIE6dTlFRs121C2/PONlSilp/B1BFHqtuqs+i8
+ ug5Oy553VR8OoXH1GjTeTkSfRmoPQ1AO46XmB+B1DlDySCT2t7wd/vVtvUbl3bOWc92cB5
+ 39Z02DlQUjhLb7XZlHBXQydoUdf07ck=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-vPuK2qnfMUiKKDNWIeIVEg-1; Mon, 25 May 2020 09:13:06 -0400
+X-MC-Unique: vPuK2qnfMUiKKDNWIeIVEg-1
+Received: by mail-wr1-f72.google.com with SMTP id e1so5736998wrm.3
+ for <qemu-devel@nongnu.org>; Mon, 25 May 2020 06:13:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CAKnaon9zo5ntl1jqDwL6CfW5kbbWJSVcRaKtg/ySyQ=;
- b=bISZnbld7VwtTekXMaZq3QmfGghTqrr3crSsQIkDSmsITljZ/4x/uXBPoJIT1QzaP/
- /aXNpSSQ1PY/UZKP/CxK/PuWsx3ZBwpSOL1CkDIA9LzQ64SBlBzqd3JQTYZH0Jpa3Drl
- mFko6mSPYuoYZytFQVy2/6TWuudzKhHyA1lCbXkUZmt+5JelakcoQmnXkNWDi/OVujV+
- s7kT4CeQ3WuSfDFa/miriPed7kMrkQtjHJjPWkKVKKC6kUm+d4XkD6idMqiESe/a8Scg
- KlhQCBWElODWchflW5/xEobTxm/UlqYfwoNDRhiBALaf/Q9AcHPnbRV6Ynol78mzwWfl
- LFTA==
-X-Gm-Message-State: AOAM530aMoZx+mf3WBTykimo32H6d1UffnzTl/nanWsAGsViCAUsm1js
- Ge2YuFx2ExbfrnSwvSBgXVMwxzKVjQP/UtX5HN7xCw==
-X-Google-Smtp-Source: ABdhPJxICd3yeJM0o34ti6DtZPaFkJWsdh5mhSpWroQt1WTYKu5dhefC/IA47UbR8xK2JZl60cAXyweoPU/E8FYpoPY=
-X-Received: by 2002:aca:ed16:: with SMTP id l22mr10530103oih.146.1590411004556; 
- Mon, 25 May 2020 05:50:04 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=6Asb8qh3vzfVJ8VsVryFQmM6PWVGQrwTaZUO4GFR6AE=;
+ b=lToN7JyRGrA0RO0feEM/v8XCEa9nJgfN2xlCpVw58dwL+q9FKFWzEIwIOa1cZhrnzZ
+ /NnCE3kpBVrT/Lir0YDBaLzcIpSOSkSd1ZjYiXYhMuC2pzxAa6477+F4POdUvxOQ/acu
+ kx5j3M+wVqRpxFjl7iPFVYCS79j769E61loZ5JPBjgjzNQzWZm0Y527NNO+J5BBONF83
+ 08D1I2v+Netsj/64OuAY1MYvyZjZF9P/HZjyzkhGDrLLeEIc8ybCmkL9gvHi1PdU7dDG
+ WYvNxGquHO3w+cYsyX/1RQY279m24Ph0YaN7XJIYhABAuW5ZE3pvyQc02LpJpc6cuy3v
+ OuNQ==
+X-Gm-Message-State: AOAM530xP1wT1VhavxG6+kx6MP90gLBDXSAEU2iIC3RsPNs7e54Y/WFo
+ yR1S601awkj3xvaYqOOQokgDfJTQlJBfvd2yWJoxXV4nvnqz88qhH+b6oM5enxhMzFoubT6fd6L
+ gnHr41u3CSlnapWw=
+X-Received: by 2002:a5d:49cd:: with SMTP id t13mr1325237wrs.292.1590412384901; 
+ Mon, 25 May 2020 06:13:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyI7vOnvETFOQUWIwKysZsjDCTvYAX/lpkpwK36+RS6v7US2m/RUwYdkwH53xGjyYFUcUXUPQ==
+X-Received: by 2002:a5d:49cd:: with SMTP id t13mr1325214wrs.292.1590412384641; 
+ Mon, 25 May 2020 06:13:04 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id g82sm1710886wmf.1.2020.05.25.06.13.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 25 May 2020 06:13:04 -0700 (PDT)
+Subject: Re: [PATCH] tests/acceptance: Add a boot test for the
+ xlnx-versal-virt machine
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200525072630.22280-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <53caef52-ad35-d44b-02a2-e0acd441b9a4@redhat.com>
+Date: Mon, 25 May 2020 15:13:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-7-armbru@redhat.com>
- <CAFEAcA9UampZxo-4Z=6+LKkC9HLrdGYT5AcLyiGVYvgU5VE+cA@mail.gmail.com>
- <878shgh8be.fsf@dusky.pond.sub.org>
- <3ebe626e-0373-0eee-6a54-27a88d656122@redhat.com>
-In-Reply-To: <3ebe626e-0373-0eee-6a54-27a88d656122@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 May 2020 13:49:53 +0100
-Message-ID: <CAFEAcA_ddMMCJm+ykRdBxW5BpyMQHbZLAELr=fAGfs3H4TYXyw@mail.gmail.com>
-Subject: Re: [PATCH 06/24] armv7m: Bury unwanted "ARM,bitband-memory" devices
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200525072630.22280-1-thuth@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 02:40:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,44 +137,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair@alistair23.me>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 25 May 2020 at 13:32, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 25/05/20 07:50, Markus Armbruster wrote:
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-> >
-> >> On Mon, 18 May 2020 at 06:04, Markus Armbruster <armbru@redhat.com> wrote:
-> >>> These devices are optional, and enabled by property "enable-bitband".
-> >>> armv7m_instance_init() creates them unconditionally, because the
-> >>> property has not been set then.  armv7m_realize() realizes them only
-> >>> when the property is true.  Works, although it leaves unrealized
-> >>> devices hanging around in the QOM composition tree.  Affects machines
-> >>> microbit, mps2-an505, mps2-an521, musca-a, and musca-b1.
-> >>>
-> >>> Bury the unwanted devices by making armv7m_realize() unparent them.
-> >>> Visible in "info qom-tree"; here's the change for microbit:
-> >>
-> >> What does "bury" mean here? To me it implies "they still
-> >> exist but we've stuck them in a hole somewhere and covered
-> >> them up", but the qom-tree delta suggests we've actually
-> >> really deleted them?
-> >
-> > We really delete them now.
-> >
-> > "They've been lying dead in the streets; give them a decent burial".
-> >
-> > Would you like me to s/Bury/Delete/?
->
-> "Bury unwanted" -> "Dispose of unused"?
+On 5/25/20 9:26 AM, Thomas Huth wrote:
+> As described by Edgar here:
+> 
+>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg605124.html
+> 
+> we can use the Ubuntu kernel for testing the xlnx-versal-virt machine.
+> So let's add a boot test for this now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 0653c8c1bf..430a6c3b43 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -307,6 +307,30 @@ class BootLinuxConsole(Test):
+>          console_pattern = 'Kernel command line: %s' % kernel_command_line
+>          self.wait_for_console_pattern(console_pattern)
+>  
+> +    def test_aarch64_xlnx_versal_virt(self):
+> +        """
+> +        :avocado: tags=arch:aarch64
+> +        :avocado: tags=machine:xlnx-versal-virt
 
-Yeah, delete or dispose of would be clearer I think.
+Thanks for adding this test!
 
-thanks
--- PMM
+Please also add:
+
+           :avocado: tags=device:pl011
+           :avocado: tags=device:arm_gicv3
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +        """
+> +        kernel_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
+> +                      'bionic-updates/main/installer-arm64/current/images/'
+> +                      'netboot/ubuntu-installer/arm64/linux')
+> +        kernel_hash = '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
+> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+> +
+> +        initrd_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
+> +                      'bionic-updates/main/installer-arm64/current/images/'
+> +                      'netboot/ubuntu-installer/arm64/initrd.gz')
+> +        initrd_hash = 'd385d3e88d53e2004c5d43cbe668b458a094f772'
+> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
+> +
+> +        self.vm.set_console()
+> +        self.vm.add_args('-m', '2G',
+> +                         '-kernel', kernel_path,
+> +                         '-initrd', initrd_path)
+> +        self.vm.launch()
+> +        self.wait_for_console_pattern('Checked W+X mappings: passed')
+> +
+>      def test_arm_virt(self):
+>          """
+>          :avocado: tags=arch:arm
+> 
+
 
