@@ -2,116 +2,92 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FDBC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CCDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:08:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A46AF20723
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:05:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41FED20723
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:08:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dU01LtNs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A46AF20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4vL5Pn0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41FED20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdAvY-00082x-Tq
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:05:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56274)
+	id 1jdAyK-0001Bb-GP
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:08:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jdAuh-0007Oe-Jj
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:04:59 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44321
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jdAug-000679-Sr
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:04:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590404698;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q7MsL3+kXII9bb2SiLV/5/Xb65b4QmmJXwmb+O4HFbA=;
- b=dU01LtNs9wyHwFcTSJZ+NXP1ok1h+DBpmNcf9YVyBkU6b+rdfOvGKU/YeerVa5DkAFMpgc
- E5RAamDBq+st28geCNYllWgzLfDE8xlpveWkpVvgww1syN8FGE/MbDJtZXQycCrpJVSfYe
- tT7lb6Xr9EjV3W2oV7h11GatyiLn+iA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-72sH34k7NlWpDI9pFyxbYw-1; Mon, 25 May 2020 07:04:56 -0400
-X-MC-Unique: 72sH34k7NlWpDI9pFyxbYw-1
-Received: by mail-ed1-f69.google.com with SMTP id f10so7315812edn.10
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 04:04:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdAxl-0000WW-Ob; Mon, 25 May 2020 07:08:09 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35704)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdAxh-0006fS-KP; Mon, 25 May 2020 07:08:09 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x14so11345931wrp.2;
+ Mon, 25 May 2020 04:08:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iL4sfFhqdm2R6XSdcTGkQgrXLA57/EPgzfZDT6s/zo4=;
+ b=c4vL5Pn0EiXaGmh+WIcWpYcG97xR8MTSJtlHK2Z6Bosy4Mk8m+qLXJuI/LNPhwpfCA
+ TzEyy7iCghRrPYA6rs04sQyu63xSEsAameQqPLHIPOF/bEm16+96B/VRRdtg7Oh7rWiy
+ SdVshGj1ERnWmBGTsyOra5xCH2deQVcZRjqEMphFnsinPPkyly+Axc79paiDj+9JYw4P
+ vj0ISywtWUEuf8j4WfJNWx8LkKXHcfElthcpmDJuU1T7XSyS0GyTQU5GxL3YahJR+khG
+ fXNr+bntB6UvtjOSAZ4V0Q3Oy/ZR56qH9FzapJ5p+3PotaEllopmhCm1suIrpryBOsLK
+ dsQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=q7MsL3+kXII9bb2SiLV/5/Xb65b4QmmJXwmb+O4HFbA=;
- b=hfJi+miNk9QNI1eRnV8muuz9bIFjUUlKxa0tKvXCdjA0U1blN5prnNzxHY1WJhuW4S
- 58HqtG/65P27ojcjgv09uU/WeWZT/YEXDxZk1FC/+/XDj3/VIqzI666XVPZOpuFjOTID
- Geb/2Teh8KYnx0/CtI0LOIJCv46WJM0Is/gp9uDRJGAaHsuZe1q01yezdb63HMXJtRBw
- Fa/pqLF6Ep+sL5HphWfYi3zabaZ1wfwzHP3v+Vx32Q7kfsCYBgYWzjbXYqdM0ffI3ExI
- tT0hNYovnjrjKcX3MjHiw3qQmsw233t03Mn7ewqDTjedvbnDwtR5QeOjGkmGYpn6BauE
- QeqA==
-X-Gm-Message-State: AOAM530OBIw1rF6Dwxmtt1LXs+IQVfrJkkvm1JyCRqSrD3I7e/KJoscX
- gN0rq6Un0z55Q9A81ain3/hB0scNE5CJUeMnKQnRzhE0lp/hrODlDVgNXOcu9U5llxqEHYH96o/
- qn/OtEBrUXAhTKSo=
-X-Received: by 2002:a17:906:c401:: with SMTP id
- u1mr17780048ejz.151.1590404695145; 
- Mon, 25 May 2020 04:04:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwpEcq2NhhrHhizPJiN84XfRrAcI8e9brAT0DhVh0/jdJclIAq+H4J6MdeB9TkPI/8lN8yQFA==
-X-Received: by 2002:a17:906:c401:: with SMTP id
- u1mr17780031ejz.151.1590404694969; 
- Mon, 25 May 2020 04:04:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8?
- ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
- by smtp.gmail.com with ESMTPSA id u26sm14867932eje.35.2020.05.25.04.04.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 May 2020 04:04:54 -0700 (PDT)
-Subject: Re: [PATCH v6 1/3] memory: drop guest writes to read-only ram device
- regions
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Yan Zhao <yan.y.zhao@intel.com>
-References: <20200430080744.31232-1-yan.y.zhao@intel.com>
- <20200430080946.31286-1-yan.y.zhao@intel.com>
- <CAFEAcA-8NH_4ZV0J9urBZdQWmqOe-Nyy4y2gLAjTJ08MpfFY0g@mail.gmail.com>
- <9dd7f00b-1199-1097-80d4-1b700c0f28d6@redhat.com>
- <20200525011853.GB8867@joy-OptiPlex-7040>
- <f836eeb3-0655-2842-2e8a-b8a42710a765@redhat.com>
- <229ec974-1939-31d8-3516-12e7b8fee27f@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f1c43064-7a47-3fb5-8114-ff223ad9f0d3@redhat.com>
-Date: Mon, 25 May 2020 13:04:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=iL4sfFhqdm2R6XSdcTGkQgrXLA57/EPgzfZDT6s/zo4=;
+ b=H4glLr9t0PogEwvMLgQGjjylkoVW/jBtTAsgDAFsuQbxXjXT1ukZvmeCnyHiN/sbPp
+ G2P8eDizr1M91B81nXPTasGqPyoysACBmZikssiKZmMBcxJh8W8O/usWl8xX/LurMaw+
+ uDvYs6a3VAH15nT7fw+HlTN2W2ph2q0w06MZc7+s033gwao52U7byzs00PwjALobpJqR
+ e508XarZVNjIlHo1PULgUeOr2c0LpZ2elvaeWirukwxbZ0jfAQmOLtbltt0EA6vjnSZC
+ nkV+q4sIRvL774PA6vh1CIq2DugklBYSBIycjpY4xWLBlnrpZ9rZ7zGMsI029NMnhH9a
+ WswQ==
+X-Gm-Message-State: AOAM530c+FMrt4VOVckwUsE7vjFoBfOOm0jRHc/roEf6EIQyIoqQwa9e
+ Q//TuHd56ekxNqHwpLhqlrHMcj/c5FY=
+X-Google-Smtp-Source: ABdhPJxk/upJpXhSNBmnOev0P1ihl4NJCHghZLINkO9kLLYkads9EVhm/62yPqOL71GIGeBmRlOaig==
+X-Received: by 2002:adf:dc0a:: with SMTP id t10mr15840731wri.342.1590404883316; 
+ Mon, 25 May 2020 04:08:03 -0700 (PDT)
+Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id o8sm10642573wmb.20.2020.05.25.04.08.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 25 May 2020 04:08:02 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/adc/stm32f2xx_adc: Correct memory region size and access
+ size
+Date: Mon, 25 May 2020 13:08:00 +0200
+Message-Id: <20200525110800.7230-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <229ec974-1939-31d8-3516-12e7b8fee27f@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 02:40:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,26 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alex Williamson <alex.williamson@redhat.com>, xin.zeng@intel.com,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/05/20 12:54, Philippe Mathieu-Daudé wrote:
->> Not all of them, only those that need to return MEMTX_ERROR.  I would
->> like some guidance from Peter as to whether (or when) reads from ROMs
->> should return MEMTX_ERROR.  This way, we can use that information to
->> device  what the read-only ram-device regions should do.
-> Is it only device-specific or might it be partly arch/machine-specific
-> (depending on the bus it is mapped)?
+The ADC region size is 256B, split as:
+ - [0x00 - 0x4f] defined
+ - [0x50 - 0xff] reserved
 
-Good point, I think that could be handled by propagating the error up in
-the memory region hierarchy (i.e. the cached AddressSpaceDispatch radix
-tree is used in the common case, but when you have a failure you
-percolate it up through the whole hierarchy since that's not a fast path).
+All registers are 32-bit (thus when the datasheet mentions the
+last defined register is 0x4c, it means its address range is
+0x4c .. 0x4f.
 
-Paolo
+This model implementation is also 32-bit. Set MemoryRegionOps
+'impl' fields.
+
+See:
+  'RM0033 Reference manual Rev 8', Table 10.13.18 "ADC register map".
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/adc/stm32f2xx_adc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/adc/stm32f2xx_adc.c b/hw/adc/stm32f2xx_adc.c
+index 4f9d485ecf..5d834a98f6 100644
+--- a/hw/adc/stm32f2xx_adc.c
++++ b/hw/adc/stm32f2xx_adc.c
+@@ -278,7 +278,7 @@ static void stm32f2xx_adc_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+ 
+     memory_region_init_io(&s->mmio, obj, &stm32f2xx_adc_ops, s,
+-                          TYPE_STM32F2XX_ADC, 0xFF);
++                          TYPE_STM32F2XX_ADC, 0x100);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+ }
+ 
+-- 
+2.21.3
 
 
