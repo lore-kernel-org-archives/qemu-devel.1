@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55530C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 10:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F172C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 10:10:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2241C2078B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 10:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B41B2078B
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 10:10:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nI3FThld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2241C2078B
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YKGkzXZF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B41B2078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdA41-0003VS-A2
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 06:10:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49592)
+	id 1jdA4K-0003uE-9r
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 06:10:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jdA2o-0001is-8q; Mon, 25 May 2020 06:09:18 -0400
-Received: from mail-vi1eur05on2099.outbound.protection.outlook.com
- ([40.107.21.99]:63329 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ id 1jdA2q-0001nP-70; Mon, 25 May 2020 06:09:20 -0400
+Received: from mail-am6eur05on2108.outbound.protection.outlook.com
+ ([40.107.22.108]:58945 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jdA2n-0003zE-CT; Mon, 25 May 2020 06:09:17 -0400
+ id 1jdA2p-0003zD-2G; Mon, 25 May 2020 06:09:19 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iUxcRLHY5xdmwm4JeojFXRv2acgYGy+fyjwugOhSx0OFW7nrhYIkAgoMSSur/1Iige7vpKWLXVuPskir4rvxB0kFG6zTcoCGsOGr9EayOLjw5XEOSaGuD1cXbyFt1puGRj3WTswVo8hx4attXBYIj85/9UUSNgrMkCxcGUF4NhjB9khHJSRs1BM2IgUOxNX8CF9OCcZue6T7BZtDxom3ne0Ag87lNVkiyXZkOg6zZQiEWfzhU8X9USV831SPgB2vgkCgWkkrSNsMnpjPplwTLDLymD8KjWy2ENrhUA/gs7nyvQl8ixo7LRYGvBB5pRJD18tZRbPBQAa/la1m69owtg==
+ b=l7dp+WiphCt0p/b6E8EiHkfHs/4zoFjfMZlMF65lrDK2VdBe2vr7yQg3iuQpvtJlyN62YWE0bpPLpsJlrnqNGp37AGsb9yuanSYddgYzPj8H8/8BQ0les67wxpeS74N+Gi6PH+SxDF9Gl0z1YRS36lIxpvS4+mXXal3738Yuztu1DFGT0V+/2EHLzr7dph8Ew0Y7q5tI0EDe/vVqHcH5pJjtyW84w6SO40MeDosjgoU/dac7bdVKSe+AOef7siKvt5vCIA/mMQ4xPJG+FQpTiWzCvuWnLQQ2SUdwAqpIe5tAHyDoQ3TuMjSV0F24/a8mwoRtVa+bOeetdSGYFHp3rg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ft2bnljl6qaPO1d7df0oPlVI+hNCPWKxsLlPln/hrQA=;
- b=gv/r+hD6WC4CBN/W5YnVflf6w73BRAKlcIpPDSZk7ivJL3bqr5BO0ONFOfp2XBAsdmhjLOSZS80jFJZEEBipBzfL32eWeOqFiI3WbeDB2uUBmGK7wGzm3I3fBwhoaZdPjnbC5Lbv4uIRhsiTEYivfmmQF5q+8DagJ83SsXfUoFo6klJJm86tis6ONbJ3KkoMHExbSaReieRdmUfDbqcXZJMWjYRKs6kLHBlHKzgc9aKoTf6dyFtcLYkn2dSiv2QOt9M00l9zisjfqAGeZAFwLeAfVOJOISYIjgNsw0Jy94ACO+A8yto+wPjxP5lTXy9wawvrwI6ThTubdz5H2O8fhw==
+ bh=GJo3Tdxyi8ASO50sVAm1KefW3miTRmTfyvdfJfHwxWM=;
+ b=bOP9J2XtxRPB8VxBR+/Jkues1iVQJuCxVVYbB6qd1dhFe/B7G+M19nStRXBtZ5/JsbQrZCoycNuhYpNeaSrZwET4G62nr6wUlz2y9BtoMpd/MMgYeRZAIi0NIP32acz2yVO97EHhvlARoMwsgyLCj2+6Z3JGnzXsjWDuChtJBylWN+leJtK1efCjD6T+1FpH8Wio1a7BpAt77jJ/7mBfVscttrs71gVM6CMwCaFE3fRg0jcoqVum58BoHBzja+DzODwwyJPmudfSmvgIi1H98ajqjHzh/7jaEuzZwT8wrKwkNprsHJLAa3T0oziYEaA1z8UZBNYRjctU+fziTfp/eQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ft2bnljl6qaPO1d7df0oPlVI+hNCPWKxsLlPln/hrQA=;
- b=nI3FThldO5GCtleJ2m6ogSJCMSl+G2B+oq3xLx6quc+zWcAe9r7ybe3sD0RuFE5Yd1or0wBDoaFQ3kO7SQw28czGZcfpLy3flXLUqc6G6m/eaYo5TRzWUdXbtvlxtOiRTlA7PGajU4NR577axXJVLH1BDSDw9uJOtB1bd/cezl4=
+ bh=GJo3Tdxyi8ASO50sVAm1KefW3miTRmTfyvdfJfHwxWM=;
+ b=YKGkzXZFQ9DOU213g8CPlTdbvvfVbgG+DdA9Q0dkdeGIabfzPF1GGcLv6Yj4oWMdOMAwZb9HAnwE9XX2uSPoG+DuVo47kRE78J5qavLzYHKU6USF7/H1wBwAQTqVIvKNMvoqnbYSVslgKjVR0alXUm5cdX22NcTHajfL2uQC2TA=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
+ by AM7PR08MB5464.eurprd08.prod.outlook.com (2603:10a6:20b:10a::21)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Mon, 25 May
- 2020 10:09:15 +0000
+ 2020 10:09:12 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.029; Mon, 25 May 2020
- 10:09:15 +0000
+ 10:09:12 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 5/5] block/io: refactor save/load vmstate
-Date: Mon, 25 May 2020 13:08:01 +0300
-Message-Id: <20200525100801.13859-6-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 2/5] block: declare some coroutine functions in
+ block/coroutines.h
+Date: Mon, 25 May 2020 13:07:58 +0300
+Message-Id: <20200525100801.13859-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200525100801.13859-1-vsementsov@virtuozzo.com>
 References: <20200525100801.13859-1-vsementsov@virtuozzo.com>
@@ -77,36 +78,36 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost.localdomain (185.215.60.147) by
  AM3PR04CA0143.eurprd04.prod.outlook.com (2603:10a6:207::27) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 10:09:14 +0000
+ 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 10:09:11 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.147]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e38bac9d-353f-4754-7c43-08d80093adca
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
+X-MS-Office365-Filtering-Correlation-Id: 523f5596-048c-4ac8-dbed-08d80093ac28
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5464:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54478ACBB891A577CE2F0D7FC1B30@AM7PR08MB5447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:153;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5464706785C967225A25028AC1B30@AM7PR08MB5464.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-Forefront-PRVS: 0414DF926F
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: B6+dKYmvDT9RL0hjCSMI9cLojNitA/e5r0jxp9GmV7dCJQexEgcmZRQ3FzcC536MkFlSzN+LCJcXsnUh8E5Y3NyGppDGGQJ/FtEkNp9z0DXseN4+MZ9V6DyYexyZg3lnY7XQTWKFQhIZi77SPq0z7dpH9zJiNEsUFExi4sSw/3X+fkXkUVS5mxYXDFbYawa58sBy0KAJdNP3qZyMNcAV8pNC6yjRAk0FBaJ+sljHqf8zO+8mihlzaKYHvz0pngIjQ4jWq1FfXwQYSuoTWht6YLdKVZWhYV4ExmJLCo58FjN7t/YFmht3nIpGG7P0Y1KSXV5aHZioDU2/IRKOyOY7nTyc4DtcZWeeEGwIe+KYvNNspJB907R1A4kPx2WcbkBk
+X-Microsoft-Antispam-Message-Info: iXm83N0DSLrBQVkbaV/FfQHY9RwikT4lSa8Msa+PmP09Z191Y9IiS3jXCrpvf8mh/OoImQmjX71uPA3DqyTm/24xPERXQGiS3lF3bGBmk2VNdW/waZkjsIbYFNGYPpodWVOu3106dUEq4WCkp9DwpGtOfvwH+D0/SDT775bI9CDDlGZJeSImIBiKj6FOcE20X2rajrRr0AmN/QnqtcpB5dcUg6BAE6rdKhkqGjCHXI8loR65kCIwMU/qu8wGz3sTDEtNWi6ktuUIZ3cHoA0gMBgCoWav8JY8hWfPEzGUil3sB0UyLUHQIokYLVJxJ9U6cV8mH0RygscRZ9nimlYxD7+G3DinUDpBzjn/D9I5VSW8SCvzWDYTj5orUFasjFoH
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(396003)(39840400004)(376002)(136003)(346002)(366004)(69590400007)(26005)(16526019)(186003)(107886003)(6506007)(66946007)(66556008)(66476007)(956004)(2906002)(2616005)(52116002)(478600001)(6916009)(5660300002)(316002)(6512007)(6486002)(1076003)(6666004)(8936002)(36756003)(86362001)(4326008)(8676002);
+ SFS:(4636009)(346002)(396003)(39840400004)(376002)(366004)(136003)(6666004)(6486002)(1076003)(316002)(52116002)(26005)(69590400007)(6916009)(6512007)(478600001)(107886003)(8676002)(6506007)(2616005)(8936002)(86362001)(16526019)(186003)(36756003)(2906002)(66556008)(66946007)(4326008)(5660300002)(66476007)(956004);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: i3wOzbIBLTGWp9fDSX9xdmD+U1Pw3ZTt1SClchG2jntQVuY/I9bTN0N3m1c2zuvU6SNyqIeDKLJKhXyKlTBFMcAuz1Gsf1+kzxd7UuaJ6HqZj86lbA1H1qPLdC9dr9z5FmgAr2/8myeMgP/xkAskl/3GSPJH86OKq4crfEKPc0+aMfzR94q8L5upopuZ88jmQCYqhyg5piu19CZb7DAI3XUSprPr1z9Ul2Uhbu4bioemkjmMJx/jg8Fyv9Ib3+LDN5z+VvJesaw5cqNGdx6rM3cigrOxBoyzrD4s9Q2A+GZOhPCyhdX3MW0WEvPb4AJIlrdESBe37G7lbCokbVipY67xcfcEB3BPQuDi0Pu8J1u2yvwbkahdmY5b4Xrn+XDTa226M+8c0qba9lN2giietRVL2tjzISFbJf9jrn6ufz+41rLLxgAbnMWbQqqSqJgEsLPTM4GKLsD0z3HkX8M6y3PsUW3v6nA/+JG8O/PfNpk=
+X-MS-Exchange-AntiSpam-MessageData: cqXBAQrjR6egkPmaBCTFdLk9wXTCz49w/kd/vMHP3DyAyslUNgN9Kl+pXMy0laiSs1RNu6YM0ZJYjbRzJ0nyo8xBybe4QVJsflqwPw45M6Vbv0IU/3fvAwRe6Vb4oibuYsEvHoGvnmQvZkCmfrOH5OUAjrn17+0gtAuwDgYAVn3HSlZQ3a01ejsseE3wM17pQMArJRE8VWfbVKBzhj6dkX8Y46X0OXA49pQOR3ZNHxCJ0i/GvTqFxaqchDw5rwCwzNxLYGtY7L+BEUG1RgqGZCBZZcOD19ttEclvXTwLAUZTKM5w4Rnu7ZuSXBVqjJYIRFWDodZCAnHhQrRXkWQIxpsINS6vE1P0QQilnsjMjd0WKQ0YIqB891hBIDYLHBgzkDE++gR7wvsSaEL2BZ6hrDS93pCE2DV1+fJI7qlevlR+ih3lNMozHVazdNBEVHHuJb5RjGfs6go4cPrTYvDcJperQF03WsuCRuIInlrq9eA=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e38bac9d-353f-4754-7c43-08d80093adca
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 10:09:15.0598 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 523f5596-048c-4ac8-dbed-08d80093ac28
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 10:09:12.3119 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XJV7YwVnAmPyIgqQIp+lWm8ziYAp+BTJDxe4vdwy4MuF38UVR4rMgEKtZ/Yb8VihtnWV5yg4tQEiOG1cmU1sDRdHrFKtdxWwYWE2VPBAX84=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
-Received-SPF: pass client-ip=40.107.21.99;
+X-MS-Exchange-CrossTenant-UserPrincipalName: vytboaSxcKvUSfw/5eEFdTOMvVO8zlxhTj1BNemWJg+/LloeIgQL5V3gR6qYMNm7rIOvGYM4f8lHSNuGkSREUMbjAmehSDgUS8xMk/3dwqI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5464
+Received-SPF: pass client-ip=40.107.22.108;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:09:15
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
@@ -136,158 +137,214 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Like for read/write in a previous commit, drop extra indirection layer,
-generate directly bdrv_readv_vmstate() and bdrv_writev_vmstate().
+We are going to keep coroutine-wrappers code (structure-packing
+parameters, BDRV_POLL wrapper functions) in a separate auto-generated
+files. So, we'll need a header with declaration of original _co_
+functions, for those which are static now. As well, we'll need
+declarations for wrapper functions. Do these declarations now, as a
+preparation step.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/coroutines.h    | 10 +++----
- include/block/block.h |  6 ++--
- block/io.c            | 67 ++++++++++++++++++++++---------------------
- 3 files changed, 42 insertions(+), 41 deletions(-)
+ block/coroutines.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++
+ block.c            |  8 +++---
+ block/io.c         | 34 +++++++++++------------
+ 3 files changed, 88 insertions(+), 21 deletions(-)
+ create mode 100644 block/coroutines.h
 
 diff --git a/block/coroutines.h b/block/coroutines.h
-index 233b8b3694..fd0dd6a5e6 100644
---- a/block/coroutines.h
+new file mode 100644
+index 0000000000..74278cfef2
+--- /dev/null
 +++ b/block/coroutines.h
-@@ -58,11 +58,9 @@ bdrv_common_block_status_above(BlockDriverState *bs,
-                                int64_t *map,
-                                BlockDriverState **file);
+@@ -0,0 +1,67 @@
++/*
++ * Block layer I/O functions
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef BLOCK_COROUTINES_INT_H
++#define BLOCK_COROUTINES_INT_H
++
++#include "block/block_int.h"
++
++int coroutine_fn bdrv_co_check(BlockDriverState *bs,
++                               BdrvCheckResult *res, BdrvCheckMode fix);
++void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
++
++int coroutine_fn
++bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
++             bool is_write, BdrvRequestFlags flags);
++int
++bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
++          bool is_write, BdrvRequestFlags flags);
++
++int coroutine_fn
++bdrv_co_common_block_status_above(BlockDriverState *bs,
++                                  BlockDriverState *base,
++                                  bool want_zero,
++                                  int64_t offset,
++                                  int64_t bytes,
++                                  int64_t *pnum,
++                                  int64_t *map,
++                                  BlockDriverState **file);
++int
++bdrv_common_block_status_above(BlockDriverState *bs,
++                               BlockDriverState *base,
++                               bool want_zero,
++                               int64_t offset,
++                               int64_t bytes,
++                               int64_t *pnum,
++                               int64_t *map,
++                               BlockDriverState **file);
++
++int coroutine_fn
++bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                   bool is_read);
++int
++bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                bool is_read);
++
++#endif /* BLOCK_COROUTINES_INT_H */
+diff --git a/block.c b/block.c
+index 8416376c9b..7f06e82880 100644
+--- a/block.c
++++ b/block.c
+@@ -48,6 +48,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/cutils.h"
+ #include "qemu/id.h"
++#include "block/coroutines.h"
  
--int coroutine_fn
--bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                   bool is_read);
--int generated_co_wrapper
--bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                bool is_read);
-+int coroutine_fn bdrv_co_readv_vmstate(BlockDriverState *bs,
-+                                       QEMUIOVector *qiov, int64_t pos);
-+int coroutine_fn bdrv_co_writev_vmstate(BlockDriverState *bs,
-+                                        QEMUIOVector *qiov, int64_t pos);
- 
- #endif /* BLOCK_COROUTINES_INT_H */
-diff --git a/include/block/block.h b/include/block/block.h
-index dce99f8453..618c0b76b5 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -568,8 +568,10 @@ int path_has_protocol(const char *path);
- int path_is_absolute(const char *path);
- char *path_combine(const char *base_path, const char *filename);
- 
--int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
--int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
-+int generated_co_wrapper
-+bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
-+int generated_co_wrapper
-+bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
- int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size);
- 
-diff --git a/block/io.c b/block/io.c
-index 305ee7219a..8c1da3c335 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2491,66 +2491,67 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+ #ifdef CONFIG_BSD
+ #include <sys/ioctl.h>
+@@ -4625,8 +4626,8 @@ static void bdrv_delete(BlockDriverState *bs)
+  * free of errors) or -errno when an internal error occurred. The results of the
+  * check are stored in res.
+  */
+-static int coroutine_fn bdrv_co_check(BlockDriverState *bs,
+-                                      BdrvCheckResult *res, BdrvCheckMode fix)
++int coroutine_fn bdrv_co_check(BlockDriverState *bs,
++                               BdrvCheckResult *res, BdrvCheckMode fix)
+ {
+     if (bs->drv == NULL) {
+         return -ENOMEDIUM;
+@@ -5643,8 +5644,7 @@ void bdrv_init_with_whitelist(void)
+     bdrv_init();
  }
  
- int coroutine_fn
--bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                   bool is_read)
-+bdrv_co_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
+-static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+-                                                  Error **errp)
++void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp)
  {
-     BlockDriver *drv = bs->drv;
-     int ret = -ENOTSUP;
+     BdrvChild *child, *parent;
+     uint64_t perm, shared_perm;
+diff --git a/block/io.c b/block/io.c
+index bd00a70b47..f5b6ce3bf6 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -29,6 +29,7 @@
+ #include "block/blockjob.h"
+ #include "block/blockjob_int.h"
+ #include "block/block_int.h"
++#include "block/coroutines.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+@@ -900,9 +901,9 @@ typedef struct RwCo {
+     BdrvRequestFlags flags;
+ } RwCo;
  
-+    if (!drv) {
-+        return -ENOMEDIUM;
-+    }
-+
-     bdrv_inc_in_flight(bs);
- 
--    if (!drv) {
--        ret = -ENOMEDIUM;
--    } else if (drv->bdrv_load_vmstate) {
--        if (is_read) {
--            ret = drv->bdrv_load_vmstate(bs, qiov, pos);
--        } else {
--            ret = drv->bdrv_save_vmstate(bs, qiov, pos);
--        }
-+    if (drv->bdrv_load_vmstate) {
-+        ret = drv->bdrv_load_vmstate(bs, qiov, pos);
-     } else if (bs->file) {
--        ret = bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
-+        ret = bdrv_co_readv_vmstate(bs->file->bs, qiov, pos);
-     }
- 
-     bdrv_dec_in_flight(bs);
-+
+-static int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
+-                                     QEMUIOVector *qiov, bool is_write,
+-                                     BdrvRequestFlags flags)
++int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
++                              QEMUIOVector *qiov, bool is_write,
++                              BdrvRequestFlags flags)
+ {
+     if (is_write) {
+         return bdrv_co_pwritev(child, offset, qiov->size, qiov, flags);
+@@ -923,9 +924,9 @@ static void coroutine_fn bdrv_rw_co_entry(void *opaque)
+ /*
+  * Process a vectored synchronous request using coroutines
+  */
+-static int bdrv_prwv(BdrvChild *child, int64_t offset,
+-                     QEMUIOVector *qiov, bool is_write,
+-                     BdrvRequestFlags flags)
++int bdrv_prwv(BdrvChild *child, int64_t offset,
++              QEMUIOVector *qiov, bool is_write,
++              BdrvRequestFlags flags)
+ {
+     Coroutine *co;
+     RwCo rwco = {
+@@ -2446,7 +2447,7 @@ early_out:
      return ret;
  }
  
--int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
--                      int64_t pos, int size)
+-static int coroutine_fn
 +int coroutine_fn
-+bdrv_co_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
+ bdrv_co_common_block_status_above(BlockDriverState *bs,
+                                   BlockDriverState *base,
+                                   bool want_zero,
+@@ -2506,12 +2507,12 @@ static void coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
+  *
+  * See bdrv_co_block_status_above() for details.
+  */
+-static int bdrv_common_block_status_above(BlockDriverState *bs,
+-                                          BlockDriverState *base,
+-                                          bool want_zero, int64_t offset,
+-                                          int64_t bytes, int64_t *pnum,
+-                                          int64_t *map,
+-                                          BlockDriverState **file)
++int bdrv_common_block_status_above(BlockDriverState *bs,
++                                   BlockDriverState *base,
++                                   bool want_zero, int64_t offset,
++                                   int64_t bytes, int64_t *pnum,
++                                   int64_t *map,
++                                   BlockDriverState **file)
  {
--    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
--    int ret;
-+    BlockDriver *drv = bs->drv;
-+    int ret = -ENOTSUP;
+     Coroutine *co;
+     BdrvCoBlockStatusData data = {
+@@ -2638,7 +2639,7 @@ typedef struct BdrvVmstateCo {
+     int                 ret;
+ } BdrvVmstateCo;
  
--    ret = bdrv_writev_vmstate(bs, &qiov, pos);
--    if (ret < 0) {
--        return ret;
-+    if (!drv) {
-+        return -ENOMEDIUM;
-     }
- 
--    return size;
--}
-+    bdrv_inc_in_flight(bs);
- 
--int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
--{
--    return bdrv_rw_vmstate(bs, qiov, pos, false);
-+    if (drv->bdrv_load_vmstate) {
-+        ret = drv->bdrv_save_vmstate(bs, qiov, pos);
-+    } else if (bs->file) {
-+        ret = bdrv_co_writev_vmstate(bs->file->bs, qiov, pos);
-+    }
-+
-+    bdrv_dec_in_flight(bs);
-+
-+    return ret;
+-static int coroutine_fn
++int coroutine_fn
+ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
+                    bool is_read)
+ {
+@@ -2670,9 +2671,8 @@ static void coroutine_fn bdrv_co_rw_vmstate_entry(void *opaque)
+     aio_wait_kick();
  }
  
--int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-+int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size)
+-static inline int
+-bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
+-                bool is_read)
++int bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                    bool is_read)
  {
-     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
--    int ret;
--
--    ret = bdrv_readv_vmstate(bs, &qiov, pos);
--    if (ret < 0) {
--        return ret;
--    }
-+    int ret = bdrv_writev_vmstate(bs, &qiov, pos);
- 
--    return size;
-+    return ret < 0 ? ret : size;
- }
- 
--int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
-+int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-+                      int64_t pos, int size)
- {
--    return bdrv_rw_vmstate(bs, qiov, pos, true);
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
-+    int ret = bdrv_readv_vmstate(bs, &qiov, pos);
-+
-+    return ret < 0 ? ret : size;
- }
- 
- /**************************************************************/
+     if (qemu_in_coroutine()) {
+         return bdrv_co_rw_vmstate(bs, qiov, pos, is_read);
 -- 
 2.21.0
 
