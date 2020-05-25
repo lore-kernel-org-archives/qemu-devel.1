@@ -7,83 +7,91 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A32C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84564C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:46:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 475E92068D
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C1FA206DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:46:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="c040eo1B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475E92068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NaKeMtdF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C1FA206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd8Tp-0006fG-EN
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 04:29:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40688)
+	id 1jd8kH-0003kZ-Ey
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 04:46:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jd8Sn-00053y-GI; Mon, 25 May 2020 04:28:01 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:58280)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jd8Si-0003Tb-Kk; Mon, 25 May 2020 04:27:58 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 8FB002E148D;
- Mon, 25 May 2020 11:27:50 +0300 (MSK)
-Received: from sas1-9998cec34266.qloud-c.yandex.net
- (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- FxQuT7vOaJ-Rl2aBwer; Mon, 25 May 2020 11:27:50 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1590395270; bh=gMhfxGcFdwdMevrhHzJ8BX4KCxU/0rt3FHhjZoSjczs=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=c040eo1BrBQQzbNHqdLjjygiFqZfOYReON+woDWLgNh3dSFX89EPkqcVTb8Kbm+re
- 1RGlSzuhKfRixCX1YLyPA77e/RX5u9fLH52fHSW3gDdJZFX4TCqHkRxxSRuEAgaWHn
- xetcmmPngbyNtGQk4qvoOnBNk/ELBzrjsrx8BpXw=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:105::1:6])
- by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- n1l1kfpX9v-RkWKceGS; Mon, 25 May 2020 11:27:47 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Mon, 25 May 2020 11:27:45 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v3 2/2] vhost-user-blk: delay vhost_user_blk_disconnect
-Message-ID: <20200525082745.GA7303@dimastep-nix>
-References: <cover.1589989075.git.dimastep@yandex-team.ru>
- <0dfb37f8728aba26c8d6c117018332a5b7dc9b56.1589989075.git.dimastep@yandex-team.ru>
- <6621f54b-45c1-c4da-04ef-42379a4f33c0@redhat.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jd8jT-00030Z-VO
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 04:45:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24740
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jd8jR-0006Mb-VV
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 04:45:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590396312;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=/BgEXHyxlhWqor0SDMdSKEJYgxW/mcMiE1Bb/o2gWag=;
+ b=NaKeMtdFnsCTkeaq7MXAwqT8Iy2V0B6BkwdA2VHd7RwfBsofXRhtr4H+7ci2goE2o/bgEF
+ 5YvmaagmUs+XPkeJSdVZb4DTEzJ0IYZhVJhT3HlqoRtM8VVgt7ekxlfhmq7G1ATiLDG/sE
+ seMMdvp8NuKGZ4S9m4La6nnLfjmvx4A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-WxEAOhBAMMOvrbUGAvpVcA-1; Mon, 25 May 2020 04:45:09 -0400
+X-MC-Unique: WxEAOhBAMMOvrbUGAvpVcA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4B75460;
+ Mon, 25 May 2020 08:45:07 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-78.ams2.redhat.com [10.36.113.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F12FF5D9C5;
+ Mon, 25 May 2020 08:44:58 +0000 (UTC)
+Subject: Re: [RFC v2 1/3] cpu-throttle: new module, extracted from cpus.c
+To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200522171013.27597-1-cfontana@suse.de>
+ <20200522171013.27597-2-cfontana@suse.de>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3c30d830-cd4b-63f6-b942-afd4bc0fb6d6@redhat.com>
+Date: Mon, 25 May 2020 10:44:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200522171013.27597-2-cfontana@suse.de>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6621f54b-45c1-c4da-04ef-42379a4f33c0@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=5.45.199.163;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 04:27:51
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 01:44:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,151 +100,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, fengli@smartx.com,
- yc-core@yandex-team.ru, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- raphael.norwitz@nutanix.com, dgilbert@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 11:31:16AM +0800, Jason Wang wrote:
+On 22/05/2020 19.10, Claudio Fontana wrote:
+> move the vcpu throttling functionality into its own module.
 > 
-> On 2020/5/20 下午11:53, Dima Stepanov wrote:
-> >A socket write during vhost-user communication may trigger a disconnect
-> >event, calling vhost_user_blk_disconnect() and clearing all the
-> >vhost_dev structures holding data that vhost-user functions expect to
-> >remain valid to roll back initialization correctly. Delay the cleanup to
-> >keep vhost_dev structure valid.
-> >There are two possible states to handle:
-> >1. RUN_STATE_PRELAUNCH: skip bh oneshot call and perform disconnect in
-> >the caller routine.
-> >2. RUN_STATE_RUNNING: delay by using bh
-> >
-> >BH changes are based on the similar changes for the vhost-user-net
-> >device:
-> >   commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
-> >   "vhost-user: delay vhost_user_stop"
+> This functionality is not specific to any accelerator,
+> and it is used currently by migration to slow down guests to try to
+> have migrations converge, and by the cocoa MacOS UI to throttle speed.
 > 
+> cpu-throttle contains the controls to adjust and inspect throttle
+> settings, start (set) and stop vcpu throttling, and the throttling
+> function itself that is run periodically on vcpus to make them take a nap.
 > 
-> It's better to explain why we don't need to deal with case 1 in the
-> vhost-user-net case.
-In general i believe we should have similar change for all the
-vhost-user devices. But i don't have a tests for it right now. So as we
-discussed in v2 e-mail thread, i decided to stick only with the
-vhost-user-blk changes. Also it seems to me that the problem is a little
-bit wider, we have the changes like:
- - only vhost-user-net: e7c83a885f865128ae3cf1946f8cb538b63cbfba
-   "vhost-user: delay vhost_user_stop"
- - only vhost-user-blk: 9d283f85d755285bf1b1bfcb1ab275239dbf2c7b
-   "fix vhost_user_blk_watch crash"
- - only vhost-user-blk: my change
-At least what i knew (maybe more, because i can miss smth). So maybe
-this "vhost_user_event()" routine should be generic for all vhost-user
-devices with the internal method calls to specific devices. I want to
-try making a rework for this, but don't want to do it in this patch set.
-Because it will require more investigation and testing, since more
-devices will be touched during refactoring.
+> Execution of the throttling function on all vcpus is triggered by a timer,
+> registered at module initialization.
+> 
+> No functionality change.
 
-> 
-> And do we still need patch 1 if we had this patch??
-Yes, we still need it. The first patch is about getting an error from
-the low level to the upper initialization error. So for example when we
-call smth like get_config() and failed because of disconnect, we will stop
-initialization. Without patch 1 we will try to call next initialization
-function and such behaviour looks incorrect.
+Thanks for the update, sounds better now!
 
-Thanks, Dima.
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  MAINTAINERS                   |   1 +
+>  Makefile.target               |   8 ++-
+>  cpu-throttle.c                | 122 ++++++++++++++++++++++++++++++++++++++++++
+>  cpus.c                        |  95 +++-----------------------------
+>  include/hw/core/cpu.h         |  37 -------------
+>  include/qemu/main-loop.h      |   5 ++
+>  include/sysemu/cpu-throttle.h |  50 +++++++++++++++++
+>  migration/migration.c         |   1 +
+>  migration/ram.c               |   1 +
+>  9 files changed, 195 insertions(+), 125 deletions(-)
+>  create mode 100644 cpu-throttle.c
+>  create mode 100644 include/sysemu/cpu-throttle.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3690f313c3..95be18c0b5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2148,6 +2148,7 @@ Main loop
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: cpus.c
+> +F: cpu-throttle.c
+>  F: include/qemu/main-loop.h
+>  F: include/sysemu/runstate.h
+>  F: util/main-loop.c
+> diff --git a/Makefile.target b/Makefile.target
+> index 8ed1eba95b..60cfa2a78b 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -152,7 +152,13 @@ endif #CONFIG_BSD_USER
+>  #########################################################
+>  # System emulator target
+>  ifdef CONFIG_SOFTMMU
+> -obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+> +obj-y += arch_init.o
+> +obj-y += cpus.o
+> +obj-y += cpu-throttle.o
 
-No other comments mixed in below.
+Hmm, maybe the new files should rather be created in the softmmu/ folder
+(now that we've got it)? And cpus.c could finally be moved there, too...
+well, it's just an idea, I've got no strong opinion about this.
 
-> 
-> Thanks
-> 
-> 
-> >
-> >Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> >---
-> >  hw/block/vhost-user-blk.c | 49 +++++++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 43 insertions(+), 6 deletions(-)
-> >
-> >diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> >index 9d8c0b3..447fc9c 100644
-> >--- a/hw/block/vhost-user-blk.c
-> >+++ b/hw/block/vhost-user-blk.c
-> >@@ -337,11 +337,6 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >-    if (!s->connected) {
-> >-        return;
-> >-    }
-> >-    s->connected = false;
-> >-
-> >      if (s->dev.started) {
-> >          vhost_user_blk_stop(vdev);
-> >      }
-> >@@ -349,6 +344,19 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
-> >      vhost_dev_cleanup(&s->dev);
-> >  }
-> >+static void vhost_user_blk_event(void *opaque, QEMUChrEvent event);
-> >+
-> >+static void vhost_user_blk_chr_closed_bh(void *opaque)
-> >+{
-> >+    DeviceState *dev = opaque;
-> >+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >+
-> >+    vhost_user_blk_disconnect(dev);
-> >+    qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_event,
-> >+            NULL, opaque, NULL, true);
-> >+}
-> >+
-> >  static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
-> >  {
-> >      DeviceState *dev = opaque;
-> >@@ -363,7 +371,28 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
-> >          }
-> >          break;
-> >      case CHR_EVENT_CLOSED:
-> >-        vhost_user_blk_disconnect(dev);
-> >+        /*
-> >+         * A close event may happen during a read/write, but vhost
-> >+         * code assumes the vhost_dev remains setup, so delay the
-> >+         * stop & clear. There are two possible paths to hit this
-> >+         * disconnect event:
-> >+         * 1. When VM is in the RUN_STATE_PRELAUNCH state. The
-> >+         * vhost_user_blk_device_realize() is a caller.
-> >+         * 2. In tha main loop phase after VM start.
-> >+         *
-> >+         * For p2 the disconnect event will be delayed. We can't
-> >+         * do the same for p1, because we are not running the loop
-> >+         * at this moment. So just skip this step and perform
-> >+         * disconnect in the caller function.
-> >+         */
-> >+        if (s->connected && runstate_is_running()) {
-> >+            AioContext *ctx = qemu_get_current_aio_context();
-> >+
-> >+            qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL, NULL,
-> >+                    NULL, NULL, false);
-> >+            aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
-> >+        }
-> >+        s->connected = false;
-> >          break;
-> >      case CHR_EVENT_BREAK:
-> >      case CHR_EVENT_MUX_IN:
-> >@@ -428,6 +457,14 @@ reconnect:
-> >      ret = vhost_dev_get_config(&s->dev, (uint8_t *)&s->blkcfg,
-> >                                 sizeof(struct virtio_blk_config));
-> >+    if (!s->connected) {
-> >+        /*
-> >+         * Perform disconnect before making reconnect. More detailed
-> >+         * comment why it was delayed is in the vhost_user_blk_event()
-> >+         * routine.
-> >+         */
-> >+        vhost_user_blk_disconnect(dev);
-> >+    }
-> >      if (ret < 0) {
-> >          error_report("vhost-user-blk: get block config failed");
-> >          goto reconnect;
-> 
+> +obj-y += gdbstub.o
+> +obj-y += balloon.o
+> +obj-y += ioport.o
+> +
+>  obj-y += qtest.o
+>  obj-y += dump/
+>  obj-y += hw/
+> diff --git a/cpu-throttle.c b/cpu-throttle.c
+> new file mode 100644
+> index 0000000000..4e6b2818ca
+> --- /dev/null
+> +++ b/cpu-throttle.c
+> @@ -0,0 +1,122 @@
+> +/*
+> + * QEMU System Emulator
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qemu/thread.h"
+> +#include "hw/core/cpu.h"
+> +#include "qemu/main-loop.h"
+> +#include "sysemu/cpus.h"
+> +#include "sysemu/cpu-throttle.h"
+> +
+> +/* vcpu throttling controls */
+> +static QEMUTimer *throttle_timer;
+> +static unsigned int throttle_percentage;
+> +
+> +#define CPU_THROTTLE_PCT_MIN 1
+> +#define CPU_THROTTLE_PCT_MAX 99
+> +#define CPU_THROTTLE_TIMESLICE_NS 10000000
+> +
+> +static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
+> +{
+> +    double pct;
+> +    double throttle_ratio;
+> +    int64_t sleeptime_ns, endtime_ns;
+> +
+> +    if (!cpu_throttle_get_percentage()) {
+> +        return;
+> +    }
+> +
+> +    pct = (double)cpu_throttle_get_percentage() / 100;
+> +    throttle_ratio = pct / (1 - pct);
+> +    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
+> +    sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
+> +    endtime_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
+> +    while (sleeptime_ns > 0 && !cpu->stop) {
+> +        if (sleeptime_ns > SCALE_MS) {
+> +            qemu_cond_timedwait_iothread(cpu->halt_cond,
+> +                                         sleeptime_ns / SCALE_MS);
+> +        } else {
+> +            qemu_mutex_unlock_iothread();
+> +            g_usleep(sleeptime_ns / SCALE_US);
+> +            qemu_mutex_lock_iothread();
+> +        }
+> +        sleeptime_ns = endtime_ns - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +    }
+> +    atomic_set(&cpu->throttle_thread_scheduled, 0);
+> +}
+> +
+> +static void cpu_throttle_timer_tick(void *opaque)
+> +{
+> +    CPUState *cpu;
+> +    double pct;
+> +
+> +    /* Stop the timer if needed */
+> +    if (!cpu_throttle_get_percentage()) {
+> +        return;
+> +    }
+> +    CPU_FOREACH(cpu) {
+> +        if (!atomic_xchg(&cpu->throttle_thread_scheduled, 1)) {
+> +            async_run_on_cpu(cpu, cpu_throttle_thread,
+> +                             RUN_ON_CPU_NULL);
+> +        }
+> +    }
+> +
+> +    pct = (double)cpu_throttle_get_percentage() / 100;
+> +    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
+> +                                   CPU_THROTTLE_TIMESLICE_NS / (1 - pct));
+> +}
+> +
+> +void cpu_throttle_set(int new_throttle_pct)
+> +{
+> +    /* Ensure throttle percentage is within valid range */
+> +    new_throttle_pct = MIN(new_throttle_pct, CPU_THROTTLE_PCT_MAX);
+> +    new_throttle_pct = MAX(new_throttle_pct, CPU_THROTTLE_PCT_MIN);
+> +
+> +    atomic_set(&throttle_percentage, new_throttle_pct);
+> +
+> +    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
+> +                                       CPU_THROTTLE_TIMESLICE_NS);
+> +}
+> +
+> +void cpu_throttle_stop(void)
+> +{
+> +    atomic_set(&throttle_percentage, 0);
+> +}
+> +
+> +bool cpu_throttle_active(void)
+> +{
+> +    return (cpu_throttle_get_percentage() != 0);
+> +}
+> +
+> +int cpu_throttle_get_percentage(void)
+> +{
+> +    return atomic_read(&throttle_percentage);
+> +}
+> +
+> +void cpu_throttle_init(void)
+> +{
+> +    throttle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
+> +                                  cpu_throttle_timer_tick, NULL);
+> +}
+> diff --git a/cpus.c b/cpus.c
+> index 5670c96bcf..3a46a4fc2b 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+[...]
+>  
+> +void qemu_cond_timedwait_iothread(QemuCond *cond, int ms)
+> +{
+> +    qemu_cond_timedwait(cond, &qemu_global_mutex, ms);
+> +}
+
+So the new function is in cpus.c ...
+
+> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+> index a6d20b0719..2fa3d90ad6 100644
+> --- a/include/qemu/main-loop.h
+> +++ b/include/qemu/main-loop.h
+> @@ -263,6 +263,11 @@ int qemu_add_child_watch(pid_t pid);
+>   */
+>  bool qemu_mutex_iothread_locked(void);
+>  
+> +/*
+> + * qemu_cond_timedwait_iothread: like the previous, but with timeout
+> + */
+> +void qemu_cond_timedwait_iothread(QemuCond *cond, int ms);
+
+... but it's prototype is in main-loop.h ? That's a little bit
+confusing... I'd rather expect it in include/sysemu/cpus.h instead? Or
+should the new function rather be moved to softmmu/vl.c ?
+
+ Thomas
+
 
