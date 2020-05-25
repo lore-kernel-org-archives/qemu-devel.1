@@ -2,89 +2,91 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E67FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 02:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 373762073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 02:47:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D19CE2076C
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c1/FRYuh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 373762073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="MbZscF39"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D19CE2076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd39S-0005Ma-DP
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 22:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42828)
+	id 1jd3Rh-0000MH-1A
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 23:06:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jd38w-0004v7-3O
- for qemu-devel@nongnu.org; Sun, 24 May 2020 22:47:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38848
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jd38u-0005ux-HN
- for qemu-devel@nongnu.org; Sun, 24 May 2020 22:47:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590374826;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZxhwvKrLAJf/sYVclQITkDkiNV0IMUKJaeIVnYF4/dA=;
- b=c1/FRYuhjwBHZArzT8MlZSDICdb6UfChtAUihLg6mVXoMm922uPdUSfxDvYyevkObgh/x0
- fGXgMjgIwueaFWFAyo0UZYlDv95EB3WX/Ymf1rdLjade/75A3udxnRjAW6og28MUzSRjOS
- H3mLqU+pSZsZP+qq+lGK0DhhvyuZvFw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-VEi3uR_5NmKUCtCyj2VrjQ-1; Sun, 24 May 2020 22:47:04 -0400
-X-MC-Unique: VEi3uR_5NmKUCtCyj2VrjQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 599BC80183C;
- Mon, 25 May 2020 02:47:02 +0000 (UTC)
-Received: from [10.72.13.226] (ovpn-13-226.pek2.redhat.com [10.72.13.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 023585D9DC;
- Mon, 25 May 2020 02:47:00 +0000 (UTC)
-Subject: Re: [PATCH V2 0/7] Latest COLO tree queued patches
-To: Zhang Chen <chen.zhang@intel.com>
-References: <20200522075357.19883-1-chen.zhang@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ba019b1f-8201-b17b-3a66-b22a945aa213@redhat.com>
-Date: Mon, 25 May 2020 10:46:59 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jd3R6-0008FI-AA
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 23:05:56 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:37465)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jd3R5-0000nz-7J
+ for qemu-devel@nongnu.org; Sun, 24 May 2020 23:05:55 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id z5so7547607qvw.4
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 20:05:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=braap-org.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=JUw6SA+aFNJL0DhGpFZToE7ce5zu8tNK/aXrR0hv2cI=;
+ b=MbZscF39G5D3hLk3ESYZ8wmiThFp4/+QXu8fYNxIUl/eIN/dD00f0WQZEPyDn9qyR+
+ 8JueNueg7UnrD8wVmpskxnrgKsFGChAsUYj421DJ/qTriE+BS+arX/LAbPQ2HMbnRMpw
+ feegx4USbeqeW7GdXDKfAvezZkT05z2buShDGPR6uMY8URhUCrsDUqWh1ehug7wfpVKo
+ 3OKS34v3aGSCBQvWxz/4me0dvh0z1ZDAeauK98OuvHoiHACkDifte8J3wo3MGt+/CkD3
+ m8+Oi9HvyswZesPAY8CuUIMt9L5mnhXY0AvKWeXEccSs8IRyxcXC/xYf+nJNd0oY6phP
+ k1Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=JUw6SA+aFNJL0DhGpFZToE7ce5zu8tNK/aXrR0hv2cI=;
+ b=r+ujz7I0StKu2DsrJUZCfigYzfhbW44rx300qaj1Uc+u1AIYH33s2F2+3qMulZD4CB
+ /ce156vuu+ERLvUe9u80+hYQ6y/ozXtv5zdGYD0/GeoxqjS7c1iMIcwTrIYwdPoniq2g
+ cCbX0lCtKXlfBj2hAxwFnCuoGLHgHYerbmqOiysSpyynn8ItldMe4XNsa1dX8lKGfz32
+ ZM/eGlqCfsXIZENEWhqYJwx3kkWmvVPBMuASk1cjPVrmTZuuxidyVc8LDK3O5gynmTbX
+ yxuhW0NmtXKyIIwtC9csHafdK6peBx8Vk71sTf6Kz8NnAP4dmbMzwVbVUwhfSeGi+kSt
+ fo/g==
+X-Gm-Message-State: AOAM531BPMGTEW4bdZQAqkq1iI/KO/RwhR19k/ZrFd8ecR75r4uEGpT2
+ qMVm/ouGLr1AZ9r8UZo/gHN6Ig==
+X-Google-Smtp-Source: ABdhPJwQI409Ly1PwqwjTotVB6dTVDuVh88Oxv9+L1YFdyDGS6zX+m7xQhkHTlTaZpfGmwn8YLLAPg==
+X-Received: by 2002:a0c:8e84:: with SMTP id x4mr14069567qvb.175.1590375954151; 
+ Sun, 24 May 2020 20:05:54 -0700 (PDT)
+Received: from localhost ([70.19.54.161])
+ by smtp.gmail.com with ESMTPSA id v1sm10520417qkb.19.2020.05.24.20.05.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 24 May 2020 20:05:53 -0700 (PDT)
+Date: Sun, 24 May 2020 23:05:52 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] scripts/clean-includes: Mark 'qemu/qemu-plugin.h' as
+ special header
+Message-ID: <20200525030552.GA990262@sff>
+References: <20200524215654.13256-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20200522075357.19883-1-chen.zhang@intel.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/24 22:47:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200524215654.13256-1-f4bug@amsat.org>
+Received-SPF: softfail client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=cota@braap.org; helo=mail-qv1-xf44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +99,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sun, May 24, 2020 at 23:56:54 +0200, Philippe Mathieu-Daudé wrote:
+> "qemu/qemu-plugin.h" isn't meant to be include by QEMU codebase,
+> but by 3rd party plugins that QEMU can use. These plugins can be
+> built out of QEMU and don't include "qemu/osdep.h".
+> Mark "qemu/qemu-plugin.h" as a special header that doesn't need
+> to be cleaned for "qemu/osdep.h".
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 2020/5/22 ä¸‹åˆ3:53, Zhang Chen wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
->
-> Hi Jason, this series include latest COLO related patches.
-> I have finish basic test and review.
-> If no other comments, please check and merge this series.
->
-> Derek Su (1):
->    colo-compare: Fix memory leak in packet_enqueue()
->
-> Lukas Straub (6):
->    net/colo-compare.c: Create event_bh with the right AioContext
->    chardev/char.c: Use qemu_co_sleep_ns if in coroutine
->    net/colo-compare.c: Fix deadlock in compare_chr_send
->    net/colo-compare.c: Only hexdump packets if tracing is enabled
->    net/colo-compare.c: Check that colo-compare is active
->    net/colo-compare.c: Correct ordering in complete and finalize
->
->   chardev/char.c     |   7 +-
->   net/colo-compare.c | 277 +++++++++++++++++++++++++++++++++------------
->   net/colo.c         |   7 ++
->   net/colo.h         |   1 +
->   net/trace-events   |   1 +
->   5 files changed, 222 insertions(+), 71 deletions(-)Philippe
->
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-Applied with the following tweaks:
-
-- reword the commit log of patch 2 asÂ  Philippe suggested
-- a missing ack from Philippe in patch 7
-
-Thanks
-
+Thanks,
+		Emilio
 
