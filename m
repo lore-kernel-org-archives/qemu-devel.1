@@ -2,97 +2,89 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D583C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4E31206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E31206DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 351CD206DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LsvUOHE7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351CD206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd90k-0002f1-ME
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 05:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43958)
+	id 1jd912-0003CS-BG
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 05:03:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jd8zo-00021x-PO
- for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:08 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:50268
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jd8zn-00015c-CW
- for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:08 -0400
-Received: from host109-156-104-24.range109-156.btcentralplus.com
- ([109.156.104.24] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jd8zi-0000Hl-66; Mon, 25 May 2020 10:02:05 +0100
-To: Igor Mammedow <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200510113505.10500-1-f4bug@amsat.org>
- <20200514120951.3588bc30@redhat.com>
- <58238d26-a9dc-0cc0-749d-6230d2646f75@amsat.org>
- <20200520120709.558a52ba@nas.mammed.net>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <aa0afa5a-9d71-69b6-0a34-5a829d974878@ilande.co.uk>
-Date: Mon, 25 May 2020 10:02:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jd90B-0002FT-2u
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33238
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jd90A-00019P-4s
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590397348;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SsXuH5ekzD9608RHToOF5NccYsk+1lwAWa8ohZy+Ubw=;
+ b=LsvUOHE7qpp71zQwtptX8+ffdJ947NRnqducE4xeQU60QdJxdCYsRJhjPdHZFovh9M/egL
+ DYWztu9KMWo8apZyy9rjB+BVKPAS5omd5rw7tct0BZ3U5FnCmIiw9qwjj43brQbPDg0+mE
+ l3Q2se66m82vbJamobGpZJp3QL4T0uU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-U3RCoT-zM2unESrhVnRG7w-1; Mon, 25 May 2020 05:02:26 -0400
+X-MC-Unique: U3RCoT-zM2unESrhVnRG7w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9319D800688;
+ Mon, 25 May 2020 09:02:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A5875D9C5;
+ Mon, 25 May 2020 09:02:25 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CC893113864A; Mon, 25 May 2020 11:02:23 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 1/2] hmp: Implement qom-get HMP command
+References: <20200520151108.160598-1-dgilbert@redhat.com>
+ <20200520151108.160598-2-dgilbert@redhat.com>
+Date: Mon, 25 May 2020 11:02:23 +0200
+In-Reply-To: <20200520151108.160598-2-dgilbert@redhat.com> (David Alan
+ Gilbert's message of "Wed, 20 May 2020 16:11:07 +0100")
+Message-ID: <87sgfoe6ao.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200520120709.558a52ba@nas.mammed.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.156.104.24
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [RFC PATCH] hw/sparc/sun4m: Use memdev backend for main RAM
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 01:44:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,57 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>, afaerber@suse.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/05/2020 11:07, Igor Mammedow wrote:
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
-> On Thu, 14 May 2020 14:13:11 +0200
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> 
->> On 5/14/20 12:09 PM, Igor Mammedov wrote:
->>> On Sun, 10 May 2020 13:35:05 +0200
->>> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>   
->>>> Since commit 82b911aaff3, machine_run_board_init() checks for
->>>> ram_memdev_id and consume it. As TYPE_SUN4M_MEMORY is no more
->>>> needed, replace it by the generic memdev allocated MemoryRegion
->>>> and remove it. This completes commit b2554752b1da7c8f.  
->>>
->>> I don't get justification here.
->>> You are removing 'frontend' device model that has little/nothing
->>> to do with how backend is instantiated.
->>>
->>> TYPE_SUN4M_MEMORY is analog to pc-dimm, only for builtin RAM
->>> (not really useful but could serve as an example).  
->>
->> I have no idea about the benefits of using memory frontend/backend
->> with emulation. Is there documentation and examples? I'm seeing this
->> code as a complicated way of doing a simple thing, but I guess I'm
->> missing the big picture here.
-> 
-> Examples are pc-dimm and nv-dimm which thanks to separation easily
-> reusable across pc/spapr/virt-arm.
-> 
-> Having frontend is also useful for mgmt purposes, where HMP/QMP
-> just has to enumerate all RAM devices, otherwise boards would have
-> to provide a callback to describe their custom mappings.
-> 
-> But for embed boards with a single blob of RAM nailed down,
-> having frontend is probably overkill (at least ATM).
-> So I'm fine with this patch /with amended commit message/
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> This started off as Andreas F=C3=A4rber's implementation from
+> March 2015, but after feedback from Paolo and Markus it morphed into
+> using the json output which handles structs reasonably.
+>
+> Use with qom-list to find the members of an object.
+>
+> (qemu) qom-get /backend/console[0]/device/vga.rom[0] size
+> 65536
+> (qemu) qom-get /machine smm
+> "auto"
+> (qemu) qom-get /machine rtc-time
+> {
+>     "tm_year": 120,
+>     "tm_sec": 51,
+>     "tm_hour": 9,
+>     "tm_min": 50,
+>     "tm_mon": 4,
+>     "tm_mday": 20
+> }
+> (qemu) qom-get /machine frob
+> Error: Property '.frob' not found
 
-I don't feel too strongly about this, however if there is a standard way of doing
-things then I would prefer to do that since it makes it easier for me as a maintainer
-if there are existing (and up-to-date) examples that I can use as a reference.
+  (qemu) qom-get /machine peripheral
+  "/machine/peripheral"
 
-Presumably it also means that if HMP/QMP commands are added in relation to machine
-RAM then the SPARC machines would get that new functionality automatically...
+Not this patch's fault, but WTF?
 
+Turns out it's simply what object_get_child_property() does.
 
-ATB,
+Paolo, is this what we want for qom-get?
 
-Mark.
+Also not this patch's fault: separating path and property feels like a
+pointless complication of the interface to me.  Why
+
+    {"execute": "qom-get", "arguments": {"path": "/machine", "property": "s=
+mm"}}
+
+and not
+
+    {"execute": "qom-get", "arguments": {"path": "/machine/smm"}}
+
+?
+
+Too late to change for QMP, I guess.
+
 
