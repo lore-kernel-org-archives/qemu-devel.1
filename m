@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37789C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3925CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F36732073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:09:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 006172073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:10:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eb6Ju+8F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36732073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXOjxdxw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006172073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdEj8-0007JO-7M
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:09:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54128)
+	id 1jdEkS-0001ND-2x
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:10:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEh2-0005XE-EZ
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36768
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEhC-0005j4-QS
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23486
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEh1-0006hf-KN
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:08 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEhC-0006kP-0q
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:07:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590419227;
+ s=mimecast20190719; t=1590419237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MQWYf2QYcqkNIHTPoPqPd3tJF9br/Kx677vEgu609W8=;
- b=eb6Ju+8FLKlOXVpCihRdXAqRVO6tACGqR82FB7+ITVc2hUoLnioRgUCerKQ1I6Z5UFYYV6
- DslNpGPg5Rz67X563eTTq6U+pF1G97huTRBGEwXfhEczjC5hhZlzcKsLwQOc1KlJIt5C1e
- r9xRzTnHUH+SRQNB0wcnffXC5XpssuY=
+ bh=xXt/e940KwQ6c6w6CifCzHczNy+4pbZbPt9Qx0gk/SI=;
+ b=VXOjxdxwMe6K37nMF0LPawEYjyuxo6Hzr0Q4WCBOQL7V0wrepAVLJHwlVH9r17W8JU3u4+
+ S6oEjfavU3f2a71nRn951s9UjAb7UZhdRT+QFvKfZUZ95fv5MjH0sc9Y5eqpAVHfZAYf4l
+ /QmAmKB61RZz6bYdmHtCyWTxyjoofj8=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-jh9kXP0HOzG1G2IJbjJbgQ-1; Mon, 25 May 2020 11:07:03 -0400
-X-MC-Unique: jh9kXP0HOzG1G2IJbjJbgQ-1
-Received: by mail-ej1-f72.google.com with SMTP id s13so6379623ejc.18
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 08:07:03 -0700 (PDT)
+ us-mta-321-Bff5hubuOL6SqKWPZ1yn6Q-1; Mon, 25 May 2020 11:07:16 -0400
+X-MC-Unique: Bff5hubuOL6SqKWPZ1yn6Q-1
+Received: by mail-ej1-f72.google.com with SMTP id g9so5685208ejs.20
+ for <qemu-devel@nongnu.org>; Mon, 25 May 2020 08:07:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MQWYf2QYcqkNIHTPoPqPd3tJF9br/Kx677vEgu609W8=;
- b=CZNJj1MEIeGHeZBcI6QdNLJB8lpGnmDp7rpzoyaABlB8lGQMr2/ASIBigaD2uIAtJL
- CZxYltUHMBpG+v95B7C6ru3s+KUUbrOhtJNvCl89a6xLaq1oaVMjjxnUXn6qjm0h7saX
- iY7ZJWW4sal1FKJlYx/e7/0+MxdvMWm72gGsJ14aIrNHg7QWQbiRwcyo7bMo/cK1orRt
- OFMHvsby2GWcrEaWLKSMyu6iy06nCGRG4KoP/d496rDe9q0rYw1M/hKoy3apLbV0+hgd
- 4QtsUhzmr0wn3Z78VFAUcy9hi8A/sRlxo+l1fWSm4w7Cj7R6dNrVha5irSpWghsV4X/i
- ozrA==
-X-Gm-Message-State: AOAM533Ov4UdaMvyJiZnWnopoFhYJeAtQxdkQ6fe3OEqUIzKhYf0dvC1
- mve4WWBubn615Uqlq0UBRrGPvBY9jaY+qOwx7vgWf9+ToFdXfD+qbZp2xP+moFHxrwyObhAichh
- FpOZRhxByrr/T0RA=
-X-Received: by 2002:a17:906:d86:: with SMTP id
- m6mr20137740eji.434.1590419222213; 
- Mon, 25 May 2020 08:07:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxiLti9ujl8zPGB3BoWaIdOxK2Mxmt4QWp+2GEsLKO7ZN/1WHhN/x7yMWjaYTOPSjCoeELqnQ==
-X-Received: by 2002:a17:906:d86:: with SMTP id
- m6mr20137701eji.434.1590419221912; 
- Mon, 25 May 2020 08:07:01 -0700 (PDT)
+ bh=xXt/e940KwQ6c6w6CifCzHczNy+4pbZbPt9Qx0gk/SI=;
+ b=BL70TmCi83PYMLMYFxssHqduoJr2eejpbGU9HcblaLaKn/dzOuIcYoLlu8/qM0izNy
+ /XB9zHltKfaKd7liBb+jnnaV8GLYRQL4QN9huz04HpgYj3+3wFcuNBBoe7/g1z4H5RVh
+ s4TVNpqbCxxNf96lpYsJ/3SKTWLiD2HGluwEYkbxUWnf6cundsebEmU5XiD1kFywqRsm
+ H8hzp2V1+H1trLKhPNOV43Ydd9lYE9kZkz/30bNzJEVDQKiv53eaucsyJy2v/+Nl6kRm
+ Nx45g5Z70guSBMTkUtUDyqIRPDQSKyd7c1TkB0tO4rdS6KqfSCljhGsFJtIwv+epfnUH
+ XcIA==
+X-Gm-Message-State: AOAM531BV5SHp2O8IGCD79gQpoL4Y+hf4LugQKaY69Gi6mJ0svGQMVGG
+ cLsQIH3HL19kKnfqaR5I2P47oPBqodKPEGZl7dzcQ9Fa3rrHA4ZpdO+MSKGyGBfm16KyHRP5pQX
+ 2Ze0VffW+M1XF9fg=
+X-Received: by 2002:a17:906:eda3:: with SMTP id
+ sa3mr20114332ejb.253.1590419234481; 
+ Mon, 25 May 2020 08:07:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyR6LUhcd2XfqLF3HQVcuZ0/RkFmoE0jg4G8feEeQRKeyoKJLqbAZEXBP3TgEeNE03L6u9V2A==
+X-Received: by 2002:a17:906:eda3:: with SMTP id
+ sa3mr20114307ejb.253.1590419234225; 
+ Mon, 25 May 2020 08:07:14 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id y13sm15544110ejm.107.2020.05.25.08.07.00
+ by smtp.gmail.com with ESMTPSA id u17sm6696494ejr.44.2020.05.25.08.07.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 25 May 2020 08:07:01 -0700 (PDT)
+ Mon, 25 May 2020 08:07:13 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/9] qapi/misc.json: Correct balloon documentation
-Date: Mon, 25 May 2020 17:06:34 +0200
-Message-Id: <20200525150640.30879-4-philmd@redhat.com>
+Subject: [PATCH v3 5/9] qapi/misc: Restrict query-vm-generation-id command to
+ machine code
+Date: Mon, 25 May 2020 17:06:36 +0200
+Message-Id: <20200525150640.30879-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200525150640.30879-1-philmd@redhat.com>
 References: <20200525150640.30879-1-philmd@redhat.com>
@@ -126,65 +127,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The documentation incorrectly uses the "size of the balloon"
-description when it should be "logical size of the VM". Fix it.
-
-The relation between both values is:
-
-  logical_vm_size = vm_ram_size - balloon_size
-
-Reported-by: David Hildenbrand <david@redhat.com>
-Suggested-by: David Hildenbrand <david@redhat.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- qapi/misc.json | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ qapi/machine.json | 20 ++++++++++++++++++++
+ qapi/misc.json    | 21 ---------------------
+ hw/acpi/vmgenid.c |  2 +-
+ stubs/vmgenid.c   |  2 +-
+ 4 files changed, 22 insertions(+), 23 deletions(-)
 
+diff --git a/qapi/machine.json b/qapi/machine.json
+index ae42d69495..545ecb9a55 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -421,6 +421,26 @@
+ ##
+ { 'command': 'query-target', 'returns': 'TargetInfo' }
+ 
++##
++# @GuidInfo:
++#
++# GUID information.
++#
++# @guid: the globally unique identifier
++#
++# Since: 2.9
++##
++{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
++
++##
++# @query-vm-generation-id:
++#
++# Show Virtual Machine Generation ID
++#
++# Since: 2.9
++##
++{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
++
+ ##
+ # @LostTickPolicy:
+ #
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 2c48ffaa62..446fc8ff83 100644
+index 26b5115638..b43fe7c602 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -191,7 +191,8 @@
+@@ -1414,24 +1414,3 @@
  #
- # Information about the guest balloon device.
- #
--# @actual: the number of bytes the balloon currently contains
-+# @actual: the logical size of the VM in bytes
-+#          Formula used: logical_vm_size = vm_ram_size - balloon_size
- #
- # Since: 0.14.0
- #
-@@ -227,7 +228,8 @@
- # Emitted when the guest changes the actual BALLOON level. This value is
- # equivalent to the @actual field return by the 'query-balloon' command
- #
--# @actual: actual level of the guest memory balloon in bytes
-+# @actual: the logical size of the VM in bytes
-+#          Formula used: logical_vm_size = vm_ram_size - balloon_size
- #
- # Note: this event is rate-limited.
- #
-@@ -756,7 +758,10 @@
- #
- # Request the balloon driver to change its balloon size.
- #
--# @value: the target size of the balloon in bytes
-+# @value: the target logical size of the VM in bytes
-+#         We can deduce the size of the balloon using this formula:
-+#            logical_vm_size = vm_ram_size - balloon_size
-+#         From it we have: balloon_size = vm_ram_size - @value
- #
- # Returns: - Nothing on success
- #          - If the balloon driver is enabled but not functional because the KVM
-@@ -774,6 +779,8 @@
- # -> { "execute": "balloon", "arguments": { "value": 536870912 } }
- # <- { "return": {} }
- #
-+# With a 2.5GiB guest this command inflated the ballon to 3GiB.
-+#
  ##
- { 'command': 'balloon', 'data': {'value': 'int'} }
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
+-
+-##
+-# @GuidInfo:
+-#
+-# GUID information.
+-#
+-# @guid: the globally unique identifier
+-#
+-# Since: 2.9
+-##
+-{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
+-
+-##
+-# @query-vm-generation-id:
+-#
+-# Show Virtual Machine Generation ID
+-#
+-# Since: 2.9
+-##
+-{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+-
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 2df7623d74..2b26bacaf8 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -12,7 +12,7 @@
  
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-machine.h"
+ #include "qemu/module.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/aml-build.h"
+diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
+index 568e42b064..bfad656c6c 100644
+--- a/stubs/vmgenid.c
++++ b/stubs/vmgenid.c
+@@ -1,6 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-machine.h"
+ #include "qapi/qmp/qerror.h"
+ 
+ GuidInfo *qmp_query_vm_generation_id(Error **errp)
 -- 
 2.21.3
 
