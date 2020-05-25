@@ -2,62 +2,85 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB5CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 19:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC759C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 20:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45E132068D
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 19:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E132068D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 98A3A2065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 20:56:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cj9JTRzv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A3A2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdJ55-0005Wz-Df
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 15:48:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55832)
+	id 1jdK9S-00083D-Q6
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 16:56:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jdJ3n-0004ki-0J
- for qemu-devel@nongnu.org; Mon, 25 May 2020 15:46:55 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:39543)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jdJ3l-0000ac-CB
- for qemu-devel@nongnu.org; Mon, 25 May 2020 15:46:54 -0400
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
- by isrv.corpit.ru (Postfix) with ESMTP id 97BC1405BE;
- Mon, 25 May 2020 22:46:40 +0300 (MSK)
-Received: from [192.168.177.99] (mjt.vpn.tls.msk.ru [192.168.177.99])
- by tsrv.corpit.ru (Postfix) with ESMTP id 76DB383;
- Mon, 25 May 2020 22:46:40 +0300 (MSK)
-Subject: Re: -nic model=rocker causes qemu to abort
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <eafa7c11-b3af-2247-ddb3-538891ad0732@msgid.tls.msk.ru>
- <1f540f9c-45f3-d02e-a087-d1059d7a8977@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <a06c7d1b-5d69-0ce0-1cf1-ea9d39cac02c@msgid.tls.msk.ru>
-Date: Mon, 25 May 2020 22:46:40 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1jdK8u-0007Ym-Sh; Mon, 25 May 2020 16:56:16 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43696)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1jdK8t-0002ns-Cg; Mon, 25 May 2020 16:56:16 -0400
+Received: by mail-io1-xd43.google.com with SMTP id h10so19799498iob.10;
+ Mon, 25 May 2020 13:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RPhfd55HVFFy1KzvqyMIxLUMQm7utjDdsmSDwwbE96w=;
+ b=Cj9JTRzvN6Su8Rdmf3qYxBTIWcj8ThvT0ieN3vEUOqSemquFZAZtTPm8rW7upD/PnS
+ PagfIxfkQAwXYtqLQk5apnlL6tLf0tcRWdR5bkMq3FOGqb+FFzMehR8y0z0vG6v/vArS
+ RvGT8ViZMEiO8+oMeVMMmmNxt1cpRBNJwUBEXp+PyHwM5frWXTKNbbzGd8qgXcSE+2F+
+ OV3rz8ibOG40B5IStWedt2ZEXY4y6gpjQEXhaPwhjz8QNiGbLoHQh7tIGv9xeKpsEwGG
+ hKi0z7+UlQVlIhxNbmsZWYbam1sVQFiYhNzKuG9bKSob5cQw70kP1zSN735IZyMGhww5
+ Thpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RPhfd55HVFFy1KzvqyMIxLUMQm7utjDdsmSDwwbE96w=;
+ b=VcoJHSTcy68pZOShh2ZsBMSCYtpb5MlZmGGzoIz6fIfExRMGfMAmF4L/6blg06cnk5
+ hObQ3R2IYwVHAolp8ymMAmy+l6E3nMT30hAhM4R818lvxfIECihClxdLdO4L0iwM7VxC
+ 9xTunIMk7WB+rLaZ9q3TwXvgU9H/KOroSBAZl5ugAy/e3M+E6a6G1CW7yb/s6A6cW5Bf
+ IMxWE9r7wkGiMhHnRE87IHaVpRAnqP/noaejNU50EXSRpZMIs7UOVD3MFMPAJyXUJHBM
+ 2TwrWI90aHxW756PuXrs9UhERwDI4EhBN99oyiUt1ltXt5hUf3seE8xQYgBO9tse7XDD
+ CNuQ==
+X-Gm-Message-State: AOAM530g4SGS+lI3pWXXXPb+S4snFm9ebfDBRYqeQZ1OhcDG7QlhI9yx
+ aNFiWCKMzwFl8xJgYBu+ayd+otB7akfn4gua2gg=
+X-Google-Smtp-Source: ABdhPJwnJRca61kC47ZARr3OYpStMhVnM7yHIBujrFdShVJsqWED1JiwjwlSSsRIYZW41dtFIDWl6sMw4gr2WyP289w=
+X-Received: by 2002:a02:908b:: with SMTP id x11mr4258549jaf.41.1590440173748; 
+ Mon, 25 May 2020 13:56:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1f540f9c-45f3-d02e-a087-d1059d7a8977@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
- helo=isrv.corpit.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 15:46:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- RCVD_IN_DNSWL_HI=-5 autolearn=_AUTOLEARN
+References: <cover.1589989075.git.dimastep@yandex-team.ru>
+ <0dfb37f8728aba26c8d6c117018332a5b7dc9b56.1589989075.git.dimastep@yandex-team.ru>
+ <20200525085741.GA7645@dimastep-nix>
+In-Reply-To: <20200525085741.GA7645@dimastep-nix>
+From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Date: Mon, 25 May 2020 16:56:02 -0400
+Message-ID: <CAFubqFsvieb923CmO4Rs8AEVPrJs6HQSuXkCvWK7CcNSoc4GNA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] vhost-user-blk: delay vhost_user_blk_disconnect
+To: Dima Stepanov <dimastep@yandex-team.ru>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,73 +93,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
+ yc-core@yandex-team.ru,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-25.05.2020 21:45, Thomas Huth wrote:
-> On 29/04/2020 18.43, Michael Tokarev wrote:
->> Hi!
->>
->> Just a fun case of (invalid) usage of qemu-system command line.
->> Someone tried -nic model=rocker, and qemu does this:
->>
->>  Unexpected error in object_property_find() at /build/qemu/git/qom/object.c:1029:
->>  qemu-system-x86_64: Property '.mac' not found
->>  Aborted
->>
->> This happens after this commit:
->>
->> commit 52310c3fa7dc854dd2376ae8a518141abcdb78f3
->> Author: Paolo Bonzini <pbonzini@redhat.com>
->> Date:   Fri Mar 2 10:30:50 2018 +0100
->>
->>     net: allow using any PCI NICs in -net or -nic
->>
->> Previously rocker rightly wasn't usable as a nic model,
->> and after this commit it is now possible.
->>
->> While I agree this is invalid usage, perhaps qemu should not
->> abort like this?  Maybe it should check the required property
->> too, before allowing this device to be a nic model?
-> 
-> QEMU theoretically should never abort() - abort() means there is
-> something wrong in the code ... so we should definitely fix this by
-> other means. Some questions:
-> 
-> 1) How is that rocker device normally used? Similar to a normal network
-> card? Or completely different?
+On Mon, May 25, 2020 at 4:58 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+>
+> On Wed, May 20, 2020 at 06:53:13PM +0300, Dima Stepanov wrote:
+> > A socket write during vhost-user communication may trigger a disconnect
+> > event, calling vhost_user_blk_disconnect() and clearing all the
+> > vhost_dev structures holding data that vhost-user functions expect to
+> > remain valid to roll back initialization correctly. Delay the cleanup to
+> > keep vhost_dev structure valid.
+> > There are two possible states to handle:
+> > 1. RUN_STATE_PRELAUNCH: skip bh oneshot call and perform disconnect in
+> > the caller routine.
+> > 2. RUN_STATE_RUNNING: delay by using bh
+> >
+> > BH changes are based on the similar changes for the vhost-user-net
+> > device:
+> >   commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
+> >   "vhost-user: delay vhost_user_stop"
+> >
+> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+>
+> I've reworked the patch based on Raphael's comment and send it for
+> review. Also i added a TODO comment in the vhost_user_blk_event()
+> routine. After review i'll send a v4 patch set.
 
-Nope, this is not a network card, it is a network SWITCH, used as a
-regular PCI device, not network-specific. Hence the problem at hand, -
-before the patch this device weren't "nic-able", so to say, because
-while it is network-related PCI device, it is not a NIC.
+Looks good to me.
 
-I guess while building a list of "nic-able" cards, we should skip some
-"nic-alike" devices and use some more specific criteria. Not everything
-which is network-related is a regular NIC.
-
-Maybe in time some other devices will appear in qemu with similar effect
-which will require another condition.
-
-Or adding a new field into the pci structure to indicate this device
-can be a NIC will solve it once for all. Or just reverting the patch :) -
-after all it isn't that bad to have a list of NIC-able devices outside
-of the device definitions, - we don't have tons of devices anyway where
-maintaining such a list outside of device model is a problem.
-
-Thanks,
-
-/mjt
-
-> 2) In case it is similar to a normal network card, would it make sense
-> to allow it with -nic or -net, too? Or should we simply disallow it
-> here? I think we could either use a list of devices that should never be
-> allowed here, or we check for the availability of that "mac" property...
-> 
->  Thomas
-> 
-
+>
+> ---
+>  hw/block/vhost-user-blk.c | 38 +++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 37 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index 9d8c0b3..76838e7 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -349,6 +349,19 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
+>      vhost_dev_cleanup(&s->dev);
+>  }
+>
+> +static void vhost_user_blk_event(void *opaque, QEMUChrEvent event);
+> +
+> +static void vhost_user_blk_chr_closed_bh(void *opaque)
+> +{
+> +    DeviceState *dev = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> +
+> +    vhost_user_blk_disconnect(dev);
+> +    qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_event,
+> +            NULL, opaque, NULL, true);
+> +}
+> +
+>  static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+>  {
+>      DeviceState *dev = opaque;
+> @@ -363,7 +376,30 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+>          }
+>          break;
+>      case CHR_EVENT_CLOSED:
+> -        vhost_user_blk_disconnect(dev);
+> +        /*
+> +         * A close event may happen during a read/write, but vhost
+> +         * code assumes the vhost_dev remains setup, so delay the
+> +         * stop & clear. There are two possible paths to hit this
+> +         * disconnect event:
+> +         * 1. When VM is in the RUN_STATE_PRELAUNCH state. The
+> +         * vhost_user_blk_device_realize() is a caller.
+> +         * 2. In tha main loop phase after VM start.
+> +         *
+> +         * For p2 the disconnect event will be delayed. We can't
+> +         * do the same for p1, because we are not running the loop
+> +         * at this moment. So just skip this step and perform
+> +         * disconnect in the caller function.
+> +         *
+> +         * TODO: maybe it is a good idea to make the same fix
+> +         * for other vhost-user devices.
+> +         */
+> +        if (runstate_is_running()) {
+> +            AioContext *ctx = qemu_get_current_aio_context();
+> +
+> +            qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL, NULL,
+> +                    NULL, NULL, false);
+> +            aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
+> +        }
+>          break;
+>      case CHR_EVENT_BREAK:
+>      case CHR_EVENT_MUX_IN:
+> --
+> 2.7.4
+>
+>
 
