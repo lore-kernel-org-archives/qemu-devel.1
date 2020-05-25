@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 460E1C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1B9C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:49:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13B532075F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31C962075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 03:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7a5JY+/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13B532075F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p3o1UhSH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31C962075F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd45D-0001sW-39
-	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 23:47:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46680)
+	id 1jd46l-00044a-Ef
+	for qemu-devel@archiver.kernel.org; Sun, 24 May 2020 23:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jd432-0008Dt-9d; Sun, 24 May 2020 23:45:39 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38411)
+ id 1jd431-0008Ap-1b; Sun, 24 May 2020 23:45:07 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35812)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jd430-0006vp-Uu; Sun, 24 May 2020 23:45:08 -0400
-Received: by mail-wr1-x433.google.com with SMTP id e1so15794036wrt.5;
- Sun, 24 May 2020 20:45:05 -0700 (PDT)
+ id 1jd430-0006vb-1A; Sun, 24 May 2020 23:45:06 -0400
+Received: by mail-wm1-x344.google.com with SMTP id n5so15455951wmd.0;
+ Sun, 24 May 2020 20:45:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=A80EDSkKnmPL8Q+dFqA3I3MZqZ/GPALeIVPMrzoZlZc=;
- b=Q7a5JY+/x/Fx8Puy7mvB8bc96TFJwCYWRF1TNHrzBQ6wS280/G0dWTYtryHJp9/RG9
- BjV8BW6CmxY8NkIPacBmsCDs/n/8JDo+VNkPuh8K3XZGXLHQBj8eeSeKg++PavsFF6NI
- bgrD29jq1stlaQYZiYyAp4fskPLfpFNwy/jWuHH/BhDvCyVkOnCk/Nv1EoQt/s2Bc++5
- UX6IjzzSobNjtXHCJfXlEsZNnkn7GT9MoYJU1HRrWVgic+KjudfaV/RNMTzPjj/6vpXz
- N3hG6KJx01xhYx6GQT1tvLsdARhPVheO+bbc67WDfzV15qp5qm0B9MQ6GDJFC0GPMp7y
- tsGA==
+ bh=Xkslp0bcUbSqRBvOaVQSgMmVi3d4Gn9gVFXVfSGdOCE=;
+ b=p3o1UhSHcL1RF1FW1OUze2JJ2p/w0TmE/a54omUR2LncONL1M3KyHs8OlX0t2d/a1G
+ 9ms71OanUt/8x5+NPlW42t077SUQVtT3X1KerdXSg85njVg37yZTk7HATO+J4F2GoSkm
+ dhNJVk00f2Sf4Hee5TLVoC4qD4shMVetenr+oSJP9jE9c3KxeBesZIVO586dn1Ql5f1q
+ MpIVs5kh9ow0lNx2n1D9yJ4MvhJWe78fW1hPN/cMGie0Dn56zgimmBc8GVGNbGIJvJih
+ U5/5opBxsYmkSU2izMqEtx402+Dv2d2eHrKmgcPqSDsXau2IV+HKJuJt4FJYhh3CcpsP
+ aPPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=A80EDSkKnmPL8Q+dFqA3I3MZqZ/GPALeIVPMrzoZlZc=;
- b=hb3qpWlk80Nq+8IHooA5KNRetoTEj8E2mv2uMWKwYpPSTv0ilmUXD0K88LavgVkR67
- wftyTGntz715qvfX0xQe5yKiNPCl10DS77M0Gz1eZDQTRP28lFTnHhCwOJnX6LteAb9e
- pT5af4F9LNvSLQP9w6/IYxBSY4b8qa0qHnuEuUCCvpOkmSwM7E6UdfZaubojAFsV6ASo
- mSDZvYoXCUdycN1t00HLz2jPEN/Smb/wuzl606zhb5jWMO9w+jMx6Fa1Wjl8QfR31nnP
- Go1C9lntm72tMFCvM5Va+fBPh/JiT/2EKij0B0p9YMFV/RQz6Rx2H7X77b4OOF/qduka
- FRKA==
-X-Gm-Message-State: AOAM531xZLBh1ey7LLqt5CMV5IVnpAYXKndCJjjvBgIZ0g1w/6hsCXf1
- D+gyAkaEHxozR9116gxTyEItXJrT5E0=
-X-Google-Smtp-Source: ABdhPJxltcSi0U8fVcMkD1hzzK4nljCMvyR/zDmwlRrs9C5jQBO1cet2W/WTTvCmIpotLWttzr9Y0g==
-X-Received: by 2002:a5d:6806:: with SMTP id w6mr13727886wru.324.1590378304686; 
- Sun, 24 May 2020 20:45:04 -0700 (PDT)
+ bh=Xkslp0bcUbSqRBvOaVQSgMmVi3d4Gn9gVFXVfSGdOCE=;
+ b=c/yPQKEwPdWWpn4Fmx/SF6tdWP7oisG/Sj2CZttXMvXTPKE7zF2XsaO2egPJJw9tif
+ mcMk/ZWNnJbNKqPOPe3YYFfYRJeyov9f7a0/zaNmG8OqL4U+7/Xf3Eu31PcXYhscEwLz
+ hQaI8GsGy25HOIR7LUhza0p3y012OfdN37Ggot20Nqr1OWt+Osmh955+1bM2Rp8Vf9+l
+ nBDumUU5v0kysRWT+szg1iPZdDCk5xPIS5bBjStG1Ii55BJidpX0+ocEuAvv0pqckTTG
+ sCfalQRwpx3QeAzax05EPpCH2AqJHnNYHRK4yZV+PIftMpTBtzfGXnMqvQKrLnozv04M
+ eyLA==
+X-Gm-Message-State: AOAM530gHhiN3jDmOhnrJERm/anHlz/d9nzRB2xQqIWVBptR/gMoqBfy
+ /F3K6FJ5MnGFMZURsZ41MkWLkNz/hUM=
+X-Google-Smtp-Source: ABdhPJzR8JVfw0S5M36v0bNBGQtde4r8uiIOX2J/wq2Jh7THGrwde9MgbuPecMqdrbOzz0BW0aSY5g==
+X-Received: by 2002:a7b:cbc5:: with SMTP id n5mr23647343wmi.110.1590378303557; 
+ Sun, 24 May 2020 20:45:03 -0700 (PDT)
 Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id n9sm17555150wmj.5.2020.05.24.20.45.03
+ by smtp.gmail.com with ESMTPSA id n9sm17555150wmj.5.2020.05.24.20.45.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 May 2020 20:45:04 -0700 (PDT)
+ Sun, 24 May 2020 20:45:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/4] hw/display/dpcd: Convert debug printf()s to trace events
-Date: Mon, 25 May 2020 05:44:58 +0200
-Message-Id: <20200525034459.28535-4-f4bug@amsat.org>
+Subject: [PATCH 2/4] hw/display/dpcd: Fix memory region size
+Date: Mon, 25 May 2020 05:44:57 +0200
+Message-Id: <20200525034459.28535-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200525034459.28535-1-f4bug@amsat.org>
 References: <20200525034459.28535-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x433.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,68 +109,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert DPRINTF() to trace events and remove ifdef'ry.
+The memory region size is 512K.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/dpcd.c       | 16 +++-------------
- hw/display/trace-events |  4 ++++
- 2 files changed, 7 insertions(+), 13 deletions(-)
+ hw/display/dpcd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/display/dpcd.c b/hw/display/dpcd.c
-index 0c1b7b35fb..64463654a1 100644
+index 170545c605..0c1b7b35fb 100644
 --- a/hw/display/dpcd.c
 +++ b/hw/display/dpcd.c
-@@ -32,16 +32,7 @@
- #include "hw/misc/auxbus.h"
- #include "migration/vmstate.h"
- #include "hw/display/dpcd.h"
--
--#ifndef DEBUG_DPCD
--#define DEBUG_DPCD 0
--#endif
--
--#define DPRINTF(fmt, ...) do {                                                 \
--    if (DEBUG_DPCD) {                                                          \
--        qemu_log("dpcd: " fmt, ## __VA_ARGS__);                                \
--    }                                                                          \
--} while (0)
-+#include "trace.h"
+@@ -1,5 +1,5 @@
+ /*
+- * dpcd.c
++ * Xilinx Display Port Control Data
+  *
+  *  Copyright (C) 2015 : GreenSocs Ltd
+  *      http://www.greensocs.com/ , email: info@greensocs.com
+@@ -137,7 +137,7 @@ static void dpcd_init(Object *obj)
+ {
+     DPCDState *s = DPCD(obj);
  
- #define DPCD_READABLE_AREA                      0x600
- 
-@@ -70,8 +61,8 @@ static uint64_t dpcd_read(void *opaque, hwaddr offset, unsigned size)
-                                        offset);
-         ret = 0;
-     }
-+    trace_dpcd_read(offset, ret);
- 
--    DPRINTF("read 0x%" PRIX8 " @0x%" HWADDR_PRIX "\n", ret, offset);
-     return ret;
+-    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x7FFFF);
++    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x80000);
+     aux_init_mmio(AUX_SLAVE(obj), &s->iomem);
  }
  
-@@ -80,8 +71,7 @@ static void dpcd_write(void *opaque, hwaddr offset, uint64_t value,
- {
-     DPCDState *e = DPCD(opaque);
- 
--    DPRINTF("write 0x%" PRIX8 " @0x%" HWADDR_PRIX "\n", (uint8_t)value, offset);
--
-+    trace_dpcd_write(offset, value);
-     if (offset < DPCD_READABLE_AREA) {
-         e->dpcd_info[offset] = value;
-     } else {
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index e6e22bef88..00543f1601 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -151,3 +151,7 @@ artist_vram_write(unsigned int size, uint64_t addr, uint64_t val) "%u 0x%"PRIx64
- artist_fill_window(unsigned int start_x, unsigned int start_y, unsigned int width, unsigned int height, uint32_t op, uint32_t ctlpln) "start=%ux%u length=%ux%u op=0x%08x ctlpln=0x%08x"
- artist_block_move(unsigned int start_x, unsigned int start_y, unsigned int dest_x, unsigned int dest_y, unsigned int width, unsigned int height) "source %ux%u -> dest %ux%u size %ux%u"
- artist_draw_line(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y) "%ux%u %ux%u"
-+
-+# dpcd.c
-+dpcd_read(uint32_t addr, uint8_t val) "read addr:0x%"PRIx32" val:0x%02x"
-+dpcd_write(uint32_t addr, uint8_t val) "write addr:0x%"PRIx32" val:0x%02x"
 -- 
 2.21.3
 
