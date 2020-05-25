@@ -2,130 +2,122 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F82C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD22BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:49:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C1022073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A77FB2073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:49:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FBhk4TkL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1022073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OZhwxEW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77FB2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdDSp-0007zB-A2
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44860)
+	id 1jdDUB-0001HP-Su
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:49:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdDRT-00070L-7D
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:46:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55882
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdDRO-0000WC-EP
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:46:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590414413;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=yE/jj0uW+AG56YPhqE3mj8rzTg7yV5pvUrgfN0rTz5M=;
- b=FBhk4TkLM39TDH61Zkbvz0bvk3i1mVBcmBo7th+Tpe3HKCxxradHO0uyZJKJ8iZAEDo6aY
- 0AdjUWCIG9l12dvJInWoDbq4P1DZcyup++LYcdqYXbtW51kyfJFs4vFHs+oQIeY4C/ea9Y
- P1zGdCfEIvy6DTunsCto2OtHu8nJp/o=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-9qyFhwJyNVWh_Mj8pKcISw-1; Mon, 25 May 2020 09:46:51 -0400
-X-MC-Unique: 9qyFhwJyNVWh_Mj8pKcISw-1
-Received: by mail-ed1-f70.google.com with SMTP id v25so4153356edy.1
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 06:46:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=yE/jj0uW+AG56YPhqE3mj8rzTg7yV5pvUrgfN0rTz5M=;
- b=PHIWf2lkG952l3QoHnrwfA3lRGq5wHbnR7gHjaReJEfXEBOQKRFaW8Yiq67s27PECF
- ZRUqb/R13hWYW8CTjxxOpOkub3qCTJGyXTKDxh8/yOWEJQoUDDY42TYVqfd8h0+EjQXs
- phBtIyhwNz24gmU7SwZ8kII7438NjujckwCV/8kgwPo/PLWPhHll0ghmwnDdYCZuc+3x
- /ELVc049QEpJkBIMpqbbzF3QwlSKi2vZzUlrscUSODkon3qWEbUXl093OuGY3potea3o
- CoOygWKE2YnTYlfuOCpkiPw4HwXS08BJHnfIU2wepQ631RybwlbLk1QmHnvHrtT3/Lzi
- DjPg==
-X-Gm-Message-State: AOAM533LmGn28wRrdqXjMTI5VH/xzv6gtu7Y2/SnO/8r5M7RUEV64mfV
- t8oqHsD6MXIuOUUUv1QthVZPndhn19f4DKliNSBLsNga3//Znz0d4K7+CyRrmOsIBND+dVfuSWx
- eHUmnyiVCJtdlneE=
-X-Received: by 2002:a17:906:7684:: with SMTP id
- o4mr19862433ejm.449.1590414410224; 
- Mon, 25 May 2020 06:46:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxot/pcLkWyo2RjCDhIYrF2Cnf2gMNmuUgC780T9XsS5+r/XycMrBjK0rhHoSaVh2VM89xgvA==
-X-Received: by 2002:a17:906:7684:: with SMTP id
- o4mr19862413ejm.449.1590414409943; 
- Mon, 25 May 2020 06:46:49 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id s8sm16374779edj.64.2020.05.25.06.46.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 May 2020 06:46:49 -0700 (PDT)
-Subject: Re: [PATCH 3/3] x86: move max-ram-below-4g to pc
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200525134101.24740-1-kraxel@redhat.com>
- <20200525134101.24740-4-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f3766c20-3bb3-4431-8781-5dea4eace5c8@redhat.com>
-Date: Mon, 25 May 2020 15:46:47 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jdDSg-00087r-Iq; Mon, 25 May 2020 09:48:18 -0400
+Received: from mail-eopbgr80118.outbound.protection.outlook.com
+ ([40.107.8.118]:56837 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jdDSd-0000xZ-8l; Mon, 25 May 2020 09:48:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UEqWLMFlNEo+kLVIUWr/nIkGejvcsIr4SWRM4DSr+vb6ZHF7bl/wcOCjjfv1GG+JL+rMBM2/hx2/Q+Lne8yeOaFr4QtkYqtinRNNpoxpeuF89LdJ/vtX9u+4wqwoGVwXomwnG1e5GG+lLCspIZ/xJx5hAmMqeSGqCqB+9296kFfL5PJAUergcKnCFOQ6DYh5dqtUjzTzpTkN4TTcDiQs8Y4EiESnRuG3pkab4thUzAPrX0wLKQJTYdB7SKR6dyCd17zQ8BOzVa7C3AqvtuNXsWsz0sannlzpyysDSi/t83IiOMdWcgeVq522Uddtab81MX9JSr6Cj5uS7pCwdB1mLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i9TzAnCzYHvHkvpwldLwxj76lgylgDyOO/6I2DloG7o=;
+ b=HSL9ORIW7JR89uw5vXhnGzaZ13/DRKXikPwqF5oIpSqi9Vm4Hodd59E63cPI/XCGDM88ddV/7RY0S5eLgjt0RxVi5KZbtwps0qwJgvDEtWTe3021jPhKLet2PVuR4JDandUGdBgNn6bfeni2M8UuWv0epdMWBKF4DziwyHME7HjSKLkFr5Hvw5LOEmMUUGx38tUu8/mT8jPNdIYS/0hOqFMYHjSK9/UaXp3TTTWFubPNOBIJEWInqupWN2LPd+7JUKGTVk3lMdsfPjEwmN/ePNA11Ew4ONB7/PvxS8KervrSUeTQTvLWuNIdvx/MB/iIseK0toXTEsnp6DGlbvlSbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i9TzAnCzYHvHkvpwldLwxj76lgylgDyOO/6I2DloG7o=;
+ b=OZhwxEW2+I2pnqCPzosYytPAj9t0MsW1FyyLTRkCL2SqbnontZnNT9YlJZXEimr4tMmlBbe7wvkTlUDj9sT95XUttvpfM7l3B4OJR/ArXtH3rUJ3yD9pywRukv1q1If4mFs7/0d1yx5mRntQLsHQag3CwCcDKCoc4tZ71N/eMGw=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5526.eurprd08.prod.outlook.com (2603:10a6:20b:108::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Mon, 25 May
+ 2020 13:48:07 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3021.029; Mon, 25 May 2020
+ 13:48:07 +0000
+Subject: Re: [PATCH v4 0/5] coroutines: generate wrapper code
+To: qemu-devel@nongnu.org
+References: <159041246428.2646.2773751210145691653@45ef0f9c86ae>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <13e2fafe-8897-c55c-49f7-1d9283949615@virtuozzo.com>
+Date: Mon, 25 May 2020 16:48:05 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200525134101.24740-4-kraxel@redhat.com>
+ Thunderbird/68.8.0
+In-Reply-To: <159041246428.2646.2773751210145691653@45ef0f9c86ae>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:55:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0P190CA0002.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.147) by
+ AM0P190CA0002.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 13:48:07 +0000
+X-Originating-IP: [185.215.60.147]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: edf7db68-10c9-487d-355f-08d800b24178
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5526:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB55267F3BC92752577CBFBB78C1B30@AM7PR08MB5526.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0414DF926F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +FZOsCdawXocvnj8KoOjHoIqowpOLPiK7S4U5tOSnr00jaBn4o5+i/rMF2MJ0wt2i1YbBrv1dEx7wyG7bbbUlAZUER1Z4is5pgrOkF55aHAUioZj5ZVkQ8icwMUIKpb/cYcpVujrsXzYBqU7HzCBRJfG6ickr89rjdWSatEVcTk62HIBMDzCTkZoqIjJnJM9P6b8e2Q7kYM6KlDrL1M8UWGyHvqU9h86ZNuEg1bCy7IM1dWPGwaE/raEBqFDpPC84hgbYr2T0Wcp0TagVS6fl0qsP09HsMhyhjjYMc7YX1X+Ev5OMX99dfeSYX3DrCzuVU2Ao0ffaTbWWZk5YUedBca7ToZXbdNlodlfmT8TDJKxfkGcEQLk7/r8o/3tFTE4G3t5McAAdeHAnWnJTSbh8NgjpzZQa4/wHs7pq0nky1IJcJMDY5kgQAEZojA6rjYhnE2VsuTjVcZTKM99ka5ktw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(136003)(346002)(376002)(39840400004)(396003)(4744005)(31696002)(86362001)(186003)(16526019)(956004)(2616005)(8676002)(8936002)(66476007)(4326008)(36756003)(5660300002)(66946007)(2906002)(66556008)(52116002)(31686004)(26005)(6486002)(316002)(16576012)(107886003)(478600001)(6916009)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 2ags5CUPtafGv++loDZ5KbXK/Gn/p31i9p5q8VvUGS4H+otfOIAfBaLTGwc1HfM82TrUTIeoDVh/eTKD7d5uLaVQl0syd0DfyeGHS55rlYu8ulbhBH8m6D0Pyjis5fOlZCqFmnVYDuPLDvgDtuRGDDb0Zxd68KL001Pi0Z4EuK4XnqMinMxNoGbsst4MTndPx6BfBuwofN97Gpci4MatPXJ9W44SPDRBuGIqAIo2rSamu15pqe5wU20ax1xcpCaEKab5rKFoyR1YNLQsMum6nOVbW5nTwemk3IMHjfpEVS23Vyoa0EICImnjwxqnshHXYFPiL451Gd3+bOMogcRySoJ57IcbbPltaipWCtkaDlSv2Ts2J6+nhfKf0MF5SyIv7FXwy6DnheM6gurEcJOrrTtHzOFyR7548XdDwaCRcsFvbkzZ2ZdAMRjCz/FPEGK+5LM4eMfKrbwtq8iSGO2XrG79gv5FBnWuPqQxjrRaYEai9uKGV0SwpPSJeKhBhzaA
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: edf7db68-10c9-487d-355f-08d800b24178
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 13:48:07.7233 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lXvS/xHZWkEG9mSNoaDkCQl97lxwrJkRePZoJ7fM5isArn5SI9fj8V6P0zmbwpN66FxJJ8o4Qljm3h/VO3XK2c98ZJ/rIvxShx0afHekAXE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5526
+Received-SPF: pass client-ip=40.107.8.118;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 09:48:08
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,272 +130,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- imammedo@redhat.com, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
+ crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/25/20 3:41 PM, Gerd Hoffmann wrote:
-> Move from X86MachineClass to PCMachineClass so it disappears
-> from microvm machine type property list.
+25.05.2020 16:14, no-reply@patchew.org wrote:
+> Patchew URL:https://patchew.org/QEMU/20200525100801.13859-1-vsementsov@virtuozzo.com/
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/hw/i386/pc.h  |  2 ++
->  include/hw/i386/x86.h |  4 ----
->  hw/i386/pc.c          | 46 +++++++++++++++++++++++++++++++++++++++++++
->  hw/i386/pc_piix.c     | 10 +++++-----
->  hw/i386/pc_q35.c      | 10 +++++-----
->  hw/i386/x86.c         | 46 -------------------------------------------
->  6 files changed, 58 insertions(+), 60 deletions(-)
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 8d764f965cd3..e6135c34d656 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -35,6 +35,7 @@ struct PCMachineState {
->      PFlashCFI01 *flash[2];
->  
->      /* Configuration options: */
-> +    uint64_t max_ram_below_4g;
->      OnOffAuto vmport;
->  
->      bool acpi_build_enabled;
-> @@ -51,6 +52,7 @@ struct PCMachineState {
->  };
->  
->  #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
-> +#define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
->  #define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
->  #define PC_MACHINE_VMPORT           "vmport"
->  #define PC_MACHINE_SMBUS            "smbus"
-> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-> index b52285481687..b79f24e28545 100644
-> --- a/include/hw/i386/x86.h
-> +++ b/include/hw/i386/x86.h
-> @@ -51,9 +51,6 @@ typedef struct {
->      qemu_irq *gsi;
->      GMappedFile *initrd_mapped_file;
->  
-> -    /* Configuration options: */
-> -    uint64_t max_ram_below_4g;
-> -
->      /* RAM information (sizes, addresses, configuration): */
->      ram_addr_t below_4g_mem_size, above_4g_mem_size;
->  
-> @@ -82,7 +79,6 @@ typedef struct {
->      AddressSpace *ioapic_as;
->  } X86MachineState;
->  
-> -#define X86_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
->  #define X86_MACHINE_SMM              "smm"
->  #define X86_MACHINE_ACPI             "acpi"
->  
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2128f3d6fe8b..80a6cac3b56f 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1856,6 +1856,45 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
->      pcms->pit_enabled = value;
->  }
->  
-> +static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
-> +                                            const char *name, void *opaque,
-> +                                            Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    uint64_t value = pcms->max_ram_below_4g;
-> +
-> +    visit_type_size(v, name, &value, errp);
-> +}
-> +
-> +static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-> +                                            const char *name, void *opaque,
-> +                                            Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    Error *error = NULL;
-> +    uint64_t value;
-> +
-> +    visit_type_size(v, name, &value, &error);
-> +    if (error) {
-> +        error_propagate(errp, error);
-> +        return;
-> +    }
-> +    if (value > 4 * GiB) {
-> +        error_setg(&error,
-> +                   "Machine option 'max-ram-below-4g=%"PRIu64
-> +                   "' expects size less than or equal to 4G", value);
-> +        error_propagate(errp, error);
-> +        return;
-> +    }
-> +
-> +    if (value < 1 * MiB) {
-> +        warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
-> +                    "BIOS may not work with less than 1MiB", value);
-> +    }
-> +
-> +    pcms->max_ram_below_4g = value;
-> +}
-> +
->  static void pc_machine_initfn(Object *obj)
->  {
->      PCMachineState *pcms = PC_MACHINE(obj);
-> @@ -1865,6 +1904,7 @@ static void pc_machine_initfn(Object *obj)
->  #else
->      pcms->vmport = ON_OFF_AUTO_OFF;
->  #endif /* CONFIG_VMPORT */
-> +    pcms->max_ram_below_4g = 0; /* use default */
->      /* acpi build is enabled by default if machine supports it */
->      pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
->      pcms->smbus_enabled = true;
-> @@ -1963,6 +2003,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->      mc->numa_mem_supported = true;
->      mc->default_ram_id = "pc.ram";
->  
-> +    object_class_property_add(oc, PC_MACHINE_MAX_RAM_BELOW_4G, "size",
-> +        pc_machine_get_max_ram_below_4g, pc_machine_set_max_ram_below_4g,
-> +        NULL, NULL);
-> +    object_class_property_set_description(oc, PC_MACHINE_MAX_RAM_BELOW_4G,
-> +        "Maximum ram below the 4G boundary (32bit boundary)");
-> +
->      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
->          pc_machine_get_device_memory_region_size, NULL,
->          NULL, NULL);
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index f66e1d73ce0b..503c35f7bf4c 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -127,11 +127,11 @@ static void pc_init1(MachineState *machine,
->      if (xen_enabled()) {
->          xen_hvm_init(pcms, &ram_memory);
->      } else {
-> -        if (!x86ms->max_ram_below_4g) {
-> -            x86ms->max_ram_below_4g = 0xe0000000; /* default: 3.5G */
-> +        if (!pcms->max_ram_below_4g) {
-> +            pcms->max_ram_below_4g = 0xe0000000; /* default: 3.5G */
->          }
-> -        lowmem = x86ms->max_ram_below_4g;
-> -        if (machine->ram_size >= x86ms->max_ram_below_4g) {
-> +        lowmem = pcms->max_ram_below_4g;
-> +        if (machine->ram_size >= pcms->max_ram_below_4g) {
->              if (pcmc->gigabyte_align) {
->                  if (lowmem > 0xc0000000) {
->                      lowmem = 0xc0000000;
-> @@ -140,7 +140,7 @@ static void pc_init1(MachineState *machine,
->                      warn_report("Large machine and max_ram_below_4g "
->                                  "(%" PRIu64 ") not a multiple of 1G; "
->                                  "possible bad performance.",
-> -                                x86ms->max_ram_below_4g);
-> +                                pcms->max_ram_below_4g);
->                  }
->              }
->          }
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 4ba8ac8774e4..90e8fb2cb737 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -154,18 +154,18 @@ static void pc_q35_init(MachineState *machine)
->      /* Handle the machine opt max-ram-below-4g.  It is basically doing
->       * min(qemu limit, user limit).
->       */
-> -    if (!x86ms->max_ram_below_4g) {
-> -        x86ms->max_ram_below_4g = 4 * GiB;
-> +    if (!pcms->max_ram_below_4g) {
-> +        pcms->max_ram_below_4g = 4 * GiB;
->      }
-> -    if (lowmem > x86ms->max_ram_below_4g) {
-> -        lowmem = x86ms->max_ram_below_4g;
-> +    if (lowmem > pcms->max_ram_below_4g) {
-> +        lowmem = pcms->max_ram_below_4g;
->          if (machine->ram_size - lowmem > lowmem &&
->              lowmem & (1 * GiB - 1)) {
->              warn_report("There is possibly poor performance as the ram size "
->                          " (0x%" PRIx64 ") is more then twice the size of"
->                          " max-ram-below-4g (%"PRIu64") and"
->                          " max-ram-below-4g is not a multiple of 1G.",
-> -                        (uint64_t)machine->ram_size, x86ms->max_ram_below_4g);
-> +                        (uint64_t)machine->ram_size, pcms->max_ram_below_4g);
->          }
->      }
->  
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 7a3bc7ab6639..49884e5c1597 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -846,45 +846,6 @@ void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
->                                  bios);
->  }
->  
-> -static void x86_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
-> -                                             const char *name, void *opaque,
-> -                                             Error **errp)
-> -{
-> -    X86MachineState *x86ms = X86_MACHINE(obj);
-> -    uint64_t value = x86ms->max_ram_below_4g;
-> -
-> -    visit_type_size(v, name, &value, errp);
-> -}
-> -
-> -static void x86_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-> -                                             const char *name, void *opaque,
-> -                                             Error **errp)
-> -{
-> -    X86MachineState *x86ms = X86_MACHINE(obj);
-> -    Error *error = NULL;
-> -    uint64_t value;
-> -
-> -    visit_type_size(v, name, &value, &error);
-> -    if (error) {
-> -        error_propagate(errp, error);
-> -        return;
-> -    }
-> -    if (value > 4 * GiB) {
-> -        error_setg(&error,
-> -                   "Machine option 'max-ram-below-4g=%"PRIu64
-> -                   "' expects size less than or equal to 4G", value);
-> -        error_propagate(errp, error);
-> -        return;
-> -    }
-> -
-> -    if (value < 1 * MiB) {
-> -        warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
-> -                    "BIOS may not work with less than 1MiB", value);
-> -    }
-> -
-> -    x86ms->max_ram_below_4g = value;
-> -}
-> -
->  bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
->  {
->      bool smm_available = false;
-> @@ -958,7 +919,6 @@ static void x86_machine_initfn(Object *obj)
->  
->      x86ms->smm = ON_OFF_AUTO_AUTO;
->      x86ms->acpi = ON_OFF_AUTO_AUTO;
-> -    x86ms->max_ram_below_4g = 0; /* use default */
->      x86ms->smp_dies = 1;
->  
->      x86ms->apicid_from_cpu_idx = x86_apicid_from_cpu_idx;
-> @@ -980,12 +940,6 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
->      x86mc->save_tsc_khz = true;
->      nc->nmi_monitor_handler = x86_nmi;
->  
-> -    object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
-> -        x86_machine_get_max_ram_below_4g, x86_machine_set_max_ram_below_4g,
-> -        NULL, NULL);
-> -    object_class_property_set_description(oc, X86_MACHINE_MAX_RAM_BELOW_4G,
-> -        "Maximum ram below the 4G boundary (32bit boundary)");
-> -
->      object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
->          x86_machine_get_smm, x86_machine_set_smm,
->          NULL, NULL);
 > 
+> Hi,
+> 
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+> block/vhdx-log.o: In function `vhdx_log_write_and_flush':
+> /tmp/qemu-test/src/block/vhdx-log.c:1049: undefined reference to `bdrv_flush'
+> /tmp/qemu-test/src/block/vhdx-log.c:1061: undefined reference to `bdrv_flush'
+> collect2: error: ld returned 1 exit status
+> make: *** [qemu-nbd] Error 1
 
-Good!
+Hmm. Who can help?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I assume, that this is because I've added block/block-gen.o into ./Makefile.objs, and not into block/Makefile.objs. I'll try it with next resend.
 
+-- 
+Best regards,
+Vladimir
 
