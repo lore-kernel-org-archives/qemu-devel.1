@@ -2,59 +2,94 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC53C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 733CB20723
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 733CB20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C25520723
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 11:28:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WoDYlOF4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C25520723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdBGp-0006Zh-L0
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57512)
+	id 1jdBHI-0007Ai-IW
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 07:28:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jdB93-0001mS-Ni
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:19:49 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:54882)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdB92-0008QJ-Ns
- for qemu-devel@nongnu.org; Mon, 25 May 2020 07:19:49 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id C68BCCD466;
- Mon, 25 May 2020 14:19:47 +0300 (MSK)
-Subject: [PATCH 8/9] tests/acceptance: record/replay tests with advcal images
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdBD9-0000pL-6O; Mon, 25 May 2020 07:24:03 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52143)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdBD7-0000ph-O9; Mon, 25 May 2020 07:24:02 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u13so6237285wml.1;
+ Mon, 25 May 2020 04:24:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=AtkGUe/9x5K/0wcu8anW+e68UuC/UG56c3D7rIQ17bs=;
+ b=WoDYlOF4Vut3kAg2QPZ3t6Q16/GDLrxNzAIT4yon1DZbMM5sorZCVYCf1Mbtip/6YC
+ 88eTGYWNmikdhTA8tOna45+Y65LAuwxmWNLwhV2v2jXcMFYKaRhi5+EayyHMW1IegpeD
+ TblYogHW548L0B7OR+EOcamCj4l4hpHvmQHs1f5W3ambEk9P83+qMYGA6DL8ybWkEyE2
+ MnOJoe/tgumgs3fADGPZUXHTRJtZrGua52W6XWb2CUhTcYCYQzB+FMDIfqyXfSRz5hFR
+ OeLbzucRyYZ74oTlRsA1MUoSwabT6x4gMNApqJ1BAg2jZQdWfRYIVSUWXsbWSM71myuB
+ rZFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=AtkGUe/9x5K/0wcu8anW+e68UuC/UG56c3D7rIQ17bs=;
+ b=CE/G5H/oSpdRrlu1QbrNlB1P9CLhroNqyMGgo5eXeaDsF2I2BYXJXU1mURbzh9JERr
+ nrmgv6BqAbZu38Cs0ey0f5ReEC4fTaqUYqdrSPhOBaOV0xdQtpSXRa22PCm2UOe8zn8h
+ f1pRtvlS9J1Ueg6mO5vkz8BUSCT8DcI6bsI+k2IYcov3hLO+yG55nSRPzPrbeixFVTLP
+ lsHe7Pdzj2+cSM+BMLXKEbA/sE+BGOeMlZK4PbqRcdhBx+c0mXAWV288wLk5TrP3JTkk
+ wqb4LoPEWocPJqDqUsyfi+w5lhJSA2HnKGqTX12SSDBLwQCXM61V50XLtjpok//5CUDn
+ cEbQ==
+X-Gm-Message-State: AOAM5313hvTavSDl4BHkt7F2I+IY2Q2xNmoiruF3gtF03pJ//HT3169x
+ 6AlQ6JZ9M1mx+eFUnCLKZKQJcX075xU=
+X-Google-Smtp-Source: ABdhPJyTx/mIOlVA3Hql6G26B83/GdHKQlncap6NgdbfZcDkgz1IUGy+3p4Z9oSL+qsZFY9cP8UNdA==
+X-Received: by 2002:a1c:4c8:: with SMTP id 191mr890147wme.14.1590405839854;
+ Mon, 25 May 2020 04:23:59 -0700 (PDT)
+Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id h196sm10715635wme.22.2020.05.25.04.23.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 25 May 2020 04:23:59 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 25 May 2020 14:19:47 +0300
-Message-ID: <159040558755.2615.4869959098521372877.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
-References: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+Subject: [PATCH 2/3] hw/display/vmware_vga: Replace printf() calls by
+ qemu_log_mask(ERROR)
+Date: Mon, 25 May 2020 13:23:53 +0200
+Message-Id: <20200525112354.10445-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200525112354.10445-1-f4bug@amsat.org>
+References: <20200525112354.10445-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: softfail client-ip=83.149.199.45;
- envelope-from=Pavel.Dovgaluk@gmail.com; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 07:19:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 7
-X-Spam_score: 0.7
-X-Spam_bar: /
-X-Spam_report: (0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, NML_ADSP_CUSTOM_MED=0.9,
- SPF_SOFTFAIL=0.665, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,106 +102,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru,
- crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds more record/replay tests with kernel images.
+Avoid flooding stdio by converting printf() calls to
+qemu_log_mask(GUEST_ERROR), which are disabled by default.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/replay_kernel.py |   80 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ hw/display/vmware_vga.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-index 4c786b1565..3849db7f3a 100644
---- a/tests/acceptance/replay_kernel.py
-+++ b/tests/acceptance/replay_kernel.py
-@@ -191,3 +191,83 @@ class ReplayKernel(Test):
-                                'console=ttyS0 vga=off')
-         console_pattern = 'No filesystem could mount root'
-         self.run_rr(kernel_path, kernel_command_line, console_pattern)
-+
-+    def do_test_advcal_2018(self, day, tar_hash, kernel_name, args=()):
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day' + day + '.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        archive.extract(file_path, self.workdir)
-+
-+        kernel_path = self.workdir + '/day' + day + '/' + kernel_name
-+        kernel_command_line = ''
-+        console_pattern = 'QEMU advent calendar'
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern,
-+            args=args)
-+
-+    def test_arm_vexpressa9(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:vexpress-a9
-+        """
-+        tar_hash = '32b7677ce8b6f1471fb0059865f451169934245b'
-+        self.do_test_advcal_2018('16', tar_hash, 'winter.zImage',
-+            ('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.dtb'))
-+
-+    def test_m68k_mcf5208evb(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:mcf5208evb
-+        """
-+        tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
-+        self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
-+
-+    def test_microblaze_s3adsp1800(self):
-+        """
-+        :avocado: tags=arch:microblaze
-+        :avocado: tags=machine:petalogix-s3adsp1800
-+        """
-+        tar_hash = '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
-+        self.do_test_advcal_2018('17', tar_hash, 'ballerina.bin')
-+
-+    def test_ppc64_e500(self):
-+        """
-+        :avocado: tags=arch:ppc64
-+        :avocado: tags=machine:ppce500
-+        """
-+        tar_hash = '6951d86d644b302898da2fd701739c9406527fe1'
-+        self.do_test_advcal_2018('19', tar_hash, 'uImage', ('-cpu', 'e5500'))
-+
-+    def test_ppc_g3beige(self):
-+        """
-+        :avocado: tags=arch:ppc
-+        :avocado: tags=machine:g3beige
-+        """
-+        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf',
-+            ('-M', 'graphics=off'))
-+
-+    def test_ppc_mac99(self):
-+        """
-+        :avocado: tags=arch:ppc
-+        :avocado: tags=machine:mac99
-+        """
-+        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf',
-+            ('-M', 'graphics=off'))
-+
-+    def test_sparc_ss20(self):
-+        """
-+        :avocado: tags=arch:sparc
-+        :avocado: tags=machine:SS-20
-+        """
-+        tar_hash = 'b18550d5d61c7615d989a06edace051017726a9f'
-+        self.do_test_advcal_2018('11', tar_hash, 'zImage.elf')
-+
-+    def test_xtensa_lx60(self):
-+        """
-+        :avocado: tags=arch:xtensa
-+        :avocado: tags=machine:lx60
-+        """
-+        tar_hash = '49e88d9933742f0164b60839886c9739cb7a0d34'
-+        self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.elf',
-+            ('-cpu', 'dc233c'))
+diff --git a/hw/display/vmware_vga.c b/hw/display/vmware_vga.c
+index 58ea82e3e5..5c0fc49d9d 100644
+--- a/hw/display/vmware_vga.c
++++ b/hw/display/vmware_vga.c
+@@ -26,6 +26,7 @@
+ #include "qemu/module.h"
+ #include "qemu/units.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "hw/loader.h"
+ #include "trace.h"
+ #include "ui/vnc.h"
+@@ -953,7 +954,8 @@ static uint32_t vmsvga_value_read(void *opaque, uint32_t address)
+             ret = s->scratch[s->index - SVGA_SCRATCH_BASE];
+             break;
+         }
+-        printf("%s: Bad register %02x\n", __func__, s->index);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad register %02x\n", __func__, s->index);
+         ret = 0;
+         break;
+     }
+@@ -1002,7 +1004,8 @@ static void vmsvga_value_write(void *opaque, uint32_t address, uint32_t value)
+             s->new_width = value;
+             s->invalidated = 1;
+         } else {
+-            printf("%s: Bad width: %i\n", __func__, value);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Bad width: %i\n", __func__, value);
+         }
+         break;
+ 
+@@ -1011,13 +1014,15 @@ static void vmsvga_value_write(void *opaque, uint32_t address, uint32_t value)
+             s->new_height = value;
+             s->invalidated = 1;
+         } else {
+-            printf("%s: Bad height: %i\n", __func__, value);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Bad height: %i\n", __func__, value);
+         }
+         break;
+ 
+     case SVGA_REG_BITS_PER_PIXEL:
+         if (value != 32) {
+-            printf("%s: Bad bits per pixel: %i bits\n", __func__, value);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Bad bits per pixel: %i bits\n", __func__, value);
+             s->config = 0;
+             s->invalidated = 1;
+         }
+@@ -1082,7 +1087,8 @@ static void vmsvga_value_write(void *opaque, uint32_t address, uint32_t value)
+             s->scratch[s->index - SVGA_SCRATCH_BASE] = value;
+             break;
+         }
+-        printf("%s: Bad register %02x\n", __func__, s->index);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad register %02x\n", __func__, s->index);
+     }
+ }
+ 
+-- 
+2.21.3
 
 
