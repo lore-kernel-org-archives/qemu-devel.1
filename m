@@ -2,82 +2,83 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A15EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01321C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:50:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E79542071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:50:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF5E1207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="AP1PWVxR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E79542071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="ViHs5jDQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5E1207D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdFN8-0007k0-Sl
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58900)
+	id 1jdFNL-0007oQ-Py
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:50:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jdFH9-0004vA-Px; Mon, 25 May 2020 11:44:27 -0400
-Received: from mout.web.de ([212.227.17.11]:44687)
+ id 1jdFHL-000536-2I; Mon, 25 May 2020 11:44:39 -0400
+Received: from mout.web.de ([212.227.15.4]:53911)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jdFH8-0006ca-Hp; Mon, 25 May 2020 11:44:27 -0400
+ id 1jdFHI-0006d9-Jb; Mon, 25 May 2020 11:44:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1590421461;
- bh=7l8UDSTdzyHaeQBjUvlzWesvyPNzew2oEjteVv+RyzU=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=AP1PWVxRzVn6iwFnBMWPwtdyJiej3qEZ8Trvuw1uD+ugvHBFIr2EP9xBOUY9tejk9
- dcAHAEsDPdXT3PnfIcx2YmY44wzuZzLD3GG/q2WhYd3EcuO0ZN1iPp6Eol2oBftORf
- jrluOKy2d4iBE4/9uG6KSMtMKPi3JA4awA6YdDpY=
+ s=dbaedf251592; t=1590421471;
+ bh=vjgc7wjc4cKdgQx7ocR5j9Ow5aCDgaGFl5sIJXEozlk=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=ViHs5jDQ4pfzj3Xp/nI5KN0SMsXGjZpKVnSmnLoiE5yesTB7r2qd7U1tjB+kXgPRJ
+ 2L+7kPDrqPtRUrZ0eHUgLSLBal1RvIA61OZYLn7KQpItmLfEhqzkkZFPBZ2iKRr1P2
+ +YaAbUQJ+GHkeZuUSrQ2ps0pXcSmhOfT80NhHzx8=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.22]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MlbHE-1jC7fS42eA-00im1p; Mon, 25
- May 2020 17:44:21 +0200
-Date: Mon, 25 May 2020 17:44:12 +0200
+Received: from luklap ([94.134.180.22]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M7sga-1iqetT06a0-00vMTA; Mon, 25
+ May 2020 17:44:31 +0200
+Date: Mon, 25 May 2020 17:44:29 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v4 0/4] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <cover.1590421341.git.lukasstraub2@web.de>
+Subject: [PATCH v4 3/4] chardev/char-socket.c: Add yank feature
+Message-ID: <f513f9d9f329ca3a87a6e0aabe2f66f0775c1d6f.1590421341.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1590421341.git.lukasstraub2@web.de>
+References: <cover.1590421341.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/phtN7D_PkqiSCtORxrJa0VZ";
+Content-Type: multipart/signed; boundary="Sig_/VulCqIaF=ENoiYFGHsER1py";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:NV87t6E6YkeAwS5rDo0MTgaIDclUMjMb9YUzLCdQhKb/QbN2PGe
- 8n3B1d8XYKOEDX0ztXq4xqSmHMXfnax/8iyAPQqJLYh6zKRUrdV2b1kjerJRUpBsmpTgcHU
- 2opkIpxeOnIguoPowg2X6ya6wesMIBRpMvcYrIckTbI9C74HbnrU6lN/bRiIrw5fG//mvXC
- GoVGsoK5YIALYWpxvbU/A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6/nIx4o8zck=:QZvHcXJCXA2eCoT3ofpO71
- d5lroxjUkSiAEP79a8uqMnVwvnDuVidKk87wlSKgIOX1RhZiLX9UPfOd58aelj9kErvO/rZ1h
- OTZAycVJ5R103fHg8qSTIC9LIiiPlmyJZjdRAOvX1771qZoFUj+jWnoFwaeNCML5YzhedZZSK
- 4yAG3LTq2dv5rUrvnKvhT5P1ES+3uhPoZsApQFnt10zlF1PoFda6O0/wY+6WCiT414G9WMZJ4
- a6tIWL+kCo3sXp++8Xpf9od68kHxEUMoS1B2h7QkNW27ICj1STNNNvwlZ9+W0t4UQcFPkz7xN
- 3z2teLxfhQ+NrCrco2duyKJBGVbwxyXQcw0k4tbSgEtyIU4CfXhPntc/8p+VwBp1WZGpAkszo
- ohJV/eZqxNRNCrB1X42NFyiydQqmK9ZgySsOoJlQOjxlUjhHiQeGZOgD0+n3kVv//J8Behjfi
- d57ds1uW7Oml4wcwcR2XeEAV2qqDMGVQkdlGnNwtrnXA1/ZustMckYhmxVNQJWWa8jQNJBajw
- lGrPw1McWq/P7xr+17m+d5Qywg49b3pm27WNihiiG5HcnvIMDcwLAUbolTSW0f3gyB4rfi0ov
- 5k966IsZT4XIv7c0ezR7jCvCOLkzQ85BVybxJs54stTFOm6yTRR6p+CSKz61pQNxlJeXjb6id
- GOzRuKauzfzVhjI7Xh3/ApwSEFs2AR1qEW4bK4UhsDI3DkO4372J5qlisz9pXvffqvP7jcJVf
- CKuhZx1uDSeQKdUYH4933dpgeT0D8KoRqrrzsDzVh4ST+y0pQcCAwmgPr7svPme3sCFx9qu+G
- lTn+nxvZmu5uLo+DMema6i0KaD5clmQ6xVTY2gEudHFT/wocMiHFQWqX9SWXHwU7O6ozzOF9d
- rneM3gOqV72/lQ+iL6bC5RtKwg896KBJ91BbV7Aeea1OXMb3nDi6jpnvWo+tRZyeLqAQ5IEof
- 7oCocCf2Rk7/nlcEE644gbRGpjeSid6OvaMS7EP3Tse67djT3gFCqthxViGp0Ims778QCvLSC
- EFlUOnzH3ur0Ybwfo6RUAGToMnSaeZFQHuORy2UiY3cycFkV9lS0KgYZfa+6ZUFzcINdoMeJh
- GXfChFm0Mum1hSAedvnH9YO4W/TO4omw/ywcaGKVYVRrA+ByOpFgW97Yzs5k2zEh521pHwdYe
- mWTxD50V1FM3HCn36YEucQx1QiaDSwMEg3LsHkk3uVmoZOPkFSZ/N6l7yMJBRg0jh7NI73Vbp
- CFTnuAsI0X/hKEnPK
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:W4nAofsUgoJbkWOGQhUE8bIBSLOkYGcX3JNZs62PClHPOTB+190
+ 3oBG62HGuMOdSh2kuL5+4sGly8vrlEkG5BodS+V5aYemxGwS/IvbfNAciqq8jkb33aA9/3w
+ Zy5b7IP2UfLZzhdr8n8ozYJydMm5T2UVGI1zzI9aM0PDLU+d6hWPmsZebOI86wuOK8iHH8X
+ bmKtFxzmZZI1ajTNKP52Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9Nrkf+Q33qo=:N14bzYhTwvlG1H02ndrZZW
+ 2W9cdAXK0Wn8c18TBSqFLf0kg2zNjibASllb4/ssqYhfzot77MUw96UYz9jbv/2tcS/Ol2VRl
+ xPaoYrx++7/m4yu/I8reyRrrMKvsc1qg9OAtQvzDQjmqKo6GzPYqJjbwG7ClZoEwShKurh4xT
+ lKrXNcaX26By7YdPIZuZSwLt11KY+kpXWrMocmzbm2Z6uAsWmsn6BEZYNhaoiWxqG5ZuUrS27
+ miGCAFZJx0bx+6WSvY8UHFcLbG7K7lcGnIfAwdd0IO7HCSmDaUxt0Z5JFkW2trJENqXQ+tiVU
+ O22yOUl/Lyqkvg7DjnVZ23Uzq0/tuvO0p627dZ8s7+zFvBqlr03fAG5N9JhvQ75LuItIp+/dp
+ xbeSnN4CtwmcSUTMmEsh0POBYmALoSZ5y/+2yOTRtGn7B4gIipPGMp73Ll6FmgBdlKEdBmCrF
+ yCDY0qr/tGLOdzkF5XD5Cntfm7hLB5IdaZr4KFv/+Qd/fhd/wks4WZ0QaQatWXDC6pCl21ME8
+ yYWxb8ZDr9xy1mTHhNFt8ppmMNKGk4ATJypkpC6kPjaI/igLZaXvAM6SOy9Gnwd1p+79xqobw
+ jUkkIZ9j/mGU2zVzW8Pz7N8luovJeoa8YqitFt/+byE6m8suGC99hc0it16DgHVKM41+V8Jab
+ b3Po8VHYtngd93xfVNbBLmlQuO5nK0yl9lZiTbI2TuYIOw66lqSy3drFrR7mwQm+0sxhJK4bQ
+ rpUo9QGVNjyvxuv7id6cSqSUuR3gawQ9Dr0SAOFa1zjSfOtXyk3XKM3zzDFG7rQ1XThn8cxo3
+ mey+8nktSeRfP505kqNoJyV3GZqnSemlDGXHPAdW08G1jOzQnsdIcFYKmHCHFLrBvhYu4LZSR
+ x2dvwDMRL8gP5Fq+u0eWZZxGQ4FDlmJhWek6OIcNn5Ov0C3DsW0Xo/7lGDQoVz1jioLgIAkRW
+ z8Z67vb3lfdc0bOFLlMWWNWe+x9IsY5VzMs0zCQhN3zqIP6DdYKe3YIonPH9hRDlh+pIsWqgX
+ 1WF14g+43As6Vk7Ztyjk0pSj7p73NDDsNBDol7/DONtR7SqUVqOZsnt5uP07oHCqGidj1S+NP
+ BI4i01Y7aLdM1qLNOEWeAkKbkiZ2zxJyTMAMuQhcgJptF5dLx26PHyEa/t4dWC9KAA0KR0Uvp
+ lcqXd5Y/oW5uLLPG9yzBgb8FrolFMZN3A8mNuCAUAD4YjTZEvnpjhM/YvDdKCxT1xDpOiACzX
+ CrsY0xsT8DYl6ypk+
+Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 11:44:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 11:44:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
@@ -110,85 +111,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/phtN7D_PkqiSCtORxrJa0VZ
+--Sig_/VulCqIaF=ENoiYFGHsER1py
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hello Everyone,
-In many cases, if qemu has a network connection (qmp, migration, chardev, e=
-tc.)
-to some other server and that server dies or hangs, qemu hangs too.
-These patches introduce the new 'yank' out-of-band qmp command to recover f=
-rom
-these kinds of hangs. The different subsystems register callbacks which get
-executed with the yank command. For example the callback can shutdown() a
-socket. This is intended for the colo use-case, but it can be used for other
-things too of course.
+Register a yank function to shutdown the socket on yank.
 
-Regards,
-Lukas Straub
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+---
+ Makefile.objs         |  1 +
+ chardev/char-socket.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-v4:
- -fix build errors...
+diff --git a/Makefile.objs b/Makefile.objs
+index 8e403b81f3..5582f4eda9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -10,6 +10,7 @@ qom-obj-y =3D qom/
+ ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
 
-v3:
- -don't touch softmmu/vl.c, use __contructor__ attribute instead (Paolo Bon=
-zini)
- -fix build errors
- -rewrite migration patch so it actually passes all tests
+ chardev-obj-y =3D chardev/
++chardev-obj-y +=3D yank.o
 
-v2:
- -don't touch io/ code anymore
- -always register yank functions
- -'yank' now takes a list of instances to yank
- -'query-yank' returns a list of yankable instances
+ authz-obj-y =3D authz/
 
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 185fe38dda..d5c6cd2153 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -34,6 +34,7 @@
+ #include "qapi/error.h"
+ #include "qapi/clone-visitor.h"
+ #include "qapi/qapi-visit-sockets.h"
++#include "yank.h"
 
-Lukas Straub (4):
-  Introduce yank feature
-  block/nbd.c: Add yank feature
-  chardev/char-socket.c: Add yank feature
-  migration: Add yank feature
+ #include "chardev/char-io.h"
 
- Makefile.objs                 |   3 +
- block/nbd.c                   | 101 ++++++++++++--------
- chardev/char-socket.c         |  24 +++++
- migration/channel.c           |  12 +++
- migration/migration.c         |  18 +++-
- migration/multifd.c           |  10 ++
- migration/qemu-file-channel.c |   6 ++
- migration/savevm.c            |   2 +
- qapi/misc.json                |  45 +++++++++
- tests/Makefile.include        |   2 +-
- yank.c                        | 174 ++++++++++++++++++++++++++++++++++
- yank.h                        |  67 +++++++++++++
- 12 files changed, 425 insertions(+), 39 deletions(-)
- create mode 100644 yank.c
- create mode 100644 yank.h
+@@ -69,6 +70,7 @@ typedef struct {
+     size_t read_msgfds_num;
+     int *write_msgfds;
+     size_t write_msgfds_num;
++    char *yank_name;
+
+     SocketAddress *addr;
+     bool is_listen;
+@@ -409,6 +411,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+
+     tcp_set_msgfds(chr, NULL, 0);
+     remove_fd_in_watch(chr);
++    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING
++        || s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
++        yank_unregister_function(s->yank_name, yank_generic_iochannel,
++                                 QIO_CHANNEL(s->sioc));
++    }
+     object_unref(OBJECT(s->sioc));
+     s->sioc =3D NULL;
+     object_unref(OBJECT(s->ioc));
+@@ -912,6 +919,8 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
+     }
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     ret =3D tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+     return ret;
+@@ -926,6 +935,8 @@ static void tcp_chr_accept(QIONetListener *listener,
+
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     tcp_chr_set_client_ioc_name(chr, cioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(cioc));
+     tcp_chr_new_client(chr, cioc);
+ }
+
+@@ -941,6 +952,8 @@ static int tcp_chr_connect_client_sync(Chardev *chr, Er=
+ror **errp)
+         object_unref(OBJECT(sioc));
+         return -1;
+     }
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+     return 0;
+@@ -956,6 +969,8 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     sioc =3D qio_net_listener_wait_client(s->listener);
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+ }
+@@ -1066,6 +1081,8 @@ static void char_socket_finalize(Object *obj)
+         object_unref(OBJECT(s->tls_creds));
+     }
+     g_free(s->tls_authz);
++    yank_unregister_instance(s->yank_name);
++    g_free(s->yank_name);
+
+     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+ }
+@@ -1081,6 +1098,8 @@ static void qemu_chr_socket_connected(QIOTask *task, =
+void *opaque)
+
+     if (qio_task_propagate_error(task, &err)) {
+         tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
++        yank_unregister_function(s->yank_name, yank_generic_iochannel,
++                                 QIO_CHANNEL(sioc));
+         check_report_connect_error(chr, err);
+         error_free(err);
+         goto cleanup;
+@@ -1115,6 +1134,8 @@ static void tcp_chr_connect_client_async(Chardev *chr)
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     sioc =3D qio_channel_socket_new();
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     /*
+      * Normally code would use the qio_channel_socket_connect_async
+      * method which uses a QIOTask + qio_task_set_error internally
+@@ -1356,6 +1377,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
+     }
+
++    s->yank_name =3D g_strconcat("chardev:", chr->label, NULL);
++    yank_register_instance(s->yank_name);
++
+     /* be isn't opened until we get a connection */
+     *be_opened =3D false;
 
 --
 2.20.1
 
---Sig_/phtN7D_PkqiSCtORxrJa0VZ
+
+--Sig_/VulCqIaF=ENoiYFGHsER1py
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7L58wACgkQNasLKJxd
-sli8mA/7BhPMvBQouH3esjIdgh0zhEjWCPd3iQNX08SOvoLQhMN/mo14U++L+ocj
-4h13L4tlf015AAol3r9Eij8wNPdYMbP4g9Zgw/m9DqW7wt1/BGrkt4/JVFPism6I
-+sxaPmC97tXQgjljri6uGGbMTnh/SMVztZV0GfzY5rT+JTSBWG0nnTWX4bzO1YDG
-o3AM3Hu9Y/AdmJ4vFJZcXo1UD3sNxbE0FTBZveS4NqbsAvTMf5eN4S/V731IZr7t
-VFBUKm1nxAoqxK5f50rIC62f3B+CW0Y7aVtZqsW1murlrq7vKHToQqBTOLgh54ZE
-XW+Ju+1l9hTYRLXzYXfNhc1WN/Y+VbIwe7bRqPmXfnjcP+S9uU5Qqxv2eYF6ZdwS
-ALdBG4Zao/qX2ayk7E79ewRBu9K+9YyC3wzg2mFjaQaw1i3hwrsF+iZ+1PXQrisP
-LwK9rsK8B+mHW195XQ4uM460bVVtCxaF+Xj4GLH3crxajb6qwuPp1fen771z9jsd
-ztvBvcB5oMyyVaPqx0U7r3zszSDZIMaNW1G08k4JRi/sN/co/wYnogUe5V9qFCMf
-ANlkgSFFaBxb8uHyhMQ6/qLhDfSjcXqxuNk/VQO2kn6mMptqX8WZmBX0anZePCzi
-lHmVUMGfR7KDw1P/crkrqPy4gtdkv5mx4qd10lUsz8+kXKP9aNY=
-=X+II
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7L590ACgkQNasLKJxd
+sljfOQ/7Bta0KcU6IflqBn+z4DjhM4F8jk9hcg96r7L3RUjgWUiMEgFSE1SPDJMo
+JqaUla7q1cBDr19AIMOVjf6y6Vw9UCHfIPh7C1y9L0wY/lLv+21R/0zmd4vM4rfL
+v7wKt8ZR9sEReFa5a1iSwcsxX8Sb6FUxF6KDHA9X7WyaClvEPCBPyNTSQFJp9AY3
+UfGpDNdbBsTfxA2Vq0eOfU+Fj5utjopiG25OWXBwWG3yB8nGN4gJerBi38YpjGyh
+xcuisp0sJfwkzjb2y+hePT9Yj3joMhen/5MoLYd9EV8Fs0Ooy67NLTnQzqj/lUq4
+b/ufiHa2f93gNCj7IygVW7jZnc7BFUi341JLgU02pxReYdEUERnITL0wheqYTKHH
+usEPq68NT1o5MSQzLhPQg49eccQgLEyHKrCEEB8YXe+sifjCAq13L53/1D+9ZHad
+eObfFO4zItkqbUlPVCIqxxkbDN0Sj9cd+QOgsC6If3HRYpZPy0weNiyDkzu6cfTa
+dB9m0Ra6wxUJRtis/DJYcl3NTekt9ovbGJihAVezfw75RnVYp/XkS8CNSvU6DWDz
+wsfFLVaY/dV1gTuh86fWFoinOOO9kW9Ht0x99R2xtW/EAHb8R0XY7/2LMPefjwpb
+cFLW82RbEmLlpOK+pGIgxAzidz7sF5LIfH5VubP60HbX3NCTw68=
+=zUHc
 -----END PGP SIGNATURE-----
 
---Sig_/phtN7D_PkqiSCtORxrJa0VZ--
+--Sig_/VulCqIaF=ENoiYFGHsER1py--
 
