@@ -2,93 +2,87 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6CFC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4766BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:35:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F9322078B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D4DC2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:35:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPBR6NhN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9322078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HKorFjuf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D4DC2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdEAj-0007NI-RJ
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 10:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
+	id 1jdECa-0008V5-8l
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 10:35:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jdE8g-0005Uh-Ac; Mon, 25 May 2020 10:31:38 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41361)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jdE8f-0007yP-8O; Mon, 25 May 2020 10:31:37 -0400
-Received: by mail-lj1-x241.google.com with SMTP id v16so21000541ljc.8;
- Mon, 25 May 2020 07:31:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=e4XS+9UCetgzP++Ff8M0j6IuSmmjc7ZWbzKdT+VXDIE=;
- b=FPBR6NhNJs6mrYNG8mUlbt1LSnlx5NxMQp7sIKlFKHDKLBVR7El4k1oI9xFy2PDbI+
- B5BQd+rgF7FQqYkovZtH+eIqkYdGGR5HUE7MUa7KIWbVYKECBoDGEumyOInrB3n4GLAn
- 5RVyUTlt1NI87dJJKzvHYhPr16RUgp2J6y9cBYImydG9tjsG3vqR5rna+SugCx1zGC7U
- Kepr5zlzlVrykZvgjN8cMzQErBwprWSeTlDyaizp1WoGOQLFjnpz9ij5lobz5g31la2N
- qgm0JHB/I7+q7oBCDDFOG7L1GwX+roLYfd+vLbvNKKxvF1k6a4sdraRH0LZhLc9CgeEw
- aAkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=e4XS+9UCetgzP++Ff8M0j6IuSmmjc7ZWbzKdT+VXDIE=;
- b=JvAEYXJ5Lh/4Ctjthd70QRNA9iwYAq1Ulm02cEq6JA1KIFI8tyGjauobgzrn8Iq7eG
- koO0ARZRyD6kbJvJlHSLfvuPPJiPJjbQky4FdhCke0XmkY4Xq9UsALWqdKDmGR+mquhO
- Tdr9NCgZAaOS12l9V1+r4pUffryHBocA4NQkTjnF5dMElci4GyNqzLp/O8m0HkCZkn6q
- B1C2eoS1QDNcZzrJkM2lFUJmNGZabmCtCMvanMTRZXpjcEUH6u/mJODh7KG+SCdJKEQI
- BtLyJ7HK3GuqJfFyrt0I1GaquFB14LHPB/jhn7OEK6/FJ6+Ug542rU+CQZW+QQVDRHoy
- KZWA==
-X-Gm-Message-State: AOAM531Ik/9cyntO7yiuYaszXqqNTZgDMat19gam8QCWNNhb/1V3WDWL
- F8DqDi2x1OmkGifZz9CIrdg=
-X-Google-Smtp-Source: ABdhPJxMQU06ELRj1wDoAKtkpAxYP6U+0Vd88pY29NsBrAHiNHPf+tjGym737VX6HBX+iF0ORTdCWg==
-X-Received: by 2002:a2e:2c0a:: with SMTP id s10mr12593568ljs.447.1590417094544; 
- Mon, 25 May 2020 07:31:34 -0700 (PDT)
-Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id 5sm4634405lju.87.2020.05.25.07.31.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 25 May 2020 07:31:33 -0700 (PDT)
-Date: Mon, 25 May 2020 16:31:32 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2] tests/acceptance: Add a boot test for the
- xlnx-versal-virt machine
-Message-ID: <20200525143132.GA8957@toto>
-References: <20200525141237.15243-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdEBI-0007jV-2u
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 10:34:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42782
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdEBH-0008Gi-3F
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 10:34:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590417258;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=6xSyCdEJLXbFihD88JarTGqRJAjtlUBbdSP9GkhVFWg=;
+ b=HKorFjufLeyy7kNaOBdIhqVSxGogFwQMqKRERw9FmlbtVtGc8gNAM98ORJVikeITSc8cwD
+ xVYsNfef6vqzAVq5BD0nBBZYJZiy9A/y2wiYcl3RTMjoHXCrPvqgh4EhWJa31b74VpFHc/
+ uc8X5wSlwqYoNePG7seKrjnH3mP00+I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-fwsWJYToOmqd5QrGP6h2tg-1; Mon, 25 May 2020 10:34:14 -0400
+X-MC-Unique: fwsWJYToOmqd5QrGP6h2tg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 380C9107ACCD;
+ Mon, 25 May 2020 14:34:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B68719D7E;
+ Mon, 25 May 2020 14:34:05 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1AA8C113864A; Mon, 25 May 2020 16:34:04 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v23 18/18] qapi: Add VFIO devices migration stats in
+ Migration stats
+References: <1589999088-31477-1-git-send-email-kwankhede@nvidia.com>
+ <1589999088-31477-19-git-send-email-kwankhede@nvidia.com>
+Date: Mon, 25 May 2020 16:34:04 +0200
+In-Reply-To: <1589999088-31477-19-git-send-email-kwankhede@nvidia.com> (Kirti
+ Wankhede's message of "Wed, 20 May 2020 23:54:48 +0530")
+Message-ID: <875zckdqxv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200525141237.15243-1-thuth@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 02:40:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,77 +96,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com, Ken.Xue@amd.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, quintela@redhat.com,
+ zhi.a.wang@intel.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 04:12:37PM +0200, Thomas Huth wrote:
-> As described by Edgar here:
-> 
->  https://www.mail-archive.com/qemu-devel@nongnu.org/msg605124.html
-> 
-> we can use the Ubuntu kernel for testing the xlnx-versal-virt machine.
-> So let's add a boot test for this now.
+Kirti Wankhede <kwankhede@nvidia.com> writes:
 
-Great, thanks Thomas!
+> Added amount of bytes transferred to the target VM by all VFIO devices
+>
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+QAPI review only.
 
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index d5000558c6c9..acbc42a1efe8 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -146,6 +146,18 @@
+>              'active', 'postcopy-active', 'postcopy-paused',
+>              'postcopy-recover', 'completed', 'failed', 'colo',
+>              'pre-switchover', 'device', 'wait-unplug' ] }
+> +##
+> +# @VfioStats:
+> +#
+> +# Detailed VFIO devices migration statistics
+> +#
+> +# @bytes: amount of bytes transferred to the target VM by VFIO devices
+> +#
+> +# Since: 5.1
+> +#
+> +##
+> +{ 'struct': 'VfioStats',
+> +  'data': {'bytes': 'int' } }
 
+Pardon my ignorance...  What exactly do VFIO devices transfer to the
+target VM?  How is that related to MigrationInfo member @ram?
 
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Added "tags=device:pl011" and "tags=device:arm_gicv3"
-> 
->  tests/acceptance/boot_linux_console.py | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 0653c8c1bf..965272387c 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -307,6 +307,32 @@ class BootLinuxConsole(Test):
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
->          self.wait_for_console_pattern(console_pattern)
+For what it's worth, MigrationStats has
+
+   # @transferred: amount of bytes already transferred to the target VM
+
+Name yours @transferred as well, for consistency?
+
+MigrationStats has much more information, and some of it is pretty
+useful to track how migration is doing, in particular whether it
+converges, and how fast.  Absent in VfioStats due to "not implemented",
+or due to "can't be done"?
+
+Byte counts should use QAPI type 'size'.  Many existing ones don't.
+Since MigrationStats uses 'int', I'll let the migration maintainers
+decide whether they want 'int' or 'size' here.
+
 >  
-> +    def test_aarch64_xlnx_versal_virt(self):
-> +        """
-> +        :avocado: tags=arch:aarch64
-> +        :avocado: tags=machine:xlnx-versal-virt
-> +        :avocado: tags=device:pl011
-> +        :avocado: tags=device:arm_gicv3
-> +        """
-> +        kernel_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-> +                      'bionic-updates/main/installer-arm64/current/images/'
-> +                      'netboot/ubuntu-installer/arm64/linux')
-> +        kernel_hash = '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +
-> +        initrd_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-> +                      'bionic-updates/main/installer-arm64/current/images/'
-> +                      'netboot/ubuntu-installer/arm64/initrd.gz')
-> +        initrd_hash = 'd385d3e88d53e2004c5d43cbe668b458a094f772'
-> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-> +
-> +        self.vm.set_console()
-> +        self.vm.add_args('-m', '2G',
-> +                         '-kernel', kernel_path,
-> +                         '-initrd', initrd_path)
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('Checked W+X mappings: passed')
-> +
->      def test_arm_virt(self):
->          """
->          :avocado: tags=arch:arm
-> -- 
-> 2.18.1
-> 
+>  ##
+>  # @MigrationInfo:
+> @@ -207,6 +219,10 @@
+>  #
+>  # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
+>  #
+> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
+> +#        only returned if VFIO device is present, migration is supported by all
+> +#         VFIO devices and status is 'active' or 'completed' (since 5.1)
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationInfo',
+> @@ -222,7 +238,8 @@
+     'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+              '*disk': 'MigrationStats',
+              '*xbzrle-cache': 'XBZRLECacheStats',
+              '*total-time': 'int',
+              '*expected-downtime': 'int',
+              '*downtime': 'int',
+              '*setup-time': 'int',
+              '*cpu-throttle-percentage': 'int',
+              '*error-desc': 'str',
+>             '*postcopy-blocktime' : 'uint32',
+>             '*postcopy-vcpu-blocktime': ['uint32'],
+>             '*compression': 'CompressionStats',
+> -           '*socket-address': ['SocketAddress'] } }
+> +           '*socket-address': ['SocketAddress'],
+> +           '*vfio': 'VfioStats' } }
+>  
+>  ##
+>  # @query-migrate:
+
+If @vfio and @ram are related, add @vfio next to @ram and @disk, please.
+
 
