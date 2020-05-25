@@ -2,81 +2,122 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5B8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F82C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7E1F207C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C1022073B
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 13:48:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cp/eyWuf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7E1F207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FBhk4TkL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1022073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdDRq-00073b-U4
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44694)
+	id 1jdDSp-0007zB-A2
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 09:48:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdDQ0-0006F5-7O
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:45:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43433
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdDRT-00070L-7D
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:46:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55882
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdDPw-000837-Oz
- for qemu-devel@nongnu.org; Mon, 25 May 2020 09:45:27 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdDRO-0000WC-EP
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 09:46:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590414322;
+ s=mimecast20190719; t=1590414413;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Dw2U/ySOWFqYPvOSOrmV1uE/IkH6FXOj5h7xIVtFtNI=;
- b=cp/eyWufR6BOiD9GokBKgCSWzZfUyUWCIKbZH4hQMH12b2CnHdtvKK90foCZMSkEK/SjMb
- T4uiRaaI0hNWjyMJt/Lej0MqtwdqZVsCT+BDgbBQuSTC9lOiBf54lfrXxgclvPL5M5oTHA
- bBV4gvfJUo7LpBm1l2LNZHXRPxXcEgY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-4nfVhKK8NnyXNeis2S7iyg-1; Mon, 25 May 2020 09:45:12 -0400
-X-MC-Unique: 4nfVhKK8NnyXNeis2S7iyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE32E460;
- Mon, 25 May 2020 13:45:10 +0000 (UTC)
-Received: from nas.mammed.net (unknown [10.40.195.242])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B8BB919D61;
- Mon, 25 May 2020 13:45:08 +0000 (UTC)
-Date: Mon, 25 May 2020 15:45:05 +0200
-From: Igor Mammedow <imammedo@redhat.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [RFC PATCH] hw/sparc/sun4m: Use memdev backend for main RAM
-Message-ID: <20200525154505.3d64c0a5@nas.mammed.net>
-In-Reply-To: <aa0afa5a-9d71-69b6-0a34-5a829d974878@ilande.co.uk>
-References: <20200510113505.10500-1-f4bug@amsat.org>
- <20200514120951.3588bc30@redhat.com>
- <58238d26-a9dc-0cc0-749d-6230d2646f75@amsat.org>
- <20200520120709.558a52ba@nas.mammed.net>
- <aa0afa5a-9d71-69b6-0a34-5a829d974878@ilande.co.uk>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=yE/jj0uW+AG56YPhqE3mj8rzTg7yV5pvUrgfN0rTz5M=;
+ b=FBhk4TkLM39TDH61Zkbvz0bvk3i1mVBcmBo7th+Tpe3HKCxxradHO0uyZJKJ8iZAEDo6aY
+ 0AdjUWCIG9l12dvJInWoDbq4P1DZcyup++LYcdqYXbtW51kyfJFs4vFHs+oQIeY4C/ea9Y
+ P1zGdCfEIvy6DTunsCto2OtHu8nJp/o=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-9qyFhwJyNVWh_Mj8pKcISw-1; Mon, 25 May 2020 09:46:51 -0400
+X-MC-Unique: 9qyFhwJyNVWh_Mj8pKcISw-1
+Received: by mail-ed1-f70.google.com with SMTP id v25so4153356edy.1
+ for <qemu-devel@nongnu.org>; Mon, 25 May 2020 06:46:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=yE/jj0uW+AG56YPhqE3mj8rzTg7yV5pvUrgfN0rTz5M=;
+ b=PHIWf2lkG952l3QoHnrwfA3lRGq5wHbnR7gHjaReJEfXEBOQKRFaW8Yiq67s27PECF
+ ZRUqb/R13hWYW8CTjxxOpOkub3qCTJGyXTKDxh8/yOWEJQoUDDY42TYVqfd8h0+EjQXs
+ phBtIyhwNz24gmU7SwZ8kII7438NjujckwCV/8kgwPo/PLWPhHll0ghmwnDdYCZuc+3x
+ /ELVc049QEpJkBIMpqbbzF3QwlSKi2vZzUlrscUSODkon3qWEbUXl093OuGY3potea3o
+ CoOygWKE2YnTYlfuOCpkiPw4HwXS08BJHnfIU2wepQ631RybwlbLk1QmHnvHrtT3/Lzi
+ DjPg==
+X-Gm-Message-State: AOAM533LmGn28wRrdqXjMTI5VH/xzv6gtu7Y2/SnO/8r5M7RUEV64mfV
+ t8oqHsD6MXIuOUUUv1QthVZPndhn19f4DKliNSBLsNga3//Znz0d4K7+CyRrmOsIBND+dVfuSWx
+ eHUmnyiVCJtdlneE=
+X-Received: by 2002:a17:906:7684:: with SMTP id
+ o4mr19862433ejm.449.1590414410224; 
+ Mon, 25 May 2020 06:46:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxot/pcLkWyo2RjCDhIYrF2Cnf2gMNmuUgC780T9XsS5+r/XycMrBjK0rhHoSaVh2VM89xgvA==
+X-Received: by 2002:a17:906:7684:: with SMTP id
+ o4mr19862413ejm.449.1590414409943; 
+ Mon, 25 May 2020 06:46:49 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id s8sm16374779edj.64.2020.05.25.06.46.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 25 May 2020 06:46:49 -0700 (PDT)
+Subject: Re: [PATCH 3/3] x86: move max-ram-below-4g to pc
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200525134101.24740-1-kraxel@redhat.com>
+ <20200525134101.24740-4-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <f3766c20-3bb3-4431-8781-5dea4eace5c8@redhat.com>
+Date: Mon, 25 May 2020 15:46:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200525134101.24740-4-kraxel@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 01:44:10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:55:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -84,7 +125,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,86 +138,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ imammedo@redhat.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 25 May 2020 10:02:00 +0100
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+On 5/25/20 3:41 PM, Gerd Hoffmann wrote:
+> Move from X86MachineClass to PCMachineClass so it disappears
+> from microvm machine type property list.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/hw/i386/pc.h  |  2 ++
+>  include/hw/i386/x86.h |  4 ----
+>  hw/i386/pc.c          | 46 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/pc_piix.c     | 10 +++++-----
+>  hw/i386/pc_q35.c      | 10 +++++-----
+>  hw/i386/x86.c         | 46 -------------------------------------------
+>  6 files changed, 58 insertions(+), 60 deletions(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 8d764f965cd3..e6135c34d656 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -35,6 +35,7 @@ struct PCMachineState {
+>      PFlashCFI01 *flash[2];
+>  
+>      /* Configuration options: */
+> +    uint64_t max_ram_below_4g;
+>      OnOffAuto vmport;
+>  
+>      bool acpi_build_enabled;
+> @@ -51,6 +52,7 @@ struct PCMachineState {
+>  };
+>  
+>  #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
+> +#define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
+>  #define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
+>  #define PC_MACHINE_VMPORT           "vmport"
+>  #define PC_MACHINE_SMBUS            "smbus"
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index b52285481687..b79f24e28545 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -51,9 +51,6 @@ typedef struct {
+>      qemu_irq *gsi;
+>      GMappedFile *initrd_mapped_file;
+>  
+> -    /* Configuration options: */
+> -    uint64_t max_ram_below_4g;
+> -
+>      /* RAM information (sizes, addresses, configuration): */
+>      ram_addr_t below_4g_mem_size, above_4g_mem_size;
+>  
+> @@ -82,7 +79,6 @@ typedef struct {
+>      AddressSpace *ioapic_as;
+>  } X86MachineState;
+>  
+> -#define X86_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
+>  #define X86_MACHINE_SMM              "smm"
+>  #define X86_MACHINE_ACPI             "acpi"
+>  
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2128f3d6fe8b..80a6cac3b56f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1856,6 +1856,45 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+>      pcms->pit_enabled = value;
+>  }
+>  
+> +static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
+> +                                            const char *name, void *opaque,
+> +                                            Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(obj);
+> +    uint64_t value = pcms->max_ram_below_4g;
+> +
+> +    visit_type_size(v, name, &value, errp);
+> +}
+> +
+> +static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
+> +                                            const char *name, void *opaque,
+> +                                            Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(obj);
+> +    Error *error = NULL;
+> +    uint64_t value;
+> +
+> +    visit_type_size(v, name, &value, &error);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +    if (value > 4 * GiB) {
+> +        error_setg(&error,
+> +                   "Machine option 'max-ram-below-4g=%"PRIu64
+> +                   "' expects size less than or equal to 4G", value);
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +
+> +    if (value < 1 * MiB) {
+> +        warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
+> +                    "BIOS may not work with less than 1MiB", value);
+> +    }
+> +
+> +    pcms->max_ram_below_4g = value;
+> +}
+> +
+>  static void pc_machine_initfn(Object *obj)
+>  {
+>      PCMachineState *pcms = PC_MACHINE(obj);
+> @@ -1865,6 +1904,7 @@ static void pc_machine_initfn(Object *obj)
+>  #else
+>      pcms->vmport = ON_OFF_AUTO_OFF;
+>  #endif /* CONFIG_VMPORT */
+> +    pcms->max_ram_below_4g = 0; /* use default */
+>      /* acpi build is enabled by default if machine supports it */
+>      pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
+>      pcms->smbus_enabled = true;
+> @@ -1963,6 +2003,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      mc->numa_mem_supported = true;
+>      mc->default_ram_id = "pc.ram";
+>  
+> +    object_class_property_add(oc, PC_MACHINE_MAX_RAM_BELOW_4G, "size",
+> +        pc_machine_get_max_ram_below_4g, pc_machine_set_max_ram_below_4g,
+> +        NULL, NULL);
+> +    object_class_property_set_description(oc, PC_MACHINE_MAX_RAM_BELOW_4G,
+> +        "Maximum ram below the 4G boundary (32bit boundary)");
+> +
+>      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+>          pc_machine_get_device_memory_region_size, NULL,
+>          NULL, NULL);
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index f66e1d73ce0b..503c35f7bf4c 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -127,11 +127,11 @@ static void pc_init1(MachineState *machine,
+>      if (xen_enabled()) {
+>          xen_hvm_init(pcms, &ram_memory);
+>      } else {
+> -        if (!x86ms->max_ram_below_4g) {
+> -            x86ms->max_ram_below_4g = 0xe0000000; /* default: 3.5G */
+> +        if (!pcms->max_ram_below_4g) {
+> +            pcms->max_ram_below_4g = 0xe0000000; /* default: 3.5G */
+>          }
+> -        lowmem = x86ms->max_ram_below_4g;
+> -        if (machine->ram_size >= x86ms->max_ram_below_4g) {
+> +        lowmem = pcms->max_ram_below_4g;
+> +        if (machine->ram_size >= pcms->max_ram_below_4g) {
+>              if (pcmc->gigabyte_align) {
+>                  if (lowmem > 0xc0000000) {
+>                      lowmem = 0xc0000000;
+> @@ -140,7 +140,7 @@ static void pc_init1(MachineState *machine,
+>                      warn_report("Large machine and max_ram_below_4g "
+>                                  "(%" PRIu64 ") not a multiple of 1G; "
+>                                  "possible bad performance.",
+> -                                x86ms->max_ram_below_4g);
+> +                                pcms->max_ram_below_4g);
+>                  }
+>              }
+>          }
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 4ba8ac8774e4..90e8fb2cb737 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -154,18 +154,18 @@ static void pc_q35_init(MachineState *machine)
+>      /* Handle the machine opt max-ram-below-4g.  It is basically doing
+>       * min(qemu limit, user limit).
+>       */
+> -    if (!x86ms->max_ram_below_4g) {
+> -        x86ms->max_ram_below_4g = 4 * GiB;
+> +    if (!pcms->max_ram_below_4g) {
+> +        pcms->max_ram_below_4g = 4 * GiB;
+>      }
+> -    if (lowmem > x86ms->max_ram_below_4g) {
+> -        lowmem = x86ms->max_ram_below_4g;
+> +    if (lowmem > pcms->max_ram_below_4g) {
+> +        lowmem = pcms->max_ram_below_4g;
+>          if (machine->ram_size - lowmem > lowmem &&
+>              lowmem & (1 * GiB - 1)) {
+>              warn_report("There is possibly poor performance as the ram size "
+>                          " (0x%" PRIx64 ") is more then twice the size of"
+>                          " max-ram-below-4g (%"PRIu64") and"
+>                          " max-ram-below-4g is not a multiple of 1G.",
+> -                        (uint64_t)machine->ram_size, x86ms->max_ram_below_4g);
+> +                        (uint64_t)machine->ram_size, pcms->max_ram_below_4g);
+>          }
+>      }
+>  
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 7a3bc7ab6639..49884e5c1597 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -846,45 +846,6 @@ void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
+>                                  bios);
+>  }
+>  
+> -static void x86_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
+> -                                             const char *name, void *opaque,
+> -                                             Error **errp)
+> -{
+> -    X86MachineState *x86ms = X86_MACHINE(obj);
+> -    uint64_t value = x86ms->max_ram_below_4g;
+> -
+> -    visit_type_size(v, name, &value, errp);
+> -}
+> -
+> -static void x86_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
+> -                                             const char *name, void *opaque,
+> -                                             Error **errp)
+> -{
+> -    X86MachineState *x86ms = X86_MACHINE(obj);
+> -    Error *error = NULL;
+> -    uint64_t value;
+> -
+> -    visit_type_size(v, name, &value, &error);
+> -    if (error) {
+> -        error_propagate(errp, error);
+> -        return;
+> -    }
+> -    if (value > 4 * GiB) {
+> -        error_setg(&error,
+> -                   "Machine option 'max-ram-below-4g=%"PRIu64
+> -                   "' expects size less than or equal to 4G", value);
+> -        error_propagate(errp, error);
+> -        return;
+> -    }
+> -
+> -    if (value < 1 * MiB) {
+> -        warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
+> -                    "BIOS may not work with less than 1MiB", value);
+> -    }
+> -
+> -    x86ms->max_ram_below_4g = value;
+> -}
+> -
+>  bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
+>  {
+>      bool smm_available = false;
+> @@ -958,7 +919,6 @@ static void x86_machine_initfn(Object *obj)
+>  
+>      x86ms->smm = ON_OFF_AUTO_AUTO;
+>      x86ms->acpi = ON_OFF_AUTO_AUTO;
+> -    x86ms->max_ram_below_4g = 0; /* use default */
+>      x86ms->smp_dies = 1;
+>  
+>      x86ms->apicid_from_cpu_idx = x86_apicid_from_cpu_idx;
+> @@ -980,12 +940,6 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
+>      x86mc->save_tsc_khz = true;
+>      nc->nmi_monitor_handler = x86_nmi;
+>  
+> -    object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
+> -        x86_machine_get_max_ram_below_4g, x86_machine_set_max_ram_below_4g,
+> -        NULL, NULL);
+> -    object_class_property_set_description(oc, X86_MACHINE_MAX_RAM_BELOW_4G,
+> -        "Maximum ram below the 4G boundary (32bit boundary)");
+> -
+>      object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
+>          x86_machine_get_smm, x86_machine_set_smm,
+>          NULL, NULL);
+> 
 
-> On 20/05/2020 11:07, Igor Mammedow wrote:
->=20
-> > On Thu, 14 May 2020 14:13:11 +0200
-> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-> >  =20
-> >> On 5/14/20 12:09 PM, Igor Mammedov wrote: =20
-> >>> On Sun, 10 May 2020 13:35:05 +0200
-> >>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-> >>>    =20
-> >>>> Since commit 82b911aaff3, machine_run_board_init() checks for
-> >>>> ram_memdev_id and consume it. As TYPE_SUN4M_MEMORY is no more
-> >>>> needed, replace it by the generic memdev allocated MemoryRegion
-> >>>> and remove it. This completes commit b2554752b1da7c8f.   =20
-> >>>
-> >>> I don't get justification here.
-> >>> You are removing 'frontend' device model that has little/nothing
-> >>> to do with how backend is instantiated.
-> >>>
-> >>> TYPE_SUN4M_MEMORY is analog to pc-dimm, only for builtin RAM
-> >>> (not really useful but could serve as an example).   =20
-> >>
-> >> I have no idea about the benefits of using memory frontend/backend
-> >> with emulation. Is there documentation and examples? I'm seeing
-> >> this code as a complicated way of doing a simple thing, but I
-> >> guess I'm missing the big picture here. =20
-> >=20
-> > Examples are pc-dimm and nv-dimm which thanks to separation easily
-> > reusable across pc/spapr/virt-arm.
-> >=20
-> > Having frontend is also useful for mgmt purposes, where HMP/QMP
-> > just has to enumerate all RAM devices, otherwise boards would have
-> > to provide a callback to describe their custom mappings.
-> >=20
-> > But for embed boards with a single blob of RAM nailed down,
-> > having frontend is probably overkill (at least ATM).
-> > So I'm fine with this patch /with amended commit message/ =20
->=20
-> I don't feel too strongly about this, however if there is a standard
-> way of doing things then I would prefer to do that since it makes it
-> easier for me as a maintainer if there are existing (and up-to-date)
-> examples that I can use as a reference.
->=20
-> Presumably it also means that if HMP/QMP commands are added in
-> relation to machine RAM then the SPARC machines would get that new
-> functionality automatically...
-I'm afraid there is no standard way to do it yet.
-Even for virt targeted boards we have a mix of
-  1. explicit mapping of memory region (arm/virt, x86, spapr),
-     -m/-machine memory-backend CLI options
-          (with optional partitioning of it internally, using aliases
-          (pc/q35, some other embed boards))=20
-     which now maps auto-created or user provided hostmem back-end
-     memory region=20
-     This area is quite a mess.
-  2. device based RAM in guise of pc-dimm or nv-dimm, where user
-     explicitly provides hostmem back-end and pairing it
-     with [pc|nv]-dimm frontend on CLI (i.e. like on real hardware
-     machines).
+Good!
 
-Theoretically you can reuse pc-dimm if whole dimm maps into VM address
-space. It will get accounted in HMP info commands automatically. But
-it hasn't been done for main RAM on any machine yet so thta's an area
-to experiment with. which opens questions:
- * how to map -m/-machine memory-backend to frontend
- * or maybe ditch -m and force user to specify all DIMMs on CLI
-   explicitly.
-
->=20
-> ATB,
->=20
-> Mark.
->=20
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
