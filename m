@@ -2,86 +2,101 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D6EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D52CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0D4B206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 08:58:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="hMlFVc6l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0D4B206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id A4E31206DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 09:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E31206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd8wL-00011a-Tc
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 04:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43390)
+	id 1jd90k-0002f1-ME
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 05:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jd8vn-0000W5-3Q; Mon, 25 May 2020 04:57:59 -0400
-Received: from forwardcorp1p.mail.yandex.net
- ([2a02:6b8:0:1472:2741:0:8b6:217]:39172)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jd8zo-00021x-PO
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:08 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:50268
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jd8vl-0000FC-OI; Mon, 25 May 2020 04:57:58 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 46EB72E1469;
- Mon, 25 May 2020 11:57:54 +0300 (MSK)
-Received: from sas1-9998cec34266.qloud-c.yandex.net
- (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- tixeNvdHtN-vo2O58qn; Mon, 25 May 2020 11:57:54 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1590397074; bh=90wMu+iZclOKuX3s2GzQRMQkjE7C5K3HtioXlbfRWGI=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=hMlFVc6lZoIiQcibVeL/x5n0d7nf3WIQumUcA8NApDioVnz2S/UWUycShYzBC7jK1
- NhTSpxWgB/qgZvsOOq6n007MyMXufH5EOvdSCqr8nMp5yHFCMHEKneWMcm4AECqOzK
- 8cqeC5tMcumficnV+wIIHJ+QsV+n48O1lr87hJOQ=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:105::1:6])
- by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- tiVZhOf8SY-voWS3gu9; Mon, 25 May 2020 11:57:50 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Mon, 25 May 2020 11:57:49 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 2/2] vhost-user-blk: delay vhost_user_blk_disconnect
-Message-ID: <20200525085741.GA7645@dimastep-nix>
-References: <cover.1589989075.git.dimastep@yandex-team.ru>
- <0dfb37f8728aba26c8d6c117018332a5b7dc9b56.1589989075.git.dimastep@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jd8zn-00015c-CW
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 05:02:08 -0400
+Received: from host109-156-104-24.range109-156.btcentralplus.com
+ ([109.156.104.24] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jd8zi-0000Hl-66; Mon, 25 May 2020 10:02:05 +0100
+To: Igor Mammedow <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200510113505.10500-1-f4bug@amsat.org>
+ <20200514120951.3588bc30@redhat.com>
+ <58238d26-a9dc-0cc0-749d-6230d2646f75@amsat.org>
+ <20200520120709.558a52ba@nas.mammed.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <aa0afa5a-9d71-69b6-0a34-5a829d974878@ilande.co.uk>
+Date: Mon, 25 May 2020 10:02:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0dfb37f8728aba26c8d6c117018332a5b7dc9b56.1589989075.git.dimastep@yandex-team.ru>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 04:57:54
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+In-Reply-To: <20200520120709.558a52ba@nas.mammed.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 109.156.104.24
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [RFC PATCH] hw/sparc/sun4m: Use memdev backend for main RAM
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,97 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
- jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
- yc-core@yandex-team.ru, pbonzini@redhat.com, marcandre.lureau@redhat.com,
- raphael.norwitz@nutanix.com
+Cc: qemu-devel@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 20, 2020 at 06:53:13PM +0300, Dima Stepanov wrote:
-> A socket write during vhost-user communication may trigger a disconnect
-> event, calling vhost_user_blk_disconnect() and clearing all the
-> vhost_dev structures holding data that vhost-user functions expect to
-> remain valid to roll back initialization correctly. Delay the cleanup to
-> keep vhost_dev structure valid.
-> There are two possible states to handle:
-> 1. RUN_STATE_PRELAUNCH: skip bh oneshot call and perform disconnect in
-> the caller routine.
-> 2. RUN_STATE_RUNNING: delay by using bh
+On 20/05/2020 11:07, Igor Mammedow wrote:
+
+> On Thu, 14 May 2020 14:13:11 +0200
+> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
 > 
-> BH changes are based on the similar changes for the vhost-user-net
-> device:
->   commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
->   "vhost-user: delay vhost_user_stop"
+>> On 5/14/20 12:09 PM, Igor Mammedov wrote:
+>>> On Sun, 10 May 2020 13:35:05 +0200
+>>> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>   
+>>>> Since commit 82b911aaff3, machine_run_board_init() checks for
+>>>> ram_memdev_id and consume it. As TYPE_SUN4M_MEMORY is no more
+>>>> needed, replace it by the generic memdev allocated MemoryRegion
+>>>> and remove it. This completes commit b2554752b1da7c8f.  
+>>>
+>>> I don't get justification here.
+>>> You are removing 'frontend' device model that has little/nothing
+>>> to do with how backend is instantiated.
+>>>
+>>> TYPE_SUN4M_MEMORY is analog to pc-dimm, only for builtin RAM
+>>> (not really useful but could serve as an example).  
+>>
+>> I have no idea about the benefits of using memory frontend/backend
+>> with emulation. Is there documentation and examples? I'm seeing this
+>> code as a complicated way of doing a simple thing, but I guess I'm
+>> missing the big picture here.
 > 
-> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> Examples are pc-dimm and nv-dimm which thanks to separation easily
+> reusable across pc/spapr/virt-arm.
+> 
+> Having frontend is also useful for mgmt purposes, where HMP/QMP
+> just has to enumerate all RAM devices, otherwise boards would have
+> to provide a callback to describe their custom mappings.
+> 
+> But for embed boards with a single blob of RAM nailed down,
+> having frontend is probably overkill (at least ATM).
+> So I'm fine with this patch /with amended commit message/
 
-I've reworked the patch based on Raphael's comment and send it for
-review. Also i added a TODO comment in the vhost_user_blk_event()
-routine. After review i'll send a v4 patch set.
+I don't feel too strongly about this, however if there is a standard way of doing
+things then I would prefer to do that since it makes it easier for me as a maintainer
+if there are existing (and up-to-date) examples that I can use as a reference.
 
----
- hw/block/vhost-user-blk.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+Presumably it also means that if HMP/QMP commands are added in relation to machine
+RAM then the SPARC machines would get that new functionality automatically...
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 9d8c0b3..76838e7 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -349,6 +349,19 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
-     vhost_dev_cleanup(&s->dev);
- }
- 
-+static void vhost_user_blk_event(void *opaque, QEMUChrEvent event);
-+
-+static void vhost_user_blk_chr_closed_bh(void *opaque)
-+{
-+    DeviceState *dev = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    vhost_user_blk_disconnect(dev);
-+    qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_event,
-+            NULL, opaque, NULL, true);
-+}
-+
- static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
- {
-     DeviceState *dev = opaque;
-@@ -363,7 +376,30 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
-         }
-         break;
-     case CHR_EVENT_CLOSED:
--        vhost_user_blk_disconnect(dev);
-+        /*
-+         * A close event may happen during a read/write, but vhost
-+         * code assumes the vhost_dev remains setup, so delay the
-+         * stop & clear. There are two possible paths to hit this
-+         * disconnect event:
-+         * 1. When VM is in the RUN_STATE_PRELAUNCH state. The
-+         * vhost_user_blk_device_realize() is a caller.
-+         * 2. In tha main loop phase after VM start.
-+         *
-+         * For p2 the disconnect event will be delayed. We can't
-+         * do the same for p1, because we are not running the loop
-+         * at this moment. So just skip this step and perform
-+         * disconnect in the caller function.
-+         *
-+         * TODO: maybe it is a good idea to make the same fix
-+         * for other vhost-user devices.
-+         */
-+        if (runstate_is_running()) {
-+            AioContext *ctx = qemu_get_current_aio_context();
-+
-+            qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL, NULL,
-+                    NULL, NULL, false);
-+            aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
-+        }
-         break;
-     case CHR_EVENT_BREAK:
-     case CHR_EVENT_MUX_IN:
--- 
-2.7.4
 
+ATB,
+
+Mark.
 
