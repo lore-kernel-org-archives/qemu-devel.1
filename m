@@ -2,91 +2,134 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BF2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160DFC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:23:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9252073B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:18:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9252073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 918132071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 15:23:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g80ZQ8Jz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 918132071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdErw-0002sn-7M
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:18:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55370)
+	id 1jdEwr-0006gy-IA
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 11:23:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdEpP-0008Pt-Mq
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:15:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58604)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdEpN-0000eD-H0
- for qemu-devel@nongnu.org; Mon, 25 May 2020 11:15:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jdEpL-0007Rw-1X
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 15:15:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 092DD2E8082
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 15:15:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEo3-0006aE-Hf
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:14:23 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58866
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdEo2-0008Id-LP
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 11:14:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590419661;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=f66NeRqfpRlgfRe38i1+1ZCvzv5Vy8dQcb2vBsN06fM=;
+ b=g80ZQ8Jzidb9LkFxLo5+cTvEb4mZf5y/EK+T4kQJ2qNa7m/vqvReGMEXVZMV/PLRQ35R87
+ 39NtKeq/Dx0IyYk4rCxS/SS9PpNBE2h9hPt2r6HZevPuWAqLo3iy2se6/7bXWLd6AHi5gk
+ MhPrrnfoDHEdQyP1hCS4bJL0TBBhHBY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-7Ha9RwqdNBqoapgdZMkCaw-1; Mon, 25 May 2020 11:14:18 -0400
+X-MC-Unique: 7Ha9RwqdNBqoapgdZMkCaw-1
+Received: by mail-ed1-f71.google.com with SMTP id dk23so7617273edb.15
+ for <qemu-devel@nongnu.org>; Mon, 25 May 2020 08:14:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=f66NeRqfpRlgfRe38i1+1ZCvzv5Vy8dQcb2vBsN06fM=;
+ b=FIN1YkrVFPNnH0UpRSz7MXNUHJO3Dm6Y68aiA4ZVTWLSBq2uqSaEGorBUD9vUhdTxU
+ bL0hNA5svo9nTQtn7KAkE6Fi946Ct82nBGb12j6M1fA3/f+aaBuh7hI6Cspf7/fkGKh/
+ vhf9hB+V489GNwjDDrBrl2sYBjb6MIQa/B1S7Z28h+/Kdz32uyIYHYUdOzsHBhZ8QTky
+ dBp/NptTqOQPBxkG9G2tAm3wI2JHZ3kiRlPwKWUKO9udY0/iI+6rCvgbl4YQswBjyEYC
+ 0h+LYI2yBPaD0T+fRkUdtONZQBsAoT1VgetQ5rhuHhly6gJpircuOxyKjlzhS/zFrMEk
+ Woww==
+X-Gm-Message-State: AOAM531GnbiMXc2/S14GYPbSL0mZWzjzRCP5Wbd2p+rWJGts1R5VwNV1
+ fEOMiTTUm4ndoYbOTnU4SMssCF+06juOz4E4yk78MgBVIPJdGr4Z2/cqCh6o0zYC7Sj+ZFXULaq
+ SgVBBCS/8hJm5K6c=
+X-Received: by 2002:a50:cdc8:: with SMTP id h8mr15501333edj.26.1590419656915; 
+ Mon, 25 May 2020 08:14:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJygrAFtfsBgdKR7gXOn1iWQt4ztTqHnssuy9AW5rsHgK5+JKrmjv1PlSnDa3wWSVAB1LrAuKg==
+X-Received: by 2002:a50:cdc8:: with SMTP id h8mr15501316edj.26.1590419656638; 
+ Mon, 25 May 2020 08:14:16 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id c15sm10979392edm.78.2020.05.25.08.14.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 25 May 2020 08:14:16 -0700 (PDT)
+Subject: Re: [RFC v3 2/4] cpu-throttle: new module, extracted from cpus.c
+To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+References: <20200525145440.29728-1-cfontana@suse.de>
+ <20200525145440.29728-3-cfontana@suse.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <99995c3f-68a3-ce07-72bb-37a9b2263e52@redhat.com>
+Date: Mon, 25 May 2020 17:14:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 May 2020 15:08:50 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1868116@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Invalid; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
- status=Fix Released; importance=Critical;
- assignee=ubuntu-desktop@lists.ubuntu.com; 
-X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
- server-next
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail furretuber janitor paelzer
- seb128
-X-Launchpad-Bug-Reporter: FurretUber (furretuber)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159041933168.20452.14103247642288551676.launchpad@soybean.canonical.com>
-Subject: [Bug 1868116] Re: QEMU monitor no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a97569e038adcea7431e7e7c77ca5d4c50626f94
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 10:50:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200525145440.29728-3-cfontana@suse.de>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:55:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,129 +138,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Roman Bolshakov <r.bolshakov@yadro.com>, haxm-team@intel.com,
+ Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu (Ubuntu)
-       Status: Triaged =3D> Invalid
+On 5/25/20 4:54 PM, Claudio Fontana wrote:
+> move the vcpu throttling functionality into its own module.
+> 
+> This functionality is not specific to any accelerator,
+> and it is used currently by migration to slow down guests to try to
+> have migrations converge, and by the cocoa MacOS UI to throttle speed.
+> 
+> cpu-throttle contains the controls to adjust and inspect throttle
+> settings, start (set) and stop vcpu throttling, and the throttling
+> function itself that is run periodically on vcpus to make them take a nap.
+> 
+> Execution of the throttling function on all vcpus is triggered by a timer,
+> registered at module initialization.
+> 
+> No functionality change.
+> 
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  MAINTAINERS                   |   3 +-
+>  include/hw/core/cpu.h         |  37 -------------
+>  include/qemu/main-loop.h      |   5 ++
+>  include/sysemu/cpu-throttle.h |  50 +++++++++++++++++
+>  migration/migration.c         |   1 +
+>  migration/ram.c               |   1 +
+>  softmmu/Makefile.objs         |   1 +
+>  softmmu/cpu-throttle.c        | 122 ++++++++++++++++++++++++++++++++++++++++++
+>  softmmu/cpus.c                |  95 +++-----------------------------
+>  9 files changed, 190 insertions(+), 125 deletions(-)
+>  create mode 100644 include/sysemu/cpu-throttle.h
+>  create mode 100644 softmmu/cpu-throttle.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0288ffbc50..708768f120 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2147,13 +2147,14 @@ F: ui/cocoa.m
+>  Main loop
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+> -F: softmmu/cpus.c
+>  F: include/qemu/main-loop.h
+>  F: include/sysemu/runstate.h
+>  F: util/main-loop.c
+>  F: util/qemu-timer.c
+>  F: softmmu/vl.c
+>  F: softmmu/main.c
+> +F: softmmu/cpus.c
 
--- =
+This line belong the the previous patch (#1).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868116
+> +F: softmmu/cpu-throttle.c
+>  F: qapi/run-state.json
 
-Title:
-  QEMU monitor no longer works
+Can you reorder patches #1/#2 to avoid moving cpu-throttle code twice?
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Invalid
-Status in vte2.91 package in Ubuntu:
-  Fix Released
-Status in qemu package in Debian:
-  Fix Released
+Otherwise this patch looks good.
 
-Bug description:
-  Repro:
-  VTE
-  $ meson _build && ninja -C _build && ninja -C _build install
+[...]
 
-  qemu:
-  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
-r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
--enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
-sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
--disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
-opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
-irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
--pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
-vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
-sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
-le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
-e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
-utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
--disable-cap-ng
-  $ make
-
-  Test:
-  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
-uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
-le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
-rent/images/netboot/mini.iso
-  - switch to monitor with CTRL+ALT+2
-  - try to enter something
-
-  Affects head of both usptream git repos.
-
-  =
-
-  --- original bug ---
-
-  It was observed that the QEMU console (normally accessible using
-  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
-  problematic because there are cases where it's required to send
-  commands to the guest, or key combinations that the host would grab
-  (as Ctrl-Alt-F1 or Alt-F4).
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 20.04
-  Package: qemu 1:4.2-3ubuntu2
-  Uname: Linux 5.6.0-rc6+ x86_64
-  ApportVersion: 2.20.11-0ubuntu20
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Thu Mar 19 12:16:31 2020
-  Dependencies:
-
-  InstallationDate: Installed on 2017-06-13 (1009 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine:
-  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
-  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
-86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
-,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
-home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
-  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
--re]
-  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
-5]
-  MachineType: LENOVO 80UG
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
-4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
-rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
-ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
-enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
-7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
-scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
-_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
-  dmi.bios.date: 08/09/2018
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN45WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
