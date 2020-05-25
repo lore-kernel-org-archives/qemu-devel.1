@@ -2,80 +2,93 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 187D7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 06:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5E9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 06:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEB0B2075F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 06:02:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB0B2075F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4477B2078B
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 06:26:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xt41kFMJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4477B2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd6BU-0001gP-16
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 02:02:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56792)
+	id 1jd6ZE-0005Wa-Bq
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 02:26:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jd6Ab-0001EB-U8
- for qemu-devel@nongnu.org; Mon, 25 May 2020 02:01:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50902)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jd6AV-0004R6-S5
- for qemu-devel@nongnu.org; Mon, 25 May 2020 02:01:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jd6AT-0002H5-ID
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 06:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8571E2E8079
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 06:00:57 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jd6YJ-00050r-BL
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 02:25:35 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43537
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jd6YH-0008JN-Hi
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 02:25:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590387931;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4t5L2kiuQXodLstMq8/yHzwVtOdcs/IM8mwHrpAUS74=;
+ b=Xt41kFMJIf+GE663YHBA1bYWiU1vwjsOB1OOY6RLvr+GPLNfbqJwPzNcb4x9jSFZukXe/5
+ kTlkT8ifUde7OAAqyh/6kbtE4vbIp5DUUoXhq1GWouYGMcIvb7lCkSUZ1wc1K8aWLoW85D
+ MdTgfcrvG43kA+R0nBSIqbcfZkEM7MU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-IpiNKflCMwCdqjCwsSP8Dg-1; Mon, 25 May 2020 02:25:25 -0400
+X-MC-Unique: IpiNKflCMwCdqjCwsSP8Dg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC899872FE2;
+ Mon, 25 May 2020 06:25:24 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 666E38384C;
+ Mon, 25 May 2020 06:25:24 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E9A5A113864A; Mon, 25 May 2020 08:25:22 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 09/24] macio: Fix to realize "mos6522-cuda" and
+ "mos6522-pmu" devices
+References: <20200518050408.4579-1-armbru@redhat.com>
+ <20200518050408.4579-10-armbru@redhat.com>
+ <CAFEAcA_S_JsuPG4UN-_zhhdZppBhiwm3-4bocO7O1XdjxC9bAw@mail.gmail.com>
+Date: Mon, 25 May 2020 08:25:22 +0200
+In-Reply-To: <CAFEAcA_S_JsuPG4UN-_zhhdZppBhiwm3-4bocO7O1XdjxC9bAw@mail.gmail.com>
+ (Peter Maydell's message of "Thu, 21 May 2020 17:26:50 +0100")
+Message-ID: <87367oh6p9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 May 2020 05:55:55 -0000
-From: Dvornikov Mihail <1880507@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dvornikov
-X-Launchpad-Bug-Reporter: Dvornikov Mihail (dvornikov)
-X-Launchpad-Bug-Modifier: Dvornikov Mihail (dvornikov)
-Message-Id: <159038615546.7053.4830753292873479822.malonedeb@gac.canonical.com>
-Subject: [Bug 1880507] [NEW] VMM from Ubuntu 20.04 does not show the memory
- consumption
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d480bfe570622b570a4b317225d8400e0f7ed611
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 02:00:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 00:06:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,40 +97,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880507 <1880507@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-KVM host system: Ubuntu 18.04 and 20.04, guest machines: Windows and
-Ubuntu. Management through Ubuntu 20.04, vmm does not show RAM
-consumption for Windows guest systems (Win7, Win2008R2), for Ubuntu
-values are shown. The error is not observed in Ubuntu 18.04/vmm.
+> On Mon, 18 May 2020 at 06:12, Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> cuda_init() creates a "mos6522-cuda" device, but it's never realized.
+>> Affects machines mac99 with via=cuda (default) and g3beige.
+>>
+>> pmu_init() creates a "mos6522-pmu" device, but it's never realized.
+>> Affects machine mac99 with via=pmu and via=pmu-adb,
+>>
+>> I wonder how this ever worked.  If the "device becomes real only on
+>> realize" thing actually works, then we've always been missing these
+>> devices, yet nobody noticed.
+>
+> Same remark as elsewhere: the devices aren't missing, we just
+> got lucky that using them in a half-initialized state happens
+> to work for these devices. Could you update the commit messages
+> when you reroll this series, please?
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Of course.  What about something like this:
 
--- =
+    In theory, a device becomes real only on realize.  In practice, the
+    transition from unreal to real is a fuzzy one.  The work to make a
+    device real can be spread between realize methods (fine),
+    instance_init methods (wrong), and board code wiring up the device
+    (fine as long as it effectively happens on realize).  Depending on
+    what exactly is done where, a device can work even when we neglect
+    to realize it.  Nevertheless, it's a clear misuse of the interface.
+    Even when it works today (more or less by chance), it can break
+    tomorrow.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880507
+>> Fix by realizing them in cuda_realize() and pmu_realize(),
+>> respectively.
+>>
+>> Fixes: 6dca62a0000f95e0b7020aa00d0ca9b2c421f341
+>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/misc/macio/cuda.c | 8 +++-----
+>>  hw/misc/macio/pmu.c  | 8 +++-----
+>>  2 files changed, 6 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+>> index e0cc0aac5d..6d4d135f71 100644
+>> --- a/hw/misc/macio/cuda.c
+>> +++ b/hw/misc/macio/cuda.c
+>> @@ -523,15 +523,13 @@ static void cuda_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      CUDAState *s = CUDA(dev);
+>>      SysBusDevice *sbd;
+>> -    MOS6522State *ms;
+>> -    DeviceState *d;
+>>      struct tm tm;
+>>
+>> +    qdev_init_nofail(DEVICE(&s->mos6522_cuda));
+>
+> Since we init the device with sysbus_init_child_obj() and
+> we're in a position here to propagate any realize error
+> back up to our caller, it would be nicer to do this via
+> setting the realize property rather than qdev_init_nofail().
 
-Title:
-  VMM from Ubuntu 20.04 does not show the memory consumption
+The error handling will be unreachable.
 
-Status in QEMU:
-  New
+The proper way to say "error not possible" is of course &error_abort,
+not qdev_init_nofail()'s &error_fatal.
 
-Bug description:
-  KVM host system: Ubuntu 18.04 and 20.04, guest machines: Windows and
-  Ubuntu. Management through Ubuntu 20.04, vmm does not show RAM
-  consumption for Windows guest systems (Win7, Win2008R2), for Ubuntu
-  values are shown. The error is not observed in Ubuntu 18.04/vmm.
+Many realize methods misuse the Error interface this way.  NULL instead
+of &error_abort is also common.  Cleaning this up is yet another big
+task.  But that's no excuse for making it bigger now.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880507/+subscriptions
+Laurent, would you prefer unreachable error handling or &error_abort?
+
+> That's what this patch from March does:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg04260.html
+> (we seem to have let that series drop accidentally,
+> probably because it was halfway through release and
+> because it touches several architectures at once).
+
+Pity.
+
 
