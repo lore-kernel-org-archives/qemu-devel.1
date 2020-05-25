@@ -2,84 +2,127 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C04C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 04:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CBAC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 04:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE327204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 04:07:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7B7F2075F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 04:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDPY4nJi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE327204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nov3G95O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B7F2075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jd4Oe-0002Le-P8
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 00:07:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47748)
+	id 1jd4cI-0005Dv-SX
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 00:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jd4O8-0001qv-EI; Mon, 25 May 2020 00:06:56 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34707)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jd4O7-0002cP-Jw; Mon, 25 May 2020 00:06:56 -0400
-Received: by mail-il1-x143.google.com with SMTP id 4so16262845ilg.1;
- Sun, 24 May 2020 21:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nRsDtZy2YlYIMN21R4+B7daGTFftOIQce142+jcEmlQ=;
- b=KDPY4nJiAi2a4Tsc4HVBl1JOi0F38RGE3orcXG1UMXmg8R1noB255BWh2aR91h5Gbu
- l8EXWWkgaiWOofe/lP8fgyZ/DMvGdh8pFnQqKOI+iE+9PAX9m/rL/Eo6WvmRVW9wv0G0
- 0+RdYm6k7DZJf1iKk8GFeCEvt04urseJCEeyQZ6BiSVPIUz+6sIKiWp8O+Hnl70Wt2nr
- W271Vsb6t2fzoty8eZKCWQ6pwCoigUWBt2OstFcfowGGB5lSupLIJxv2OcULZJLMU3oN
- qVKvuBMdozGvdKVbpKad46JjABMVoV/RM0gWgc4UfL55SS7IFeN5VzKdoA4WQ5yUi5Nn
- UGHA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jd4bb-0004md-Oo
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 00:20:51 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49964
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jd4ba-0004on-A2
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 00:20:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590380448;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=C0lDCbx2O2j/tjV55sDnHX103bMl15EJ3Z8poC0dNA0=;
+ b=Nov3G95O3fa2mvM4Wn8ZODPN++YtfIU9dCJhywJe7fNS3wN53tsoO6Cnsgt6cJ7r1lKraz
+ lWCiY5YcLphGtW0e+RJDhv7dTjb1dE4IP7112+pRS4IMQ4dmFroJAkj6ymj4v9I8uDxNp7
+ p2WSn/k0HzNaeO6rYTMpmmRlgYRxTLs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-dvlbolVtP2yYwWVxraN9iQ-1; Mon, 25 May 2020 00:20:46 -0400
+X-MC-Unique: dvlbolVtP2yYwWVxraN9iQ-1
+Received: by mail-wm1-f72.google.com with SMTP id t62so6234705wmt.7
+ for <qemu-devel@nongnu.org>; Sun, 24 May 2020 21:20:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nRsDtZy2YlYIMN21R4+B7daGTFftOIQce142+jcEmlQ=;
- b=J9FYqGUXu7g0pfnszU6JBsW9/Rb8Kx4BeyaxL1hsDG0BGWr6uwc/lefiIb0mwkknl3
- odK+iBLGa5x/I9BPykYVSCk0LDD+nnEgsAQjD531RTd+1XI2vzv45qdFdTYnIN4PGyAn
- rGrR0lyFtW4htOAnJ9+hO7TCt3zQaPYPG5bxFG+XaEIuUgdNiUGwD/IW4zMXEkJGPpSp
- gWF6iDKY/ip/NXMufgdN+42edYm8lPx7+vnu5a9icfVUT8wm+XexCs89oiYx0TQ1CjoU
- EaGOIcMk9bvLPN/k2xoq6Wdhbi/CrR9i1pZ9WQr9mlzVlrFmdrouK+pkYBRdGX0Nl9Fy
- ESUA==
-X-Gm-Message-State: AOAM531DRiONaqOA5S6frf5Ga1kplGZnbqSB15PUPhdclEdzbS441uGU
- X3CPT3ho4BS8vTy6Xwrps74wmbPa78PnK+vQWDc=
-X-Google-Smtp-Source: ABdhPJy6VkTosKj8EQSKBJ3sSiZtXvVcw7ipcDE1DXTOIVFwbzxqnzXT6/RaqOTbT5P4DFhXjcY1aGjiJ/u64mi5QqU=
-X-Received: by 2002:a92:d188:: with SMTP id z8mr21610866ilz.60.1590379613944; 
- Sun, 24 May 2020 21:06:53 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=C0lDCbx2O2j/tjV55sDnHX103bMl15EJ3Z8poC0dNA0=;
+ b=Nbq0oKxc9FtKTWYsn5s5AkH6xA09QjxmiTXi+jf/N3VYgW6wYANZbBKMmkLRwIkwTH
+ cl4GN8pHMVjuJjuV5wkDDRZvMpy0KZqcn19J9bLJM2TngnfA40MTZ6ogjCdPZGiSJnIc
+ QQRJRzWLV/BKFrmBJgJ1gtVu05gl1Oi9kNFoqWg/hIW++a6Ecni3QYpN2zEavax3o7zR
+ Ni0Xd4YjaeIT4FYfTYHXst5A4kD4rbsmM1A0Caw5Mxl6Nxp09QJYm+6MfK9CSTGG/bIf
+ I868wrHk1BFesoOHsVWLRuzrZyVsi2TbwqRBl7BqL6fUpPCnt09jowYu5mMDZ0hFQKCL
+ IhFg==
+X-Gm-Message-State: AOAM533l1pxrwMM2Bs8ZvYnkWg2XeQLsFJoRJNByMycRrjHsyjl1HlFK
+ sAPLb2ygbm50nbIUl1Qifs4OhRkaomnwXoYOimjD3333OzxqzlGdi+h5EbhY3MTXaIsjX1v5XcE
+ Iuks+4IQIf7GlazI=
+X-Received: by 2002:adf:8287:: with SMTP id 7mr13412354wrc.396.1590380445662; 
+ Sun, 24 May 2020 21:20:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgJzS/yvLLIq5yr3NrxoWJnxa6z71LuE4YR0DPjCZRi80ncuHbKUFvnhFlaYEFTABAwLWYUA==
+X-Received: by 2002:adf:8287:: with SMTP id 7mr13412335wrc.396.1590380445469; 
+ Sun, 24 May 2020 21:20:45 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id l5sm9004551wml.27.2020.05.24.21.20.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 24 May 2020 21:20:44 -0700 (PDT)
+Subject: Re: [PATCH] configure: Do not ignore malloc value
+To: Leonid Bloch <lb.workbox@gmail.com>, qemu-devel@nongnu.org
+References: <20200524221204.9791-1-lb.workbox@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <a03a3bf6-4761-1d1a-2812-13701980680e@redhat.com>
+Date: Mon, 25 May 2020 06:20:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200522171726.648279-1-stefanha@redhat.com>
- <20200522171726.648279-4-stefanha@redhat.com>
-In-Reply-To: <20200522171726.648279-4-stefanha@redhat.com>
-From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Mon, 25 May 2020 00:06:43 -0400
-Message-ID: <CAFubqFtNAJTAV4XRvNRJQEFMMxk0maX=2iOohe_T5hjWHy=gwQ@mail.gmail.com>
-Subject: Re: [PATCH 3/5] vhost-user-blk: add VIRTIO_F_RING_PACKED feature bit
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-il1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200524221204.9791-1-lb.workbox@gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 00:06:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,49 +135,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- jasowang@redhat.com, cohuck@redhat.com, QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 22, 2020 at 1:20 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> Vhost devices have a list of feature bits that the device backend is
-> allowed to control. The VIRTIO_F_RING_PACKED feature is a feature that
-> must be negotiated through all the way to the device backend. Add it so
-> the device backend can declare whether or not it supports the packed
-> ring layout.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 5/25/20 12:12 AM, Leonid Bloch wrote:
+> From: Leonid Bloch <lbloch@janustech.com>
+> 
+> Not checking the value of malloc will cause a warning with GCC 10.1,
+> which may result in configuration failure, with the following line in
+> config.log:
+> 
+> config-temp/qemu-conf.c:2:18: error: ignoring return value of ‘malloc’ declared with attribute ‘warn_unused_result’ [-Werror=unused-result]
+>     2 | int main(void) { malloc(1); return 0; }
+>       |                  ^~~~~~~~~
 
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Do we want to add -Wno-unused-result to compile_prog()?
 
+> 
+> Signed-off-by: Leonid Bloch <lb.workbox@gmail.com>
 > ---
->  hw/block/vhost-user-blk.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 9d8c0b3909..10e114a19a 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -44,6 +44,7 @@ static const int user_feature_bits[] = {
->      VIRTIO_BLK_F_DISCARD,
->      VIRTIO_BLK_F_WRITE_ZEROES,
->      VIRTIO_F_VERSION_1,
-> +    VIRTIO_F_RING_PACKED,
->      VIRTIO_RING_F_INDIRECT_DESC,
->      VIRTIO_RING_F_EVENT_IDX,
->      VIRTIO_F_NOTIFY_ON_EMPTY,
-> --
-> 2.25.3
->
+>  configure | 20 +++++++++++++++++---
+>  1 file changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 2fc05c4465..d0220b2944 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4567,7 +4567,13 @@ fi
+>  if test "$tcmalloc" = "yes" ; then
+>    cat > $TMPC << EOF
+>  #include <stdlib.h>
+> -int main(void) { malloc(1); return 0; }
+> +int main(void) {
+> +    void *tmp = malloc(1);
+> +    if (tmp != NULL) {
+> +        return 0;
+> +    }
+> +    return 1;
+> +}
+>  EOF
+>  
+>    if compile_prog "" "-ltcmalloc" ; then
+> @@ -4583,7 +4589,13 @@ fi
+>  if test "$jemalloc" = "yes" ; then
+>    cat > $TMPC << EOF
+>  #include <stdlib.h>
+> -int main(void) { malloc(1); return 0; }
+> +int main(void) {
+> +    void *tmp = malloc(1);
+> +    if (tmp != NULL) {
+> +        return 0;
+> +    }
+> +    return 1;
+> +}
+>  EOF
+>  
+>    if compile_prog "" "-ljemalloc" ; then
+> @@ -6144,7 +6156,9 @@ if test "$sanitizers" = "yes" ; then
+>  #include <stdlib.h>
+>  int main(void) {
+>      void *tmp = malloc(10);
+> -    return *(int *)(tmp + 2);
+> +    if (tmp != NULL) {
+> +        return *(int *)(tmp + 2);
+> +    }
+>  }
+>  EOF
+>    if compile_prog "$CPU_CFLAGS -Werror -fsanitize=undefined" ""; then
+> 
+
 
