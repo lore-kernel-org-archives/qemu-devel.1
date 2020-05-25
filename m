@@ -2,81 +2,60 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C77C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAD9C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E502420888
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:53:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E502420888
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F350820888
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 14:56:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F350820888
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdETQ-0001Tz-4t
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 10:53:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51808)
+	id 1jdEWv-0004bE-Vj
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 10:56:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdER4-0007wn-RS
- for qemu-devel@nongnu.org; Mon, 25 May 2020 10:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51442)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdER3-0003ba-4k
- for qemu-devel@nongnu.org; Mon, 25 May 2020 10:50:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jdER0-0003K9-7v
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 14:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2962C2E8078
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 14:50:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 May 2020 14:36:48 -0000
-From: Laurent Vivier <1880518@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier rajaskakodkar
-X-Launchpad-Bug-Reporter: Rajas Kakodkar (rajaskakodkar)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159039304634.8018.14704731502559290875.malonedeb@gac.canonical.com>
-Message-Id: <159041740888.20020.13427360368180447889.malone@soybean.canonical.com>
-Subject: [Bug 1880518] Re: issue while installing docker inside s390x container
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e9815586d718354be7edc6f40ce77c9fca2f40ee
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 10:50:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jdEV7-0002v0-0n
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 10:54:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46304)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jdEV5-000438-OO
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 10:54:48 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id B2786AC85;
+ Mon, 25 May 2020 14:54:46 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [RFC v3 0/4] QEMU cpus.c refactoring
+Date: Mon, 25 May 2020 16:54:36 +0200
+Message-Id: <20200525145440.29728-1-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 01:03:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,55 +64,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880518 <1880518@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Roman Bolshakov <r.bolshakov@yadro.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Without a more detailled error message we can'know what happens.
+Motivation and higher level steps:
 
-What I see is you don't have the 'OC' flags that should help to execute
-binaries with (s) bit.
+https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
 
-You should also report the version of qemu.
+--------
 
-** Tags added: linux-user
+v2 -> v3:
 
--- =
+* turned into a 4 patch series, adding a first patch moving
+  softmmu code currently in top_srcdir to softmmu/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880518
+* cpu-throttle: moved to softmmu/
 
-Title:
-  issue while installing docker inside s390x container
+* cpu-timers, icount:
 
-Status in QEMU:
-  New
+  - moved to softmmu/
 
-Bug description:
-  This is in reference to https://github.com/multiarch/qemu-user-static/iss=
-ues/108.
-  I am facing issue while installing docker inside s390x container under qe=
-mu on Ubuntu 18.04 host running on amd64.
-  Following are the contents of /proc/sys/fs/binfmt_misc/qemu-s390x on Inte=
-l host after running =
+  - fixed assumption of qtest_enabled() => icount_enabled()
+  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
 
-  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  enabled
-  interpreter /usr/bin/qemu-s390x-static
-  flags: F
-  offset 0
-  magic 7f454c4602020100000000000000000000020016
-  mask ffffffffffffff00fffffffffffffffffffeffff
-  I could get docker service up with the following trick. =
+  Fix is in hw/core/ptimer.c,
 
-  printf '{"iptables": false,"ip-masq": false,"bridge": "none" }' > /etc/do=
-cker/daemon.json
-  But even though docker service comes up, images are not getting pulled, d=
-ocker pull fails with the following error.
-  failed to register layer: Error processing tar file(exit status 1):
+  where the artificial timeout rate limit should not be applied
+  under qtest_enabled(), in a similar way to how it is not applied
+  for icount_enabled().
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880518/+subscriptions
+* CpuAccelInterface: no change.
+
+
+--------
+
+
+v1 -> v2:
+
+* 1/3 (cpu-throttle): provide a description in the commit message
+
+* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
+  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
+
+  To do this, qtest had to be detached from icount. To this end, a
+  trivial global counter for qtest has been introduced.
+
+* 3/3 (CpuAccelInterface): provided a description.
+
+This is point 8) in that plan. The idea is to extract the unrelated parts
+in cpus, and register interfaces from each single accelerator to the main
+cpus module (cpus.c).
+
+While doing this RFC, I noticed some assumptions about Windows being
+either TCG or HAX (not considering WHPX) that might need to be revisited.
+I added a comment there.
+
+The thing builds successfully based on Linux cross-compilations for
+windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
+
+Tests run successully for tcg and kvm configurations, but did not test on
+windows or darwin.
+
+Welcome your feedback and help on this,
+
+Claudio
+
+*** BLURB HERE ***
+
+Claudio Fontana (4):
+  softmmu: move softmmu only files from root
+  cpu-throttle: new module, extracted from cpus.c
+  cpu-timers, icount: new modules
+  cpus: extract out accel-specific code to each accel
+
+ MAINTAINERS                                  |   14 +-
+ Makefile.target                              |    7 +-
+ accel/kvm/Makefile.objs                      |    2 +
+ accel/kvm/kvm-all.c                          |   15 +-
+ accel/kvm/kvm-cpus-interface.c               |   94 ++
+ accel/kvm/kvm-cpus-interface.h               |    8 +
+ accel/qtest.c                                |   88 +-
+ accel/stubs/kvm-stub.c                       |    3 +-
+ accel/tcg/Makefile.objs                      |    1 +
+ accel/tcg/cpu-exec.c                         |   43 +-
+ accel/tcg/tcg-all.c                          |   19 +-
+ accel/tcg/tcg-cpus-interface.c               |  523 ++++++
+ accel/tcg/tcg-cpus-interface.h               |    8 +
+ accel/tcg/translate-all.c                    |    3 +-
+ cpus.c                                       | 2290 --------------------------
+ docs/replay.txt                              |    6 +-
+ exec.c                                       |    4 -
+ hw/core/cpu.c                                |    1 +
+ hw/core/ptimer.c                             |    6 +-
+ hw/i386/x86.c                                |    1 +
+ include/exec/cpu-all.h                       |    4 +
+ include/exec/exec-all.h                      |    4 +-
+ include/hw/core/cpu.h                        |   37 -
+ include/qemu/main-loop.h                     |    5 +
+ include/qemu/timer.h                         |   22 +-
+ include/sysemu/cpu-throttle.h                |   50 +
+ include/sysemu/cpu-timers.h                  |   72 +
+ include/sysemu/cpus.h                        |   44 +-
+ include/sysemu/hvf.h                         |    1 -
+ include/sysemu/hw_accel.h                    |   57 +-
+ include/sysemu/kvm.h                         |    2 +-
+ include/sysemu/qtest.h                       |    2 +
+ include/sysemu/replay.h                      |    4 +-
+ migration/migration.c                        |    1 +
+ migration/ram.c                              |    1 +
+ replay/replay.c                              |    6 +-
+ softmmu/Makefile.objs                        |   13 +
+ arch_init.c => softmmu/arch_init.c           |    0
+ balloon.c => softmmu/balloon.c               |    0
+ softmmu/cpu-throttle.c                       |  122 ++
+ softmmu/cpu-timers.c                         |  267 +++
+ softmmu/cpus.c                               |  741 +++++++++
+ softmmu/icount.c                             |  496 ++++++
+ ioport.c => softmmu/ioport.c                 |    0
+ memory.c => softmmu/memory.c                 |    0
+ memory_mapping.c => softmmu/memory_mapping.c |    0
+ qtest.c => softmmu/qtest.c                   |   34 +-
+ softmmu/timers-state.h                       |   45 +
+ softmmu/vl.c                                 |    8 +-
+ stubs/Makefile.objs                          |    4 +-
+ stubs/clock-warp.c                           |    4 +-
+ stubs/cpu-get-clock.c                        |    3 +-
+ stubs/cpu-get-icount.c                       |   21 -
+ stubs/cpu-synchronize-state.c                |   15 +
+ stubs/icount.c                               |   22 +
+ stubs/qemu-timer-notify-cb.c                 |    8 +
+ stubs/qtest.c                                |    5 +
+ target/alpha/translate.c                     |    3 +-
+ target/arm/helper.c                          |    7 +-
+ target/i386/Makefile.objs                    |    7 +-
+ target/i386/hax-all.c                        |    6 +-
+ target/i386/hax-cpus-interface.c             |   85 +
+ target/i386/hax-cpus-interface.h             |    8 +
+ target/i386/hax-i386.h                       |    2 +
+ target/i386/hax-posix.c                      |   12 +
+ target/i386/hax-windows.c                    |   20 +
+ target/i386/hvf/Makefile.objs                |    2 +-
+ target/i386/hvf/hvf-cpus-interface.c         |   92 ++
+ target/i386/hvf/hvf-cpus-interface.h         |    8 +
+ target/i386/hvf/hvf.c                        |    5 +-
+ target/i386/whpx-all.c                       |    3 +
+ target/i386/whpx-cpus-interface.c            |   96 ++
+ target/i386/whpx-cpus-interface.h            |    8 +
+ target/riscv/csr.c                           |    8 +-
+ tests/ptimer-test-stubs.c                    |    7 +-
+ tests/test-timed-average.c                   |    2 +-
+ util/main-loop.c                             |    4 +-
+ util/qemu-timer.c                            |   12 +-
+ 78 files changed, 3136 insertions(+), 2517 deletions(-)
+ create mode 100644 accel/kvm/kvm-cpus-interface.c
+ create mode 100644 accel/kvm/kvm-cpus-interface.h
+ create mode 100644 accel/tcg/tcg-cpus-interface.c
+ create mode 100644 accel/tcg/tcg-cpus-interface.h
+ delete mode 100644 cpus.c
+ create mode 100644 include/sysemu/cpu-throttle.h
+ create mode 100644 include/sysemu/cpu-timers.h
+ rename arch_init.c => softmmu/arch_init.c (100%)
+ rename balloon.c => softmmu/balloon.c (100%)
+ create mode 100644 softmmu/cpu-throttle.c
+ create mode 100644 softmmu/cpu-timers.c
+ create mode 100644 softmmu/cpus.c
+ create mode 100644 softmmu/icount.c
+ rename ioport.c => softmmu/ioport.c (100%)
+ rename memory.c => softmmu/memory.c (100%)
+ rename memory_mapping.c => softmmu/memory_mapping.c (100%)
+ rename qtest.c => softmmu/qtest.c (95%)
+ create mode 100644 softmmu/timers-state.h
+ delete mode 100644 stubs/cpu-get-icount.c
+ create mode 100644 stubs/cpu-synchronize-state.c
+ create mode 100644 stubs/icount.c
+ create mode 100644 stubs/qemu-timer-notify-cb.c
+ create mode 100644 target/i386/hax-cpus-interface.c
+ create mode 100644 target/i386/hax-cpus-interface.h
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.c
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.h
+ create mode 100644 target/i386/whpx-cpus-interface.c
+ create mode 100644 target/i386/whpx-cpus-interface.h
+
+-- 
+2.16.4
+
 
