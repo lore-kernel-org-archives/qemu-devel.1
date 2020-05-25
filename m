@@ -2,84 +2,85 @@ Return-Path: <SRS0=XKWp=7H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A646C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 21:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A69C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 22:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E234A206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 21:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E60CA2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 22:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TQfTO9BY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E234A206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgZpt+Ut"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E60CA2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdKDN-0001KA-39
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 17:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33444)
+	id 1jdLLP-0008OR-4O
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 18:13:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jdKCf-0000nL-Bv
- for qemu-devel@nongnu.org; Mon, 25 May 2020 17:00:09 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45950)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jdLKj-0007l9-O2; Mon, 25 May 2020 18:12:33 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41392)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jdKCe-0003Tg-DR
- for qemu-devel@nongnu.org; Mon, 25 May 2020 17:00:08 -0400
-Received: by mail-ot1-x344.google.com with SMTP id c3so14636126otr.12
- for <qemu-devel@nongnu.org>; Mon, 25 May 2020 14:00:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jdLKi-0007iE-WA; Mon, 25 May 2020 18:12:33 -0400
+Received: by mail-io1-xd42.google.com with SMTP id o5so19956037iow.8;
+ Mon, 25 May 2020 15:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=Ph9LPORolCYrOZxQY9hTIW2ywccxlczXkbzUZWeTvV8=;
- b=TQfTO9BY1trsXNKR9NiFixkdzSkdInQyiyUXuGHYh4iTU1g+jmdqQmydQVWeD/N2L0
- hCvZOT5cDKz6psny2W4aNZKerglGPQkjsa72Osy6VaEqyvgdJ3Y3fQsDBJBKawBEK6oe
- cx4kBFa+ATWhRCfVr/naIynPAAC7UCxoAfRXy8bA4KYN2N9GxqFk1KTLTwpAQZGMoNI9
- wfKI4/46TB2shoMq9EFbnIzQ68n1tTy7R8dQ9xY3UD/DvJAf0z3LMigGvHuyMUMldbAd
- N75pItIO0v6wMlsIbTcpp1No0OMoNJslyrUm13A4qSF2/ZgaqLHsGTKsj8k6hcU4ILuE
- Ku1w==
+ bh=0ybd/vTKoMnsphUJs3gJenYD5RIMfyIS7Gf777XZfUE=;
+ b=XgZpt+Ut03IhuPnpXy2q5o1yt/ITg4lGHEhioOtOe4vL/AavNK2CcZqv4wnU0v8dxJ
+ reuXOUOxn1WkqKLyWKebe/wgZzLEaAkDrk/AKCVS5grnSi0l2hZzFw67+UQmDEdWd4Qa
+ W5nNEBgC5XyHu7AO4cD8QjLBc8C4kEddSMx5GNQQWcPk1T6zxjYOe0yc9+mn1gEX3gev
+ s1GMcYZKco1eYcSYAhbZrm4+vh2amPYvGRc9hLl7lZNNm91NM00huAhe/71hnPbHFPdq
+ XGfrktQ+UqtuyDprPNA+6SgEGn+r4NKLnbyW2UQlQA5MpIi0MnJxRC+QoSJ3HutPJ5F/
+ bZ+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ph9LPORolCYrOZxQY9hTIW2ywccxlczXkbzUZWeTvV8=;
- b=GCyk+w1obBib/ttCUEvG/m3zX00iGzM1yrn+02IQiIK+fM/VJ+UNDm7UHeGU64LsLu
- Lx6HPRzo/JMPdgMI4w728DCmoj1JcIgFw5JlOK2X2d1iIhHAAKPSKt1vEWKMaYHBpDa1
- 7q3ItMrcQ6a4groncNiBktYSFfM6KKIReROOm6+EdLKUGJN4KZKc/qT9xU/QX4p/LoWK
- ekm8E8GkoGDWd3tCke9xH158uNJaACaM/18tQRrB2QrQg6u8WUHO4S061L/bzFKEkqpL
- vRUL6doAxCsft6zmBoDRR2dLjniJjOjGE0KD8kAzdNH2eCY/wBRxvlUzUer/OjYVqDD0
- IOxA==
-X-Gm-Message-State: AOAM530KdDONhtlWlhjUyh6Uj+M2ABrWJwKo6em8KNZtenErEkd5HtGO
- IdLV4XHta0BNsHuap+Y9A6nPyhBxKfnpZmKXT/Pphw==
-X-Google-Smtp-Source: ABdhPJzm3ZaYX0lqQYvddNEgmf4rsbZDr1uCQrgEJ1AEuurwof67S0rpRALrG2lp3THXA3V+bpqJUqd8uyH+t8gajWA=
-X-Received: by 2002:a9d:b82:: with SMTP id 2mr21116041oth.221.1590440406740;
- Mon, 25 May 2020 14:00:06 -0700 (PDT)
+ bh=0ybd/vTKoMnsphUJs3gJenYD5RIMfyIS7Gf777XZfUE=;
+ b=D0wZn52Ea/6Fzz4xzC68F9sNNZdGuNBNry1AmKF9ZiI9eAQZ+NGQZPuYbSMwILjNuO
+ F4+0W3NYyGXhCviNv91YckbO3j+tIu1fTzHdui7e3vesTObIF7wuOEkBLVgWdyLzOhtq
+ Q6cIfklTVr8Lsj+62sfqjNjdZgfMptcJgljxFEhkPOZVSlsOB7dwOXehB9GLI3cZDiHC
+ 8V4asO4CWP0wGCcjtxnDY/h1cRlKz+I1m0BmSmWzTGNYK15wNRuLPyxtLIQCJRB6uK0R
+ Yp8tvUzNZhBzL0wu00YaFHs5z9hWBWV6jc5hFRtGaHXTkulQFDdeCXXIHGvg28NaC4An
+ fyAg==
+X-Gm-Message-State: AOAM530sezWmy4peDas80X0c5/CHRIYr04znz42GiIvnitFLa5IQdZH2
+ 8HCtIx5hGHHkviIOT8DdG8P2ACPSE7gZf2duHpY=
+X-Google-Smtp-Source: ABdhPJyfOoOoORgxo3vJUXu1jtlg2M7R5UPpvOJur6GZb8B8/Meu8nEikBNeNHQwlbFGDalDpD1kpyDoXcXh4OaZoKY=
+X-Received: by 2002:a02:7009:: with SMTP id f9mr15768023jac.8.1590444750530;
+ Mon, 25 May 2020 15:12:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200525155826.11333-1-philmd@redhat.com>
-In-Reply-To: <20200525155826.11333-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 May 2020 21:59:55 +0100
-Message-ID: <CAFEAcA8UGjx5S+zVHX_Oon-ELaCRuLpXEDrjs0VoAwqJ7uPn3g@mail.gmail.com>
-Subject: Re: [PATCH] hw/block/pflash_cfi01: Limit maximum flash size to 256 MiB
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+References: <20200525111001.8147-1-f4bug@amsat.org>
+In-Reply-To: <20200525111001.8147-1-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 25 May 2020 15:12:03 -0700
+Message-ID: <CAKmqyKP+7p2Kmti_Ds68ja=gLgY96tKjMhN8ACgDfaFv+XROgA@mail.gmail.com>
+Subject: Re: [PATCH v2] hw/adc/stm32f2xx_adc: Correct memory region size and
+ access size
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -94,41 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Hongbo Zhang <hongbo.zhang@linaro.org>,
- Tanmay Jagdale <tanmay.jagdale@linaro.org>, Qemu-block <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Radoslaw Biernacki <radoslaw.biernacki@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Leif Lindholm <leif@nuviainc.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 25 May 2020 at 16:58, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Mon, May 25, 2020 at 4:10 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 >
-> As of this commit, the biggest CFI01 NOR flash documented is
-> the Micron PC28F00BP33EF. Its size is 2 GiB (256 MiB).
+> The ADC region size is 256B, split as:
+>  - [0x00 - 0x4f] defined
+>  - [0x50 - 0xff] reserved
 >
-> Actually this "2Gb device employs a virtual chip enable feature,
-> which combines two 1Gb die with a common chip enable".
+> All registers are 32-bit (thus when the datasheet mentions the
+> last defined register is 0x4c, it means its address range is
+> 0x4c .. 0x4f.
 >
-> Since we do not want to model unrealistic hardware, cap the
-> current model to this maximum. At least we have a datasheet
-> to refer.
+> This model implementation is also 32-bit. Set MemoryRegionOps
+> 'impl' fields.
 >
-> If a bigger flash is provided, the user get this warning:
+> See:
+>   'RM0033 Reference manual Rev 8', Table 10.13.18 "ADC register map".
 >
->   qemu-system-aarch64: Initialization of device cfi.pflash01 failed: Maxi=
-mum supported CFI flash size is 16 MiB.
->
-> Note, the sbsa-ref ARM machine introduced in commit 64580903c2b
-> already uses a pair of 256 MiB flash devices.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-What problem is this check solving? Is there some implementation
-imposed limitation or a limit within the flash header format
-that means larger sizes don't work? If so, what's the restriction?
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-thanks
--- PMM
+Alistair
+
+> ---
+> v2: Commit staged changes... (MemoryRegionOps::impl)
+> ---
+>  hw/adc/stm32f2xx_adc.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/adc/stm32f2xx_adc.c b/hw/adc/stm32f2xx_adc.c
+> index 4f9d485ecf..01a0b14e69 100644
+> --- a/hw/adc/stm32f2xx_adc.c
+> +++ b/hw/adc/stm32f2xx_adc.c
+> @@ -246,6 +246,8 @@ static const MemoryRegionOps stm32f2xx_adc_ops =3D {
+>      .read =3D stm32f2xx_adc_read,
+>      .write =3D stm32f2xx_adc_write,
+>      .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .impl.min_access_size =3D 4,
+> +    .impl.max_access_size =3D 4,
+>  };
+>
+>  static const VMStateDescription vmstate_stm32f2xx_adc =3D {
+> @@ -278,7 +280,7 @@ static void stm32f2xx_adc_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+>
+>      memory_region_init_io(&s->mmio, obj, &stm32f2xx_adc_ops, s,
+> -                          TYPE_STM32F2XX_ADC, 0xFF);
+> +                          TYPE_STM32F2XX_ADC, 0x100);
+>      sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+>  }
+>
+> --
+> 2.21.3
+>
+>
 
