@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD498C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 16:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A767DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 16:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A097D2070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 16:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F8502070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 May 2020 16:45:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOUYYzRg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A097D2070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JosIrdcD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8502070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdGCD-0004oO-ID
-	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 12:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35716)
+	id 1jdGEW-0006Sv-Lk
+	for qemu-devel@archiver.kernel.org; Mon, 25 May 2020 12:45:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jdGAt-0003rk-Dc
- for qemu-devel@nongnu.org; Mon, 25 May 2020 12:42:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53512
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jdGDT-0005lH-Lv
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 12:44:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42707
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jdGAs-00011e-IN
- for qemu-devel@nongnu.org; Mon, 25 May 2020 12:42:03 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jdGDR-0001VJ-U7
+ for qemu-devel@nongnu.org; Mon, 25 May 2020 12:44:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590424921;
+ s=mimecast20190719; t=1590425080;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=heJEOUcJzXhi1J8ZU28yazzfD/jbNYRkqQ0AKy4C6/8=;
- b=hOUYYzRgQAkPLx/qNddT8Dh1zFB3M1UOx9LcvwkfXsUjXXj8ELurn6uKlAqpv+dNql6Rrw
- 6EV4l333uXpZpWfA9obdx7xc36qbGLTOmo3CWzsyq4/D13bagvYcTJeurZqTHgCBckirxE
- JDwphe/UrJpzFrGCm1yHvdsZCv2Zp8w=
+ bh=Gf3r9sqNSSn4m3BfQM2aytPpmei85VMCCiWrZAZUNPA=;
+ b=JosIrdcDR9PdYDNSuhdUOeSB+nhAcFb9Kp18G8w58c5SMQCKHs/+32jCclDuZB1BCqIzZF
+ UDWG4NXOw/FJnCtcCJSje/oDM11Ai9EiJlKnWBbWNxaGA6L8096A+yCYHiXp+y6N/4GHMz
+ Rnjf/4M2kDKB9h1DL75+KimVZBCMhL8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-Svkxf6D4OG69YTRSEVNdHA-1; Mon, 25 May 2020 12:41:58 -0400
-X-MC-Unique: Svkxf6D4OG69YTRSEVNdHA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-228-mGYFXRtsMlmM_ZNaSHYefQ-1; Mon, 25 May 2020 12:44:38 -0400
+X-MC-Unique: mGYFXRtsMlmM_ZNaSHYefQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 987EA100726A;
- Mon, 25 May 2020 16:41:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-91.ams2.redhat.com [10.36.114.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 565FF60BE1;
- Mon, 25 May 2020 16:41:51 +0000 (UTC)
-Date: Mon, 25 May 2020 18:41:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Reiter <s.reiter@proxmox.com>
-Subject: Re: [RFC PATCH 2/3] block: Allow bdrv_run_co() from different
- AioContext
-Message-ID: <20200525164150.GD19863@linux.fritz.box>
-References: <20200512144318.181049-1-kwolf@redhat.com>
- <20200512144318.181049-3-kwolf@redhat.com>
- <2ab7bae7-03c3-f269-1db1-202aeb41bdf3@proxmox.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4F9B18B6424;
+ Mon, 25 May 2020 16:44:37 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A4BA96EDA4;
+ Mon, 25 May 2020 16:44:22 +0000 (UTC)
+Date: Mon, 25 May 2020 18:44:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH 2/3] microvm: drop max-ram-below-4g support
+Message-ID: <20200525184418.1c91e340@redhat.com>
+In-Reply-To: <20200525134101.24740-3-kraxel@redhat.com>
+References: <20200525134101.24740-1-kraxel@redhat.com>
+ <20200525134101.24740-3-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2ab7bae7-03c3-f269-1db1-202aeb41bdf3@proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 06:55:03
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/25 01:44:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -93,70 +94,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, mreitz@redhat.com, t.lamprecht@proxmox.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 25.05.2020 um 16:18 hat Stefan Reiter geschrieben:
-> On 5/12/20 4:43 PM, Kevin Wolf wrote:
-> > Coroutine functions that are entered through bdrv_run_co() are already
-> > safe to call from synchronous code in a different AioContext because
-> > bdrv_coroutine_enter() will schedule them in the context of the node.
-> > 
-> > However, the coroutine fastpath still requires that we're already in the
-> > right AioContext when called in coroutine context.
-> > 
-> > In order to make the behaviour more consistent and to make life a bit
-> > easier for callers, let's check the AioContext and automatically move
-> > the current coroutine around if we're not in the right context yet.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/io.c | 15 ++++++++++++++-
-> >   1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/io.c b/block/io.c
-> > index c1badaadc9..7808e8bdc0 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -895,8 +895,21 @@ static int bdrv_run_co(BlockDriverState *bs, CoroutineEntry *entry,
-> >                          void *opaque, int *ret)
-> >   {
-> >       if (qemu_in_coroutine()) {
-> > -        /* Fast-path if already in coroutine context */
-> > +        Coroutine *self = qemu_coroutine_self();
-> > +        AioContext *bs_ctx = bdrv_get_aio_context(bs);
-> > +        AioContext *co_ctx = qemu_coroutine_get_aio_context(self);
-> > +
-> > +        if (bs_ctx != co_ctx) {
-> > +            /* Move to the iothread of the node */
-> > +            aio_co_schedule(bs_ctx, self);
-> > +            qemu_coroutine_yield();
+On Mon, 25 May 2020 15:41:00 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> Not useful for microvm and allows users to shot themself
+s/shot/shoot/
+
+> into the foot (make ram + mmio overlap).
+also see my toher reply to previous version, parhaps we can drop some more logic here
+
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/i386/microvm.c | 19 -------------------
+>  1 file changed, 19 deletions(-)
 > 
-> I'm pretty sure this can lead to a race: When the thread we're re-scheduling
-> to is faster to schedule us than we can reach qemu_coroutine_yield, then
-> we'll get an abort ("Co-routine re-entered recursively"), since co->caller
-> is still set.
-> 
-> I've seen this happen in our code when I try to do the scheduling fandangle
-> there.
-
-Ah, crap. I guess letting a coroutine re-schedule itself is only safe
-within the same thread then.
-
-> Is there a safer way to have a coroutine reschedule itself? Some lock
-> missing?
-
-There is no problem that can't be solved by adding another level of
-indirection... We would have to schedule a BH in the original thread
-that will only schedule the coroutine in its new thread after it has
-yielded.
-
-Maybe we should actually introduce a helper function that moves the
-current coroutine to a different AioContext this way.
-
-Kevin
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index 44c08f8a5ab0..4b6ec2bbe331 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -173,25 +173,6 @@ static void microvm_memory_init(MicrovmMachineState *mms)
+>      ram_addr_t lowmem = 0x80000000; /* 2G */
+>      int i;
+>  
+> -    /*
+> -     * Handle the machine opt max-ram-below-4g.  It is basically doing
+> -     * min(qemu limit, user limit).
+> -     */
+> -    if (!x86ms->max_ram_below_4g) {
+> -        x86ms->max_ram_below_4g = 4 * GiB;
+> -    }
+> -    if (lowmem > x86ms->max_ram_below_4g) {
+> -        lowmem = x86ms->max_ram_below_4g;
+> -        if (machine->ram_size - lowmem > lowmem &&
+> -            lowmem & (1 * GiB - 1)) {
+> -            warn_report("There is possibly poor performance as the ram size "
+> -                        " (0x%" PRIx64 ") is more then twice the size of"
+> -                        " max-ram-below-4g (%"PRIu64") and"
+> -                        " max-ram-below-4g is not a multiple of 1G.",
+> -                        (uint64_t)machine->ram_size, x86ms->max_ram_below_4g);
+> -        }
+> -    }
+> -
+>      if (machine->ram_size > lowmem) {
+>          x86ms->above_4g_mem_size = machine->ram_size - lowmem;
+>          x86ms->below_4g_mem_size = lowmem;
 
 
