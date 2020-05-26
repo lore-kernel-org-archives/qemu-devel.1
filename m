@@ -4,80 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92116C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1209AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59B1D206F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFE072075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:58:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYVXXdz1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B1D206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKKyAgIU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFE072075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdbwZ-0006PT-Ji
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:56:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51276)
+	id 1jdbyR-0007sF-1O
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:58:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbvu-0005t4-83
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:56:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55186
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbxL-0007IR-3k
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:57:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52524
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbvs-0003Ti-HO
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:56:01 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbxJ-0003Zn-4s
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:57:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590508558;
+ s=mimecast20190719; t=1590508648;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ExvP0V1+INEAGK5lSUT/2b1atNKdbvLM0DMkBuSlWm4=;
- b=JYVXXdz1TjVB2ElGADYr3y8LWjOI4VEdNQmdV5TDoedCt2rgLS3A3e6kJDxb+E5QmlaNpM
- UjT3bvXBT1oUtLCBVMJw1X3XSsA1z2BWXm3I2kU+jH6zNr7ZwBkq/vIn9iKjeUQFb+CJr3
- x7DZLUsVknGRlUcBnS2PaZtUmoncmmo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-AS-FxxEbOfm8NWT7r35ZXA-1; Tue, 26 May 2020 11:55:52 -0400
-X-MC-Unique: AS-FxxEbOfm8NWT7r35ZXA-1
-Received: by mail-ed1-f71.google.com with SMTP id w15so8527258edi.11
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 08:55:52 -0700 (PDT)
+ bh=uHfewdW+B25fwKTErGP5EiUy1IJ0SQfvNK1I6bygjRA=;
+ b=NKKyAgIUZhaK+GKIWAPKhGGhHhyvKQbwXIH1kvH/pgNOTsdVSpdFD+wA0Awjrx7ZNqPJDx
+ FaKfvq0pZeSq5sZzvD2bkUY4Br3UNTZ9abNy3TXySuXoTb9Ovtj0zaod/yecU6fdJGneZY
+ 47vPYi521Jky2cPcXM5WTAN1rvx8NSc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-_F2VPq--NH6CiEvtdVKOCg-1; Tue, 26 May 2020 11:57:26 -0400
+X-MC-Unique: _F2VPq--NH6CiEvtdVKOCg-1
+Received: by mail-ej1-f71.google.com with SMTP id pj20so7472381ejb.3
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 08:57:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=ExvP0V1+INEAGK5lSUT/2b1atNKdbvLM0DMkBuSlWm4=;
- b=CJfn4yu8/csriCcRRGBoMSSut81Mdnc0SR2k53FCsBd6dhXYKE1uMnzVYMAy6D/SE6
- sDEmIj5WuxXabP/rVLmDpqNjirpNVe5FQUFQQ0SXUcjIuRO/gOvtwpx3WxGGkK3o/Avi
- TvmBRBiE8ape75vUoozh0vqXwl1gksFtZQgCS6HmMBzG+7qNwRaz7DR/pkksMlc5OzSx
- FTVLY/OQ2MSrsXg6L6KDmxOTKkGdPqFsGnXiAAnf2LduWdk0SVMna+YALTz7kp9bXirT
- CMQIpNzgPFyruDr1Q+GQysPlBuZQO1VZBb2hRqQ7iMhoznvlSEXVlH22c/Bw2jk8DVk0
- dGEg==
-X-Gm-Message-State: AOAM532RnwIbSSQ0sR6hdxX2EOasdvzt36wNxM+icXbt3axtxR8mvPDY
- SXAF//Xi5jjC4PUULQbjbRUAmp7CE4rsur/+p8HxiVnAvxUdue9p6pDSTiALV6NvCvsflZknm+P
- 4BxmaclPVScU5oo8=
-X-Received: by 2002:a50:d7d1:: with SMTP id m17mr7964970edj.126.1590508551222; 
- Tue, 26 May 2020 08:55:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJydcFHNeRChSIoHPPWwMYXRqYzz4xHvl//AZpWRPYMGs16IW0vNvE+U/bVTbDBTWIbevdeAOA==
-X-Received: by 2002:a50:d7d1:: with SMTP id m17mr7964936edj.126.1590508550957; 
- Tue, 26 May 2020 08:55:50 -0700 (PDT)
+ bh=uHfewdW+B25fwKTErGP5EiUy1IJ0SQfvNK1I6bygjRA=;
+ b=PoXU1VbNlPakE8L1C1LbWeR9a/UfSj4kwSS4xSHIPJioXQCosL/CU0gHQtfXf97ztG
+ SxEQgiCitpMQvyc3g38Lknd27aNyDq7YPYWCgqyMbxPAMjVLgRhWGt3iuNTb0S3/mKt1
+ xF2ZpRQ2XavBx4NkeFWILk3J8ByvVRx0NDCBYXGS5ts1taVtHmTUQSocI+hT7j93LF78
+ +oVZQnSh7F9AfwsF4ML2pGoz1CqyI33GgRN0nv6/T4mS2Z5UZmwwAUUc4rKYSXV2JSE2
+ s5xU1G5Ae0ZHkBtPc+O/d1YV+FD3k2LJMz9zTu+VpAwa8J0vibbzjwShE4JHkbeAhPMi
+ BK2w==
+X-Gm-Message-State: AOAM5304I0pQFL3pkdA/uQ3DxvPHBWbcaeU1w6AfgTxzwXY5c7i87wk9
+ BpFsb20Zn67skTckvVq1LDbKPqa8IUPJOh8AwmlCO3FHvxeMVvDFM9EhWjSZonYvT2PDI1Q36DC
+ TayWqvbUTGMR9370=
+X-Received: by 2002:a17:906:3652:: with SMTP id
+ r18mr1679481ejb.526.1590508645327; 
+ Tue, 26 May 2020 08:57:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAzb3ZfJjoP8hMaL9VGwMySjRLqni0IHu3PnbMmYN1wccHUFOLAWR0fHBhaBtor2iw77rdvQ==
+X-Received: by 2002:a17:906:3652:: with SMTP id
+ r18mr1679453ejb.526.1590508644988; 
+ Tue, 26 May 2020 08:57:24 -0700 (PDT)
 Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id b15sm277828edj.37.2020.05.26.08.55.49
+ by smtp.gmail.com with ESMTPSA id h20sm239012eja.61.2020.05.26.08.57.23
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 08:55:50 -0700 (PDT)
-Subject: Re: [PATCH RFC 02/32] scripts/qmp: Fix shebang and imports
+ Tue, 26 May 2020 08:57:24 -0700 (PDT)
+Subject: Re: [PATCH RFC 04/32] python/qemu/lib: delint, add pylintrc
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-3-jsnow@redhat.com>
+ <20200514055403.18902-5-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,20 +104,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <d607ffed-9556-87f0-ff4f-169d99667957@redhat.com>
-Date: Tue, 26 May 2020 17:55:48 +0200
+Message-ID: <3c8bdd85-fa93-b788-8040-58ca2cf0e296@redhat.com>
+Date: Tue, 26 May 2020 17:57:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514055403.18902-3-jsnow@redhat.com>
+In-Reply-To: <20200514055403.18902-5-jsnow@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 10:22:33
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:19:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -147,143 +149,193 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/14/20 7:53 AM, John Snow wrote:
-> There's more wrong with these scripts; They are in various stages of
-> disrepair. That's beyond the scope of this current patchset.
+> Bring our these files up to speed with pylint 2.5.0.
+> Add a pylintrc file to formalize which pylint subset
+> we are targeting.
 > 
-> This just mechanically corrects the imports and the shebangs, as part of
-> ensuring that the python/qemu/lib refactoring didn't break anything
-> needlessly.
+> The similarity ignore is there to suppress similarity
+> reports across imports, which for typing constants,
+> are going to trigger this report erroneously.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
-
-Whoops, I address this in a patch series I'm working on, too. I'll keep
-my patch in there for now until this one makes it in, or vice-versa.
-
-https://www.mail-archive.com/qemu-block@nongnu.org/msg66801.html
+> ---
+>  python/qemu/lib/machine.py |  6 ++--
+>  python/qemu/lib/pylintrc   | 58 ++++++++++++++++++++++++++++++++++++++
+>  python/qemu/lib/qtest.py   | 42 +++++++++++++++++----------
+>  3 files changed, 88 insertions(+), 18 deletions(-)
+>  create mode 100644 python/qemu/lib/pylintrc
+> 
+> diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
+> index e3ea523571..c79fc8fb89 100644
+> --- a/python/qemu/lib/machine.py
+> +++ b/python/qemu/lib/machine.py
+> @@ -58,7 +58,7 @@ def __init__(self, reply):
+>          self.reply = reply
+>  
+>  
+> -class QEMUMachine(object):
+> +class QEMUMachine:
+>      """
+>      A QEMU VM
+>  
+> @@ -242,7 +242,7 @@ def _base_args(self):
+>                           'chardev=mon,mode=control'])
+>          if self._machine is not None:
+>              args.extend(['-machine', self._machine])
+> -        for i in range(self._console_index):
+> +        for _ in range(self._console_index):
+>              args.extend(['-serial', 'null'])
+>          if self._console_set:
+>              self._console_address = os.path.join(self._sock_dir,
+> @@ -383,7 +383,7 @@ def shutdown(self, has_quit: bool = False) -> None:
+>                  command = ' '.join(self._qemu_full_args)
+>              else:
+>                  command = ''
+> -            LOG.warning(msg, -exitcode, command)
+> +            LOG.warning(msg, -int(exitcode), command)
+>  
+>          self._launched = False
+>  
+> diff --git a/python/qemu/lib/pylintrc b/python/qemu/lib/pylintrc
+> new file mode 100644
+> index 0000000000..5d6ae7367d
+> --- /dev/null
+> +++ b/python/qemu/lib/pylintrc
+> @@ -0,0 +1,58 @@
+> +[MASTER]
+> +
+> +[MESSAGES CONTROL]
+> +
+> +# Disable the message, report, category or checker with the given id(s). You
+> +# can either give multiple identifiers separated by comma (,) or put this
+> +# option multiple times (only on the command line, not in the configuration
+> +# file where it should appear only once). You can also use "--disable=all" to
+> +# disable everything first and then reenable specific checks. For example, if
+> +# you want to run only the similarities checker, you can use "--disable=all
+> +# --enable=similarities". If you want to run only the classes checker, but have
+> +# no Warning level messages displayed, use "--disable=all --enable=classes
+> +# --disable=W".
+> +disable=too-many-arguments,
+> +        too-many-instance-attributes,
+> +        too-many-public-methods,
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> ---
->  scripts/qmp/qmp      | 4 +++-
->  scripts/qmp/qom-fuse | 4 +++-
->  scripts/qmp/qom-get  | 6 ++++--
->  scripts/qmp/qom-list | 4 +++-
->  scripts/qmp/qom-set  | 6 ++++--
->  scripts/qmp/qom-tree | 6 ++++--
->  6 files changed, 21 insertions(+), 9 deletions(-)
-> 
-> diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
-> index 0625fc2aba..5981f7c414 100755
-> --- a/scripts/qmp/qmp
-> +++ b/scripts/qmp/qmp
-> @@ -11,7 +11,9 @@
->  # See the COPYING file in the top-level directory.
->  
->  import sys, os
-> -from qmp import QEMUMonitorProtocol
 > +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> +from qemu.lib import QEMUMonitorProtocol
->  
->  def print_response(rsp, prefix=[]):
->      if type(rsp) == list:
-> diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-> index 6bada2c33d..6006f1d562 100755
-> --- a/scripts/qmp/qom-fuse
-> +++ b/scripts/qmp/qom-fuse
-> @@ -15,7 +15,9 @@ import fuse, stat
->  from fuse import Fuse
->  import os, posix
->  from errno import *
-> -from qmp import QEMUMonitorProtocol
+> +[REPORTS]
 > +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> +from qemu.lib import QEMUMonitorProtocol
->  
->  fuse.fuse_python_api = (0, 2)
->  
-> diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
-> index 007b4cd442..1d04d1b119 100755
-> --- a/scripts/qmp/qom-get
-> +++ b/scripts/qmp/qom-get
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
->  ##
->  # QEMU Object Model test tools
+> +[REFACTORING]
+> +
+> +[MISCELLANEOUS]
+> +
+> +[LOGGING]
+> +
+> +[BASIC]
+> +
+> +# Good variable names which should always be accepted, separated by a comma.
+> +good-names=i,
+> +           j,
+> +           k,
+> +           ex,
+> +           Run,
+> +           _,
+> +           fd,
+> +
+> +[VARIABLES]
+> +
+> +[STRING]
+> +
+> +[SPELLING]
+> +
+> +[FORMAT]
+> +
+> +[SIMILARITIES]
+> +
+> +# Ignore imports when computing similarities.
+> +ignore-imports=yes
+> +
+> +[TYPECHECK]
+> +
+> +[CLASSES]
+> +
+> +[IMPORTS]
+> +
+> +[DESIGN]
+> +
+> +[EXCEPTIONS]
+> diff --git a/python/qemu/lib/qtest.py b/python/qemu/lib/qtest.py
+> index d24ad04256..53d814c064 100644
+> --- a/python/qemu/lib/qtest.py
+> +++ b/python/qemu/lib/qtest.py
+> @@ -1,5 +1,11 @@
+> -# QEMU qtest library
+> -#
+> +"""
+> +QEMU qtest library
+> +
+> +qtest offers the QEMUQtestProtocol and QEMUQTestMachine classes, which
+> +offer a connection to QEMU's qtest protocol socket, and a qtest-enabled
+> +subclass of QEMUMachine, respectively.
+> +"""
+> +
+>  # Copyright (C) 2015 Red Hat Inc.
 >  #
-> @@ -13,7 +13,9 @@
+>  # Authors:
+> @@ -17,19 +23,21 @@
+>  from .machine import QEMUMachine
 >  
->  import sys
->  import os
-> -from qmp import QEMUMonitorProtocol
+>  
+> -class QEMUQtestProtocol(object):
+> +class QEMUQtestProtocol:
+> +    """
+> +    QEMUQtestProtocol implements a connection to a qtest socket.
 > +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> +from qemu.lib import QEMUMonitorProtocol
->  
->  cmd, args = sys.argv[0], sys.argv[1:]
->  socket_path = None
-> diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
-> index 03bda3446b..94e3bc21ba 100755
-> --- a/scripts/qmp/qom-list
-> +++ b/scripts/qmp/qom-list
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
->  ##
->  # QEMU Object Model test tools
->  #
-> @@ -13,6 +13,8 @@
->  
->  import sys
->  import os
+> +    :param address: QEMU address, can be either a unix socket path (string)
+> +                    or a tuple in the form ( address, port ) for a TCP
+> +                    connection
+> +    :param server: server mode, listens on the socket (bool)
+> +    :raise socket.error: on socket connection errors
 > +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
->  from qmp import QEMUMonitorProtocol
+> +    .. note::
+> +       No conection is estabalished by __init__(), this is done
+> +       by the connect() or accept() methods.
+> +    """
+>      def __init__(self, address, server=False):
+> -        """
+> -        Create a QEMUQtestProtocol object.
+> -
+> -        @param address: QEMU address, can be either a unix socket path (string)
+> -                        or a tuple in the form ( address, port ) for a TCP
+> -                        connection
+> -        @param server: server mode, listens on the socket (bool)
+> -        @raise socket.error on socket connection errors
+> -        @note No connection is established, this is done by the connect() or
+> -              accept() methods
+> -        """
+>          self._address = address
+>          self._sock = self._get_sock()
+>          self._sockfile = None
+> @@ -73,15 +81,19 @@ def cmd(self, qtest_cmd):
+>          return resp
 >  
->  cmd, args = sys.argv[0], sys.argv[1:]
-> diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-> index c37fe78b00..a78080a4fc 100755
-> --- a/scripts/qmp/qom-set
-> +++ b/scripts/qmp/qom-set
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
->  ##
->  # QEMU Object Model test tools
->  #
-> @@ -13,7 +13,9 @@
+>      def close(self):
+> +        """Close this socket."""
+>          self._sock.close()
+>          self._sockfile.close()
 >  
->  import sys
->  import os
-> -from qmp import QEMUMonitorProtocol
-> +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> +from qemu.lib import QEMUMonitorProtocol
+>      def settimeout(self, timeout):
+> +        """Set a timeout, in seconds."""
+>          self._sock.settimeout(timeout)
 >  
->  cmd, args = sys.argv[0], sys.argv[1:]
->  socket_path = None
-> diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
-> index 1c8acf61e7..4866c15581 100755
-> --- a/scripts/qmp/qom-tree
-> +++ b/scripts/qmp/qom-tree
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
->  ##
->  # QEMU Object Model test tools
->  #
-> @@ -15,7 +15,9 @@
 >  
->  import sys
->  import os
-> -from qmp import QEMUMonitorProtocol
-> +
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> +from qemu.lib import QEMUMonitorProtocol
+>  class QEMUQtestMachine(QEMUMachine):
+> -    '''A QEMU VM'''
+> +    """
+> +    A QEMU VM, with a qtest socket available.
+> +    """
 >  
->  cmd, args = sys.argv[0], sys.argv[1:]
->  socket_path = None
+>      def __init__(self, binary, args=None, name=None, test_dir="/var/tmp",
+>                   socket_scm_helper=None, sock_dir=None):
 > 
 
 
