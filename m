@@ -2,87 +2,90 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD197C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F41C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD932073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2351D20787
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:29:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6CFotiv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD932073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnQviRad"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2351D20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdcRl-00028q-Qn
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:28:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55036)
+	id 1jdcSH-0003GD-AY
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdcQo-0001C5-Bk; Tue, 26 May 2020 12:27:58 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41014)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdcQn-0001Vi-Cu; Tue, 26 May 2020 12:27:58 -0400
-Received: by mail-io1-xd42.google.com with SMTP id o5so22648071iow.8;
- Tue, 26 May 2020 09:27:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=5tBqtXYJu6MqQ0/JHvw/YkqqhCbb5FSWfs4YssNy1Zc=;
- b=Y6CFotivyIi96bMAYu+TXDwKNnLse7bKJHnwPCcR+8QYXUqmyQRrwgr6dkucalx+Eh
- IVrUu77YIg/ygGkZeXY0mw8UfmXpL6zojBWtZaA5X2y3etNLejxYOxJx2h5+pyPVO1Xv
- JJMUfsD23mNvObApIPJ5bhPmMElLu7ohAUnaMoLEkB3MlASIG27BIt2V2K0w3P89++Ip
- u89EKAGW6D1nJpYcAJKl3vBrKFuZEh8eI8N5XxDhwyDSMC7gyJck0Cj5E3zRnenquYmh
- mnBFydMwLsQotFwoPXwk/9Rdy0KYNg3hRt65VPPA5xvNcqkZ3GLFnAjVCr1Yzp8Sx6x5
- UdWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=5tBqtXYJu6MqQ0/JHvw/YkqqhCbb5FSWfs4YssNy1Zc=;
- b=Or8wDMCf5zM0Q/nflK9zs+Djhd1Pz3mfiuzI2m9W+FgD6RAoZppBHrgTeh9L5EZVyI
- UmamzrF35s/O0dShJOOgWX+/EdvwXiQ5RfTUdGc+UQBAZt1R8ZnNkSu/I7tdY1RdLo3O
- qK7LNhmizkUj0+tYeKeP3VQFCbdpOWDyrpUuHSMPjfqXX3K8/+jyqymAZKlnM920rNko
- dfxRMDjK5UpGMVAtp/7OphXJE6jpSE2TiO2q+s0OrpBObbN/W+niewK/TDo/EWWE85mo
- NFeRHsDm6wwh3crzs31X4CbPnpuCJ2hVS6cinZRdbnNuUfWdrTiGlKU4wgtXhwV+AWiF
- yYBg==
-X-Gm-Message-State: AOAM532jIXMyh/mdInrHnLAsJ9VrSCSgZYHUxKiUJXJCtCvGbpEZOWZ9
- MkJfixlYwULBYkXtPgEZyTyhoYVz3ueg34exkFY=
-X-Google-Smtp-Source: ABdhPJzTq6yUuhSRFiMxFuFmyy/qrAoEhYAPPkpFqRgao0mDhO9CzjBNq8biqiNDcedGGZSLh/Cu/42jkRkDRxbGRjE=
-X-Received: by 2002:a5d:9604:: with SMTP id w4mr18128397iol.105.1590510476036; 
- Tue, 26 May 2020 09:27:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdcQh-00011X-Dc
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:27:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54673
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdcQf-0001Td-4v
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:27:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590510467;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=o8RiUdp4UtY7imz0c0+ZlJIjYzT4VB53SY0luOLORZ4=;
+ b=gnQviRadUuPzCplFdMJ3r8IuYZJg7unTO46/ojQwVGvuX04FMdBF810cJz+jK6wQRhl6lg
+ U1GOv7ZAFtuMfy4edihvLjv3FjFFn+XMtfvXZ2L4FgI1qq9f+KMKXxAe/TPCubwVI7vzfX
+ Z5pqxX6aEj0uVX2OPM7oxbC2RG2FkBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-aCLaN0h1NYWff9unM_rfGg-1; Tue, 26 May 2020 12:27:42 -0400
+X-MC-Unique: aCLaN0h1NYWff9unM_rfGg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EF6B107ACCD;
+ Tue, 26 May 2020 16:27:41 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EAB0A5D9E5;
+ Tue, 26 May 2020 16:27:40 +0000 (UTC)
+Subject: Re: [PATCH v6 4/5] qemu-img: Add convert --bitmaps option
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200521192137.1120211-1-eblake@redhat.com>
+ <20200521192137.1120211-5-eblake@redhat.com>
+ <365251de-7e67-afcb-475c-98a57fdc2568@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <e0e665de-8567-233d-af60-420355cea1cf@redhat.com>
+Date: Tue, 26 May 2020 11:27:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200525141237.15243-1-thuth@redhat.com>
-In-Reply-To: <20200525141237.15243-1-thuth@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 26 May 2020 09:18:57 -0700
-Message-ID: <CAKmqyKMLezOO+EsjhpDO5RPM9pJFxtnZ7XcA3POeyjNb4yAEtQ@mail.gmail.com>
-Subject: Re: [PATCH v2] tests/acceptance: Add a boot test for the
- xlnx-versal-virt machine
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <365251de-7e67-afcb-475c-98a57fdc2568@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,85 +99,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 7:13 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> As described by Edgar here:
->
->  https://www.mail-archive.com/qemu-devel@nongnu.org/msg605124.html
->
-> we can use the Ubuntu kernel for testing the xlnx-versal-virt machine.
-> So let's add a boot test for this now.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 5/25/20 2:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 21.05.2020 22:21, Eric Blake wrote:
+>> Make it easier to copy all the persistent bitmaps of (the top layer
+>> of) a source image along with its guest-visible contents, by adding a
+>> boolean flag for use with qemu-img convert.  This is basically
+>> shorthand, as the same effect could be accomplished with a series of
+>> 'qemu-img bitmap --add' and 'qemu-img bitmap --merge -b source'
+>> commands, or by their corresponding QMP commands.
+>>
+>> Note that this command will fail in the same scenarios where 'qemu-img
+>> measure' omits a 'bitmaps size:' line, namely, when either the source
+>> or the destination lacks persistent bitmap support altogether.
+>>
+>> See also https://bugzilla.redhat.com/show_bug.cgi?id=1779893
+>>
+>> While touching this, clean up a couple coding issues spotted in the
+>> same function: an extra blank line, and merging back-to-back 'if
+>> (!skip_create)' blocks.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+> 
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>> @@ -2573,6 +2632,13 @@ static int img_convert(int argc, char **argv)
+>>       }
+>>       out_bs = blk_bs(s.target);
+>>
+>> +    if (nbitmaps > 0 && 
+>> !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
+> 
+> We will not fail, if target doesn't support bitmaps, source supports 
+> them but has no bitmaps? Doesn't seem to be a problem, but a bit less 
+> strict than you write in commit message.
+> 
+> So, maybe, s/nbitmaps > 0/bitmaps/
 
-Alistair
+In fact, nbitmaps is not needed at all (it was useful in earlier 
+iterations, but as the series has morphed, it is no longer buying me 
+anything useful).
 
-> ---
->  v2: Added "tags=3Ddevice:pl011" and "tags=3Ddevice:arm_gicv3"
->
->  tests/acceptance/boot_linux_console.py | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 0653c8c1bf..965272387c 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -307,6 +307,32 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
->          self.wait_for_console_pattern(console_pattern)
->
-> +    def test_aarch64_xlnx_versal_virt(self):
-> +        """
-> +        :avocado: tags=3Darch:aarch64
-> +        :avocado: tags=3Dmachine:xlnx-versal-virt
-> +        :avocado: tags=3Ddevice:pl011
-> +        :avocado: tags=3Ddevice:arm_gicv3
-> +        """
-> +        kernel_url =3D ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-> +                      'bionic-updates/main/installer-arm64/current/image=
-s/'
-> +                      'netboot/ubuntu-installer/arm64/linux')
-> +        kernel_hash =3D '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> +
-> +        initrd_url =3D ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-> +                      'bionic-updates/main/installer-arm64/current/image=
-s/'
-> +                      'netboot/ubuntu-installer/arm64/initrd.gz')
-> +        initrd_hash =3D 'd385d3e88d53e2004c5d43cbe668b458a094f772'
-> +        initrd_path =3D self.fetch_asset(initrd_url, asset_hash=3Dinitrd=
-_hash)
-> +
-> +        self.vm.set_console()
-> +        self.vm.add_args('-m', '2G',
-> +                         '-kernel', kernel_path,
-> +                         '-initrd', initrd_path)
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('Checked W+X mappings: passed')
-> +
->      def test_arm_virt(self):
->          """
->          :avocado: tags=3Darch:arm
-> --
-> 2.18.1
->
->
+> 
+>> +        error_report("Format driver '%s' does not support bitmaps",
+>> +                     out_fmt);
+> 
+> Hmm seems, out_fmt may be NULL at this point, consider the path:
+> const char *out_fmt = NULL
+> ...
+> [no -O option]
+> --target-image-opts, so out_fmt doesn't default to "raw" but remains NULL
+> ...
+> 
+> So, with s/out_fmt/out_bs->drv->format_name/ (and with or without 
+> s/nbitmaps > 0/bitmaps/):
+> 
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Okay, I'm squashing this in, and adding your R-b.  Pull request coming 
+shortly.
+
+diff --git i/qemu-img.c w/qemu-img.c
+index 8ecebe178890..d7e846e60742 100644
+--- i/qemu-img.c
++++ w/qemu-img.c
+@@ -2196,7 +2196,6 @@ static int img_convert(int argc, char **argv)
+      bool force_share = false;
+      bool explict_min_sparse = false;
+      bool bitmaps = false;
+-    size_t nbitmaps = 0;
+
+      ImgConvertState s = (ImgConvertState) {
+          /* Need at least 4k of zeros for sparse detection */
+@@ -2565,10 +2564,8 @@ static int img_convert(int argc, char **argv)
+          }
+      }
+
+-    /* Determine how many bitmaps need copying */
++    /* Determine if bitmaps need copying */
+      if (bitmaps) {
+-        BdrvDirtyBitmap *bm;
+-
+          if (s.src_num > 1) {
+              error_report("Copying bitmaps only possible with single 
+source");
+              ret = -1;
+@@ -2579,11 +2576,6 @@ static int img_convert(int argc, char **argv)
+              ret = -1;
+              goto out;
+          }
+-        FOR_EACH_DIRTY_BITMAP(blk_bs(s.src[0]), bm) {
+-            if (bdrv_dirty_bitmap_get_persistence(bm)) {
+-                nbitmaps++;
+-            }
+-        }
+      }
+
+      /*
+@@ -2632,9 +2624,9 @@ static int img_convert(int argc, char **argv)
+      }
+      out_bs = blk_bs(s.target);
+
+-    if (nbitmaps > 0 && !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
++    if (bitmaps && !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
+          error_report("Format driver '%s' does not support bitmaps",
+-                     out_fmt);
++                     out_bs->drv->format_name);
+          ret = -1;
+          goto out;
+      }
+@@ -2700,7 +2692,7 @@ static int img_convert(int argc, char **argv)
+      ret = convert_do_copy(&s);
+
+      /* Now copy the bitmaps */
+-    if (nbitmaps > 0 && ret == 0) {
++    if (bitmaps && ret == 0) {
+          ret = convert_copy_bitmaps(blk_bs(s.src[0]), out_bs);
+      }
+
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
