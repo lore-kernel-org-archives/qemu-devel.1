@@ -2,91 +2,95 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A90CC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F88C433E1
 	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 05:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D79362071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 05:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 549E32071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 05:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aF3FTq75"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79362071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKMdrWXg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549E32071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdScN-0001ia-5K
+	id 1jdScN-0001iR-Iv
 	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 01:59:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60552)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdSba-0000uU-MZ
+ id 1jdSba-0000uc-Vv
  for qemu-devel@nongnu.org; Tue, 26 May 2020 01:58:26 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:42753)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35700)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdSbZ-0006PF-Uu
+ id 1jdSba-0006PN-7m
  for qemu-devel@nongnu.org; Tue, 26 May 2020 01:58:26 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id s8so19096415wrt.9
+Received: by mail-wr1-x441.google.com with SMTP id x14so13770231wrp.2
  for <qemu-devel@nongnu.org>; Mon, 25 May 2020 22:58:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=OjikxZJqKYWyGNB2Nj82kz4FyRssinnND9PjTJAmeF4=;
- b=aF3FTq75oV9daXNuyrUmMnTFEoELHt6vtQamWCwuJ/wxrBHm472WzEg4+EGZ6BbT77
- eo4JLk0KVyitaLuZophUd6SFPpNAZV/YE7e4CTwsC2+xAKTfo2TCDPL0Oo43+j8HyYv5
- ndgRl6cMLeBcfi/ApqoBTkCcrWPvHzzMsIixgQxYxc4h0bK3SGtGU2LEd1g7ggrxIQy9
- 8C6ar4GpthmUoO+oeUFszHu4PmaZienl1cKjvDLhjkheJs5sNYJ0pqg1UVMDU2CapkJ9
- ptQRI5wo8Ld1h4Rk4XCdbrgAOYwKcI6ksx4zUieg+0YaIUFrHTk33mjZlli+ZQjzcQby
- 9Uow==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rxgWqsaxiMy6B4YGC/YTXF3N15jU8g4frTvpAKYBgWQ=;
+ b=hKMdrWXgwmtFqyC422/xyzeYJvLkmww6uKsJmrFns5MSVK11NQgbCjxbwOf6NRr+Lf
+ JQHQbv0coj8CcSAXk06xosPlqGyjP5cKPNfaSpzTFtQWu19Jsuz55LvpCLPuvK2fPayM
+ KzaWPK3NZSwWPQ7Bk5d1VkFUsvjEMwohQ6zRLd042b/vuSh3Fl2upSQOTKdLcR0VFGbw
+ I/HNoS2sWUVlgfRTFkFy4grKC8YkirC+EWx/2Sfm5woY/mG5QmN1GEwmCaAlPBKHix9A
+ Fd+vebVs5ulfWfCmcnq+/5WDuZ5R7PCA5OLMPSh04HnLVyAbzKf48czEMqKbpKPuFVfh
+ su9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=OjikxZJqKYWyGNB2Nj82kz4FyRssinnND9PjTJAmeF4=;
- b=ayNG4CKJ0/LSaDJ23pfhm9quWzAgTDBL/grJIPJpA/OTyMAVPRESh97pjOHdrUj7pE
- u4c4ymd+SMOAmDLgTucZZn8Xn8kz2NsKppmSQSrBCRV8qTTFJHXChWJ4uD/EYkUv4xGK
- scUToGT7F0GMpNM4n6/L2KtouFuTV7hJyAGbHW6PEPjcBG7dXlEHBjQAUSW8iljS2AyD
- TyWroUGb9O8v5m8OKYZYMIb7PZpfLCjRt7qeTg4TnLCWSInWFwcSPXyickysxcy2KLz7
- iDoDS1Ak8O9m/bbFV3NFtoKH+yLMXiRW7i9FcVsk7OuW1fyp4J8Z01y/GfVGfQP3JGb2
- Wn1g==
-X-Gm-Message-State: AOAM531iFaKG9U5ZEFGIR4Y8qlXL9wy39VCD8yNoJJ2ZzM7ezpX4vNX+
- ZjrbgMGuDDJCmpZvZDcVpk9Ud3FmD10=
-X-Google-Smtp-Source: ABdhPJzuuWn2J/om0UBzfP2q8BPmNQHKXTTsCtboxMWscYqhzy9ZbmZk/iCHLaucdwl+QRSs5lJAAA==
-X-Received: by 2002:a05:6000:4:: with SMTP id h4mr17809081wrx.36.1590472703357; 
- Mon, 25 May 2020 22:58:23 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=rxgWqsaxiMy6B4YGC/YTXF3N15jU8g4frTvpAKYBgWQ=;
+ b=QwJUCsKDwmRTu6HLei7uTTyTmsDbUEyDL0I0a00vMKURZjQ8wQRdob+x82BfaY0hEK
+ L3oLi0272SMFOvdg4QbYIlZWLkakeIAc2aQdI8Bac2A5PnGr8O3P/1/uYpHXrwYI8UmA
+ l5slvvS+oDoTF877L7UoFSgXl6Q91+ckYkZDh/pWdqoM8Y+9ndCDnFTdr0JiwcPKeMZJ
+ xvrIAkwYX/B8oLfalwaomZgBfFhSHDvSQmjvVsflUhgNkCAC94Ps+aoyeJnTi3pxi3s4
+ D13TJMZEZb3VoYp8GOKf2lSPmG7zy4gHf/JkLTHn2mm3vYYvdamm7xfk6E/NtgWVxwXG
+ odTg==
+X-Gm-Message-State: AOAM530HSBJzMAPEn9YZijl5+/9znOUAdxMMb++0swFwLVC6PgwQewaQ
+ gUWp43iJgNxRCvsgZkGedgtGzdi+5kM=
+X-Google-Smtp-Source: ABdhPJzBX/UihyTemnwXE7hDCVTIvZAoyhHm3GF+NdXxxzAQyBAPLMVFMQJ0Pm67h5pYoGX0VfWoXw==
+X-Received: by 2002:a5d:6288:: with SMTP id k8mr3765544wru.94.1590472704674;
+ Mon, 25 May 2020 22:58:24 -0700 (PDT)
 Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id s8sm19887710wrt.69.2020.05.25.22.58.22
+ by smtp.gmail.com with ESMTPSA id s8sm19887710wrt.69.2020.05.25.22.58.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 25 May 2020 22:58:22 -0700 (PDT)
+ Mon, 25 May 2020 22:58:24 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] tests/qtest/fuzz: Avoid QTest serialization
-Date: Tue, 26 May 2020 07:58:18 +0200
-Message-Id: <20200526055820.12999-1-f4bug@amsat.org>
+Subject: [PATCH 1/2] tests/qtest/fuzz: Avoid QTest ioport serialization
+Date: Tue, 26 May 2020 07:58:19 +0200
+Message-Id: <20200526055820.12999-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200526055820.12999-1-f4bug@amsat.org>
+References: <20200526055820.12999-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
  FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,24 +111,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alexander,
+We don't need to serialize over QTest chardev when we can
+directly access the globally registered I/O address space.
 
-I forgot to share these 2 patches wrote before
-the direct MemoryRegion fuzzer sent yesterday.
+i440fx-qtest-reboot-fuzz gets 2x performance improvement.
 
-Regards,
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/qtest/fuzz/i440fx_fuzz.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Phil.
-
-Philippe Mathieu-Daudé (2):
-  tests/qtest/fuzz: Avoid QTest ioport serialization
-  tests/qtest/fuzz: Avoid QTest mmio serialization
-
- tests/qtest/fuzz/i440fx_fuzz.c      | 19 +++++++++++++------
- tests/qtest/fuzz/virtio_net_fuzz.c  |  6 ++++--
- tests/qtest/fuzz/virtio_scsi_fuzz.c |  6 +++++-
- 3 files changed, 22 insertions(+), 9 deletions(-)
-
+diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+index bcd6769b4c..d770caffa7 100644
+--- a/tests/qtest/fuzz/i440fx_fuzz.c
++++ b/tests/qtest/fuzz/i440fx_fuzz.c
+@@ -20,6 +20,7 @@
+ #include "fuzz/qos_fuzz.h"
+ #include "fuzz/fork_fuzz.h"
+ 
++#include "exec/address-spaces.h"
+ 
+ #define I440FX_PCI_HOST_BRIDGE_CFG 0xcf8
+ #define I440FX_PCI_HOST_BRIDGE_DATA 0xcfc
+@@ -59,22 +60,28 @@ static void ioport_fuzz_qtest(QTestState *s,
+                                       I440FX_PCI_HOST_BRIDGE_DATA;
+         switch (a.opcode % ACTION_MAX) {
+         case WRITEB:
+-            qtest_outb(s, addr, (uint8_t)a.value);
++            address_space_write(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                                &a.value, sizeof(uint8_t));
+             break;
+         case WRITEW:
+-            qtest_outw(s, addr, (uint16_t)a.value);
++            address_space_write(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                                &a.value, sizeof(uint16_t));
+             break;
+         case WRITEL:
+-            qtest_outl(s, addr, (uint32_t)a.value);
++            address_space_write(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                                &a.value, sizeof(uint32_t));
+             break;
+         case READB:
+-            qtest_inb(s, addr);
++            address_space_read(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                               &a.value, sizeof(uint8_t));
+             break;
+         case READW:
+-            qtest_inw(s, addr);
++            address_space_read(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                               &a.value, sizeof(uint16_t));
+             break;
+         case READL:
+-            qtest_inl(s, addr);
++            address_space_read(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
++                               &a.value, sizeof(uint32_t));
+             break;
+         }
+         /* Move to the next operation */
 -- 
 2.21.3
 
