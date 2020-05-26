@@ -2,88 +2,96 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C612C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2D8C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E69AE2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:19:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E055220776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:23:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rrErR/xk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E69AE2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgPWnYoA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E055220776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdf6r-0008Su-4M
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43366)
+	id 1jdfAz-0001hY-3q
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:23:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jdf6B-0007r0-RP; Tue, 26 May 2020 15:18:51 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:38890 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jdf6A-00027M-EW; Tue, 26 May 2020 15:18:51 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id E756E4C80C;
- Tue, 26 May 2020 19:18:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-transfer-encoding:content-disposition
- :content-type:content-type:mime-version:references:message-id
- :subject:subject:from:from:date:date:received:received:received;
- s=mta-01; t=1590520723; x=1592335124; bh=+X2W6B1dVBAEYBvgcvQaaN
- Z1XrNWpFif7Kyy/Cl63b8=; b=rrErR/xklLBiRq7qLEtnLnmoZqskUQpfDEqaic
- HZKLVYDUfBpQxcV15JXm2v2VxT8hQUAexBfZdYoT/DM+haWUa7EnaXeoUykjOS5q
- A8gXaZtRLEfOWj5oBprJaRsLvcE+sYpasdHAJ4XM+qGM+e/1eBecp0QLCsWThy4D
- ag128=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fsz_tCLt5sfE; Tue, 26 May 2020 22:18:43 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 3B28747117;
- Tue, 26 May 2020 22:18:43 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 26
- May 2020 22:18:44 +0300
-Date: Tue, 26 May 2020 22:18:44 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 3/7] sysemu/hvf: Only declare hvf_allowed when HVF is
- available
-Message-ID: <20200526191844.GB4851@SPB-NB-133.local>
-References: <20200526172427.17460-1-f4bug@amsat.org>
- <20200526172427.17460-4-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
+ id 1jdfA6-0001I9-W6
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 15:22:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21589
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
+ id 1jdfA5-0004fp-06
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 15:22:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590520971;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0lDOZvNin70BZwlpd7fYYs5+G2w2klt8pUoQBw3YU8A=;
+ b=KgPWnYoAHFHpPLp+qXiVYZHWoP14VRs3Of5CuyQ7LdXnQ1CSp2eW6prruHLmvDGGjwR7FP
+ a9BpN5aO61VSXFUVcgksLOGXRLYaC4mMMTn62QHdD93dluinMAZGmc9+Y8JZzs0+3UDaYs
+ +g+TwDX2RbRLYL5NVQKBVvHRCuIkBFE=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-Ik8LQHeNMp2M2V-P1qtNCg-1; Tue, 26 May 2020 15:22:46 -0400
+X-MC-Unique: Ik8LQHeNMp2M2V-P1qtNCg-1
+Received: by mail-ua1-f72.google.com with SMTP id v10so8260115uae.13
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 12:22:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0lDOZvNin70BZwlpd7fYYs5+G2w2klt8pUoQBw3YU8A=;
+ b=tmKQ5sUNby98ZY5W3oRsgybDi12oEcLBt5BCjYj5Y4rcYvo9fn+to6Jq3VsfKKanxH
+ Y46hugL/CCEuOZ9zL88PXIVUJoRVp4SinPm/hH3BPEnkcCZ9Z+1xXaXMWcbQoHppwkk0
+ SAgENvdHW+fjaMCrBvqWkfi/giAWAn4/BLgs4TyxrMXNxncHSOBZkvn4Kz5Nwk/+35FC
+ Kb8tbj4apmiSm7ls6Gw4pfCX1vSgB71r+X1tiSm7E8ILaiNYkb0/obvUy2md2206MFcX
+ fXg0x0ISb4ThdEMSr8h3vxQaAXqaENygiT/a7Gwp1SyxGmHZ8fU55jzSr3fz3ObfDQJ6
+ ZF3g==
+X-Gm-Message-State: AOAM530ecUTthGWkWjTMYQNYI7ESZYBywDv6iVw7NFcoWZJtFbmi7CmE
+ I3OIqd814UaGS9fHxmNctV2d1R184Aohjq2pSdO1YCfVyezFx93uSo70bCfz6Lugw/pJuA5Kb0G
+ ePNcPHSFLrEM5YD37Ivn/I8f4BmCRruE=
+X-Received: by 2002:a67:d984:: with SMTP id u4mr2363674vsj.33.1590520965422;
+ Tue, 26 May 2020 12:22:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzG25xKXx/tL4w2e/N6AJ5Kew/8txoJLSjakiPrtp9wjHnnoIQs+5f2L7l8lNgNG9LXHART6GgSC8U8azR+jho=
+X-Received: by 2002:a67:d984:: with SMTP id u4mr2363659vsj.33.1590520965159;
+ Tue, 26 May 2020 12:22:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200526172427.17460-4-f4bug@amsat.org>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 15:16:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+References: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
+ <159040558755.2615.4869959098521372877.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <159040558755.2615.4869959098521372877.stgit@pasha-ThinkPad-X280>
+From: Willian Rampazzo <wrampazz@redhat.com>
+Date: Tue, 26 May 2020 16:22:34 -0300
+Message-ID: <CAKJDGDZSJTFAVnBFJetA+kQrr9_0fK+1oPzK8isoJ6chaj9fjQ@mail.gmail.com>
+Subject: Re: [PATCH 8/9] tests/acceptance: record/replay tests with advcal
+ images
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=wrampazz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 10:22:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,62 +104,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E .
- Iglesias" <edgar.iglesias@xilinx.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>, dovgaluk@ispras.ru,
+ pavel.dovgaluk@ispras.ru, Cleber Rosa Junior <crosa@redhat.com>,
+ pbonzini@redhat.com, Philippe Mathieu Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 26, 2020 at 07:24:23PM +0200, Philippe Mathieu-Daudé wrote:
-> When HVF is not available, the hvf_allowed variable does not exist.
-> 
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Mon, May 25, 2020 at 8:28 AM Pavel Dovgalyuk
+<Pavel.Dovgaluk@gmail.com> wrote:
+>
+> This patch adds more record/replay tests with kernel images.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > ---
-> v2: Fixed typo s/tcg_allowed/hvf_allowed/ (Edgar)
-> ---
->  include/sysemu/hvf.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-> index d211e808e9..fe95743124 100644
-> --- a/include/sysemu/hvf.h
-> +++ b/include/sysemu/hvf.h
-> @@ -18,7 +18,6 @@
->  #include "exec/memory.h"
->  #include "sysemu/accel.h"
->  
-> -extern bool hvf_allowed;
->  #ifdef CONFIG_HVF
->  #include <Hypervisor/hv.h>
->  #include <Hypervisor/hv_vmx.h>
-> @@ -26,11 +25,12 @@ extern bool hvf_allowed;
->  #include "target/i386/cpu.h"
->  uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
->                                   int reg);
-> +extern bool hvf_allowed;
->  #define hvf_enabled() (hvf_allowed)
-> -#else
-> +#else /* !CONFIG_HVF */
->  #define hvf_enabled() 0
->  #define hvf_get_supported_cpuid(func, idx, reg) 0
-> -#endif
-> +#endif /* !CONFIG_HVF */
->  
->  /* hvf_slot flags */
->  #define HVF_SLOT_LOG (1 << 0)
-> -- 
-> 2.21.3
-> 
+>  tests/acceptance/replay_kernel.py |   80 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>
+> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
+> index 4c786b1565..3849db7f3a 100644
+> --- a/tests/acceptance/replay_kernel.py
+> +++ b/tests/acceptance/replay_kernel.py
+> @@ -191,3 +191,83 @@ class ReplayKernel(Test):
+>                                 'console=ttyS0 vga=off')
+>          console_pattern = 'No filesystem could mount root'
+>          self.run_rr(kernel_path, kernel_command_line, console_pattern)
+> +
+> +    def do_test_advcal_2018(self, day, tar_hash, kernel_name, args=()):
+> +        tar_url = ('https://www.qemu-advent-calendar.org'
+> +                   '/2018/download/day' + day + '.tar.xz')
 
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Making the file name flexible helps in the code organization. Still,
+in this specific case, due to limitations in the Avocado Asset parser,
+this construction is ignored in an `avocado assets fetch <file>`
+command. It results in the file being downloaded during the test run
+and the time spent to download the files being accounted for in the
+test time, and if the files are not saved in the Travis cache after
+this test runs, it also means the files will be downloaded again every
+time it runs.
 
-Thanks,
-Roman
+The straight forward solution to that is having the complete URL
+described and fetched for each test.
+
+> +        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
+> +        archive.extract(file_path, self.workdir)
+> +
+> +        kernel_path = self.workdir + '/day' + day + '/' + kernel_name
+> +        kernel_command_line = ''
+> +        console_pattern = 'QEMU advent calendar'
+> +        self.run_rr(kernel_path, kernel_command_line, console_pattern,
+> +            args=args)
+> +
+> +    def test_arm_vexpressa9(self):
+> +        """
+> +        :avocado: tags=arch:arm
+> +        :avocado: tags=machine:vexpress-a9
+> +        """
+> +        tar_hash = '32b7677ce8b6f1471fb0059865f451169934245b'
+> +        self.do_test_advcal_2018('16', tar_hash, 'winter.zImage',
+> +            ('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.dtb'))
+> +
+> +    def test_m68k_mcf5208evb(self):
+> +        """
+> +        :avocado: tags=arch:m68k
+> +        :avocado: tags=machine:mcf5208evb
+> +        """
+> +        tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
+> +        self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
+> +
+> +    def test_microblaze_s3adsp1800(self):
+> +        """
+> +        :avocado: tags=arch:microblaze
+> +        :avocado: tags=machine:petalogix-s3adsp1800
+> +        """
+> +        tar_hash = '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
+> +        self.do_test_advcal_2018('17', tar_hash, 'ballerina.bin')
+> +
+> +    def test_ppc64_e500(self):
+> +        """
+> +        :avocado: tags=arch:ppc64
+> +        :avocado: tags=machine:ppce500
+> +        """
+> +        tar_hash = '6951d86d644b302898da2fd701739c9406527fe1'
+> +        self.do_test_advcal_2018('19', tar_hash, 'uImage', ('-cpu', 'e5500'))
+> +
+> +    def test_ppc_g3beige(self):
+> +        """
+> +        :avocado: tags=arch:ppc
+> +        :avocado: tags=machine:g3beige
+> +        """
+> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
+> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf',
+> +            ('-M', 'graphics=off'))
+> +
+> +    def test_ppc_mac99(self):
+> +        """
+> +        :avocado: tags=arch:ppc
+> +        :avocado: tags=machine:mac99
+> +        """
+> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
+> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf',
+> +            ('-M', 'graphics=off'))
+> +
+> +    def test_sparc_ss20(self):
+> +        """
+> +        :avocado: tags=arch:sparc
+> +        :avocado: tags=machine:SS-20
+> +        """
+> +        tar_hash = 'b18550d5d61c7615d989a06edace051017726a9f'
+> +        self.do_test_advcal_2018('11', tar_hash, 'zImage.elf')
+> +
+> +    def test_xtensa_lx60(self):
+> +        """
+> +        :avocado: tags=arch:xtensa
+> +        :avocado: tags=machine:lx60
+> +        """
+> +        tar_hash = '49e88d9933742f0164b60839886c9739cb7a0d34'
+> +        self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.elf',
+> +            ('-cpu', 'dc233c'))
+>
+>
+
 
