@@ -2,88 +2,92 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C25C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFCA32071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:17:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D9DB20776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuyX8DWN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCA32071A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSUiKduX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9DB20776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdUls-0001pP-KI
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 04:17:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47670)
+	id 1jdUnM-0003vr-Be
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 04:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdUl6-00012M-Bo; Tue, 26 May 2020 04:16:24 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37362)
+ id 1jdUmL-0002Sh-FQ
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 04:17:42 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdUl5-0006kf-LM; Tue, 26 May 2020 04:16:24 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f5so2331379wmh.2;
- Tue, 26 May 2020 01:16:22 -0700 (PDT)
+ id 1jdUmK-0006pK-Q8
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 04:17:41 -0400
+Received: by mail-wr1-x442.google.com with SMTP id i15so19428730wrx.10
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 01:17:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Xtv3pfI08ph+Vnmgl5CRTzpt6lk1dLDI5NDSsSeV5NE=;
- b=XuyX8DWNsDZzoxOWgZP2RYH/wao6LBYcz3c+h9E1RlN0+O0pbtm2ZgyEPpB4HFrSZl
- Vzk9MWgufj/PgHh4bxiYnlvGKfMqBQ5Ps0gyIKNdkGQlfKdMmNy2BL1cZcfPvpMbvYeQ
- mQiK12iPqCWPNWg3+0KZqyWyt7dI6j4dEmRCDo3OO68/Rb39HqdnktXngS7aXd1Im4md
- 6PkBZZLPU9+G8qMArSJbSIEEgb8qM93Ruzrqg9adbbxe/IrUZ5G33+x6OMyWHBTL1uC2
- ZKHEgA/PTBOBzQfgqpF5pvajUhRq2R0APL36U1rneQ8GJzAFPjMKL9AEPFehz/L3qyOn
- iTdg==
+ bh=rVeWaYkh+55WUlfx5f1RL+YYPQaKW76HE6852F1yfa8=;
+ b=YSUiKduXyZTM6GhVpUUud2lmPlwCLGL+taV+4zW4bxXgjmARE4pbT4CywhJ2jC25+s
+ QqRaL7nw2j9aU5jYW8EH3J3eIihxGrAxKEx74X/ys6jaJ/lxPHNhglBWOfllMFYSDuyV
+ iaQXVkyZS/Cyili69SDbnDpkS9KKDTKG6aiVxLZ2L0slSkCX57gLFtJZPDKwqHasLbf9
+ l9HCXByQ2dWEOKALZf8MIU5v1XlZQcfwf+iLHNKlXwM6wnNnsEBsklYFJirGKIi2wnsY
+ DlUJ3VLacNiub+XpHO2S4axWEflg0KqcK/ApKvHrgAhA7TApLAQSGI/h6XH/pwW2Ejt5
+ oV6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Xtv3pfI08ph+Vnmgl5CRTzpt6lk1dLDI5NDSsSeV5NE=;
- b=Z5NCXVjPvYJ6cx5hcKDzMGWnQf0SXNSg9K9b2YFIOogXhsBMte/IkP9IbcyEVgeewK
- A0S79l1SSZFACkJeBlsB8V02MnYQAoXPC9QMxCRN7DutEy/NUWmrC0Sw1QBon1B/+S8T
- A40m83WJtp9jUJl9eZZfkhDbs8aUzf1yujfi61SmmTiHiUgimSkoofVR142iyf5xWtrL
- 1Nmtc11RdAvQR6rmAuLT2BtLgZ+4b4C/DxZ6476Y2saakad/kVDXpo98Y3BPRje/zJkW
- kgdpCzF6aWfwk8rGeFMroiZ8UznqsbBHJtz3DCUeaqNzqEIVBci1VzDMQWAtTQl3nFVV
- 6TRQ==
-X-Gm-Message-State: AOAM530u7GGOCD92/S/qMCmMQkmyEj+LDH6ZdJeZaifBfSd3Nul+vDyx
- g1+Wkf0ZIviyvotzLrIzEAw=
-X-Google-Smtp-Source: ABdhPJxFIzWUGLU+DjwiXREVvpqVyDfTwQ2HTwdQKxBbh9zXAyDl3DXP4Psk7OsNwFjlEY4/EJR5ow==
-X-Received: by 2002:a05:600c:297:: with SMTP id 23mr305757wmk.12.1590480981152; 
- Tue, 26 May 2020 01:16:21 -0700 (PDT)
+ bh=rVeWaYkh+55WUlfx5f1RL+YYPQaKW76HE6852F1yfa8=;
+ b=lGbgerFNEqwXFJxaFBbJAQARz0Ts/adH2brZXpsYiVYltV1U6Xsk4rQq6eICmcy2wS
+ 37gK3D95VUot2CAZBqXHCGe3g8Il+4CkrSwnv3bOc8eSFEp0t52pvlZDfL0cfZGifnxa
+ 6h7HecmGJXXRFSY5QkaPsO0QLK48eoLNAkRW+Gg6c+PIRKJvjBAjl3guSXiDf4l/r257
+ +Ex1U98tHOqeWThadmWDT+ctp6CEASFsEV1SPLk0U4o5xkXwc+oEkkLllZVVlXXOsIVi
+ UpdumFbgE5EEh6arc4Kw65cTBzHLYAM7PSozjYu0oUaHLUfduvezqu8SmC/HQ/LzPE1w
+ dP+Q==
+X-Gm-Message-State: AOAM533P++/dwcKmlXeHIOK1ql4UHxH/mFSDiuRtdmo8mQeIBCtXgdDZ
+ XUoQTYr7RCa+juNhLjp2VkY=
+X-Google-Smtp-Source: ABdhPJwju761sjSflCgsbM7SGseVCPaM7EuO4ZRWYnzoA1g19+FotE21J49sFX6hR1A4ALeNZ5qL3w==
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr18649020wrv.174.1590481059177; 
+ Tue, 26 May 2020 01:17:39 -0700 (PDT)
 Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id b185sm170016wmd.3.2020.05.26.01.16.20
+ by smtp.gmail.com with ESMTPSA id t8sm9737901wro.56.2020.05.26.01.17.37
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 01:16:20 -0700 (PDT)
-Subject: Re: [PATCH 11/14] hw/display/vmware_vga: Let the PCI device own its
- I/O MemoryRegion
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20200526062252.19852-1-f4bug@amsat.org>
- <20200526062252.19852-12-f4bug@amsat.org>
- <20200526080123.ul5r4abphqfi7lkq@sirius.home.kraxel.org>
+ Tue, 26 May 2020 01:17:38 -0700 (PDT)
+Subject: Re: [PATCH 1/2] hw/mips/mips_int: De-duplicate KVM interrupt delivery
+To: Thomas Huth <thuth@redhat.com>, chen huacai <zltjiangshi@gmail.com>,
+ qemu-level <qemu-devel@nongnu.org>
+References: <20200429082916.10669-1-f4bug@amsat.org>
+ <20200429082916.10669-2-f4bug@amsat.org>
+ <CABDp7VoyvX2vD6awEC-GwnEu8SW=pMPPR7mrfKCSzamrnomPKg@mail.gmail.com>
+ <dc94a9f4-b6c9-97fa-4515-3e51ef9b816a@amsat.org>
+ <193e8262-fa43-2132-02ae-e8bceca86c80@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4a6478f2-6b70-40df-093f-e81d2437bfa7@amsat.org>
-Date: Tue, 26 May 2020 10:16:19 +0200
+Message-ID: <997e7635-93fa-d711-4c10-1cf3c02f2482@amsat.org>
+Date: Tue, 26 May 2020 10:17:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200526080123.ul5r4abphqfi7lkq@sirius.home.kraxel.org>
+In-Reply-To: <193e8262-fa43-2132-02ae-e8bceca86c80@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -106,27 +110,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm@nongnu.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/26/20 10:01 AM, Gerd Hoffmann wrote:
-> On Tue, May 26, 2020 at 08:22:49AM +0200, Philippe Mathieu-DaudÃƒÆ’Ã‚Â© wrote:
->> To avoid the orphan I/O memory region being added in the /unattached
->> QOM container, register the PCI device as its owner.
->>
->> Signed-off-by: Philippe Mathieu-DaudÃƒÆ’Ã‚Â© <f4bug@amsat.org>
->> ---
->> RFC: This might break migration
+On 5/26/20 9:57 AM, Thomas Huth wrote:
+> On 12/05/2020 09.08, Philippe Mathieu-Daudé wrote:
+>> On 4/29/20 10:48 AM, chen huacai wrote:
+>>> Hi, Philippe,
+>>>
+>>> On Wed, Apr 29, 2020 at 4:30 PM Philippe Mathieu-Daudé
+>>> <f4bug@amsat.org> wrote:
+>>>>
+>>>> Refactor duplicated code in a single place.
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>>   hw/mips/mips_int.c | 11 +++--------
+>>>>   1 file changed, 3 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+>>>> index 796730b11d..4a1bf846da 100644
+>>>> --- a/hw/mips/mips_int.c
+>>>> +++ b/hw/mips/mips_int.c
+>>>> @@ -47,17 +47,12 @@ static void cpu_mips_irq_request(void *opaque,
+>>>> int irq, int level)
+>>>>
+>>>>       if (level) {
+>>>>           env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
+>>>> -
+>>>> -        if (kvm_enabled() && irq == 2) {
+>>>> -            kvm_mips_set_interrupt(cpu, irq, level);
+>>>> -        }
+>>>> -
+>>>>       } else {
+>>>>           env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
+>>>> +    }
+>>>>
+>>>> -        if (kvm_enabled() && irq == 2) {
+>>>> -            kvm_mips_set_interrupt(cpu, irq, level);
+>>>> -        }
+>>>> +    if (kvm_enabled() && irq == 2) {
+>>>> +        kvm_mips_set_interrupt(cpu, irq, level);
+>>>>       }
+>>>>
+>>>>       if (env->CP0_Cause & CP0Ca_IP_mask) {
+>>>> -- 
+>>>> 2.21.1
 > 
-> --verbose please.  This doesn't touch the live migration data stream?
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Oops, this is an I/O region... I was confused by this warning form Peter:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg681970.html
-
-But it is restricted to RAM regions, so this patch is harmless.
+Thanks, queued to mips-next.
 
