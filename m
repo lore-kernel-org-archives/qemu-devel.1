@@ -2,94 +2,86 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F26C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4006208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B383F2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:17:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eus+7YeD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4006208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rVv1rkAF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B383F2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdewj-00009S-Tz
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:09:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57790)
+	id 1jdf4f-0005cv-T9
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:17:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1jdevk-0007qT-Um
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:08:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34602
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1jdevi-0002b6-PN
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:08:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590520081;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XsqIYPuleZxM0g1eJ0Tl9Rl8fj5Jgz8fJlh+kvIcgsU=;
- b=eus+7YeDVuuLo9+DVyESzhwnCzNyfscmrUCpKETbh3t9xYGU/8SCwEh7Z9+Zn20fZ0C45D
- KLExwZUMqXtAkomPlJ0Db3xMmtLgH4BSpQ8y8zKiINmMy+6D+xsEcvo/VHM/ChKUkbEYAz
- EiWkunQEL/jwNtIO4n3w8lNTK08+bK8=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-0mRAV81APtyzhV_Nc6H0Kg-1; Tue, 26 May 2020 15:06:36 -0400
-X-MC-Unique: 0mRAV81APtyzhV_Nc6H0Kg-1
-Received: by mail-ua1-f71.google.com with SMTP id l26so2880270uak.21
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 12:06:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XsqIYPuleZxM0g1eJ0Tl9Rl8fj5Jgz8fJlh+kvIcgsU=;
- b=H2vwVEa9a8Yj2D37mE4Z+pi3q0esMHplDy8e28F6TEmvAfYfLl+KM7W7wfRF4uTzuc
- 2EYxbeWoUaoaurMA59IZVlC+m0euhKvlu1hrspegNG2DvDy2JHNyA7Sw/9+BUGnAFVCn
- +z9PspvA7Sab/7xLZgtwoudl+Z6K1UxHXU4WfGgKodsZ+kTsfercMvME13Gem9AxZahX
- qGg/jENesSiSoQqVr5EtP9UybJbkuzPgu8q6E5qOXb3g1ccsYvWv8B3eI1Os4GevfWAh
- RjsLwguL0UswB8j87V7ExDZyN9v7mFXidNnGHG15j6ysdDteMX0cOiFUVDY0Fj8G6Qhk
- MDYQ==
-X-Gm-Message-State: AOAM533evOlEB1m1fvoS3jpqkuwPuZf5nrdHhxIUgplYFE/CQWhR0lUI
- BSFsSESV9hwGZBEiy5mKFaIhQpz3j+EnbYUDaBZXn3RIRam4bLuWF8zeWFH73ytCGOdIRFPNZ7k
- jqqkeECuHl4zQTn4GylCteRiJjp/1YI4=
-X-Received: by 2002:a67:87c7:: with SMTP id j190mr2114218vsd.125.1590519993660; 
- Tue, 26 May 2020 12:06:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6InneStS7bYYK6ob4wYBupg4ffI7UQBaXMZ581WA7MGS48jvyNMK6cHcaSOTRSt/zJbdT/uFepZs53rqPpwI=
-X-Received: by 2002:a67:87c7:: with SMTP id j190mr2114190vsd.125.1590519993278; 
- Tue, 26 May 2020 12:06:33 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jdf3p-0004lk-Uo
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 15:16:25 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:38592 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jdf3Z-00009W-6L
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 15:16:25 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id AFF6D4AC44;
+ Tue, 26 May 2020 19:16:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1590520561;
+ x=1592334962; bh=XBnA6pvONTxXPFeES539xj5oH4GOqLpfQInPcIzMT2Y=; b=
+ rVv1rkAFw6BCFekhSlBjHJ2+1ubRDdc7L8eDqpCFCcGeNRkkX7Tm1g+RukV0rVn7
+ 4z1+jP3607/bHt7FYtudL5BeIVFDw04zI7EHyagNG6neWHCd0A0BvdUit8jqtyYt
+ ugBiEtVruv4dy7Vak4WsFK7AvTlm4VPSR14Pc8wiCD4=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ampTV91FXGbb; Tue, 26 May 2020 22:16:01 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id C26B34C164;
+ Tue, 26 May 2020 22:15:59 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 26
+ May 2020 22:16:01 +0300
+Date: Tue, 26 May 2020 22:16:00 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [RFC v3 4/4] cpus: extract out accel-specific code to each accel
+Message-ID: <20200526191600.GA4851@SPB-NB-133.local>
+References: <20200525145440.29728-1-cfontana@suse.de>
+ <20200525145440.29728-5-cfontana@suse.de>
 MIME-Version: 1.0
-References: <159040554265.2615.8993443700754452381.stgit@pasha-ThinkPad-X280>
- <159040559302.2615.18392869399102145442.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159040559302.2615.18392869399102145442.stgit@pasha-ThinkPad-X280>
-From: Willian Rampazzo <wrampazz@redhat.com>
-Date: Tue, 26 May 2020 16:06:22 -0300
-Message-ID: <CAKJDGDZZGaUm1RFcA3cBfQiiMRRpg7hd_VcRZ3zkrFtN9BhxkQ@mail.gmail.com>
-Subject: Re: [PATCH 9/9] tests/acceptance: Linux boot test for record/replay
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=wrampazz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200525145440.29728-5-cfontana@suse.de>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 15:16:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,203 +95,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, dovgaluk@ispras.ru,
- pavel.dovgaluk@ispras.ru, Cleber Rosa Junior <crosa@redhat.com>,
- pbonzini@redhat.com, Philippe Mathieu Daude <philmd@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Cameron Esfahani <dirty@apple.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 8:30 AM Pavel Dovgalyuk
-<Pavel.Dovgaluk@gmail.com> wrote:
->
-> This patch adds a test for record/replay, which boots Linux
-> image from the disk and interacts with the network.
-> The idea and code of this test is borrowed from boot_linux.py
-> However, currently record/replay works only for x86_64,
-> therefore other tests were excluded.
->
-> Each test consists of the following phases:
->  - downloading the disk image
->  - recording the execution
->  - replaying the execution
->
-> Replay does not validates the output, but waits until QEMU
-> finishes the execution. This is reasonable, because
-> QEMU usually hangs when replay goes wrong.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Mon, May 25, 2020 at 04:54:40PM +0200, Claudio Fontana wrote:
+> each accelerator registers a new "CpusAccelInterface"
+> on initialization, providing functions for starting a vcpu,
+> kicking a vcpu, and sychronizing state.
+> 
+> This way the code in cpus.cc is now all general softmmu code,
+> nothing (or almost nothing) accelerator-specific anymore.
+> 
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
 > ---
->  MAINTAINERS                      |    1
->  tests/acceptance/replay_linux.py |  140 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 141 insertions(+)
->  create mode 100644 tests/acceptance/replay_linux.py
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index e9a9ce4f66..97f066a9b2 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2498,6 +2498,7 @@ F: include/sysemu/replay.h
->  F: docs/replay.txt
->  F: stubs/replay.c
->  F: tests/acceptance/replay_kernel.py
-> +F: tests/acceptance/replay_linux.py
->
->  IOVA Tree
->  M: Peter Xu <peterx@redhat.com>
-> diff --git a/tests/acceptance/replay_linux.py b/tests/acceptance/replay_linux.py
+>  MAINTAINERS                          |   1 +
+>  accel/kvm/Makefile.objs              |   2 +
+>  accel/kvm/kvm-all.c                  |  15 +-
+>  accel/kvm/kvm-cpus-interface.c       |  94 ++++
+>  accel/kvm/kvm-cpus-interface.h       |   8 +
+>  accel/qtest.c                        |  82 ++++
+>  accel/stubs/kvm-stub.c               |   3 +-
+>  accel/tcg/Makefile.objs              |   1 +
+>  accel/tcg/tcg-all.c                  |  12 +-
+>  accel/tcg/tcg-cpus-interface.c       | 523 ++++++++++++++++++++
+>  accel/tcg/tcg-cpus-interface.h       |   8 +
+>  hw/core/cpu.c                        |   1 +
+>  include/sysemu/cpus.h                |  32 ++
+>  include/sysemu/hvf.h                 |   1 -
+>  include/sysemu/hw_accel.h            |  57 +--
+>  include/sysemu/kvm.h                 |   2 +-
+>  softmmu/cpus.c                       | 911 +++--------------------------------
+>  stubs/Makefile.objs                  |   1 +
+>  stubs/cpu-synchronize-state.c        |  15 +
+>  target/i386/Makefile.objs            |   7 +-
+>  target/i386/hax-all.c                |   6 +-
+>  target/i386/hax-cpus-interface.c     |  85 ++++
+>  target/i386/hax-cpus-interface.h     |   8 +
+>  target/i386/hax-i386.h               |   2 +
+>  target/i386/hax-posix.c              |  12 +
+>  target/i386/hax-windows.c            |  20 +
+>  target/i386/hvf/Makefile.objs        |   2 +-
+>  target/i386/hvf/hvf-cpus-interface.c |  92 ++++
+>  target/i386/hvf/hvf-cpus-interface.h |   8 +
+>  target/i386/hvf/hvf.c                |   5 +-
+>  target/i386/whpx-all.c               |   3 +
+>  target/i386/whpx-cpus-interface.c    |  96 ++++
+>  target/i386/whpx-cpus-interface.h    |   8 +
+>  33 files changed, 1220 insertions(+), 903 deletions(-)
+>  create mode 100644 accel/kvm/kvm-cpus-interface.c
+>  create mode 100644 accel/kvm/kvm-cpus-interface.h
+>  create mode 100644 accel/tcg/tcg-cpus-interface.c
+>  create mode 100644 accel/tcg/tcg-cpus-interface.h
+>  create mode 100644 stubs/cpu-synchronize-state.c
+>  create mode 100644 target/i386/hax-cpus-interface.c
+>  create mode 100644 target/i386/hax-cpus-interface.h
+>  create mode 100644 target/i386/hvf/hvf-cpus-interface.c
+>  create mode 100644 target/i386/hvf/hvf-cpus-interface.h
+>  create mode 100644 target/i386/whpx-cpus-interface.c
+>  create mode 100644 target/i386/whpx-cpus-interface.h
+
+Hi Claudio,
+
+Overall it looks good.
+
+I wonder if the new structure should get singular form, i.e.
+softmmu/cpu.c instead of softmmu/cpus.c
+
+Perhaps cpus.c had plural form because it was related to implementation
+of multiple CPUs/accels. After the split, each accel got it's own
+implementation of accel interface.
+
+"<accel>-cpus-interface.c" contains implementation rather than interface
+it's a bit confusing. Perhaps it should be called: "<accel>-cpu.c" or
+even "<accel>-accel.c".
+
+By the way, If we use registration for each accel, does it mean that
+include/sysemu/<accel>.h and accel stubs are no longer needed in shared
+location?
+
+There's an AccelClass in accel/accel.c, I wonder if it should be re-used
+for accel CPU registration? I don't know but may be generic the leftover
+of cpus.c also belongs to accel/ rather than softmmu/?
+
+>  
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 149de000a0..cae22afe4d 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -4,7 +4,39 @@
+>  #include "qemu/timer.h"
+>  
+>  /* cpus.c */
+> +
+> +/* CPU execution threads */
+> +
+> +typedef struct CpusAccelInterface {
+> +    void (*create_vcpu_thread)(CPUState *cpu);
+> +    void (*kick_vcpu_thread)(CPUState *cpu);
+> +
+> +    void (*cpu_synchronize_post_reset)(CPUState *cpu);
+> +    void (*cpu_synchronize_post_init)(CPUState *cpu);
+> +    void (*cpu_synchronize_state)(CPUState *cpu);
+> +    void (*cpu_synchronize_pre_loadvm)(CPUState *cpu);
+> +} CpusAccelInterface;
+
+
+I think plural name may be replaced to singular. Interface suffix
+doesn't seem to be used in QEMU.
+
+cpu_ and _vcpu are sort meaning the same and may be replaced to generic
+cpu_ prefix. There's a CPUState, CPU<Arch>State, and IMO shorter
+CPUAccel seems to match the naming. I also don't know if cpu_ prefix
+should be kept.
+
+So here's how I see the interface:
+
+typedef struct CPUAccel {
+    void (*create_thread)(CPUState *cpu);
+    void (*kick_thread)(CPUState *cpu);
+
+    void (*synchronize_post_reset)(CPUState *cpu);
+    void (*synchronize_post_init)(CPUState *cpu);
+    void (*synchronize_state)(CPUState *cpu);
+    void (*synchronize_pre_loadvm)(CPUState *cpu);
+} CPUAccel;
+
+
+> +
+> +/* register accel-specific interface */
+> +void cpus_register_accel_interface(CpusAccelInterface *i);
+> +
+> +/* interface available for cpus accelerator threads */
+> +
+> +/* For temporary buffers for forming a name */
+> +#define VCPU_THREAD_NAME_SIZE 16
+> +
+> +void cpus_kick_thread(CPUState *cpu);
+
+If it's addressing a single CPU should it be singular too, i.e.
+cpu_kick_thread?
+
+> +bool cpu_thread_is_idle(CPUState *cpu);
+>  bool all_cpu_threads_idle(void);
+> +bool cpu_can_run(CPUState *cpu);
+> +void qemu_wait_io_event_common(CPUState *cpu);
+> +void qemu_wait_io_event(CPUState *cpu);
+> +void cpu_thread_signal_created(CPUState *cpu);
+> +void cpu_thread_signal_destroyed(CPUState *cpu);
+> +void cpu_handle_guest_debug(CPUState *cpu);
+> +
+> +/* end interface for cpus accelerator threads */
+> +
+>  bool qemu_in_vcpu_thread(void);
+>  void qemu_init_cpu_loop(void);
+>  void resume_all_vcpus(void);
+> diff --git a/target/i386/hvf/Makefile.objs b/target/i386/hvf/Makefile.objs
+> index 927b86bc67..bdbc2c0227 100644
+> --- a/target/i386/hvf/Makefile.objs
+> +++ b/target/i386/hvf/Makefile.objs
+> @@ -1,2 +1,2 @@
+> -obj-y += hvf.o
+> +obj-y += hvf.o hvf-cpus-interface.o
+>  obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
+> diff --git a/target/i386/hvf/hvf-cpus-interface.c b/target/i386/hvf/hvf-cpus-interface.c
 > new file mode 100644
-> index 0000000000..08eedb23ef
+> index 0000000000..54bfe307c1
 > --- /dev/null
-> +++ b/tests/acceptance/replay_linux.py
-> @@ -0,0 +1,140 @@
-> +# Record/replay test that boots a complete Linux system via a cloud image
-> +#
-> +# Copyright (c) 2020 ISP RAS
-> +#
-> +# Author:
-> +#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
+> +++ b/target/i386/hvf/hvf-cpus-interface.c
+> @@ -0,0 +1,92 @@
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/main-loop.h"
+> +#include "sysemu/hvf.h"
+> +#include "sysemu/runstate.h"
+> +#include "sysemu/cpus.h"
+> +#include "qemu/guest-random.h"
 > +
-> +import os
+> +#include "hvf-cpus-interface.h"
 > +
-> +from avocado_qemu import Test, BUILD_DIR
+> +/*
+> + * The HVF-specific vCPU thread function. This one should only run when the host
+> + * CPU supports the VMX "unrestricted guest" feature.
+> + */
+> +static void *hvf_cpu_thread_fn(void *arg)
+> +{
+> +    CPUState *cpu = arg;
 > +
-> +from avocado.utils import cloudinit
-> +from avocado.utils import network
-> +from avocado.utils import vmimage
-> +from avocado.utils import datadrainer
-> +from avocado.utils.path import find_command
+> +    int r;
 > +
-> +class ReplayLinux(Test):
+> +    assert(hvf_enabled());
+> +
+> +    rcu_register_thread();
+> +
+> +    qemu_mutex_lock_iothread();
+> +    qemu_thread_get_self(cpu->thread);
+> +
+> +    cpu->thread_id = qemu_get_thread_id();
+> +    cpu->can_do_io = 1;
+> +    current_cpu = cpu;
+> +
+> +    hvf_init_vcpu(cpu);
+> +
+> +    /* signal CPU creation */
+> +    cpu_thread_signal_created(cpu);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+> +
+> +    do {
+> +        if (cpu_can_run(cpu)) {
+> +            r = hvf_vcpu_exec(cpu);
+> +            if (r == EXCP_DEBUG) {
+> +                cpu_handle_guest_debug(cpu);
+> +            }
+> +        }
+> +        qemu_wait_io_event(cpu);
+> +    } while (!cpu->unplug || cpu_can_run(cpu));
+> +
+> +    hvf_vcpu_destroy(cpu);
+> +    cpu_thread_signal_destroyed(cpu);
+> +    qemu_mutex_unlock_iothread();
+> +    rcu_unregister_thread();
+> +    return NULL;
+> +}
+> +
+> +static void hvf_kick_vcpu_thread(CPUState *cpu)
+> +{
+> +    cpus_kick_thread(cpu);
 
-There is no need to copy/paste the whole BootLinux class. You can
-inherit from it and re-implement the lauch_and_wait method. Inheriting
-avoids duplication of code.
 
-> +    """
-> +    Boots a Linux system, checking for a successful initialization
-> +    """
-> +
-> +    timeout = 1800
-> +    chksum = None
-> +    hdd = 'ide-hd'
-> +    cd = 'ide-cd'
-> +    bus = ''
-> +
-> +    def setUp(self):
-> +        super(ReplayLinux, self).setUp()
-> +        self.prepare_boot()
-> +        self.prepare_cloudinit()
-> +
-> +    def vm_add_disk(self, vm, path, id, device):
-> +        bus_string = ''
-> +        if self.bus != '':
-> +            bus_string = ',bus=%s.%d' % (self.bus, id,)
-> +        vm.add_args('-drive', 'file=%s,snapshot,id=disk%s,if=none' % (path, id))
-> +        vm.add_args('-drive', 'driver=blkreplay,id=disk%s-rr,if=none,image=disk%s' % (id, id))
-> +        vm.add_args('-device', '%s,drive=disk%s-rr%s' % (device, id, bus_string))
-> +
-> +    def prepare_boot(self):
-> +        self.log.debug('Looking for and selecting a qemu-img binary to be '
-> +                       'used to create the bootable snapshot image')
-> +        # If qemu-img has been built, use it, otherwise the system wide one
-> +        # will be used.  If none is available, the test will cancel.
-> +        qemu_img = os.path.join(BUILD_DIR, 'qemu-img')
-> +        if not os.path.exists(qemu_img):
-> +            qemu_img = find_command('qemu-img', False)
-> +        if qemu_img is False:
-> +            self.cancel('Could not find "qemu-img", which is required to '
-> +                        'create the bootable image')
-> +        vmimage.QEMU_IMG = qemu_img
-> +
-> +        self.log.info('Downloading/preparing boot image')
-> +        # Fedora 31 only provides ppc64le images
-> +        image_arch = self.arch
-> +        if image_arch == 'ppc64':
-> +            image_arch = 'ppc64le'
-> +        try:
-> +            self.boot = vmimage.get(
-> +                'fedora', arch=image_arch, version='31',
-> +                checksum=self.chksum,
-> +                algorithm='sha256',
-> +                cache_dir=self.cache_dirs[0],
-> +                snapshot_dir=self.workdir)
-> +        except:
-> +            self.cancel('Failed to download/prepare boot image')
-> +
-> +    def prepare_cloudinit(self):
-> +        self.log.info('Preparing cloudinit image')
-> +        try:
-> +            self.cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
-> +            self.phone_home_port = network.find_free_port()
-> +            cloudinit.iso(self.cloudinit_iso, self.name,
-> +                          username='root',
-> +                          password='password',
-> +                          # QEMU's hard coded usermode router address
-> +                          phone_home_host='10.0.2.2',
-> +                          phone_home_port=self.phone_home_port)
-> +        except Exception:
-> +            self.cancel('Failed to prepared cloudinit image')
-> +
-> +    def launch_and_wait(self, record, args, shift):
-> +        vm = self.get_vm()
-> +        vm.add_args('-smp', '1')
-> +        vm.add_args('-m', '1024')
-> +        vm.add_args('-object', 'filter-replay,id=replay,netdev=hub0port0')
-> +        vm.add_args(*args)
-> +        self.vm_add_disk(vm, self.boot.path, 0, self.hdd)
-> +        self.vm_add_disk(vm, self.cloudinit_iso, 1, self.cd)
-> +        if record:
-> +            mode = 'record'
-> +        else:
-> +            mode = 'replay'
-> +        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s' %
-> +                    (shift, mode, os.path.join(self.workdir, 'replay.bin')))
-> +
-> +        vm.set_console()
-> +        vm.launch()
-> +        console_drainer = datadrainer.LineLogger(vm.console_socket.fileno(),
-> +                                                 logger=self.log.getChild('console'),
-> +                                                 stop_check=(lambda : not vm.is_running()))
-> +        console_drainer.start()
-> +        if record:
-> +            self.log.info('VM launched, waiting for boot confirmation from guest')
-> +            cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), self.name)
-> +            vm.shutdown()
-> +        else:
-> +            self.log.info('VM launched, waiting the recorded execution to be replayed')
-> +            vm.wait()
-> +
-> +    def run_rr(self, args=(), shift=7):
-> +        self.launch_and_wait(True, args, shift)
-> +        self.launch_and_wait(False, args, shift)
-> +
-> +class ReplayLinuxX8664(ReplayLinux):
-> +    """
-> +    :avocado: tags=arch:x86_64
-> +    """
-> +    bus = 'ide'
-> +
-> +    chksum = 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c5c27a0'
-> +
-> +    def test_pc_i440fx(self):
-> +        """
-> +        :avocado: tags=machine:pc
-> +        :avocado: tags=accel:tcg
-> +        """
-> +        self.run_rr(shift=1)
-> +
-> +    def test_pc_q35(self):
-> +        """
-> +        :avocado: tags=machine:q35
-> +        :avocado: tags=accel:tcg
-> +        """
-> +        self.run_rr(shift=3)
->
->
+I think we should leave it empty since it's not really implemented for
+HVF. Here's a WIP implementation I'm yet to send:
 
+https://github.com/roolebo/qemu/commit/4437a4b8af31b0adaa58375f09e0b8547507f64f#diff-5e6ad1baa140ca4a1743b5a2f1a664b5R970
+
+> +}
+> +
+> +static void hvf_cpu_synchronize_noop(CPUState *cpu)
+> +{
+> +}
+> +
+> +static void hvf_start_vcpu_thread(CPUState *cpu)
+> +{
+> +    char thread_name[VCPU_THREAD_NAME_SIZE];
+> +
+> +    /*
+> +     * HVF currently does not support TCG, and only runs in
+> +     * unrestricted-guest mode.
+> +     */
+> +    assert(hvf_enabled());
+> +
+> +    cpu->thread = g_malloc0(sizeof(QemuThread));
+> +    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+> +    qemu_cond_init(cpu->halt_cond);
+> +
+> +    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
+> +             cpu->cpu_index);
+> +    qemu_thread_create(cpu->thread, thread_name, hvf_cpu_thread_fn,
+> +                       cpu, QEMU_THREAD_JOINABLE);
+> +}
+> +
+> +CpusAccelInterface hvf_cpus_interface = {
+> +    .create_vcpu_thread = hvf_start_vcpu_thread,
+
+I think it was meant as hvf_create_vcpu_thread.
+
+> +    .kick_vcpu_thread = hvf_kick_vcpu_thread,
+> +
+> +    .cpu_synchronize_post_reset = hvf_cpu_synchronize_noop,
+> +    .cpu_synchronize_post_init = hvf_cpu_synchronize_noop,
+> +    .cpu_synchronize_state = hvf_cpu_synchronize_noop,
+> +    .cpu_synchronize_pre_loadvm = hvf_cpu_synchronize_noop,
+
+I have tested the RFC with hvf accel and it seems to work although I
+expected it fail. The noop functions are the reason of the behaviour. In
+some sense it's not equivalent to what it was before but to be fair it's
+not possible to use existing hvf_cpu_synchronize_* functions in
+target/i386/hvf/hvf.c without breaking hvf.
+
+Here's how it fails. hvf_cpu_synchronize_state() sets dirty flag to mark
+that emulator registers in CPUX86State are going to be out of sync with
+accel registers. If we bind .cpu_synchronize_state to
+hvf_synchronize_state it'd be called from vapic_write() on I/O writes
+(from kvmvapic.bin option ROM) to KVM vAPIC page (I/O port 0x7e).
+
+But HVF uses two emulator states CPUX86State and HVFX86EmulatorState
+and they may become out-of-sync. That's exactly what happens when an I/O
+write to KVM vAPIC is made. The I/O write triggers cpu state
+synchronization, so VMCS registers are fetched into CPUX86State and the
+vcpu_dirty flag is set. Emulation code then advances RIP in the
+macvm_set_rip() by modifying VMCS directly. On the next round of vcpu
+run loop it checks if the cpu is dirty (it is) and pushes CPUX86State
+into the VMCS, effectively overwriting what was set by macvm_set_rip().
+
+If the RFC isn't expected to be merged for a couple of weeks I can
+prepare a series that drops HVFX86EmulatorState. I need the change for
+single-stepping support in HVF anyway.
+
+Thanks,
+Roman
 
