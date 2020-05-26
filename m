@@ -2,71 +2,83 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D004C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B258DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CA9920663
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA9920663
+	by mail.kernel.org (Postfix) with ESMTPS id 84E7320663
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:51:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84E7320663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdY7Z-0002RA-Br
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 07:51:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45248)
+	id 1jdY7d-0002X0-K4
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 07:51:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jdY6o-0001KG-99
- for qemu-devel@nongnu.org; Tue, 26 May 2020 07:51:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38118)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jdY6q-0001Kz-DZ
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 07:51:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18331
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jdY6n-0004kf-Ff
- for qemu-devel@nongnu.org; Tue, 26 May 2020 07:51:02 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04QBWI95072540; Tue, 26 May 2020 07:50:26 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3170032434-1
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jdY6p-0004me-Cy
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 07:51:04 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04QBVEe9101427; Tue, 26 May 2020 07:50:30 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 316wevcjcp-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 26 May 2020 07:50:25 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04QBoNE8010094;
- Tue, 26 May 2020 11:50:23 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma03fra.de.ibm.com with ESMTP id 316uf82brw-1
+ Tue, 26 May 2020 07:50:30 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04QBYEFl110675;
+ Tue, 26 May 2020 07:50:29 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.106])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 316wevcjb3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 26 May 2020 11:50:23 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04QBoLKE11206730
+ Tue, 26 May 2020 07:50:29 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+ by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04QBc5Zt023825;
+ Tue, 26 May 2020 11:50:28 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma04fra.de.ibm.com with ESMTP id 316uf8abhe-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 26 May 2020 11:50:27 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04QBoP0933685506
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 May 2020 11:50:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0E0D85204E;
- Tue, 26 May 2020 11:50:21 +0000 (GMT)
+ Tue, 26 May 2020 11:50:25 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 87F9D4C044;
+ Tue, 26 May 2020 11:50:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4695A4C05A;
+ Tue, 26 May 2020 11:50:25 +0000 (GMT)
 Received: from smtp.tlslab.ibm.com (unknown [9.101.4.1])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id D198052050;
- Tue, 26 May 2020 11:50:20 +0000 (GMT)
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+ Tue, 26 May 2020 11:50:25 +0000 (GMT)
 Received: from bahia.ibmuc.com (sig-9-145-63-64.uk.ibm.com [9.145.63.64])
- by smtp.tlslab.ibm.com (Postfix) with ESMTP id 3634C22003E;
- Tue, 26 May 2020 13:50:20 +0200 (CEST)
+ by smtp.tlslab.ibm.com (Postfix) with ESMTP id 7A45122003E;
+ Tue, 26 May 2020 13:50:24 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 0/5] 9p patches 2020-05-26
-Date: Tue, 26 May 2020 13:49:27 +0200
-Message-Id: <20200526114931.391049-1-groug@kaod.org>
+Subject: [PULL 1/5] 9pfs: include linux/limits.h for XATTR_SIZE_MAX
+Date: Tue, 26 May 2020 13:49:28 +0200
+Message-Id: <20200526114931.391049-2-groug@kaod.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200526114931.391049-1-groug@kaod.org>
+References: <20200526114931.391049-1-groug@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -75,16 +87,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-05-26_01:2020-05-26,
  2020-05-26 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- cotscore=-2147483648 bulkscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=986 phishscore=0 impostorscore=0 mlxscore=0 spamscore=0
- adultscore=0 clxscore=1034 lowpriorityscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005260083
-Received-SPF: softfail client-ip=148.163.156.1; envelope-from=groug@kaod.org;
+ phishscore=0 malwarescore=0
+ bulkscore=0 mlxscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
+ adultscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1034
+ suspectscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005260083
+Received-SPF: softfail client-ip=148.163.158.5; envelope-from=groug@kaod.org;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 07:50:51
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 07:50:54
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -103,52 +114,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Dan Robertson <dan@dlrobertson.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit fea8f3ed739536fca027cf56af7f5576f37ef9=
-cd:
+From: Dan Robertson <dan@dlrobertson.com>
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/pflash-next-20=
-200522' into staging (2020-05-22 18:54:47 +0100)
+linux/limits.h should be included for the XATTR_SIZE_MAX definition used
+by v9fs_xattrcreate.
 
-are available in the Git repository at:
+Fixes: 3b79ef2cf488 ("9pfs: limit xattr size in xattrcreate")
+Signed-off-by: Dan Robertson <dan@dlrobertson.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-Id: <20200515203015.7090-2-dan@dlrobertson.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-  https://github.com/gkurz/qemu.git tags/9p-next-2020-05-26
-
-for you to fetch changes up to 84af75577cceb195b044e2d5ba6d940206b169ca:
-
-  xen/9pfs: increase max ring order to 9 (2020-05-25 11:45:40 +0200)
-
-----------------------------------------------------------------
-- fix build with musl libc
-- fix potential deadlock of QEMU main event loop (cannot be hit with linu=
-x
-  client)
-- revert 9pfs reply truncation (LP 1877688)
-- xen backend waits for client to free space on the reply ring instead of
-  truncating or disconnecting
-
-----------------------------------------------------------------
-Dan Robertson (1):
-  9pfs: include linux/limits.h for XATTR_SIZE_MAX
-
-Greg Kurz (1):
-  9p: Lock directory streams with a CoMutex
-
-Stefano Stabellini (3):
-  Revert "9p: init_in_iov_from_pdu can truncate the size"
-  xen/9pfs: yield when there isn't enough room on the ring
-  xen/9pfs: increase max ring order to 9
-
- hw/9pfs/9p.c               | 34 ++++++++++++--------------------
- hw/9pfs/9p.h               | 10 +++++-----
- hw/9pfs/virtio-9p-device.c | 11 ++++-------
- hw/9pfs/xen-9p-backend.c   | 40 ++++++++++++++++++++++++++------------
- 4 files changed, 49 insertions(+), 46 deletions(-)
-
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index a2a14b59793c..68c2df7333f9 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -28,6 +28,7 @@
+ #include "sysemu/qtest.h"
+ #include "qemu/xxhash.h"
+ #include <math.h>
++#include <linux/limits.h>
+=20
+ int open_fd_hw;
+ int total_open_fd;
 --=20
 2.21.3
 
