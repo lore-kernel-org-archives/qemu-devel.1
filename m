@@ -2,92 +2,89 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00968C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8437C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C45FB20704
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:40:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D8E420704
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:40:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjgpCiPx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C45FB20704
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQgFVP3z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D8E420704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jddZ0-0005il-TL
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46858)
+	id 1jddZJ-0005uu-RQ
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jddXe-0004Mn-Mc
- for qemu-devel@nongnu.org; Tue, 26 May 2020 13:39:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45416)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jddW8-0001j9-Vn; Tue, 26 May 2020 13:37:33 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:36680)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jddXa-0006Ui-MA
- for qemu-devel@nongnu.org; Tue, 26 May 2020 13:39:05 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c3so16995309wru.12
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 10:39:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jddW7-0005ll-4D; Tue, 26 May 2020 13:37:31 -0400
+Received: by mail-il1-x141.google.com with SMTP id 17so21344269ilj.3;
+ Tue, 26 May 2020 10:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3hfD3ml7lk6m4OdRbIJyvHpcUBE7nj0l2MA3rhHfEF8=;
- b=WjgpCiPxiZvziRAtxDY8oHafCj63QdrcEz0Bmej+CacJaDEBqnlT6lIsBa0Mmr9vGB
- EPNR9M1k35FRp1mvFR+q8NKn4csW8hZqnJwaF8RYVr3NJOoBbdq/NSLHhbact18bBKj0
- 0xCMNjIANelPBYolbaI4n2cwt5oW8cIAAEGzFg2/W33kd9TQxenferNyd9qJWIAHKdF2
- JDM01QhGcAecC3DyYvO9DjssHRiKw/4RgtBGiJ6ikgsx/FQ36c4rJMHAUvtPcRlTMBEE
- nlBRSoiy3oTuENx9+yHbRm9AEy3GgOl/5aN7IHMcfdy0g23b9oA8ujWbz8I8lTxS/yv8
- HFlw==
+ :cc:content-transfer-encoding;
+ bh=7dIEbDvjdPSgiC8KM+8KpNw2JYaYxr6R5A6LSlImonY=;
+ b=jQgFVP3zBEvCFOi/6th7JnPuipZCfzltmxZv+SAGJbagvzWUylgKGdXJTbxZ/wqNIR
+ 8cr9l+hXsuY3MfkvyUYE2FDHVv3Q++ZKvgJN12jdv6C11BrFVr8RuJIDJHhjKWpFlWCF
+ WMiEC/9BdIics6oxDXdqi8E0eVKzqCrtmbnhAti77ZtRsYE4/M0+S/09dw474ZJKbHFi
+ 9FG1QRJwvkjk8fCT7C1Yi2EFxnGD4V5TRfY/JR88nqPkikv90yNpkhvXgf0RGrpsWA0R
+ hiWYEYaGOKd3+tFwn62+jvI55mmfQo+HE0MxDmAK3XsYJuGFIFHXxNzb/XBeggEgzxex
+ ndkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3hfD3ml7lk6m4OdRbIJyvHpcUBE7nj0l2MA3rhHfEF8=;
- b=GyptuX0M/qwNIuORhkzhd/ibtA8qVUvXH82ELe8mcOzt/e237C2QY9zyyPZo6B/J+/
- z+/TSlnTs1KiIRlX+RL/Kd06CfkpWjcyNoMCG6coRASj0sFWZB+6u++PLsXCvWNVajtp
- CsCSB/H2ExnoyjIqg4ZJnq81SII1/eUzuAfk8ub/X+ONBMHqxfHX7b7aaGZc5ZDFwV43
- zLOv6c37P4tREtjI4ELQU3NAgSmi+EJ1aX9di6Elb+hIZz6A1gofgF1h7l8QBCKyVmT6
- 26g04+0EQbxJsgrX3sOmOztPy77kug4Si3bKlsdClEZOqlRoE6/Zh/BeC4aTuw+H6O3C
- hLxA==
-X-Gm-Message-State: AOAM5316qrQMV5r3ShX2SMOQTRG/V+bG31XXUVA11cqJpuGRAF1iVl1o
- +OraL9exChdPfdMndOHDfqi8EjqDGUaxHqBm7PE=
-X-Google-Smtp-Source: ABdhPJyP+nfa3EQCLgCxncuAZ+LLH22AQLwwFLEaTT9aouGS4SyvXTp6l9WrCq9v84fN9flfjH1AQhD4SLKNoIjUpuc=
-X-Received: by 2002:a5d:4385:: with SMTP id i5mr14199068wrq.420.1590514740886; 
- Tue, 26 May 2020 10:39:00 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=7dIEbDvjdPSgiC8KM+8KpNw2JYaYxr6R5A6LSlImonY=;
+ b=UE4WoQ+LhGxQtUFXVwXHAQreVzRAKJZjCPke00y1jxpypceB8Mf4cMqSEIZ8q95iCS
+ VT8ZvSqBrtocBWLXV5bkqzZJhpYZZ2xnX18lfkDiXIi2fto2/kiPycKFurTuu0LhCGKn
+ 3LyVNpQKfgCK4uoyd6Si4wZjC8yTTv92bg9FSFQ16itZ+hZXetLqOz00Bc0KgzwnLRhM
+ GS5nspLPiJw8ju3DwZ/LJo8fcavkvgVbOHu+OQr5ZblghVE8igCzD3STGIIbNe7nkFy4
+ aR5RPfYkB9esspp3xDJUSvRhHQ2J8oX6T9/i7Biz7QvSWp3w6gH7cNf/v5ErddFwAuGx
+ PDTA==
+X-Gm-Message-State: AOAM533l0ZZO5ohZftrRntKIDgoKjrq+mBRTK+G4h1mEy6kMW8KcX4Uq
+ mBO7OAI76YucMStKaluufn97Y6MQNH04jGYHil4=
+X-Google-Smtp-Source: ABdhPJzhC0PdugwaudBVQOwlxOW61qX8+Ql10z8rH3hctJ4A1vgLodp3f51KA/0/+6NrK4kpdNc3MNv2rc1Si2r2Dwg=
+X-Received: by 2002:a92:d087:: with SMTP id h7mr2336786ilh.227.1590514649527; 
+ Tue, 26 May 2020 10:37:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
- <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
- <CALTWKrVGqVb1mjsaoxYm4Y1iQoXYwz7ToC7T6r2EDPp-_LO=LQ@mail.gmail.com>
- <4e78400c-42be-08c6-492d-dc5596551efd@linaro.org>
- <CAHiYmc6zKmxgyKHzT4gazvJvPsX3SQYLjSXwK50_2eURkR3_NA@mail.gmail.com>
- <CAHiYmc7z+OfvE7nN1j14n2O8seVtqem_hsBwq=WyFgeo=WfybA@mail.gmail.com>
- <CALTWKrXv6NQUEzKFvPN4TmDGCKxY-Zaa+Dt-z0+sTgndco+EMA@mail.gmail.com>
- <CAHiYmc6289cQZEptA=KjpMDLx3S94Au7W79DXH9KTM-MLi3ADA@mail.gmail.com>
- <CAHiYmc7r0GBLytokN=cyonrQAC6S8J=SpPf9KroPgG+ACJPV5Q@mail.gmail.com>
-In-Reply-To: <CAHiYmc7r0GBLytokN=cyonrQAC6S8J=SpPf9KroPgG+ACJPV5Q@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 26 May 2020 19:38:47 +0200
-Message-ID: <CAHiYmc70D2xo4m9zx16EbVH+om+04cqJz3O+Wa9pq7S=6LF-3A@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+References: <20200526062252.19852-1-f4bug@amsat.org>
+ <20200526062252.19852-15-f4bug@amsat.org>
+In-Reply-To: <20200526062252.19852-15-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 26 May 2020 10:28:29 -0700
+Message-ID: <CAKmqyKM9r2QXppfiEW4RVrXNbYzhx-Ds2CsODKVUk0Sxei0JwA@mail.gmail.com>
+Subject: Re: [PATCH 14/14] hw/display/pxa2xx_lcd: Replace printf() call by
+ qemu_log_mask()
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,35 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> >
-> > I think your last sentence in the bug report is not entirely correct.
-> > It is not known what would be performance results in case of
-> > correcting mmap.c. So, if possible, and unless Richard or someone else
-> > disagrees, please change that last sentence to: "By doing so, a better
-> > performance results could be achieved, compared to the case of the
-> > workaround described above."
-> >
-> > Also, please add the tag "linux-user".
-> >
+On Mon, May 25, 2020 at 11:36 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> Replace printf() calls by qemu_log_mask(UNIMP), which is
+> disabled by default. This avoid flooding the terminal when
+> fuzzing the device.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Ahmed, since rx target supports system only mode at the moment, they
-must include page crossing check in use_goto_tb(), which is missing
-right now. So, since the rx bug is of a little bit of different
-nature, please file another bug for rx target only - they have the bug
-in system mode too, as opposed to other targets. Their fix should and
-could be applied independently on any user-mode modifications for any
-other target.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Sincerely,
-Aleksandar
+Alistair
+
+> ---
+>  hw/display/pxa2xx_lcd.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
+> index d5f2e82a4e..ff90104b80 100644
+> --- a/hw/display/pxa2xx_lcd.c
+> +++ b/hw/display/pxa2xx_lcd.c
+> @@ -426,9 +426,10 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr o=
+ffset,
+>          if ((s->control[0] & LCCR0_ENB) && !(value & LCCR0_ENB))
+>              s->status[0] |=3D LCSR0_QD;
+>
+> -        if (!(s->control[0] & LCCR0_LCDT) && (value & LCCR0_LCDT))
+> -            printf("%s: internal frame buffer unsupported\n", __func__);
+> -
+> +        if (!(s->control[0] & LCCR0_LCDT) && (value & LCCR0_LCDT)) {
+> +            qemu_log_mask(LOG_UNIMP,
+> +                          "%s: internal frame buffer unsupported\n", __f=
+unc__);
+> +        }
+>          if ((s->control[3] & LCCR3_API) &&
+>                  (value & LCCR0_ENB) && !(value & LCCR0_LCDT))
+>              s->status[0] |=3D LCSR0_ABC;
+> @@ -462,9 +463,9 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr of=
+fset,
+>          break;
+>
+>      case OVL1C1:
+> -        if (!(s->ovl1c[0] & OVLC1_EN) && (value & OVLC1_EN))
+> -            printf("%s: Overlay 1 not supported\n", __func__);
+> -
+> +        if (!(s->ovl1c[0] & OVLC1_EN) && (value & OVLC1_EN)) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: Overlay 1 not supported\n", __=
+func__);
+> +        }
+>          s->ovl1c[0] =3D value & 0x80ffffff;
+>          s->dma_ch[1].up =3D (value & OVLC1_EN) || (s->control[0] & LCCR0=
+_SDS);
+>          break;
+> @@ -474,9 +475,9 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr of=
+fset,
+>          break;
+>
+>      case OVL2C1:
+> -        if (!(s->ovl2c[0] & OVLC1_EN) && (value & OVLC1_EN))
+> -            printf("%s: Overlay 2 not supported\n", __func__);
+> -
+> +        if (!(s->ovl2c[0] & OVLC1_EN) && (value & OVLC1_EN)) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: Overlay 2 not supported\n", __=
+func__);
+> +        }
+>          s->ovl2c[0] =3D value & 0x80ffffff;
+>          s->dma_ch[2].up =3D !!(value & OVLC1_EN);
+>          s->dma_ch[3].up =3D !!(value & OVLC1_EN);
+> @@ -488,9 +489,10 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr o=
+ffset,
+>          break;
+>
+>      case CCR:
+> -        if (!(s->ccr & CCR_CEN) && (value & CCR_CEN))
+> -            printf("%s: Hardware cursor unimplemented\n", __func__);
+> -
+> +        if (!(s->ccr & CCR_CEN) && (value & CCR_CEN)) {
+> +            qemu_log_mask(LOG_UNIMP,
+> +                          "%s: Hardware cursor unimplemented\n", __func_=
+_);
+> +        }
+>          s->ccr =3D value & 0x81ffffe7;
+>          s->dma_ch[5].up =3D !!(value & CCR_CEN);
+>          break;
+> --
+> 2.21.3
+>
+>
 
