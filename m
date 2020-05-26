@@ -2,87 +2,88 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BAFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65407C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05F442053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:32:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34ABD2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:34:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0EbywkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F442053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfkMh/xF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34ABD2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jddRP-0002m7-5I
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36490)
+	id 1jddTY-0005Kx-Ck
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:34:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jddPK-0001DH-UO
- for qemu-devel@nongnu.org; Tue, 26 May 2020 13:30:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32278
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jddPJ-0008Mt-3A
- for qemu-devel@nongnu.org; Tue, 26 May 2020 13:30:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590514228;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UBqdWjmEc/msbKZwVVNYZNJeNnDanGxhIaX85cc6jhY=;
- b=C0EbywkV+nFsvX9gksSEHEc5Fdf430+9XeiOdU5hYgPtiCOCTjfD8r7+iBD/RrWaDn38kt
- 8tnVBYVH7cvZPWaF00UkRTMyT0p0HoVncfGJOwtD9Shmy+WNMPdcej7YXI++UDms+tMg3l
- yTKPwv9qUh05XCxJ2uZzcNnJaEN5hhM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-0mNBKSTLPGG9IZO9UvjDXA-1; Tue, 26 May 2020 13:30:25 -0400
-X-MC-Unique: 0mNBKSTLPGG9IZO9UvjDXA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6ECF107ACF4;
- Tue, 26 May 2020 17:30:23 +0000 (UTC)
-Received: from work-vm (ovpn-112-104.ams2.redhat.com [10.36.112.104])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74AB97A1E2;
- Tue, 26 May 2020 17:30:00 +0000 (UTC)
-Date: Tue, 26 May 2020 18:29:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 5/5] virtio: enable VIRTIO_F_RING_PACKED for all devices
-Message-ID: <20200526172957.GL2864@work-vm>
-References: <20200522171726.648279-1-stefanha@redhat.com>
- <20200522171726.648279-6-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jddQr-0002U2-MR; Tue, 26 May 2020 13:32:05 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36484)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jddQp-00010i-TV; Tue, 26 May 2020 13:32:05 -0400
+Received: by mail-qk1-x742.google.com with SMTP id 205so8323936qkg.3;
+ Tue, 26 May 2020 10:31:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PN6K5e1tyvrYhrCtBaGYgmQsUJa63MJXQBwAz/mTpnA=;
+ b=KfkMh/xFWIimZxCOVVkpGTvqaonAkkcOHs+oK7834EsMXUPFiCjnOUnZs4UP4jhTGE
+ nzvCl9pPaap2Wv6hNo66ox1hLn+9Xmh23ZCDzDvRZDZAGMdjHIfQbKh4VdBDhn1LVac3
+ d5ZOsSjOL9JIfrrvbzP8A0jFJP+dsaSJtURPYCtGdnQBhuiY8JCDObVfjyqsRHTsTlUq
+ ypGog6Pfb6wFxjMKNCHhyb+ShF1248l0ywoGbrQkkq6phhAZ6F30pJh0zMgS34MjXIml
+ joSsw99vi3JybQc5JOR5L2KRP8ASs+fRBU2rNUh8G0NyIKdAbEfq7K5Jb6IWf/YSiuBr
+ Lqnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PN6K5e1tyvrYhrCtBaGYgmQsUJa63MJXQBwAz/mTpnA=;
+ b=N0gOQnDo9m25VKRMo4LZ68S1jFPx2rqmtNB0urDJfok7UmNyK0GBBfebQ8wdhzoyte
+ xYCN8ZHgBrCjS+YuBuvP8CZlOm24Ga14GuYt3cFOjYuKPJtiWXk1aLB4syvGf0kkKEDn
+ iJA5k+hRNm4cKq9bESJ6431KwdYlO2dnn0+KWKfZiNWkKKlrNu4qPbyxsOAq8Jrd/Eyf
+ 5dB5uIBnTMr5CFIfMTRF9s46JWAPmnH9gBACuTfXJ8gYHQrUN847HwBioj+QXXJTY+WK
+ Z/HlldxQyNu0if1N0/smOro0sN/OVi79FvdMksSAbCi4qD+7Q2+3qM1R8GX+kQULcV8X
+ rJJQ==
+X-Gm-Message-State: AOAM530cU2k7bND0TvnJyGzXjqApQBNSyFCI8+jBhv3A4080zXkFW/jg
+ 5xOAOCv+HrQKtH01kDwXIcaJWveHVQEHv25eR/I=
+X-Google-Smtp-Source: ABdhPJxdI/1eBoBFFXQiAA55TlaOXRIFWZVxubtUpZ/hFSBOz2VuGJ2XoBND3j1Ebn0PFWERTx+6mcWuPbMnzUdHG7s=
+X-Received: by 2002:a37:96c4:: with SMTP id y187mr2573316qkd.126.1590514316837; 
+ Tue, 26 May 2020 10:31:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200522171726.648279-6-stefanha@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
+References: <20200526062252.19852-1-f4bug@amsat.org>
+ <20200526062252.19852-8-f4bug@amsat.org>
+In-Reply-To: <20200526062252.19852-8-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 26 May 2020 10:22:57 -0700
+Message-ID: <CAKmqyKNdWM5hwv0aK3tjFh6LSXdgZrUud-idSBp=mhapkkgO-A@mail.gmail.com>
+Subject: Re: [PATCH 07/14] hw/display/dpcd: Fix memory region size
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
+ envelope-from=alistair23@gmail.com; helo=mail-qk1-x742.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,87 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- jasowang@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Fam Zheng <fam@euphon.net>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> The packed virtqueue layout was introduced in VIRTIO 1.1. It is a single
-> ring instead of a split avail/used ring design. There are CPU cache
-> advantages to this layout and it is also suited better to hardware
-> implementation.
-> 
-> The vhost-net backend has already supported packed virtqueues for some
-> time. Performance benchmarks show that virtio-blk performance on NVMe
-> drives is also improved.
-> 
-> Go ahead and enable this feature for all VIRTIO devices. Keep it
-> disabled for QEMU 5.0 and earlier machine types.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Mon, May 25, 2020 at 11:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> The memory region size is 512K.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
 
 > ---
->  include/hw/virtio/virtio.h |  2 +-
->  hw/core/machine.c          | 18 +++++++++++++++++-
->  2 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index b69d517496..fd5b4a2044 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -292,7 +292,7 @@ typedef struct VirtIORNGConf VirtIORNGConf;
->      DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
->                        VIRTIO_F_IOMMU_PLATFORM, false), \
->      DEFINE_PROP_BIT64("packed", _state, _field, \
-> -                      VIRTIO_F_RING_PACKED, false)
-> +                      VIRTIO_F_RING_PACKED, true)
->  
->  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
->  bool virtio_queue_enabled(VirtIODevice *vdev, int n);
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index bb3a7b18b1..3598c3c825 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,7 +28,23 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  
-> -GlobalProperty hw_compat_5_0[] = {};
-> +GlobalProperty hw_compat_5_0[] = {
-> +    { "vhost-user-blk", "packed", "off" },
-> +    { "vhost-user-fs-device", "packed", "off" },
-> +    { "vhost-vsock-device", "packed", "off" },
-> +    { "virtio-9p-device", "packed", "off" },
-> +    { "virtio-balloon-device", "packed", "off" },
-> +    { "virtio-blk-device", "packed", "off" },
-> +    { "virtio-crypto-device", "packed", "off" },
-> +    { "virtio-gpu-device", "packed", "off" },
-> +    { "virtio-input-device", "packed", "off" },
-> +    { "virtio-iommu-device", "packed", "off" },
-> +    { "virtio-net-device", "packed", "off" },
-> +    { "virtio-pmem", "packed", "off" },
-> +    { "virtio-rng-device", "packed", "off" },
-> +    { "virtio-scsi-common", "packed", "off" },
-> +    { "virtio-serial-device", "packed", "off" },
-> +};
->  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
->  
->  GlobalProperty hw_compat_4_2[] = {
-> -- 
-> 2.25.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+>  hw/display/dpcd.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/display/dpcd.c b/hw/display/dpcd.c
+> index 170545c605..0c1b7b35fb 100644
+> --- a/hw/display/dpcd.c
+> +++ b/hw/display/dpcd.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * dpcd.c
+> + * Xilinx Display Port Control Data
+>   *
+>   *  Copyright (C) 2015 : GreenSocs Ltd
+>   *      http://www.greensocs.com/ , email: info@greensocs.com
+> @@ -137,7 +137,7 @@ static void dpcd_init(Object *obj)
+>  {
+>      DPCDState *s =3D DPCD(obj);
+>
+> -    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x7FFF=
+F);
+> +    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x8000=
+0);
+>      aux_init_mmio(AUX_SLAVE(obj), &s->iomem);
+>  }
+>
+> --
+> 2.21.3
+>
+>
 
