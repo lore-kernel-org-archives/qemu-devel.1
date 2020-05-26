@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1912C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B74F5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:35:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0D18207FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:34:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80BE2204EF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="plYsxoYZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D18207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpNL+/K5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80BE2204EF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdZig-0008SA-TS
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56914)
+	id 1jdZjz-00030L-NG
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:35:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhR-0006EU-Oi
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:32:57 -0400
-Received: from mail-ed1-x52c.google.com ([2a00:1450:4864:20::52c]:36690)
+ id 1jdZhO-00068F-QN
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:32:54 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:40781)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhR-0005oN-2p
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:32:57 -0400
-Received: by mail-ed1-x52c.google.com with SMTP id b91so17684520edf.3
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:32:56 -0700 (PDT)
+ id 1jdZhO-0005o3-32
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:32:54 -0400
+Received: by mail-ed1-x541.google.com with SMTP id l5so17660449edn.7
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ExVlN86Dv7JggIxvLUBjz5FHxHeWDg8nuqJ3/185rZA=;
- b=plYsxoYZSAgslB/C0RDbBVII2MFwI9zXj+XMhSiXSrA9RD+ot4V+ICbX2lNw8YbkCQ
- XfGLg4XTNCoWvgopHufcRduVvzUx+SGYn/Uhdb+14WZXdTJHyLnpPonnh5EAOpTb6Chv
- ef7qhRoppJ1H9T043aO0IzXz2EphMcv1Lvd/dH5ccm9HVJ51HPh2/a7X/fUPolYuKVuz
- W3pDhPKicbksceasvtsDnRP8kRqM+wsFQFdugIFNIU9IGF0yjtfLdXkcbup16qmsG39q
- WAyOZ+QhX9zDuVW1C7O18+9PVaLSubQHe8zfncwc2EwI+xMfx746rjKU8kIlP0Gt+5hk
- loxQ==
+ bh=ZxmLzjQ4bUorljqYuWr6VmTgXnIbg6am868WkyxH1FQ=;
+ b=BpNL+/K5SfywsaJDSQ9O21LwYnTqCvzt7t63Vo/Mpao/5JAAjf+fFbRSMSdNsLhQ5Y
+ 6jRVtd6Il3VhkTC1n6M8gNK2T0lk+3nQidh5iHavVK0r/SANwbDd/t5jMlHzSbOfJUQp
+ nwbbmP/nTYDxZIPp+vfCrzHaQbFH4s8oV84iK81KSOb+l1aw9HwvFs/OoQUF1i5g2xaS
+ sJdJ0M4SO1aD//pPqnoinNEEoQVG94Cw6fT/NwnOlbuU7kZIdXriRYCId3LJVrnvpTh5
+ 2Mj51PKdwjKHGj4qRS4G/DmVh20iJW0vkR8AAlJ0+64JsmSO7JqnrE8TBa7nph+htv62
+ TOyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ExVlN86Dv7JggIxvLUBjz5FHxHeWDg8nuqJ3/185rZA=;
- b=ffJGNTo7l/KPqUo1mGS+I3v5sYWZsdFhPIty6NfkGiXInRKWHtyAtFu8AtuaVN7EAz
- jaMYmEBgHLhl4OnXOaexxHYyjbOtpwCjrPoN2YsqZb2AFJQRtGK6hIriCWzsES0yQLZP
- 0x9qV4gW7nA67T3BpBtU5pEHrflVTHmn7RhS/0fM1ZTnwWjWbvngtxqKQ0Q4J1ir65DW
- fcthgYVIW0C/HEfOTA2453GUha1Graqyw9V+ydC+sqWrO4Kbuut5I81PJpBCBfAY+7Eq
- x91w3dUr0x34WyzrBAK1oJC5ps0PRBvQl62KggIripm5Syv/lVh85GhiN269doUhVKcg
- ffjA==
-X-Gm-Message-State: AOAM530iD/vJdZa1bzRF0lmRG6qfXZwphmWM9l6MQ1WY6EXrAhwtbGas
- isOYcYT6uCLedT7exobj/mcpzRG9PKs=
-X-Google-Smtp-Source: ABdhPJzh5e2NJGorrQJUH5eWtCdS6ap4rrW8N0+JXwmSTQz4ZyMcEgH1vsP+EBW4EoanR6T4h6cucQ==
-X-Received: by 2002:aa7:ca49:: with SMTP id j9mr20535964edt.186.1590499975531; 
- Tue, 26 May 2020 06:32:55 -0700 (PDT)
+ bh=ZxmLzjQ4bUorljqYuWr6VmTgXnIbg6am868WkyxH1FQ=;
+ b=Qwtdmk8DZ/Mp2/i8pAQTnvYavDAMcXAvZ3em/QwZjpL6SiNaHM4zDuds2hCwMj680+
+ mvLbXgZtaKeU6AsO989TpP8VpVWsxae3r53f0O4OSvwHbithVRVyKSw6LDE2ACqT5gtb
+ DnJ6LKROVMN5Ny1KFbRdiv894M9TAVRLcJvz4BLAuUosC52f5UCZzJHQDTzlGzstffZJ
+ NiEZQB5kmR/1B/Sb+egwmdtFlTb3lS8jPlj39ErzIF6z9/AxYl244bE62EUG9FUmY5fJ
+ UEakbL5PXZVWgl+8hFDYHiL92AQW18ThdZk8UkTWV2O8uJSxY/DnnJRx9Nyfw8EZEISL
+ 1DEQ==
+X-Gm-Message-State: AOAM531yerypLst2rGPg/zMQAgFEx/1TlpMWBAXTN8V21YtYCaF3JcR3
+ 2PLg4xfUxu+cAgwKQnmoaJK4q/iD1BY=
+X-Google-Smtp-Source: ABdhPJzYHzoRGE1wRVBnVl/SGEjiVqL2TidTtPjmaa+8kLuri9nxRc4LVKVSWfZFp6XS+Xi6mlJdxg==
+X-Received: by 2002:aa7:c609:: with SMTP id h9mr2594792edq.155.1590499972630; 
+ Tue, 26 May 2020 06:32:52 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id n25sm1623084edo.56.2020.05.26.06.32.54
+ by smtp.gmail.com with ESMTPSA id n25sm1623084edo.56.2020.05.26.06.32.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 May 2020 06:32:54 -0700 (PDT)
+ Tue, 26 May 2020 06:32:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/14] hw/pci-host/bonito: Map peripheral using physical address
-Date: Tue, 26 May 2020 15:32:37 +0200
-Message-Id: <20200526133247.13066-5-f4bug@amsat.org>
+Subject: [PULL 02/14] hw/pci-host: Use CONFIG_PCI_BONITO to select the Bonito
+ North Bridge
+Date: Tue, 26 May 2020 15:32:35 +0200
+Message-Id: <20200526133247.13066-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200526133247.13066-1-f4bug@amsat.org>
 References: <20200526133247.13066-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::52c;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x52c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,42 +109,67 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  Thomas Huth <thuth@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <chenhc@lemote.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peripherals are mapped at physical address on busses.
-Only CPU/IOMMU can use virtual addresses.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-id: <20200510210128.18343-8-f4bug@amsat.org>
+Ease the kconfig selection by introducing CONFIG_PCI_BONITO to select
+the Bonito North Bridge.
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: <20200510210128.18343-6-f4bug@amsat.org>
+Reviewed-by: Huacai Chen <chenhc@lemote.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci-host/bonito.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/mips/Kconfig           | 1 +
+ hw/pci-host/Kconfig       | 4 ++++
+ hw/pci-host/Makefile.objs | 2 +-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index b874468ea6..b90e5a636d 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -647,12 +647,12 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     memory_region_init_io(&s->iomem_ldma, OBJECT(s), &bonito_ldma_ops, s,
-                           "ldma", 0x100);
-     sysbus_init_mmio(sysbus, &s->iomem_ldma);
--    sysbus_mmio_map(sysbus, 3, 0xbfe00200);
-+    sysbus_mmio_map(sysbus, 3, 0x1fe00200);
+diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+index 2c2adbc42a..2240504dff 100644
+--- a/hw/mips/Kconfig
++++ b/hw/mips/Kconfig
+@@ -43,6 +43,7 @@ config JAZZ
  
-     memory_region_init_io(&s->iomem_cop, OBJECT(s), &bonito_cop_ops, s,
-                           "cop", 0x100);
-     sysbus_init_mmio(sysbus, &s->iomem_cop);
--    sysbus_mmio_map(sysbus, 4, 0xbfe00300);
-+    sysbus_mmio_map(sysbus, 4, 0x1fe00300);
+ config FULONG
+     bool
++    select PCI_BONITO
  
-     /* Map PCI IO Space  0x1fd0 0000 - 0x1fd1 0000 */
-     memory_region_init_alias(&s->bonito_pciio, OBJECT(s), "isa_mmio",
+ config MIPS_CPS
+     bool
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index 9642c77e98..8db41edc7e 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -55,3 +55,7 @@ config PCI_EXPRESS_DESIGNWARE
+     bool
+     select PCI_EXPRESS
+     select MSI_NONBROKEN
++
++config PCI_BONITO
++    select PCI
++    bool
+diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+index 8c87e8494d..e422e0aca0 100644
+--- a/hw/pci-host/Makefile.objs
++++ b/hw/pci-host/Makefile.objs
+@@ -12,7 +12,7 @@ common-obj-$(CONFIG_PPCE500_PCI) += ppce500.o
+ common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
+ 
+ common-obj-$(CONFIG_PCI_SABRE) += sabre.o
+-common-obj-$(CONFIG_FULONG) += bonito.o
++common-obj-$(CONFIG_PCI_BONITO) += bonito.o
+ common-obj-$(CONFIG_PCI_I440FX) += i440fx.o
+ common-obj-$(CONFIG_XEN_IGD_PASSTHROUGH) += xen_igd_pt.o
+ common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
 -- 
 2.21.3
 
