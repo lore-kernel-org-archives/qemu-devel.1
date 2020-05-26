@@ -2,106 +2,88 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D69EBC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 14:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E23BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 14:27:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9835206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 14:24:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9835206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
+	by mail.kernel.org (Postfix) with ESMTPS id E70D220704
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 14:27:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhXn6Chf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70D220704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdaVM-0001hG-PV
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 10:24:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55298)
+	id 1jdaXl-0003IV-6c
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 10:27:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>)
- id 1jdZSQ-0006Fm-HS; Tue, 26 May 2020 09:17:26 -0400
-Received: from mail.netbsd.org ([199.233.217.200]:60308)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>)
- id 1jdZSP-0003Ez-7Y; Tue, 26 May 2020 09:17:26 -0400
-Received: from [IPv6:::1] (localhost [127.0.0.1])
- by mail.netbsd.org (Postfix) with ESMTP id 11E5E84C8B;
- Tue, 26 May 2020 13:17:18 +0000 (UTC)
-Subject: Re: [PATCH 1/1] util/oslib: Returns real thread identifier on FreeBSD
- and NetBSD
-To: David CARLIER <devnexen@gmail.com>, Thomas Huth <thuth@redhat.com>,
- pbonzini@readhat.com, qemu-trivial@nongnu.org
-References: <CA+XhMqwMsmoYwNtkrvAEG_j_-8L=+PYcXSz--1Qg622szArkRQ@mail.gmail.com>
- <f9ebb603-0a0e-8775-8405-dd8de2493a3f@redhat.com>
- <CA+XhMqx6_mWvb-5Z2Mbtw3V-q-WkZPnOF10VK=iLwSwUGnOJAQ@mail.gmail.com>
-From: Kamil Rytarowski <kamil@netbsd.org>
-Autocrypt: addr=kamil@netbsd.org; keydata=
- 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
-Message-ID: <5b53af7c-72bd-f096-1763-353a8f9596e9@netbsd.org>
-Date: Tue, 26 May 2020 15:15:49 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jdaTU-0001ON-1V
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 10:22:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47667
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jdaTS-00006S-6e
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 10:22:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590502953;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=nJJJueX7AQo7+yPqQeAFEAHFKBBtCyDy7VQoB3Ju6iA=;
+ b=UhXn6ChfNz6+u1HHBAFd6nSGPYaPi3K95XhJ8mylWnLryMnEOdhLQNBuCmZaYU9LkNU3YR
+ ssArpqNVStg8R6f5ylGulniOe7p+qqJ9WJcPAHepWVP1dPHcL4w5VkCHtvDw/HXsYDzMmo
+ zeYkhjCRRNOBAvr3gJ5HtdketW5Fxcc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-O2ND-AFWOyaDcCSKDN72jQ-1; Tue, 26 May 2020 10:22:31 -0400
+X-MC-Unique: O2ND-AFWOyaDcCSKDN72jQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6063F8018A7;
+ Tue, 26 May 2020 14:22:30 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-102.rdu2.redhat.com [10.10.115.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79BCB5C1C5;
+ Tue, 26 May 2020 14:22:20 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id E7A4722036E; Tue, 26 May 2020 10:22:19 -0400 (EDT)
+Date: Tue, 26 May 2020 10:22:19 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices
+ on all buses
+Message-ID: <20200526142219.GE108774@redhat.com>
+References: <20200525084511.51379-1-david@redhat.com>
+ <20200526132840.GD108774@redhat.com>
+ <dddadb61-b0af-a9c0-64f8-ac3c47d37566@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+XhMqx6_mWvb-5Z2Mbtw3V-q-WkZPnOF10VK=iLwSwUGnOJAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=199.233.217.200; envelope-from=kamil@netbsd.org;
- helo=mail.netbsd.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 07:57:51
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+In-Reply-To: <dddadb61-b0af-a9c0-64f8-ac3c47d37566@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 10:22:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Tue, 26 May 2020 10:21:34 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,60 +95,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, qemu-devel@nongnu.org,
- bauerchen@tencent.com, Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Kamil Rytarowski <kamil@netbsd.org>
+On Tue, May 26, 2020 at 03:44:10PM +0200, David Hildenbrand wrote:
+> On 26.05.20 15:28, Vivek Goyal wrote:
+> > On Mon, May 25, 2020 at 10:45:11AM +0200, David Hildenbrand wrote:
+> >> E.g., with "pc-q35-4.2", trying to coldplug a virtio-pmem-pci devices
+> >> results in
+> >>     "virtio-pmem-pci not supported on this bus"
+> >>
+> >> Reasons is, that the bus does not support hotplug and, therefore, does
+> >> not have a hotplug handler. Let's allow coldplugging virtio-pmem devices
+> >> on such buses. The hotplug order is only relevant for virtio-pmem-pci
+> >> when the guest is already alive and the device is visible before
+> >> memory_device_plug() wired up the memory device bits.
+> >>
+> >> Hotplug attempts will still fail with:
+> >>     "Error: Bus 'pcie.0' does not support hotplugging"
+> >>
+> >> Hotunplug attempts will still fail with:
+> >>     "Error: Bus 'pcie.0' does not support hotplugging"
+> >>
+> >> Reported-by: Vivek Goyal <vgoyal@redhat.com>
+> >> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> >> Cc: Igor Mammedov <imammedo@redhat.com>
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: Richard Henderson <rth@twiddle.net>
+> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> >> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/i386/pc.c | 18 ++++++++++--------
+> >>  1 file changed, 10 insertions(+), 8 deletions(-)
+> > 
+> > Thanks for the patch David. I still seem to face a different error though.
+> > 
+> > 2020-05-26T13:26:05.720617Z qemu-system-x86_64: -device virtio-pmem-pci,memdev=pmem1,id=nv1: memory devices (e.g. for memory hotplug) are not enabled, please specify the maxmem option
+> > 
+> > Following is my domain xml file.
+> > 
+> > Vivek
+> 
+> Hi Vivek,
+> 
+> you have to declare the maxMemory option. Memory devices like
+> virtio-pmem-pci reside in RAM like a pc-dimm or a nvdimm. If your
+> virtio-pmem device will be 4GB, you have to add that to maxMemory.
+> 
+>   <memory unit='GiB'>64</memory>
+>   <maxMemory unit='GiB'>68</maxMemory>
+>   <currentMemory unit='GiB'>64</currentMemory>
+> 
+> (you might have to add "slots='0'" or "slots='1'" to maxMemory to make
+> libvirt happy)
 
-On 26.05.2020 09:29, David CARLIER wrote:
-> From 792fbcd9114f43bd80fd1ef5b25cd9935a536f9f Mon Sep 17 00:00:00 2001
-> From: David Carlier <devnexen@gmail.com>
-> Date: Tue, 26 May 2020 08:25:26 +0100
-> Subject: [PATCH] util/oslib: Returns the real thread identifier on FreeBSD and
->  NetBSD
+Ok, tried that.
+
+<maxMemory slots='1' unit='KiB'>134217728</maxMemory>
+
+And now it complains about.
+
+error: unsupported configuration: At least one numa node has to be configured when enabling memory hotplug
+
+So ultimately it seems to be wanting me to somehow enable memory hotplug
+to be able to use virtio-pmem?
+
+Thanks
+Vivek
+
 > 
-> getpid is good enough in a mono thread context, however
->  thr_self/_lwp_self reflects the real current thread identifier
->  from a given process.
-> ---
->  util/oslib-posix.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> @Pankaj, do we have a virtio-pmem doc somewhere describing how to set it up?
 > 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 062236a1ab..916f1be224 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -48,11 +48,13 @@
->  #ifdef __FreeBSD__
->  #include <sys/sysctl.h>
->  #include <sys/user.h>
-> +#include <sys/thr.h>
->  #include <libutil.h>
->  #endif
+> -- 
+> Thanks,
 > 
->  #ifdef __NetBSD__
->  #include <sys/sysctl.h>
-> +#include <lwp.h>
->  #endif
-> 
->  #include "qemu/mmap-alloc.h"
-> @@ -84,6 +86,13 @@ int qemu_get_thread_id(void)
->  {
->  #if defined(__linux__)
->      return syscall(SYS_gettid);
-> +#elif defined(__FreeBSD__)
-> +    /* thread id is up to INT_MAX */
-> +    long tid;
-> +    thr_self(&tid);
-> +    return (int)tid;
-> +#elif defined(__NetBSD__)
-> +    return _lwp_self();
->  #else
->      return getpid();
->  #endif
-> 
+> David / dhildenb
 
 
