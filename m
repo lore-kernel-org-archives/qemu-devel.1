@@ -2,71 +2,95 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3F0C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:50:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E2C720776
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2C720776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5233320776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:50:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2biI6F5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5233320776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdXAd-0003kj-6J
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38830)
+	id 1jdXAg-0003tL-IA
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:50:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdX7c-00071K-KE; Tue, 26 May 2020 06:47:48 -0400
-Resent-Date: Tue, 26 May 2020 06:47:48 -0400
-Resent-Message-Id: <E1jdX7c-00071K-KE@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21775)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdX7b-0002BU-4M; Tue, 26 May 2020 06:47:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590490049; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hG1Gu6Frg6dRqE4Uj5E4Zw+/xPPlHS0ILk6gG5jhIPSbBmoh9o+0Q5s0NtPgRv5pVg75sewb4kLwL1eE4j7YS41Mz/ArB5eyUxhndjCjb40MZAxDYcY2IoUAxEd8x4fxT3L5gYNHRf/8YuOszOPn08frlvkuGjZCZedGuyk6NvY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590490049;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Y/DyOfcdQL00VO0GKUl/NvS+qPS4wZohghKFC9nPQSw=; 
- b=Cugp61F9zm0qZoEgkzhOi699ksuIsLZJAq/h1+Qw4FnciS1CNvC5TKj583rrMrk2O4Xrgi3P2bgMG9hyoO5uJyFRYV+uZFQUcX1dIaoRDC2y46+CAdfKbbCRUKPgmoKb/H87M6tQJRBDflS4rJpd8r3qi0PMljK3nGVcxts9Qr4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159049004653043.47033956487644;
- Tue, 26 May 2020 03:47:26 -0700 (PDT)
-Message-ID: <159049004463.9494.8302673029620017182@45ef0f9c86ae>
-In-Reply-To: <20200526081740.256236-1-rvkagan@yandex-team.ru>
-Subject: Re: [PATCH v5 0/5] block: widen and check consistency of size-related
- BlockConf properties
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdX7R-0006kt-FD
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:37 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:46699)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdX7Q-00028r-Pe
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:37 -0400
+Received: by mail-ej1-x643.google.com with SMTP id e2so23233262eje.13
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:47:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=QG/Ao1FLrrqA3qiyJ5oTk9vVoadIo9/g3miLYRH/cTM=;
+ b=C2biI6F5tauTNWAKpodEppwGET3Oo1lW6hnW1Q1YvizkdKWGlfOYaUHzR2GDMGChdp
+ nEg+YD61KFzXPAReQyjrdoWA5znOMYp5BYg4eGD4nzutlgALy1ptZUnt3LlH9TmvKN0D
+ oq4TctufDbhmkcF9Lf245gEmmgop+qRXl4DeMnDN7FqxA88tDPgwjE6KwW9dQaAan5Wl
+ tJRQswKKS4+6fptHwgkSSO7twCyjTFlvXiOLVS3Gx4uxtkXJ4hy2XVhSiqPM9lqUxf+M
+ YiI/lIN6FER6y0rbraJSFdi4Ilczuvx0vEvuEKZ2nLNTq83yGOQN2I5LYFmbAEEIPdFT
+ gbtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=QG/Ao1FLrrqA3qiyJ5oTk9vVoadIo9/g3miLYRH/cTM=;
+ b=W2yRZWQsnmjjZ+DpuIjjMplhiknhlz0zK1+xXLTdy9D2ceOqRhD2NyUnvQE+l74BmQ
+ qr2mm0hHAiVZxRu82jpWMi4m3suN41rnljIntm5g6K4J7u5OZs9XsOIPYV0b9KpJJdZc
+ G/JxgYt2oOEn2y/RjNIpUmbMK2AjXihMbj30c3N7ixsG57Tn2j8eToQyz03Qz/T3NWXB
+ U8K7bjA1CEnlrqKMjNgfVuHOQcsb0yiHc0MpIKiF4b1vPCW8uz4awKyOL+uNFYhnf3Kv
+ dfdZyyfjMkJxl7zeFWb7xQMfGRD8xus691rUWPi+BJW8V5WZzCZC5ZP4kEilIfcYn1z2
+ 27Gw==
+X-Gm-Message-State: AOAM5337wjtC1M1u4jmmbdzz2r+9WGZNsJh8NlaQHEi50JCFP86P2n5y
+ bGtXVSi/LQZYZms9SUc7JJdkdz1+ljY=
+X-Google-Smtp-Source: ABdhPJyoo+VtWtbHcSdXGZfsOYXDOW8z0e8hYTZTEy6Nhtq3mdrhXEUSSjZ4eLADOLWtHCCFNGEY3w==
+X-Received: by 2002:a17:906:81ce:: with SMTP id
+ e14mr553124ejx.76.1590490055287; 
+ Tue, 26 May 2020 03:47:35 -0700 (PDT)
+Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id c27sm3342597ejd.19.2020.05.26.03.47.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 May 2020 03:47:34 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 05/14] hw/pci-host/bonito: Map all the Bonito64 I/O range
+Date: Tue, 26 May 2020 12:47:17 +0200
+Message-Id: <20200526104726.11273-6-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200526104726.11273-1-f4bug@amsat.org>
+References: <20200526104726.11273-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: rvkagan@yandex-team.ru
-Date: Tue, 26 May 2020 03:47:26 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:17:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,52 +104,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, kraxel@redhat.com,
- stefanha@redhat.com, kbusch@kernel.org, pbonzini@redhat.com, jsnow@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, libvir-list@redhat.com,
+ Thomas Huth <thuth@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyNjA4MTc0MC4yNTYy
-MzYtMS1ydmthZ2FuQHlhbmRleC10ZWFtLnJ1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUyNjA4MTc0MC4yNTYyMzYtMS1ydmth
-Z2FuQHlhbmRleC10ZWFtLnJ1ClN1YmplY3Q6IFtQQVRDSCB2NSAwLzVdIGJsb2NrOiB3aWRlbiBh
-bmQgY2hlY2sgY29uc2lzdGVuY3kgb2Ygc2l6ZS1yZWxhdGVkIEJsb2NrQ29uZiBwcm9wZXJ0aWVz
-ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo2NjExYzUzIGJsb2NrOiBsaWZ0IGJsb2Nrc2l6ZSBwcm9wZXJ0
-eSBsaW1pdCB0byAyIE1pQgoxZWZlMDk0IGJsb2NrOiBtYWtlIHNpemUtcmVsYXRlZCBCbG9ja0Nv
-bmYgcHJvcGVydGllcyBhY2NlcHQgc2l6ZSBzdWZmaXhlcwpmOWQ4OGRmIHFkZXYtcHJvcGVydGll
-czogYmxvY2tzaXplOiB1c2Ugc2FtZSBsaW1pdHMgaW4gY29kZSBhbmQgZGVzY3JpcHRpb24KYmVl
-NjZjZiBibG9jazogY29uc29saWRhdGUgYmxvY2tzaXplIHByb3BlcnRpZXMgY29uc2lzdGVuY3kg
-Y2hlY2tzCjhiMmZkYzEgdmlydGlvLWJsazogc3RvcmUgb3B0X2lvX3NpemUgd2l0aCBjb3JyZWN0
-IHNpemUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNSBDaGVja2luZyBjb21taXQgOGIyZmRjMWIx
-OGIyICh2aXJ0aW8tYmxrOiBzdG9yZSBvcHRfaW9fc2l6ZSB3aXRoIGNvcnJlY3Qgc2l6ZSkKMi81
-IENoZWNraW5nIGNvbW1pdCBiZWU2NmNmZGU3NmYgKGJsb2NrOiBjb25zb2xpZGF0ZSBibG9ja3Np
-emUgcHJvcGVydGllcyBjb25zaXN0ZW5jeSBjaGVja3MpCjMvNSBDaGVja2luZyBjb21taXQgZjlk
-ODhkZjRjMDNlIChxZGV2LXByb3BlcnRpZXM6IGJsb2Nrc2l6ZTogdXNlIHNhbWUgbGltaXRzIGlu
-IGNvZGUgYW5kIGRlc2NyaXB0aW9uKQo0LzUgQ2hlY2tpbmcgY29tbWl0IDFlZmUwOTRiNzYzNyAo
-YmxvY2s6IG1ha2Ugc2l6ZS1yZWxhdGVkIEJsb2NrQ29uZiBwcm9wZXJ0aWVzIGFjY2VwdCBzaXpl
-IHN1ZmZpeGVzKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIwMDogRklMRTogaHcv
-Y29yZS9xZGV2LXByb3BlcnRpZXMuYzoxMjQ0OgorICAgICAgICAgICAgICAgICAgIlByb3BlcnR5
-ICVzLiVzIGRvZXNuJ3QgdGFrZSB2YWx1ZSAnJSIgUFJJZDY0ICInLCBpdCdzIG5vdCBhIHBvd2Vy
-IG9mIDIiLAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDcwIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDQvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS81IENoZWNraW5nIGNvbW1p
-dCA2NjExYzUzODkxNWEgKGJsb2NrOiBsaWZ0IGJsb2Nrc2l6ZSBwcm9wZXJ0eSBsaW1pdCB0byAy
-IE1pQikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAyMDA1MjYwODE3NDAuMjU2MjM2LTEtcnZrYWdhbkB5YW5kZXgtdGVhbS5ydS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+To ease following guest accesses to the Bonito64 chipset,
+map its I/O range as UnimplementedDevice.
+We can now see the accesses to unimplemented peripheral
+using the '-d unimp' command line option.
+
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-id: <20200510210128.18343-9-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/pci-host/bonito.c | 3 +++
+ hw/pci-host/Kconfig  | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index b90e5a636d..f09bb1c6a8 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -48,6 +48,7 @@
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+ #include "exec/address-spaces.h"
++#include "hw/misc/unimp.h"
+ 
+ /* #define DEBUG_BONITO */
+ 
+@@ -644,6 +645,8 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     sysbus_init_mmio(sysbus, &phb->data_mem);
+     sysbus_mmio_map(sysbus, 2, BONITO_SPCICONFIG_BASE);
+ 
++    create_unimplemented_device("bonito", BONITO_REG_BASE, BONITO_REG_SIZE);
++
+     memory_region_init_io(&s->iomem_ldma, OBJECT(s), &bonito_ldma_ops, s,
+                           "ldma", 0x100);
+     sysbus_init_mmio(sysbus, &s->iomem_ldma);
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index 8db41edc7e..036a61877a 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -58,4 +58,5 @@ config PCI_EXPRESS_DESIGNWARE
+ 
+ config PCI_BONITO
+     select PCI
++    select UNIMP
+     bool
+-- 
+2.21.3
+
 
