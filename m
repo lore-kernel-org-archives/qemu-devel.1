@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A737C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8527BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 236B4204EF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52F882068D
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1mfZZSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 236B4204EF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miqQjbCO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F882068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdZlE-0005yg-Bj
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:36:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57002)
+	id 1jdZlH-00065e-BB
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:36:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhh-0006q3-82
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:13 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:46722)
+ id 1jdZhV-0006Mt-31
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:01 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:33143)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhg-0005qy-8O
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:12 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id e2so23773812eje.13
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:33:11 -0700 (PDT)
+ id 1jdZhU-0005om-0g
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:00 -0400
+Received: by mail-ed1-x542.google.com with SMTP id e10so17663977edq.0
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:32:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pPV3t0ciHdfu4yziGudCLa1nZMiogySec4g5RazN6FY=;
- b=W1mfZZSFWow35xwNsVIdReKxgBP3yyskiyFSYhIimtM3idRn7OTYuov7YAxyJMFcbt
- qy8CEuiLxo1JgT5vbtlGVHg3fzHlYH7Nh7tI2KhOByAXKuXBbbvwmfZs86azK2WO64Jp
- zw3lpPe7LzRsJV+uozP/yea5/Wey1ZDfziScfO2X4pW5WdY3rG1IYL3/RpYRckjqJ5PH
- IXATvGV6driLpV2vnkivt05CEVrTukqcezBMnhRQQqCAhq8Y7R6EmvHMISHYqPD2dMJB
- /EhLyiUP+GWdq5SZSBtkRj9Mxmj/S2WaElDR5/cmqK2/k4iBXH8Zb02f5obRlC76EUPd
- BFjg==
+ bh=ZjWj0dUmFcXqSOvS5eV4ZH48B9zS/5L5K/OAOs2OdMM=;
+ b=miqQjbCOXsFwvwKODOXKEMFRdT9ZqZWH8xCRlMQZHfoJEbZCpfdxcvQLUUO9bFnRWW
+ W2MAYmEGQEkWpwLSToi9URAwZGHFRrGJgXNpovC9qYeJZzM1Esy72lguuBP9M/jyLc/6
+ nI1AuUtMf3k2Tkwc5FviK0gVJuXUSzYNP8BdmCnjublauaqwSnxi/uic36vB8lgKqemr
+ ORRa/6K6UH4z3JL/cvxL4sR1T6CaGrqElrKvIdthJAcCMQ51Qw09Fa2PKOYhU9+PpAeS
+ TjDX46xHkgX3OtRmmPwg8U+Oo6adIh/l0v9rNVIRFaaEE1MKNv8VoBdG16cWWmZh8MJq
+ 52bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=pPV3t0ciHdfu4yziGudCLa1nZMiogySec4g5RazN6FY=;
- b=XKuAxg/puMbhb5+0jJqY2sxLa3mSbfEvASXGHLecVoBMozn8LXKpNanNGuRFutBxkP
- TTs4AvmOE2WSJpGQ5VQDh+zkFFwWMuq1H0qd7D6oIAvyxu4TO0kt8K/xStaeOkZNiUy4
- 6DRDkQYizP6nDkxURytq8JYfVGqb6MCv7M137z7PwS9I6B6Ebcy3We1DQxMZAVNTXKmh
- JRQ74BJxCK2FS71FSBbSnQUXxnMrXgws/LVCJ12j5hJ8HnkaWgcyxc/Bcv32q2py4HFm
- j9XQGVamsr/C2bUvX4AzLxn7jWyFNJ5dwlPlcJELWwYMBUEeImiEGdl4RQfhSk5P7xWg
- Jz3w==
-X-Gm-Message-State: AOAM532wAVMPeMIIpCnBG4T9FoTcHOMhfbTCTAWx7Z+WrDZB7q58QYPh
- JkkF+g4cvVow4rv50kOpDSkE/0UAjDY=
-X-Google-Smtp-Source: ABdhPJxZQ3xrejlUHBn6UZjExFOrdzOzBr3xqGngyOSsnoUpEWmtvMLtz2AmdpSlStqjzl+MjhOlIA==
-X-Received: by 2002:a17:906:edb5:: with SMTP id
- sa21mr1161894ejb.78.1590499990526; 
- Tue, 26 May 2020 06:33:10 -0700 (PDT)
+ bh=ZjWj0dUmFcXqSOvS5eV4ZH48B9zS/5L5K/OAOs2OdMM=;
+ b=MPVPgH01QZRwX9C+yFQpdZks0mHDjF+dtnWFgRNgWH688tVn/QT5Swqy86vjBnCjHM
+ chY6nTaVUN+W56C3wUtILQ6EG6aEZ4W/GAII1pvItIA5LK9zPW37K7Ol7kksE4cwlG6h
+ DlTWlIL6BuXHgETeUVDK33PdDBy4j196Vmk2/VWhWSqBGkGmDm76ud8wmQByd6W5Mj4E
+ q5CwGjYeXluvOUBdfRbxy+/WV4/9nxq7wMEHxuGpDYrxhySceelbyu3dYPIXLezSevqM
+ esTMNzFPUBFlBhTSjQcQkmLHsn50t/lPRBHVpUJiJHfBresY+yz9Bu4CmIdAnhqfgDbd
+ 5tfA==
+X-Gm-Message-State: AOAM530Zs3Srxb81/pgVCbPWLLtMSLeTjzQrj9DUz4hI03QYpmsN+GRe
+ QwsSSQ/D9LTd4sa54UiHKqdZsAyU80Y=
+X-Google-Smtp-Source: ABdhPJy+QzkJ3L07bCS9TKLkT8JyNSsqPfDai0Swx+md90g3+7A3sUKqNYSLjXYEhxeZ4LyCQqy/9A==
+X-Received: by 2002:a05:6402:2032:: with SMTP id
+ ay18mr19601948edb.281.1590499978445; 
+ Tue, 26 May 2020 06:32:58 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id n25sm1623084edo.56.2020.05.26.06.33.09
+ by smtp.gmail.com with ESMTPSA id n25sm1623084edo.56.2020.05.26.06.32.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 May 2020 06:33:09 -0700 (PDT)
+ Tue, 26 May 2020 06:32:57 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/14] MAINTAINERS: Change Aleksandar Rikalo's email address
-Date: Tue, 26 May 2020 15:32:47 +0200
-Message-Id: <20200526133247.13066-15-f4bug@amsat.org>
+Subject: [PULL 06/14] hw/pci-host/bonito: Map the different PCI ranges more
+ detailed
+Date: Tue, 26 May 2020 15:32:39 +0200
+Message-Id: <20200526133247.13066-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200526133247.13066-1-f4bug@amsat.org>
 References: <20200526133247.13066-1-f4bug@amsat.org>
@@ -80,8 +81,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -116,94 +117,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Better describe the Bonito64 MEM HI/LO and I/O PCI ranges,
+add more PCI regions as unimplemented.
 
-Aleksandar Rikalo wants to use a different email address from
-now on.
-
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-id: <20200518200920.17344-18-aleksandar.qemu.devel@gmail.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-id: <20200526104726.11273-7-f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- .mailmap    |  3 ++-
- MAINTAINERS | 12 ++++++------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ hw/pci-host/bonito.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-diff --git a/.mailmap b/.mailmap
-index 6412067bde..e3628c7a66 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -42,7 +42,8 @@ Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-devel <qemu
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@mips.com>
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <aleksandar.markovic@imgtec.com>
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> <amarkovic@wavecomp.com>
--Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
-+Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <arikalo@wavecomp.com>
-+Aleksandar Rikalo <aleksandar.rikalo@syrmia.com> <aleksandar.rikalo@rt-rk.com>
- Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
- James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f46ab150dc..a209b5d8ce 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -213,7 +213,7 @@ F: disas/microblaze.c
- MIPS TCG CPUs
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: target/mips/
- F: default-configs/*mips*
-@@ -1048,7 +1048,7 @@ MIPS Machines
- -------------
- Jazz
- M: Hervé Poussineau <hpoussin@reactos.org>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: hw/mips/jazz.c
- F: hw/display/jazz_led.c
-@@ -1069,7 +1069,7 @@ F: tests/acceptance/machine_mips_malta.py
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index f09bb1c6a8..52015cc2a7 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -39,6 +39,7 @@
+  */
  
- Mipssim
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Odd Fixes
- F: hw/mips/mipssim.c
- F: hw/net/mipsnet.c
-@@ -1077,7 +1077,7 @@ F: hw/net/mipsnet.c
- R4000
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Obsolete
- F: hw/mips/r4k.c
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/pci.h"
+ #include "hw/irq.h"
+@@ -82,7 +83,7 @@
+ #define BONITO_PCILO1_BASE      0x14000000
+ #define BONITO_PCILO2_BASE      0x18000000
+ #define BONITO_PCIHI_BASE       0x20000000
+-#define BONITO_PCIHI_SIZE       0x20000000
++#define BONITO_PCIHI_SIZE       0x60000000
+ #define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
+ #define BONITO_PCIIO_BASE       0x1fd00000
+ #define BONITO_PCIIO_BASE_VA    0xbfd00000
+@@ -605,14 +606,26 @@ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+     BonitoState *bs = BONITO_PCI_HOST_BRIDGE(dev);
++    MemoryRegion *pcimem_lo_alias = g_new(MemoryRegion, 3);
  
-@@ -1094,7 +1094,7 @@ F: include/hw/isa/vt82c686.h
+-    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
++    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIHI_SIZE);
+     phb->bus = pci_register_root_bus(dev, "pci",
+                                      pci_bonito_set_irq, pci_bonito_map_irq,
+                                      dev, &bs->pci_mem, get_system_io(),
+                                      0x28, 32, TYPE_PCI_BUS);
+-    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
+-                                &bs->pci_mem);
++
++    for (size_t i = 0; i < 3; i++) {
++        char *name = g_strdup_printf("pci.lomem%zu", i);
++
++        memory_region_init_alias(&pcimem_lo_alias[i], NULL, name,
++                                 &bs->pci_mem, i * 64 * MiB, 64 * MiB);
++        memory_region_add_subregion(get_system_memory(),
++                                    BONITO_PCILO_BASE + i * 64 * MiB,
++                                    &pcimem_lo_alias[i]);
++        g_free(name);
++    }
++
++    create_unimplemented_device("pci.io", BONITO_PCIIO_BASE, 1 * MiB);
+ }
  
- Boston
- M: Paul Burton <pburton@wavecomp.com>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
-@@ -2608,7 +2608,7 @@ F: disas/i386.c
- MIPS TCG target
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-+R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: tcg/mips/
+ static void bonito_realize(PCIDevice *dev, Error **errp)
+@@ -620,6 +633,8 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     PCIBonitoState *s = PCI_BONITO(dev);
+     SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
++    BonitoState *bs = BONITO_PCI_HOST_BRIDGE(s->pcihost);
++    MemoryRegion *pcimem_alias = g_new(MemoryRegion, 1);
  
+     /*
+      * Bonito North Bridge, built on FPGA,
+@@ -652,6 +667,7 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     sysbus_init_mmio(sysbus, &s->iomem_ldma);
+     sysbus_mmio_map(sysbus, 3, 0x1fe00200);
+ 
++    /* PCI copier */
+     memory_region_init_io(&s->iomem_cop, OBJECT(s), &bonito_cop_ops, s,
+                           "cop", 0x100);
+     sysbus_init_mmio(sysbus, &s->iomem_cop);
+@@ -669,6 +685,14 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     sysbus_init_mmio(sysbus, &s->bonito_localio);
+     sysbus_mmio_map(sysbus, 6, BONITO_DEV_BASE);
+ 
++    memory_region_init_alias(pcimem_alias, NULL, "pci.mem.alias",
++                             &bs->pci_mem, 0, BONITO_PCIHI_SIZE);
++    memory_region_add_subregion(get_system_memory(),
++                                BONITO_PCIHI_BASE, pcimem_alias);
++    create_unimplemented_device("PCI_2",
++                                (hwaddr)BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE,
++                                2 * GiB);
++
+     /* set the default value of north bridge pci config */
+     pci_set_word(dev->config + PCI_COMMAND, 0x0000);
+     pci_set_word(dev->config + PCI_STATUS, 0x0000);
 -- 
 2.21.3
 
