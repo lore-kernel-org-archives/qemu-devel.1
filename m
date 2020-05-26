@@ -8,73 +8,71 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EFDC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B52C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:01:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F144420776
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:59:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B99D220776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:01:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0OzhjBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F144420776
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6cN7P2Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B99D220776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdcvI-0007ZH-4n
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:59:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55962)
+	id 1jdcwm-00014d-VB
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:01:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdcsH-0001sO-CW; Tue, 26 May 2020 12:56:21 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:40337)
+ id 1jdcuw-0007WY-8P; Tue, 26 May 2020 12:59:06 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:33707)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdcsF-0003Rg-TL; Tue, 26 May 2020 12:56:20 -0400
-Received: by mail-io1-xd42.google.com with SMTP id q8so21391954iow.7;
- Tue, 26 May 2020 09:56:18 -0700 (PDT)
+ id 1jdcut-0005FF-JQ; Tue, 26 May 2020 12:59:05 -0400
+Received: by mail-il1-x143.google.com with SMTP id y17so18971262ilg.0;
+ Tue, 26 May 2020 09:59:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UaBvgKQcklPNmrmRbw60e70SnGLomqQFDLLUcqlmqwg=;
- b=F0OzhjBeoSAlxYqugpvac9k0zNVfyJZ1+3/CYaJEVtBbSgjsGVRRLvrH8FgshLGCmr
- 0oE8uGPMa7FjtyJ8goFoJK/ADORdxT33xC/hGaM1NRWXUe1UojPQ59ntBf1ulh1ussrI
- 7kV5PN5BAkuwiBYXbLYbsTslkvfGdxPixpfHnLceOep3+3eYM4UrxAAWFxkhiMjwUP+b
- elaDCe0x3KCuLmXaa+vbtfzcylUez01b+dkDqy4DO8vVJxzkCTxlBRLmZyJsk9gi19pZ
- BSDqxasz/jwly/cUkhyzpixf2hki172FQg9UAXUCuhm4OwAL8An5/K4OUBqS8g5PP87+
- ai2A==
+ :cc; bh=4KcvRCTJBZ1bnes7UmDOjJu5yTIQC/Pznn9vGduLt18=;
+ b=M6cN7P2YV39c5/vdkW5tKQ5Nr1j4jI4/rSEDKMeCxIvc+fgvJR775GBYVRkdbr8RQm
+ oII0iYiwGLLRy8atxtwq9b7nh9T4593qER+1i2vmNtHp2D4qaOxAIa5FalHiwxTWhVJt
+ dxRHDWaZSEM+WfkNkwLgaointBusOeqSceQRAy/qoniu7gmhDMMUqiTH9/JwFLuGm2ks
+ tpZk4uFKdmLzOObkUI/ssI0fPxD7VeWw+2dfqcavZtYGs0HxYfgKOwpggSmnshyeEyhi
+ 1xchI6y5/RrdBOWyB3s2IUzB6sGdf2APoLUGRuS8N4pMqVfLwbhmd0iI7zH1ZjyMywPQ
+ Z15w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UaBvgKQcklPNmrmRbw60e70SnGLomqQFDLLUcqlmqwg=;
- b=mm3vSih8hzgV3hkcrw8r8I95hLYjIZastE0Ehyxuh+SvlC1zNTaKsR4C8WMRGZ194L
- an2oDdqk/BxcWzZLuC6wTxARxNVbTes3VMlEeuevzDSvA9RFW9hqYa69F6B6v/HsRRD0
- wMkGwov0dmYFfKaIQ5GESRgERwgPWZiWjAj61FcHErKmAt7EIL9qlh1Ck97MY6Opn2IL
- 9YEyzLxwD1gu9FSgzRaIaoZ0nLyVJDsiQdy/9hSSNZm9xuOFTrR+ehTESMjsaIJUBgMy
- RHvKH/bcLU9qa2VF8RqzTE8vJU92kqYfhoWaCSMqZ63J7Xrzl9gIOgruLwGESnmuK0Tn
- VCSw==
-X-Gm-Message-State: AOAM533wGrSoeYX4GMyF8o2lT+N969naT8uYUVDbJ/LiAsvdBDfQOsfL
- AATweeA7q+afSp4w2xa8c12OSfr1gyGvgGjkU5U=
-X-Google-Smtp-Source: ABdhPJwauc72nYuI1fguaPlvR/qVplpcX5/5/cBD5QvewjmiroqtkB8FWuqfHsW14F5AzmF+sTXJc68jK7EOeRLlXuk=
-X-Received: by 2002:a02:6543:: with SMTP id u64mr1986792jab.26.1590512176396; 
- Tue, 26 May 2020 09:56:16 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=4KcvRCTJBZ1bnes7UmDOjJu5yTIQC/Pznn9vGduLt18=;
+ b=HnyeHCe9nB7cAIpNfTZJ3wIjJ3VSo0GhCErcrGb1UeZlrpuNjGOC9ZHhloN+DPQ6GE
+ BQ4limtdovxZ1K7ZOE2kQeJv2xprP7dg7trG/EXC0EBDsky8oRoWiWDKewpwfwU1pWcc
+ CNorJ0FzqJgfgFZbECrJ+TUAIUx5gQvxbJ1aAoFL/hfZ4WG+TCYBa9PrtkjLiuXoiyXA
+ N5I5Pesaqz/FddF7QefA9ZiDCPVhienqWu88qkqR1zNJtZjqH8FEKWdVEitUN2mn2hyk
+ 53Pv84jVhugdnIzZ6l79/ZXLGqQRuJJ1eyH8sMfZ8jit69Tg9xzzyvpqCRMINKtCs+yD
+ w30g==
+X-Gm-Message-State: AOAM530hM5tvBnQOXMkfk034BOr05mbS5Fy1Qw3u92PM8X9EB29mjTv9
+ nwTIjMfLVPjiSzZOpTeoQnWeA0H+q9JUFgRDEJE=
+X-Google-Smtp-Source: ABdhPJyrEAeXglCooAotgLWpPz9BfAJCdoBvhNKqQSuZCoQtC4ktsAU70+WeU5N9/m0e20NVAVku95oh+Cl9Yhyow9E=
+X-Received: by 2002:a92:d087:: with SMTP id h7mr2171135ilh.227.1590512341154; 
+ Tue, 26 May 2020 09:59:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200526062252.19852-1-f4bug@amsat.org>
- <20200526062252.19852-4-f4bug@amsat.org>
-In-Reply-To: <20200526062252.19852-4-f4bug@amsat.org>
+References: <1590072147-13035-1-git-send-email-bmeng.cn@gmail.com>
+ <1590072147-13035-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1590072147-13035-2-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 26 May 2020 09:47:15 -0700
-Message-ID: <CAKmqyKPzfVkCiQTa2a9kaT0a-ZVR6=LSmW-A29e=O2NkMXhwjg@mail.gmail.com>
-Subject: Re: [PATCH 03/14] hw/display/cirrus_vga: Convert debug printf() to
- trace event
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 26 May 2020 09:50:01 -0700
+Message-ID: <CAKmqyKPvWsFRWZ=J0egmzJUCZ9e2O-yKJk3sgd196CuOey=OnQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/riscv: virt: Remove the riscv_ prefix of the
+ machine* functions
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -97,66 +95,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 11:25 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+On Thu, May 21, 2020 at 7:42 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> Remove the riscv_ prefix of the machine* functions.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/display/cirrus_vga.c | 4 +---
->  hw/display/trace-events | 1 +
->  2 files changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> index 1f29731ffe..33ccdde000 100644
-> --- a/hw/display/cirrus_vga.c
-> +++ b/hw/display/cirrus_vga.c
-> @@ -1512,9 +1512,7 @@ static int cirrus_vga_read_gr(CirrusVGAState * s, u=
-nsigned reg_index)
->  static void
->  cirrus_vga_write_gr(CirrusVGAState * s, unsigned reg_index, int reg_valu=
-e)
+>  hw/riscv/virt.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index c695a44..f1d6b61 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -471,7 +471,7 @@ static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
+>      return dev;
+>  }
+>
+> -static void riscv_virt_board_init(MachineState *machine)
+> +static void virt_machine_init(MachineState *machine)
 >  {
-> -#if defined(DEBUG_BITBLT) && 0
-> -    printf("gr%02x: %02x\n", reg_index, reg_value);
-> -#endif
-> +    trace_vga_cirrus_write_gr(reg_index, reg_value);
->      switch (reg_index) {
->      case 0x00:                 // Standard VGA, BGCOLOR 0x000000ff
->         s->vga.gr[reg_index] =3D reg_value & gr_mask[reg_index];
-> diff --git a/hw/display/trace-events b/hw/display/trace-events
-> index 47b2b168ae..c3043e4ced 100644
-> --- a/hw/display/trace-events
-> +++ b/hw/display/trace-events
-> @@ -133,6 +133,7 @@ vga_vbe_write(uint32_t index, uint32_t val) "index 0x=
-%x, val 0x%x"
->  vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
->  vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
->  vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x=
-%x"
-> +vga_cirrus_write_gr(uint8_t index, uint8_t val) "GR addr 0x%02x, val 0x%=
-02x"
+>      const struct MemmapEntry *memmap = virt_memmap;
+>      RISCVVirtState *s = RISCV_VIRT_MACHINE(machine);
+> @@ -632,32 +632,32 @@ static void riscv_virt_board_init(MachineState *machine)
+>      g_free(plic_hart_config);
+>  }
 >
->  # sii9022.c
->  sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+> -static void riscv_virt_machine_instance_init(Object *obj)
+> +static void virt_machine_instance_init(Object *obj)
+>  {
+>  }
+>
+> -static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
+> +static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+>
+>      mc->desc = "RISC-V VirtIO board";
+> -    mc->init = riscv_virt_board_init;
+> +    mc->init = virt_machine_init;
+>      mc->max_cpus = 8;
+>      mc->default_cpu_type = VIRT_CPU;
+>      mc->pci_allow_0_address = true;
+>  }
+>
+> -static const TypeInfo riscv_virt_machine_typeinfo = {
+> +static const TypeInfo virt_machine_typeinfo = {
+>      .name       = MACHINE_TYPE_NAME("virt"),
+>      .parent     = TYPE_MACHINE,
+> -    .class_init = riscv_virt_machine_class_init,
+> -    .instance_init = riscv_virt_machine_instance_init,
+> +    .class_init = virt_machine_class_init,
+> +    .instance_init = virt_machine_instance_init,
+>      .instance_size = sizeof(RISCVVirtState),
+>  };
+>
+> -static void riscv_virt_machine_init_register_types(void)
+> +static void virt_machine_init_register_types(void)
+>  {
+> -    type_register_static(&riscv_virt_machine_typeinfo);
+> +    type_register_static(&virt_machine_typeinfo);
+>  }
+>
+> -type_init(riscv_virt_machine_init_register_types)
+> +type_init(virt_machine_init_register_types)
 > --
-> 2.21.3
+> 2.7.4
 >
 >
 
