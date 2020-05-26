@@ -2,85 +2,134 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA04C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB852C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:38:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1FD1206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F9B7206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:38:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+wK57S4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FD1206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CipoqE5S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9B7206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdbcD-0003H2-5W
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:35:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
+	id 1jdbem-0004gF-Qh
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:38:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jdbbZ-0002ln-R2
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:35:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41936
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbe5-00049B-4A
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:37:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44462
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jdbbX-0007iK-Rc
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:35:00 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdbdB-0008Mp-0U
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:37:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590507298;
+ s=mimecast20190719; t=1590507399;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sepANqzkspghmlxghwN3pNV4427hDrEuiKemgIzEQpY=;
- b=a+wK57S41kG95XH9qXN2gk/2N2av8AUaUj+Al7ftddiF6vql2G4GHxLoA1N4wuA7Xhz2RS
- D3C+0INN3+/qlrY+8EF+z+4Cmx+kmTa/Zh7C+bDuCtwqUOPkCV5MBSTIaobNjXcp4yWQRK
- dS8TQ3/08fSMy6kK7aITTTy9rDOLP2E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-LM-dJYAZMP63jygkKAM9jg-1; Tue, 26 May 2020 11:34:54 -0400
-X-MC-Unique: LM-dJYAZMP63jygkKAM9jg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A6CF100CCC0;
- Tue, 26 May 2020 15:34:53 +0000 (UTC)
-Received: from localhost (ovpn-113-132.ams2.redhat.com [10.36.113.132])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A80019D7C;
- Tue, 26 May 2020 15:34:49 +0000 (UTC)
-Date: Tue, 26 May 2020 16:34:48 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH 0/4] fuzz: misc changes for oss-fuzz compatability
-Message-ID: <20200526153448.GA6797@stefanha-x1.localdomain>
-References: <20200512030133.29896-1-alxndr@bu.edu>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JPO71FoTWCLpPIX+ZA5F7U9WacQLiJFlUZVUjR2Yp3M=;
+ b=CipoqE5SIoFGKvzxbe0sY0Q3YbQuiUSskd4Iu9W6MM52QHlkMp3tgEw4ehgbQW67sGg/Gl
+ Z9B0tGLzUR8KKQvq17yLusBR2NCb4w4LfMuaR+ys8KfNFQM+BhNJZvIpH3TnQk5BWaOaLT
+ UZkFoIKESy1lNd9KRI2oaRPDKzsgZ/8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-90mcQRgyMXiCi83mAJb6pw-1; Tue, 26 May 2020 11:36:38 -0400
+X-MC-Unique: 90mcQRgyMXiCi83mAJb6pw-1
+Received: by mail-ed1-f69.google.com with SMTP id x11so9092375edj.21
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 08:36:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=JPO71FoTWCLpPIX+ZA5F7U9WacQLiJFlUZVUjR2Yp3M=;
+ b=KSVZfKQAWwSCQrfvUGhscQwZXhV26AsJaFQJZ8kUWgUGYA07j+vqgwGj4/Mkc123IC
+ NkV0vix1fDoIHcDIYanr+DBavZvsHvL9oAnnCGuU5+8FcB4JFEnC4sdNk7pTI3uzTgWs
+ z8hFCb2npK1mXmglKoTwktqV/di9Hx8DYsil1WfJMjMRRncQ2JuG5LdAMOIUHHzV+QNR
+ smkMmawwAVBsjMuuETdIN7H6N0R65pxV3EvY9T2exh61hn5tsyZ6zTNduRLZSfGnAJIa
+ yoJAogQHvUghA3kl8/Z49GrSPc6lOxtGdDTNtqnSJ4/edr3DSUmbmMkDYpFZs7Q3jM54
+ wT+w==
+X-Gm-Message-State: AOAM532AIr7Gfo4q/BsEUNcR9+YP+daPHnX55lq9M0uEbrYZJ7/luGKd
+ MDSfa7LZTbJEXFvb41E/pP+goZBiNbEtct+ckgF0opjG7yUw9OSY4o3RHn0PZG61ROlvCKgyUpM
+ s/HfKnvJ9hPfSTfc=
+X-Received: by 2002:a17:906:934e:: with SMTP id
+ p14mr1624032ejw.502.1590507397235; 
+ Tue, 26 May 2020 08:36:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJycfUPt/QE1+XG2hf1PQXMEgdEXc/I8oblFi28xvze5/zcD45JvrUlbCtu2eCm6g0DW0cpypg==
+X-Received: by 2002:a17:906:934e:: with SMTP id
+ p14mr1624001ejw.502.1590507397021; 
+ Tue, 26 May 2020 08:36:37 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id bf15sm209651edb.46.2020.05.26.08.36.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 May 2020 08:36:36 -0700 (PDT)
+Subject: Re: [PATCH v3 4/9] qapi/misc: Restrict balloon-related commands to
+ machine code
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200525150640.30879-1-philmd@redhat.com>
+ <20200525150640.30879-5-philmd@redhat.com>
+ <87eer787tr.fsf@dusky.pond.sub.org>
+ <7e926561-c2c3-e815-8518-b283db7c60fd@redhat.com>
+ <87mu5v3w3t.fsf@dusky.pond.sub.org>
+ <7fb7564d-23cc-28b8-bf5f-a80797c518ec@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <67d74bcb-ac60-a6f7-e485-7e419dbf50dc@redhat.com>
+Date: Tue, 26 May 2020 17:36:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200512030133.29896-1-alxndr@bu.edu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <7fb7564d-23cc-28b8-bf5f-a80797c518ec@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 10:22:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,69 +142,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, bsd@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 5/26/20 11:31 AM, Philippe Mathieu-Daudé wrote:
+> +Laurent
+> 
+> On 5/26/20 11:04 AM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>
+>>> On 5/26/20 9:38 AM, Markus Armbruster wrote:
+>>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>>>
+>>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>>
+>>>> A brief note on why restricting "to machine code" is useful would be
+>>>> nice.  Same for the other patches.
+>>>>
+>>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>>>
+>>>
+>>> What about this?
+>>>
+>>> "QEMU can do system-mode and user-mode emulation.
+>>> Only system mode emulate a machine.
+>>> Remove this feature from the user-mode emulation."
+>>
+>> Is is a feature of user-mode emulation before the patch?  Or is it just
+>> dead code?
+>>
+>> Hint: QMP commands tend to be dead code when the program doesn't expose
+>> a QMP monitor :)
+> 
+> Maybe a 'corollary' question, "How user-mode users use QMP?"
+> 
 
-On Mon, May 11, 2020 at 11:01:29PM -0400, Alexander Bulekov wrote:
-> Hello,
-> With these patches, the fuzzer passes the oss-fuzz build checks.
-> There are also some miscelanous improvement to the fuzzer, in general:
->  * If building for oss-fuzz, check executable_dir/pc-bios for
->    the bios images
->  * Fix a typo in the i440fx-qtest-reboot argument which resulted in an
->    invalid argument to qemu_main
->  * Add an alternate name to resolve libfuzzer's internal fuzzer::TPC
->    object at link-time
->  * For all fork-based fuzzers, run the main-loop in the parent, to
->    prevent the clock from running far-ahead of the previous main-loop.
-> -Alex
->=20
-> Alexander Bulekov (4):
->   fuzz: add datadir for oss-fuzz compatability
->   fuzz: fix typo in i440fx-qtest-reboot arguments
->   fuzz: add mangled object name to linker script
->   fuzz: run the main-loop in fork-server process
->=20
->  include/sysemu/sysemu.h             |  2 ++
->  softmmu/vl.c                        |  2 +-
->  tests/qtest/fuzz/fork_fuzz.ld       |  5 +++++
->  tests/qtest/fuzz/fuzz.c             | 15 +++++++++++++++
->  tests/qtest/fuzz/i440fx_fuzz.c      |  3 ++-
->  tests/qtest/fuzz/virtio_net_fuzz.c  |  2 ++
->  tests/qtest/fuzz/virtio_scsi_fuzz.c |  2 ++
->  7 files changed, 29 insertions(+), 2 deletions(-)
->=20
-> --=20
-> 2.26.2
->=20
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---bp/iNruPH9dso1Pn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7NNxgACgkQnKSrs4Gr
-c8hclwf+KhmEOkoFRF8NwOSHX4N6tUCZx3vacVfsKppTNKYjQ7y+KJf0UxiWCz8b
-mjbiHuJBT8eL2gzqotknXCetKN6x/gQabe1J1eM3xbJwhdiM9sgbbVfJTESrVSxg
-Y+X6ZoRvt48umnk4yxKHsSWS/36+sc0mnngNVyezwVwBez56WfVtyeMb2HTd3mRV
-F9y2zuMP+xSK2fm1pgmHOJnhXSULDB9qaiToo1eo1IcbUPga1Jbm+p+Jpo/BavE7
-LnygnRQdklsyo3h8fRx5z8/10u8z/nXSo1eQgY2UMJxkAqqCHmMHGETP9cQrco5t
-5cwCYSyC+qTxivMcYcJCkyh2bXb1iQ==
-=kt4U
------END PGP SIGNATURE-----
-
---bp/iNruPH9dso1Pn--
+I can't find a way to start a user-mode process with a QMP socket, is
+there one?
 
 
