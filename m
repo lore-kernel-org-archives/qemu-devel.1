@@ -2,80 +2,90 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B07C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85858C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:43:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC20A207CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A1EE207CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:43:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIFiVkvl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC20A207CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1ycnENH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1EE207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdgO3-0003LN-TV
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 16:41:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60952)
+	id 1jdgQT-00050G-Hm
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 16:43:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jdgNN-0002bV-MS; Tue, 26 May 2020 16:40:41 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:44161)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jdgNM-0005Bd-4E; Tue, 26 May 2020 16:40:41 -0400
-Received: by mail-ej1-x644.google.com with SMTP id x20so25247920ejb.11;
- Tue, 26 May 2020 13:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=wIVSx8nuFV0C/ZwGcJt2YLvwEDbKDhleCMhZsPUzjfY=;
- b=dIFiVkvlrBsqp6mDY8MwaicIuBSA27u9IHzh1o9+6k3GFKAfeM+lh1AiXZjutbIjhj
- Ro8sGQG9hyfl6Ld08Z1/tpg6NmJF6aeNsqfW8FVfqsTzzG7ro1mtDVKeoNbUjIRivsci
- q4ctuK3GNOeGxf36ZKTpP8gb5z/r1Oz016AzHwDYueV7StkOdTipy4A6AU8OI9jS1cl3
- R+5iZsvHOUMBZnoCPBYDbhgZM+9HN5CCz8L8KrtHcx+ed24Tp3OlqLDQouVOoBFw3yHm
- E66978vRpOldaC6GZtf9gbGO/jSxJYKtucKxPLJlOEkjAOT4NK4kR/5XJDr3p+tcqagL
- q1Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=wIVSx8nuFV0C/ZwGcJt2YLvwEDbKDhleCMhZsPUzjfY=;
- b=J3CS+vhqxqxYijSG4xr3tiBE7exRYSKmMfGfvGOo4jV3hm3SSvl7EC+xyAnEZdORDs
- arA+xu0aIb66xaSuA70lKkJQpVYfCEmhwEp7nj9FheGOM1d7jyixG45DbfViK8D+Kphe
- 5uJuVjC/6x1sxZwMPC0BSWq+9xKUIGSw3oLTA+KSveowFAgDuaDElzaFiz+C/2sPZXuk
- HwQDMQEZtx015vIiRYXPkr5QbnLJCgVUn7xyLqsm62oLVuUl87AvDHAupvQRg2JDuFit
- fZrDK/xdubJRAzcJcsHs9mzpO+AEgJm709MFPvnvM0KpdDm3NEAESwq3TALBwIBxGNer
- Mdeg==
-X-Gm-Message-State: AOAM531DsV8UNJLPiv8aCkzoQNG8OnuRAEWOAixx/K9jTT9YvoB5PIVF
- Td1DNarCwBwlopAjvq5Z+JRUkNIippSmQ0IXcJh4/rPy+MA=
-X-Google-Smtp-Source: ABdhPJz0FjjNinoGNLHCdNwJtvEC58jETArNtwLJswN3j7CR5NUwxr1waY8c4R/bP/3jID8BCai6bOweCxZVNCSMtGA=
-X-Received: by 2002:a17:906:3481:: with SMTP id
- g1mr2541665ejb.530.1590525638120; 
- Tue, 26 May 2020 13:40:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdgPb-00044z-3j
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 16:42:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51283
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdgPZ-0006Sx-JX
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 16:42:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590525776;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4b2N3HB+mptn6S9xvtKiKeTw/Neh/mcI3og6Dpvc0KU=;
+ b=E1ycnENH3v4gEtOBy6z1KtjjfXTTjuSAtWrjk6niS4VKUf7XxZqbEcWNjFGgR6eE1kT2xZ
+ +XHczI+kHvZ35ul4vKx+7Y8tGkWa9e7MTTbWu0se09kg692Nam14VY6QEDur8kVkHNucQD
+ X+MMp5ZeS9f0WUOAAZe4MPwHnVqc5y0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-IWaI2G06NcaEDlSSoD8z1A-1; Tue, 26 May 2020 16:42:53 -0400
+X-MC-Unique: IWaI2G06NcaEDlSSoD8z1A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A298C1007B09;
+ Tue, 26 May 2020 20:42:52 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0777579C4D;
+ Tue, 26 May 2020 20:42:48 +0000 (UTC)
+Subject: Re: [PATCH v4 0/5] coroutines: generate wrapper code
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <159041246428.2646.2773751210145691653@45ef0f9c86ae>
+ <13e2fafe-8897-c55c-49f7-1d9283949615@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <495c85cd-016d-2da9-ad7a-80d715eff12d@redhat.com>
+Date: Tue, 26 May 2020 15:42:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-From: David CARLIER <devnexen@gmail.com>
-Date: Tue, 26 May 2020 21:40:27 +0100
-Message-ID: <CA+XhMqwH6btbKFD0Ei47e+QHN2eBPG5H2PTS92MAje2Tij4Y=A@mail.gmail.com>
-Subject: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for MacOS
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=devnexen@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <13e2fafe-8897-c55c-49f7-1d9283949615@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 15:25:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,53 +98,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
+ crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From b24a6702beb2a4e2a9c1c03b69c6d1dd07d4cf08 Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Tue, 26 May 2020 21:35:27 +0100
-Subject: [PATCH] util/oslib: current process full path resolution on MacOS
+On 5/25/20 8:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 25.05.2020 16:14, no-reply@patchew.org wrote:
+>> Patchew 
+>> URL:https://patchew.org/QEMU/20200525100801.13859-1-vsementsov@virtuozzo.com/ 
+>>
+>>
+>>
+>>
+>> Hi,
+>>
+>> This series failed the docker-quick@centos7 build test. Please find 
+>> the testing commands and
+>> their output below. If you have Docker installed, you can probably 
+>> reproduce it
+>> locally.
+>>
+>> === TEST SCRIPT BEGIN ===
+>> #!/bin/bash
+>> make docker-image-centos7 V=1 NETWORK=1
+>> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+>> === TEST SCRIPT END ===
+>>
+>> block/vhdx-log.o: In function `vhdx_log_write_and_flush':
+>> /tmp/qemu-test/src/block/vhdx-log.c:1049: undefined reference to 
+>> `bdrv_flush'
+>> /tmp/qemu-test/src/block/vhdx-log.c:1061: undefined reference to 
+>> `bdrv_flush'
+>> collect2: error: ld returned 1 exit status
+>> make: *** [qemu-nbd] Error 1
+> 
+> Hmm. Who can help?
+> 
+> I assume, that this is because I've added block/block-gen.o into 
+> ./Makefile.objs, and not into block/Makefile.objs. I'll try it with next 
+> resend.
 
-Using existing libproc to fill the path.
+Are you doing in-tree or VPATH builds?  When I tried a VPATH build, I got:
 
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- util/oslib-posix.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+$ make -C build block/block-gen.c V=1
+make: Entering directory '/home/eblake/qemu/build'
+...
+cat include/block/block.h block/coroutines.h | 
+/home/eblake/qemu/scripts/coroutine-wrapper.py > block/block-gen.c
+cat: include/block/block.h: No such file or directory
+cat: block/coroutines.h: No such file or directory
+make: 'block/block-gen.c' is up to date.
+make: Leaving directory '/home/eblake/qemu/build'
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 062236a1ab..96f0405ee6 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -55,6 +55,10 @@
- #include <sys/sysctl.h>
- #endif
+and a resulting block/block-gen.c that declares nothing but 3 #includes.
 
-+#ifdef __APPLE__
-+#include <libproc.h>
-+#endif
-+
- #include "qemu/mmap-alloc.h"
-
- #ifdef CONFIG_DEBUG_STACK_USAGE
-@@ -366,6 +370,15 @@ void qemu_init_exec_dir(const char *argv0)
-             p = buf;
-         }
-     }
-+#elif defined(__APPLE__)
-+    {
-+        uint32_t len;
-+        len = proc_pidpath(getpid(), buf, sizeof(buf) - 1);
-+        if (len > 0) {
-+            buf[len] = 0;
-+            p = buf;
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
 -- 
-2.26.2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
