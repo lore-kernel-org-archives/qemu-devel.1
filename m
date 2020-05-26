@@ -2,97 +2,65 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8527BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD90C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52F882068D
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:36:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miqQjbCO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F882068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5DE0E2068D
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:38:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DE0E2068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdZlH-00065e-BB
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56922)
+	id 1jdZmS-000074-GO
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:38:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhV-0006Mt-31
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:01 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:33143)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdZhU-0005om-0g
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:33:00 -0400
-Received: by mail-ed1-x542.google.com with SMTP id e10so17663977edq.0
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ZjWj0dUmFcXqSOvS5eV4ZH48B9zS/5L5K/OAOs2OdMM=;
- b=miqQjbCOXsFwvwKODOXKEMFRdT9ZqZWH8xCRlMQZHfoJEbZCpfdxcvQLUUO9bFnRWW
- W2MAYmEGQEkWpwLSToi9URAwZGHFRrGJgXNpovC9qYeJZzM1Esy72lguuBP9M/jyLc/6
- nI1AuUtMf3k2Tkwc5FviK0gVJuXUSzYNP8BdmCnjublauaqwSnxi/uic36vB8lgKqemr
- ORRa/6K6UH4z3JL/cvxL4sR1T6CaGrqElrKvIdthJAcCMQ51Qw09Fa2PKOYhU9+PpAeS
- TjDX46xHkgX3OtRmmPwg8U+Oo6adIh/l0v9rNVIRFaaEE1MKNv8VoBdG16cWWmZh8MJq
- 52bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZjWj0dUmFcXqSOvS5eV4ZH48B9zS/5L5K/OAOs2OdMM=;
- b=MPVPgH01QZRwX9C+yFQpdZks0mHDjF+dtnWFgRNgWH688tVn/QT5Swqy86vjBnCjHM
- chY6nTaVUN+W56C3wUtILQ6EG6aEZ4W/GAII1pvItIA5LK9zPW37K7Ol7kksE4cwlG6h
- DlTWlIL6BuXHgETeUVDK33PdDBy4j196Vmk2/VWhWSqBGkGmDm76ud8wmQByd6W5Mj4E
- q5CwGjYeXluvOUBdfRbxy+/WV4/9nxq7wMEHxuGpDYrxhySceelbyu3dYPIXLezSevqM
- esTMNzFPUBFlBhTSjQcQkmLHsn50t/lPRBHVpUJiJHfBresY+yz9Bu4CmIdAnhqfgDbd
- 5tfA==
-X-Gm-Message-State: AOAM530Zs3Srxb81/pgVCbPWLLtMSLeTjzQrj9DUz4hI03QYpmsN+GRe
- QwsSSQ/D9LTd4sa54UiHKqdZsAyU80Y=
-X-Google-Smtp-Source: ABdhPJy+QzkJ3L07bCS9TKLkT8JyNSsqPfDai0Swx+md90g3+7A3sUKqNYSLjXYEhxeZ4LyCQqy/9A==
-X-Received: by 2002:a05:6402:2032:: with SMTP id
- ay18mr19601948edb.281.1590499978445; 
- Tue, 26 May 2020 06:32:58 -0700 (PDT)
-Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id n25sm1623084edo.56.2020.05.26.06.32.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 May 2020 06:32:57 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 06/14] hw/pci-host/bonito: Map the different PCI ranges more
- detailed
-Date: Tue, 26 May 2020 15:32:39 +0200
-Message-Id: <20200526133247.13066-7-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200526133247.13066-1-f4bug@amsat.org>
-References: <20200526133247.13066-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jdZjz-0003OL-Lv
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:35:35 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:45693)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jdZjw-0006Iq-SP
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:35:34 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 5526274633F;
+ Tue, 26 May 2020 15:35:21 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 08AA6746331; Tue, 26 May 2020 15:35:21 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 07187746335;
+ Tue, 26 May 2020 15:35:21 +0200 (CEST)
+Date: Tue, 26 May 2020 15:35:21 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 5/7] sm501: Replace hand written implementation with
+ pixman where possible
+In-Reply-To: <20200526104318.wmsqqtia3h52l454@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.22.395.2005261434540.87757@zero.eik.bme.hu>
+References: <cover.1590089984.git.balaton@eik.bme.hu>
+ <58666389b6cae256e4e972a32c05cf8aa51bffc0.1590089984.git.balaton@eik.bme.hu>
+ <20200526104318.wmsqqtia3h52l454@sirius.home.kraxel.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,112 +73,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, libvir-list@redhat.com,
- Thomas Huth <thuth@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Better describe the Bonito64 MEM HI/LO and I/O PCI ranges,
-add more PCI regions as unimplemented.
+On Tue, 26 May 2020, Gerd Hoffmann wrote:
+> On Thu, May 21, 2020 at 09:39:44PM +0200, BALATON Zoltan wrote:
+>> Besides being faster this should also prevent malicious guests to
+>> abuse 2D engine to overwrite data or cause a crash.
+>
+>>          uint32_t src_base = s->twoD_source_base & 0x03FFFFFF;
+>> -        uint8_t *src = s->local_mem + src_base;
+>
+>> -                    val = *(_pixel_type *)&src[index_s];                      \
+>
+> Well, the advantage of *not* using pixman is that you can easily switch
+> the code to use offsets instead of pointers, then apply the mask to the
+> *final* offset to avoid oob data access:
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-id: <20200526104726.11273-7-f4bug@amsat.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/pci-host/bonito.c | 32 ++++++++++++++++++++++++++++----
- 1 file changed, 28 insertions(+), 4 deletions(-)
+The mask applied to src_base is not to prevent overflow but to implement 
+register limits. Only these bits are valid if I remember correctly, so 
+even if I use offsets I need to check for overflow. This patch basically 
+does that by changing parameters to unsigned to prevent them being 
+negative, checking values we multiply by to prevent them to be zero and 
+then calculating first and last offset and check if they are within vram. 
+(Unless of course I've made a mistake somewhere.) This should prevent 
+overflow with one check and does not need to apply a mask at every step. 
+The vram size can also be different so it's not a fixed mask anyway.
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index f09bb1c6a8..52015cc2a7 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -39,6 +39,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qemu/error-report.h"
- #include "hw/pci/pci.h"
- #include "hw/irq.h"
-@@ -82,7 +83,7 @@
- #define BONITO_PCILO1_BASE      0x14000000
- #define BONITO_PCILO2_BASE      0x18000000
- #define BONITO_PCIHI_BASE       0x20000000
--#define BONITO_PCIHI_SIZE       0x20000000
-+#define BONITO_PCIHI_SIZE       0x60000000
- #define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
- #define BONITO_PCIIO_BASE       0x1fd00000
- #define BONITO_PCIIO_BASE_VA    0xbfd00000
-@@ -605,14 +606,26 @@ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
-     BonitoState *bs = BONITO_PCI_HOST_BRIDGE(dev);
-+    MemoryRegion *pcimem_lo_alias = g_new(MemoryRegion, 3);
- 
--    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
-+    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIHI_SIZE);
-     phb->bus = pci_register_root_bus(dev, "pci",
-                                      pci_bonito_set_irq, pci_bonito_map_irq,
-                                      dev, &bs->pci_mem, get_system_io(),
-                                      0x28, 32, TYPE_PCI_BUS);
--    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
--                                &bs->pci_mem);
-+
-+    for (size_t i = 0; i < 3; i++) {
-+        char *name = g_strdup_printf("pci.lomem%zu", i);
-+
-+        memory_region_init_alias(&pcimem_lo_alias[i], NULL, name,
-+                                 &bs->pci_mem, i * 64 * MiB, 64 * MiB);
-+        memory_region_add_subregion(get_system_memory(),
-+                                    BONITO_PCILO_BASE + i * 64 * MiB,
-+                                    &pcimem_lo_alias[i]);
-+        g_free(name);
-+    }
-+
-+    create_unimplemented_device("pci.io", BONITO_PCIIO_BASE, 1 * MiB);
- }
- 
- static void bonito_realize(PCIDevice *dev, Error **errp)
-@@ -620,6 +633,8 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     PCIBonitoState *s = PCI_BONITO(dev);
-     SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
-     PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
-+    BonitoState *bs = BONITO_PCI_HOST_BRIDGE(s->pcihost);
-+    MemoryRegion *pcimem_alias = g_new(MemoryRegion, 1);
- 
-     /*
-      * Bonito North Bridge, built on FPGA,
-@@ -652,6 +667,7 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     sysbus_init_mmio(sysbus, &s->iomem_ldma);
-     sysbus_mmio_map(sysbus, 3, 0x1fe00200);
- 
-+    /* PCI copier */
-     memory_region_init_io(&s->iomem_cop, OBJECT(s), &bonito_cop_ops, s,
-                           "cop", 0x100);
-     sysbus_init_mmio(sysbus, &s->iomem_cop);
-@@ -669,6 +685,14 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     sysbus_init_mmio(sysbus, &s->bonito_localio);
-     sysbus_mmio_map(sysbus, 6, BONITO_DEV_BASE);
- 
-+    memory_region_init_alias(pcimem_alias, NULL, "pci.mem.alias",
-+                             &bs->pci_mem, 0, BONITO_PCIHI_SIZE);
-+    memory_region_add_subregion(get_system_memory(),
-+                                BONITO_PCIHI_BASE, pcimem_alias);
-+    create_unimplemented_device("PCI_2",
-+                                (hwaddr)BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE,
-+                                2 * GiB);
-+
-     /* set the default value of north bridge pci config */
-     pci_set_word(dev->config + PCI_COMMAND, 0x0000);
-     pci_set_word(dev->config + PCI_STATUS, 0x0000);
--- 
-2.21.3
+If not using pixman then I'd need to reimplement optimised 2D ops that 
+will likely never be as good as pixman and no point in doing it several 
+times for every device model so I'd rather try to use pixman where 
+possible unless a better library is available.
 
+>    val = *(_pixel_type*)(&s->local_mem[(s->twoD_source_base + index_s) & 0x03FFFFFF]);
+>
+>> +        if ((rop_mode && rop == 0x5) || (!rop_mode && rop == 0x55)) {
+>> +            /* Invert dest, is there a way to do this with pixman? */
+>
+> PIXMAN_OP_XOR maybe?
+
+Maybe, but looking at the pixman source I couldn't decide if
+
+UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (s, dest_ia, d, src_ia);
+
+seen here:
+https://cgit.freedesktop.org/pixman/tree/pixman/pixman-combine32.c#n396
+is really the same as s ^ d.
+
+>> +            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+>> +                /* regions may overlap: copy via temporary */
+>
+> The usual way for a hardware blitter is to have a direction bit, i.e.
+> the guest os can ask to blit in top->bottom or bottom->top scanline
+> ordering.  The guest can use that to make sure the blit does not
+
+Yes, this is the rtl above (right to left) and AmigaOS sets this most of 
+the time so only relying on that to detect overlaps is not efficient.
+
+> overwrite things.  But note the guest can also intentionally use
+> overlapping regions, i.e. memset(0) the first scanline, then use a blit
+> with overlap to clear the whole screen.  The later will surely break if
+> you blit via temporary image ...
+
+Fortunately no guest code seems to do that so unless we find one needing 
+it I don't worry much about such rare cases. It would be best if pixman 
+supported this but while I've found patches were submitted they did not 
+get merged so far so using a temporary seems to be the simplest way that 
+works well enough for now.
+
+>> +                pixman_blt((uint32_t *)&s->local_mem[src_base],
+>> +                           (uint32_t *)&s->local_mem[dst_base],
+>> +                           src_pitch * (1 << format) / sizeof(uint32_t),
+>> +                           dst_pitch * (1 << format) / sizeof(uint32_t),
+>> +                           8 * (1 << format), 8 * (1 << format),
+>> +                           src_x, src_y, dst_x, dst_y, width, height);
+>
+> See above, i'm not convinced pixman is the best way here.
+> When using pixman I'd suggest:
+>
+>  (1) src = pixman_image_create_bits_no_clear(...);
+>  (2) dst = pixman_image_create_bits_no_clear(...);
+>  (3) pixman_image_composite(PIXMAN_OP_SRC, src, NULL, dst, ...);
+>  (4) pixman_image_unref(src);
+>  (5) pixman_image_unref(dst);
+>
+> pixman_blt() is probably doing basically the same.
+
+Actually not the same, pixman_blt is faster operating directly on pointers 
+while we need all the pixman_image overhead to use pixman_image_composite. 
+Blitter is used for a lot of small ops (I've seen AmigaOS even call it 
+with 1 pixel regions) so going through pixman_image every time does not 
+seem to be efficient. To implement more complex ops this may be needed so 
+I may try to figure that out later but I'd need some test cases to test if 
+the results are correct. The current patches do the same as before (except 
+for some rare overlapping cases as you noted above but we haven't observed 
+any yet) and fix the overflows so this was the best I could do in the time 
+I had. Maybe I try to improve this later but don't plan to rewrite it now.
+
+>  The advantage of not
+> using pixman_blt() is that
+>
+>  (a) you can also use pixman ops other than PIXMAN_OP_SRC, and
+>  (b) you can have a helper function for (1)+(2) which very carefully
+>      applies sanity checks to make sure the pixman image created stays
+>      completely inside s->local_mem.
+>  (c) you have the option to completely rearrange the code flow, for
+>      example update the src pixman image whenever the guest touches
+>      src_base or src_pitch or format instead of having a
+>      create/op/unref cycle on every blitter op.
+
+From traces I think most guest would write bltter related regs on every op 
+so probably not worth the hassle to try to update regions on register 
+access and we could do it on every op, possibly optimising 1 pixel blits 
+and small regions via some special cases but even then simple copy image 
+is probably the most common op that might worth doing via pixman_blt as 
+it's expected to be frequently used so the less overhead is the better. 
+Therefore I'd only use image_composite for more complex ops but that's too 
+much effort for a relatively unused device model. Maybe for ati-vga I'll 
+try to make it better but first should fix microengine for that so drivers 
+can talk to it. I'd rather spend my limited free time on that than further 
+improving sm501 unless some bugs show up.
+
+>> +        pixman_fill((uint32_t *)&s->local_mem[dst_base],
+>> +                    dst_pitch * (1 << format) / sizeof(uint32_t),
+>> +                    8 * (1 << format), dst_x, dst_y, width, height, color);
+>
+>  (1) src = pixman_image_create_solid(...), otherwise same as above ;)
+
+Same argument as composite_image and for fill we don't even have any 
+advantage so while for composite implementing other ops is a reason to not 
+use pixman_blt I see no reason to not go the fastest way for fill.
+
+Regards,
+BALATON Zoltan
 
