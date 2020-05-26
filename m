@@ -7,79 +7,82 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C87C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B11C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:46:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 099B820723
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:44:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9B3320787
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:46:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YM3sf1SX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099B820723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZK2oWbxW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B3320787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdch0-0007cu-4V
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:44:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41360)
+	id 1jdciM-00019L-20
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:46:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdcet-0004dt-Pe
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:42:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47877
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jdcer-0004Zg-Oa
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:42:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46724
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdces-0002sA-KN
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:42:31 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jdceq-0002qc-H9
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:42:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590511349;
+ s=mimecast20190719; t=1590511346;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xydBB4a77F6ev/Rdwtmv5eQnd75LN+ldAUqy0nGnk+w=;
- b=YM3sf1SXjuj3PY3CJNjj8LVF0R95rviPnDrugEsseKURh1SI/+7KlJZrt09HRMjJ5zBJE2
- Srd31l3qI/VlQJg8kCWfKsYnAvRpIjCwgnWceEip6hCgWODHRbKfMSJ+ydYKrLwlG6c/iA
- aKcHGlWgx0GR/0z8kS/55zZg38Ywrrk=
+ bh=roULH0BHdVTWRU1sdcZcVNI1RpaX8hguuSGdm/MInuk=;
+ b=ZK2oWbxWE6l0CVdnaZR/f6d/rLOzxImtzfqSkS6oDI53gw1F62+0EZw6E6Ymp0sMVyUTHm
+ WIeCepQ5FDoSuWan2bknvYPjmNZneWB9v0BISKoilwBZvtLhRT/ogEHMNMtWMZhgWvt8ay
+ WAzBq+H6z87+3JGpdQvLJYi7NgP2tbA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-ycy2himkOxCLRcyCiHDnKw-1; Tue, 26 May 2020 12:42:27 -0400
-X-MC-Unique: ycy2himkOxCLRcyCiHDnKw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-503-lfvPOGW6PxSh3XrK01_5jw-1; Tue, 26 May 2020 12:42:22 -0400
+X-MC-Unique: lfvPOGW6PxSh3XrK01_5jw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DC1883DB38;
- Tue, 26 May 2020 16:42:26 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F2419007C;
- Tue, 26 May 2020 16:42:23 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 02/11] block/dirty-bitmap: add bdrv_has_named_bitmaps helper
-Date: Tue, 26 May 2020 11:42:02 -0500
-Message-Id: <20200526164211.1569366-3-eblake@redhat.com>
-In-Reply-To: <20200526164211.1569366-1-eblake@redhat.com>
-References: <20200526164211.1569366-1-eblake@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3D33108BD11;
+ Tue, 26 May 2020 16:42:21 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-239.ams2.redhat.com [10.36.113.239])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6270B19D71;
+ Tue, 26 May 2020 16:42:17 +0000 (UTC)
+Date: Tue, 26 May 2020 18:42:15 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Reiter <s.reiter@proxmox.com>
+Subject: Re: [RFC PATCH 2/3] block: Allow bdrv_run_co() from different
+ AioContext
+Message-ID: <20200526164215.GA8886@linux.fritz.box>
+References: <20200512144318.181049-1-kwolf@redhat.com>
+ <20200512144318.181049-3-kwolf@redhat.com>
+ <2ab7bae7-03c3-f269-1db1-202aeb41bdf3@proxmox.com>
+ <20200525164150.GD19863@linux.fritz.box>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200525164150.GD19863@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,67 +95,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Dirty Bitmaps" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, t.lamprecht@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Am 25.05.2020 um 18:41 hat Kevin Wolf geschrieben:
+> Am 25.05.2020 um 16:18 hat Stefan Reiter geschrieben:
+> > On 5/12/20 4:43 PM, Kevin Wolf wrote:
+> > > Coroutine functions that are entered through bdrv_run_co() are already
+> > > safe to call from synchronous code in a different AioContext because
+> > > bdrv_coroutine_enter() will schedule them in the context of the node.
+> > > 
+> > > However, the coroutine fastpath still requires that we're already in the
+> > > right AioContext when called in coroutine context.
+> > > 
+> > > In order to make the behaviour more consistent and to make life a bit
+> > > easier for callers, let's check the AioContext and automatically move
+> > > the current coroutine around if we're not in the right context yet.
+> > > 
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > ---
+> > >   block/io.c | 15 ++++++++++++++-
+> > >   1 file changed, 14 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/block/io.c b/block/io.c
+> > > index c1badaadc9..7808e8bdc0 100644
+> > > --- a/block/io.c
+> > > +++ b/block/io.c
+> > > @@ -895,8 +895,21 @@ static int bdrv_run_co(BlockDriverState *bs, CoroutineEntry *entry,
+> > >                          void *opaque, int *ret)
+> > >   {
+> > >       if (qemu_in_coroutine()) {
+> > > -        /* Fast-path if already in coroutine context */
+> > > +        Coroutine *self = qemu_coroutine_self();
+> > > +        AioContext *bs_ctx = bdrv_get_aio_context(bs);
+> > > +        AioContext *co_ctx = qemu_coroutine_get_aio_context(self);
+> > > +
+> > > +        if (bs_ctx != co_ctx) {
+> > > +            /* Move to the iothread of the node */
+> > > +            aio_co_schedule(bs_ctx, self);
+> > > +            qemu_coroutine_yield();
+> > 
+> > I'm pretty sure this can lead to a race: When the thread we're re-scheduling
+> > to is faster to schedule us than we can reach qemu_coroutine_yield, then
+> > we'll get an abort ("Co-routine re-entered recursively"), since co->caller
+> > is still set.
+> > 
+> > I've seen this happen in our code when I try to do the scheduling fandangle
+> > there.
+> 
+> Ah, crap. I guess letting a coroutine re-schedule itself is only safe
+> within the same thread then.
+> 
+> > Is there a safer way to have a coroutine reschedule itself? Some lock
+> > missing?
+> 
+> There is no problem that can't be solved by adding another level of
+> indirection... We would have to schedule a BH in the original thread
+> that will only schedule the coroutine in its new thread after it has
+> yielded.
+> 
+> Maybe we should actually introduce a helper function that moves the
+> current coroutine to a different AioContext this way.
 
-To be used for bitmap migration in further commit.
+Like this:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200521220648.3255-3-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/dirty-bitmap.h |  1 +
- block/dirty-bitmap.c         | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
+https://repo.or.cz/qemu/kevin.git/commitdiff/ed0244ba4ac699f7e8eaf7512ff25645cf43bda2
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 5a8d52e4deaf..36e8da4fc2e3 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -95,6 +95,7 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
- bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
-+bool bdrv_has_named_bitmaps(BlockDriverState *bs);
- bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index f9bfc77985e8..c01319b188c3 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -818,6 +818,19 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
-     return false;
- }
+The series for which I need this isn't quite ready yet, so I haven't
+sent it as a patch yet, but if it proves useful in other contexts, we
+can always commit it without the rest.
 
-+bool bdrv_has_named_bitmaps(BlockDriverState *bs)
-+{
-+    BdrvDirtyBitmap *bm;
-+
-+    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
-+        if (bdrv_dirty_bitmap_name(bm)) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- /* Called with BQL taken. */
- void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap, bool persistent)
- {
--- 
-2.26.2
+Kevin
 
 
