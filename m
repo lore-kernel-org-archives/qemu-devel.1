@@ -2,74 +2,75 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F26C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C612C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B383F2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E69AE2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:19:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rVv1rkAF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B383F2053B
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rrErR/xk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E69AE2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdf4f-0005cv-T9
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:17:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
+	id 1jdf6r-0008Su-4M
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:19:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jdf3p-0004lk-Uo
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:16:25 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:38592 helo=mta-01.yadro.com)
+ id 1jdf6B-0007r0-RP; Tue, 26 May 2020 15:18:51 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:38890 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jdf3Z-00009W-6L
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:16:25 -0400
+ id 1jdf6A-00027M-EW; Tue, 26 May 2020 15:18:51 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id AFF6D4AC44;
- Tue, 26 May 2020 19:16:03 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id E756E4C80C;
+ Tue, 26 May 2020 19:18:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1590520561;
- x=1592334962; bh=XBnA6pvONTxXPFeES539xj5oH4GOqLpfQInPcIzMT2Y=; b=
- rVv1rkAFw6BCFekhSlBjHJ2+1ubRDdc7L8eDqpCFCcGeNRkkX7Tm1g+RukV0rVn7
- 4z1+jP3607/bHt7FYtudL5BeIVFDw04zI7EHyagNG6neWHCd0A0BvdUit8jqtyYt
- ugBiEtVruv4dy7Vak4WsFK7AvTlm4VPSR14Pc8wiCD4=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1590520723; x=1592335124; bh=+X2W6B1dVBAEYBvgcvQaaN
+ Z1XrNWpFif7Kyy/Cl63b8=; b=rrErR/xklLBiRq7qLEtnLnmoZqskUQpfDEqaic
+ HZKLVYDUfBpQxcV15JXm2v2VxT8hQUAexBfZdYoT/DM+haWUa7EnaXeoUykjOS5q
+ A8gXaZtRLEfOWj5oBprJaRsLvcE+sYpasdHAJ4XM+qGM+e/1eBecp0QLCsWThy4D
+ ag128=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ampTV91FXGbb; Tue, 26 May 2020 22:16:01 +0300 (MSK)
+ with ESMTP id Fsz_tCLt5sfE; Tue, 26 May 2020 22:18:43 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id C26B34C164;
- Tue, 26 May 2020 22:15:59 +0300 (MSK)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 3B28747117;
+ Tue, 26 May 2020 22:18:43 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 26
- May 2020 22:16:01 +0300
-Date: Tue, 26 May 2020 22:16:00 +0300
+ May 2020 22:18:44 +0300
+Date: Tue, 26 May 2020 22:18:44 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [RFC v3 4/4] cpus: extract out accel-specific code to each accel
-Message-ID: <20200526191600.GA4851@SPB-NB-133.local>
-References: <20200525145440.29728-1-cfontana@suse.de>
- <20200525145440.29728-5-cfontana@suse.de>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 3/7] sysemu/hvf: Only declare hvf_allowed when HVF is
+ available
+Message-ID: <20200526191844.GB4851@SPB-NB-133.local>
+References: <20200526172427.17460-1-f4bug@amsat.org>
+ <20200526172427.17460-4-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <20200525145440.29728-5-cfontana@suse.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200526172427.17460-4-f4bug@amsat.org>
 X-Originating-IP: [172.17.204.212]
 X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
  T-EXCH-02.corp.yadro.com (172.17.10.102)
@@ -95,311 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Cameron Esfahani <dirty@apple.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+Cc: "Edgar E .
+ Iglesias" <edgar.iglesias@xilinx.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 04:54:40PM +0200, Claudio Fontana wrote:
-> each accelerator registers a new "CpusAccelInterface"
-> on initialization, providing functions for starting a vcpu,
-> kicking a vcpu, and sychronizing state.
+On Tue, May 26, 2020 at 07:24:23PM +0200, Philippe Mathieu-Daudé wrote:
+> When HVF is not available, the hvf_allowed variable does not exist.
 > 
-> This way the code in cpus.cc is now all general softmmu code,
-> nothing (or almost nothing) accelerator-specific anymore.
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  MAINTAINERS                          |   1 +
->  accel/kvm/Makefile.objs              |   2 +
->  accel/kvm/kvm-all.c                  |  15 +-
->  accel/kvm/kvm-cpus-interface.c       |  94 ++++
->  accel/kvm/kvm-cpus-interface.h       |   8 +
->  accel/qtest.c                        |  82 ++++
->  accel/stubs/kvm-stub.c               |   3 +-
->  accel/tcg/Makefile.objs              |   1 +
->  accel/tcg/tcg-all.c                  |  12 +-
->  accel/tcg/tcg-cpus-interface.c       | 523 ++++++++++++++++++++
->  accel/tcg/tcg-cpus-interface.h       |   8 +
->  hw/core/cpu.c                        |   1 +
->  include/sysemu/cpus.h                |  32 ++
->  include/sysemu/hvf.h                 |   1 -
->  include/sysemu/hw_accel.h            |  57 +--
->  include/sysemu/kvm.h                 |   2 +-
->  softmmu/cpus.c                       | 911 +++--------------------------------
->  stubs/Makefile.objs                  |   1 +
->  stubs/cpu-synchronize-state.c        |  15 +
->  target/i386/Makefile.objs            |   7 +-
->  target/i386/hax-all.c                |   6 +-
->  target/i386/hax-cpus-interface.c     |  85 ++++
->  target/i386/hax-cpus-interface.h     |   8 +
->  target/i386/hax-i386.h               |   2 +
->  target/i386/hax-posix.c              |  12 +
->  target/i386/hax-windows.c            |  20 +
->  target/i386/hvf/Makefile.objs        |   2 +-
->  target/i386/hvf/hvf-cpus-interface.c |  92 ++++
->  target/i386/hvf/hvf-cpus-interface.h |   8 +
->  target/i386/hvf/hvf.c                |   5 +-
->  target/i386/whpx-all.c               |   3 +
->  target/i386/whpx-cpus-interface.c    |  96 ++++
->  target/i386/whpx-cpus-interface.h    |   8 +
->  33 files changed, 1220 insertions(+), 903 deletions(-)
->  create mode 100644 accel/kvm/kvm-cpus-interface.c
->  create mode 100644 accel/kvm/kvm-cpus-interface.h
->  create mode 100644 accel/tcg/tcg-cpus-interface.c
->  create mode 100644 accel/tcg/tcg-cpus-interface.h
->  create mode 100644 stubs/cpu-synchronize-state.c
->  create mode 100644 target/i386/hax-cpus-interface.c
->  create mode 100644 target/i386/hax-cpus-interface.h
->  create mode 100644 target/i386/hvf/hvf-cpus-interface.c
->  create mode 100644 target/i386/hvf/hvf-cpus-interface.h
->  create mode 100644 target/i386/whpx-cpus-interface.c
->  create mode 100644 target/i386/whpx-cpus-interface.h
-
-Hi Claudio,
-
-Overall it looks good.
-
-I wonder if the new structure should get singular form, i.e.
-softmmu/cpu.c instead of softmmu/cpus.c
-
-Perhaps cpus.c had plural form because it was related to implementation
-of multiple CPUs/accels. After the split, each accel got it's own
-implementation of accel interface.
-
-"<accel>-cpus-interface.c" contains implementation rather than interface
-it's a bit confusing. Perhaps it should be called: "<accel>-cpu.c" or
-even "<accel>-accel.c".
-
-By the way, If we use registration for each accel, does it mean that
-include/sysemu/<accel>.h and accel stubs are no longer needed in shared
-location?
-
-There's an AccelClass in accel/accel.c, I wonder if it should be re-used
-for accel CPU registration? I don't know but may be generic the leftover
-of cpus.c also belongs to accel/ rather than softmmu/?
-
+> v2: Fixed typo s/tcg_allowed/hvf_allowed/ (Edgar)
+> ---
+>  include/sysemu/hvf.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+> index d211e808e9..fe95743124 100644
+> --- a/include/sysemu/hvf.h
+> +++ b/include/sysemu/hvf.h
+> @@ -18,7 +18,6 @@
+>  #include "exec/memory.h"
+>  #include "sysemu/accel.h"
 >  
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index 149de000a0..cae22afe4d 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -4,7 +4,39 @@
->  #include "qemu/timer.h"
+> -extern bool hvf_allowed;
+>  #ifdef CONFIG_HVF
+>  #include <Hypervisor/hv.h>
+>  #include <Hypervisor/hv_vmx.h>
+> @@ -26,11 +25,12 @@ extern bool hvf_allowed;
+>  #include "target/i386/cpu.h"
+>  uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
+>                                   int reg);
+> +extern bool hvf_allowed;
+>  #define hvf_enabled() (hvf_allowed)
+> -#else
+> +#else /* !CONFIG_HVF */
+>  #define hvf_enabled() 0
+>  #define hvf_get_supported_cpuid(func, idx, reg) 0
+> -#endif
+> +#endif /* !CONFIG_HVF */
 >  
->  /* cpus.c */
-> +
-> +/* CPU execution threads */
-> +
-> +typedef struct CpusAccelInterface {
-> +    void (*create_vcpu_thread)(CPUState *cpu);
-> +    void (*kick_vcpu_thread)(CPUState *cpu);
-> +
-> +    void (*cpu_synchronize_post_reset)(CPUState *cpu);
-> +    void (*cpu_synchronize_post_init)(CPUState *cpu);
-> +    void (*cpu_synchronize_state)(CPUState *cpu);
-> +    void (*cpu_synchronize_pre_loadvm)(CPUState *cpu);
-> +} CpusAccelInterface;
+>  /* hvf_slot flags */
+>  #define HVF_SLOT_LOG (1 << 0)
+> -- 
+> 2.21.3
+> 
 
-
-I think plural name may be replaced to singular. Interface suffix
-doesn't seem to be used in QEMU.
-
-cpu_ and _vcpu are sort meaning the same and may be replaced to generic
-cpu_ prefix. There's a CPUState, CPU<Arch>State, and IMO shorter
-CPUAccel seems to match the naming. I also don't know if cpu_ prefix
-should be kept.
-
-So here's how I see the interface:
-
-typedef struct CPUAccel {
-    void (*create_thread)(CPUState *cpu);
-    void (*kick_thread)(CPUState *cpu);
-
-    void (*synchronize_post_reset)(CPUState *cpu);
-    void (*synchronize_post_init)(CPUState *cpu);
-    void (*synchronize_state)(CPUState *cpu);
-    void (*synchronize_pre_loadvm)(CPUState *cpu);
-} CPUAccel;
-
-
-> +
-> +/* register accel-specific interface */
-> +void cpus_register_accel_interface(CpusAccelInterface *i);
-> +
-> +/* interface available for cpus accelerator threads */
-> +
-> +/* For temporary buffers for forming a name */
-> +#define VCPU_THREAD_NAME_SIZE 16
-> +
-> +void cpus_kick_thread(CPUState *cpu);
-
-If it's addressing a single CPU should it be singular too, i.e.
-cpu_kick_thread?
-
-> +bool cpu_thread_is_idle(CPUState *cpu);
->  bool all_cpu_threads_idle(void);
-> +bool cpu_can_run(CPUState *cpu);
-> +void qemu_wait_io_event_common(CPUState *cpu);
-> +void qemu_wait_io_event(CPUState *cpu);
-> +void cpu_thread_signal_created(CPUState *cpu);
-> +void cpu_thread_signal_destroyed(CPUState *cpu);
-> +void cpu_handle_guest_debug(CPUState *cpu);
-> +
-> +/* end interface for cpus accelerator threads */
-> +
->  bool qemu_in_vcpu_thread(void);
->  void qemu_init_cpu_loop(void);
->  void resume_all_vcpus(void);
-> diff --git a/target/i386/hvf/Makefile.objs b/target/i386/hvf/Makefile.objs
-> index 927b86bc67..bdbc2c0227 100644
-> --- a/target/i386/hvf/Makefile.objs
-> +++ b/target/i386/hvf/Makefile.objs
-> @@ -1,2 +1,2 @@
-> -obj-y += hvf.o
-> +obj-y += hvf.o hvf-cpus-interface.o
->  obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
-> diff --git a/target/i386/hvf/hvf-cpus-interface.c b/target/i386/hvf/hvf-cpus-interface.c
-> new file mode 100644
-> index 0000000000..54bfe307c1
-> --- /dev/null
-> +++ b/target/i386/hvf/hvf-cpus-interface.c
-> @@ -0,0 +1,92 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/main-loop.h"
-> +#include "sysemu/hvf.h"
-> +#include "sysemu/runstate.h"
-> +#include "sysemu/cpus.h"
-> +#include "qemu/guest-random.h"
-> +
-> +#include "hvf-cpus-interface.h"
-> +
-> +/*
-> + * The HVF-specific vCPU thread function. This one should only run when the host
-> + * CPU supports the VMX "unrestricted guest" feature.
-> + */
-> +static void *hvf_cpu_thread_fn(void *arg)
-> +{
-> +    CPUState *cpu = arg;
-> +
-> +    int r;
-> +
-> +    assert(hvf_enabled());
-> +
-> +    rcu_register_thread();
-> +
-> +    qemu_mutex_lock_iothread();
-> +    qemu_thread_get_self(cpu->thread);
-> +
-> +    cpu->thread_id = qemu_get_thread_id();
-> +    cpu->can_do_io = 1;
-> +    current_cpu = cpu;
-> +
-> +    hvf_init_vcpu(cpu);
-> +
-> +    /* signal CPU creation */
-> +    cpu_thread_signal_created(cpu);
-> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
-> +
-> +    do {
-> +        if (cpu_can_run(cpu)) {
-> +            r = hvf_vcpu_exec(cpu);
-> +            if (r == EXCP_DEBUG) {
-> +                cpu_handle_guest_debug(cpu);
-> +            }
-> +        }
-> +        qemu_wait_io_event(cpu);
-> +    } while (!cpu->unplug || cpu_can_run(cpu));
-> +
-> +    hvf_vcpu_destroy(cpu);
-> +    cpu_thread_signal_destroyed(cpu);
-> +    qemu_mutex_unlock_iothread();
-> +    rcu_unregister_thread();
-> +    return NULL;
-> +}
-> +
-> +static void hvf_kick_vcpu_thread(CPUState *cpu)
-> +{
-> +    cpus_kick_thread(cpu);
-
-
-I think we should leave it empty since it's not really implemented for
-HVF. Here's a WIP implementation I'm yet to send:
-
-https://github.com/roolebo/qemu/commit/4437a4b8af31b0adaa58375f09e0b8547507f64f#diff-5e6ad1baa140ca4a1743b5a2f1a664b5R970
-
-> +}
-> +
-> +static void hvf_cpu_synchronize_noop(CPUState *cpu)
-> +{
-> +}
-> +
-> +static void hvf_start_vcpu_thread(CPUState *cpu)
-> +{
-> +    char thread_name[VCPU_THREAD_NAME_SIZE];
-> +
-> +    /*
-> +     * HVF currently does not support TCG, and only runs in
-> +     * unrestricted-guest mode.
-> +     */
-> +    assert(hvf_enabled());
-> +
-> +    cpu->thread = g_malloc0(sizeof(QemuThread));
-> +    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-> +    qemu_cond_init(cpu->halt_cond);
-> +
-> +    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
-> +             cpu->cpu_index);
-> +    qemu_thread_create(cpu->thread, thread_name, hvf_cpu_thread_fn,
-> +                       cpu, QEMU_THREAD_JOINABLE);
-> +}
-> +
-> +CpusAccelInterface hvf_cpus_interface = {
-> +    .create_vcpu_thread = hvf_start_vcpu_thread,
-
-I think it was meant as hvf_create_vcpu_thread.
-
-> +    .kick_vcpu_thread = hvf_kick_vcpu_thread,
-> +
-> +    .cpu_synchronize_post_reset = hvf_cpu_synchronize_noop,
-> +    .cpu_synchronize_post_init = hvf_cpu_synchronize_noop,
-> +    .cpu_synchronize_state = hvf_cpu_synchronize_noop,
-> +    .cpu_synchronize_pre_loadvm = hvf_cpu_synchronize_noop,
-
-I have tested the RFC with hvf accel and it seems to work although I
-expected it fail. The noop functions are the reason of the behaviour. In
-some sense it's not equivalent to what it was before but to be fair it's
-not possible to use existing hvf_cpu_synchronize_* functions in
-target/i386/hvf/hvf.c without breaking hvf.
-
-Here's how it fails. hvf_cpu_synchronize_state() sets dirty flag to mark
-that emulator registers in CPUX86State are going to be out of sync with
-accel registers. If we bind .cpu_synchronize_state to
-hvf_synchronize_state it'd be called from vapic_write() on I/O writes
-(from kvmvapic.bin option ROM) to KVM vAPIC page (I/O port 0x7e).
-
-But HVF uses two emulator states CPUX86State and HVFX86EmulatorState
-and they may become out-of-sync. That's exactly what happens when an I/O
-write to KVM vAPIC is made. The I/O write triggers cpu state
-synchronization, so VMCS registers are fetched into CPUX86State and the
-vcpu_dirty flag is set. Emulation code then advances RIP in the
-macvm_set_rip() by modifying VMCS directly. On the next round of vcpu
-run loop it checks if the cpu is dirty (it is) and pushes CPUX86State
-into the VMCS, effectively overwriting what was set by macvm_set_rip().
-
-If the RFC isn't expected to be merged for a couple of weeks I can
-prepare a series that drops HVFX86EmulatorState. I need the change for
-single-stepping support in HVF anyway.
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
 Thanks,
 Roman
