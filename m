@@ -2,89 +2,88 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFC0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D08C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2BD620721
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90550207CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 19:51:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H75pLFk4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2BD620721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="EynrEIbh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90550207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdfDI-0003Tg-5s
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
+	id 1jdfbK-0000sv-ML
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 15:51:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdfCD-0002Q4-OR
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:25:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54623
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdfCC-00060Z-Vb
- for qemu-devel@nongnu.org; Tue, 26 May 2020 15:25:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590521103;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DVlxxzX7eglvRpE3dQPlOSQw3ofhUg24cF009QW4RFk=;
- b=H75pLFk4Gz8+vxn8+JUtGqZ4Ub3cVyDaBpFE+7zNzatHEpwWu3QfuP0Srzvudf0Z0Y7+ft
- RfJiI246ysxECCWo4Dy9y3dCwu6SKt1MlCrBB2I4bZjrq0apjcXPB4cg38ZPD2u8lakRDa
- X7mPIbdpp06PH6+DoGmID1nngJW8OPE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-Y0kf3xD8Np2aLEWTxvkTLA-1; Tue, 26 May 2020 15:24:57 -0400
-X-MC-Unique: Y0kf3xD8Np2aLEWTxvkTLA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jdfaP-000090-1J; Tue, 26 May 2020 15:50:05 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:40620 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jdfaO-0007Ca-0Z; Tue, 26 May 2020 15:50:04 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 881704C80C;
+ Tue, 26 May 2020 19:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1590522597; x=1592336998; bh=FVT/trrJgIfKMhmT84JJlK
+ bLQPWgFe3TOBzRG1JQjs0=; b=EynrEIbhIjqUg8mWD0wefAPZofuKcxIq+rJbc7
+ viKxbkNRU15Ce2ycJTtPaijHJ2ZFMw3ur3LbJxrOdwZn8tW+l55jlJJSNLZnMn0H
+ FfLP5DD5AARZMCmD/+NJJhXRCVFEB9ggljQKt7usfEnl3VbAo18YVEeHurfq1evv
+ L3xDY=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ds3rRuzpHzvi; Tue, 26 May 2020 22:49:57 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CB4280183C;
- Tue, 26 May 2020 19:24:56 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 626F960C47;
- Tue, 26 May 2020 19:24:52 +0000 (UTC)
-Subject: Re: [PATCH v4 1/5] block/io: refactor coroutine wrappers
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200525100801.13859-1-vsementsov@virtuozzo.com>
- <20200525100801.13859-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <931ea1e6-17f4-c87d-fca1-d58660f8fccb@redhat.com>
-Date: Tue, 26 May 2020 14:24:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mta-01.yadro.com (Postfix) with ESMTPS id 0F3D446420;
+ Tue, 26 May 2020 22:49:56 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 26
+ May 2020 22:49:57 +0300
+Date: Tue, 26 May 2020 22:49:57 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 1/7] sysemu/accel: Restrict machine methods to
+ system-mode
+Message-ID: <20200526194957.GC4851@SPB-NB-133.local>
+References: <20200526172427.17460-1-f4bug@amsat.org>
+ <20200526172427.17460-2-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20200525100801.13859-2-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 15:25:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200526172427.17460-2-f4bug@amsat.org>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 15:16:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,37 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- crosa@redhat.com, den@openvz.org
+Cc: "Edgar E .
+ Iglesias" <edgar.iglesias@xilinx.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/25/20 5:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Most of our coroutine wrappers already follow this convention:
+On Tue, May 26, 2020 at 07:24:21PM +0200, Philippe Mathieu-Daudé wrote:
+> Restrict init_machine(), setup_post() and has_memory()
+> to system-mode.
 > 
-> We have 'coroutine_fn bdrv_co_<something>(<normal argument list>)' as
-> the core function, and a wrapper 'bdrv_<something>(<same argument
-> list>)' which does a polling loop.
-> 
-> The only outsiders are the bdrv_prwv_co and
-> bdrv_common_block_status_above wrappers. Let's refactor them to behave
-> as the others, it simplifies further conversion of coroutine wrappers.
-
-It might be worth mentioning that a later patch in the series will then 
-further reduce the indirection present here.  But R-b still stands.
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->   block/io.c | 61 +++++++++++++++++++++++++++++-------------------------
->   1 file changed, 33 insertions(+), 28 deletions(-)
+>  include/sysemu/accel.h | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+> index 47e5788530..e08b8ab8fa 100644
+> --- a/include/sysemu/accel.h
+> +++ b/include/sysemu/accel.h
+> @@ -37,10 +37,12 @@ typedef struct AccelClass {
+>      /*< public >*/
+>  
+>      const char *name;
+> +#ifndef CONFIG_USER_ONLY
+>      int (*init_machine)(MachineState *ms);
+>      void (*setup_post)(MachineState *ms, AccelState *accel);
+>      bool (*has_memory)(MachineState *ms, AddressSpace *as,
+>                         hwaddr start_addr, hwaddr size);
+> +#endif
+>      bool *allowed;
+>      /*
+>       * Array of global properties that would be applied when specific
+> -- 
+> 2.21.3
+> 
 
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+
+Thanks,
+Roman
 
