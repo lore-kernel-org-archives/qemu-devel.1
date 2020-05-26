@@ -2,71 +2,90 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB6DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD3BCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C2D620663
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:06:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C2D620663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 807BD20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 08:07:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E6HasEhY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807BD20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdUbN-0002dj-LG
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 04:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45652)
+	id 1jdUcR-0003vY-Na
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 04:07:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdUXB-0004RH-4i; Tue, 26 May 2020 04:02:01 -0400
-Resent-Date: Tue, 26 May 2020 04:02:01 -0400
-Resent-Message-Id: <E1jdUXB-0004RH-4i@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21716)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jdUbO-0002oA-1X
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 04:06:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35436
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdUX9-0003uG-8R; Tue, 26 May 2020 04:02:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590480081; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=XmXq7RAo2ppFathmAZ9VT6r3A1+EvqDnF3kmJ25/41DAVySJkde/AwjxEIWrW3eSh73BnccbNjPTPHxqwRF8yYEIWwJo0gXQ0mHsTrVdEm8tGJqGVHxqhYyKMnjOv+1FGWgctcLZLqMtRNl9sS5r0DKFKd7mZMFZW2HPl9xHZwo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590480081;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6yU1K5yi4PXn/bAEEOX/zYjBwTqTWnhWpfX2RJR29i0=; 
- b=AS8XJBpxOk97tMZPngiIFGEKk8zTjMGGAgFfZ6fDkb6CdU1zQm5T3J/MhLJ+IxaZ51YJQKN7XPuOtH5pf8VCNggdP2j+qL7IM/B068x9XIZpuThdiqtWD7FS3FR4QHdMIzHH9jy12qf2yuZBuqOkWD6WvWIMOANcK41Q2ss+ZP0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590480078839733.2454656612559;
- Tue, 26 May 2020 01:01:18 -0700 (PDT)
-Message-ID: <159048007747.8305.13096425178050944933@45ef0f9c86ae>
-In-Reply-To: <cover.1590429901.git.berto@igalia.com>
-Subject: Re: [PATCH v7 00/32] Add subcluster allocation to qcow2
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jdUbN-0004kJ-9D
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 04:06:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590480380;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N62yquLSNCxDQV2QKxruJZ6QlvzKfFr6Z6h4p0GGcuY=;
+ b=E6HasEhY18y/sz5m2I0bUwQupuLhVQn6uFPBZgIEeXmGSslq37PDepKrazZrAh61PNOGiF
+ 8BibiZqaoH7bxhPajzsc3+ga8KPZkdg/sf26xTBL+f9VxB+W12kQaKmC1rxcQQXVyCJ/nH
+ Wv6R+JYTD6x6nxkqt3qyaBXNj90UB1Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-cq5GOZiQMKq0906eCPzCLg-1; Tue, 26 May 2020 04:06:18 -0400
+X-MC-Unique: cq5GOZiQMKq0906eCPzCLg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08AC48018A7;
+ Tue, 26 May 2020 08:06:17 +0000 (UTC)
+Received: from [10.40.195.106] (unknown [10.40.195.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C01F810013D2;
+ Tue, 26 May 2020 08:06:15 +0000 (UTC)
+Subject: Re: [PATCH 2/2] qmp: Expose MachineClass::default_ram_id
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <cover.1590426097.git.mprivozn@redhat.com>
+ <2dbffbc4e2c0f3a0184daaadf56f94a85aedef58.1590426097.git.mprivozn@redhat.com>
+ <20200525180603.GS577771@habkost.net>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <1e8434ce-60c6-8e69-7ac7-65886993050b@redhat.com>
+Date: Tue, 26 May 2020 10:06:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: berto@igalia.com
-Date: Tue, 26 May 2020 01:01:18 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:17:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200525180603.GS577771@habkost.net>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,65 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, dereksu@qnap.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTkwNDI5OTAxLmdp
-dC5iZXJ0b0BpZ2FsaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVUV09S
-Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0xNCBO
-RVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBjaGFyZGV2L2NoYXIt
-bnVsbC5vCiAgQ0MgICAgICBjaGFyZGV2L2NoYXItcGFyYWxsZWwubwovdG1wL3FlbXUtdGVzdC9z
-cmMvYmxvY2svcWNvdzItY2x1c3Rlci5jOiBJbiBmdW5jdGlvbiAncWNvdzJfZ2V0X2hvc3Rfb2Zm
-c2V0JzoKL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYzo0NzM6MTk6IGVy
-cm9yOiAnZXhwZWN0ZWRfdHlwZScgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1
-bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdCiAgICAgICAgIH0gZWxzZSBpZiAo
-dHlwZSAhPSBleHBlY3RlZF90eXBlKSB7CiAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10
-ZXN0L3NyYy9ibG9jay9xY293Mi1jbHVzdGVyLmM6NDQ5OjI1OiBub3RlOiAnZXhwZWN0ZWRfdHlw
-ZScgd2FzIGRlY2xhcmVkIGhlcmUKICAgICBRQ293MlN1YmNsdXN0ZXJUeXBlIGV4cGVjdGVkX3R5
-cGUsIHR5cGU7CiAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9i
-bG9jay9xY293Mi1jbHVzdGVyLmM6NDc1OjE5OiBlcnJvcjogJ2NoZWNrX29mZnNldCcgbWF5IGJl
-IHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5p
-dGlhbGl6ZWRdCiAgICAgICAgIH0gZWxzZSBpZiAoY2hlY2tfb2Zmc2V0KSB7CiAgICAgICAgICAg
-ICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi1jbHVzdGVyLmM6NDQ3OjEw
-OiBub3RlOiAnY2hlY2tfb2Zmc2V0JyB3YXMgZGVjbGFyZWQgaGVyZQogICAgIGJvb2wgY2hlY2tf
-b2Zmc2V0OwogICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svcWNvdzItY2x1c3Rl
-ci5jOjQ3NjoyOTogZXJyb3I6ICdleHBlY3RlZF9vZmZzZXQnIG1heSBiZSB1c2VkIHVuaW5pdGlh
-bGl6ZWQgaW4gdGhpcyBmdW5jdGlvbiBbLVdlcnJvcj1tYXliZS11bmluaXRpYWxpemVkXQogICAg
-ICAgICAgICAgZXhwZWN0ZWRfb2Zmc2V0ICs9IHMtPmNsdXN0ZXJfc2l6ZTsKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi1jbHVzdGVy
-LmM6NDQ4OjE0OiBub3RlOiAnZXhwZWN0ZWRfb2Zmc2V0JyB3YXMgZGVjbGFyZWQgaGVyZQogICAg
-IHVpbnQ2NF90IGV4cGVjdGVkX29mZnNldDsKICAgICAgICAgICAgICBeCmNjMTogYWxsIHdhcm5p
-bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2U6ICoqKiBbYmxvY2svcWNvdzItY2x1c3Rl
-ci5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAg
-Q0MgICAgICBjaGFyZGV2L2NoYXItcGlwZS5vClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBs
-YXN0KToKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
-cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
-cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTQ5ZGU2ZjgxMDU2
-ZTRkYWRhOGZkY2IyZjM2NDc2ZDBkJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAn
-c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywg
-J0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywg
-J0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
-Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6
-L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWNj
-eTF5M3VnL3NyYy9kb2NrZXItc3JjLjIwMjAtMDUtMjYtMDMuNTkuMDIuMzA2NTA6L3Zhci90bXAv
-cWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1
-aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1s
-YWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTQ5ZGU2ZjgxMDU2ZTRkYWRhOGZkY2IyZjM2NDc2
-ZDBkCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRp
-cmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWNjeTF5M3VnL3NyYycKbWFrZTog
-KioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAybTE1
-LjMxOXMKdXNlciAgICAwbTguMTE2cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU5MDQyOTkwMS5naXQuYmVydG9AaWdhbGlhLmNv
-bS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 5/25/20 8:06 PM, Eduardo Habkost wrote:
+> On Mon, May 25, 2020 at 07:03:28PM +0200, Michal Privoznik wrote:
+>> If a management application (like Libvirt) want's to preserve
+>> migration ability and switch to '-machine memory-backend' it
+>> needs to set exactly the same RAM id as QEMU would. Since the id
+>> is machine type dependant, expose it under 'query-machines'
+>> result.
+>>
+>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> 
+> The code looks good, but documentation was a bit confusing:
+> 
+>> ---
+> [...]
+>> +# @default-ram-id: the default name of initial RAM memory region (since 5.1)
+>> +#
+> 
+> Everywhere else in the commit message you call it "id", but here
+> you say "name".  Also, I don't think we have any references to a
+> "memory region" abstraction in the docs for the QAPI schema,
+> -machine options, or memory backend objects.
+> 
+> I had to look it up in the code, to finally understand you were
+> talking about the memory backend object ID.
+> 
+> To make it consistent with terminology used for -machine and
+> QAPI, I suggest:
+> 
+>    @default-ram-id: the default ID of initial RAM memory backend (since 5.1)
+> 
+> I can change it before committing, if you agree.
+
+Thanks for the offer, but I will post a v2, because as I was developing 
+patches for libvirt to consume this I found out that some machine types 
+don't have the attribute set (riscv is one of them). Therefore I will 
+have to make this optional.
+
+Michal
+
 
