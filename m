@@ -2,84 +2,84 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E7FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5EAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 12:02:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951C920663
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 11:57:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9348320663
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 12:02:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="guyzqjAy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951C920663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J91W+Cz3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9348320663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdYD2-0002Kn-PN
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 07:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45842)
+	id 1jdYHc-0005Ug-R1
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 08:02:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdYC3-0001Ge-9j
- for qemu-devel@nongnu.org; Tue, 26 May 2020 07:56:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21152
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdYGZ-0004tw-9Z
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 08:01:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39959
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdYC2-0005fF-FO
- for qemu-devel@nongnu.org; Tue, 26 May 2020 07:56:26 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdYGX-0006vQ-Tm
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 08:01:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590494185;
+ s=mimecast20190719; t=1590494464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qDiKNskY0Xk6GNZAad3n84krLKJiT2g8YZ2uMYr9HvI=;
- b=guyzqjAy/hwun533FGBbiChiEffPiIUkIRwMp9bww8lNJDHZPloSSrkp1JrhdSiTqNhQr1
- IFkCAg2knyYc8n47TTajPgqPyrUidZ7NBUlIIom76w2OUJ8wWs6oAk7ptetiAHUqYrxWqn
- GD3SI2fhnoqTwNMWoPJo3p0UV3XghCc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-IroX5K_0Pausnge40rtJMw-1; Tue, 26 May 2020 07:56:24 -0400
-X-MC-Unique: IroX5K_0Pausnge40rtJMw-1
-Received: by mail-ed1-f71.google.com with SMTP id bm11so8788605edb.8
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 04:56:23 -0700 (PDT)
+ bh=dHEWyrZWC131zwnoFGUZLXcbcB4oFZzQ33l5lxF/tzg=;
+ b=J91W+Cz3s0ztsxL2lUZSJJloGsZ23qZ5Qnqnj33ZrVyJ21wGqv3eK+huE7arsHy3jyoLbZ
+ BUGMiv68NxBgoC5wXQBTbd5tinrtI8fD+G5lT427P2+MZOcz8R8LwRt8P3YGngq6y4ImId
+ PlD/Mh7GMjzUGefPNFbu09a4ojFtNbE=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-JAER2vMqPV2tHbOaeHhWKA-1; Tue, 26 May 2020 08:01:02 -0400
+X-MC-Unique: JAER2vMqPV2tHbOaeHhWKA-1
+Received: by mail-ed1-f70.google.com with SMTP id g10so8854947edt.3
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 05:01:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=qDiKNskY0Xk6GNZAad3n84krLKJiT2g8YZ2uMYr9HvI=;
- b=NTH/8flzDpWF9CDTLK+7QjjolqQ+Hyqlwbtbt3Kvx5DVV3D1Jy7EoLW4131PfAphDx
- akYddBvt2sbtMU1YlR5Knjl/O+RKMo4mDRXi8s7wEUkm4//GH/LB2S/pltPnQ0ju/ycm
- zZsLBCdqP9uoUK/lTEz7khYu4eb4EQwh5L5wdVSHYT7mCqWZrEIr6EXsn+EiZH/awhS1
- 4IY2fixO132v9nnd+SPWE9VP8jry/FWOiL4vQIQqB+U5+jshPWx2eN1iiLK5VtSWMBq+
- Tk0QiAbZpUlz51QlJJzf9y5L/4HbaF0Bg08Jf3yUtyTloGZ9x1alO/Bgmx86RZQMA8WU
- lOwQ==
-X-Gm-Message-State: AOAM531Kcfpt7pwkXHTXndckgifguIYo8SPrqWPK1U5z8QFtNJVrn0uC
- xTUmZ5gQKuBiDljytGrzzJvOKqw+aZoAV7PQlqq+dM5a8YFLLCUZndsHUPqEZviAY0exI87mQ2a
- srCQkNKMK5nq7aDo=
-X-Received: by 2002:a17:906:8d0:: with SMTP id
- o16mr817201eje.196.1590494182552; 
- Tue, 26 May 2020 04:56:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzX3e2BVqkkOoK0isDrM7iUxNO0/FW9C2FPvKMwjnGwEzyiTWNWqZxWDu9hUPnejZ7+USczEA==
-X-Received: by 2002:a17:906:8d0:: with SMTP id
- o16mr817189eje.196.1590494182385; 
- Tue, 26 May 2020 04:56:22 -0700 (PDT)
+ bh=dHEWyrZWC131zwnoFGUZLXcbcB4oFZzQ33l5lxF/tzg=;
+ b=i7Ayje1/dZZAWXM16EpNcfni38IF7vbPPGK9w3H2FXn8qxbod4ew1X2EmlEGkfWJWm
+ fGYVeiXOG6seEIekFMb4HUcuKchOOO/DynD01QpCNP4u9xSZzU7gy55z1kgzesZ3B7eZ
+ OQGWSS5Me+ErFMn5qaYiRSIG3SeiZQr34QGlZS4hmBIPrp2e/X0HWM/QRm2756BBUyyY
+ mKY1iDnwcJ4GkPXUG8AF2fAWyOmo8Awiz9SkqPT7xsTJ8lRndWckN1OeFsgKgHVeUS34
+ BWSF5G2dTyExu1Dk65XUK6xgMrt8XJzQrCiQ/73aXuEhhS99EKjSVXNZJcOrorbyhwSa
+ FPPg==
+X-Gm-Message-State: AOAM532NP9bReBt37/Ij/amm3HLC8Phos6vXvG9pBVHFG7te3c//wELO
+ 0nC8fZoN01MPJp7HksnVLwv2QxjT9ycztiqGTPvQzdnoV4spgR2MOdABf7/u10LFTHdVIDGNoqS
+ II/3H0rT9mQGDcUw=
+X-Received: by 2002:a17:906:d98:: with SMTP id
+ m24mr729191eji.553.1590494461258; 
+ Tue, 26 May 2020 05:01:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzl+aTiCwkK3IYBd60kaeM5M+mLO0yCTK3blEyFdi2CkhL8gBYaUowxlt7K3IhCME3i7pj3NQ==
+X-Received: by 2002:a17:906:d98:: with SMTP id
+ m24mr729151eji.553.1590494460871; 
+ Tue, 26 May 2020 05:01:00 -0700 (PDT)
 Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id si16sm18000562ejb.101.2020.05.26.04.56.21
+ by smtp.gmail.com with ESMTPSA id jx14sm17295136ejb.79.2020.05.26.05.00.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 04:56:21 -0700 (PDT)
-Subject: Re: [PATCH 13/55] hw/ppc: Eliminate two superfluous QOM casts
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200519145551.22836-1-armbru@redhat.com>
- <20200519145551.22836-14-armbru@redhat.com>
+ Tue, 26 May 2020 05:01:00 -0700 (PDT)
+Subject: Re: [PATCH 2/7] block/nvme: drop tautologous assertion
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200519171138.201667-1-stefanha@redhat.com>
+ <20200519171138.201667-3-stefanha@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,12 +104,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2f0fc6d2-c74b-e7f1-6021-73222571acd6@redhat.com>
-Date: Tue, 26 May 2020 13:56:20 +0200
+Message-ID: <31b8ad04-8187-0690-ec15-ae10b8ab6dac@redhat.com>
+Date: Tue, 26 May 2020 14:00:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200519145551.22836-14-armbru@redhat.com>
+In-Reply-To: <20200519171138.201667-3-stefanha@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -138,62 +138,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/20 4:55 PM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/ppc/mac_newworld.c | 4 ++--
->  hw/ppc/mac_oldworld.c | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+On 5/19/20 7:11 PM, Stefan Hajnoczi wrote:
+> nvme_process_completion() explicitly checks cid so the assertion that
+> follows is always true:
 > 
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 69281d7834..2d069dcc59 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -122,7 +122,7 @@ static void ppc_core99_init(MachineState *machine)
->      long kernel_size, initrd_size;
->      UNINHostState *uninorth_pci;
->      PCIBus *pci_bus;
-> -    NewWorldMacIOState *macio;
-> +    PCIDevice *macio;
->      bool has_pmu, has_adb;
->      MACIOIDEState *macio_ide;
->      BusState *adb_bus;
-> @@ -375,7 +375,7 @@ static void ppc_core99_init(MachineState *machine)
->      pci_bus = PCI_HOST_BRIDGE(uninorth_pci)->bus;
->  
->      /* MacIO */
-> -    macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
-> +    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
->      dev = DEVICE(macio);
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
->      qdev_prop_set_bit(dev, "has-pmu", has_pmu);
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index cfc2eae1d9..f73ec5f3a9 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -94,7 +94,7 @@ static void ppc_heathrow_init(MachineState *machine)
->      uint32_t kernel_base, initrd_base, cmdline_base = 0;
->      int32_t kernel_size, initrd_size;
->      PCIBus *pci_bus;
-> -    OldWorldMacIOState *macio;
-> +    PCIDevice *macio;
->      MACIOIDEState *macio_ide;
->      SysBusDevice *s;
->      DeviceState *dev, *pic_dev;
-> @@ -278,7 +278,7 @@ static void ppc_heathrow_init(MachineState *machine)
->      ide_drive_get(hd, ARRAY_SIZE(hd));
->  
->      /* MacIO */
-> -    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
-> +    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
->      dev = DEVICE(macio);
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
->      object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+>   if (cid == 0 || cid > NVME_QUEUE_SIZE) {
+>       ...
+>       continue;
+>   }
+>   assert(cid <= NVME_QUEUE_SIZE);
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/nvme.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 7eb4512666..5286227074 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -336,7 +336,6 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
+>                      cid);
+>              continue;
+>          }
+> -        assert(cid <= NVME_QUEUE_SIZE);
+>          trace_nvme_complete_command(s, q->index, cid);
+>          preq = &q->reqs[cid - 1];
+>          req = *preq;
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
