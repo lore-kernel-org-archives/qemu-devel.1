@@ -6,83 +6,84 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78932C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC36C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E850206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:02:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4740A206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqu6uHg8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E850206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XTGpKwMo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4740A206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdb6A-0001Lv-DD
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:02:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44186)
+	id 1jdb74-0002qp-CN
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdb4k-0008JO-Oz
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:01:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25943
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdb4j-0007AI-AE
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:01:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590505262;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0H8zShkyHZ34e+kLKnFPjG67UAgJILajgJr1UU3bASc=;
- b=iqu6uHg8FktEuNWViex51e38aLpPgfwH1Iy1VvydOE1vxwKFfjygWApxA83ulIjiOP6v9G
- hKekbepYTOsL3YcZvT+XsZcKCr8QlIet6sWFq9jt4YAgrCtUsxsZ/dtEmrdIRDf5tQXnal
- /pQ3PS5VbyPFDuLs+S7UPGJlWwyALKc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-3CiJTGy6O2S-TC1EXk6Gpw-1; Tue, 26 May 2020 11:01:01 -0400
-X-MC-Unique: 3CiJTGy6O2S-TC1EXk6Gpw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A12D464;
- Tue, 26 May 2020 15:00:59 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9CA36EDBA;
- Tue, 26 May 2020 15:00:49 +0000 (UTC)
-Date: Tue, 26 May 2020 17:00:48 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 2/8] qapi/misc: Restrict LostTickPolicy enum to
- machine code
-Message-ID: <20200526170048.5970b187@redhat.com>
-In-Reply-To: <20200316000348.29692-3-philmd@redhat.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
- <20200316000348.29692-3-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jdb53-0000C9-Ij
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:01:25 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:37888)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jdb51-0007Do-SU
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:01:24 -0400
+Received: by mail-lj1-x242.google.com with SMTP id m18so24892665ljo.5
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 08:01:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=JLbAW+x6xG3wJveCGaX2SvBQnerCVzanTHd7T7O5c9g=;
+ b=XTGpKwMoEj5+dWS835w4y1/6kBgLvQe+KDEtwf3M7dYUjaY6HtIJpMwvvXGtfdHbzy
+ /3sZ0Q06NALy5D1in7og2LKEkxNiCoQzKynuqmZ0AEpTvL18u6QoCXxSM0PnQHo35zHv
+ 2hpHb8lnzrTfgbTj/0QCynlkgv3msloF8LM52rvn3CPJdl/Vcr6XaGDxLiyaYCUb8XRl
+ vcGJgKC99T8eiCLMrHWKSi/YHD67hgOYe/6lVqf5lDFUCYk+RaWBwFruxxSk/LRbT5bD
+ GLcZ3N3alk7qH/rSvlGPJSkSpxs+WY7PgsQi4f+AYDwkgebypKqKBu6xqRRbhPhqUUcY
+ Cu1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=JLbAW+x6xG3wJveCGaX2SvBQnerCVzanTHd7T7O5c9g=;
+ b=EKflBw0hWtFD/Mpj7NH2qRWuRmqGBo0sBTUvvw3tL6s2xYR/ZUSu3JVQUSCVVoyVeN
+ MwQHe/AQwBAQOci129ALBTrTCrfm4Mjz9z5nYgGAzb3jOKoWeDRLMhWP7PZrfWy7NBER
+ toxKQWcA5bl4betXt+piJH0cNPTJbfTOHPGqVGNsCACPnSWY5AL9epdt/01hY3J1g40R
+ C0st0dWMzE0GKwaUJ412LdbIHCBbhfPIusDcg8RQbXIe3h4rVc25K/MZVc62fNhOW/Uq
+ F/duTh+fYWo83E3pbBvAwXn2op9ub0mehf5hqKp+GXqPb65om8Wy5r03+Vr32ZSkCjX+
+ dkAA==
+X-Gm-Message-State: AOAM533QqP0yrXXr1ipk0jqvdq3Vi0roKRA1JARqIaIoWB5x7F9V52xe
+ mN8nJXiEg3GMOSIvtEaAzjwPyK9vr2bhtkTO9I2FXg==
+X-Google-Smtp-Source: ABdhPJwEBNITwvZku8WUgbadaAbyk7uGFvVzQX6oQ7oiprfRc6GnkBSySXfmvSXDVOzvoAFOo6bjBJ4sfSZ3gqVCd7I=
+X-Received: by 2002:a2e:9bcc:: with SMTP id w12mr862926ljj.9.1590505278999;
+ Tue, 26 May 2020 08:01:18 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+References: <20200522160755.886-1-robert.foley@linaro.org>
+ <20200522160755.886-3-robert.foley@linaro.org>
+ <c9800478-e184-32ad-6cec-3f8ad4e3bed1@redhat.com>
+In-Reply-To: <c9800478-e184-32ad-6cec-3f8ad4e3bed1@redhat.com>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Tue, 26 May 2020 11:01:14 -0400
+Message-ID: <CAEyhzFtvUt9wwJNcQ8b5i3UiJjxa-_m3ufZwhu1Frw5FQZJtMw@mail.gmail.com>
+Subject: Re: [PATCH 02/19] cpu: convert queued work to a QSIMPLEQ
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:19:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=robert.foley@linaro.org; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,182 +96,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S.
- Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Puhov <peter.puhov@linaro.org>, "Emilio G. Cota" <cota@braap.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 01:03:42 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Sun, 24 May 2020 at 06:21, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 5/22/20 6:07 PM, Robert Foley wrote:
+> > From: "Emilio G. Cota" <cota@braap.org>
+> >
+> > Instead of open-coding it.
+>
+> Please use a full sentence (repeating the patch subject):
+>
+> "Convert queued work to a QSIMPLEQ instead of open-coding it."
+>
+> (Not all email clients display the subject preceding the content).
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+OK, I will update this commit message.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  qapi/machine.json            | 32 ++++++++++++++++++++++++++++++++
->  qapi/misc.json               | 32 --------------------------------
->  include/hw/rtc/mc146818rtc.h |  2 +-
->  hw/core/qdev-properties.c    |  1 +
->  hw/i386/kvm/i8254.c          |  2 +-
->  5 files changed, 35 insertions(+), 34 deletions(-)
->=20
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index de05730704..07ffc07ba2 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -415,6 +415,38 @@
->  ##
->  { 'command': 'query-target', 'returns': 'TargetInfo' }
-> =20
-> +##
-> +# @LostTickPolicy:
-> +#
-> +# Policy for handling lost ticks in timer devices.  Ticks end up getting
-> +# lost when, for example, the guest is paused.
-> +#
-> +# @discard: throw away the missed ticks and continue with future injecti=
-on
-> +#           normally.  The guest OS will see the timer jump ahead by a
-> +#           potentially quite significant amount all at once, as if the
-> +#           intervening chunk of time had simply not existed; needless t=
-o
-> +#           say, such a sudden jump can easily confuse a guest OS which =
-is
-> +#           not specifically prepared to deal with it.  Assuming the gue=
-st
-> +#           OS can deal correctly with the time jump, the time in the gu=
-est
-> +#           and in the host should now match.
-> +#
-> +# @delay: continue to deliver ticks at the normal rate.  The guest OS wi=
-ll
-> +#         not notice anything is amiss, as from its point of view time w=
-ill
-> +#         have continued to flow normally.  The time in the guest should=
- now
-> +#         be behind the time in the host by exactly the amount of time d=
-uring
-> +#         which ticks have been missed.
-> +#
-> +# @slew: deliver ticks at a higher rate to catch up with the missed tick=
-s.
-> +#        The guest OS will not notice anything is amiss, as from its poi=
-nt
-> +#        of view time will have continued to flow normally.  Once the ti=
-mer
-> +#        has managed to catch up with all the missing ticks, the time in
-> +#        the guest and in the host should match.
-> +#
-> +# Since: 2.0
-> +##
-> +{ 'enum': 'LostTickPolicy',
-> +  'data': ['discard', 'delay', 'slew' ] }
-> +
->  ##
->  # @NumaOptionsType:
->  #
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index c18fe681fb..2725d835ad 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -7,38 +7,6 @@
-> =20
->  { 'include': 'common.json' }
-> =20
-> -##
-> -# @LostTickPolicy:
-> -#
-> -# Policy for handling lost ticks in timer devices.  Ticks end up getting
-> -# lost when, for example, the guest is paused.
-> -#
-> -# @discard: throw away the missed ticks and continue with future injecti=
-on
-> -#           normally.  The guest OS will see the timer jump ahead by a
-> -#           potentially quite significant amount all at once, as if the
-> -#           intervening chunk of time had simply not existed; needless t=
-o
-> -#           say, such a sudden jump can easily confuse a guest OS which =
-is
-> -#           not specifically prepared to deal with it.  Assuming the gue=
-st
-> -#           OS can deal correctly with the time jump, the time in the gu=
-est
-> -#           and in the host should now match.
-> -#
-> -# @delay: continue to deliver ticks at the normal rate.  The guest OS wi=
-ll
-> -#         not notice anything is amiss, as from its point of view time w=
-ill
-> -#         have continued to flow normally.  The time in the guest should=
- now
-> -#         be behind the time in the host by exactly the amount of time d=
-uring
-> -#         which ticks have been missed.
-> -#
-> -# @slew: deliver ticks at a higher rate to catch up with the missed tick=
-s.
-> -#        The guest OS will not notice anything is amiss, as from its poi=
-nt
-> -#        of view time will have continued to flow normally.  Once the ti=
-mer
-> -#        has managed to catch up with all the missing ticks, the time in
-> -#        the guest and in the host should match.
-> -#
-> -# Since: 2.0
-> -##
-> -{ 'enum': 'LostTickPolicy',
-> -  'data': ['discard', 'delay', 'slew' ] }
-> -
->  ##
->  # @add_client:
->  #
-> diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
-> index 10c93a096a..58a7748c66 100644
-> --- a/include/hw/rtc/mc146818rtc.h
-> +++ b/include/hw/rtc/mc146818rtc.h
-> @@ -9,7 +9,7 @@
->  #ifndef HW_RTC_MC146818RTC_H
->  #define HW_RTC_MC146818RTC_H
-> =20
-> -#include "qapi/qapi-types-misc.h"
-> +#include "qapi/qapi-types-machine.h"
->  #include "qemu/queue.h"
->  #include "qemu/timer.h"
->  #include "hw/isa/isa.h"
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 2047114fca..59380ed761 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -4,6 +4,7 @@
->  #include "qapi/error.h"
->  #include "hw/pci/pci.h"
->  #include "qapi/qapi-types-block.h"
-> +#include "qapi/qapi-types-machine.h"
->  #include "qapi/qapi-types-misc.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qemu/ctype.h"
-> diff --git a/hw/i386/kvm/i8254.c b/hw/i386/kvm/i8254.c
-> index 876f5aa6fa..22ba6149b5 100644
-> --- a/hw/i386/kvm/i8254.c
-> +++ b/hw/i386/kvm/i8254.c
-> @@ -25,7 +25,7 @@
-> =20
->  #include "qemu/osdep.h"
->  #include <linux/kvm.h>
-> -#include "qapi/qapi-types-misc.h"
-> +#include "qapi/qapi-types-machine.h"
->  #include "qapi/error.h"
->  #include "qemu/module.h"
->  #include "qemu/timer.h"
-
+Thanks & Regards,
+-Rob
+>
+> Otherwise:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> >
+> > While at it, make sure that all accesses to the list are
+> > performed while holding the list's lock.
+> >
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > ---
+> >  cpus-common.c         | 25 ++++++++-----------------
+> >  cpus.c                | 14 ++++++++++++--
+> >  hw/core/cpu.c         |  1 +
+> >  include/hw/core/cpu.h |  6 +++---
+> >  4 files changed, 24 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/cpus-common.c b/cpus-common.c
+> > index 55d5df8923..210fc7fc39 100644
+> > --- a/cpus-common.c
+> > +++ b/cpus-common.c
+> > @@ -97,7 +97,7 @@ void cpu_list_remove(CPUState *cpu)
+> >  }
+> >
+> >  struct qemu_work_item {
+> > -    struct qemu_work_item *next;
+> > +    QSIMPLEQ_ENTRY(qemu_work_item) node;
+> >      run_on_cpu_func func;
+> >      run_on_cpu_data data;
+> >      bool free, exclusive, done;
+> > @@ -106,13 +106,7 @@ struct qemu_work_item {
+> >  static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi=
+)
+> >  {
+> >      qemu_mutex_lock(&cpu->work_mutex);
+> > -    if (cpu->queued_work_first =3D=3D NULL) {
+> > -        cpu->queued_work_first =3D wi;
+> > -    } else {
+> > -        cpu->queued_work_last->next =3D wi;
+> > -    }
+> > -    cpu->queued_work_last =3D wi;
+> > -    wi->next =3D NULL;
+> > +    QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+> >      wi->done =3D false;
+> >      qemu_mutex_unlock(&cpu->work_mutex);
+> >
+> > @@ -306,17 +300,14 @@ void process_queued_cpu_work(CPUState *cpu)
+> >  {
+> >      struct qemu_work_item *wi;
+> >
+> > -    if (cpu->queued_work_first =3D=3D NULL) {
+> > +    qemu_mutex_lock(&cpu->work_mutex);
+> > +    if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+> > +        qemu_mutex_unlock(&cpu->work_mutex);
+> >          return;
+> >      }
+> > -
+> > -    qemu_mutex_lock(&cpu->work_mutex);
+> > -    while (cpu->queued_work_first !=3D NULL) {
+> > -        wi =3D cpu->queued_work_first;
+> > -        cpu->queued_work_first =3D wi->next;
+> > -        if (!cpu->queued_work_first) {
+> > -            cpu->queued_work_last =3D NULL;
+> > -        }
+> > +    while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
+> > +        wi =3D QSIMPLEQ_FIRST(&cpu->work_list);
+> > +        QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+> >          qemu_mutex_unlock(&cpu->work_mutex);
+> >          if (wi->exclusive) {
+> >              /* Running work items outside the BQL avoids the following=
+ deadlock:
+> > diff --git a/cpus.c b/cpus.c
+> > index 5670c96bcf..af44027549 100644
+> > --- a/cpus.c
+> > +++ b/cpus.c
+> > @@ -97,9 +97,19 @@ bool cpu_is_stopped(CPUState *cpu)
+> >      return cpu->stopped || !runstate_is_running();
+> >  }
+> >
+> > +static inline bool cpu_work_list_empty(CPUState *cpu)
+> > +{
+> > +    bool ret;
+> > +
+> > +    qemu_mutex_lock(&cpu->work_mutex);
+> > +    ret =3D QSIMPLEQ_EMPTY(&cpu->work_list);
+> > +    qemu_mutex_unlock(&cpu->work_mutex);
+> > +    return ret;
+> > +}
+> > +
+> >  static bool cpu_thread_is_idle(CPUState *cpu)
+> >  {
+> > -    if (cpu->stop || cpu->queued_work_first) {
+> > +    if (cpu->stop || !cpu_work_list_empty(cpu)) {
+> >          return false;
+> >      }
+> >      if (cpu_is_stopped(cpu)) {
+> > @@ -1498,7 +1508,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+> >              cpu =3D first_cpu;
+> >          }
+> >
+> > -        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+> > +        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) =
+{
+> >
+> >              atomic_mb_set(&tcg_current_rr_cpu, cpu);
+> >              current_cpu =3D cpu;
+> > diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+> > index 5284d384fb..77703d62b7 100644
+> > --- a/hw/core/cpu.c
+> > +++ b/hw/core/cpu.c
+> > @@ -368,6 +368,7 @@ static void cpu_common_initfn(Object *obj)
+> >      cpu->nr_threads =3D 1;
+> >
+> >      qemu_mutex_init(&cpu->work_mutex);
+> > +    QSIMPLEQ_INIT(&cpu->work_list);
+> >      QTAILQ_INIT(&cpu->breakpoints);
+> >      QTAILQ_INIT(&cpu->watchpoints);
+> >
+> > diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> > index 07f7698155..d78ff1d165 100644
+> > --- a/include/hw/core/cpu.h
+> > +++ b/include/hw/core/cpu.h
+> > @@ -331,8 +331,8 @@ struct qemu_work_item;
+> >   * @opaque: User data.
+> >   * @mem_io_pc: Host Program Counter at which the memory was accessed.
+> >   * @kvm_fd: vCPU file descriptor for KVM.
+> > - * @work_mutex: Lock to prevent multiple access to queued_work_*.
+> > - * @queued_work_first: First asynchronous work pending.
+> > + * @work_mutex: Lock to prevent multiple access to @work_list.
+> > + * @work_list: List of pending asynchronous work.
+> >   * @trace_dstate_delayed: Delayed changes to trace_dstate (includes al=
+l changes
+> >   *                        to @trace_dstate).
+> >   * @trace_dstate: Dynamic tracing state of events for this vCPU (bitma=
+sk).
+> > @@ -376,7 +376,7 @@ struct CPUState {
+> >      sigjmp_buf jmp_env;
+> >
+> >      QemuMutex work_mutex;
+> > -    struct qemu_work_item *queued_work_first, *queued_work_last;
+> > +    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+> >
+> >      CPUAddressSpace *cpu_ases;
+> >      int num_ases;
+> >
+>
 
