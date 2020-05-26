@@ -2,91 +2,96 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:32:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA4F4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:36:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 954132073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5BD20721
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:36:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FX3AlHiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954132073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lnfyh9n6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5BD20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdcUp-0005Ik-Ig
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:32:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
+	id 1jdcYd-00005q-Ir
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:36:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jdcSI-0003YU-0x
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:29:30 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39346)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdcXh-0007k3-M2; Tue, 26 May 2020 12:35:05 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:46670)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jdcSH-0002I1-3y
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:29:29 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t18so6967087wru.6
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 09:29:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdcXf-0005vA-RS; Tue, 26 May 2020 12:35:04 -0400
+Received: by mail-ed1-x543.google.com with SMTP id m21so1652153eds.13;
+ Tue, 26 May 2020 09:35:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=V6ykpu323/hkpcPq28c3whFfHCBSSO7lfj/XeW+QWV4=;
- b=FX3AlHiIpXZcd2ugG1zpEHme9sY05qzbtR4whTlL7ywsBMlBntZwbBIIuV2QQk/b5e
- eXzWEPCh/3xHMewhBl0k8pfqsYaywF7OTRlQRU/So/RvGR4z9NnoZpLrgpE43/thPD80
- f0i2PbBtt5HG7lPvYxyApB/COgr4plbx+NIUl9nT1NsSPaISbYT7DvRkbPxEjrZTEwnv
- uxma8iDwJa06Lx/AS/Ru6UNJ0uxl3Ksz1Mm9Lk/QKg6gO26T0P0qV0k9/hCi6Jg4yuEo
- Pfl29Oag5twfO5a7DhWJM6JZdGQwgjyktGfEl02s8zZfRxhBZcGQ7lsHKD5DaYBZSdiP
- Clhw==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=CwD+5/sJjrX1n3x46dk05WNppGiKdaTTjs5dbKTiJVc=;
+ b=lnfyh9n6eqnG/z0US/t7N/P9z2EQVGQfTP6tqD0uCwDD4OkAN2hy4ZLTBrUN4xTowO
+ tZx7976Deo69SBr/m4NjeSG/7wFyf0v9jAPJDcYRes1MLgCqkiNtE47Sa2BXitOgcRQd
+ ez3z6j8umiXknGIKbmeedlj2ZXcNDY0BDwn281ScyAYyJ4gEtdrzE2HpaJ2GP+IKFwd2
+ 4+K1VoiYy97G11In6WJF6DAtSIBG4kj7OoJUQRRLQSM/rUTvy/HPo/IQnUiNCFrMP9f7
+ aD3E/AMjYafQnrnP3s4G1oXTmw6TLUnTfmo+Aof7P/+VGdvA4dM/gUqVJaVOaEIt18zx
+ TC0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=V6ykpu323/hkpcPq28c3whFfHCBSSO7lfj/XeW+QWV4=;
- b=mv16sLPti/v7WZayxShewshuLMnfWAeoT+Ioa1r4Br2P5SPiN5kVGplrh5sTzJn3Ny
- AheJI0W5+oKkaedyuoO4wY2W5qNwexwiP2wzqAKEy+RdHe5nwa4135Gg9XWlVxEDSU/z
- nnJpBDWQ9/QfCm3hpaXlhYnqv0kMhUEr58cb/EWc5gwRLrRQ0GHFDxQmF+ZHzmttxoJR
- FDUAiRz2I+TfU+HQdW6HLrU35D8dVkimNy7oZYUMD/9ic621Br+rGRHD374UUd0RJ1nm
- dg60BngAuZr3yctLc9BYROWqqiE6DcjL+MFN+w/EdWb6NIpWqHu4uLVjdAlxjjdJjWna
- V2fA==
-X-Gm-Message-State: AOAM533fvwPHioBu7oMxbBIm7JXFD+VLbFP+bvfUiyclcgSHzA6bOQ2W
- AHaAtn37tvvEOmRNkrI9Pqz4dMSPG60MR0Vp+I8=
-X-Google-Smtp-Source: ABdhPJxOnc+9N7irJ4jfBhRzSdX9k3zinSzdw5A+hPLMYFaB10tYv4Fko1TTNej8diOucoIo4DX+b6ANDHM1YPJvE9E=
-X-Received: by 2002:a5d:4b0f:: with SMTP id v15mr20377828wrq.162.1590510567432; 
- Tue, 26 May 2020 09:29:27 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CwD+5/sJjrX1n3x46dk05WNppGiKdaTTjs5dbKTiJVc=;
+ b=NaPdtrpwIhB8BVNdUdmjaB/I1Lp0a9Sjt/BwFyXSySKUTN/kRH6ow8IHaFKCs3iW8x
+ NXIHdeelKo+LlKsvrHPAXrG1fDD0D/jKbQWm9TOqC94OoYqeC86noQJFVHejUtVBNLme
+ WKNIzil24R9g6BeNgV1kTDD8FKl9EB1ydgK5A8qrZ5wwcj/ZI2cffYUTr5/USE1e6WPX
+ XCFKVEbnNBZAS+WBJkN41Vuc9InN284m8LsRxgtzk2bjleFCqiVy0QWMQkhnfVEwagoz
+ 2YtAH2FGCiNTTjlZW51c+ecmmKuqKPnJ/IlDDLITGirb0MGQas80CwpeA82hMiREyupX
+ T0oQ==
+X-Gm-Message-State: AOAM533gJ8AyCdrQuI4uA3xk8TWvQ46nyNMEZfPKZOYW09at6fPphO6Y
+ wg/xl5OGUbu3UOrCTNJ8PV0lnjTMKJ8=
+X-Google-Smtp-Source: ABdhPJzNl8p2EGcucUZK8OPqtAO7QmDhJbWwx645fAHiMoCwWbxqLr6eS+qgNPp4C4xliChqP2/opA==
+X-Received: by 2002:a05:6402:2035:: with SMTP id
+ ay21mr19837725edb.279.1590510901278; 
+ Tue, 26 May 2020 09:35:01 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id nj6sm302535ejb.99.2020.05.26.09.34.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 May 2020 09:35:00 -0700 (PDT)
+Subject: Re: [PATCH v3 2/2] hw/m68k/mcf52xx: Replace hw_error() by
+ qemu_log_mask()
+To: Thomas Huth <huth@tuxfamily.org>
+References: <20200526094052.1723-1-f4bug@amsat.org>
+ <20200526094052.1723-3-f4bug@amsat.org> <20200526180416.4f151f81@thl530>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d2171c12-ae7f-30aa-2361-30b8e58906c5@amsat.org>
+Date: Tue, 26 May 2020 18:34:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
- <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
- <CALTWKrVGqVb1mjsaoxYm4Y1iQoXYwz7ToC7T6r2EDPp-_LO=LQ@mail.gmail.com>
- <4e78400c-42be-08c6-492d-dc5596551efd@linaro.org>
- <CAHiYmc6zKmxgyKHzT4gazvJvPsX3SQYLjSXwK50_2eURkR3_NA@mail.gmail.com>
- <CAHiYmc7z+OfvE7nN1j14n2O8seVtqem_hsBwq=WyFgeo=WfybA@mail.gmail.com>
- <CALTWKrXv6NQUEzKFvPN4TmDGCKxY-Zaa+Dt-z0+sTgndco+EMA@mail.gmail.com>
-In-Reply-To: <CALTWKrXv6NQUEzKFvPN4TmDGCKxY-Zaa+Dt-z0+sTgndco+EMA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 26 May 2020 18:29:14 +0200
-Message-ID: <CAHiYmc6289cQZEptA=KjpMDLx3S94Au7W79DXH9KTM-MLi3ADA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
+In-Reply-To: <20200526180416.4f151f81@thl530>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -101,38 +106,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 18:08 Ahmed Karaman
-<ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Tue, May 26, 2020 at 4:14 PM Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> > Ahmed, please follow the instructions on this page: How to report a QEM=
-U bug and file the bug related to the discussion, to the best of your abili=
-ties, if possible, today.
->
-> Please find the link to the bug below:
-> https://bugs.launchpad.net/qemu/+bug/1880722
+On 5/26/20 6:04 PM, Thomas Huth wrote:
+> Am Tue, 26 May 2020 11:40:52 +0200
+> schrieb Philippe Mathieu-Daudé <f4bug@amsat.org>:
+> 
+>> hw_error() calls exit(). This a bit overkill when we can log
+>> the accesses as unimplemented or guest error.
+>>
+>> When fuzzing the devices, we don't want the whole process to
+>> exit. Replace some hw_error() calls by qemu_log_mask().
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> [...]
+>> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+>> index b84c152ce3..108623b4ad 100644
+>> --- a/hw/m68k/mcf5208.c
+>> +++ b/hw/m68k/mcf5208.c
+>> @@ -9,10 +9,10 @@
+>>  #include "qemu/osdep.h"
+>>  #include "qemu/units.h"
+>>  #include "qemu/error-report.h"
+>> +#include "qemu/log.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu-common.h"
+>>  #include "cpu.h"
+>> -#include "hw/hw.h"
+>>  #include "hw/irq.h"
+>>  #include "hw/m68k/mcf.h"
+>>  #include "hw/m68k/mcf_fec.h"
+>> @@ -111,8 +111,9 @@ static void m5208_timer_write(void *opaque,
+>> hwaddr offset, case 4:
+>>          break;
+>>      default:
+>> -        hw_error("m5208_timer_write: Bad offset 0x%x\n",
+>> (int)offset);
+>> -        break;
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" PRIx64
+>> "\n",
+> 
+> That likely should be HWADDR_PRIX, too? ... could be fixed up while
+> applying the patch.
 
-I think your last sentence in the bug report is not entirely correct.
-It is not known what would be performance results in case of
-correcting mmap.c. So, if possible, and unless Richard or someone else
-disagrees, please change that last sentence to: "By doing so, a better
-performance results could be achieved, compared to the case of the
-workaround described above."
+Oops yes. Thanks a lot!
 
-Also, please add the tag "linux-user".
-
-Yours,
-Aleksandar
+> 
+> With that:
+> Reviewed-by: Thomas Huth <huth@tuxfamily.org>
+> 
+> 
+>> +                      __func__, offset);
+>> +        return;
+>>      }
+>>      m5208_timer_update(s);
+>>  }
+>> @@ -136,7 +137,8 @@ static uint64_t m5208_timer_read(void *opaque,
+>> hwaddr addr, case 4:
+>>          return ptimer_get_count(s->timer);
+>>      default:
+>> -        hw_error("m5208_timer_read: Bad offset 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"
+>> HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+>>          return 0;
+>>      }
+>>  }
+>> @@ -164,7 +166,8 @@ static uint64_t m5208_sys_read(void *opaque,
+>> hwaddr addr, return 0;
+>>  
+>>      default:
+>> -        hw_error("m5208_sys_read: Bad offset 0x%x\n", (int)addr);
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"
+>> HWADDR_PRIX "\n",
+>> +                      __func__, addr);
+>>          return 0;
+>>      }
+>>  }
+>> @@ -172,7 +175,8 @@ static uint64_t m5208_sys_read(void *opaque,
+>> hwaddr addr, static void m5208_sys_write(void *opaque, hwaddr addr,
+>>                              uint64_t value, unsigned size)
+>>  {
+>> -    hw_error("m5208_sys_write: Bad offset 0x%x\n", (int)addr);
+>> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIX
+>> "\n",
+>> +                  __func__, addr);
+>>  }
+> 
 
