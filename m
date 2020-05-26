@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52D8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDE8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:53:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FB9E2089D
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0543E2084C
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:53:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+liUXVl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB9E2089D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsd4wzbJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0543E2084C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdXDE-0001P9-SM
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:53:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38816)
+	id 1jdXDJ-0001ae-5T
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:53:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdX7X-0006wR-Qh
- for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:44 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:33749)
+ id 1jdX7b-000706-9H
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:47 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:36586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdX7X-0002Ab-5c
- for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:43 -0400
-Received: by mail-ed1-x544.google.com with SMTP id e10so17247812edq.0
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:47:42 -0700 (PDT)
+ id 1jdX7Y-0002BH-Qb
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:46 -0400
+Received: by mail-ed1-x543.google.com with SMTP id b91so17268293edf.3
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=O0RMe/KIBJnQN5FAGIPVddGSupuK4ETk0arXsanrJz8=;
- b=H+liUXVl/w8SmXcvC+Ql+HMJplISn4a/nIfwYIH/UQZDe5YgTOitTCXbYiPyEB1FM9
- EPYWJxSMkvdRTksmn30MB3+MF0ZrOAl/7kHtPuM2lFz6KaiydwzJvI+splJODH3W83TY
- cfl9G7vwWQnvp4dE9MrFXceIVFb4lsmBCxk0PxOc3RZ82LZoPfcGqjLR/2j0V1pdVtsc
- NB/sGC1HXRXeClbeEKhPk5stPSgDu/5gVuoJHJlNpIBxIP3wX+M7uefc7AC4a8LuUiKY
- IW0C7td/RIaAUOdSswxE+TgMril0PhTEp2o3bfE8DhDzdh8GrKUCP2307ZNdAC6wXMV+
- T2YQ==
+ bh=Zt3NGcbexO6A3j4Pp4sNR582d+oR5aMY1t+EX1xMPMU=;
+ b=lsd4wzbJgCUx4wUGuErLmn9yyr88MOLORdSujfyNlreWFhCV3ZzQkLxotnDD4Il9Qn
+ 2S8c99x9MYtt55lGvShDPLKpfl5dhatcX8wpm6xTK659EbaEignYtGdsqryza8OOsE8F
+ vhl1E0FZRy3GBrQKOAHaLLTAa5dU35/wIQnWWcAdfHpQnAKyI8+ujnYS4JwFD5cOdaXD
+ MbP3Mh4I3DvF9EMn+jcNY1Nf0Ys6np9m2GlllccJ2Yzs6pZO2XIh/2aW4z5KXCDM0TNZ
+ Ca29iTFiNue3YjShVQaMBkirMQVAi4Zw4wEh/cmdd3rw5MhBWRAcFMy7CWAHbiWYdXgU
+ b/6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=O0RMe/KIBJnQN5FAGIPVddGSupuK4ETk0arXsanrJz8=;
- b=DbktyWtkpQM+0B2EgsUY6mI1FsHFVvTg+MwRTHM6AVcIzTMy6R1145yLg1ztz4K0JM
- xPkOIpJVPGE4fJajDTw++CUpl20X0DTJCxAz/vcH5gijlxrGFPwF3fi8haMu/IQXmnaC
- /kkEkWUGPfZeKwvDjTC33apgAF7eXh0O8ac+kDZ18iTqPH4on1m6iprNNXXqKYjOYcmO
- v2epgpRQ042p+YbZVHc8P8LittJ4V7cRGcroBjQG/9zgzmM7254VWKJ5QF0FXakK15Z+
- zAjWTj+pE69oeevn52uhB7Dt/Mz8nrU8RRhGRblHmZYCGWUp4loOY+qXOUmR1U2cmXMs
- M6iQ==
-X-Gm-Message-State: AOAM533hhmTeIITlkoA7LoMBb+yV2kza14siB1iHsA5WOXSeuQVrIYA1
- HFy0DnHWZsu4Ue3S1fxU9huC+wontVw=
-X-Google-Smtp-Source: ABdhPJyyAHRwvz1QFqRke0gd34JWn3GXI8WomKQHJsrtEZW5IitbO859IkEZ7qbYfUjNEdXttrAzog==
-X-Received: by 2002:a50:955a:: with SMTP id v26mr19533154eda.5.1590490061184; 
- Tue, 26 May 2020 03:47:41 -0700 (PDT)
+ bh=Zt3NGcbexO6A3j4Pp4sNR582d+oR5aMY1t+EX1xMPMU=;
+ b=e11f2IUgUSBhFGMa37MR1AclU3ECpGYT/1D5SikuizqttHYtr3ZHzskxm0zv9pQmUr
+ J5HqgQHH2xHwRnxW4ULwAqZVioadPm5ypxp7HPSz2336Ki1Hj/aQkJc0/mUydO1lt/F4
+ syM7/GJGybcq51JtKR5bdV7NHU7wMl0ftSdKGSGstoMqgPLqq2SvsbujIn1QRR4xFEFw
+ y50uEtyRQVK8q7gfAkkrEuqXqU4AJva6CPhKCOaz2caEbvZah/PBZt/7Ihbzn+6SzpAU
+ TcXb316xgNOV02zG8gWQir4wGw24dkhOD9aukwlQ94liTGwWnvuIJxzSjTj5ayA2r1cm
+ HIkg==
+X-Gm-Message-State: AOAM53394xFTF1noOmj2x1G8CEl0SZkKp21twGeIEeo2/gugt1Iaqj2J
+ b2tAi+1KcsMxGW+zJl7IZYc25bPy6N0=
+X-Google-Smtp-Source: ABdhPJy1MOvO1jejgEGSqlT+tqSgZj60UNlF3SD4n/lv295flmVB+qnElWDlJV05i3riqUPEoxG59A==
+X-Received: by 2002:a05:6402:31b1:: with SMTP id
+ dj17mr19307144edb.142.1590490062733; 
+ Tue, 26 May 2020 03:47:42 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id c27sm3342597ejd.19.2020.05.26.03.47.39
+ by smtp.gmail.com with ESMTPSA id c27sm3342597ejd.19.2020.05.26.03.47.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 May 2020 03:47:40 -0700 (PDT)
+ Tue, 26 May 2020 03:47:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/14] hw/mips/fuloong2e: Move code and update a comment
-Date: Tue, 26 May 2020 12:47:21 +0200
-Message-Id: <20200526104726.11273-10-f4bug@amsat.org>
+Subject: [PATCH 10/14] hw/mips/fuloong2e: Fix typo in Fuloong machine name
+Date: Tue, 26 May 2020 12:47:22 +0200
+Message-Id: <20200526104726.11273-11-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200526104726.11273-1-f4bug@amsat.org>
 References: <20200526104726.11273-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,42 +109,301 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  Thomas Huth <thuth@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <chenhc@lemote.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the RAM-related call closer to the RAM creation block,
-rename the ROM comment.
+We always miswrote the Fuloong machine... Fix its name.
+Add an machine alias to the previous name for backward
+compatibility.
 
-Reviewed-by: Huacai Chen <chenhc@lemote.com>
-Message-id: <20200510210128.18343-4-f4bug@amsat.org>
+Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-id: <20200510210128.18343-5-f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/mips_fulong2e.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ docs/system/deprecated.rst               |  5 +++
+ docs/system/target-mips.rst              |  2 +-
+ default-configs/mips64el-softmmu.mak     |  2 +-
+ hw/isa/vt82c686.c                        |  2 +-
+ hw/mips/{mips_fulong2e.c => fuloong2e.c} | 41 ++++++++++++------------
+ hw/pci-host/bonito.c                     |  8 ++---
+ tests/qtest/endianness-test.c            |  2 +-
+ MAINTAINERS                              |  4 +--
+ hw/mips/Kconfig                          |  2 +-
+ hw/mips/Makefile.objs                    |  2 +-
+ 10 files changed, 38 insertions(+), 32 deletions(-)
+ rename hw/mips/{mips_fulong2e.c => fuloong2e.c} (91%)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 05b9efa516..6996f5e3d1 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -315,12 +315,11 @@ static void mips_fulong2e_init(MachineState *machine)
-         error_report("Invalid RAM size, should be 256MB");
-         exit(EXIT_FAILURE);
-     }
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 3142fac386..f0061f94aa 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -368,6 +368,11 @@ mips ``r4k`` platform (since 5.0)
+ This machine type is very old and unmaintained. Users should use the ``malta``
+ machine type instead.
  
--    /* allocate RAM */
-+    /* Boot ROM */
-     memory_region_init_rom(bios, NULL, "fulong2e.bios", BIOS_SIZE,
++mips ``fulong2e`` machine (since 5.1)
++'''''''''''''''''''''''''''''''''''''
++
++This machine has been renamed ``fuloong2e``.
++
+ ``pc-1.0``, ``pc-1.1``, ``pc-1.2`` and ``pc-1.3`` (since 5.0)
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+diff --git a/docs/system/target-mips.rst b/docs/system/target-mips.rst
+index 2736fd0509..cd2a931edf 100644
+--- a/docs/system/target-mips.rst
++++ b/docs/system/target-mips.rst
+@@ -74,7 +74,7 @@ The MIPS Magnum R4000 emulation supports:
+ 
+ -  G364 framebuffer
+ 
+-The Fulong 2E emulation supports:
++The Fuloong 2E emulation supports:
+ 
+ -  Loongson 2E CPU
+ 
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index 8b0c9b1e15..9f8a3ef156 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -2,7 +2,7 @@
+ 
+ include mips-softmmu-common.mak
+ CONFIG_IDE_VIA=y
+-CONFIG_FULONG=y
++CONFIG_FULOONG=y
+ CONFIG_ATI_VGA=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_JAZZ=y
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index d9b51fce8d..fac4e56b7d 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -503,7 +503,7 @@ static void via_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_via;
+     /*
+      * Reason: part of VIA VT82C686 southbridge, needs to be wired up,
+-     * e.g. by mips_fulong2e_init()
++     * e.g. by mips_fuloong2e_init()
+      */
+     dc->user_creatable = false;
+ }
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/fuloong2e.c
+similarity index 91%
+rename from hw/mips/mips_fulong2e.c
+rename to hw/mips/fuloong2e.c
+index 6996f5e3d1..f583c44b79 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/fuloong2e.c
+@@ -1,5 +1,5 @@
+ /*
+- * QEMU fulong 2e mini pc support
++ * QEMU fuloong 2e mini pc support
+  *
+  * Copyright (c) 2008 yajin (yajin@vm-kernel.org)
+  * Copyright (c) 2009 chenming (chenming@rdc.faw.com.cn)
+@@ -11,8 +11,8 @@
+  */
+ 
+ /*
+- * Fulong 2e mini pc is based on ICT/ST Loongson 2e CPU (MIPS III like, 800MHz)
+- * http://www.linux-mips.org/wiki/Fulong
++ * Fuloong 2e mini pc is based on ICT/ST Loongson 2e CPU (MIPS III like, 800MHz)
++ * https://www.linux-mips.org/wiki/Fuloong_2E
+  *
+  * Loongson 2e user manual:
+  * http://www.loongsondeveloper.com/doc/Loongson2EUserGuide.pdf
+@@ -45,13 +45,13 @@
+ #include "sysemu/reset.h"
+ #include "qemu/error-report.h"
+ 
+-#define DEBUG_FULONG2E_INIT
++#define DEBUG_FULOONG2E_INIT
+ 
+ #define ENVP_ADDR               0x80002000l
+ #define ENVP_NB_ENTRIES         16
+ #define ENVP_ENTRY_SIZE         256
+ 
+-/* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
++/* Fuloong 2e has a 512k flash: Winbond W39L040AP70Z */
+ #define BIOS_SIZE               (512 * KiB)
+ #define MAX_IDE_BUS             2
+ 
+@@ -68,12 +68,12 @@
+  * 2, use "Bonito2edev" to replace "dir_corresponding_to_your_target_hardware"
+  * in the "Compile Guide".
+  */
+-#define FULONG_BIOSNAME "pmon_fulong2e.bin"
++#define FULOONG_BIOSNAME "pmon_2e.bin"
+ 
+-/* PCI SLOT in fulong 2e */
+-#define FULONG2E_VIA_SLOT        5
+-#define FULONG2E_ATI_SLOT        6
+-#define FULONG2E_RTL8139_SLOT    7
++/* PCI SLOT in Fuloong 2e */
++#define FULOONG2E_VIA_SLOT        5
++#define FULOONG2E_ATI_SLOT        6
++#define FULOONG2E_RTL8139_SLOT    7
+ 
+ static struct _loaderparams {
+     int ram_size;
+@@ -278,7 +278,7 @@ static void network_init(PCIBus *pci_bus)
+         const char *default_devaddr = NULL;
+ 
+         if (i == 0 && (!nd->model || strcmp(nd->model, "rtl8139") == 0)) {
+-            /* The fulong board has a RTL8139 card using PCI SLOT 7 */
++            /* The Fuloong board has a RTL8139 card using PCI SLOT 7 */
+             default_devaddr = "07";
+         }
+ 
+@@ -286,7 +286,7 @@ static void network_init(PCIBus *pci_bus)
+     }
+ }
+ 
+-static void mips_fulong2e_init(MachineState *machine)
++static void mips_fuloong2e_init(MachineState *machine)
+ {
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+@@ -318,7 +318,7 @@ static void mips_fulong2e_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, 0, machine->ram);
+ 
+     /* Boot ROM */
+-    memory_region_init_rom(bios, NULL, "fulong2e.bios", BIOS_SIZE,
++    memory_region_init_rom(bios, NULL, "fuloong2e.bios", BIOS_SIZE,
                             &error_fatal);
--
--    memory_region_add_subregion(address_space_mem, 0, machine->ram);
      memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
  
-     /*
+@@ -336,7 +336,7 @@ static void mips_fulong2e_init(MachineState *machine)
+         write_bootloader(env, memory_region_get_ram_ptr(bios), kernel_entry);
+     } else {
+         if (bios_name == NULL) {
+-                bios_name = FULONG_BIOSNAME;
++                bios_name = FULOONG_BIOSNAME;
+         }
+         filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+         if (filename) {
+@@ -362,7 +362,7 @@ static void mips_fulong2e_init(MachineState *machine)
+     pci_bus = bonito_init((qemu_irq *)&(env->irq[2]));
+ 
+     /* South bridge -> IP5 */
+-    vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
++    vt82c686b_southbridge_init(pci_bus, FULOONG2E_VIA_SLOT, env->irq[5],
+                                &smbus, &isa_bus);
+ 
+     /* GPU */
+@@ -383,14 +383,15 @@ static void mips_fulong2e_init(MachineState *machine)
+     network_init(pci_bus);
+ }
+ 
+-static void mips_fulong2e_machine_init(MachineClass *mc)
++static void mips_fuloong2e_machine_init(MachineClass *mc)
+ {
+-    mc->desc = "Fulong 2e mini pc";
+-    mc->init = mips_fulong2e_init;
++    mc->desc = "Fuloong 2e mini pc";
++    mc->alias = "fulong2e";             /* Incorrect name used up to QEMU 4.2 */
++    mc->init = mips_fuloong2e_init;
+     mc->block_default_type = IF_IDE;
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("Loongson-2E");
+     mc->default_ram_size = 256 * MiB;
+-    mc->default_ram_id = "fulong2e.ram";
++    mc->default_ram_id = "fuloong2e.ram";
+ }
+ 
+-DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
++DEFINE_MACHINE("fuloong2e", mips_fuloong2e_machine_init)
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index d0201ce59e..f9697dcc43 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -11,7 +11,7 @@
+  */
+ 
+ /*
+- * fulong 2e mini pc has a bonito north bridge.
++ * fuloong 2e mini pc has a bonito north bridge.
+  */
+ 
+ /*
+@@ -573,11 +573,11 @@ static int pci_bonito_map_irq(PCIDevice *pci_dev, int irq_num)
+     slot = (pci_dev->devfn >> 3);
+ 
+     switch (slot) {
+-    case 5:   /* FULONG2E_VIA_SLOT, SouthBridge, IDE, USB, ACPI, AC97, MC97 */
++    case 5:   /* FULOONG2E_VIA_SLOT, SouthBridge, IDE, USB, ACPI, AC97, MC97 */
+         return irq_num % 4 + BONITO_IRQ_BASE;
+-    case 6:   /* FULONG2E_ATI_SLOT, VGA */
++    case 6:   /* FULOONG2E_ATI_SLOT, VGA */
+         return 4 + BONITO_IRQ_BASE;
+-    case 7:   /* FULONG2E_RTL_SLOT, RTL8139 */
++    case 7:   /* FULOONG2E_RTL_SLOT, RTL8139 */
+         return 5 + BONITO_IRQ_BASE;
+     case 8 ... 12: /* PCI slot 1 to 4 */
+         return (slot - 8 + irq_num) + 6 + BONITO_IRQ_BASE;
+diff --git a/tests/qtest/endianness-test.c b/tests/qtest/endianness-test.c
+index 2798802c63..cc088ac01a 100644
+--- a/tests/qtest/endianness-test.c
++++ b/tests/qtest/endianness-test.c
+@@ -33,7 +33,7 @@ static const TestCase test_cases[] = {
+     { "mips64", "pica61", 0x90000000, .bswap = true },
+     { "mips64", "mips", 0x14000000, .bswap = true },
+     { "mips64", "malta", 0x10000000, .bswap = true },
+-    { "mips64el", "fulong2e", 0x1fd00000 },
++    { "mips64el", "fuloong2e", 0x1fd00000 },
+     { "ppc", "g3beige", 0xfe000000, .bswap = true, .superio = "i82378" },
+     { "ppc", "40p", 0x80000000, .bswap = true },
+     { "ppc", "bamboo", 0xe8000000, .bswap = true, .superio = "i82378" },
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8f597aae12..8136a0e56c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1081,13 +1081,13 @@ R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+ S: Obsolete
+ F: hw/mips/mips_r4k.c
+ 
+-Fulong 2E
++Fuloong 2E
+ M: Huacai Chen <chenhc@lemote.com>
+ M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ S: Odd Fixes
+-F: hw/mips/mips_fulong2e.c
++F: hw/mips/fuloong2e.c
+ F: hw/isa/vt82c686.c
+ F: hw/pci-host/bonito.c
+ F: include/hw/isa/vt82c686.h
+diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+index 2240504dff..67d39c56a4 100644
+--- a/hw/mips/Kconfig
++++ b/hw/mips/Kconfig
+@@ -41,7 +41,7 @@ config JAZZ
+     select DS1225Y
+     select JAZZ_LED
+ 
+-config FULONG
++config FULOONG
+     bool
+     select PCI_BONITO
+ 
+diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+index 525809af07..8ab41edc3f 100644
+--- a/hw/mips/Makefile.objs
++++ b/hw/mips/Makefile.objs
+@@ -3,6 +3,6 @@ obj-$(CONFIG_R4K) += mips_r4k.o
+ obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
+ obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
+ obj-$(CONFIG_JAZZ) += mips_jazz.o
+-obj-$(CONFIG_FULONG) += mips_fulong2e.o
++obj-$(CONFIG_FULOONG) += fuloong2e.o
+ obj-$(CONFIG_MIPS_CPS) += cps.o
+ obj-$(CONFIG_MIPS_BOSTON) += boston.o
 -- 
 2.21.3
 
