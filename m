@@ -2,90 +2,92 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F41C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0A2C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:32:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2351D20787
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 954132073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:32:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnQviRad"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2351D20787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FX3AlHiI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954132073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdcSH-0003GD-AY
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:29:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
+	id 1jdcUp-0005Ik-Ig
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:32:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdcQh-00011X-Dc
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:27:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54673
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdcQf-0001Td-4v
- for qemu-devel@nongnu.org; Tue, 26 May 2020 12:27:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590510467;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=o8RiUdp4UtY7imz0c0+ZlJIjYzT4VB53SY0luOLORZ4=;
- b=gnQviRadUuPzCplFdMJ3r8IuYZJg7unTO46/ojQwVGvuX04FMdBF810cJz+jK6wQRhl6lg
- U1GOv7ZAFtuMfy4edihvLjv3FjFFn+XMtfvXZ2L4FgI1qq9f+KMKXxAe/TPCubwVI7vzfX
- Z5pqxX6aEj0uVX2OPM7oxbC2RG2FkBo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-aCLaN0h1NYWff9unM_rfGg-1; Tue, 26 May 2020 12:27:42 -0400
-X-MC-Unique: aCLaN0h1NYWff9unM_rfGg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EF6B107ACCD;
- Tue, 26 May 2020 16:27:41 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EAB0A5D9E5;
- Tue, 26 May 2020 16:27:40 +0000 (UTC)
-Subject: Re: [PATCH v6 4/5] qemu-img: Add convert --bitmaps option
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200521192137.1120211-1-eblake@redhat.com>
- <20200521192137.1120211-5-eblake@redhat.com>
- <365251de-7e67-afcb-475c-98a57fdc2568@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e0e665de-8567-233d-af60-420355cea1cf@redhat.com>
-Date: Tue, 26 May 2020 11:27:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jdcSI-0003YU-0x
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:29:30 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39346)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jdcSH-0002I1-3y
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 12:29:29 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t18so6967087wru.6
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 09:29:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=V6ykpu323/hkpcPq28c3whFfHCBSSO7lfj/XeW+QWV4=;
+ b=FX3AlHiIpXZcd2ugG1zpEHme9sY05qzbtR4whTlL7ywsBMlBntZwbBIIuV2QQk/b5e
+ eXzWEPCh/3xHMewhBl0k8pfqsYaywF7OTRlQRU/So/RvGR4z9NnoZpLrgpE43/thPD80
+ f0i2PbBtt5HG7lPvYxyApB/COgr4plbx+NIUl9nT1NsSPaISbYT7DvRkbPxEjrZTEwnv
+ uxma8iDwJa06Lx/AS/Ru6UNJ0uxl3Ksz1Mm9Lk/QKg6gO26T0P0qV0k9/hCi6Jg4yuEo
+ Pfl29Oag5twfO5a7DhWJM6JZdGQwgjyktGfEl02s8zZfRxhBZcGQ7lsHKD5DaYBZSdiP
+ Clhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=V6ykpu323/hkpcPq28c3whFfHCBSSO7lfj/XeW+QWV4=;
+ b=mv16sLPti/v7WZayxShewshuLMnfWAeoT+Ioa1r4Br2P5SPiN5kVGplrh5sTzJn3Ny
+ AheJI0W5+oKkaedyuoO4wY2W5qNwexwiP2wzqAKEy+RdHe5nwa4135Gg9XWlVxEDSU/z
+ nnJpBDWQ9/QfCm3hpaXlhYnqv0kMhUEr58cb/EWc5gwRLrRQ0GHFDxQmF+ZHzmttxoJR
+ FDUAiRz2I+TfU+HQdW6HLrU35D8dVkimNy7oZYUMD/9ic621Br+rGRHD374UUd0RJ1nm
+ dg60BngAuZr3yctLc9BYROWqqiE6DcjL+MFN+w/EdWb6NIpWqHu4uLVjdAlxjjdJjWna
+ V2fA==
+X-Gm-Message-State: AOAM533fvwPHioBu7oMxbBIm7JXFD+VLbFP+bvfUiyclcgSHzA6bOQ2W
+ AHaAtn37tvvEOmRNkrI9Pqz4dMSPG60MR0Vp+I8=
+X-Google-Smtp-Source: ABdhPJxOnc+9N7irJ4jfBhRzSdX9k3zinSzdw5A+hPLMYFaB10tYv4Fko1TTNej8diOucoIo4DX+b6ANDHM1YPJvE9E=
+X-Received: by 2002:a5d:4b0f:: with SMTP id v15mr20377828wrq.162.1590510567432; 
+ Tue, 26 May 2020 09:29:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <365251de-7e67-afcb-475c-98a57fdc2568@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200519162144.10831-1-ahmedkhaledkaraman@gmail.com>
+ <a0f3967f-e125-d888-bc6d-44414edbfd5b@linaro.org>
+ <CALTWKrVGqVb1mjsaoxYm4Y1iQoXYwz7ToC7T6r2EDPp-_LO=LQ@mail.gmail.com>
+ <4e78400c-42be-08c6-492d-dc5596551efd@linaro.org>
+ <CAHiYmc6zKmxgyKHzT4gazvJvPsX3SQYLjSXwK50_2eURkR3_NA@mail.gmail.com>
+ <CAHiYmc7z+OfvE7nN1j14n2O8seVtqem_hsBwq=WyFgeo=WfybA@mail.gmail.com>
+ <CALTWKrXv6NQUEzKFvPN4TmDGCKxY-Zaa+Dt-z0+sTgndco+EMA@mail.gmail.com>
+In-Reply-To: <CALTWKrXv6NQUEzKFvPN4TmDGCKxY-Zaa+Dt-z0+sTgndco+EMA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 26 May 2020 18:29:14 +0200
+Message-ID: <CAHiYmc6289cQZEptA=KjpMDLx3S94Au7W79DXH9KTM-MLi3ADA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Update use_goto_tb() in hppa and rx targets
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,135 +101,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/25/20 2:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 21.05.2020 22:21, Eric Blake wrote:
->> Make it easier to copy all the persistent bitmaps of (the top layer
->> of) a source image along with its guest-visible contents, by adding a
->> boolean flag for use with qemu-img convert.  This is basically
->> shorthand, as the same effect could be accomplished with a series of
->> 'qemu-img bitmap --add' and 'qemu-img bitmap --merge -b source'
->> commands, or by their corresponding QMP commands.
->>
->> Note that this command will fail in the same scenarios where 'qemu-img
->> measure' omits a 'bitmaps size:' line, namely, when either the source
->> or the destination lacks persistent bitmap support altogether.
->>
->> See also https://bugzilla.redhat.com/show_bug.cgi?id=1779893
->>
->> While touching this, clean up a couple coding issues spotted in the
->> same function: an extra blank line, and merging back-to-back 'if
->> (!skip_create)' blocks.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
-> 
+=D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 18:08 Ahmed Karaman
+<ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Tue, May 26, 2020 at 4:14 PM Aleksandar Markovic
+> <aleksandar.qemu.devel@gmail.com> wrote:
+> > Ahmed, please follow the instructions on this page: How to report a QEM=
+U bug and file the bug related to the discussion, to the best of your abili=
+ties, if possible, today.
+>
+> Please find the link to the bug below:
+> https://bugs.launchpad.net/qemu/+bug/1880722
 
->> @@ -2573,6 +2632,13 @@ static int img_convert(int argc, char **argv)
->>       }
->>       out_bs = blk_bs(s.target);
->>
->> +    if (nbitmaps > 0 && 
->> !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
-> 
-> We will not fail, if target doesn't support bitmaps, source supports 
-> them but has no bitmaps? Doesn't seem to be a problem, but a bit less 
-> strict than you write in commit message.
-> 
-> So, maybe, s/nbitmaps > 0/bitmaps/
+I think your last sentence in the bug report is not entirely correct.
+It is not known what would be performance results in case of
+correcting mmap.c. So, if possible, and unless Richard or someone else
+disagrees, please change that last sentence to: "By doing so, a better
+performance results could be achieved, compared to the case of the
+workaround described above."
 
-In fact, nbitmaps is not needed at all (it was useful in earlier 
-iterations, but as the series has morphed, it is no longer buying me 
-anything useful).
+Also, please add the tag "linux-user".
 
-> 
->> +        error_report("Format driver '%s' does not support bitmaps",
->> +                     out_fmt);
-> 
-> Hmm seems, out_fmt may be NULL at this point, consider the path:
-> const char *out_fmt = NULL
-> ...
-> [no -O option]
-> --target-image-opts, so out_fmt doesn't default to "raw" but remains NULL
-> ...
-> 
-> So, with s/out_fmt/out_bs->drv->format_name/ (and with or without 
-> s/nbitmaps > 0/bitmaps/):
-> 
-> 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-Okay, I'm squashing this in, and adding your R-b.  Pull request coming 
-shortly.
-
-diff --git i/qemu-img.c w/qemu-img.c
-index 8ecebe178890..d7e846e60742 100644
---- i/qemu-img.c
-+++ w/qemu-img.c
-@@ -2196,7 +2196,6 @@ static int img_convert(int argc, char **argv)
-      bool force_share = false;
-      bool explict_min_sparse = false;
-      bool bitmaps = false;
--    size_t nbitmaps = 0;
-
-      ImgConvertState s = (ImgConvertState) {
-          /* Need at least 4k of zeros for sparse detection */
-@@ -2565,10 +2564,8 @@ static int img_convert(int argc, char **argv)
-          }
-      }
-
--    /* Determine how many bitmaps need copying */
-+    /* Determine if bitmaps need copying */
-      if (bitmaps) {
--        BdrvDirtyBitmap *bm;
--
-          if (s.src_num > 1) {
-              error_report("Copying bitmaps only possible with single 
-source");
-              ret = -1;
-@@ -2579,11 +2576,6 @@ static int img_convert(int argc, char **argv)
-              ret = -1;
-              goto out;
-          }
--        FOR_EACH_DIRTY_BITMAP(blk_bs(s.src[0]), bm) {
--            if (bdrv_dirty_bitmap_get_persistence(bm)) {
--                nbitmaps++;
--            }
--        }
-      }
-
-      /*
-@@ -2632,9 +2624,9 @@ static int img_convert(int argc, char **argv)
-      }
-      out_bs = blk_bs(s.target);
-
--    if (nbitmaps > 0 && !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
-+    if (bitmaps && !bdrv_supports_persistent_dirty_bitmap(out_bs)) {
-          error_report("Format driver '%s' does not support bitmaps",
--                     out_fmt);
-+                     out_bs->drv->format_name);
-          ret = -1;
-          goto out;
-      }
-@@ -2700,7 +2692,7 @@ static int img_convert(int argc, char **argv)
-      ret = convert_do_copy(&s);
-
-      /* Now copy the bitmaps */
--    if (nbitmaps > 0 && ret == 0) {
-+    if (bitmaps && ret == 0) {
-          ret = convert_copy_bitmaps(blk_bs(s.src[0]), out_bs);
-      }
-
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Yours,
+Aleksandar
 
