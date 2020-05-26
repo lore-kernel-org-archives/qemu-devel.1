@@ -2,87 +2,93 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A20BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCBBC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBB2C2073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8E6B2073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:47:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/f69nGB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB2C2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rbd+18Y+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E6B2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdX4D-0004KW-2y
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38302)
+	id 1jdX7S-0006PH-5N
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdX3R-0003aw-Ej
- for qemu-devel@nongnu.org; Tue, 26 May 2020 06:43:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50751
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdX3P-0001E6-Rj
- for qemu-devel@nongnu.org; Tue, 26 May 2020 06:43:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590489806;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Gt6ck0J0yEML7ZbgUZ3X+4VmrS0fz/8h77uIdf6Pcr8=;
- b=U/f69nGBQz6+BGcTKaLZ5i4QOGwPolcDB7kVMA1SsksoalwomuKxMcYVomdP6QdB+nQY/y
- xNS9wN64kTWgoKz82Mn1MZX+JxXwi+tEoBmt6JhLJE6Ji6RRJDXKsWatD5X16sutunV6DY
- 6i+IeCnpnQ1I6qOrKPvnEXrsmWWUM0g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-L0zLwgAGMMOAc7WhhwfYiA-1; Tue, 26 May 2020 06:43:22 -0400
-X-MC-Unique: L0zLwgAGMMOAc7WhhwfYiA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E784B800053;
- Tue, 26 May 2020 10:43:20 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2739C648DB;
- Tue, 26 May 2020 10:43:20 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E3C3D17444; Tue, 26 May 2020 12:43:18 +0200 (CEST)
-Date: Tue, 26 May 2020 12:43:18 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH v2 5/7] sm501: Replace hand written implementation with
- pixman where possible
-Message-ID: <20200526104318.wmsqqtia3h52l454@sirius.home.kraxel.org>
-References: <cover.1590089984.git.balaton@eik.bme.hu>
- <58666389b6cae256e4e972a32c05cf8aa51bffc0.1590089984.git.balaton@eik.bme.hu>
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jdX6N-0005hD-J7
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:46:31 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54762)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jdX6M-0001pa-K1
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:46:31 -0400
+Received: by mail-wm1-x342.google.com with SMTP id h4so2655502wmb.4
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=8/2p96nvDB8tgYcEmtJxrf+Si2eiGAU3/SyssBplbhk=;
+ b=Rbd+18Y+OL73HXKl+F6pSQBj9nXF+KfxZ3T3MSpjv73y3PG6i4X7uOXWriRxAYIXaq
+ BBKDCGmBeH8NGHeEoRWwMUP6OlY1uo2thg4wIP8McresousdTce9t0L4X79O2rUHWUmr
+ RXG7JaXGimo8ACd0oV/V89v/qDgqoV/q4o+teri/aq0Zt4wdiWW6at+FIlDPCTels3pl
+ tS9H/GQHcrj07oT2srjlwL5CXoFF3sVLYr7XyQbCaCGPlr1MrUks3uh7r+udZNj4eioJ
+ u5foWU0gjErFrIjZBn8mF7E1uIIaTAZRcQ3SeUFN67cPeu5Bxb9m+5E89aMyiL9h7SfK
+ WUag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=8/2p96nvDB8tgYcEmtJxrf+Si2eiGAU3/SyssBplbhk=;
+ b=oo7dCS39LuYXEKIqZ7eQTHR3d/Nj9HqfHrzrJzgLoBk4hMoKsBCxNMzmJBpYBAh7jv
+ EJEcT0UAoSJOfD1VqcQVWI7wETFkwjPA14vLCeL8Evg86vSo2ih9WfyExxpzZVpKtKS2
+ 8vSvtU5II4Gt4+FDdPKHHj3AJAeAr5kO3HhjFuASdT3mfjC3/h8sz1PfJJhJ0OTDAi2O
+ bcVmWYER0JgYHHfAArgCi7HSOZrU6hyx25hW9V+zPbacxbY13dxp2LFTmOvnpQC7VAmu
+ IEcpFyZNVT0JWavpvFYJoRS8OHXn3oaXSeRqH9jO6nZ6Hpq+FY0lJbSka0Qgmlo6d3Em
+ WjhQ==
+X-Gm-Message-State: AOAM531/Kj1w41wTEFy9joV8Erkc/+l9bjl0OS9qz9Smvvx3+aZC5K73
+ WvZ+CwUS4SUf0CZj1vN2CdripPhJJOw0Y8F0q7w=
+X-Google-Smtp-Source: ABdhPJx7snTIUhch8hpB/9G8S/YPMrNau4I+sBcPu/7SrQg+g9iUCLvgKEc33TASGzfDGCI0UHMrYWXudhBISBIhaDc=
+X-Received: by 2002:a1c:18e:: with SMTP id 136mr757343wmb.159.1590489989063;
+ Tue, 26 May 2020 03:46:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <58666389b6cae256e4e972a32c05cf8aa51bffc0.1590089984.git.balaton@eik.bme.hu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
+ <20200518200920.17344-21-aleksandar.qemu.devel@gmail.com>
+ <dba8f844-e28a-bd13-9655-75f8004ad21f@amsat.org>
+ <CAHiYmc6DMA2LRXama80zaPi+7RqFQYWL5OwtRn_Xk-ueASAi_A@mail.gmail.com>
+ <3cc6c3d2-19f6-8502-a460-67c5853ff953@amsat.org>
+In-Reply-To: <3cc6c3d2-19f6-8502-a460-67c5853ff953@amsat.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 26 May 2020 12:46:16 +0200
+Message-ID: <CAHiYmc6xuRQ0u+BLotEpKvmF+_vv2madz80oUJqsJz0o3a3JdA@mail.gmail.com>
+Subject: Re: [PATCH v6 20/21] hw/mips: Add some logging for bad register
+ offset cases
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,80 +101,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: aleksandar.rikalo@syrmia.com, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 09:39:44PM +0200, BALATON Zoltan wrote:
-> Besides being faster this should also prevent malicious guests to
-> abuse 2D engine to overwrite data or cause a crash.
+=D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:38 Philippe Math=
+ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On 5/26/20 12:05 PM, Aleksandar Markovic wrote:
+> > =D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 09:42 Philippe =
+Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >>
+> >> On 5/18/20 10:09 PM, Aleksandar Markovic wrote:
+> >>> Log the cases where a guest attempts read or write using bad
+> >>> register offset.
+> >>>
+> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>
+> >> Not well tested apparently, because it doesn't build with GCC 5.4.0
+> >> (Ubuntu):
+> >>
+> >> hw/mips/malta.c: In function =E2=80=98malta_fpga_read=E2=80=99:
+> >> hw/mips/malta.c:430:85: error: format =E2=80=98%x=E2=80=99 expects arg=
+ument of type
+> >> =E2=80=98unsigned int=E2=80=99, but argument 2 has type =E2=80=98hwadd=
+r {aka long unsigned int}=E2=80=99
+> >> [-Werror=3Dformat=3D]
+> >> hw/mips/malta.c: In function =E2=80=98malta_fpga_write=E2=80=99:
+> >> hw/mips/malta.c:517:85: error: format =E2=80=98%x=E2=80=99 expects arg=
+ument of type
+> >> =E2=80=98unsigned int=E2=80=99, but argument 2 has type =E2=80=98hwadd=
+r {aka long unsigned int}=E2=80=99
+> >> [-Werror=3Dformat=3D]
+> >> cc1: all warnings being treated as errors
+> >>
+> >> I amended this snippet ...:
+> >>
+> >> -- >8 --
+> >> @@ -428,8 +428,8 @@ static uint64_t malta_fpga_read(void *opaque, hwad=
+dr
+> >> addr,
+> >>
+> >>      default:
+> >>          qemu_log_mask(LOG_GUEST_ERROR,
+> >> -                      "malta_fpga_read: Bad register offset 0x"
+> >> -                      TARGET_FMT_lx "\n", addr);
+> >> +                      "malta_fpga_read: Bad register addr
+> >> 0x%"HWADDR_PRIX"\n",
+> >> +                      addr);
+> >>          break;
+> >>      }
+> >>      return val;
+> >> @@ -515,8 +515,8 @@ static void malta_fpga_write(void *opaque, hwaddr =
+addr,
+> >>
+> >>      default:
+> >>          qemu_log_mask(LOG_GUEST_ERROR,
+> >> -                      "malta_fpga_write: Bad register offset 0x"
+> >> -                      TARGET_FMT_lx "\n", addr);
+> >> +                      "malta_fpga_write: Bad register addr
+> >> 0x%"HWADDR_PRIX"\n",
+> >> +                      addr);
+> >>          break;
+> >>      }
+> >>  }
+> >> ---
+> >>
+> >> ... and queued to mips-next,
+> >>
+> >
+> > Hi, Philippe,
+> >
+> > Many thanks for correcting my mistake in this patch!
+> > May I ask you to refer to your queue as hw/mips-next, rather than
+> > mips-next, for the sake of clarity?
+>
+> Tags with '/' are hard to manage, let's use mips-hw-next,
+> mips-target-next for your pull requests and mips-kvm-next for Huacai's on=
+es.
+>
+> > And, when do you plan to send the pull request?
+>
+> Waiting for Gerd's audio-next one to get merged because he took my
+> "mips_fulong2e: Remove unused 'audio/audio.h' include" patch and I don't
+> want Peter to have to manually resolve conflicts (there shouldn't be,
+> but I don't want to risk bother him with a "automatic 3-way merge" warnin=
+g).
+>
 
->          uint32_t src_base = s->twoD_source_base & 0x03FFFFFF;
-> -        uint8_t *src = s->local_mem + src_base;
+Philippe, I think you created a lot of problems here without any real need.
 
-> -                    val = *(_pixel_type *)&src[index_s];                      \
+We should sync between us rather than sent "surprise" "pull requests".
 
-Well, the advantage of *not* using pixman is that you can easily switch
-the code to use offsets instead of pointers, then apply the mask to the
-*final* offset to avoid oob data access:
+I am not happy with coordination of our common MIPS work.
 
-    val = *(_pixel_type*)(&s->local_mem[(s->twoD_source_base + index_s) & 0x03FFFFFF]);
-
-> +        if ((rop_mode && rop == 0x5) || (!rop_mode && rop == 0x55)) {
-> +            /* Invert dest, is there a way to do this with pixman? */
-
-PIXMAN_OP_XOR maybe?
-
-> +            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
-> +                /* regions may overlap: copy via temporary */
-
-The usual way for a hardware blitter is to have a direction bit, i.e.
-the guest os can ask to blit in top->bottom or bottom->top scanline
-ordering.  The guest can use that to make sure the blit does not
-overwrite things.  But note the guest can also intentionally use
-overlapping regions, i.e. memset(0) the first scanline, then use a blit
-with overlap to clear the whole screen.  The later will surely break if
-you blit via temporary image ...
-
-> +                pixman_blt((uint32_t *)&s->local_mem[src_base],
-> +                           (uint32_t *)&s->local_mem[dst_base],
-> +                           src_pitch * (1 << format) / sizeof(uint32_t),
-> +                           dst_pitch * (1 << format) / sizeof(uint32_t),
-> +                           8 * (1 << format), 8 * (1 << format),
-> +                           src_x, src_y, dst_x, dst_y, width, height);
-
-See above, i'm not convinced pixman is the best way here.
-When using pixman I'd suggest:
-
-  (1) src = pixman_image_create_bits_no_clear(...);
-  (2) dst = pixman_image_create_bits_no_clear(...);
-  (3) pixman_image_composite(PIXMAN_OP_SRC, src, NULL, dst, ...);
-  (4) pixman_image_unref(src);
-  (5) pixman_image_unref(dst);
-
-pixman_blt() is probably doing basically the same.  The advantage of not
-using pixman_blt() is that
-
-  (a) you can also use pixman ops other than PIXMAN_OP_SRC, and
-  (b) you can have a helper function for (1)+(2) which very carefully
-      applies sanity checks to make sure the pixman image created stays
-      completely inside s->local_mem.
-  (c) you have the option to completely rearrange the code flow, for
-      example update the src pixman image whenever the guest touches
-      src_base or src_pitch or format instead of having a
-      create/op/unref cycle on every blitter op.
-
-> +        pixman_fill((uint32_t *)&s->local_mem[dst_base],
-> +                    dst_pitch * (1 << format) / sizeof(uint32_t),
-> +                    8 * (1 << format), dst_x, dst_y, width, height, color);
-
-  (1) src = pixman_image_create_solid(...), otherwise same as above ;)
-
-take care,
-  Gerd
-
+> >
+> > Thanks,
+> > Aleksandar
+> >
+> >
+> >> Thanks,
+> >>
+> >> Phil.
+> >>
+> >>> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> >>> ---
+> >>>  hw/mips/mips_malta.c | 14 ++++++--------
+> >>>  1 file changed, 6 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> >>> index e4c4de1b4e..88869b828e 100644
+> >>> --- a/hw/mips/mips_malta.c
+> >>> +++ b/hw/mips/mips_malta.c
+> >>> @@ -427,10 +427,9 @@ static uint64_t malta_fpga_read(void *opaque, hw=
+addr addr,
+> >>>          break;
+> >>>
+> >>>      default:
+> >>> -#if 0
+> >>> -        printf("malta_fpga_read: Bad register offset 0x" TARGET_FMT_=
+lx "\n",
+> >>> -               addr);
+> >>> -#endif
+> >>> +        qemu_log_mask(LOG_GUEST_ERROR,
+> >>> +                      "malta_fpga_read: Bad register offset 0x"
+> >>> +                      TARGET_FMT_lx "\n", addr);
+> >>>          break;
+> >>>      }
+> >>>      return val;
+> >>> @@ -515,10 +514,9 @@ static void malta_fpga_write(void *opaque, hwadd=
+r addr,
+> >>>          break;
+> >>>
+> >>>      default:
+> >>> -#if 0
+> >>> -        printf("malta_fpga_write: Bad register offset 0x" TARGET_FMT=
+_lx "\n",
+> >>> -               addr);
+> >>> -#endif
+> >>> +        qemu_log_mask(LOG_GUEST_ERROR,
+> >>> +                      "malta_fpga_write: Bad register offset 0x"
+> >>> +                      TARGET_FMT_lx "\n", addr);
+> >>>          break;
+> >>>      }
+> >>>  }
+> >>>
+> >
 
