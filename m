@@ -2,95 +2,87 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D44C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FCFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E381720776
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BED0620776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFDaXgua"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E381720776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uygr6lw7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BED0620776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdco2-0001Et-34
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:51:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45672)
+	id 1jdcoC-0001hv-RX
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdciz-0002g7-HZ; Tue, 26 May 2020 12:46:45 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:42054)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jdcmu-0008Mx-Fs; Tue, 26 May 2020 12:50:48 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41494)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdciy-0005hv-M7; Tue, 26 May 2020 12:46:45 -0400
-Received: by mail-ed1-x544.google.com with SMTP id k19so18231787edv.9;
- Tue, 26 May 2020 09:46:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jdcmt-0008P8-8X; Tue, 26 May 2020 12:50:48 -0400
+Received: by mail-io1-xd42.google.com with SMTP id o5so22742175iow.8;
+ Tue, 26 May 2020 09:50:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=5dc+q+V0lscs6cXnzEkH5M+IYF1zKZogiJC+dn3t85w=;
- b=GFDaXguavyRv45sHK3kwXd6gWaCQ24YuhbUn0za1/qb9MdXDAEUe3kHLhVhU1GV/9Q
- HziPyj9k3iYI7QaeXfrz7hUCr+QmpyoGx3wGFSbPkQrr/wi34nOHTHNryEEHLh/ZwUV+
- +F6e6Lms+OhsKoB3YqVC0tSk+Y0T/XeFWnZImwuckdr13zS9ipXioc6BmVQBdipCJhIa
- XuSmjjiR/PJDDBKw2Q9bUaEU3xlgv9kPsS4WpGtgPGErCoylF777dan7uWMDuXjixivO
- MC3BGcc5L0lTQJNJ1Y5+04g0o0mlauN8obCQO7Wj3HN5cStgy6FjKb3CE1oo3lYIpuJ5
- tfHw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=4xhxIuW5e7MTY17vJexhuzlogi09eAgFg3lNXL700Oc=;
+ b=uygr6lw7iZ5vnE1WD+PojkgydN/vd4U/GOGrtaI/dHHgBelfq8fXQLEZBUGrcMUsNx
+ s2rQZCjSKAqSfcK26TuA2103yaVQA3WDL0sguGB5GmNSdahiErUrIshSroZpJjAta886
+ Wss6/sg8albn11yBHg+T+F6OPJO3A/Ks743qAmYjkoKN8ovFpnCnqZcczJLQ8Bk7jyaA
+ gjlkDQg/DjFGTOlQj6LfX6zQ8nXnTkGhDLdAftnT57/lMh27od5U7QDjJ0S9ao1+O02a
+ lB6WeJLRnWOGG1xIvPLT6PgkU3fTrzwHHzNiXPOvz3cC0Yfs8c/koWijyChHWvWFFps2
+ Ek7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5dc+q+V0lscs6cXnzEkH5M+IYF1zKZogiJC+dn3t85w=;
- b=S3Ct8PbcMvYza44zY18gEk+pHeAdj1xBTWtSuXfDRdCF+iKB9/cZ+GnUCK0WqOiRGp
- MWvkWACch7rXfNXBsNPNRwngzbdMGoam0apntouFpku3Xyl4brgAg7zqEOziOm27pfuK
- X3oZAnu0AfR/E44BmeKXE+VfcxAy+PrckPiCXgAD4TsfC62CjnWadNE91a7O0qnOgr9n
- hWjbcHqpB3ESDgsJ3lAdeycegBHmmdTWU/Dj83Oek9JeDZLJF8a+7NijDHwvBpC/9/Mk
- xw3LKayvexFvBjOcE1ltDs0PV7/+8S64W24/qj+yHmQrB8o9QIlUNQ96LTYKS1uW6Rj6
- ZJXg==
-X-Gm-Message-State: AOAM530LlGQaJle6WxuHLULFsbyzqjb7BGJz/19x37lzZ4e6MoPPHvQv
- qTkekufV0M22FDz6xD7D0GhgBjCWqAg=
-X-Google-Smtp-Source: ABdhPJykay5hDSLsoJOR17vA7AzJ//AEN7BDDFIRx/mc6nuLklAmvNQynP9/gxQlByzVdDPkXU508g==
-X-Received: by 2002:a05:6402:c95:: with SMTP id
- cm21mr20907665edb.81.1590511602757; 
- Tue, 26 May 2020 09:46:42 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id dr19sm370475ejc.122.2020.05.26.09.46.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 09:46:42 -0700 (PDT)
-Subject: Re: [PATCH] hw/registerfields: Prefix local variables with underscore
- in macros
-To: qemu-devel@nongnu.org
-References: <20200510203457.10546-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7bdb49c1-5396-0bf4-5f83-3849910e5d68@amsat.org>
-Date: Tue, 26 May 2020 18:46:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=4xhxIuW5e7MTY17vJexhuzlogi09eAgFg3lNXL700Oc=;
+ b=P1LIyHs0mAzCei121O86kF/tnPI9SkJLpxCrz6ryvr5kaLeBswOHtD0WsWVCg+7O3T
+ mYq47dOYj6iEV+6imzwLXygiEaPJrk29YS2nnzIKVuOYhIWgmscjnjAZW267+M7lS74s
+ ubnPbreOmURq7h1wcVHaZOGLKoigCtTODtvMyHGGfCHNa8MJY5e9f/YSK8WB0t0MPo2Z
+ 4HtWTcZhyoJW37QkNjGQRvm8xKFWuoq3XPoQ2lYbimZdBof4vjtT1CfP2m8er6sQ2/78
+ W+bsqPpb7bnBepIF6j//FAekNqGSZXst39vn4K9TeJkyu/sFH//XuxjwrpwzYHdDHidb
+ 5zhw==
+X-Gm-Message-State: AOAM5306fIBOM7ql0S9QRIAzs0p455DlVoGiuKupvYpbb5w450XmUrAm
+ Ec4Ne8A8LKgFq6ZKvQLBiT6+HE1PmreQTSlhGtc=
+X-Google-Smtp-Source: ABdhPJyncKVcuCtrgK6WZ/NuVPhU4G8aCrFJYvhnLbiixk+Wq6nzRO7BdNF5PR7woGqtLp76fSqzuNp+iDnaojUPX0U=
+X-Received: by 2002:a5d:9d03:: with SMTP id j3mr4516138ioj.176.1590511845417; 
+ Tue, 26 May 2020 09:50:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200510203457.10546-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+References: <20200526062252.19852-1-f4bug@amsat.org>
+ <20200526062252.19852-3-f4bug@amsat.org>
+In-Reply-To: <20200526062252.19852-3-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 26 May 2020 09:41:46 -0700
+Message-ID: <CAKmqyKMhGXK+NPH16neMJc+8q7tGACHzTpMqT1CgpXT6x9fR0A@mail.gmail.com>
+Subject: Re: [PATCH 02/14] hw/display/cg3: Convert debug printf()s to trace
+ events
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -105,83 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping?
+On Mon, May 25, 2020 at 11:23 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> Convert DPRINTF() to trace events and remove ifdef'ry.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On 5/10/20 10:34 PM, Philippe Mathieu-Daudé wrote:
-> One can name a local variable holding a value as 'v', but it
-> currently clashes with the registerfields macros. To save others
-> to debug the same mistake, prefix the macro's local variables
-> with an underscore.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  include/hw/registerfields.h | 40 ++++++++++++++++++-------------------
->  1 file changed, 20 insertions(+), 20 deletions(-)
-> 
-> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-> index 0407edb7ec..93fa4a84c2 100644
-> --- a/include/hw/registerfields.h
-> +++ b/include/hw/registerfields.h
-> @@ -66,35 +66,35 @@
->  #define FIELD_DP8(storage, reg, field, val) ({                            \
->      struct {                                                              \
->          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint8_t d;                                                            \
-> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> +    } _v = { .v = val };                                                  \
-> +    uint8_t _d;                                                           \
-> +    _d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, _v.v);              \
-> +    _d; })
->  #define FIELD_DP16(storage, reg, field, val) ({                           \
->      struct {                                                              \
->          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint16_t d;                                                           \
-> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> +    } _v = { .v = val };                                                  \
-> +    uint16_t _d;                                                          \
-> +    _d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, _v.v);              \
-> +    _d; })
->  #define FIELD_DP32(storage, reg, field, val) ({                           \
->      struct {                                                              \
->          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint32_t d;                                                           \
-> -    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> +    } _v = { .v = val };                                                  \
-> +    uint32_t _d;                                                          \
-> +    _d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, _v.v);              \
-> +    _d; })
->  #define FIELD_DP64(storage, reg, field, val) ({                           \
->      struct {                                                              \
->          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
-> -    } v = { .v = val };                                                   \
-> -    uint64_t d;                                                           \
-> -    d = deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
-> -                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
-> -    d; })
-> +    } _v = { .v = val };                                                  \
-> +    uint64_t _d;                                                          \
-> +    _d = deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,          \
-> +                  R_ ## reg ## _ ## field ## _LENGTH, _v.v);              \
-> +    _d; })
->  
->  /* Deposit a field to array of registers.  */
->  #define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
-> 
+>  hw/display/cg3.c        | 14 ++++----------
+>  hw/display/trace-events |  4 ++++
+>  2 files changed, 8 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+> index f7f1c199ce..7cbe6e56ff 100644
+> --- a/hw/display/cg3.c
+> +++ b/hw/display/cg3.c
+> @@ -35,6 +35,7 @@
+>  #include "hw/qdev-properties.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> +#include "trace.h"
+>
+>  /* Change to 1 to enable debugging */
+>  #define DEBUG_CG3 0
+> @@ -63,12 +64,6 @@
+>  #define CG3_VRAM_SIZE 0x100000
+>  #define CG3_VRAM_OFFSET 0x800000
+>
+> -#define DPRINTF(fmt, ...) do { \
+> -    if (DEBUG_CG3) { \
+> -        printf("CG3: " fmt , ## __VA_ARGS__); \
+> -    } \
+> -} while (0)
+> -
+>  #define TYPE_CG3 "cgthree"
+>  #define CG3(obj) OBJECT_CHECK(CG3State, (obj), TYPE_CG3)
+>
+> @@ -195,7 +190,8 @@ static uint64_t cg3_reg_read(void *opaque, hwaddr add=
+r, unsigned size)
+>          val =3D 0;
+>          break;
+>      }
+> -    DPRINTF("read %02x from reg %" HWADDR_PRIx "\n", val, addr);
+> +    trace_cg3_read(addr, val, size);
+> +
+>      return val;
+>  }
+>
+> @@ -206,9 +202,7 @@ static void cg3_reg_write(void *opaque, hwaddr addr, =
+uint64_t val,
+>      uint8_t regval;
+>      int i;
+>
+> -    DPRINTF("write %" PRIx64 " to reg %" HWADDR_PRIx " size %d\n",
+> -            val, addr, size);
+> -
+> +    trace_cg3_write(addr, val, size);
+>      switch (addr) {
+>      case CG3_REG_BT458_ADDR:
+>          s->dac_index =3D val;
+> diff --git a/hw/display/trace-events b/hw/display/trace-events
+> index e6e22bef88..47b2b168ae 100644
+> --- a/hw/display/trace-events
+> +++ b/hw/display/trace-events
+> @@ -151,3 +151,7 @@ artist_vram_write(unsigned int size, uint64_t addr, u=
+int64_t val) "%u 0x%"PRIx64
+>  artist_fill_window(unsigned int start_x, unsigned int start_y, unsigned =
+int width, unsigned int height, uint32_t op, uint32_t ctlpln) "start=3D%ux%=
+u length=3D%ux%u op=3D0x%08x ctlpln=3D0x%08x"
+>  artist_block_move(unsigned int start_x, unsigned int start_y, unsigned i=
+nt dest_x, unsigned int dest_y, unsigned int width, unsigned int height) "s=
+ource %ux%u -> dest %ux%u size %ux%u"
+>  artist_draw_line(unsigned int start_x, unsigned int start_y, unsigned in=
+t end_x, unsigned int end_y) "%ux%u %ux%u"
+> +
+> +# cg3.c
+> +cg3_read(uint32_t addr, uint32_t val, unsigned size) "read addr:0x%06"PR=
+Ix32" val:0x%08"PRIx32" size:%u"
+> +cg3_write(uint32_t addr, uint32_t val, unsigned size) "write addr:0x%06"=
+PRIx32" val:0x%08"PRIx32" size:%u"
+> --
+> 2.21.3
+>
+>
 
