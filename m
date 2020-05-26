@@ -8,73 +8,73 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DF1C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F00AAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:55:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D0E820776
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEF0320776
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 16:55:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jheA7ja9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0E820776
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WH1Iy3+H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF0320776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdcrm-0008Q9-Hc
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:55:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51442)
+	id 1jdcrp-000079-WD
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 12:55:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdco8-00024J-M6; Tue, 26 May 2020 12:52:04 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:46973)
+ id 1jdcki-0005A3-81; Tue, 26 May 2020 12:48:32 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:40724)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdco6-0000m8-Ov; Tue, 26 May 2020 12:52:03 -0400
-Received: by mail-io1-xd41.google.com with SMTP id j8so22723257iog.13;
- Tue, 26 May 2020 09:52:01 -0700 (PDT)
+ id 1jdckh-00070P-1S; Tue, 26 May 2020 12:48:31 -0400
+Received: by mail-il1-x142.google.com with SMTP id a18so3871230ilp.7;
+ Tue, 26 May 2020 09:48:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=wogobYdgA7pdWEUiow9y+BbE4SrJpOahPEjnfmC9ss0=;
- b=jheA7ja9yxFsNrUeovavT8+NzngQH/J+PJ4kuh0t/fwMH3SYb7nkLNyudNtVldLNNG
- eoXiq06CtQJ3uxyzvV7NyH0N4JoqlcLnh6vWkJrTiNrLgNheyz7gP8R0shM89QDbtw8p
- JZUjizEJni0l4y29EpjSrqEqzOExoJi634eEtOXK+9pty7OITgNGpiG5Njr+V5wn3Ry5
- LUxNVYgx6wx+92PYH/nfCF7INVc2/A2sARyBanCkXDNPf/YA4jgAjgZwE5TLFKt6dvr/
- 2dGc0B+aWkRbqkeM0yEc0gIlX8XwbYOB1Vb1c/7zNZNbnr7PEu7PeYRjx5CfWXvGsEvI
- K1Ew==
+ bh=cI2kBYN4v92zgki8aIm+KltLVDl7Q7AyJhU1Q/w/19I=;
+ b=WH1Iy3+HM6GY0QWzvBllseWDzwXzXwH0BylC7P+OrrzTzKwlb0U0RKhkZ4hqdFNVv4
+ 7CE1CI6eAPJ68XfxUtCdeaJ5H80YGfoAumQQmLUjwMZdVQltnK+xtwi8jHO/eLXLkEfr
+ hPnpNpEvfBobhfrau36aU1Mp5baX4u5gY2M3pKgHgzoV8aCWzIoort4z7FecQdXxf4L8
+ u5uW3N8+ZEatBbiJM0Y+6l23/u+WuXNYhKduqoREIDel1TXf6AXhST7YMCxZUoLOy2Lo
+ TUBJfw4T0jlRTLPI79WLkSjKRjz+7+n9YPMRIXW9x00o4L/Xgbgpoo1h/etI+FOdcdLj
+ cMtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=wogobYdgA7pdWEUiow9y+BbE4SrJpOahPEjnfmC9ss0=;
- b=CQdEyb2BmSYeFi0aoF4/Zpd0L2m/DQJwV0ZDHw3j9x7XWiC9AppndmTJGB8OrVjsjh
- e+105rY3Shc2Uuy+Om6vijqDX0+W/RHmgpb/MJMUy8on51uuodI0F5zj5WlBUXlWAkSf
- 7iqNNeTlTvzEpezg+ojij8y0cN5oUnnLmpzb2SY8RsByEaw060Or+p070vArXcwxZKuU
- pbj+0pYf2mvCFseimZXbfFhB3jbtnF+yw+qbcoZriRre0YlLj8qxRFKUyKO0gBfF6XGU
- 3/VZXSCZ3Toloisz+IQASvG9TXnnTTYvNicLxiLZoWJEoolw0eUIS6WBe94Hfbcgt8Y0
- qD4A==
-X-Gm-Message-State: AOAM5339RCJddAREkCFztbzLr1AMND+aOpG9zlyXKjERQHwAJv+YhFeH
- IVBJq89Yvcvw1BFY7ka9nsY9jR2JVHpKkGiBB6w=
-X-Google-Smtp-Source: ABdhPJwG6bLuMi57LOOhtuFM7Cd+Y8FlPRKN7hczqoZy/Qg+bhnVHVNLF7Y1r4RMiuDna+oMVFZgZrmdvQFR8GxrUj4=
-X-Received: by 2002:a02:7009:: with SMTP id f9mr1962296jac.8.1590511920816;
- Tue, 26 May 2020 09:52:00 -0700 (PDT)
+ bh=cI2kBYN4v92zgki8aIm+KltLVDl7Q7AyJhU1Q/w/19I=;
+ b=aWOFDSsMrq6bcK+M0iDcE9m1gu9QY97tbkXd4eNdK0rqNYtDPlwG5hrYhWxPq4/Z3q
+ Yyy6OhqvfVBYS11ZWy8FB5OR6wTnIGtVfE/1NRCeLmMiS+HkwI8Dp/Olz2X3vvZ3Og3/
+ UgX1xs82bTpBBYe2mj7gZ8wCQiQGWGm4fVb2uRgNdzewHWfsyIqS91oVB26ysnEgH9lo
+ LNXCwEfPgOx7aYsE7X4v3OLKRWAu1rhFe2SY7efHM1QXNBn5zYnSg4XtLO3RoqlB+rnZ
+ cM+mvdn/4XL82z//WUORf0pV09Z1vkFFqJ6LsaDDoCJf8qSbx0+MqiOIfkcU2/kHj+70
+ HjsA==
+X-Gm-Message-State: AOAM530bm6ftlOMh4E90BV8h1W76JMxUoqcffOPaFUmFqg8k2lcoXPna
+ a6BsBYYf4tYaFzp8rIT2K1dik9DXZJmGFVCkVG8=
+X-Google-Smtp-Source: ABdhPJxQHi27S2/M/o+cjyhHVWaU8HxASjseal0bsvr5rADvxOkGgEt2gEOtsiC3oMS6B9YTdTnvdTvzXFxkWGYwhjY=
+X-Received: by 2002:a92:48d1:: with SMTP id j78mr2059806ilg.131.1590511708940; 
+ Tue, 26 May 2020 09:48:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200526062252.19852-1-f4bug@amsat.org>
- <20200526062252.19852-5-f4bug@amsat.org>
-In-Reply-To: <20200526062252.19852-5-f4bug@amsat.org>
+References: <20200525034459.28535-1-f4bug@amsat.org>
+ <20200525034459.28535-4-f4bug@amsat.org>
+In-Reply-To: <20200525034459.28535-4-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 26 May 2020 09:42:56 -0700
-Message-ID: <CAKmqyKOc=Zs0VA-_BKDsrG__RXtgcM7JR8cwsNsd8RNr9VKVgA@mail.gmail.com>
-Subject: Re: [PATCH 04/14] hw/display/cirrus_vga: Use qemu_log_mask(UNIMP)
- instead of debug printf
+Date: Tue, 26 May 2020 09:39:30 -0700
+Message-ID: <CAKmqyKM=i6jp6y023ExLztqTeg6dc+O5Rv05_tYcCYi48E1-pA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] hw/display/dpcd: Convert debug printf()s to trace
+ events
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -100,20 +100,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  QEMU Trivial <qemu-trivial@nongnu.org>,
  Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 11:25 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+On Sun, May 24, 2020 at 8:46 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 >
-> Replace some debug printf() calls by qemu_log_mask(LOG_UNIMP),
-> and add a new one in cirrus_linear_bitblt_read().
+> Convert DPRINTF() to trace events and remove ifdef'ry.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -122,58 +118,78 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/display/cirrus_vga.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+>  hw/display/dpcd.c       | 16 +++-------------
+>  hw/display/trace-events |  4 ++++
+>  2 files changed, 7 insertions(+), 13 deletions(-)
 >
-> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> index 33ccdde000..f9f837b850 100644
-> --- a/hw/display/cirrus_vga.c
-> +++ b/hw/display/cirrus_vga.c
-> @@ -35,6 +35,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/module.h"
->  #include "qemu/units.h"
-> +#include "qemu/log.h"
->  #include "sysemu/reset.h"
->  #include "qapi/error.h"
->  #include "trace.h"
-> @@ -905,9 +906,8 @@ static int cirrus_bitblt_cputovideo(CirrusVGAState * =
-s)
->  static int cirrus_bitblt_videotocpu(CirrusVGAState * s)
->  {
->      /* XXX */
-> -#ifdef DEBUG_BITBLT
-> -    printf("cirrus: bitblt (video to cpu) is not implemented yet\n");
+> diff --git a/hw/display/dpcd.c b/hw/display/dpcd.c
+> index 0c1b7b35fb..64463654a1 100644
+> --- a/hw/display/dpcd.c
+> +++ b/hw/display/dpcd.c
+> @@ -32,16 +32,7 @@
+>  #include "hw/misc/auxbus.h"
+>  #include "migration/vmstate.h"
+>  #include "hw/display/dpcd.h"
+> -
+> -#ifndef DEBUG_DPCD
+> -#define DEBUG_DPCD 0
 > -#endif
-> +    qemu_log_mask(LOG_UNIMP,
-> +                  "cirrus: bitblt (video to cpu) is not implemented\n");
->      return 0;
->  }
+> -
+> -#define DPRINTF(fmt, ...) do {                                          =
+       \
+> -    if (DEBUG_DPCD) {                                                   =
+       \
+> -        qemu_log("dpcd: " fmt, ## __VA_ARGS__);                         =
+       \
+> -    }                                                                   =
+       \
+> -} while (0)
+> +#include "trace.h"
 >
-> @@ -989,9 +989,8 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
->          cirrus_blt_mode & (CIRRUS_BLTMODE_MEMSYSSRC |
->                             CIRRUS_BLTMODE_MEMSYSDEST))
->         =3D=3D (CIRRUS_BLTMODE_MEMSYSSRC | CIRRUS_BLTMODE_MEMSYSDEST)) {
-> -#ifdef DEBUG_BITBLT
-> -       printf("cirrus: bitblt - memory-to-memory copy is requested\n");
-> -#endif
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "cirrus: bitblt - memory-to-memory copy requested\=
-n");
->         goto bitblt_ignore;
+>  #define DPCD_READABLE_AREA                      0x600
+>
+> @@ -70,8 +61,8 @@ static uint64_t dpcd_read(void *opaque, hwaddr offset, =
+unsigned size)
+>                                         offset);
+>          ret =3D 0;
 >      }
+> +    trace_dpcd_read(offset, ret);
 >
-> @@ -2412,6 +2411,9 @@ static uint64_t cirrus_linear_bitblt_read(void *opa=
-que,
->
->      /* XXX handle bitblt */
->      (void)s;
-> +    qemu_log_mask(LOG_UNIMP,
-> +                  "cirrus: linear bitblt is not implemented\n");
-> +
->      return 0xff;
+> -    DPRINTF("read 0x%" PRIX8 " @0x%" HWADDR_PRIX "\n", ret, offset);
+>      return ret;
 >  }
 >
+> @@ -80,8 +71,7 @@ static void dpcd_write(void *opaque, hwaddr offset, uin=
+t64_t value,
+>  {
+>      DPCDState *e =3D DPCD(opaque);
+>
+> -    DPRINTF("write 0x%" PRIX8 " @0x%" HWADDR_PRIX "\n", (uint8_t)value, =
+offset);
+> -
+> +    trace_dpcd_write(offset, value);
+>      if (offset < DPCD_READABLE_AREA) {
+>          e->dpcd_info[offset] =3D value;
+>      } else {
+> diff --git a/hw/display/trace-events b/hw/display/trace-events
+> index e6e22bef88..00543f1601 100644
+> --- a/hw/display/trace-events
+> +++ b/hw/display/trace-events
+> @@ -151,3 +151,7 @@ artist_vram_write(unsigned int size, uint64_t addr, u=
+int64_t val) "%u 0x%"PRIx64
+>  artist_fill_window(unsigned int start_x, unsigned int start_y, unsigned =
+int width, unsigned int height, uint32_t op, uint32_t ctlpln) "start=3D%ux%=
+u length=3D%ux%u op=3D0x%08x ctlpln=3D0x%08x"
+>  artist_block_move(unsigned int start_x, unsigned int start_y, unsigned i=
+nt dest_x, unsigned int dest_y, unsigned int width, unsigned int height) "s=
+ource %ux%u -> dest %ux%u size %ux%u"
+>  artist_draw_line(unsigned int start_x, unsigned int start_y, unsigned in=
+t end_x, unsigned int end_y) "%ux%u %ux%u"
+> +
+> +# dpcd.c
+> +dpcd_read(uint32_t addr, uint8_t val) "read addr:0x%"PRIx32" val:0x%02x"
+> +dpcd_write(uint32_t addr, uint8_t val) "write addr:0x%"PRIx32" val:0x%02=
+x"
 > --
 > 2.21.3
 >
