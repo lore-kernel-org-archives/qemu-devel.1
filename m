@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7959C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9303C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BCC32086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D96A2084C
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 10:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Awyer0DF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BCC32086A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi9xE9F6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D96A2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdXDh-0002Uy-O9
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:54:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38832)
+	id 1jdXEc-0003cb-Fh
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 06:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdX7c-00071L-O6
- for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:48 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:39328)
+ id 1jdX7d-00071t-2n
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:49 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:34336)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdX7a-0002Bb-6F
+ id 1jdX7b-0002Bs-JO
  for qemu-devel@nongnu.org; Tue, 26 May 2020 06:47:48 -0400
-Received: by mail-ed1-x533.google.com with SMTP id bs4so17246001edb.6
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:47:45 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id i16so17250233edv.1
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 03:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=CA4dl2WNChH9j4MQdjSr57dN4nPG4AfEzYEDKDaDKgY=;
- b=Awyer0DFiUu5NTfopXNQYtR4WipbpFNj6v5nxxXKpEDuQGaPlBiLNg3YABxf9dxhTf
- 1Ek8/4AsA8CjIB9By29jSxlYnkjHhHrijfRBHMDowbt8HTIGCLcKk0dHHIMkfQ/K9bwS
- M3A4M+lb4KO4PGPjbHeTArSZUHicP09ybctEBXm0cw/Foz5l8zBaAbTupRmBadPAaGF9
- yC52lJUPwwBPQvY3FjoTbnYrEdTCOQdQZLUGHX+aVM7H5qtJzXX/EItU84NwvWpXJ0Tr
- HXRcAWR3Pi9RewuAeyhbU8hxGB2Y8H/KE4doc14tNciASJruZomJR5+3R2d1D/BUguJv
- N5lw==
+ bh=45UgqB7xiuv75to9D1xtOkBXTGrFM8LHRPwW44N+AXY=;
+ b=Oi9xE9F6rOTJgixcMpWfSS/NfUvbfq+cZ18N8xzAXMsVsblxvzRwmW5IZFl/VZZyuO
+ m/MHptzNBrrwlhhDV3ougwUuLaWWLtTf6B+B1fpX+hNt/UoNWIGMx1z7NIFSQONiCJW9
+ JfRwTQ44mTbc2fk8SX1Jsyy9Eg/Asbk6nTezEWUwO4K3GsTHEWrg5JyTDA33h/lHLrom
+ 3UJLswgKJMLnUd9fSDQWS/ZoivOXXclYtG4aTPdwyXatELinW8gZbq2kG6sRT7EIwdg9
+ BQTC/Kk60fS54gXBogOERLxFnGxlaJgQWWzNQC7g8b1TDOvDnPlFywWzpTJs6z9YXD/k
+ tSMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=CA4dl2WNChH9j4MQdjSr57dN4nPG4AfEzYEDKDaDKgY=;
- b=C/g02YGtliP58zNvVChBEM2KsxDm6KH/sUnwBfBQ6NLMq9nIg1mqXwB8Z9eTbdhZLV
- 7nLwx8p1S76T94/goJWrqyA14wNqMEOhqhUHpVTvIZFyvyZFR0/9/KpwtF+TkCVetwrd
- fmLUdS9Tr/gnnvldYEWAo59Ho44h6iKgxOFqsF/0BFZfuQ9j+UEnvLcxjB6NZhpvhoPf
- POfxvUf5Ds4J10aSuLL5oKLb/7Cf638l4YtCgi0v9Mck4BEGyVFkAujz9Pd0bU8NA0jP
- DfWWhzY4T9pDlFV+AgYKyLoxj5+yOlMDwGZmjwp/duRBj4Kc+vKbLkkxlmfGFs+61HcP
- 4Xrw==
-X-Gm-Message-State: AOAM530InXS8tNrOVKW5vuyuQDpUafelHHCkzCBYGYy9LXS3FZRjGTh5
- QA/zr+JPFeOkmYXhUPQAyBX1qy2WY9s=
-X-Google-Smtp-Source: ABdhPJwnxMuZ0W4ADcfuIOCKATeEMRyPV62TWp9vH1xXJ2pTzpB2JmpMMtINunhzUEgjZBnsyQvWWQ==
-X-Received: by 2002:a50:eb0c:: with SMTP id y12mr18730066edp.165.1590490064069; 
- Tue, 26 May 2020 03:47:44 -0700 (PDT)
+ bh=45UgqB7xiuv75to9D1xtOkBXTGrFM8LHRPwW44N+AXY=;
+ b=U/8wYveePEWWkjFCuR3TRKufGn9lp/1Vl+epg1rJZ9ilwSrYboOUEIS3Cnz/UMFHlT
+ +bPx4j+p92GtUMWoQcF54jpBDlyzGk8G82OEpAchiV+tv92DWOukOo20TXo+TjwzZ7tl
+ bLpqYt3/adLNLNkFHUlB007jehtIsJvZIN3BMKs/cJ49V/qrtx+b4QXY7yHVRaiZGcIK
+ sQM41wHU/tPdAIDFAtrqGwx96+f9rG/9Dih0DIGgnpprDgEIKnQk81HeJJ2eGkRIqJ0R
+ CC+EBK4CA5bpyMlmb0ssslA3UCyRxHuZTvN54wNmI+Ka4mIL0vS0IMK/c5j3C4yzaYKc
+ 86vQ==
+X-Gm-Message-State: AOAM532zZA+6V7B8FXa5RwsyRXJYjI6FNn48w/KuCMZXdyrFQVr4e2IB
+ jw15ApuTMdFxJ0U+c+sfF4CeHvqETh0=
+X-Google-Smtp-Source: ABdhPJz2BuRcHYEb0vJvbDghC8GF7FUB+ZLTYw4hWm0S4PsoeKn/UWCsOYNfxvHRzf7lUPCp+rcP7g==
+X-Received: by 2002:a50:8e56:: with SMTP id 22mr18385165edx.268.1590490066045; 
+ Tue, 26 May 2020 03:47:46 -0700 (PDT)
 Received: from x1w.redhat.com (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id c27sm3342597ejd.19.2020.05.26.03.47.42
+ by smtp.gmail.com with ESMTPSA id c27sm3342597ejd.19.2020.05.26.03.47.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 May 2020 03:47:43 -0700 (PDT)
+ Tue, 26 May 2020 03:47:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/14] hw/mips: Rename malta/mipssim/r4k/jazz files
-Date: Tue, 26 May 2020 12:47:23 +0200
-Message-Id: <20200526104726.11273-12-f4bug@amsat.org>
+Subject: [PATCH 12/14] hw/mips/malta: Add some logging for bad register offset
+ cases
+Date: Tue, 26 May 2020 12:47:24 +0200
+Message-Id: <20200526104726.11273-13-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200526104726.11273-1-f4bug@amsat.org>
 References: <20200526104726.11273-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x533.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,99 +118,51 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-Machine file names should not have prefix "mips_".
+Log the cases where a guest attempts read or write using bad
+register offset.
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-id: <20200518200920.17344-22-aleksandar.qemu.devel@gmail.com>
-[PMD: Fixed Fuloong line conflict due to rebase]
+Message-id: <20200518200920.17344-21-aleksandar.qemu.devel@gmail.com>
+[PMD: Replaced TARGET_FMT_lx by HWADDR_PRIX]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/{mips_jazz.c => jazz.c}       | 0
- hw/mips/{mips_malta.c => malta.c}     | 0
- hw/mips/{mips_mipssim.c => mipssim.c} | 0
- hw/mips/{mips_r4k.c => r4k.c}         | 0
- MAINTAINERS                           | 8 ++++----
- hw/mips/Makefile.objs                 | 8 ++++----
- 6 files changed, 8 insertions(+), 8 deletions(-)
- rename hw/mips/{mips_jazz.c => jazz.c} (100%)
- rename hw/mips/{mips_malta.c => malta.c} (100%)
- rename hw/mips/{mips_mipssim.c => mipssim.c} (100%)
- rename hw/mips/{mips_r4k.c => r4k.c} (100%)
+ hw/mips/malta.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/jazz.c
-similarity index 100%
-rename from hw/mips/mips_jazz.c
-rename to hw/mips/jazz.c
-diff --git a/hw/mips/mips_malta.c b/hw/mips/malta.c
-similarity index 100%
-rename from hw/mips/mips_malta.c
-rename to hw/mips/malta.c
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mipssim.c
-similarity index 100%
-rename from hw/mips/mips_mipssim.c
-rename to hw/mips/mipssim.c
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/r4k.c
-similarity index 100%
-rename from hw/mips/mips_r4k.c
-rename to hw/mips/r4k.c
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8136a0e56c..f46ab150dc 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1050,7 +1050,7 @@ Jazz
- M: Hervé Poussineau <hpoussin@reactos.org>
- R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
- S: Maintained
--F: hw/mips/mips_jazz.c
-+F: hw/mips/jazz.c
- F: hw/display/jazz_led.c
- F: hw/dma/rc4030.c
+diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+index e4c4de1b4e..b673a3a248 100644
+--- a/hw/mips/malta.c
++++ b/hw/mips/malta.c
+@@ -427,10 +427,9 @@ static uint64_t malta_fpga_read(void *opaque, hwaddr addr,
+         break;
  
-@@ -1061,7 +1061,7 @@ R: Aurelien Jarno <aurelien@aurel32.net>
- S: Maintained
- F: hw/isa/piix4.c
- F: hw/acpi/piix4.c
--F: hw/mips/mips_malta.c
-+F: hw/mips/malta.c
- F: hw/mips/gt64xxx_pci.c
- F: include/hw/southbridge/piix.h
- F: tests/acceptance/linux_ssh_mips_malta.py
-@@ -1071,7 +1071,7 @@ Mipssim
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
- S: Odd Fixes
--F: hw/mips/mips_mipssim.c
-+F: hw/mips/mipssim.c
- F: hw/net/mipsnet.c
+     default:
+-#if 0
+-        printf("malta_fpga_read: Bad register offset 0x" TARGET_FMT_lx "\n",
+-               addr);
+-#endif
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "malta_fpga_read: Bad register addr 0x%"HWADDR_PRIX"\n",
++                      addr);
+         break;
+     }
+     return val;
+@@ -515,10 +514,9 @@ static void malta_fpga_write(void *opaque, hwaddr addr,
+         break;
  
- R4000
-@@ -1079,7 +1079,7 @@ M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- R: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
- S: Obsolete
--F: hw/mips/mips_r4k.c
-+F: hw/mips/r4k.c
- 
- Fuloong 2E
- M: Huacai Chen <chenhc@lemote.com>
-diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-index 8ab41edc3f..739e2b7b40 100644
---- a/hw/mips/Makefile.objs
-+++ b/hw/mips/Makefile.objs
-@@ -1,8 +1,8 @@
- obj-y += addr.o mips_int.o
--obj-$(CONFIG_R4K) += mips_r4k.o
--obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
--obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
--obj-$(CONFIG_JAZZ) += mips_jazz.o
-+obj-$(CONFIG_R4K) += r4k.o
-+obj-$(CONFIG_MALTA) += gt64xxx_pci.o malta.o
-+obj-$(CONFIG_MIPSSIM) += mipssim.o
-+obj-$(CONFIG_JAZZ) += jazz.o
- obj-$(CONFIG_FULOONG) += fuloong2e.o
- obj-$(CONFIG_MIPS_CPS) += cps.o
- obj-$(CONFIG_MIPS_BOSTON) += boston.o
+     default:
+-#if 0
+-        printf("malta_fpga_write: Bad register offset 0x" TARGET_FMT_lx "\n",
+-               addr);
+-#endif
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "malta_fpga_write: Bad register addr 0x%"HWADDR_PRIX"\n",
++                      addr);
+         break;
+     }
+ }
 -- 
 2.21.3
 
