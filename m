@@ -2,93 +2,97 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 625E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 09:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4C7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 09:07:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 296502073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 09:06:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6E102073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 09:07:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4jlyScX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 296502073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USVB0tDN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6E102073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdVX9-0007iu-C3
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 05:06:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52152)
+	id 1jdVY9-0000Ij-6v
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 05:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdVWG-0006Rl-QP
- for qemu-devel@nongnu.org; Tue, 26 May 2020 05:05:08 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35349
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdVWG-00064G-30
- for qemu-devel@nongnu.org; Tue, 26 May 2020 05:05:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590483906;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=j8sC3s/38IyhZScGbGQ0qngTZOWWZV429IoCC3J4Crs=;
- b=C4jlyScXwAnGvReVd/+nLl9yQTB59XDTd4wMsAnIH+CRFiW+ktHBJNWCG0dZPUez0OFr11
- wAeEDh7GQ6pvZOMvMfuLlzvcXvN4qu/914SQQeGZ3PCMZItXlPGIg1QjGiB+Phe1u1qawA
- l8wVTI89f9yndbAjlT7jBqIELFgCSt0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-Sj8Ue6d6OqS-YEDeYQugrw-1; Tue, 26 May 2020 05:05:05 -0400
-X-MC-Unique: Sj8Ue6d6OqS-YEDeYQugrw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D586D100961C;
- Tue, 26 May 2020 09:05:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA0AF79C45;
- Tue, 26 May 2020 09:04:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8A57B113864A; Tue, 26 May 2020 11:04:54 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 4/9] qapi/misc: Restrict balloon-related commands to
- machine code
-References: <20200525150640.30879-1-philmd@redhat.com>
- <20200525150640.30879-5-philmd@redhat.com>
- <87eer787tr.fsf@dusky.pond.sub.org>
- <7e926561-c2c3-e815-8518-b283db7c60fd@redhat.com>
-Date: Tue, 26 May 2020 11:04:54 +0200
-In-Reply-To: <7e926561-c2c3-e815-8518-b283db7c60fd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 26 May 2020 10:04:20
- +0200")
-Message-ID: <87mu5v3w3t.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdVWn-0007EF-HP
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 05:05:41 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:33898)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdVWm-0006IK-SQ
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 05:05:41 -0400
+Received: by mail-ej1-x641.google.com with SMTP id l27so858975ejc.1
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 02:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=AaGpGWJIxRyf8KvgXf1g5vnImU0jWseT1eVif382Tus=;
+ b=USVB0tDNuDrHzhIreWLHqUtpB532HuBkwo//INkeoRCXEQh7eOKerKk1R2qiOJIO/V
+ XINyvTAQgNYjkBx8RqOW0AqBV+nLX4+1KdSYV4oMPhU+IUcBKeUcYl4GGYSomuXuaaHZ
+ YJKDcA1OjVWJBs74xhk5C4LmH/5Y53rWD44SpzJGwLmew50ajUCN+lBqVI5OGdO2m7dJ
+ ShI9i14XZGPGAnfJzEi9EbuJdyS4RgmeMNS/e6o8jPG0mw/kZpILg/Dcxrulp8y0U1Jm
+ bOIJGsg2M0tXYWs2IstTFq0mfyEkEJ268p4WiN+AODl3NmGckxsXaQm671X8SRWS3oUC
+ Sm7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=AaGpGWJIxRyf8KvgXf1g5vnImU0jWseT1eVif382Tus=;
+ b=mEAUQ7zmGZcMAf+9lP5g4X4WIbEiZ707V7Ope9Zyj4F+qpaUBHzBy7hlJl5T4/wvK5
+ pv/ggUsOJJktQevOH15WpVhobTq0Gl5Zihlj5smG7HOtPGPFepPOPXZ9ZJwbtkJb/j5g
+ BSdzo9mzQvx8Qp5A0FxqnsOfAg2pNgWrAzEOY4bgyXnd3lbBblqVOjGJbCcOhJi0hzSA
+ osn+QpVycwYi5AgXRKZcMVHFshctf9px2ukrywRx5avuS9Z3+JWe0U+JWTbWeCT9aSrp
+ wuVT9p1tMfWzK/8/+dOz44IyoGshkhTJ5eZc6qf/pDe9NJI4aFf0JfX24U7vxO/q+seR
+ cKfg==
+X-Gm-Message-State: AOAM530Xqu/+ynAopB9Ws6oHa/z/JqP2DY8TkpSnquptToORxCi+HEYS
+ O3LMTlFMk0/8ajLvfq2Xf3k=
+X-Google-Smtp-Source: ABdhPJxpmldVjdB1yKOwYB06dSsb0MfoISpIV5fCAm5/u8GejvDw+DllAQ9zLaNsn1U99XLH73KIUg==
+X-Received: by 2002:a17:906:2cc2:: with SMTP id
+ r2mr216795ejr.269.1590483939227; 
+ Tue, 26 May 2020 02:05:39 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id s19sm15630242edx.92.2020.05.26.02.05.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 May 2020 02:05:38 -0700 (PDT)
+Subject: Re: [PATCH 0/2] tests/qtest/fuzz: Avoid QTest serialization
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200526055820.12999-1-f4bug@amsat.org>
+ <20200526085609.GA766304@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0e3f6528-b26e-6b5b-be23-f7cf79c216f5@amsat.org>
+Date: Tue, 26 May 2020 11:05:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 00:48:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200526085609.GA766304@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,43 +105,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S.
- Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Alexander Bulekov <alxndr@bu.edu>,
+ Bandan Das <bsd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+On 5/26/20 10:56 AM, Stefan Hajnoczi wrote:
+> On Tue, May 26, 2020 at 07:58:18AM +0200, Philippe Mathieu-Daudé wrote:
+>> Hi Alexander,
+>>
+>> I forgot to share these 2 patches wrote before
+>> the direct MemoryRegion fuzzer sent yesterday.
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+>> Philippe Mathieu-Daudé (2):
+>>   tests/qtest/fuzz: Avoid QTest ioport serialization
+>>   tests/qtest/fuzz: Avoid QTest mmio serialization
+>>
+>>  tests/qtest/fuzz/i440fx_fuzz.c      | 19 +++++++++++++------
+>>  tests/qtest/fuzz/virtio_net_fuzz.c  |  6 ++++--
+>>  tests/qtest/fuzz/virtio_scsi_fuzz.c |  6 +++++-
+>>  3 files changed, 22 insertions(+), 9 deletions(-)
+> 
+> Will it still be possible to print qtest reproducer commands when a
+> crash is found?
 
-> On 5/26/20 9:38 AM, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>=20
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>=20
->> A brief note on why restricting "to machine code" is useful would be
->> nice.  Same for the other patches.
->>=20
->> Acked-by: Markus Armbruster <armbru@redhat.com>
->>=20
->
-> What about this?
->
-> "QEMU can do system-mode and user-mode emulation.
-> Only system mode emulate a machine.
-> Remove this feature from the user-mode emulation."
+Yes, there is no change in the corpus format.
 
-Is is a feature of user-mode emulation before the patch?  Or is it just
-dead code?
+> 
+> Other than this concern, higher fuzzing rates would be great.
 
-Hint: QMP commands tend to be dead code when the program doesn't expose
-a QMP monitor :)
+Thanks,
 
+Phil.
 
