@@ -2,122 +2,82 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D368DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA619C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98EFC20704
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8038F20704
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:24:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="il63u3rs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EFC20704
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fg27oQAb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8038F20704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdTwc-0004Eg-Qu
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 03:24:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41382)
+	id 1jdTwq-0004Tp-PE
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 03:24:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdTvd-0003K8-Nz
- for qemu-devel@nongnu.org; Tue, 26 May 2020 03:23:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39255
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jdTvm-0003XS-P6
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:23:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47792
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdTvc-00055G-II
- for qemu-devel@nongnu.org; Tue, 26 May 2020 03:23:13 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jdTvm-000571-0i
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:23:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590477791;
+ s=mimecast20190719; t=1590477801;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hTIBnrew/94g2Ur7ADjImWIlPx+Vsi8rsN+UE5XrAyQ=;
- b=il63u3rsX3qMtpy7+6CnXJoezbFCB2UnATlcVdrgFxC3qTYvrL9YCmMVX7/FmNmFSioM9i
- oKM2BS27oYaC9vjtT2C1pv+54WvUorrMq5n40G77VsJKROg7CnozEwauXN2n9GSoMyvj9l
- hvkQi2VeeqYKzWmMdcJzLTC/ibC1ehk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-mcA_K-O-MPetOhsx_JeGeA-1; Tue, 26 May 2020 03:23:10 -0400
-X-MC-Unique: mcA_K-O-MPetOhsx_JeGeA-1
-Received: by mail-wr1-f71.google.com with SMTP id l18so4304726wrm.0
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 00:23:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=hTIBnrew/94g2Ur7ADjImWIlPx+Vsi8rsN+UE5XrAyQ=;
- b=fHtztyrRgEDtfsugeCmxXzS1qTd+Wn7MHScsT+eQTBA5MZijXhibz8eb76hTpMrLeD
- 5SvtqypTTFxAKB4+9VzTRNie/Xwhj9KypG3eNH2253dguVZoImGS7vYxB29eeY+cLgXX
- 9bTjhscHq827xFoMcNit8MKPV+G2y5jVnQBIt++wj8Xzs2weV2vdJg66DOzWWyNKJ39+
- 1RCqzEKy8+m33fd8k1pHXsePt0eIoxKij3240eKetW+mN72bJstN00AhtDr2kgn/QO+c
- u5W/8Xv0cyl/ZPmCiiphTsEo47PyiBsGg1VMQrQPfcmsHRl3LJmC0tswAF43tMEnm4Lg
- lZTw==
-X-Gm-Message-State: AOAM533mYjKndTZB4/Io6RbFJK7AWyrdfxjeQJJdHgsrBIHmSJB2kw70
- 8Q7DHvEklwpELJonHLBvT+fWti49zmslkMemt8zVjQDdVvdW8fi/PJyLrkeffIvrIbYUHMsZWK2
- o56XdaJlr++Qezw8=
-X-Received: by 2002:adf:e744:: with SMTP id c4mr20254661wrn.71.1590477788932; 
- Tue, 26 May 2020 00:23:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNLq9BE3yW+LCEx8tAyjJa8yWpmb9lpyDZdrDkT0xDHbwBbCyLetyv34/Cbd1FuCI5chUnmA==
-X-Received: by 2002:adf:e744:: with SMTP id c4mr20254613wrn.71.1590477788592; 
- Tue, 26 May 2020 00:23:08 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id a15sm9136260wra.86.2020.05.26.00.23.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 00:23:07 -0700 (PDT)
-Subject: Re: [PATCH v3 1/9] target/i386: Restrict X86CPUFeatureWord to X86
- targets
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200525150640.30879-1-philmd@redhat.com>
- <20200525150640.30879-2-philmd@redhat.com>
- <87o8qb8aab.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <8590aa71-d8a5-4aa8-3672-e1ccfa96bcbd@redhat.com>
-Date: Tue, 26 May 2020 09:23:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=Af9OWCxiLuUmfuDth/SgRGvS12HJr+d02hiZGS+ph30=;
+ b=Fg27oQAbrY4jzb6gmBMlaTusOv21c+SIq0fERzHyhJ0pn12vg6mRsoWPpLP8T/frdPuVl9
+ JQJ7bkYWUg0i5qxH8O6EUIakjYkwrysFPhHwRISb78b5WiM3QqlG6cmnMeGHDJUQFJ3M2z
+ nhlIUe+f6SnSpP/AzrwW92EkUWu4N34=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-GsmL1c1LPqS0E2QZTHrncw-1; Tue, 26 May 2020 03:23:19 -0400
+X-MC-Unique: GsmL1c1LPqS0E2QZTHrncw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 263E1107ACF2;
+ Tue, 26 May 2020 07:23:18 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-138.ams2.redhat.com [10.36.112.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46BDE5D9E5;
+ Tue, 26 May 2020 07:23:15 +0000 (UTC)
+Subject: Re: [PATCH] hw/display/omap_dss: Replace fprintf() call by
+ qemu_log_mask(LOG_UNIMP)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200524103833.8188-1-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2b9ed3fc-2f57-7202-0c15-52de18fc890c@redhat.com>
+Date: Tue, 26 May 2020 09:23:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <87o8qb8aab.fsf@dusky.pond.sub.org>
+In-Reply-To: <20200524103833.8188-1-f4bug@amsat.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:19:28
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 00:48:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -138,222 +98,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- David Hildenbrand <david@redhat.com>, Peter Lieven <pl@kamp.de>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Alexander Bulekov <alxndr@bu.edu>,
+ qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/26/20 8:45 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+On 24/05/2020 12.38, Philippe Mathieu-Daudé wrote:
+> Replace fprintf() call by qemu_log_mask(LOG_UNIMP), which is
+> disabled by default. This avoid flooding the terminal when
+> fuzzing the device.
 > 
->> Move out x86-specific structures from generic machine code.
->>
->> Acked-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  qapi/machine-target.json   | 45 ++++++++++++++++++++++++++++++++++++++
->>  qapi/machine.json          | 42 -----------------------------------
->>  target/i386/cpu.c          |  2 +-
->>  target/i386/machine-stub.c | 22 +++++++++++++++++++
->>  target/i386/Makefile.objs  |  3 ++-
->>  5 files changed, 70 insertions(+), 44 deletions(-)
->>  create mode 100644 target/i386/machine-stub.c
->>
->> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
->> index f2c82949d8..fb7a4b7850 100644
->> --- a/qapi/machine-target.json
->> +++ b/qapi/machine-target.json
->> @@ -3,6 +3,51 @@
->>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>  # See the COPYING file in the top-level directory.
->>  
->> +##
->> +# @X86CPURegister32:
->> +#
->> +# A X86 32-bit register
->> +#
->> +# Since: 1.5
->> +##
->> +{ 'enum': 'X86CPURegister32',
->> +  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ],
->> +  'if': 'defined(TARGET_I386)' }
->> +
->> +##
->> +# @X86CPUFeatureWordInfo:
->> +#
->> +# Information about a X86 CPU feature word
->> +#
->> +# @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
->> +#
->> +# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
->> +#                   feature word
->> +#
->> +# @cpuid-register: Output register containing the feature bits
->> +#
->> +# @features: value of output register, containing the feature bits
->> +#
->> +# Since: 1.5
->> +##
->> +{ 'struct': 'X86CPUFeatureWordInfo',
->> +  'data': { 'cpuid-input-eax': 'int',
->> +            '*cpuid-input-ecx': 'int',
->> +            'cpuid-register': 'X86CPURegister32',
->> +            'features': 'int' },
->> +  'if': 'defined(TARGET_I386)' }
->> +
->> +##
->> +# @DummyForceArrays:
->> +#
->> +# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internally
->> +#
->> +# Since: 2.5
->> +##
->> +{ 'struct': 'DummyForceArrays',
->> +  'data': { 'unused': ['X86CPUFeatureWordInfo'] },
->> +  'if': 'defined(TARGET_I386)' }
->> +
->>  ##
->>  # @CpuModelInfo:
->>  #
->> diff --git a/qapi/machine.json b/qapi/machine.json
->> index ff7b5032e3..1fe31d374c 100644
->> --- a/qapi/machine.json
->> +++ b/qapi/machine.json
->> @@ -511,48 +511,6 @@
->>     'dst': 'uint16',
->>     'val': 'uint8' }}
->>  
->> -##
->> -# @X86CPURegister32:
->> -#
->> -# A X86 32-bit register
->> -#
->> -# Since: 1.5
->> -##
->> -{ 'enum': 'X86CPURegister32',
->> -  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ] }
->> -
->> -##
->> -# @X86CPUFeatureWordInfo:
->> -#
->> -# Information about a X86 CPU feature word
->> -#
->> -# @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
->> -#
->> -# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
->> -#                   feature word
->> -#
->> -# @cpuid-register: Output register containing the feature bits
->> -#
->> -# @features: value of output register, containing the feature bits
->> -#
->> -# Since: 1.5
->> -##
->> -{ 'struct': 'X86CPUFeatureWordInfo',
->> -  'data': { 'cpuid-input-eax': 'int',
->> -            '*cpuid-input-ecx': 'int',
->> -            'cpuid-register': 'X86CPURegister32',
->> -            'features': 'int' } }
->> -
->> -##
->> -# @DummyForceArrays:
->> -#
->> -# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internally
->> -#
->> -# Since: 2.5
->> -##
->> -{ 'struct': 'DummyForceArrays',
->> -  'data': { 'unused': ['X86CPUFeatureWordInfo'] } }
->> -
->>  ##
->>  # @NumaCpuOptions:
->>  #
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 7a4a8e3847..832498c723 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -37,7 +37,7 @@
->>  #include "qemu/option.h"
->>  #include "qemu/config-file.h"
->>  #include "qapi/error.h"
->> -#include "qapi/qapi-visit-machine.h"
->> +#include "qapi/qapi-visit-machine-target.h"
->>  #include "qapi/qapi-visit-run-state.h"
->>  #include "qapi/qmp/qdict.h"
->>  #include "qapi/qmp/qerror.h"
->> diff --git a/target/i386/machine-stub.c b/target/i386/machine-stub.c
->> new file mode 100644
->> index 0000000000..cb301af057
->> --- /dev/null
->> +++ b/target/i386/machine-stub.c
->> @@ -0,0 +1,22 @@
->> +/*
->> + * QAPI x86 CPU features stub
->> + *
->> + * Copyright (c) 2020 Red Hat, Inc.
->> + *
->> + * Author:
->> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + * SPDX-License-Identifier: GPL-2.0-or-later
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qapi/qapi-visit-machine-target.h"
->> +
->> +void visit_type_X86CPUFeatureWordInfoList(Visitor *v, const char *name,
->> +                                      X86CPUFeatureWordInfoList **obj,
->> +                                      Error **errp)
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/display/omap_dss.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Unusual indentation.
-> 
->> +{
->> +}
-> 
-> Two kinds of stubs: stubs that can get called, and stubs that exist only
-> to satisfy the linker.  Which kind is this one?
+> diff --git a/hw/display/omap_dss.c b/hw/display/omap_dss.c
+> index 32dc0d6aa7..21fde58a26 100644
+> --- a/hw/display/omap_dss.c
+> +++ b/hw/display/omap_dss.c
+> @@ -619,7 +619,7 @@ static void omap_rfbi_transfer_start(struct omap_dss_s *s)
+>      if (s->rfbi.control & (1 << 1)) {				/* BYPASS */
+>          /* TODO: in non-Bypass mode we probably need to just assert the
+>           * DRQ and wait for DMA to write the pixels.  */
+> -        fprintf(stderr, "%s: Bypass mode unimplemented\n", __func__);
+> +        qemu_log_mask(LOG_UNIMP, "%s: Bypass mode unimplemented\n", __func__);
+>          return;
+>      }
 
-I suppose "stubs that exist only to satisfy the linker" must abort if
-ever called...
-
-> 
->> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
->> index 48e0c28434..1cdfc9f50c 100644
->> --- a/target/i386/Makefile.objs
->> +++ b/target/i386/Makefile.objs
->> @@ -17,6 +17,7 @@ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-posix.o
->>  endif
->>  obj-$(CONFIG_HVF) += hvf/
->>  obj-$(CONFIG_WHPX) += whpx-all.o
->> -endif
->> +endif # CONFIG_SOFTMMU
->>  obj-$(CONFIG_SEV) += sev.o
->>  obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
->> +obj-$(call lnot,$(CONFIG_SOFTMMU)) += machine-stub.o
-> 
-> Suggest
-> 
->    ifeq ($(CONFIG_SOFTMMU),y)
->    ...
->    else
->    obj-y += machine-stub.o
->    endif
-> 
-> Matter of taste.
-> 
-
-OK
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
