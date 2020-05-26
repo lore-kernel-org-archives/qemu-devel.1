@@ -2,86 +2,100 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8224C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CDEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FBE62084C
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B436207CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 13:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OD/9EKbQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FBE62084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s+nXypRJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B436207CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdZT5-0006nr-LY
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55310)
+	id 1jdZWN-000091-Ht
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 09:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdZSW-0006HI-Va
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:17:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21924
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jdZSW-0003FU-3u
- for qemu-devel@nongnu.org; Tue, 26 May 2020 09:17:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590499050;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=H60CR2bumLUrZNbHAeSdtxU4wvH05jUxOQC8+WODwqE=;
- b=OD/9EKbQTq05bWHWZL2nZ4TGW80CXoEiGrHcxhlfmbEw8oKXEfbHZc2pPFcNmQYXHX40/6
- +ItzrjKX9gvJPhnpo8F/Jh+o5rfgxNqMEyeJ3nwM6mZlVYf4ZDsEFsdzuT6xw9+icx6RGZ
- h3S2IJpK6+GUdO6yBEZsTXvhAQSZOFs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-hpHn6f7sMeqAiTq33X5wQQ-1; Tue, 26 May 2020 09:17:29 -0400
-X-MC-Unique: hpHn6f7sMeqAiTq33X5wQQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F576461
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 13:17:28 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F13319D61;
- Tue, 26 May 2020 13:17:26 +0000 (UTC)
-Date: Tue, 26 May 2020 15:17:24 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Michal Privoznik <mprivozn@redhat.com>
-Subject: Re: [PATCH v2 2/2] qmp: Expose MachineClass::default_ram_id
-Message-ID: <20200526151724.37b6fe63@redhat.com>
-In-Reply-To: <9384422f63fe594a54d801f9cb4539b1d2ce9b67.1590481402.git.mprivozn@redhat.com>
-References: <cover.1590481402.git.mprivozn@redhat.com>
- <9384422f63fe594a54d801f9cb4539b1d2ce9b67.1590481402.git.mprivozn@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdZVJ-0007yA-O1
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:20:25 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:35395)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jdZVI-0003tz-Ql
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 09:20:25 -0400
+Received: by mail-ed1-x543.google.com with SMTP id be9so17624355edb.2
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 06:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zNS5pllvNuW6vOVdMC3Q5yI0uFFsp0HH+3GKgpUmxdU=;
+ b=s+nXypRJ7Z8T7wXT1s+ua79V8A5+OjIek2b3UJwput8Pc/eF1fwS23GxaFAyTEDRKD
+ IAuriZ486HjLvg/CFsvrD/WVR1glZaAGHnCLCyzhqYo3Ts8GlJJ8BIyFQgAFOslGOxnu
+ wBBT9VSM+oLv6dAPFGlmkzYWl9ioH+3O6ae2kYuSIc54cFsWve2vTUUuXxb+K/lXngVj
+ +S3A1j1hg5gDUPCXj2x4zb7fb2meY94PfR9Ikc9gEno8w8csLC58nx750GdnTJ5o1tzt
+ 3uxu7BTJVPDXlhpoAFvSi7tsqn7m+InMvsZt1DQ5sO0y08ZDZmKji9DJqsKslJIZjo7Y
+ K3zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zNS5pllvNuW6vOVdMC3Q5yI0uFFsp0HH+3GKgpUmxdU=;
+ b=GrNrbBeqPUeP3A6WxYNGkhOMOC4dPE2nN3991WBG43u6brSJ0AuDEOZYd9zZcOQqTv
+ Ps/uNy9u7sd4JeXVTUgeFrB671p9X00mGr0sr+EeJ93zTDpVMkOfAROfoottwExo3/aD
+ kjQS5bJD70b53aspvCPXqFiVxE7Sr4DTMxA2iqYFl4sEPX+m4WIuFcRi5XeB16qRd4pC
+ 57gX0/2zYxhGG/hDfDPs3a2T0UkrERRQNqHoPgy6iUwnSY91iwRkd2Cz948GBcamJ0PK
+ 8Rl3tiAfage5BTeiw73CEt+2+0yygSSBJTO061YCSqFS9tlTdG8qrxYYb7P0MHZrFDYF
+ bSpQ==
+X-Gm-Message-State: AOAM532qwB8Ea3Dq8pQwYtUMb/q6EZGTURrCxF7fuRNSM4CLIk6KATdh
+ 2fP7py+GlcbMCUberoVyQvc=
+X-Google-Smtp-Source: ABdhPJzsarsnjbLkDtQIat1CcnhBLE01u40rFcIDtUjk3clSVc/zFDzgk/rAcWJv35WLntjzQlDvJA==
+X-Received: by 2002:a05:6402:cb1:: with SMTP id
+ cn17mr19462007edb.382.1590499223303; 
+ Tue, 26 May 2020 06:20:23 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id f13sm19065735edk.36.2020.05.26.06.20.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 May 2020 06:20:22 -0700 (PDT)
+Subject: Re: [PATCH 00/14] hw/mips: patch queue for 2020-05-26
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
+References: <20200526104726.11273-1-f4bug@amsat.org>
+ <CAHiYmc7_Td7hCPbkboMUZpy5HQH47DR1Jh-ux9t7MW+kt=o6Eg@mail.gmail.com>
+ <CAHiYmc5ir9JDULc2ssNLx+DQZ7jm7oY_UxYiotHV4Yh+pJH7vw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d343aa59-625e-28c4-315d-aab79d668a95@amsat.org>
+Date: Tue, 26 May 2020 15:20:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAHiYmc5ir9JDULc2ssNLx+DQZ7jm7oY_UxYiotHV4Yh+pJH7vw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,67 +108,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, libvir-list@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Huacai Chen <chenhc@lemote.com>, Thomas Huth <thuth@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 26 May 2020 10:25:35 +0200
-Michal Privoznik <mprivozn@redhat.com> wrote:
-
-> If a management application (like Libvirt) want's to preserve
-> migration ability and switch to '-machine memory-backend' it
-> needs to set exactly the same RAM id as QEMU would. Since the id
-> is machine type dependant, expose it under 'query-machines'
-> result. Some machine types don't have the attribute set (riscv
-> family for example), therefore the QMP attribute must be
-> optional.
+On 5/26/20 3:14 PM, Aleksandar Markovic wrote:
+> уто, 26. мај 2020. у 13:06 Aleksandar Markovic
+> <aleksandar.qemu.devel@gmail.com> је написао/ла:
+>>
+>> уто, 26. мај 2020. у 12:47 Philippe Mathieu-Daudé <f4bug@amsat.org> је
+>> написао/ла:
+>>>
+>>> Hi,
+>>>
+>>> This is the current state of my hw/mips/next tree.
+>>>
+>>> - MAINTAINERS updated to welcome Huacai Chen and Jiaxun Yang,
+>>>   and update Aleksandar Rikalo's email address,
+>>>
+>>> - Trivial improvements in the Bonito64 North Bridge and the
+>>>   Fuloong 2e machine,
+>>>
+>>> - MIPS Machines names unified without 'mips_' prefix.
+>>>
+>>> The following patches need review:
+>>>
+>>> - #6  "hw/pci-host/bonito: Map the different PCI ranges more detailled"
+>>> - #10 "hw/mips/fuloong2e: Fix typo in Fuloong machine name"
+>>>
+>>
+>> I agreed with these two patches, thanks for your help, patch 6 looks
+>> much better now.
+>>
+>> Hope you will be able to send pull request sooner rather than later.
+>> Please work with Gerd to speed up the process, resolving the
+>> dependencies efficiently.
+>>
 > 
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/core/machine-qmp-cmds.c | 4 ++++
->  qapi/machine.json          | 5 ++++-
->  2 files changed, 8 insertions(+), 1 deletion(-)
+> Hi, Gerd,
 > 
-> diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-> index 2c5da8413d..3e11a740c9 100644
-> --- a/hw/core/machine-qmp-cmds.c
-> +++ b/hw/core/machine-qmp-cmds.c
-> @@ -238,6 +238,10 @@ MachineInfoList *qmp_query_machines(Error **errp)
->              info->default_cpu_type = g_strdup(mc->default_cpu_type);
->              info->has_default_cpu_type = true;
->          }
-> +        if (mc->default_ram_id) {
-> +            info->default_ram_id = g_strdup(mc->default_ram_id);
-> +            info->has_default_ram_id = true;
-> +        }
->  
->          entry = g_malloc0(sizeof(*entry));
->          entry->value = info;
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 39caa1d914..76c1606390 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -355,13 +355,16 @@
->  # @default-cpu-type: default CPU model typename if none is requested via
->  #                    the -cpu argument. (since 4.2)
->  #
-> +# @default-ram-id: the default ID of initial RAM memory backend (since 5.1)
-> +#
->  # Since: 1.2.0
->  ##
->  { 'struct': 'MachineInfo',
->    'data': { 'name': 'str', '*alias': 'str',
->              '*is-default': 'bool', 'cpu-max': 'int',
->              'hotpluggable-cpus': 'bool',  'numa-mem-supported': 'bool',
-> -            'deprecated': 'bool', '*default-cpu-type': 'str' } }
-> +            'deprecated': 'bool', '*default-cpu-type': 'str',
-> +            '*default-ram-id': 'str' } }
->  
->  ##
->  # @query-machines:
+> My understanding is that a rather trivial issue (removing an #include)
+> from a mips-specific file, makes your potential pull request, and this
+> Philippe's pull request dependent between themself. I think actually
+> Philippe is waiting for your pull request to be sent and applied.
+> Could you update us on the planned timing of your pull request?
 
+Don't worry, Gerd sent his pullreq and Peter is testing it. I'm waiting
+Peter's testing done to rebase/send. No hurry anyway ;)
+
+> 
+> Thanks,
+> Aleksandar
+> 
+> P.S Too bad such trivial issues from time to time cause stalls in our
+> workflows, but I guess it is sometimes unavoidable, and we have to
+> live with that.
+> 
+> 
+>> Yours,
+>> Aleksandar
+>>
+>>
+>>
+>>
+>>> Aleksandar Markovic (3):
+>>>   hw/mips: Rename malta/mipssim/r4k/jazz files
+>>>   hw/mips/malta: Add some logging for bad register offset cases
+>>>   MAINTAINERS: Change Aleksandar Rikalo's email address
+>>>
+>>> Huacai Chen (1):
+>>>   MAINTAINERS: Add Huacai Chen as fuloong2e co-maintainer
+>>>
+>>> Philippe Mathieu-Daudé (10):
+>>>   hw/pci-host: Use CONFIG_PCI_BONITO to select the Bonito North Bridge
+>>>   hw/pci-host/bonito: Fix DPRINTF() format strings
+>>>   hw/pci-host/bonito: Map peripheral using physical address
+>>>   hw/pci-host/bonito: Map all the Bonito64 I/O range
+>>>   hw/pci-host/bonito: Map the different PCI ranges more detailled
+>>>   hw/pci-host/bonito: Better describe the I/O CS regions
+>>>   hw/pci-host/bonito: Set the Config register reset value with
+>>>     FIELD_DP32
+>>>   hw/mips/fuloong2e: Move code and update a comment
+>>>   hw/mips/fuloong2e: Fix typo in Fuloong machine name
+>>>   hw/mips/mips_int: De-duplicate KVM interrupt delivery
+>>>
+>>>  docs/system/deprecated.rst               |  5 ++
+>>>  docs/system/target-mips.rst              |  2 +-
+>>>  default-configs/mips64el-softmmu.mak     |  2 +-
+>>>  hw/isa/vt82c686.c                        |  2 +-
+>>>  hw/mips/{mips_fulong2e.c => fuloong2e.c} | 48 ++++++-------
+>>>  hw/mips/{mips_jazz.c => jazz.c}          |  0
+>>>  hw/mips/{mips_malta.c => malta.c}        | 14 ++--
+>>>  hw/mips/mips_int.c                       | 11 +--
+>>>  hw/mips/{mips_mipssim.c => mipssim.c}    |  0
+>>>  hw/mips/{mips_r4k.c => r4k.c}            |  0
+>>>  hw/pci-host/bonito.c                     | 87 +++++++++++++++++++-----
+>>>  tests/qtest/endianness-test.c            |  2 +-
+>>>  .mailmap                                 |  3 +-
+>>>  MAINTAINERS                              | 26 +++----
+>>>  hw/mips/Kconfig                          |  3 +-
+>>>  hw/mips/Makefile.objs                    | 10 +--
+>>>  hw/pci-host/Kconfig                      |  5 ++
+>>>  hw/pci-host/Makefile.objs                |  2 +-
+>>>  18 files changed, 142 insertions(+), 80 deletions(-)
+>>>  rename hw/mips/{mips_fulong2e.c => fuloong2e.c} (91%)
+>>>  rename hw/mips/{mips_jazz.c => jazz.c} (100%)
+>>>  rename hw/mips/{mips_malta.c => malta.c} (99%)
+>>>  rename hw/mips/{mips_mipssim.c => mipssim.c} (100%)
+>>>  rename hw/mips/{mips_r4k.c => r4k.c} (100%)
+>>>
+>>> --
+>>> 2.21.3
+>>>
+> 
 
