@@ -2,90 +2,90 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B07C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE0C720787
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:46:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C2532068D
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qrbcyZLB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0C720787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HVBr3Bsr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C2532068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdUIX-0001bl-V1
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 03:46:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43760)
+	id 1jdUJ2-0002be-Al
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 03:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdUHA-0008MQ-Js
- for qemu-devel@nongnu.org; Tue, 26 May 2020 03:45:28 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35780)
+ id 1jdUGc-0007F0-BY
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:44:54 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40335)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdUH9-0000P3-WD
- for qemu-devel@nongnu.org; Tue, 26 May 2020 03:45:28 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n5so2263203wmd.0
- for <qemu-devel@nongnu.org>; Tue, 26 May 2020 00:45:27 -0700 (PDT)
+ id 1jdUGb-0000AD-Nr
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:44:54 -0400
+Received: by mail-wm1-x342.google.com with SMTP id r15so1995271wmh.5
+ for <qemu-devel@nongnu.org>; Tue, 26 May 2020 00:44:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=pXXDynFGIl09r/hiWIK2esYQrjIPZTwOjj1QaED/tqk=;
- b=qrbcyZLB5prDsumDTD7JAAMwociXC6KlIp/MpHUK/ZOVJjKf5mkY7KyLNsg281na59
- Z9CWuwoqAj43XghkRJsiIEDnfix8TvNv5/e5yr3p7ocH0OrPvIU5tUbO+PJEOwDxUphh
- DnfVzinZAQvWIC565c12dgwCP+d4mRr0GuZQUmPMPe4GP8ILF9n7gVDUKu6h0EHnTOWJ
- rBTBRN/kebW8XA8+h6ixASGWQSOlFAouFVh2exFf0d7KRxtp7Gqn/P8lah1WynPFGgdt
- PHRZQ55q76nn/iIC50MLfW3GWNF1DquLmbvoHrsh+Qf+ekTT+41XrU9EUMAWPvlD8zh+
- DUHQ==
+ bh=jS61tJlHZiFmME9R10JS8InkHphE33vjnBCN0Mc2K70=;
+ b=HVBr3Bsr/ZZ+KP/B1Y0tzyYtZj4KplaOuVWqI4/9BTUNgUkyqmsPPnGgxifQENodny
+ Rdoa7xoAXdet8v4rt0G1mJeYqlDky5RIFGZQ1vAz8iRYBCO1wFtoR055vxbcYpS/I0kC
+ e84EJAb2ZhqcNY3ywb8rtwW+FDs6aEkeSuOGeG3NqyLFWymMhahTTJe08B1wCTqjl96K
+ 6R5uVNIkC5h9xctZy6yfRLHW8HpoLOra40KBFNlNT5/J22POlDEdUtjSwzdAhR7UpOl8
+ vu4uqsMtobGa8sOxDvwFsW5Jj4D4mga9ze7tAmqGaJuoXjS0PnIeUxzOqZSBjyjsmqRK
+ Ziyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=pXXDynFGIl09r/hiWIK2esYQrjIPZTwOjj1QaED/tqk=;
- b=kpC+drCpC8mYdtOSCP8uS1mvh7qdhU1+huJP17dPmbD0rJWz+ytDg2lnQCbVbOsJhL
- TCLl7ncSra4FuY1yoP/VgdhSco6swZ2nRkAs4kjBnk8KZL6eHu2UY/FPwTFK5b2KLJzs
- yR9sX7v4x6kMOgoo0pWAefW6LjLCql6aDQsN5Vy8s9Y7GJTDnTexzpcctPHb8Lp/rGFo
- 7qAgWoDnuBrGLwTLcdAPhd9kfBeNFDomxsct7fguA5NLFUgjJ5YF8otlGcZJVFWSXGU6
- q3r38d4mdldT+yr/R50uMNpugWILAvQlhdRR6j9sWT1aaTK/3NCe/uel5pn5NvTBAIhx
- 6a3g==
-X-Gm-Message-State: AOAM533lN9jRhh/0F+CySojIlWqIFISpXHS9vEwRpCWyjbXO8sB7eHrJ
- /+UrnI114NgeT7cqz3uJTg0=
-X-Google-Smtp-Source: ABdhPJybKJJSwRONLmx5cgxAUUYF18910ZCo05thWHXhXQYiKyqXMkHUYCKrgX1TsIwVyJpTP2jgcQ==
-X-Received: by 2002:a05:600c:228d:: with SMTP id
- 13mr139799wmf.182.1590479126337; 
- Tue, 26 May 2020 00:45:26 -0700 (PDT)
+ bh=jS61tJlHZiFmME9R10JS8InkHphE33vjnBCN0Mc2K70=;
+ b=iRyi9qiooIJXF0HkKlq52xRlK65DI/1TVi42nAThpuGEZ+xa7DHpz6DMRf31cWNE39
+ aI86PxeYuBQUEPLr6mHBKDx+foATPyYw90jHiAPQQtBUsxQZQOJ8qv9LkkRTGdW8OQ+z
+ ds2Cnys9bHd7QRmcdRrBVnWMapM5weiwxvgr5xSmPwRkcsUjiN5PQv3y3Lk+xqEycNoP
+ tRW9AEv3vzRx1i49XjiquItbi+BzwsztDb1Bgwk8ThUNuJygSe85EwotxV9nFVGuLhzv
+ 1vAY8nFXL/wtGDiYJ2W5Si1KprXUVTlcg69w4SoO3iBZDTnA2xIqPC5UG2VjDGrapWTB
+ Mo0g==
+X-Gm-Message-State: AOAM533D+dV/QVdr/Y5lQJgqS4EDdzTwbUnjl8aUkuQDnbpT/7L6Q+l2
+ oqT14e6yMbsSv9ula3nh20o=
+X-Google-Smtp-Source: ABdhPJxRSf4zMou9sD/N3j/fD+ihMW00QSkEAsyyWYFP0K/FEwA5fcWrJkLkgQopaV8WH42n1TVDCQ==
+X-Received: by 2002:a7b:c413:: with SMTP id k19mr139086wmi.124.1590479092466; 
+ Tue, 26 May 2020 00:44:52 -0700 (PDT)
 Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id n6sm20258957wrt.58.2020.05.26.00.45.25
+ by smtp.gmail.com with ESMTPSA id u3sm11742989wrw.89.2020.05.26.00.44.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 26 May 2020 00:45:25 -0700 (PDT)
-Subject: Re: [PATCH] hw/mips/mips_fulong2e: Remove unused 'audio/audio.h'
- include
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Tue, 26 May 2020 00:44:51 -0700 (PDT)
+Subject: Re: [PATCH v6 17/21] MAINTAINERS: Change Aleksandar Rikalo's email
+ address
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  qemu-devel@nongnu.org
-References: <20200515084209.9419-1-f4bug@amsat.org>
+References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
+ <20200518200920.17344-18-aleksandar.qemu.devel@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f007ddaa-d186-af34-b660-a687969a731b@amsat.org>
-Date: Tue, 26 May 2020 09:45:24 +0200
+Message-ID: <ed0ead1b-50a7-3595-d81d-ab3e5419562f@amsat.org>
+Date: Tue, 26 May 2020 09:44:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200515084209.9419-1-f4bug@amsat.org>
+In-Reply-To: <20200518200920.17344-18-aleksandar.qemu.devel@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,35 +108,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: aleksandar.rikalo@syrmia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/20 10:42 AM, Philippe Mathieu-Daudé wrote:
-> The Fuloong machine never had to use "audio/audio.h", remove it.
+On 5/18/20 10:09 PM, Aleksandar Markovic wrote:
+> Aleksandar Rikalo wants to use a different email address from
+> now on.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 > ---
->  hw/mips/mips_fulong2e.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index ef02d54b33..05b9efa516 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -33,7 +33,6 @@
->  #include "hw/mips/mips.h"
->  #include "hw/mips/cpudevs.h"
->  #include "hw/pci/pci.h"
-> -#include "audio/audio.h"
->  #include "qemu/log.h"
->  #include "hw/loader.h"
->  #include "hw/ide/pci.h"
-> 
+>  .mailmap    |  3 ++-
+>  MAINTAINERS | 12 ++++++------
+>  2 files changed, 8 insertions(+), 7 deletions(-)
 
 Thanks, queued to mips-next.
 
