@@ -8,72 +8,73 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65407C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34ABD2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:34:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC3432053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 17:35:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfkMh/xF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34ABD2053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mz5eKXZ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3432053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jddTY-0005Kx-Ck
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
+	id 1jddTi-0005fW-Uf
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 13:35:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jddQr-0002U2-MR; Tue, 26 May 2020 13:32:05 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36484)
+ id 1jddSa-00044s-A3; Tue, 26 May 2020 13:33:52 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:46424)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jddQp-00010i-TV; Tue, 26 May 2020 13:32:05 -0400
-Received: by mail-qk1-x742.google.com with SMTP id 205so8323936qkg.3;
- Tue, 26 May 2020 10:31:57 -0700 (PDT)
+ id 1jddSY-0002mg-Tg; Tue, 26 May 2020 13:33:52 -0400
+Received: by mail-qk1-x744.google.com with SMTP id c12so2559395qkk.13;
+ Tue, 26 May 2020 10:33:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=PN6K5e1tyvrYhrCtBaGYgmQsUJa63MJXQBwAz/mTpnA=;
- b=KfkMh/xFWIimZxCOVVkpGTvqaonAkkcOHs+oK7834EsMXUPFiCjnOUnZs4UP4jhTGE
- nzvCl9pPaap2Wv6hNo66ox1hLn+9Xmh23ZCDzDvRZDZAGMdjHIfQbKh4VdBDhn1LVac3
- d5ZOsSjOL9JIfrrvbzP8A0jFJP+dsaSJtURPYCtGdnQBhuiY8JCDObVfjyqsRHTsTlUq
- ypGog6Pfb6wFxjMKNCHhyb+ShF1248l0ywoGbrQkkq6phhAZ6F30pJh0zMgS34MjXIml
- joSsw99vi3JybQc5JOR5L2KRP8ASs+fRBU2rNUh8G0NyIKdAbEfq7K5Jb6IWf/YSiuBr
- Lqnw==
+ bh=0Dr7A8+ioW84EKnz0a2eSHIkSFmUZeUruSLYmyCx8cE=;
+ b=Mz5eKXZ1c3zs0Uroi1BqXJvHw4z0A/esYHlw17mM+rLGE10B3SqEZU394FoUDi21Wr
+ s1H1ensFarsc9p5dFcGIUzmSW2xbjeiLOOYIOwzTUhxK8QIUo7TF744cW963nX2095nE
+ MhzChYqnpI1ibwin3WoE+2kUH9WWnpAkQ0jPfWNbMjE5qSY//ApiXth8Mpj1ksZNU/Mf
+ 6JhBcMzAbRmqfcK4RoqZlQ+YwsC7Riv6DSGaHZTLSzYUCObveQvqqP0QAIkTgMr4YM+S
+ fJzBCmI/sPgvu0OyK3b8Rq6YmgvIif5tmaK4Wj3ZPpUCyP0Kc096ZhWFZCs6+3hhKwo/
+ F4xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=PN6K5e1tyvrYhrCtBaGYgmQsUJa63MJXQBwAz/mTpnA=;
- b=N0gOQnDo9m25VKRMo4LZ68S1jFPx2rqmtNB0urDJfok7UmNyK0GBBfebQ8wdhzoyte
- xYCN8ZHgBrCjS+YuBuvP8CZlOm24Ga14GuYt3cFOjYuKPJtiWXk1aLB4syvGf0kkKEDn
- iJA5k+hRNm4cKq9bESJ6431KwdYlO2dnn0+KWKfZiNWkKKlrNu4qPbyxsOAq8Jrd/Eyf
- 5dB5uIBnTMr5CFIfMTRF9s46JWAPmnH9gBACuTfXJ8gYHQrUN847HwBioj+QXXJTY+WK
- Z/HlldxQyNu0if1N0/smOro0sN/OVi79FvdMksSAbCi4qD+7Q2+3qM1R8GX+kQULcV8X
- rJJQ==
-X-Gm-Message-State: AOAM530cU2k7bND0TvnJyGzXjqApQBNSyFCI8+jBhv3A4080zXkFW/jg
- 5xOAOCv+HrQKtH01kDwXIcaJWveHVQEHv25eR/I=
-X-Google-Smtp-Source: ABdhPJxdI/1eBoBFFXQiAA55TlaOXRIFWZVxubtUpZ/hFSBOz2VuGJ2XoBND3j1Ebn0PFWERTx+6mcWuPbMnzUdHG7s=
-X-Received: by 2002:a37:96c4:: with SMTP id y187mr2573316qkd.126.1590514316837; 
- Tue, 26 May 2020 10:31:56 -0700 (PDT)
+ bh=0Dr7A8+ioW84EKnz0a2eSHIkSFmUZeUruSLYmyCx8cE=;
+ b=M1eI4tZQGZlwxD1SaFnTADCwziujsBOImBvtFB/o+FJcvP1SR26LbXZaN/39K0q/EV
+ ZkjS2+QWretlxhR160Ue3Nyg6CiHVWhTw6TjlHQ/CglcymmsLLQg+BAlAIR5RPBfYVvi
+ C2K0TplY32tTLlnGEwgyUKx9hvezv+9WU82OdFMOrKVsed3R/Z28BCrQVkuprC60+yix
+ wuMll5qNWNJ6Hqg6Su610oihrH6CxNpxIWUmgzgNQpXWOKqcl98c6RYpVKR+ROntEEkr
+ ux4PYGWcUgnJMeZ0qcZH7lBt560VyBmsIqXf6EoPvn5JXJuSK8IJraw5pJvcYVf2pund
+ MOyw==
+X-Gm-Message-State: AOAM531KKoqvyGVkXgw+GZLvxaTOs3E0xECtp1tkVN/GrZcsMad1MV2C
+ LflK/d5t9bGvcBebhOZB3W6aCk13MPDGm1oNm/s=
+X-Google-Smtp-Source: ABdhPJyzrZEIzFEgdfUEzSz70ZeijYW2LeFpqhO1hMREYhxK6qz2+po/PgcAeXAHwrG9FGaegza+Qj+akYywa6f/e3c=
+X-Received: by 2002:a37:484c:: with SMTP id v73mr2483097qka.496.1590514427871; 
+ Tue, 26 May 2020 10:33:47 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200526062252.19852-1-f4bug@amsat.org>
- <20200526062252.19852-8-f4bug@amsat.org>
-In-Reply-To: <20200526062252.19852-8-f4bug@amsat.org>
+ <20200526062252.19852-10-f4bug@amsat.org>
+In-Reply-To: <20200526062252.19852-10-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 26 May 2020 10:22:57 -0700
-Message-ID: <CAKmqyKNdWM5hwv0aK3tjFh6LSXdgZrUud-idSBp=mhapkkgO-A@mail.gmail.com>
-Subject: Re: [PATCH 07/14] hw/display/dpcd: Fix memory region size
+Date: Tue, 26 May 2020 10:24:49 -0700
+Message-ID: <CAKmqyKNQgnvixD2dqNmzyQTvHiO0TJCWP9DgdyTJCdcFEk76PQ@mail.gmail.com>
+Subject: Re: [PATCH 09/14] hw/display/xlnx_dp: Replace disabled DPRINTF() by
+ error_report()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=alistair23@gmail.com; helo=mail-qk1-x742.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
+ envelope-from=alistair23@gmail.com; helo=mail-qk1-x744.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -108,10 +109,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 11:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+On Mon, May 25, 2020 at 11:29 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
 >
-> The memory region size is 512K.
+> DPRINTF() calls are disabled by default, so when unexpected
+> data is used, the whole process abort without information.
+>
+> Display a bit of information with error_report() before crashing.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -120,30 +124,74 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/display/dpcd.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/display/xlnx_dp.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
 >
-> diff --git a/hw/display/dpcd.c b/hw/display/dpcd.c
-> index 170545c605..0c1b7b35fb 100644
-> --- a/hw/display/dpcd.c
-> +++ b/hw/display/dpcd.c
+> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+> index 3e5fb44e06..8d940cd8d1 100644
+> --- a/hw/display/xlnx_dp.c
+> +++ b/hw/display/xlnx_dp.c
 > @@ -1,5 +1,5 @@
 >  /*
-> - * dpcd.c
-> + * Xilinx Display Port Control Data
+> - * xlnx_dp.c
+> + * Xilinx Display Port
 >   *
 >   *  Copyright (C) 2015 : GreenSocs Ltd
 >   *      http://www.greensocs.com/ , email: info@greensocs.com
-> @@ -137,7 +137,7 @@ static void dpcd_init(Object *obj)
->  {
->      DPCDState *s =3D DPCD(obj);
+> @@ -24,6 +24,7 @@
 >
-> -    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x7FFF=
-F);
-> +    memory_region_init_io(&s->iomem, obj, &aux_ops, s, TYPE_DPCD, 0x8000=
-0);
->      aux_init_mmio(AUX_SLAVE(obj), &s->iomem);
->  }
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+>  #include "hw/display/xlnx_dp.h"
+> @@ -465,7 +466,7 @@ static uint8_t xlnx_dp_aux_pop_tx_fifo(XlnxDPState *s=
+)
+>      uint8_t ret;
+>
+>      if (fifo8_is_empty(&s->tx_fifo)) {
+> -        DPRINTF("tx_fifo underflow..\n");
+> +        error_report("%s: TX_FIFO underflow", __func__);
+>          abort();
+>      }
+>      ret =3D fifo8_pop(&s->tx_fifo);
+> @@ -525,6 +526,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, u=
+int32_t value)
+>          qemu_log_mask(LOG_UNIMP, "xlnx_dp: Write i2c status not implemen=
+ted\n");
+>          break;
+>      default:
+> +        error_report("%s: invalid command: %u", __func__, cmd);
+>          abort();
+>      }
+>
+> @@ -631,8 +633,8 @@ static void xlnx_dp_change_graphic_fmt(XlnxDPState *s=
+)
+>          s->g_plane.format =3D PIXMAN_b8g8r8;
+>          break;
+>      default:
+> -        DPRINTF("error: unsupported graphic format %u.\n",
+> -                s->avbufm_registers[AV_BUF_FORMAT] & DP_GRAPHIC_MASK);
+> +        error_report("%s: unsupported graphic format %u", __func__,
+> +                     s->avbufm_registers[AV_BUF_FORMAT] & DP_GRAPHIC_MAS=
+K);
+>          abort();
+>      }
+>
+> @@ -647,8 +649,8 @@ static void xlnx_dp_change_graphic_fmt(XlnxDPState *s=
+)
+>          s->v_plane.format =3D PIXMAN_x8b8g8r8;
+>          break;
+>      default:
+> -        DPRINTF("error: unsupported video format %u.\n",
+> -                s->avbufm_registers[AV_BUF_FORMAT] & DP_NL_VID_FMT_MASK)=
+;
+> +        error_report("%s: unsupported video format %u", __func__,
+> +                     s->avbufm_registers[AV_BUF_FORMAT] & DP_NL_VID_FMT_=
+MASK);
+>          abort();
+>      }
 >
 > --
 > 2.21.3
