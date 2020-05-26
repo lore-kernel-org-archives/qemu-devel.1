@@ -2,63 +2,85 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE301C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA04C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B323F2078C
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:34:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B323F2078C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id F1FD1206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 15:35:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+wK57S4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FD1206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdbaz-00026m-TL
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48806)
+	id 1jdbcD-0003H2-5W
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 11:35:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jdbaO-0001fT-OI
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:33:48 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:60939)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jdbaN-0007PJ-1y
- for qemu-devel@nongnu.org; Tue, 26 May 2020 11:33:47 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 04QFWuQk031293
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Tue, 26 May 2020 11:32:57 -0400
-Date: Tue, 26 May 2020 11:32:56 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 2/2] tests/qtest/fuzz: Avoid QTest mmio serialization
-Message-ID: <20200526153256.eorfnmfaxkui66q2@mozz.bu.edu>
-References: <20200526055820.12999-1-f4bug@amsat.org>
- <20200526055820.12999-3-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jdbbZ-0002ln-R2
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:35:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41936
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jdbbX-0007iK-Rc
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 11:35:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590507298;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sepANqzkspghmlxghwN3pNV4427hDrEuiKemgIzEQpY=;
+ b=a+wK57S41kG95XH9qXN2gk/2N2av8AUaUj+Al7ftddiF6vql2G4GHxLoA1N4wuA7Xhz2RS
+ D3C+0INN3+/qlrY+8EF+z+4Cmx+kmTa/Zh7C+bDuCtwqUOPkCV5MBSTIaobNjXcp4yWQRK
+ dS8TQ3/08fSMy6kK7aITTTy9rDOLP2E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-LM-dJYAZMP63jygkKAM9jg-1; Tue, 26 May 2020 11:34:54 -0400
+X-MC-Unique: LM-dJYAZMP63jygkKAM9jg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A6CF100CCC0;
+ Tue, 26 May 2020 15:34:53 +0000 (UTC)
+Received: from localhost (ovpn-113-132.ams2.redhat.com [10.36.113.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A80019D7C;
+ Tue, 26 May 2020 15:34:49 +0000 (UTC)
+Date: Tue, 26 May 2020 16:34:48 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: [PATCH 0/4] fuzz: misc changes for oss-fuzz compatability
+Message-ID: <20200526153448.GA6797@stefanha-x1.localdomain>
+References: <20200512030133.29896-1-alxndr@bu.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200512030133.29896-1-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200526055820.12999-3-f4bug@amsat.org>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 10:57:30
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,90 +93,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: darren.kenny@oracle.com, bsd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200526 0758, Philippe Mathieu-Daudé wrote:
-> We don't need to serialize over QTest chardev when we can
-> directly access the MMIO address space via the first
-> registered CPU view.
-> 
-> virtio-net-socket gets ~50% performance improvement.
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-One option might be to write alternate (direct) implemtations for
-qtest_out*, qtest_write*, qest_read*, qtest_bufread, qtest_bufwrite and
-qtest_memset. Maybe these could even go into qtest.c, alleviating some
-of the complexity of qtest_process_command(). Then there can be
-a preprocessor option to link against libqtest or against the direct
-access functions. In the case of qos-based virtio and scsi fuzzers
-below, this would also mean that abstract functions such as
-qvirtqueue_add would also go through the direct access layer, instead of
-mixing direct access and qtest commands.
+On Mon, May 11, 2020 at 11:01:29PM -0400, Alexander Bulekov wrote:
+> Hello,
+> With these patches, the fuzzer passes the oss-fuzz build checks.
+> There are also some miscelanous improvement to the fuzzer, in general:
+>  * If building for oss-fuzz, check executable_dir/pc-bios for
+>    the bios images
+>  * Fix a typo in the i440fx-qtest-reboot argument which resulted in an
+>    invalid argument to qemu_main
+>  * Add an alternate name to resolve libfuzzer's internal fuzzer::TPC
+>    object at link-time
+>  * For all fork-based fuzzers, run the main-loop in the parent, to
+>    prevent the clock from running far-ahead of the previous main-loop.
+> -Alex
+>=20
+> Alexander Bulekov (4):
+>   fuzz: add datadir for oss-fuzz compatability
+>   fuzz: fix typo in i440fx-qtest-reboot arguments
+>   fuzz: add mangled object name to linker script
+>   fuzz: run the main-loop in fork-server process
+>=20
+>  include/sysemu/sysemu.h             |  2 ++
+>  softmmu/vl.c                        |  2 +-
+>  tests/qtest/fuzz/fork_fuzz.ld       |  5 +++++
+>  tests/qtest/fuzz/fuzz.c             | 15 +++++++++++++++
+>  tests/qtest/fuzz/i440fx_fuzz.c      |  3 ++-
+>  tests/qtest/fuzz/virtio_net_fuzz.c  |  2 ++
+>  tests/qtest/fuzz/virtio_scsi_fuzz.c |  2 ++
+>  7 files changed, 29 insertions(+), 2 deletions(-)
+>=20
+> --=20
+> 2.26.2
+>=20
 
-I don't think this is something we need right now, but it would be
-useful for building qtest reproducers.
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+Stefan
 
-> ---
->  tests/qtest/fuzz/virtio_net_fuzz.c  | 6 ++++--
->  tests/qtest/fuzz/virtio_scsi_fuzz.c | 6 +++++-
->  2 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
-> index d08a47e278..ec993c9d5f 100644
-> --- a/tests/qtest/fuzz/virtio_net_fuzz.c
-> +++ b/tests/qtest/fuzz/virtio_net_fuzz.c
-> @@ -19,6 +19,8 @@
->  #include "fork_fuzz.h"
->  #include "qos_fuzz.h"
->  
-> +#include "exec/address-spaces.h"
-> +#include "hw/core/cpu.h"
->  
->  #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
->  #define QVIRTIO_RX_VQ 0
-> @@ -69,8 +71,8 @@ static void virtio_net_fuzz_multi(QTestState *s,
->               * If checking used ring, ensure that the fuzzer doesn't trigger
->               * trivial asserion failure on zero-zied buffer
->               */
-> -            qtest_memwrite(s, req_addr, Data, vqa.length);
-> -
-> +            address_space_write(first_cpu->as, req_addr, MEMTXATTRS_UNSPECIFIED,
-> +                                &Data, vqa.length);
->  
->              free_head = qvirtqueue_add(s, q, req_addr, vqa.length,
->                      vqa.write, vqa.next);
-> diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> index 3b95247f12..5096a5a730 100644
-> --- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> +++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> @@ -23,6 +23,9 @@
->  #include "fork_fuzz.h"
->  #include "qos_fuzz.h"
->  
-> +#include "exec/address-spaces.h"
-> +#include "hw/core/cpu.h"
-> +
->  #define PCI_SLOT                0x02
->  #define PCI_FN                  0x00
->  #define QVIRTIO_SCSI_TIMEOUT_US (1 * 1000 * 1000)
-> @@ -108,7 +111,8 @@ static void virtio_scsi_fuzz(QTestState *s, QVirtioSCSIQueues* queues,
->  
->          /* Copy the data into ram, and place it on the virtqueue */
->          uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
-> -        qtest_memwrite(s, req_addr, Data, vqa.length);
-> +        address_space_write(first_cpu->as, req_addr, MEMTXATTRS_UNSPECIFIED,
-> +                            &Data, vqa.length);
->          if (vq_touched[vqa.queue] == 0) {
->              vq_touched[vqa.queue] = 1;
->              free_head[vqa.queue] = qvirtqueue_add(s, q, req_addr, vqa.length,
-> -- 
-> 2.21.3
-> 
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7NNxgACgkQnKSrs4Gr
+c8hclwf+KhmEOkoFRF8NwOSHX4N6tUCZx3vacVfsKppTNKYjQ7y+KJf0UxiWCz8b
+mjbiHuJBT8eL2gzqotknXCetKN6x/gQabe1J1eM3xbJwhdiM9sgbbVfJTESrVSxg
+Y+X6ZoRvt48umnk4yxKHsSWS/36+sc0mnngNVyezwVwBez56WfVtyeMb2HTd3mRV
+F9y2zuMP+xSK2fm1pgmHOJnhXSULDB9qaiToo1eo1IcbUPga1Jbm+p+Jpo/BavE7
+LnygnRQdklsyo3h8fRx5z8/10u8z/nXSo1eQgY2UMJxkAqqCHmMHGETP9cQrco5t
+5cwCYSyC+qTxivMcYcJCkyh2bXb1iQ==
+=kt4U
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
+
 
