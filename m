@@ -2,91 +2,95 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B5BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 06:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FD3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 137D4207CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 06:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5535420890
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 07:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baSbnwHC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137D4207CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="xAx1oDC4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5535420890
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdTLm-0004tT-A1
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 02:46:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36758)
+	id 1jdTcc-0000t8-Be
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 03:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdTKu-00041v-81
- for qemu-devel@nongnu.org; Tue, 26 May 2020 02:45:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52770
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdTKs-0006Pg-SZ
- for qemu-devel@nongnu.org; Tue, 26 May 2020 02:45:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590475512;
+ (Exim 4.90_1) (envelope-from <damien.hedde@greensocs.com>)
+ id 1jdTa4-0000NP-Ak
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:00:56 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:48972)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <damien.hedde@greensocs.com>)
+ id 1jdTa2-00012N-A2
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 03:00:55 -0400
+Received: from [192.168.1.12] (lfbn-gre-1-344-171.w90-112.abo.wanadoo.fr
+ [90.112.62.171])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id EEBF296EF0;
+ Tue, 26 May 2020 07:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1590476450;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UvgGktSiesJJCrfZkmYnSs6aL5wOIBi+RgDGo65run8=;
- b=baSbnwHCbMxZs3+nt7rotRqTc9J/3/WzlUXYESI865s207zVWTrGoSpV2yGNLCrYgIpUJC
- YpizzjrKN1rb2JotVXY7UChbC0XtaknvF5Ge8WkzeADZufkU50yRVNK8V7v7TaxOE4D4AH
- zzCKOtpVEiNJwtDbPmf9dLN2dHDr8qs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-pMepmNAKNZKKWwOebGZHVA-1; Tue, 26 May 2020 02:45:11 -0400
-X-MC-Unique: pMepmNAKNZKKWwOebGZHVA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAF9C100CD01;
- Tue, 26 May 2020 06:45:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ECFEA19D7E;
- Tue, 26 May 2020 06:45:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 77B25113864A; Tue, 26 May 2020 08:45:00 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 1/9] target/i386: Restrict X86CPUFeatureWord to X86
- targets
-References: <20200525150640.30879-1-philmd@redhat.com>
- <20200525150640.30879-2-philmd@redhat.com>
-Date: Tue, 26 May 2020 08:45:00 +0200
-In-Reply-To: <20200525150640.30879-2-philmd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 25 May 2020 17:06:32
- +0200")
-Message-ID: <87o8qb8aab.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=U0faZZaugXZw+q+2vSV/sjcObdSaRl/uB+p5HDcSGKs=;
+ b=xAx1oDC4v6vEnJcLtuGF1tXRLtdu40gvkxjG4GkRY3Lu2QQne9awcIMMKf8AG8V5wKYkAp
+ wxCIuvqIzLb1eEldhz73fEb4bBG35p8pttCiS2rgqSZdM/R26s66BVUaYHJoC1filmMAGy
+ i8EX4hp+Y41CBfFA6v6wXngIvBKoyAw=
+Subject: Re: [PATCH v5 4/7] dwc-hsotg (dwc2) USB host controller emulation
+To: Paul Zimmerman <pauldzim@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200512064900.28554-1-pauldzim@gmail.com>
+ <20200512064900.28554-5-pauldzim@gmail.com>
+ <CAFEAcA8ru0DyVTvVcTjf0AH8wi+d64m=iP_qbHrsLnGt65Y0Kg@mail.gmail.com>
+ <CADBGO79puzxx8dC2_kxe0eGJ34fn=DwwgNfL9xSBt=dQvEcOUw@mail.gmail.com>
+ <CAFEAcA_SVkgtr959SGKCgdFHX15pq-bkHXbF5RvMJXhVgBfb0Q@mail.gmail.com>
+ <CADBGO790Wy5rQqi1VSROe9pfVWef=_6-6opxjh7cojgKZU+CZQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <5a848198-d5b4-4450-fad5-bf40a3ecdac0@greensocs.com>
+Date: Tue, 26 May 2020 09:00:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CADBGO790Wy5rQqi1VSROe9pfVWef=_6-6opxjh7cojgKZU+CZQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:14:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1590476450;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=U0faZZaugXZw+q+2vSV/sjcObdSaRl/uB+p5HDcSGKs=;
+ b=6vshP0t5fOL8wtBpvtTJ0+rp+maTzrGfDltSQWIeCT0IalzHpxCUSCfafG6bBqt8sBcWOI
+ MNN4ubtaKPp8/68BUIJT6sXH6AlTiEQQmtzHQyju6sZE+p+vYgP7BhrNln9n1YydttOoNQ
+ gDoqqj3pYOPcksC6cMAixQCG2hInS60=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1590476450; a=rsa-sha256; cv=none;
+ b=A+wC9KC4fCGugmhPVG2337VCJivrVzjvvrv4XmWigWmoBlUhOE83Bb1FzJQOSyQwbQoAYe
+ TBpbAVUx6l7ixeXBA6xX5Yvy0UD/6sIOnlgLX0Ei1YHBkpTPY+paby/MylKCK56TN3Lgu9
+ tAJidmR+aGOOtpCJNzhxwRBimozKdA0=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Received-SPF: pass client-ip=5.135.226.135;
+ envelope-from=damien.hedde@greensocs.com; helo=beetle.greensocs.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 03:00:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,220 +104,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael
- S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- David Hildenbrand <david@redhat.com>, Peter Lieven <pl@kamp.de>,
- qemu-devel@nongnu.org, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Move out x86-specific structures from generic machine code.
+
+On 5/20/20 11:24 PM, Paul Zimmerman wrote:
+> On Wed, May 20, 2020 at 6:18 AM Peter Maydell <peter.maydell@linaro.org
+> <mailto:peter.maydell@linaro.org>> wrote:
+> 
+>     On Wed, 20 May 2020 at 06:49, Paul Zimmerman <pauldzim@gmail.com
+>     <mailto:pauldzim@gmail.com>> wrote:
+>     > Is there a tree somewhere that has a working example of a
+>     > three-phase reset? I did a 'git grep' on the master branch and didn't
+>     > find any code that is actually using it. I tried to implement it from
+>     > the example in reset.rst, but I'm getting a segfault on the first
+>     line in
+>     > resettable_class_set_parent_phases() that I'm having trouble figuring
+>     > out.
+> 
+>     Hmm, I thought we'd committed a change of a device to use the new
+>     mechanism along with the actual implementation but I can't see it
+>     now. Damien, what's the status with getting Xilinx devices to use the
+>     3-phase reset API?
+> 
+> 
+> Never mind, I found the problem, I wasn't initializing my class properly.
+> It's working now,I'll send along a new patch series shortly.
+> 
+> Thanks,
+> Paul
 >
-> Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  qapi/machine-target.json   | 45 ++++++++++++++++++++++++++++++++++++++
->  qapi/machine.json          | 42 -----------------------------------
->  target/i386/cpu.c          |  2 +-
->  target/i386/machine-stub.c | 22 +++++++++++++++++++
->  target/i386/Makefile.objs  |  3 ++-
->  5 files changed, 70 insertions(+), 44 deletions(-)
->  create mode 100644 target/i386/machine-stub.c
->
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index f2c82949d8..fb7a4b7850 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -3,6 +3,51 @@
->  # This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
->  # See the COPYING file in the top-level directory.
-> =20
-> +##
-> +# @X86CPURegister32:
-> +#
-> +# A X86 32-bit register
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'enum': 'X86CPURegister32',
-> +  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ],
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @X86CPUFeatureWordInfo:
-> +#
-> +# Information about a X86 CPU feature word
-> +#
-> +# @cpuid-input-eax: Input EAX value for CPUID instruction for that featu=
-re word
-> +#
-> +# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
-> +#                   feature word
-> +#
-> +# @cpuid-register: Output register containing the feature bits
-> +#
-> +# @features: value of output register, containing the feature bits
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'X86CPUFeatureWordInfo',
-> +  'data': { 'cpuid-input-eax': 'int',
-> +            '*cpuid-input-ecx': 'int',
-> +            'cpuid-register': 'X86CPURegister32',
-> +            'features': 'int' },
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @DummyForceArrays:
-> +#
-> +# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internal=
-ly
-> +#
-> +# Since: 2.5
-> +##
-> +{ 'struct': 'DummyForceArrays',
-> +  'data': { 'unused': ['X86CPUFeatureWordInfo'] },
-> +  'if': 'defined(TARGET_I386)' }
-> +
->  ##
->  # @CpuModelInfo:
->  #
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index ff7b5032e3..1fe31d374c 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -511,48 +511,6 @@
->     'dst': 'uint16',
->     'val': 'uint8' }}
-> =20
-> -##
-> -# @X86CPURegister32:
-> -#
-> -# A X86 32-bit register
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'enum': 'X86CPURegister32',
-> -  'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ] }
-> -
-> -##
-> -# @X86CPUFeatureWordInfo:
-> -#
-> -# Information about a X86 CPU feature word
-> -#
-> -# @cpuid-input-eax: Input EAX value for CPUID instruction for that featu=
-re word
-> -#
-> -# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
-> -#                   feature word
-> -#
-> -# @cpuid-register: Output register containing the feature bits
-> -#
-> -# @features: value of output register, containing the feature bits
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'X86CPUFeatureWordInfo',
-> -  'data': { 'cpuid-input-eax': 'int',
-> -            '*cpuid-input-ecx': 'int',
-> -            'cpuid-register': 'X86CPURegister32',
-> -            'features': 'int' } }
-> -
-> -##
-> -# @DummyForceArrays:
-> -#
-> -# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList internal=
-ly
-> -#
-> -# Since: 2.5
-> -##
-> -{ 'struct': 'DummyForceArrays',
-> -  'data': { 'unused': ['X86CPUFeatureWordInfo'] } }
-> -
->  ##
->  # @NumaCpuOptions:
->  #
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7a4a8e3847..832498c723 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -37,7 +37,7 @@
->  #include "qemu/option.h"
->  #include "qemu/config-file.h"
->  #include "qapi/error.h"
-> -#include "qapi/qapi-visit-machine.h"
-> +#include "qapi/qapi-visit-machine-target.h"
->  #include "qapi/qapi-visit-run-state.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qerror.h"
-> diff --git a/target/i386/machine-stub.c b/target/i386/machine-stub.c
-> new file mode 100644
-> index 0000000000..cb301af057
-> --- /dev/null
-> +++ b/target/i386/machine-stub.c
-> @@ -0,0 +1,22 @@
-> +/*
-> + * QAPI x86 CPU features stub
-> + *
-> + * Copyright (c) 2020 Red Hat, Inc.
-> + *
-> + * Author:
-> + *   Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qapi-visit-machine-target.h"
-> +
-> +void visit_type_X86CPUFeatureWordInfoList(Visitor *v, const char *name,
-> +                                      X86CPUFeatureWordInfoList **obj,
-> +                                      Error **errp)
 
-Unusual indentation.
+Sorry, I was off grid during the last days.
+It's a bit late but if anyone is looking of examples theses xilinx
+devices are in the tree:
++ hw/char/cadence_uart.c
++ hw/misc/zynq_slcr.c
 
-> +{
-> +}
-
-Two kinds of stubs: stubs that can get called, and stubs that exist only
-to satisfy the linker.  Which kind is this one?
-
-> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-> index 48e0c28434..1cdfc9f50c 100644
-> --- a/target/i386/Makefile.objs
-> +++ b/target/i386/Makefile.objs
-> @@ -17,6 +17,7 @@ obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posix.o
->  endif
->  obj-$(CONFIG_HVF) +=3D hvf/
->  obj-$(CONFIG_WHPX) +=3D whpx-all.o
-> -endif
-> +endif # CONFIG_SOFTMMU
->  obj-$(CONFIG_SEV) +=3D sev.o
->  obj-$(call lnot,$(CONFIG_SEV)) +=3D sev-stub.o
-> +obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D machine-stub.o
-
-Suggest
-
-   ifeq ($(CONFIG_SOFTMMU),y)
-   ...
-   else
-   obj-y +=3D machine-stub.o
-   endif
-
-Matter of taste.
-
+Damien
 
