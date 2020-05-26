@@ -2,88 +2,52 @@ Return-Path: <SRS0=4PQo=7I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D065FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB60C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:28:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FB19207D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:20:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgDiceer"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB19207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADA7420899
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 May 2020 20:28:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADA7420899
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdg3t-0000iF-Q3
-	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 16:20:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59016)
+	id 1jdgB6-00046h-Sh
+	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 16:28:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jdg3F-0000CT-RK
- for qemu-devel@nongnu.org; Tue, 26 May 2020 16:19:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25215
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jdg3E-00041D-87
- for qemu-devel@nongnu.org; Tue, 26 May 2020 16:19:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590524390;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QTtt9LMjfJw2IHxrEcqSdlDibKWSqdvA8/c3DDMFwRk=;
- b=VgDiceeruo219s9Lj+3SYZeISB4u67BMVSl/MbyatrxdA1Mjty1ylFcTUEz0bUI8zN0hzx
- Z9A9eqIw+Oket89KYyGPKJ0J0/kdUzgbX71jBjMZlItt0JEmwbqqUrHQgE/Qcqa8fMxV5/
- x00JskZn/4KLSBo1zPLjjR1yOfSOSP4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-OMk8aasiMCmllyd0oIcpSA-1; Tue, 26 May 2020 16:19:45 -0400
-X-MC-Unique: OMk8aasiMCmllyd0oIcpSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F58A107ACCA;
- Tue, 26 May 2020 20:19:43 +0000 (UTC)
-Received: from x1.home (ovpn-114-203.phx2.redhat.com [10.3.114.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B52479C4F;
- Tue, 26 May 2020 20:19:41 +0000 (UTC)
-Date: Tue, 26 May 2020 14:19:39 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200526141939.2632f100@x1.home>
-In-Reply-To: <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home>
- <20200525065925.GA698@joy-OptiPlex-7040>
- <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 01:51:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jdgAE-0003Zd-9N; Tue, 26 May 2020 16:27:06 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48070)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jdgA8-0000mG-P6; Tue, 26 May 2020 16:27:04 -0400
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jdg9y-0003rd-73; Tue, 26 May 2020 23:26:50 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2] iotests: Dump QCOW2 dirty bitmaps metadata
+Date: Tue, 26 May 2020 23:26:47 +0300
+Message-Id: <1590524807-821646-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/26 16:26:57
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,153 +60,451 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, Yan Zhao <yan.y.zhao@intel.com>,
- changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 25 May 2020 18:50:54 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Add dirty bitmap information to QCOW2 metadata dump in qcow2.py script.
+The sample output:
 
-> On 5/25/2020 12:29 PM, Yan Zhao wrote:
-> > On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:  
-> >> Hi folks,
-> >>
-> >> My impression is that we're getting pretty close to a workable
-> >> implementation here with v22 plus respins of patches 5, 6, and 8.  We
-> >> also have a matching QEMU series and a proposal for a new i40e
-> >> consumer, as well as I assume GVT-g updates happening internally at
-> >> Intel.  I expect all of the latter needs further review and discussion,
-> >> but we should be at the point where we can validate these proposed
-> >> kernel interfaces.  Therefore I'd like to make a call for reviews so
-> >> that we can get this wrapped up for the v5.8 merge window.  I know
-> >> Connie has some outstanding documentation comments and I'd like to make
-> >> sure everyone has an opportunity to check that their comments have been
-> >> addressed and we don't discover any new blocking issues.  Please send
-> >> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
-> >> interface and implementation.  Thanks!
-> >>  
-> > hi Alex
-> > after porting gvt/i40e vf migration code to kernel/qemu v23, we spoted
-> > two bugs.
-> > 1. "Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
-> >     This is a qemu bug that the dirty bitmap query range is not the same
-> >     as the dma map range. It can be fixed in qemu. and I just have a little
-> >     concern for kernel to have this restriction.
-> >   
-> 
-> I never saw this unaligned size in my testing. In this case if you can 
-> provide vfio_* event traces, that will helpful.
+Header extension:         Bitmaps
+magic                     0x23852875
+length                    24
+nb_bitmaps                2
+reserved32                0
+bitmap_directory_size     0x40
+bitmap_directory_offset   0x100000
 
-Yeah, I'm curious why we're hitting such a call path, I think we were
-designing this under the assumption we wouldn't see these.  I also
-wonder if we really need to enforce the dma mapping range for getting
-the dirty bitmap with the current implementation (unmap+dirty obviously
-still has the restriction).  We do shift the bitmap in place for
-alignment, but I'm not sure why we couldn't shift it back and only
-clear the range that was reported.  Kirti, do you see other issues?  I
-think a patch to lift that restriction is something we could plan to
-include after the initial series is included and before we've committed
-to the uapi at the v5.8 release.
+Bitmap name               bitmap-1
+flag                      "auto"
+bitmap_table_offset       0x90000
+bitmap_table_size         8
+flags                     2
+type                      1
+granularity_bits          15
+name_size                 8
+extra_data_size           0
+
+Bitmap table
+   0     serialized, offset 0xa0000
+   1     all-zeroes, offset 0x0
+   2     all-zeroes, offset 0x0
+   3     all-zeroes, offset 0x0
+   4     all-zeroes, offset 0x0
+   5     all-zeroes, offset 0x0
+   6     all-zeroes, offset 0x0
+   7     all-zeroes, offset 0x0
+
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+v2:
+  01: Refactoring of the Python code in the script qcow2.py.
+      New methods were added. The bitmap dictionary was instantiated.
+      The all of bitmaps information is read completely before
+      printing the dictionary.
+  02: The outputs of the tests 031, 036 and 061 were modified.
+
+ tests/qemu-iotests/031.out  |  22 +++---
+ tests/qemu-iotests/036.out  |   4 +-
+ tests/qemu-iotests/061.out  |  14 ++--
+ tests/qemu-iotests/qcow2.py | 167 +++++++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 179 insertions(+), 28 deletions(-)
+
+diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
+index 46f97c5..0383ebb 100644
+--- a/tests/qemu-iotests/031.out
++++ b/tests/qemu-iotests/031.out
+@@ -24,7 +24,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
  
-> > 2. migration abortion, reporting
-> > "qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
-> > qemu-system-x86_64-lm: error while loading state section id 49(vfio)
-> > qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
-> > 
-> > It's still a qemu bug and we can fixed it by
-> > "
-> > if (migration->pending_bytes == 0) {
-> > +            qemu_put_be64(f, 0);
-> > +            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> > "  
-> 
-> In which function in QEMU do you have to add this?
-
-I think this is relative to QEMU path 09/ where Yan had the questions
-below on v16 and again tried to get answers to them on v22:
-
-https://lore.kernel.org/qemu-devel/20200520031323.GB10369@joy-OptiPlex-7040/
-
-Kirti, please address these questions.
-
-> > and actually there are some extra concerns about this part, as reported in
-> > [1][2].
-> > 
-> > [1] data_size should be read ahead of data_offset
-> > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02795.html.
-> > [2] should not repeatedly update pending_bytes in vfio_save_iterate()
-> > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02796.html.
-> > 
-> > but as those errors are all in qemu, and we have finished basic tests in
-> > both gvt & i40e, we're fine with the kernel part interface in general now.
-> > (except for my concern [1], which needs to update kernel patch 1)
-> >   
-> 
->  >> what if pending_bytes is not 0, but vendor driver just does not want  to
->  >> send data in this iteration? isn't it right to get data_size first   
-> before
->  >> getting data_offset?  
-> 
-> If vendor driver doesn't want to send data but still has data in staging 
-> buffer, vendor driver still can control to send pending_bytes for this 
-> iteration as 0 as this is a trap field.
-> 
-> I would defer this to Alex.
-
-This is my understanding of the protocol as well, when the device is
-running, pending_bytes might drop to zero if no internal state has
-changed and may be non-zero on the next iteration due to device
-activity.  When the device is not running, pending_bytes reporting zero
-indicates the device is done, there is no further state to transmit.
-Does that meet your need/expectation?
-
-> > so I wonder which way in your mind is better, to give our reviewed-by to
-> > the kernel part now, or hold until next qemu fixes?
-> > and as performance data from gvt is requested from your previous mail, is
-> > that still required before the code is accepted?
-
-The QEMU series does not need to be perfect, I kind of expect we might
-see a few iterations of that beyond the kernel portion being accepted.
-We should have the QEMU series to the point that we've resolved any
-uapi issues though, which it seems like we're pretty close to having.
-Ideally I'd like to get the kernel series into my next branch before
-the merge window opens, where it seems like upstream is on schedule to
-have that happen this Sunday.  If you feel we're to the point were we
-can iron a couple details out during the v5.8 development cycle, then
-please provide your reviewed-by.  We haven't fully committed to a uapi
-until we've committed to it for a non-rc release.
-
-I think the performance request was largely due to some conversations
-with Dave Gilbert wondering if all this actually works AND is practical
-for a LIVE migration.  I think we're all curious about things like how
-much data does a GPU have to transfer in each phase of migration, and
-particularly if the final phase is going to be a barrier to claiming
-the VM is actually sufficiently live.  I'm not sure we have many
-options if a device simply has a very large working set, but even
-anecdotal evidence that the stop-and-copy phase transfers abMB from the
-device while idle or xyzMB while active would give us some idea what to
-expect.  Kirti, have you done any of those sorts of tests for NVIDIA's
-driver?
-
-> > BTW, we have also conducted some basic tests when viommu is on, and found out
-> > errors like
-> > "qemu-system-x86_64-dt: vtd_iova_to_slpte: detected slpte permission error (iova=0x0, level=0x3, slpte=0x0, write=1)
-> > qemu-system-x86_64-dt: vtd_iommu_translate: detected translation failure (dev=00:03:00, iova=0x0)
-> > qemu-system-x86_64-dt: New fault is not recorded due to compression of faults".
-> >   
-> 
-> I saw these errors, I'm looking into it.
-
-Let's try to at least determine if this is a uapi issue or just a QEMU
-implementation bug for progressing the kernel series.  Thanks,
-
-Alex
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -52,7 +52,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -80,12 +80,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
+ 
+-Header extension:
++Header extension:         Backing format
+ magic                     0xe2792aca
+ length                    11
+ data                      'host_device'
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -115,12 +115,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -148,12 +148,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -181,17 +181,17 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Backing format
+ magic                     0xe2792aca
+ length                    11
+ data                      'host_device'
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
+index 23b699c..d305f1a 100644
+--- a/tests/qemu-iotests/036.out
++++ b/tests/qemu-iotests/036.out
+@@ -24,7 +24,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ incompatible_features     []
+ compatible_features       []
+ autoclear_features        [63]
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -36,7 +36,7 @@ No errors were found on the image.
+ incompatible_features     []
+ compatible_features       []
+ autoclear_features        []
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 5a8d36d..bb4b236 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -24,7 +24,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -82,7 +82,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -138,7 +138,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -193,7 +193,7 @@ autoclear_features        [42]
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -262,7 +262,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -324,7 +324,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+@@ -353,7 +353,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             104
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    288
+ data                      <binary>
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index 94a07b2..483decb 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -4,6 +4,132 @@ import sys
+ import struct
+ import string
+ 
++
++class Qcow2BitmapDirEntry:
++
++    name = ''
++    BME_FLAG_IN_USE = 1
++    BME_FLAG_AUTO = 1 << 1
++
++    uint8_t = 'B'
++    uint16_t = 'H'
++    uint32_t = 'I'
++    uint64_t = 'Q'
++
++    fields = [
++        [uint64_t, '%#x', 'bitmap_table_offset'],
++        [uint32_t, '%d',  'bitmap_table_size'],
++        [uint32_t, '%d',  'flags'],
++        [uint8_t,  '%d',  'type'],
++        [uint8_t,  '%d',  'granularity_bits'],
++        [uint16_t, '%d',  'name_size'],
++        [uint32_t, '%d',  'extra_data_size']
++    ]
++
++    fmt = '>' + ''.join(field[0] for field in fields)
++
++    def __init__(self, data):
++
++        entry = struct.unpack(Qcow2BitmapDirEntry.fmt, data)
++        self.__dict__ = dict((field[2], entry[i])
++                             for i, field in enumerate(
++                                 Qcow2BitmapDirEntry.fields))
++
++        self.bitmap_table_size = self.bitmap_table_size \
++            * struct.calcsize(self.uint64_t)
++
++    def bitmap_dir_entry_raw_size(self):
++        return struct.calcsize(self.fmt) + self.name_size + \
++            self.extra_data_size
++
++    def dump_bitmap_dir_entry(self):
++        print("%-25s" % 'Bitmap name', self.name)
++        if (self.flags & self.BME_FLAG_IN_USE) != 0:
++            print("%-25s" % 'flag', '"in-use"')
++        if (self.flags & self.BME_FLAG_AUTO) != 0:
++            print("%-25s" % 'flag', '"auto"')
++        for f in Qcow2BitmapDirEntry.fields:
++            value = self.__dict__[f[2]]
++            value_str = f[1] % value
++
++            print("%-25s" % f[2], value_str)
++        print("")
++
++    def read_bitmap_table(self, fd):
++        fd.seek(self.bitmap_table_offset)
++        table_size = self.bitmap_table_size * struct.calcsize(self.uint64_t)
++        table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
++        self.bitmap_table = enumerate(table)
++
++    def print_bitmap_table(self):
++        BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
++        BME_TABLE_ENTRY_FLAG_ALL_ONES = 1
++        bmt_type = ['all-zeroes', 'all-ones', 'serialized']
++
++        print("Bitmap table")
++        for i, entry in self.bitmap_table:
++            offset = entry & BME_TABLE_ENTRY_OFFSET_MASK
++            if offset != 0:
++                index = 2
++            else:
++                index = entry & BME_TABLE_ENTRY_FLAG_ALL_ONES
++            print("   %-4d  %s, offset %#x" % (i, bmt_type[index], offset))
++        print("")
++
++
++class Qcow2BitmapExt:
++
++    uint32_t = 'I'
++    uint64_t = 'Q'
++
++    fields = [
++        [uint32_t, '%d',  'nb_bitmaps'],
++        [uint32_t, '%d',  'reserved32'],
++        [uint64_t, '%#x', 'bitmap_directory_size'],
++        [uint64_t, '%#x', 'bitmap_directory_offset']
++    ]
++
++    fmt = '>' + ''.join(field[0] for field in fields)
++
++    def __init__(self, data):
++
++        extension = struct.unpack(Qcow2BitmapExt.fmt, data)
++        self.__dict__ = dict((field[2], extension[i])
++                             for i, field in enumerate(Qcow2BitmapExt.fields))
++
++    def dump_bitmap_ext(self):
++        for f in Qcow2BitmapExt.fields:
++            value = self.__dict__[f[2]]
++            value_str = f[1] % value
++
++            print("%-25s" % f[2], value_str)
++        print("")
++
++    def read_bitmap_directory(self, fd):
++        self.bitmaps = []
++        fd.seek(self.bitmap_directory_offset)
++        buf_size = struct.calcsize(Qcow2BitmapDirEntry.fmt)
++
++        for n in range(self.nb_bitmaps):
++            buf = fd.read(buf_size)
++            dir_entry = Qcow2BitmapDirEntry(buf)
++            fd.seek(dir_entry.extra_data_size, 1)
++            bitmap_name = fd.read(dir_entry.name_size)
++            dir_entry.name = bitmap_name.decode('ascii')
++            self.bitmaps.append(dir_entry)
++            entry_raw_size = dir_entry.bitmap_dir_entry_raw_size()
++            shift = ((entry_raw_size + 7) & ~7) - entry_raw_size
++            fd.seek(shift, 1)
++
++        for bm in self.bitmaps:
++            bm.read_bitmap_table(fd)
++
++    def print_bitmaps(self):
++        for bm in self.bitmaps:
++            bm.dump_bitmap_dir_entry()
++            bm.print_bitmap_table()
++
++
+ class QcowHeaderExtension:
+ 
+     def __init__(self, magic, length, data):
+@@ -21,6 +147,11 @@ class QcowHeaderExtension:
+ 
+ class QcowHeader:
+ 
++    QCOW2_EXT_MAGIC_BACKING_FORMAT = 0xE2792ACA
++    QCOW2_EXT_MAGIC_FEATURE_TABLE = 0x6803f857
++    QCOW2_EXT_MAGIC_CRYPTO_HEADER = 0x0537be77
++    QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
++    QCOW2_EXT_MAGIC_DATA_FILE = 0x44415441
+     uint32_t = 'I'
+     uint64_t = 'Q'
+ 
+@@ -127,6 +258,15 @@ class QcowHeader:
+         buf = buf[0:header_bytes-1]
+         fd.write(buf)
+ 
++    def extension_name(self, magic):
++        return {
++            self.QCOW2_EXT_MAGIC_BACKING_FORMAT: 'Backing format',
++            self.QCOW2_EXT_MAGIC_FEATURE_TABLE: 'Feature table',
++            self.QCOW2_EXT_MAGIC_CRYPTO_HEADER: 'Crypto header',
++            self.QCOW2_EXT_MAGIC_BITMAPS: 'Bitmaps',
++            self.QCOW2_EXT_MAGIC_DATA_FILE: 'Data file',
++        }.get(magic, 'Unknown')
++
+     def dump(self):
+         for f in QcowHeader.fields:
+             value = self.__dict__[f[2]]
+@@ -142,30 +282,41 @@ class QcowHeader:
+             print("%-25s" % f[2], value_str)
+         print("")
+ 
+-    def dump_extensions(self):
++    def dump_extensions(self, fd):
+         for ex in self.extensions:
+ 
++            print("%-25s %s" % ("Header extension:", self.extension_name(
++                ex.magic)))
++            print("%-25s %#x" % ("magic", ex.magic))
++            print("%-25s %d" % ("length", ex.length))
++
+             data = ex.data[:ex.length]
+             if all(c in string.printable.encode('ascii') for c in data):
+                 data = "'%s'" % data.decode('ascii')
++                print("%-25s %s" % ("data", data))
+             else:
+-                data = "<binary>"
++                self.dump_extension_data(fd, ex)
+ 
+-            print("Header extension:")
+-            print("%-25s %#x" % ("magic", ex.magic))
+-            print("%-25s %d" % ("length", ex.length))
+-            print("%-25s %s" % ("data", data))
+             print("")
+ 
++    def dump_extension_data(self, fd, ext):
++        if ext.magic == self.QCOW2_EXT_MAGIC_BITMAPS:
++            b_ext = Qcow2BitmapExt(ext.data)
++            b_ext.dump_bitmap_ext()
++            b_ext.read_bitmap_directory(fd)
++            b_ext.print_bitmaps()
++        else:
++            print("%-25s %s" % ("data", "<binary>"))
++
+ 
+ def cmd_dump_header(fd):
+     h = QcowHeader(fd)
+     h.dump()
+-    h.dump_extensions()
++    h.dump_extensions(fd)
+ 
+ def cmd_dump_header_exts(fd):
+     h = QcowHeader(fd)
+-    h.dump_extensions()
++    h.dump_extensions(fd)
+ 
+ def cmd_set_header(fd, name, value):
+     try:
+-- 
+1.8.3.1
 
 
