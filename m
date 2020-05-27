@@ -2,71 +2,91 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BCDC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 041A5C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C4B42075A
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C4B42075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7F9A207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:55:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kq1TsjJ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F9A207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je3uJ-0007dM-LP
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 17:48:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47332)
+	id 1je41Z-0004Xk-Tu
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 17:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1je3tB-0005rX-It; Wed, 27 May 2020 17:47:06 -0400
-Resent-Date: Wed, 27 May 2020 17:47:05 -0400
-Resent-Message-Id: <E1je3tB-0005rX-It@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21751)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je40a-0003j4-JY
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 17:54:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45775
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1je3t9-0006oM-FV; Wed, 27 May 2020 17:47:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590616001; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=UjySlMA6vLamnAXS6AlIKHpr3OpN3/QHcTDvNscKsE8xrhHcyfE9x7y+/E+2A0JcAS5vGu544esbe9i7olT2h35jwj3XZQU5w7Xk0ayZgJasv/+0JVkaiclnFkKA3uLLQxnyj8OQxApRC0U5QaMX/BHT0kYpcOhhR3ka6nhxFNc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590616001;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=bIP/2R+mk9vAUrZq0/XvKMNIqIV+8GuJpVAahO9OpAc=; 
- b=MaBeqvg41tJ40mQvLI3Ov1vRBp0i8IeNDIhlrA/rtQLRSy0T2gfHjQYBi8JkkoZtYNFic4r3XztDXzlrT7gTYpopuNlS3w4PRrvXDfzcZ1uYpw00vVdOPgb3V571X9Xa3Wt7DAEVY0h1TYPKnRjlps/tPWV4Fw5/DfTR0uKT9Y0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590615999101252.9370545416176;
- Wed, 27 May 2020 14:46:39 -0700 (PDT)
-Message-ID: <159061599705.16318.11961887809600256765@45ef0f9c86ae>
-In-Reply-To: <20200527203733.16129-1-vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v5 0/7] coroutines: generate wrapper code
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je40Y-0001sa-O0
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 17:54:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590616478;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8LIG6MeffebLl7tbw7y3dbZeMD4wr/6DOPFSIdE4Etc=;
+ b=Kq1TsjJ4I83Olg4kj6Qrc0EcEKsY/cWdM4OwCSk5C5mT5wA0aHhOQy0Gp3S7UrFNP+uoFi
+ p/6Azeg2La4ry9MCHABfzqvYZ2wsLyr4J2suQOFiSP/50ajod8hBe0Q+JOucTMxh93cfyF
+ 5yhIXvdK7cxC+i0eiIG2akCaJj0ga8E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-B72HsHzrPAavzwn0nuZxaw-1; Wed, 27 May 2020 17:54:33 -0400
+X-MC-Unique: B72HsHzrPAavzwn0nuZxaw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB6C71009616;
+ Wed, 27 May 2020 21:54:32 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 979C7620AF;
+ Wed, 27 May 2020 21:54:32 +0000 (UTC)
+Subject: Re: [Bug 1881004] [NEW] fpu/softfloat.c: error: bitwise negation of a
+ boolean expression
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Bug 1881004 <1881004@bugs.launchpad.net>
+References: <159060681483.5838.13632051970488338647.malonedeb@wampee.canonical.com>
+ <CAFEAcA_NTEUoWfqpG9uhPY0pE697F-_MDLNexq75k0tYdEuuYg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ee41069e-5e6f-d4f5-22ed-795deb4b7ba5@redhat.com>
+Date: Wed, 27 May 2020 16:54:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Wed, 27 May 2020 14:46:39 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 17:46:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAFEAcA_NTEUoWfqpG9uhPY0pE697F-_MDLNexq75k0tYdEuuYg@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,47 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com, den@openvz.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyNzIwMzczMy4xNjEy
-OS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
-Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
-Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpUeXBlRXJyb3I6IF9f
-aW5pdF9fKCkgZ290IGFuIHVuZXhwZWN0ZWQga2V5d29yZCBhcmd1bWVudCAnY2FwdHVyZV9vdXRw
-dXQnCiAgQ0MgICAgICAvdG1wL3FlbXUtdGVzdC9idWlsZC9zbGlycC9zcmMvYm9vdHAubwogIEdF
-TiAgICAgdWkvaW5wdXQta2V5bWFwLXVzYi10by1xY29kZS5jCm1ha2U6ICoqKiBbYmxvY2svYmxv
-Y2stZ2VuLmNdIEVycm9yIDEKbWFrZTogKioqIERlbGV0aW5nIGZpbGUgYGJsb2NrL2Jsb2NrLWdl
-bi5jJwptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIEdFTiAgICAg
-dWkvaW5wdXQta2V5bWFwLXdpbjMyLXRvLXFjb2RlLmMKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9j
-ZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29t
-bWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVt
-dS5pbnN0YW5jZS51dWlkPTdhNGM5Yzg3YmI3YjRiNjFhZTk5MTQyYjhjY2Q0YzEyJywgJy11Jywg
-JzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAn
-LWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScs
-ICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywg
-Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
-LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdnc1dzdrNnovc3JjL2RvY2tlci1zcmMuMjAyMC0wNS0y
-Ny0xNy40NC40MC41NzM6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFy
-L3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
-dHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTdhNGM5
-Yzg3YmI3YjRiNjFhZTk5MTQyYjhjY2Q0YzEyCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJy
-b3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLXZ3NXc3azZ6L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9z
-N10gRXJyb3IgMgoKcmVhbCAgICAxbTU3LjkwNnMKdXNlciAgICAwbTguNDc1cwoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MjcyMDM3
-MzMuMTYxMjktMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tA
-Y2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 5/27/20 4:40 PM, Peter Maydell wrote:
+> On Wed, 27 May 2020 at 20:21, Philippe Mathieu-Daudé
+> <1881004@bugs.launchpad.net> wrote:
+>>
+>> Public bug reported:
+>>
+>> Last time I built QEMU was on commit d5c75ec500d96f1d93447f990cd5a4ef5ba27fae,
+>> I just pulled to fea8f3ed739536fca027cf56af7f5576f37ef9cd and now get:
+>>
+>>    CC      lm32-softmmu/fpu/softfloat.o
+>> fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
+>>      absZ &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
+>>              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>              !
+> 
+> 
+> "(x & y)" is not a boolean expression, so we should report this to clang
+> as a bug (I assume what they actually are trying to complain about is
+> bitwise AND with a boolean expression).
+
+We have:
+
+uint64_t &= ~ ( ( ( int8_t ^ int ) == int ) & bool )
+
+which is
+
+uint64_t &= ~ ( bool & bool )
+
+which is then
+
+uint64_t &= ~ ( int )
+
+resulting in one of:
+
+uint64_t &= 0xffffffffffffffff
+uint64_t &= 0xfffffffffffffffe
+
+It is a very odd way of stating that 'if this condition is true, mask 
+out the least-significant-bit'.  In general, 'bool & bool' is used where 
+the side-effect-skipping 'bool && bool' is inappropriate; I'm a bit 
+surprised that clang is not questioning whether we meant '&&' instead of 
+'&' (the two operators give the same effect in this case).
+
+You are right that clang is fishy for calling it logical negation of a 
+bool, when it is really logical negation of an int, but we are also 
+fishy in that we are using bitwise AND of two bools as an int in the 
+first place.
+
+Regardless of whether clang changes, would it be better to write the 
+code as:
+
+if (((roundBits ^ 0x40) == 0) && roundNearestEven) {
+     absZ &= ~1;
+}
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
