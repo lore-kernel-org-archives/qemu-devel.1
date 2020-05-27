@@ -2,88 +2,89 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C56BFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DEDC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:51:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 813B3207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFE402078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:51:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SgDD3K0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 813B3207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3qpu2KY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFE402078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxLk-0001G8-Mx
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:48:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43330)
+	id 1jdxPL-0005S7-0M
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:51:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jdxL6-0000cV-Gr; Wed, 27 May 2020 10:47:28 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35876)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jdxL5-0002DC-7t; Wed, 27 May 2020 10:47:28 -0400
-Received: by mail-wr1-x444.google.com with SMTP id q11so12132281wrp.3;
- Wed, 27 May 2020 07:47:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GrOGXpO7huguJbiqlss87D9k1iAkerndtQgIwlErOGU=;
- b=SgDD3K0GNnxPXkB645sD03pHKUf5og4Hwslcp9YtSocdYz0bjCpns2EBTYnZROqFA4
- rBEKTX6+Xx1d04onodKDoa1ZVYbzrRhoUyXKEOH8j7KWY4XWWBDVTTgFlLEciX4kghbB
- JDGmZpZfQEWkgUqDF5OOoEa4K2+fpp9mhYl8W0IYXH3RRdSMQNR1Z7YPwZRc+Zm8Jbjw
- QPiDzirM8tvPN2F5CJgJ6OWdtlqxMoYBrH/o6KV++Asq5rhcOOyop/leCtHM37+JRwLN
- 90wHe5YG5pYWV0VISU/HrIwwRN/3f1yXVxm1Sa8i1zBTP4x9iALgBBtD0asu2RueUpIv
- HcoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GrOGXpO7huguJbiqlss87D9k1iAkerndtQgIwlErOGU=;
- b=QgRhFmvORpMYIylsMkYwaPnXCmyOE4FHdCdGPE/im5pPitBNaT6EupdXfmY7LODrZK
- wiwzFHYKtvFeD8jdIkJI/El1s9IEPLfc9mtrlXb93Tjk2a29GlCg5SmEXsOlojqOSfXg
- sjsJHRYfI/eBte9NCXbpKfrZ7bKp88rhLBFJIfahmDh/ZbIDB2Z230lJwmdannSPht+Q
- IhcLXAwQysm+UmMuVBFnqL9pYeaq4EWhxj+nIBdjzySQz74dTv+tn/VqODwEuDpamEve
- Tut/LjwseVkBEuT/RglzvL7a5irYEPIZaqTXUtx/9bYU9eZuf/Sq8A/MaMfzL3jUWqB2
- qY+Q==
-X-Gm-Message-State: AOAM533bH/CGQRQq0/2VJ0jC+hG2W6fksquEuPoseWIRrwH4GP7IND6P
- +r0auWm0ogvlOGaCn230ZWay31PRoDh5CXVYDOo=
-X-Google-Smtp-Source: ABdhPJwaqJ9shuwQr9EJYNIOc3MgZCB9FCr7MAjKJ6MKoyoX+KaPDw9zXulTTqKOns75hxzcxIiPjtNKubUzDXFxueM=
-X-Received: by 2002:adf:e64b:: with SMTP id b11mr24234086wrn.402.1590590845626; 
- Wed, 27 May 2020 07:47:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdxOU-0004fM-JG
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:50:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24755
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdxOS-0004MX-QL
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:50:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590591055;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Jt2O02vs+NLP0r9p0Z1zjPBIZdH//DNFNRyNX/mabPM=;
+ b=G3qpu2KY6Go5VVjMJ5CO6XipBTIPrLXE3+t6EWTwXUgFpRNdKGUS85Ji7Vbe1G+AD+ugnE
+ Y6fpps9nbDENPKaRrZFw/Yg1VKSh6XT+7xzGuVw4ndgkQuWbOfeMrUuEq3m1C3QbC0GWlH
+ +kJb7r7rWR8va8MIZvpifOo5JpxjtVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-Aj8ZSKYKNliX64OSfWTUIg-1; Wed, 27 May 2020 10:50:51 -0400
+X-MC-Unique: Aj8ZSKYKNliX64OSfWTUIg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFF17EC1B6;
+ Wed, 27 May 2020 14:50:49 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1CD662932;
+ Wed, 27 May 2020 14:50:40 +0000 (UTC)
+Subject: Re: [PATCH v6 4/5] block: make size-related BlockConf properties
+ accept size suffixes
+To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org
+References: <20200527124511.986099-1-rvkagan@yandex-team.ru>
+ <20200527124511.986099-5-rvkagan@yandex-team.ru>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d2ac3549-e63d-d737-41fa-21965c551175@redhat.com>
+Date: Wed, 27 May 2020 09:50:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200527100546.29297-1-alex.bennee@linaro.org>
- <20200527100546.29297-3-alex.bennee@linaro.org>
- <CAHiYmc7EJVxKXZ4G96cL-Bm3tT8UR_dgr7y3oisUMnuJ0u3zaw@mail.gmail.com>
-In-Reply-To: <CAHiYmc7EJVxKXZ4G96cL-Bm3tT8UR_dgr7y3oisUMnuJ0u3zaw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 27 May 2020 16:47:13 +0200
-Message-ID: <CAHiYmc7TYHMcitiG9ELxfz-EC8DSG1b7FeFsxXxTbu-7FSih=Q@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] linux-user: deal with address wrap for
- ARM_COMMPAGE on 32 bit
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200527124511.986099-5-rvkagan@yandex-team.ru>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,156 +98,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Bug 1880225 <1880225@bugs.launchpad.net>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- qemu-arm@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, John Snow <jsnow@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=81=D1=80=D0=B5, 27. =D0=BC=D0=B0=D1=98 2020. =D1=83 14:05 Aleksandar Ma=
-rkovic
-<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> =D1=81=D1=80=D0=B5, 27. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:07 Alex Benn=
-=C3=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> > We rely on the pointer to wrap when accessing the high address of the
-> > COMMPAGE so it lands somewhere reasonable. However on 32 bit hosts we
-> > cannot afford just to map the entire 4gb address range. The old mmap
-> > trial and error code handled this by just checking we could map both
-> > the guest_base and the computed COMMPAGE address.
-> >
-> > We can't just manipulate loadaddr to get what we want so we introduce
-> > an offset which pgb_find_hole can apply when looking for a gap for
-> > guest_base that ensures there is space left to map the COMMPAGE
-> > afterwards.
-> >
-> > This is arguably a little inefficient for the one 32 bit
-> > value (kuser_helper_version) we need to keep there given all the
-> > actual code entries are picked up during the translation phase.
-> >
-> > Fixes: ee94743034b
-> > Bug: https://bugs.launchpad.net/qemu/+bug/1880225
->
-> For the scenario in this bug report, for today's master, before and after
-> applying this patch:
->
+On 5/27/20 7:45 AM, Roman Kagan wrote:
+> Several BlockConf properties represent respective sizes in bytes so it
+> makes sense to accept size suffixes for them.
+> 
+> Turn them all into uint32_t and use size-suffix-capable setters/getters
+> on them; introduce DEFINE_PROP_SIZE32 and adjust DEFINE_PROP_BLOCKSIZE
+> for that. (Making them uint64_t and reusing DEFINE_PROP_SIZE isn't
+> justified because guests expect at most 32bit values.)
+> 
+> Also, since min_io_size is exposed to the guest by scsi and virtio-blk
+> devices as an uint16_t in units of logical blocks, introduce an
+> additional check in blkconf_blocksizes to prevent its silent truncation.
+> 
+> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+> ---
+> v5 -> v6:
+> - add prop_size32 instead of going with 64bit
 
-I am not sure how significant is this info, but I executed the test
-without applying patch 1/3, so only 2/3 was applied in the case
-"AFTER".
+Would it be worth adding prop_size32 as its own patch, before using it 
+here?  But I'll review this as-is.
 
-Aleksandar
+> +++ b/hw/block/block.c
+> @@ -96,6 +96,17 @@ bool blkconf_blocksizes(BlockConf *conf, Error **errp)
+>           return false;
+>       }
+>   
+> +    /*
+> +     * all devices which support min_io_size (scsi and virtio-blk) expose it to
+> +     * the guest as a uint16_t in units of logical blocks
+> +     */
+> +    if (conf->min_io_size > conf->logical_block_size * UINT16_MAX) {
 
-> BEFORE:
->
-> $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-> qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294:
-> probe_guest_base: Assertion `have_guest_base' failed.
-> Aborted
->
-> AFTER:
->
-> $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-> CONTROL RESULT: (toupper_string)
->  nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
-lnmpapq
->  NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
-LNMPAPQ
->
-> So, it works in my test bed.
->
-> Tested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->
-> > Cc: Bug 1880225 <1880225@bugs.launchpad.net>
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > Cc: Richard Henderson <richard.henderson@linaro.org>
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >  linux-user/elfload.c | 18 ++++++++++--------
-> >  1 file changed, 10 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> > index d6027867a1a..31defce95b5 100644
-> > --- a/linux-user/elfload.c
-> > +++ b/linux-user/elfload.c
-> > @@ -2145,7 +2145,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t=
- guest_size, uintptr_t brk, lon
-> >
-> >  /* Return value for guest_base, or -1 if no hole found. */
-> >  static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest=
-_size,
-> > -                               long align)
-> > +                               long align, uintptr_t offset)
-> >  {
-> >      GSList *maps, *iter;
-> >      uintptr_t this_start, this_end, next_start, brk;
-> > @@ -2171,7 +2171,7 @@ static uintptr_t pgb_find_hole(uintptr_t guest_lo=
-addr, uintptr_t guest_size,
-> >
-> >          this_end =3D ((MapInfo *)iter->data)->start;
-> >          next_start =3D ((MapInfo *)iter->data)->end;
-> > -        align_start =3D ROUND_UP(this_start, align);
-> > +        align_start =3D ROUND_UP(this_start + offset, align);
-> >
-> >          /* Skip holes that are too small. */
-> >          if (align_start >=3D this_end) {
-> > @@ -2221,6 +2221,7 @@ static void pgb_static(const char *image_name, ab=
-i_ulong orig_loaddr,
-> >  {
-> >      uintptr_t loaddr =3D orig_loaddr;
-> >      uintptr_t hiaddr =3D orig_hiaddr;
-> > +    uintptr_t offset =3D 0;
-> >      uintptr_t addr;
-> >
-> >      if (hiaddr !=3D orig_hiaddr) {
-> > @@ -2234,18 +2235,19 @@ static void pgb_static(const char *image_name, =
-abi_ulong orig_loaddr,
-> >      if (ARM_COMMPAGE) {
-> >          /*
-> >           * Extend the allocation to include the commpage.
-> > -         * For a 64-bit host, this is just 4GiB; for a 32-bit host,
-> > -         * the address arithmetic will wrap around, but the difference
-> > -         * will produce the correct allocation size.
-> > +         * For a 64-bit host, this is just 4GiB; for a 32-bit host we
-> > +         * need to ensure there is space bellow the guest_base so we
-> > +         * can map the commpage in the place needed when the address
-> > +         * arithmetic wraps around.
-> >           */
-> >          if (sizeof(uintptr_t) =3D=3D 8 || loaddr >=3D 0x80000000u) {
-> >              hiaddr =3D (uintptr_t)4 << 30;
-> >          } else {
-> > -            loaddr =3D ARM_COMMPAGE & -align;
-> > +            offset =3D (128 * KiB);
-> >          }
-> >      }
-> >
-> > -    addr =3D pgb_find_hole(loaddr, hiaddr - loaddr, align);
-> > +    addr =3D pgb_find_hole(loaddr, hiaddr - loaddr, align, offset);
-> >      if (addr =3D=3D -1) {
-> >          /*
-> >           * If ARM_COMMPAGE, there *might* be a non-consecutive allocat=
-ion
-> > @@ -2280,7 +2282,7 @@ static void pgb_dynamic(const char *image_name, l=
-ong align)
-> >           * just above that, and maximises the positive guest addresses=
-.
-> >           */
-> >          commpage =3D ARM_COMMPAGE & -align;
-> > -        addr =3D pgb_find_hole(commpage, -commpage, align);
-> > +        addr =3D pgb_find_hole(commpage, -commpage, align, 0);
-> >          assert(addr !=3D -1);
-> >          guest_base =3D addr;
-> >      }
-> > --
-> > 2.20.1
-> >
-> >
+This risks overflow.  Better would be:
+
+if (conf->min_io_size / conf->logical_block-size > UINT16_MAX)
+
+> +        error_setg(errp,
+> +                   "min_io_size must not exceed " stringify(UINT16_MAX)
+> +                   " logical blocks");
+> +        return false;
+> +    }
+> +
+>       if (!QEMU_IS_ALIGNED(conf->opt_io_size, conf->logical_block_size)) {
+>           error_setg(errp,
+>                      "opt_io_size must be a multiple of logical_block_size");
+
+> +++ b/tests/qemu-iotests/172.out
+> @@ -24,11 +24,11 @@ Testing:
+>                 dev: floppy, id ""
+>                   unit = 0 (0x0)
+>                   drive = "floppy0"
+> -                logical_block_size = 512 (0x200)
+> -                physical_block_size = 512 (0x200)
+> -                min_io_size = 0 (0x0)
+> -                opt_io_size = 0 (0x0)
+> -                discard_granularity = 4294967295 (0xffffffff)
+> +                logical_block_size = 512 (512 B)
+> +                physical_block_size = 512 (512 B)
+> +                min_io_size = 0 (0 B)
+> +                opt_io_size = 0 (0 B)
+> +                discard_granularity = 4294967295 (4 GiB)
+
+Although 4 GiB is not quite the same as 4294967295, the exact byte value 
+next to the approximate size is not too bad.  The mechanical fallout 
+from the change from int to size is fine to me.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
