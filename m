@@ -2,85 +2,91 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627A3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A737C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3748520787
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:20:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3748520787
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E44E020787
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:31:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMfCLmN2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44E020787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdpQF-0002v5-E2
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:20:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55628)
+	id 1jdpbA-0007Uw-1y
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:31:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdpPh-0002VK-HN
- for qemu-devel@nongnu.org; Wed, 27 May 2020 02:19:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36576)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdpPg-0005d0-2c
- for qemu-devel@nongnu.org; Wed, 27 May 2020 02:19:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jdpPd-0005lz-TU
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 06:19:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CB3412E8087
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 06:19:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdpaB-0006zn-9q
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 02:30:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48985
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdpa9-0005BG-Q1
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 02:30:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590561027;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=e/uERUDEw/rJv174lR0x9aFTQCPxPllMUq14dHSIfOs=;
+ b=fMfCLmN22IBGDaQNbCStuzU81aqDSE7W918Nn2J3F72RD+tuOZsBcpqFs55WgMdH1uu6LT
+ RDxN9EQUIMZY/HXrDZ3N4EIjRzlN97Ezo1K5VZqJBvhG3oqmAmtLRbqBbl109GkRDSzYiG
+ YmpgcEY231w5oP1GgujuDVQTjQOyTx0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-96zJYsyENFC5L43ea8hjIg-1; Wed, 27 May 2020 02:30:23 -0400
+X-MC-Unique: 96zJYsyENFC5L43ea8hjIg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA5C818017EE;
+ Wed, 27 May 2020 06:30:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D46D010013D7;
+ Wed, 27 May 2020 06:30:19 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 685FD113864A; Wed, 27 May 2020 08:30:18 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PULL 0/8] Audio 20200526 patches
+References: <20200526075639.27949-1-kraxel@redhat.com>
+Date: Wed, 27 May 2020 08:30:18 +0200
+In-Reply-To: <20200526075639.27949-1-kraxel@redhat.com> (Gerd Hoffmann's
+ message of "Tue, 26 May 2020 09:56:31 +0200")
+Message-ID: <87ftblsxdx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 May 2020 06:03:53 -0000
-From: Greg Kurz <1336794@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=None; component=None;
- status=Confirmed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: agretha crobinso ericvh gkurz infinoid janitor
- l-admin-o maxim-kuvyrkov
-X-Launchpad-Bug-Reporter: Cole Robinson (crobinso)
-X-Launchpad-Bug-Modifier: Greg Kurz (gkurz)
-References: <20140702135258.23882.15100.malonedeb@soybean.canonical.com>
-Message-Id: <159055943336.806.7379057394662646136.malone@chaenomeles.canonical.com>
-Subject: [Bug 1336794] Re: 9pfs does not honor open file handles on unlinked
- files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a4b391a2f278390a1fc11040096240214498ea60
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:00:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,100 +95,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1336794 <1336794@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For the records.
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-QEMU patches:
+> The following changes since commit fea8f3ed739536fca027cf56af7f5576f37ef9cd:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/pflash-next-20200522' into staging (2020-05-22 18:54:47 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/audio-20200526-pull-request
+>
+> for you to fetch changes up to b3b8a1fea6ed5004bbad2f70833caee70402bf02:
+>
+>   hw/mips/mips_fulong2e: Remove unused 'audio/audio.h' include (2020-05-26 08:46:14 +0200)
+>
+> ----------------------------------------------------------------
+> audio: add JACK client audiodev.
+> audio: bugfixes and cleanups.
+>
+> ----------------------------------------------------------------
 
-https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg07586.html
+$ qemu-system-aarch64 -S -accel qtest -display none -M akita -monitor stdio
+(qemu) qemu-system-aarch64: /work/armbru/qemu/audio/paaudio.c:779: qpa_audio_init: Assertion `dev->driver == AUDIODEV_DRIVER_PA' failed.
 
-Linux patches:
+Same for 40p, akita, borzoi, cheetah, integratorcp, milkymist, musicpal,
+n800, n810, realview-eb, realview-eb-mpcore, realview-pb-a8,
+realview-pbx-a9, spitz, terrier, versatileab, versatilepb, vexpress-a15,
+vexpress-a9, xlnx-zcu102, z2.
 
-https://sourceforge.net/p/v9fs/mailman/message/35175775/
+git-bisect blames commit 2e44570321 "audio/jack: add JACK client
+audiodev".
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1336794
-
-Title:
-  9pfs does not honor open file handles on unlinked files
-
-Status in QEMU:
-  Confirmed
-Status in Ubuntu:
-  Confirmed
-
-Bug description:
-  This was originally filed over here:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1114221
-
-  The open-unlink-fstat idiom used in some places to create an anonymous
-  private temporary file does not work in a QEMU guest over a virtio-9p
-  filesystem.
-
-  Version-Release number of selected component (if applicable):
-
-  qemu-kvm-1.6.2-6.fc20.x86_64
-  qemu-system-x86-1.6.2-6.fc20.x86_64
-  (those are fedora RPMs)
-
-  How reproducible:
-
-  Always. See this example C program:
-
-  https://bugzilla.redhat.com/attachment.cgi?id=3D913069
-
-  Steps to Reproduce:
-  1. Export a filesystem with virt-manager for the guest.
-        (type: mount, driver: default, mode: passthrough)
-  2. Start guest and mount that filesystem
-        (mount -t 9p -o trans=3Dvirtio,version=3D9p2000.L  ...)
-  3. Run a program that uses open-unlink-fstat
-        (in my case it was trying to compile Perl 5.20)
-
-  Actual results:
-
-  fstat fails:
-
-  open("/home/tst/filename", O_RDWR|O_CREAT|O_EXCL, 0600) =3D 3
-  unlink("/home/tst/filename")            =3D 0
-  fstat(3, 0x23aa1a8)                     =3D -1 ENOENT (No such file or di=
-rectory)
-  close(3)
-
-  Expected results:
-
-  open("/home/tst/filename", O_RDWR|O_CREAT|O_EXCL, 0600) =3D 3
-  unlink("/home/tst/filename")            =3D 0
-  fstat(3, {st_mode=3DS_IFREG|0600, st_size=3D0, ...}) =3D 0
-  fcntl(3, F_SETFD, FD_CLOEXEC)           =3D 0
-  close(3) =
-
-
-  Additional info:
-
-  There was a patch put into the kernel back in '07 to handle this very
-  problem for other filesystems; maybe its helpful:
-
-        http://lwn.net/Articles/251228/
-
-  There is also a thread on LKML from last December specifically about
-  this very problem:
-
-        https://lkml.org/lkml/2013/12/31/163
-
-  There was a discussion on the QEMU list back in '11 that doesn't seem
-  to have come to a conclusion, but did provide the test program that
-  i've attached to this report:
-
-        http://marc.info/?l=3Dqemu-devel&m=3D130443605720648&w=3D2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1336794/+subscriptions
 
