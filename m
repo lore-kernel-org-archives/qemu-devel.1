@@ -2,82 +2,102 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7894BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A98C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:54:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E57D20C56
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:53:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E57D20C56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E25520C56
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:54:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E25520C56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdqsQ-0003Ek-FT
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:53:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48314)
+	id 1jdqtQ-0005aW-Rj
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:54:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdqrG-0001RG-J7
- for qemu-devel@nongnu.org; Wed, 27 May 2020 03:52:14 -0400
-Received: from mail-ej1-f68.google.com ([209.85.218.68]:35806)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jdqrF-0005L4-F4
- for qemu-devel@nongnu.org; Wed, 27 May 2020 03:52:14 -0400
-Received: by mail-ej1-f68.google.com with SMTP id y13so4898700eju.2
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 00:52:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=V8/R3XDOhv+EBwJfIsEGBrb3ekCpboZGCo3efFZDEcY=;
- b=kkxtTOFWTqKDtluk3Z5lJgawQCcimUpDHGm14tWtjcGa+GJD5MnkbVbkIxfft+23Jg
- svvuSpZqtAynEUI75nq0t5hLCc5ePqOoNF++wHYQRy+3Z6wy2W2/CkfBPygaXZ7WQbpr
- OkLnXyVfNTcjsxVDSrpHOnQEpiRjBxh02qnLlKVlw3Mfx9lc4sFlhI3GdD+YgdEHLvS/
- JMcL3HQawAbS0QbvPinGBl1/xOyNIQWY5Op28/IwtlidAEG0FpB7br2tpY9Jzo/C4fpG
- 4TkA7UKD1LPrJ6gigR+3ve8pA87fASYlXn6KqYmE1pLXe99OyghAsX0jb7lusIa/sx7i
- DL+A==
-X-Gm-Message-State: AOAM531R8a4FggjmO2gIWVfOBumDtJoTtcWoIzsa4X7SuuEolOrk6M91
- hKr268E4k2LNL5IquFQx/JfQ0bK7Ylz9BQgN/1E=
-X-Google-Smtp-Source: ABdhPJxyUTmNMh3NwJPhMGhr3g/4gWVZBsM/hGaN+AgdhC/2WtIpd3tCjqkyKuXCxtb3lXjoSLCDEhkdhYEg6qz+QOY=
-X-Received: by 2002:a17:906:9404:: with SMTP id
- q4mr4675249ejx.138.1590565932008; 
- Wed, 27 May 2020 00:52:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jdqon-0004uP-KY; Wed, 27 May 2020 03:49:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18648)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jdqom-0003e4-FP; Wed, 27 May 2020 03:49:41 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04R7Wweh132771; Wed, 27 May 2020 03:49:39 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3170c6sq7n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 03:49:38 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04R7XB5m133811;
+ Wed, 27 May 2020 03:49:38 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3170c6sq6h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 03:49:38 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04R7fknp011259;
+ Wed, 27 May 2020 07:49:36 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03ams.nl.ibm.com with ESMTP id 316uf87e5y-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 07:49:36 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04R7nYtE61866228
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 27 May 2020 07:49:34 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0612BA4060;
+ Wed, 27 May 2020 07:49:34 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 50235A4054;
+ Wed, 27 May 2020 07:49:33 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 27 May 2020 07:49:33 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 7/9] pc-bios: s390x: Move panic() into header and add
+ infinite loop
+Date: Wed, 27 May 2020 03:49:18 -0400
+Message-Id: <20200527074920.43669-8-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200527074920.43669-1-frankja@linux.ibm.com>
+References: <20200527074920.43669-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-References: <20200518200920.17344-1-aleksandar.qemu.devel@gmail.com>
- <20200518200920.17344-21-aleksandar.qemu.devel@gmail.com>
- <dba8f844-e28a-bd13-9655-75f8004ad21f@amsat.org>
- <CAHiYmc6DMA2LRXama80zaPi+7RqFQYWL5OwtRn_Xk-ueASAi_A@mail.gmail.com>
- <3cc6c3d2-19f6-8502-a460-67c5853ff953@amsat.org>
- <CAHiYmc6xuRQ0u+BLotEpKvmF+_vv2madz80oUJqsJz0o3a3JdA@mail.gmail.com>
-In-Reply-To: <CAHiYmc6xuRQ0u+BLotEpKvmF+_vv2madz80oUJqsJz0o3a3JdA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 27 May 2020 09:52:00 +0200
-Message-ID: <CAAdtpL7ROfxW-LVMzUjnAOogmvHunPZ+tppX-OwuEO7+7uj=5Q@mail.gmail.com>
-Subject: Re: [PATCH v6 20/21] hw/mips: Add some logging for bad register
- offset cases
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.218.68;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f68.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 03:52:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-05-27_02:2020-05-26,
+ 2020-05-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0
+ cotscore=-2147483648 priorityscore=1501 impostorscore=0 clxscore=1015
+ suspectscore=1 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ phishscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005270053
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 03:49:33
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,174 +110,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ thuth@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar,
+panic() was defined for the ccw and net bios, i.e. twice, so it's
+cleaner to rather put it into the header.
 
-On Tue, May 26, 2020 at 12:46 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
-> =D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:38 Philippe Ma=
-thieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
-> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > On 5/26/20 12:05 PM, Aleksandar Markovic wrote:
-> > > =D1=83=D1=82=D0=BE, 26. =D0=BC=D0=B0=D1=98 2020. =D1=83 09:42 Philipp=
-e Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
-> > > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > >>
-> > >> On 5/18/20 10:09 PM, Aleksandar Markovic wrote:
-> > >>> Log the cases where a guest attempts read or write using bad
-> > >>> register offset.
-> > >>>
-> > >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > >>> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > >>
-> > >> Not well tested apparently, because it doesn't build with GCC 5.4.0
-> > >> (Ubuntu):
-> > >>
-> > >> hw/mips/malta.c: In function =E2=80=98malta_fpga_read=E2=80=99:
-> > >> hw/mips/malta.c:430:85: error: format =E2=80=98%x=E2=80=99 expects a=
-rgument of type
-> > >> =E2=80=98unsigned int=E2=80=99, but argument 2 has type =E2=80=98hwa=
-ddr {aka long unsigned int}=E2=80=99
-> > >> [-Werror=3Dformat=3D]
-> > >> hw/mips/malta.c: In function =E2=80=98malta_fpga_write=E2=80=99:
-> > >> hw/mips/malta.c:517:85: error: format =E2=80=98%x=E2=80=99 expects a=
-rgument of type
-> > >> =E2=80=98unsigned int=E2=80=99, but argument 2 has type =E2=80=98hwa=
-ddr {aka long unsigned int}=E2=80=99
-> > >> [-Werror=3Dformat=3D]
-> > >> cc1: all warnings being treated as errors
-> > >>
-> > >> I amended this snippet ...:
-> > >>
-> > >> -- >8 --
-> > >> @@ -428,8 +428,8 @@ static uint64_t malta_fpga_read(void *opaque, hw=
-addr
-> > >> addr,
-> > >>
-> > >>      default:
-> > >>          qemu_log_mask(LOG_GUEST_ERROR,
-> > >> -                      "malta_fpga_read: Bad register offset 0x"
-> > >> -                      TARGET_FMT_lx "\n", addr);
-> > >> +                      "malta_fpga_read: Bad register addr
-> > >> 0x%"HWADDR_PRIX"\n",
-> > >> +                      addr);
-> > >>          break;
-> > >>      }
-> > >>      return val;
-> > >> @@ -515,8 +515,8 @@ static void malta_fpga_write(void *opaque, hwadd=
-r addr,
-> > >>
-> > >>      default:
-> > >>          qemu_log_mask(LOG_GUEST_ERROR,
-> > >> -                      "malta_fpga_write: Bad register offset 0x"
-> > >> -                      TARGET_FMT_lx "\n", addr);
-> > >> +                      "malta_fpga_write: Bad register addr
-> > >> 0x%"HWADDR_PRIX"\n",
-> > >> +                      addr);
-> > >>          break;
-> > >>      }
-> > >>  }
-> > >> ---
-> > >>
-> > >> ... and queued to mips-next,
-> > >>
-> > >
-> > > Hi, Philippe,
-> > >
-> > > Many thanks for correcting my mistake in this patch!
-> > > May I ask you to refer to your queue as hw/mips-next, rather than
-> > > mips-next, for the sake of clarity?
-> >
-> > Tags with '/' are hard to manage, let's use mips-hw-next,
-> > mips-target-next for your pull requests and mips-kvm-next for Huacai's =
-ones.
-> >
-> > > And, when do you plan to send the pull request?
-> >
-> > Waiting for Gerd's audio-next one to get merged because he took my
-> > "mips_fulong2e: Remove unused 'audio/audio.h' include" patch and I don'=
-t
-> > want Peter to have to manually resolve conflicts (there shouldn't be,
-> > but I don't want to risk bother him with a "automatic 3-way merge" warn=
-ing).
-> >
->
-> Philippe, I think you created a lot of problems here without any real nee=
-d.
+Also let's add an infinite loop into the assembly of disabled_wait() so
+the caller doesn't need to take care of it.
 
-Did I?
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c     | 7 -------
+ pc-bios/s390-ccw/netmain.c  | 8 --------
+ pc-bios/s390-ccw/s390-ccw.h | 9 +++++++--
+ pc-bios/s390-ccw/start.S    | 5 +++--
+ 4 files changed, 10 insertions(+), 19 deletions(-)
 
->
-> We should sync between us rather than sent "surprise" "pull requests".
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 8b912454c9..146a50760b 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -46,13 +46,6 @@ void write_iplb_location(void)
+     lowcore->ptr_iplb = ptr2u32(&iplb);
+ }
+ 
+-void panic(const char *string)
+-{
+-    sclp_print(string);
+-    disabled_wait();
+-    while (1) { }
+-}
+-
+ unsigned int get_loadparm_index(void)
+ {
+     return atoui(loadparm_str);
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+index 73def8de4f..ef7ce1e01d 100644
+--- a/pc-bios/s390-ccw/netmain.c
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -439,14 +439,6 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+     return rc;
+ }
+ 
+-void panic(const char *string)
+-{
+-    sclp_print(string);
+-    for (;;) {
+-        disabled_wait();
+-    }
+-}
+-
+ void write_subsystem_identification(void)
+ {
+     SubChannelId *schid = (SubChannelId *) 184;
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index c5820e43ae..36b884cced 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -50,12 +50,11 @@ typedef unsigned long long __u64;
+ #include "iplb.h"
+ 
+ /* start.s */
+-void disabled_wait(void);
++void disabled_wait(void) __attribute__ ((__noreturn__));
+ void consume_sclp_int(void);
+ void consume_io_int(void);
+ 
+ /* main.c */
+-void panic(const char *string);
+ void write_subsystem_identification(void);
+ void write_iplb_location(void);
+ extern char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+@@ -91,6 +90,12 @@ bool menu_is_enabled_enum(void);
+ 
+ #define MAX_BOOT_ENTRIES  31
+ 
++static inline void panic(const char *string)
++{
++    sclp_print(string);
++    disabled_wait();
++}
++
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index aa8fceb19d..35be141d8d 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -47,8 +47,9 @@ memsetxc:
+  */
+ 	.globl disabled_wait
+ disabled_wait:
+-        larl %r1,disabled_wait_psw
+-        lpswe   0(%r1)
++        larl	%r1,disabled_wait_psw
++        lpswe	0(%r1)
++1:	j	1b
+ 
+ 
+ /*
+-- 
+2.25.1
 
-This I clearly understood. I doubt this will ever happen again.
-
->
-> I am not happy with coordination of our common MIPS work.
-
-I am also unhappy with my MIPS contributions.
-
-Regards,
-
-Phil.
-
->
-> > >
-> > > Thanks,
-> > > Aleksandar
-> > >
-> > >
-> > >> Thanks,
-> > >>
-> > >> Phil.
-> > >>
-> > >>> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com=
->
-> > >>> ---
-> > >>>  hw/mips/mips_malta.c | 14 ++++++--------
-> > >>>  1 file changed, 6 insertions(+), 8 deletions(-)
-> > >>>
-> > >>> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> > >>> index e4c4de1b4e..88869b828e 100644
-> > >>> --- a/hw/mips/mips_malta.c
-> > >>> +++ b/hw/mips/mips_malta.c
-> > >>> @@ -427,10 +427,9 @@ static uint64_t malta_fpga_read(void *opaque, =
-hwaddr addr,
-> > >>>          break;
-> > >>>
-> > >>>      default:
-> > >>> -#if 0
-> > >>> -        printf("malta_fpga_read: Bad register offset 0x" TARGET_FM=
-T_lx "\n",
-> > >>> -               addr);
-> > >>> -#endif
-> > >>> +        qemu_log_mask(LOG_GUEST_ERROR,
-> > >>> +                      "malta_fpga_read: Bad register offset 0x"
-> > >>> +                      TARGET_FMT_lx "\n", addr);
-> > >>>          break;
-> > >>>      }
-> > >>>      return val;
-> > >>> @@ -515,10 +514,9 @@ static void malta_fpga_write(void *opaque, hwa=
-ddr addr,
-> > >>>          break;
-> > >>>
-> > >>>      default:
-> > >>> -#if 0
-> > >>> -        printf("malta_fpga_write: Bad register offset 0x" TARGET_F=
-MT_lx "\n",
-> > >>> -               addr);
-> > >>> -#endif
-> > >>> +        qemu_log_mask(LOG_GUEST_ERROR,
-> > >>> +                      "malta_fpga_write: Bad register offset 0x"
-> > >>> +                      TARGET_FMT_lx "\n", addr);
-> > >>>          break;
-> > >>>      }
-> > >>>  }
-> > >>>
-> > >
 
