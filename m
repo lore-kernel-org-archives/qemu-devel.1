@@ -2,148 +2,133 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6C4C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C34C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 416712078C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:24:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416712078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10945207D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:25:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMPgCDht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10945207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jduAN-0007Sb-Eh
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 07:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37482)
+	id 1jduBe-000159-5l
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 07:25:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jdu9h-00071P-Lr; Wed, 27 May 2020 07:23:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60952)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jdu9e-0006El-VD; Wed, 27 May 2020 07:23:29 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04RB9mLc149054; Wed, 27 May 2020 07:23:24 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 316ygc7aqv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 07:23:23 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04RAXVOw150484;
- Wed, 27 May 2020 07:23:23 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 316ygc7apy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 07:23:23 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04RBFKr1005598;
- Wed, 27 May 2020 11:23:21 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma04ams.nl.ibm.com with ESMTP id 316uf8yscm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 11:23:21 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04RBNIuj26607828
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 27 May 2020 11:23:18 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A8AA7AE056;
- Wed, 27 May 2020 11:23:18 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4EBB8AE04D;
- Wed, 27 May 2020 11:23:18 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.21.239])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 27 May 2020 11:23:18 +0000 (GMT)
-Subject: Re: [PATCH v3 4/9] pc-bios: s390x: Get rid of magic offsets into the
- lowcore
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200527074920.43669-1-frankja@linux.ibm.com>
- <20200527074920.43669-5-frankja@linux.ibm.com>
- <a69f12b8-4ade-698a-b8cf-fd1f370a7c16@de.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d02ec3bf-e74e-ea55-d05c-c701acff2673@linux.ibm.com>
-Date: Wed, 27 May 2020 13:23:17 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jduAa-0007l0-Eg
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 07:24:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24301
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jduAY-0006PU-Dd
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 07:24:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590578660;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=wXK5keqVzLVKsV98Q1CIzeEZ1VY8hzdxiB1xh8Y7CJk=;
+ b=QMPgCDhtvZMgVQds91c7PTjeMERtde+nql1IK/3QEQCyOjdH0wTwwl+fFskvTAdx35Ddk8
+ lbsnbhLWgkHnfbBqct1J8W5MjFkRjff9J5uVCgZwRZpwoZ4yFXMEW0/7i3P35awzsULCYf
+ lRaRk0eqTgM2icw2opB35fbkmuHC86Y=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-a-8-YYoxM3O4dK7ogL-Kow-1; Wed, 27 May 2020 07:24:19 -0400
+X-MC-Unique: a-8-YYoxM3O4dK7ogL-Kow-1
+Received: by mail-ej1-f72.google.com with SMTP id s13so8721286ejc.18
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 04:24:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=wXK5keqVzLVKsV98Q1CIzeEZ1VY8hzdxiB1xh8Y7CJk=;
+ b=dITfh+EJeuxCZ6+oQ1wHpBebreRVtIKr/IS8YaAnFxDEJMBLlsPtIAaWeKA+oRMZn/
+ 3sPEIhDRAs+8nhBhKihi31Z+5CjEElzSqhW3h2qFXnhGeoLYhP7dS7vXRQOOBpB5G9eT
+ dVAJ75C1tdG0q9WI+a1TFvaOIOTeZ8bR8DI2kup31Z3ygFRzKMTGs9MAZrNHmDmLT9Qq
+ U6BophoCG7Zh8Kn9NoqtTpPVyRk6P39T/yM3lO+JhU+iCb495QPQ7XCxlw+3yNLll0MA
+ 0Rbqh+/G/p60CbcQIPHETnNm0CF/MeHrodIQYFydK9NwpJ8vi5/1vLZhSQR5Izo/h1ks
+ Yz4g==
+X-Gm-Message-State: AOAM530/AIhzl29gxbCaQTNtZRl5YeVl/N9GyBWNyphPrGHORSDNr9Pq
+ aN36mvYPcdZCNpWJT+NEh7n2EpjG1lc9O/KRDNf4Za8MOslfVc6MGFL7jsQ3/SUT43MMl1w8CVk
+ UtCYEYLltUCXE9i8=
+X-Received: by 2002:a50:fb1a:: with SMTP id d26mr23569716edq.83.1590578657947; 
+ Wed, 27 May 2020 04:24:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxsN/f0jKHlkQjBBGv+JXJ7+k1EPDuYrCDuJGndLdPsnIEvEm7g49vyOWbb3ISI499D3eYFDA==
+X-Received: by 2002:a50:fb1a:: with SMTP id d26mr23569688edq.83.1590578657522; 
+ Wed, 27 May 2020 04:24:17 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id o21sm2487237ejb.31.2020.05.27.04.24.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 27 May 2020 04:24:17 -0700 (PDT)
+Subject: Re: [PATCH 01/24] arm/stm32f405: Fix realization of "stm32f2xx-adc"
+ devices
+To: Markus Armbruster <armbru@redhat.com>,
+ Alistair Francis <alistair23@gmail.com>
+References: <20200518050408.4579-1-armbru@redhat.com>
+ <20200518050408.4579-2-armbru@redhat.com>
+ <CAKmqyKOun2FyT+JR8cyrP9eQn9xFDAppFb4W12ym-TPGt9h7Hg@mail.gmail.com>
+ <87d0707bri.fsf@dusky.pond.sub.org>
+ <CAKmqyKM3oOLfAxupqfabrj_epQCCE_YbwnkU4cRd5mtg8+7_yg@mail.gmail.com>
+ <87blm9ralp.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <4d5649f0-df3c-d075-5c82-c80ecde08f95@redhat.com>
+Date: Wed, 27 May 2020 13:24:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <a69f12b8-4ade-698a-b8cf-fd1f370a7c16@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-05-27_03:2020-05-27,
- 2020-05-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0
- cotscore=-2147483648 spamscore=0 lowpriorityscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015 malwarescore=0
- adultscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005270077
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 07:23:24
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+In-Reply-To: <87blm9ralp.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -157,119 +142,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com,
- david@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz
-Content-Type: multipart/mixed; boundary="zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a"
-
---zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 5/27/20 10:50 AM, Christian Borntraeger wrote:
->=20
->=20
-> On 27.05.20 09:49, Janosch Frank wrote:
->> If we have a lowcore struct that has members for offsets that we want
->> to touch, why not use it?
+On 5/27/20 11:27 AM, Markus Armbruster wrote:
+> Alistair Francis <alistair23@gmail.com> writes:
+> 
+>> On Mon, May 18, 2020 at 10:08 PM Markus Armbruster <armbru@redhat.com> wrote:
+>>>
+>>> Alistair Francis <alistair23@gmail.com> writes:
+>>>
+>>>> On Sun, May 17, 2020 at 10:06 PM Markus Armbruster <armbru@redhat.com> wrote:
+>>>>>
+>>>>> stm32f405_soc_initfn() creates six such devices, but
+>>>>> stm32f405_soc_realize() realizes only one.  Affects machine
+>>>>> netduinoplus2.
+>>>>>
+>>>>> I wonder how this ever worked.  If the "device becomes real only on
+>>>>> realize" thing actually works, then we've always been missing five of
+>>>>> six such devices, yet nobody noticed.
+>>>>
+>>>> I must have just been testing the first ADC.
+>>>>
+>>>>>
+>>>>> Fix stm32f405_soc_realize() to realize all six.  Visible in "info
+>>>>> qtree":
+>>>>>
+>>>>>      bus: main-system-bus
+>>>>>        type System
+>>>>>        dev: stm32f405-soc, id ""
+>>>>>          cpu-type = "cortex-m4-arm-cpu"
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>     -    mmio ffffffffffffffff/00000000000000ff
+>>>>>     +    mmio 0000000040012000/00000000000000ff
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>     -    mmio ffffffffffffffff/00000000000000ff
+>>>>>     +    mmio 0000000040012000/00000000000000ff
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>     -    mmio ffffffffffffffff/00000000000000ff
+>>>>>     +    mmio 0000000040012000/00000000000000ff
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>     -    mmio ffffffffffffffff/00000000000000ff
+>>>>>     +    mmio 0000000040012000/00000000000000ff
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>          mmio 0000000040012000/00000000000000ff
+>>>>>        dev: stm32f2xx-adc, id ""
+>>>>>          gpio-out "sysbus-irq" 1
+>>>>>     -    mmio ffffffffffffffff/00000000000000ff
+>>>>>     +    mmio 0000000040012000/00000000000000ff
+>>>>>        dev: armv7m, id ""
+>>>>>
+>>>>> The mmio addresses look suspicious.
+>>>>
+>>>> Good catch, thanks :)
+>>>
+>>> I'd love to squash in corrections, but I don't know the correct
+>>> addresses.  Can you help?
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->> ---
->>  pc-bios/s390-ccw/cio.h  | 17 +++++++++++------
->>  pc-bios/s390-ccw/main.c |  8 +++-----
->>  2 files changed, 14 insertions(+), 11 deletions(-)
+>> Yep, thanks for squashing it in.
 >>
->> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
->> index aaa432dedd..1e5d4e92e1 100644
->> --- a/pc-bios/s390-ccw/cio.h
->> +++ b/pc-bios/s390-ccw/cio.h
->> @@ -122,12 +122,17 @@ typedef struct schib {
->>  } __attribute__ ((packed, aligned(4))) Schib;
->> =20
->>  typedef struct subchannel_id {
->> -        __u32 cssid:8;
->> -        __u32:4;
->> -        __u32 m:1;
->> -        __u32 ssid:2;
->> -        __u32 one:1;
->> -        __u32 sch_no:16;
->> +    union {
->> +        struct {
->> +            __u16 cssid:8;
->> +            __u16 reserved:4;
->> +            __u16 m:1;
->> +            __u16 ssid:2;
->> +            __u16 one:1;
->> +        };
->> +        __u16 sch_id;
->> +    };
->> +    __u16 sch_no;
->>  } __attribute__ ((packed, aligned(4))) SubChannelId;
->>  >  struct chsc_header {
->> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->> index 4e65b411e1..8b912454c9 100644
->> --- a/pc-bios/s390-ccw/main.c
->> +++ b/pc-bios/s390-ccw/main.c
->> @@ -36,11 +36,9 @@ LowCore *lowcore; /* Yes, this *is* a pointer to ad=
-dress 0 */
->>   */
->>  void write_subsystem_identification(void)
->>  {
->> -    SubChannelId *schid =3D (SubChannelId *) 184;
->> -    uint32_t *zeroes =3D (uint32_t *) 188;
->> -
->> -    *schid =3D blk_schid;
->> -    *zeroes =3D 0;
->> +    lowcore->subchannel_id =3D blk_schid.sch_id;
->> +    lowcore->subchannel_nr =3D blk_schid.sch_no;
->> +    lowcore->io_int_parm =3D 0;
->>  }
->> =20
->>  void write_iplb_location(void)
->=20
-> As an alternative, why not change the definition of Lowcore and replace=
- both 16bit
-> fields lowcore->subchannel_id and lowcore->subchannel_nr with SubChanne=
-lID.
-> You can then simply assign lowcore->schid=3D blk_schid;
->=20
-> ?
->=20
-I think Pierre voted against that in the internal review if I remember
-correctly.
+>> The three addresses are:
+>>
+>> 0x40012000
+>> 0x40012100
+>> 0x40012200
+>>
+>> and they all share interrupt number 18.
+> 
+> An the other three?  There are six devices in total...
 
+Alistair looked at the stm32f205, which has 3 ADCs (and seems correct).
 
---zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a--
+> 
+>> Let me know if you want me to do it.
 
---kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Alistair, the problem is the stm32f405. I guess the bug come from
+copy/pasting then modifying for the shared IRQ.
 
------BEGIN PGP SIGNATURE-----
+    /* Timer 2 to 5 */
+    for (i = 0; i < STM_NUM_TIMERS; i++) {
+       ...
+    }
+    ...
+    /* ADC device, the IRQs are ORed together */
+    ...
+    dev = DEVICE(&(s->adc[i])); <=== i = STM_NUM_TIMERS = 4
+    object_property_set_bool(OBJECT(&s->adc[i]),
+                             true, "realized", &err);
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7OTaUACgkQ41TmuOI4
-ufgleA//WgNHRpTNekN/DInEimxRfToK3iUt62pswBQWOgCjpn0FHW3RJT1cKP73
-HVThLhtNUdnphQDRTHw1AhAW2RtdFw3VqUl30PKnX76mVxoNs/LMJj22rNrH2ejb
-8sZdYTlNNdMDg/q/zDDJ72yf+I0LdKRxRURNszHDy/fXQ8ZplMFnobPUrSe+HscV
-phBE2IAI0CJn8Xw2ZCFNTD97ChWXJg5LtNlhWCz3UXnxDaeCTVoJ/7qy5j9FhcFq
-H1+bdie4Ddont8Rt+kN6bRndNqKJ3fRtOBWoAWtejfOVlBnFRR/l+ICJINlJG+NJ
-vNVEwb2PJrJFqCLWP1LpZmSNvwetWOy3mgCJGdfTanukae4ToFmH1++DIuWkRoUH
-06xO8A8hFJln0n+RagzvevBD4FF7hP6mrme1NZ6+qxO8n5Z2Hknm2eUTinRAb9dk
-k3uSlmwPY2RPHuZtgP5YwPWG46b2rH3NVCUK0dWwj/foB9Zw/gZ2L0CHOY7J2WJR
-Dx6tkrYKSm+f3dWSWO6e4TTxgRh427ituE2cZ7kEbeWWB22fYUyCsrHOfeKCLeKv
-vUrDLiwqmYXlppev/GCMnxZ7LvFs5vFImqGJfdAMqCdr0XqIiM76hwTgxGGF3pRa
-13aTq3wP7AhRigh94Hs4tSUdjuBS4o1CaFPWHkv1Me6jVhsz410=
-=3REW
------END PGP SIGNATURE-----
+Only ADC#3 is realized, then mapped at 0x40012000.
 
---kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz--
+You need to unparent the others anyway, so it is easier to realize
+adc[0] and unparent the rest:
+
+    for (i = 1; i < STM_NUM_ADCS; i++) {
+       ...
+    }
 
 
