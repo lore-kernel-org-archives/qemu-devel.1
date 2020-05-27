@@ -1,97 +1,85 @@
 Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60899C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5165FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BCD62078C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C8B3207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="evKLwX8c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BCD62078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PzV93t1G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8B3207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdpsw-0007M8-9y
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33194)
+	id 1jdpzw-00029v-83
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <1482995675@qq.com>) id 1jdpsE-0006wo-Bd
- for qemu-devel@nongnu.org; Wed, 27 May 2020 02:49:10 -0400
-Received: from smtpbg702.qq.com ([203.205.195.102]:56755
- helo=smtpproxy21.qq.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <1482995675@qq.com>) id 1jdps7-0000xn-7T
- for qemu-devel@nongnu.org; Wed, 27 May 2020 02:49:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1590562125; bh=zvU/f2PjUv74LOGUE3HyuCP6z24EGGAWESBS/lEdyPM=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=evKLwX8cbCwnO8Milkx54puiK0WbEeRr7UKhy5DgjaxZGH7zaN+veAd6OsaXMHOqL
- bn3FcddN95X3UshQpJiIDL4+QbO3Z6S+J33EkseecmeQwDLZU2YNNowFgAQbN0e0KZ
- GoGPsh2RbL6W11liAoQCY9qS51mF+jzkqNzxmcXQ=
-X-QQ-FEAT: 322/xMGPkyrCCB34SMiSlXfWqrz9maOWd3MpeErG+Wykj2dZERMKweUh7do8N
- aqxqkvY6CcKQdUn5U+sUV6NRM4jyMXMvX7KncCJqHc5h2uc6dZ4fFV5flB8vlhFtywLj3H1
- 5TebO5WNJZvyWToaDLGVTXqReiLSYc3kcXkNQJRD/Jq01rZEuiGUtERGkTEk0s8F7R/Gk4Z
- 2QO0PP0yuHHRRDbGkq8M8fHY2rqc/3E7UOX1SJV/1qEyn+3m7S+wZjXYCXgKquMOpUxw/eu
- WvSw==
-X-QQ-SSF: 00010000000000F000000000000000D
-X-QQ-XMAILINFO: M/m4MOBkWHa1cmh3Z6d3GjVdFa7kzmR8lUzw3nvGThE6S4WsIOmz+ll4TT2VPY
- blo/aet9FAdRk2Ol+S3MhYHYfxfUQzEBPlIxTw6XBksR1QRx1SIpMEyyHWKVwYe+6JavwqES88aur
- 6peHeMDW8xkFlIsJDmLyI6CDBCQC8HlDHKKcaULofm/LUMdBDBclcs/gb+X2X+yVNUPhIcaK6T+TY
- JMJwSuPNgdnowC6WcpIBtkzwcH/HmSL1aUiORRP9B67zu9yLuqANMdwATP+DfqEdKRwf/HgH6iBCl
- GcYEBZ6ZS7Tl/SsACI39ibdlzJj7KKbzZQulcmfLLKIORdGmEsCwq37Hu24BGi9N2rs2DpOq8naw3
- yw242aRawGecykx2sCD1/Y4hglWQ3wkeb+vZrNzLhWZ2LySkMpTPfbwkJ/fRO6jaqYwGZ65J6JnD3
- gvr6GSIvblyQjMbzJmkC00jcLXOZo6vy+YB3nyGNW5P9dr07zGNdjr2ZmD84NcaYUHqy1RQVI6Bcs
- xcIeZQ6pg+QVTp3afT3DBeRAWl/RsojVQteaKXqRTKPA0KJS71IqOnSuMt7+sr1SQFrrBiBpkEkra
- hTg5iBiF7Dz0Qgds/3MFNkiw/XkzR/NmPigPpVWAPtsjs8go3L36kKIYGJ9h7wqVguX0K88erGPJO
- QIRDYOxnh3IpvZNpY+1h6d7xo1Mw==
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 124.64.70.219
-X-QQ-STYLE: 
-X-QQ-mid: webmail725t1590562123t6386191
-From: "=?ISO-8859-1?B?Y2FzbWFj?=" <1482995675@qq.com>
-To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: GDB get wrong debug infos on TI DSP architecture extension
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="----=_NextPart_5ECE0D4B_106116D0_5848FAFC"
-Content-Transfer-Encoding: 8Bit
-Date: Wed, 27 May 2020 14:48:43 +0800
-X-Priority: 3
-Message-ID: <tencent_86D9DB902C46CBAC4F3A6FD5B4CDA93B7506@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Wed, 27 May 2020 14:48:44 +0800 (CST)
-Feedback-ID: webmail:qq.com:bgforeign:bgforeign12
-X-QQ-Bgrelay: 1
-Received-SPF: pass client-ip=203.205.195.102; envelope-from=1482995675@qq.com;
- helo=smtpproxy21.qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 02:48:50
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, FROM_EXCESS_BASE64=0.979,
- HTML_MESSAGE=0.001, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdpzE-0001D0-5Y
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 02:56:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34775
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdpzC-0005Rv-P8
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 02:56:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590562581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=6nR2rOkgw/C8QMrv3BnydfPOBJsah/0konKWMPr7DkA=;
+ b=PzV93t1GBwn1DhCjCjZZCMZFGD3oq+MYZWeaCPfbHyX03OanxXNybhVCbDUZKyuzb8redD
+ uNP2xS3Q4A4dcyUC6Tl93hZBcz56hCvM4vDUU9TSPIGcVpk5mgcCednSv/ePvJfmanXkrM
+ NFZcqCy35zIoxR+HT23C1h6Fehq0IIY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-i9NzYUKIPRm3ChYN9LvoQQ-1; Wed, 27 May 2020 02:56:19 -0400
+X-MC-Unique: i9NzYUKIPRm3ChYN9LvoQQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5989F460
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 06:56:18 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 795065D9C9;
+ Wed, 27 May 2020 06:56:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id EB259113864A; Wed, 27 May 2020 08:56:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] trace/simple: Fix unauthorized enable
+Date: Wed, 27 May 2020 08:56:13 +0200
+Message-Id: <20200527065613.25322-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,140 +92,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
+st_set_trace_file() accidentally enables tracing.  It's called
+unconditionally during startup, which is why QEMU built with the
+simple trace backend always writes a trace file "trace-$PID".
 
-------=_NextPart_5ECE0D4B_106116D0_5848FAFC
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+This has been broken for quite a while.  I didn't track down the exact
+commit.
 
-SGkgYWxsLA0KJm5ic3A7Jm5ic3A7IEkgYW0gd29ya2luZyBvbiBhIFRJIERTUCBhcmNoaXRl
-Y3R1cmUgZXh0ZW5zaW9uIGZvciBRRU1VLiBOb3csIHdlIGFyZSBhZGRpbmcgR0RCIGRlYnVn
-Z2luZyBmZWF0dXJlcy4gDQombmJzcDsmbmJzcDsgV2UgaGF2ZSBkb25lIHRoZSBmb2xsb3dp
-bmcsIGJ1dCBub3Qgc3VyZSB3ZSBhcmUgb24gdGhlIHJpZ2h0IHRyYWNrIDoNCiZuYnNwOyZu
-YnNwOyAtIGFkZCBhIHhtbCBkZXNjcmlwdGlvbiBmaWxlIGluIGdkYi14bWwsIHdpdGhvdXQg
-dW5kZXJzdGFuZGluZyB0aGUgcHVycG9zZSBvZiB0aGUgZmlsZSwgd2h5IHNvbWUgYXJjaGl0
-ZWN0dXJlcyBkb24ndCBwcm92aWRlIHN1Y2ggeG1sIGZpbGU/DQombmJzcDsmbmJzcDsgLSBh
-ZGQgKioqX2NwdV9nZGJfcmVhZF9yZWdpc3RlcigpLCAqKipfY3B1X2dkYl93cml0ZV9yZWdp
-c3RlcigpOw0KJm5ic3A7Jm5ic3A7IC0gYWRkZWQmbmJzcDsgZHNwX2NwdV9nZXRfcGh5c19w
-YWdlX2F0dHJzX2RlYnVnKCksIGJ1dCB1bmNlcnRhaW4gYWJvdXQgd2hhdCB0byByZXR1cm4N
-CiZuYnNwOyAmbmJzcDsmbmJzcDsgZHNwX2NwdV9nZXRfcGh5c19wYWdlX2F0dHJzX2RlYnVn
-KENQVVN0YXRlICpjcywgdmFkZHIgYWRkciwgTWVtVHhBdHRycyAqYXR0cnMpIA0KJm5ic3A7
-ICZuYnNwOyZuYnNwOyB7DQombmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgcmV0dXJuIGFk
-ZHIgJmFtcDsgVEFSR0VUX1BBR0VfTUFTSzsmbmJzcDsmbmJzcDsNCiZuYnNwOyAmbmJzcDsm
-bmJzcDsgfQ0KJm5ic3A7Jm5ic3A7IA0KJm5ic3A7Jm5ic3A7IFdlIHJ1biBRRU1VIHdpdGgg
-dGhlIHRoZXNlIGFyZ3VtZW50cw0KJm5ic3A7Jm5ic3A7IHFlbXUtc3lzdGVtLWRzcCAuLi4g
-LWtlcm5lbCBmaWxlbmFtZS5vdXQgLVMgLXMNCiZuYnNwOyZuYnNwOyANCiZuYnNwOyZuYnNw
-OyBJdCB0dXJucyBvdXQgdGhhdCBnZGIgcmVhZHMgaW5jb3JyZWN0IHJlZ2lzdGVyIHZhbHVl
-cywgYW5kIGNvbXBsYWlucyA6ICJ3YXJuaW5nOiBUYXJnZXQtc3VwcGxpZWQgcmVnaXN0ZXJz
-IGFyZSBub3Qgc3VwcG9ydGVkIGJ5IHRoZSBjdXJyZW50IGFyY2hpdGVjdHVyZSIuDQombmJz
-cDsmbmJzcDsgDQombmJzcDsmbmJzcDsgU29tZXRoaW5nIGlzIG1pc3NpbmcgaGVyZSwgb3Ig
-d2UgZG8gaXQgaW4gYSB3cm9uZyB3YXkuJm5ic3A7IEFueSBhZHZpc2Ugd291bGQgYmUgaGVs
-cGZ1bCB0byB1cy4NCiZuYnNwOyZuYnNwOyANCiZuYnNwOyZuYnNwOyBUaGFua3MuDQombmJz
-cDsgJm5ic3A7DQp4aWFvbGVpDQoNCiZuYnNwOyZuYnNwOyAtLS0tLSB0aV9kc3AueG1sJm5i
-c3A7IC0tLS0tDQombmJzcDsmbmJzcDsgDQombmJzcDsmbmJzcDsgPD94bWwgdmVyc2lvbj0i
-MS4wIj8mZ3Q7DQo8IURPQ1RZUEUgZmVhdHVyZSBTWVNURU0gImdkYi10YXJnZXQuZHRkIiZn
-dDsNCjxmZWF0dXJlIG5hbWU9Im9yZy5nbnUuZ2RiLnRpYzN4LmNvcmUiJmd0Ow0KJm5ic3A7
-Jm5ic3A7Jm5ic3A7IDxyZWcgbmFtZT0icjAiJm5ic3A7IGJpdHNpemU9IjMyIiZndDs8L3Jl
-ZyZndDsNCiZuYnNwOzxyZWcgbmFtZT0icjEiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7DQom
-bmJzcDs8cmVnIG5hbWU9InIyIiZuYnNwOyBiaXRzaXplPSIzMiImZ3Q7PC9yZWcmZ3Q7DQom
-bmJzcDs8cmVnIG5hbWU9InIzIiZuYnNwOyBiaXRzaXplPSIzMiIvJmd0Ow0KJm5ic3A7PHJl
-ZyBuYW1lPSJyNCImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDsNCiZuYnNwOzxyZWcgbmFtZT0i
-cjUiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9InI2IiZuYnNw
-OyBiaXRzaXplPSIzMiIvJmd0Ow0KJm5ic3A7PHJlZyBuYW1lPSJyNyImbmJzcDsgYml0c2l6
-ZT0iMzIiLyZndDsNCiZuYnNwOzxyZWcgbmFtZT0iYXIwIiBiaXRzaXplPSIzMiIvJmd0Ow0K
-Jm5ic3A7PHJlZyBuYW1lPSJhcjEiIGJpdHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5h
-bWU9ImFyMiIgYml0c2l6ZT0iMzIiLyZndDsNCiZuYnNwOzxyZWcgbmFtZT0iYXIzIiBiaXRz
-aXplPSIzMiIvJmd0Ow0KJm5ic3A7PHJlZyBuYW1lPSJhcjQiIGJpdHNpemU9IjMyIi8mZ3Q7
-DQombmJzcDs8cmVnIG5hbWU9ImFyNSIgYml0c2l6ZT0iMzIiLyZndDsNCiZuYnNwOzxyZWcg
-bmFtZT0iYXI2IiBiaXRzaXplPSIzMiIvJmd0Ow0KJm5ic3A7PHJlZyBuYW1lPSJhcjciIGJp
-dHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9ImRwIiZuYnNwOyBiaXRzaXplPSIz
-MiIvJmd0Ow0KJm5ic3A7PHJlZyBuYW1lPSJpcjAiIGJpdHNpemU9IjMyIi8mZ3Q7DQombmJz
-cDs8cmVnIG5hbWU9ImlyMSIgYml0c2l6ZT0iMzIiLyZndDsNCiZuYnNwOzxyZWcgbmFtZT0i
-YmsiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9InNwIiZuYnNw
-OyBiaXRzaXplPSIzMiIgdHlwZT0iZGF0YV9wdHIiLyZndDsNCiZuYnNwOzxyZWcgbmFtZT0i
-c3QiJm5ic3A7IGJpdHNpemU9IjMyIiZndDs8L3JlZyZndDsNCiZuYnNwOzxyZWcgbmFtZT0i
-aWUiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9ImlmIiZuYnNw
-OyBiaXRzaXplPSIzMiIvJmd0Ow0KJm5ic3A7PHJlZyBuYW1lPSJpb2YiIGJpdHNpemU9IjMy
-Ii8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9InJzIiZuYnNwOyBiaXRzaXplPSIzMiIvJmd0Ow0K
-Jm5ic3A7PHJlZyBuYW1lPSJyZSImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDsNCiZuYnNwOzxy
-ZWcgbmFtZT0icmMiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7DQombmJzcDs8cmVnIG5hbWU9
-InBjIiZuYnNwOyBiaXRzaXplPSIzMiIgdHlwZT0iZGF0YV9wdHIiLyZndDsNCiZuYnNwOzxy
-ZWcgbmFtZT0iY2xrIiZuYnNwOyBiaXRzaXplPSIzMiIvJmd0Ow0KPC9mZWF0dXJlJmd0Ow0K
-Jm5ic3A7Jm5ic3A7
+Fix st_set_trace_file() to restore the state.
 
-------=_NextPart_5ECE0D4B_106116D0_5848FAFC
-Content-Type: text/html;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+v2: Make st_set_trace_file() less confusing [Stefan]
 
-PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
-YXJzZXQ9R0IxODAzMCI+PGRpdj5IaSBhbGwsPGJyPiZuYnNwOyZuYnNwOyBJIGFtIHdvcmtp
-bmcgb24gYSBUSSBEU1AgYXJjaGl0ZWN0dXJlIGV4dGVuc2lvbiBmb3IgUUVNVS4gTm93LCB3
-ZSBhcmUgYWRkaW5nIEdEQiBkZWJ1Z2dpbmcgZmVhdHVyZXMuIDxicj4mbmJzcDsmbmJzcDsg
-V2UgaGF2ZSBkb25lIHRoZSBmb2xsb3dpbmcsIGJ1dCBub3Qgc3VyZSB3ZSBhcmUgb24gdGhl
-IHJpZ2h0IHRyYWNrIDo8YnI+Jm5ic3A7Jm5ic3A7IC0gYWRkIGEgeG1sIGRlc2NyaXB0aW9u
-IGZpbGUgaW4gZ2RiLXhtbCwgd2l0aG91dCB1bmRlcnN0YW5kaW5nIHRoZSBwdXJwb3NlIG9m
-IHRoZSBmaWxlLCB3aHkgc29tZSBhcmNoaXRlY3R1cmVzIGRvbid0IHByb3ZpZGUgc3VjaCB4
-bWwgZmlsZT88YnI+Jm5ic3A7Jm5ic3A7IC0gYWRkICoqKl9jcHVfZ2RiX3JlYWRfcmVnaXN0
-ZXIoKSwgKioqX2NwdV9nZGJfd3JpdGVfcmVnaXN0ZXIoKTs8YnI+Jm5ic3A7Jm5ic3A7IC0g
-YWRkZWQmbmJzcDsgZHNwX2NwdV9nZXRfcGh5c19wYWdlX2F0dHJzX2RlYnVnKCksIGJ1dCB1
-bmNlcnRhaW4gYWJvdXQgd2hhdCB0byByZXR1cm48YnI+Jm5ic3A7ICZuYnNwOyZuYnNwOyBk
-c3BfY3B1X2dldF9waHlzX3BhZ2VfYXR0cnNfZGVidWcoQ1BVU3RhdGUgKmNzLCB2YWRkciBh
-ZGRyLCBNZW1UeEF0dHJzICphdHRycykgPGJyPiZuYnNwOyAmbmJzcDsmbmJzcDsgezxicj4m
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgcmV0dXJuIGFkZHIgJmFtcDsgVEFSR0VUX1BB
-R0VfTUFTSzsmbmJzcDsmbmJzcDs8YnI+Jm5ic3A7ICZuYnNwOyZuYnNwOyB9PGJyPiZuYnNw
-OyZuYnNwOyA8YnI+Jm5ic3A7Jm5ic3A7IFdlIHJ1biBRRU1VIHdpdGggdGhlIHRoZXNlIGFy
-Z3VtZW50czxicj4mbmJzcDsmbmJzcDsgcWVtdS1zeXN0ZW0tZHNwIC4uLiAta2VybmVsIGZp
-bGVuYW1lLm91dCAtUyAtczxicj4mbmJzcDsmbmJzcDsgPGJyPiZuYnNwOyZuYnNwOyBJdCB0
-dXJucyBvdXQgdGhhdCBnZGIgcmVhZHMgaW5jb3JyZWN0IHJlZ2lzdGVyIHZhbHVlcywgYW5k
-IGNvbXBsYWlucyA6ICJ3YXJuaW5nOiBUYXJnZXQtc3VwcGxpZWQgcmVnaXN0ZXJzIGFyZSBu
-b3Qgc3VwcG9ydGVkIGJ5IHRoZSBjdXJyZW50IGFyY2hpdGVjdHVyZSIuPGJyPiZuYnNwOyZu
-YnNwOyA8YnI+Jm5ic3A7Jm5ic3A7IFNvbWV0aGluZyBpcyBtaXNzaW5nIGhlcmUsIG9yIHdl
-IGRvIGl0IGluIGEgd3Jvbmcgd2F5LiZuYnNwOyBBbnkgYWR2aXNlIHdvdWxkIGJlIGhlbHBm
-dWwgdG8gdXMuPGJyPiZuYnNwOyZuYnNwOyA8YnI+Jm5ic3A7Jm5ic3A7IFRoYW5rcy48YnI+
-Jm5ic3A7ICZuYnNwOzwvZGl2PjxkaXY+eGlhb2xlaTwvZGl2PjxkaXY+PGJyPiZuYnNwOyZu
-YnNwOyAtLS0tLSB0aV9kc3AueG1sJm5ic3A7IC0tLS0tPGJyPiZuYnNwOyZuYnNwOyA8YnI+
-Jm5ic3A7Jm5ic3A7ICZsdDs/eG1sIHZlcnNpb249IjEuMCI/Jmd0Ozxicj4mbHQ7IURPQ1RZ
-UEUgZmVhdHVyZSBTWVNURU0gImdkYi10YXJnZXQuZHRkIiZndDs8YnI+Jmx0O2ZlYXR1cmUg
-bmFtZT0ib3JnLmdudS5nZGIudGljM3guY29yZSImZ3Q7PGJyPiZuYnNwOyZuYnNwOyZuYnNw
-OyAmbHQ7cmVnIG5hbWU9InIwIiZuYnNwOyBiaXRzaXplPSIzMiImZ3Q7Jmx0Oy9yZWcmZ3Q7
-PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0icjEiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7PGJy
-PiZuYnNwOyZsdDtyZWcgbmFtZT0icjIiJm5ic3A7IGJpdHNpemU9IjMyIiZndDsmbHQ7L3Jl
-ZyZndDs8YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJyMyImbmJzcDsgYml0c2l6ZT0iMzIiLyZn
-dDs8YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJyNCImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDs8
-YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJyNSImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDs8YnI+
-Jm5ic3A7Jmx0O3JlZyBuYW1lPSJyNiImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDs8YnI+Jm5i
-c3A7Jmx0O3JlZyBuYW1lPSJyNyImbmJzcDsgYml0c2l6ZT0iMzIiLyZndDs8YnI+Jm5ic3A7
-Jmx0O3JlZyBuYW1lPSJhcjAiIGJpdHNpemU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcg
-bmFtZT0iYXIxIiBiaXRzaXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9ImFy
-MiIgYml0c2l6ZT0iMzIiLyZndDs8YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJhcjMiIGJpdHNp
-emU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0iYXI0IiBiaXRzaXplPSIzMiIv
-Jmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9ImFyNSIgYml0c2l6ZT0iMzIiLyZndDs8YnI+
-Jm5ic3A7Jmx0O3JlZyBuYW1lPSJhcjYiIGJpdHNpemU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZs
-dDtyZWcgbmFtZT0iYXI3IiBiaXRzaXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5h
-bWU9ImRwIiZuYnNwOyBiaXRzaXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9
-ImlyMCIgYml0c2l6ZT0iMzIiLyZndDs8YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJpcjEiIGJp
-dHNpemU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0iYmsiJm5ic3A7IGJpdHNp
-emU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0ic3AiJm5ic3A7IGJpdHNpemU9
-IjMyIiB0eXBlPSJkYXRhX3B0ciIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9InN0IiZu
-YnNwOyBiaXRzaXplPSIzMiImZ3Q7Jmx0Oy9yZWcmZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFt
-ZT0iaWUiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0i
-aWYiJm5ic3A7IGJpdHNpemU9IjMyIi8mZ3Q7PGJyPiZuYnNwOyZsdDtyZWcgbmFtZT0iaW9m
-IiBiaXRzaXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9InJzIiZuYnNwOyBi
-aXRzaXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9InJlIiZuYnNwOyBiaXRz
-aXplPSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9InJjIiZuYnNwOyBiaXRzaXpl
-PSIzMiIvJmd0Ozxicj4mbmJzcDsmbHQ7cmVnIG5hbWU9InBjIiZuYnNwOyBiaXRzaXplPSIz
-MiIgdHlwZT0iZGF0YV9wdHIiLyZndDs8YnI+Jm5ic3A7Jmx0O3JlZyBuYW1lPSJjbGsiJm5i
-c3A7IGJpdHNpemU9IjMyIi8mZ3Q7PGJyPiZsdDsvZmVhdHVyZSZndDs8YnI+Jm5ic3A7Jm5i
-c3A7IDxicj48L2Rpdj4=
+ trace/simple.h |  2 +-
+ trace/simple.c | 20 ++++++++++++++------
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-------=_NextPart_5ECE0D4B_106116D0_5848FAFC--
-
-
+diff --git a/trace/simple.h b/trace/simple.h
+index 5771a0634f..26ccbc8b8a 100644
+--- a/trace/simple.h
++++ b/trace/simple.h
+@@ -12,7 +12,7 @@
+ #define TRACE_SIMPLE_H
+ 
+ void st_print_trace_file_status(void);
+-void st_set_trace_file_enabled(bool enable);
++bool st_set_trace_file_enabled(bool enable);
+ void st_set_trace_file(const char *file);
+ bool st_init(void);
+ void st_flush_trace_buffer(void);
+diff --git a/trace/simple.c b/trace/simple.c
+index fc7106ec49..9cd2ed1fb3 100644
+--- a/trace/simple.c
++++ b/trace/simple.c
+@@ -302,10 +302,17 @@ static int st_write_event_mapping(void)
+     return 0;
+ }
+ 
+-void st_set_trace_file_enabled(bool enable)
++/**
++ * Enable / disable tracing, return whether it was enabled.
++ *
++ * @enable: enable if %true, else disable.
++ */
++bool st_set_trace_file_enabled(bool enable)
+ {
++    bool was_enabled = trace_fp;
++
+     if (enable == !!trace_fp) {
+-        return; /* no change */
++        return was_enabled;     /* no change */
+     }
+ 
+     /* Halt trace writeout */
+@@ -323,14 +330,14 @@ void st_set_trace_file_enabled(bool enable)
+ 
+         trace_fp = fopen(trace_file_name, "wb");
+         if (!trace_fp) {
+-            return;
++            return was_enabled;
+         }
+ 
+         if (fwrite(&header, sizeof header, 1, trace_fp) != 1 ||
+             st_write_event_mapping() < 0) {
+             fclose(trace_fp);
+             trace_fp = NULL;
+-            return;
++            return was_enabled;
+         }
+ 
+         /* Resume trace writeout */
+@@ -340,6 +347,7 @@ void st_set_trace_file_enabled(bool enable)
+         fclose(trace_fp);
+         trace_fp = NULL;
+     }
++    return was_enabled;
+ }
+ 
+ /**
+@@ -350,7 +358,7 @@ void st_set_trace_file_enabled(bool enable)
+  */
+ void st_set_trace_file(const char *file)
+ {
+-    st_set_trace_file_enabled(false);
++    bool saved_enable = st_set_trace_file_enabled(false);
+ 
+     g_free(trace_file_name);
+ 
+@@ -361,7 +369,7 @@ void st_set_trace_file(const char *file)
+         trace_file_name = g_strdup_printf("%s", file);
+     }
+ 
+-    st_set_trace_file_enabled(true);
++    st_set_trace_file_enabled(saved_enable);
+ }
+ 
+ void st_print_trace_file_status(void)
+-- 
+2.21.3
 
 
