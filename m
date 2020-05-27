@@ -2,88 +2,90 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44278C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6F5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B53520787
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A1C72088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:59:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/hTyNIq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B53520787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GkV9WwpX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A1C72088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdzKI-00072o-9j
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:54:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34000)
+	id 1jdzPD-0002tl-58
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:59:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdzJB-00052y-OD; Wed, 27 May 2020 12:53:37 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34608)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jdzJA-0005br-6h; Wed, 27 May 2020 12:53:37 -0400
-Received: by mail-io1-xd44.google.com with SMTP id f3so26812295ioj.1;
- Wed, 27 May 2020 09:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NyNUKP1GL3kMltgD5ZUaU1TzowdKQWg0vRQhluEWl+I=;
- b=W/hTyNIqXAOnLw1uNFJlQ0oP/4PxqXhN2wyOoLHabF4GeTHqidlC+fDl821uFTGBbt
- VaqTNWJbhN/Y7lSsOAgUc2pBIIrcCkt9TKEmxRcORHef4qJeoKhfbP68zB4KKgjRt/ER
- NGQ3pyj2xrqWCMRayGyILD2bOv7SJoYl3dp5FQCCIYP/JLhXX85F9cHpeqyczMKfk8q+
- /kU0sz97JwZBtrLkBla42TKuxjH7yQwqso3xMrvoHaCAb7qj7Umus/tS81O4Wj0DmR1L
- cqdiZr9d8xV0YsJXbQfWLi9hk85mtyftNEZ0IR4rHX8bObryASvaukanqjDHso0ZlSfB
- /jbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NyNUKP1GL3kMltgD5ZUaU1TzowdKQWg0vRQhluEWl+I=;
- b=OORHVAKXUiClz/5L3qFbXpAxpAm33EXKcRJSOWaaNgd09x3ScHSovOgBoFbXNMDt4i
- BDnP9FStV8mrgjpxd3We1nUHJcP1XNMYO8wsQPwyfMfLUBnpgaO1wQBIvbqNDaZ025EU
- hAvT0RnxU+RDJ7j3Euj/73JrswOUj6tmYwDEJ+AD1KA3OWfNU1XvxpZw+rFVa/842lso
- 0oRJfZqyfKQyRcG2KnlrDzL3w9JnVu+CKjM+oFnM2cZxQZSsHxSBG4GqvofyDpYrk1Zl
- x6AdI7GzIpBaVq4t9N8Uhr6thqA0QYkAtFNiXBPWliTWrZH6kqDcjsQAGVJhyFDCCAyt
- tFLg==
-X-Gm-Message-State: AOAM530DQ1EQN41jXOdHbzgXRC8Ki3lJr9iPetUwbL01QhwzYllLDhAO
- hDOS4Fpobzm0G/yryImTlknVdpncAd27VKc8HA0=
-X-Google-Smtp-Source: ABdhPJzBR6BUCc29aFnMa0ZTkGJnuE2CgGgMxlyHfYQQ2EfPRcxCNyljP4JD+zGsCnwpPcQKXEGpfr51XxrQSoNT2/s=
-X-Received: by 2002:a02:b782:: with SMTP id f2mr6412145jam.91.1590598414719;
- Wed, 27 May 2020 09:53:34 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=40961fbaf=alistair.francis@wdc.com>)
+ id 1jdzOH-0001Df-Dy; Wed, 27 May 2020 12:58:53 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=40961fbaf=alistair.francis@wdc.com>)
+ id 1jdzOF-000244-G1; Wed, 27 May 2020 12:58:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1590598731; x=1622134731;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=0d53OiKp+2++SK471VZFVwFek97LO7t66ZdInaTMRjw=;
+ b=GkV9WwpXrH32s5/3KSixzoXUd50RzWtwPA2FBAIMyvm0n/zB0kbnCahB
+ NCcFBrgeaL8OfD9Vj7OIe4Dy9v2PutI/Up1W17A4W+OB4mDnTtRC81xLt
+ gj4q1KMb2QDe15XWBqhRVmEg/rqFedA3PPtR24/0zm5eVy6ys6garHUlE
+ hKSwdNujSte7/kXzMzAHdOWnsGJUT9OXiZ/s66hc3YpNEpZ14QkaropsI
+ t5oclbRgIJYIkGGnA7dLbPNyo0EWAmTHE/OTBnqhbM4VDDiRmF36DFtc+
+ aiI1IpNCOmBRjqVUCJvQ9RJPGaQIdtgIoJZ7PbsRMpln7TUim3LYkmzVj Q==;
+IronPort-SDR: cwkUHCLk1Fc5Cvri6PYRIgnn/rxS39YSp42geR9vcY3DaLXorwCOJ6EDYPkSQcFTOEH948PT+c
+ HYHv8QGFnbs4+F+KLmcJ/RP1hXhAVNtl1kz6KBrUbwxXHcZJ4m+EixVwyKba8esDeKjkSm+OuC
+ +cfQifH6/tnA6Zc8Lu5GYQxYip6G8t2woEBoN9zdg9wVovE5V7AS7eHMPoIX0eHyvZqTPuVk0j
+ m8hPWLWrepx/SGRB4zU5KfFim3uOs6sbGA+W1Ct0rCrjNhDTdOqjFhEXiMdKE0iazlKt6cwWIe
+ 518=
+X-IronPort-AV: E=Sophos;i="5.73,442,1583164800"; d="scan'208";a="138633211"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 28 May 2020 00:58:45 +0800
+IronPort-SDR: GSsJAiiqubFpTOytLmuiQSBi6GfJejldiT/9ioHnIQWXQ5k0xpy0iJRuGFKqp1GxEo+mJmleuj
+ bJkO9FdZX1/J7E1Ym9TuJth8HQcDXbP3E=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 May 2020 09:48:02 -0700
+IronPort-SDR: N4/snaMvqFFkwTS8kZYipzZ4iynP6nZpRi+YGncy8kgtMt+/20CqXkjoAziXKXzlLcY8VOB1gx
+ GQ2REn7fhxCg==
+WDCIronportException: Internal
+Received: from 71vjjc2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.96])
+ by uls-op-cesaip01.wdc.com with ESMTP; 27 May 2020 09:58:46 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v4 00/10]  RISC-V Add the OpenTitan Machine
+Date: Wed, 27 May 2020 09:50:11 -0700
+Message-Id: <cover.1590598125.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <cover.1589923785.git.alistair.francis@wdc.com>
- <24ba2634ff761e7a1e6b28b15929b03db3f59008.1589923785.git.alistair.francis@wdc.com>
- <2c695b2b-a292-61ff-bd2b-5f2ff2b48271@c-sky.com>
- <CAKmqyKMKGpNT+RRnNWCTzVjYppEpE+T2DZVDFiVcvnecYtu2kQ@mail.gmail.com>
- <27acc4bd-ae60-ad7e-0efb-105d4c20e132@c-sky.com>
-In-Reply-To: <27acc4bd-ae60-ad7e-0efb-105d4c20e132@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 27 May 2020 09:44:34 -0700
-Message-ID: <CAKmqyKP=vPtx3oZ40vB_UhP22HtdKp25TSA+ki04=HoFdSEtYQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/9] target/riscv: Add the lowRISC Ibex CPU
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=40961fbaf=alistair.francis@wdc.com;
+ helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 12:58:46
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,92 +99,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
+ alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 26, 2020 at 6:58 PM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
->
->
-> On 2020/5/27 1:12, Alistair Francis wrote:
-> > On Fri, May 22, 2020 at 12:51 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
-> >>
-> >>
-> >> On 2020/5/20 5:31, Alistair Francis wrote:
-> >>> Ibex is a small and efficient, 32-bit, in-order RISC-V core with
-> >>> a 2-stage pipeline that implements the RV32IMC instruction set
-> >>> architecture.
-> >>>
-> >>> For more details on lowRISC see here:
-> >>> https://github.com/lowRISC/ibex
-> >>>
-> >>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> >>> Reviewed-by: Bin Meng <bin.meng@windriver.com>
-> >>> ---
-> >>>    target/riscv/cpu.h |  1 +
-> >>>    target/riscv/cpu.c | 10 ++++++++++
-> >>>    2 files changed, 11 insertions(+)
-> >>>
-> >>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> >>> index d0e7f5b9c5..8733d7467f 100644
-> >>> --- a/target/riscv/cpu.h
-> >>> +++ b/target/riscv/cpu.h
-> >>> @@ -35,6 +35,7 @@
-> >>>    #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
-> >>>    #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
-> >>>    #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
-> >>> +#define TYPE_RISCV_CPU_IBEX             RISCV_CPU_TYPE_NAME("lowrisc-ibex")
-> >>>    #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
-> >>>    #define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
-> >>>    #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
-> >>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> >>> index 5eb3c02735..eb2bbc87ae 100644
-> >>> --- a/target/riscv/cpu.c
-> >>> +++ b/target/riscv/cpu.c
-> >>> @@ -156,6 +156,15 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
-> >>>        set_feature(env, RISCV_FEATURE_PMP);
-> >>>    }
-> >>>
-> >>> +static void rv32imcu_nommu_cpu_init(Object *obj)
-> >>> +{
-> >>> +    CPURISCVState *env = &RISCV_CPU(obj)->env;
-> >>> +    set_misa(env, RV32 | RVI | RVM | RVC | RVU);
-> >>> +    set_priv_version(env, PRIV_VERSION_1_10_0);
-> >>> +    set_resetvec(env, 0x8090);
-> >> Hi Alistair,
-> >>
-> >> I see all RISC-V cpus  have an reset vector which acts as the first pc
-> >> when machine boots up.
-> >> However, the first pc is more like an attribute of a machine, not a cpu.
-> > In general it seems to be a CPU property. I assume that some CPUs
-> > would allow the reset vector to be selectable though, in which case it
-> > becomes a board property.
-> >
-> >> Another reason is that the cpu names are a combination of ISA.
-> >> Then the cpus from different vendors may have same ISA, with different
-> >> reset vectors.
-> >>
-> >> Do you think so?
-> > If you are worried about CPUs with different vectors we could always
-> > make it a property in the future and have boards override it. I don't
-> > think we need that yet (only 1 CPU is different) but it is an easy
-> > future change.
-> I think your are right. A cpu reset vector property is better. If there
-> is a conflict in the future,
-> we can add the property there.
->
-> Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+OpenTitan is an open source silicon Root of Trust (RoT) project. This
+series adds initial support for the OpenTitan machine to QEMU.
 
-Great! Thanks :)
+This series add the Ibex CPU to the QEMU RISC-V target. It then adds the
+OpenTitan machine, the Ibex UART and the Ibex PLIC.
 
-Alistair
+The UART has been tested sending and receiving data.
 
->
-> Zhiwei
+With this series QEMU can boot the OpenTitan ROM, Tock OS and a Tock
+userspace app.
+
+The Ibex PLIC is similar to the RISC-V PLIC (and is based on the QEMU
+implementation) with some differences. The hope is that the Ibex PLIC
+will converge to follow the RISC-V spec. As that happens I want to
+update the QEMU Ibex PLIC and hopefully eventually replace the current
+PLIC as the implementation is a little overlay complex.
+
+For more details on OpenTitan, see here: https://docs.opentitan.org/
+
+v4:
+ - Don't set the reset vector in realise
+ - Fix a bug where the MMU is always enabled
+ - Fixup the PMP/MMU size logic
+v3:
+ - Small fixes pointed out in review
+v2:
+ - Rebase on master
+ - Get uart receive working
+
+
+
+Alistair Francis (10):
+  riscv/boot: Add a missing header include
+  target/riscv: Don't overwrite the reset vector
+  target/riscv: Disable the MMU correctly
+  target/riscv: Add the lowRISC Ibex CPU
+  riscv: Initial commit of OpenTitan machine
+  hw/char: Initial commit of Ibex UART
+  hw/intc: Initial commit of lowRISC Ibex PLIC
+  riscv/opentitan: Connect the PLIC device
+  riscv/opentitan: Connect the UART device
+  target/riscv: Use a smaller guess size for no-MMU PMP
+
+ default-configs/riscv32-softmmu.mak |   1 +
+ default-configs/riscv64-softmmu.mak |  11 +-
+ include/hw/char/ibex_uart.h         | 110 +++++++
+ include/hw/intc/ibex_plic.h         |  63 ++++
+ include/hw/riscv/boot.h             |   1 +
+ include/hw/riscv/opentitan.h        |  79 +++++
+ target/riscv/cpu.h                  |   1 +
+ hw/char/ibex_uart.c                 | 492 ++++++++++++++++++++++++++++
+ hw/intc/ibex_plic.c                 | 261 +++++++++++++++
+ hw/riscv/opentitan.c                | 204 ++++++++++++
+ target/riscv/cpu.c                  |  21 +-
+ target/riscv/pmp.c                  |  14 +-
+ MAINTAINERS                         |  13 +
+ hw/char/Makefile.objs               |   1 +
+ hw/intc/Makefile.objs               |   1 +
+ hw/riscv/Kconfig                    |   9 +
+ hw/riscv/Makefile.objs              |   1 +
+ 17 files changed, 1272 insertions(+), 11 deletions(-)
+ create mode 100644 include/hw/char/ibex_uart.h
+ create mode 100644 include/hw/intc/ibex_plic.h
+ create mode 100644 include/hw/riscv/opentitan.h
+ create mode 100644 hw/char/ibex_uart.c
+ create mode 100644 hw/intc/ibex_plic.c
+ create mode 100644 hw/riscv/opentitan.c
+
+-- 
+2.26.2
+
 
