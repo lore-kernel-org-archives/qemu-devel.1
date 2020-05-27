@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB0EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950DEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:50:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4234A2078C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F3DC20787
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:50:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="T8UclndY";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="M9Gd2gpx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4234A2078C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GuLSEjHg";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="go7aV0qm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3DC20787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdox1-0006M6-D2
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 01:50:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47300)
+	id 1jdoxV-0006kV-Gf
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 01:50:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=409226bd6=Anup.Patel@wdc.com>)
- id 1jdoqI-0003A1-Ar; Wed, 27 May 2020 01:43:06 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:3615)
+ id 1jdoqX-0003oc-GS; Wed, 27 May 2020 01:43:21 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:3641)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=409226bd6=Anup.Patel@wdc.com>)
- id 1jdoqG-0003Rx-PR; Wed, 27 May 2020 01:43:06 -0400
+ id 1jdoqV-0003aK-03; Wed, 27 May 2020 01:43:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590558184; x=1622094184;
+ t=1590558199; x=1622094199;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:content-transfer-encoding:mime-version;
- bh=TYOhDUvGXhVIkQHt2ZGBAU2yZzGi9FOklLlhVGSZQHA=;
- b=T8UclndYfdAY5HD+VBbBSzQCB8O/axLBgSp57Ls9Nj4SF240ETufgCvL
- fBnrOwL9eg3NZdF18kHjkhL3+rBA9HRjm7FHH0y8/npKhdwUYExk9dSp8
- 1CHFBuRh8cvILA74kyqQDjnSf7yRcviGULSakADvB0ocf11cmHPynjQec
- eGdDc0V/ClZyNJ3zX/tIsyGR2dJC/DSIW2D0N7EHQaMOcYGLAfRPIvJAB
- JYYdIsl/dr3RGBL7dnRqW3V2zN+TeCSOQ+8Hv/jb0O294S1ROnUfP0N+X
- k8384VXbG+sgVN054/s8CAECorRBTFGYXyv+DmNqA7+Ai5wI0LUqCKPaL g==;
-IronPort-SDR: VKsFZ11wKOxHkyOlvXXN5a0d8/w8sJtLG8+nF9vIp0kkQqfz3u5+uaoAUyuhnSTVxft7uztcne
- 7Bw3JlLwGGmq1Rdbk/VmSAUkoNpqz0rdy3qvhoAVCPiwt37Co7b4XmRqLH49HWjrs/GqUNU6MF
- SgX2KIWtjpliqqHK5dD3WRlPP2FiTVPifiPBLKf+XdwSp57gMTmFUS7VcTJ4E3CrPogQYweXaL
- 0Zto+FRMg/d7CaJeua5PgfFRyS3HbhBci9C6dMRM4uppfh0RF6wymosOMIq9/TOkEvisoJGubg
- Fz8=
-X-IronPort-AV: E=Sophos;i="5.73,440,1583164800"; d="scan'208";a="247638074"
+ bh=fcl2/s4taLYbTTKslRBqqC8oTwWKwM22EGfD/3R2t9E=;
+ b=GuLSEjHgGRSqeZMu4P7HVsO+5FbQTAcnWWE6OKO3/5yA07P9ssLZRzfH
+ d23dOAroALwu/WycKXP+vQvPLK3aICydQLgmHrMc3/b07TDsKzHrQR8oM
+ hHcpamI7NXKTytJIU0mCpdFrNCQT3wnJk7u6hYfYQ2J0cyfE0Pzhw0kt5
+ UJ+Tm4NAQWBYeA307qtt1gmDuSG5ox40B377KIv2YkRqiOl1E7562h13r
+ lI8r/AC1KDXCiAjYPxJujEXQcbb4Tk2Lp43b4IEth2B2kEGqBzACBboNu
+ jrIIh+iNe/2waPsRSv5lOPtwAJJRyayWX3pMVaLXUaI6ZytODR92+kY2Y Q==;
+IronPort-SDR: YXEGalN6fI3VH2cSGd0nHumSyauJf6CDErZiiMrXioGEyVSQmfz/RHbVhA1QiaBlRIcp7gnowC
+ 02iwX4BmRyjzXVTB7+u/UPyQHdVKKkRBPsxZTRN2uRobQoWpWIYxmdZxw7l2mjfLXJ4uwjaCTZ
+ Bi3iPzNSrcsbxETHTKn0940gjLtSfxAelJ2smw/KMU02RN60jvdB5OhlTTxP3WFUHC34SRSNMe
+ pmQFzNnjmlDRHdqe6CedV9A+xLMrtc1p9/PY9IaqICgJThN2s/cu3hXV0zBmSq7Q1PnFXVkWAH
+ WUE=
+X-IronPort-AV: E=Sophos;i="5.73,440,1583164800"; d="scan'208";a="247638104"
 Received: from mail-dm6nam10lp2103.outbound.protection.outlook.com (HELO
  NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.103])
- by ob1.hgst.iphmx.com with ESMTP; 27 May 2020 13:43:02 +0800
+ by ob1.hgst.iphmx.com with ESMTP; 27 May 2020 13:43:17 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I3iAG0ypi7ZQldgycVMUaVovnxK1j+W/2ah6hbr6/K4WJ6cOXv9ZCaMZlvYfvUa2OawHj7jH2COyi98d/Q7TEb7harbsEaPpTgcCBXv48Zye03GB0I2lF9NijdJ3EJQB55yW7T4hWFROzlMgQlAWEb7zVKhOQoCGZ9wlsAKCMMxD21dKMNbG59SL/Kf2redK90sIbANAp1JJNIhmC8N8n7v4otMsysBoDUOLy5X/w7YxtxZP1qhfKy+px4guEmQkBl9eZLV4+Af9EyaAq2ny2/Km1u95Pg/zOHT/HC0q1qm50PQpLYeV35z9N4MmqXls+QEgdCNf6n3Dc1g+wmqHvg==
+ b=KhCD5gf5B1gtbUKoi/iLc1z7mgjzRShaTEKzgODb7ykwP4+K5o+gQUUETyXxgKJVdX7ikFemdRU2rT0VqIb6DyGMjWRAebGlorN1RxSkgmoglRZMjgTDwdTnTqOj6NYeBQJ0jhqjfWNO3rjS8PTk4Ff0Mix7i1ZjMBIJVA7++kmZndzQgzcohd4wqTzksM6yHymc5FmO1sH9P+qGt7vriZ/rTt8dQlQQsceVUopmyPrmtlLErp8oMXUFSG29YN8w6MAXlfbrr2w7jabeYnBwjr+MjH2eikQ3wo7T3WwAAllEoWirPEZJjgK+IIJmZdgYgjARROGil5NMKegF/+DIRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t5wFUTJ97chLrxAx7+sb4faEuMenrhWFh4zXvcXH9J8=;
- b=RczpWTVR5Q7KeLiTKB+IzC+YQcpz7WPMKG4ysJEmW43oneturmSO/LkuZ66FbdsqNdSUdld2uFO0yfPRRtjESG0G14iSBV9m9kzdd9CTXDqnOrsPnZ/HHExjXKd18wNjhZGynwbt4qQmonmK9hTAhOQRoovk0opW/wVq63caDCtiLRpiFLHRPRQSFbgalbVONtJ8XdtqOyKgdr1lRF3PFK+orpgLNCa27RW7eAWElDAbH+ZMVla6+g+eH1vIKNl2KB/R9Y4ArLyPlT1NkXipSxTugKqXlgoXdPyW7jleF6MPGynf3S5I9AOKUdOH7exMm5RMasxU/K72Y4EhM0yDrg==
+ bh=tSqZwf+oGC6GnqJHzn0BQlbEQMiydC/gkmw6w1nYSYI=;
+ b=CIr7ia+crK739Y3KE7C++B5yI7v4Z9pq0t4YFX9VydCd+9463tTP4E3+rruLKS9WaM2t1T2WooCCbgS+91/fN7h9S1ZGwj6a4sveEhHnyVh0wy6cjTKpjmEDaQPuRQhxior6+VspL9Y6AEUS6pXJwbzJqy0LBWH1NKG1r9tebW3t47XnulUIYi9istf6Rav4wI669EcKKwwNLEoefbgMAY1mVmkxP/BqOIlQkV4YxSQv1FDPpD0TTAsTgew50Y95FzKKt1AAczSJ4R8kxuwcj2ZltfOuMvK1GGajdPW2RKR/zaeCL7vi93jdwZ9HIO9fplJiCUh3Ba68t7v8h+LEiQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t5wFUTJ97chLrxAx7+sb4faEuMenrhWFh4zXvcXH9J8=;
- b=M9Gd2gpxUEgaf3sK8QFbDEUy7igNsGhcAwz2Sh0JfjloLbQTPsbGxpdKnHFblll8E2pu465Rk6C7iUi/NvH6EdGGPbM/a+I97XTQFeT1J7ULVLyDCNMa3N67FRNsilKsxvpEkQ9w+DAvczoiAEgwpCwVWRvZ+ipm8krf6/fkkuc=
+ bh=tSqZwf+oGC6GnqJHzn0BQlbEQMiydC/gkmw6w1nYSYI=;
+ b=go7aV0qmY9CB3gsRADaXZTt4pMDcWqmFGoNd2XKfTPHfvTuzHWnnQuuh0HstrqHBDrVAmnFmlDQsshhsZDEuA3jpXR2GqVTxNie+0mG6anzw+Buwp8Fjcxgy0wcQ6UoyHcymTf3aWjZWVzBRWDr8Buq3satmcWZqaUmi+9J0+ec=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=wdc.com;
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
  by DM6PR04MB6923.namprd04.prod.outlook.com (2603:10b6:5:242::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Wed, 27 May
- 2020 05:43:01 +0000
+ 2020 05:43:16 +0000
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::f8b3:c124:482b:52e0]) by DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::f8b3:c124:482b:52e0%5]) with mapi id 15.20.3021.029; Wed, 27 May 2020
- 05:43:01 +0000
+ 05:43:16 +0000
 From: Anup Patel <anup.patel@wdc.com>
 To: Eduardo Habkost <ehabkost@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -87,9 +87,9 @@ To: Eduardo Habkost <ehabkost@redhat.com>,
  Palmer Dabbelt <palmer@dabbelt.com>,
  Alistair Francis <Alistair.Francis@wdc.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>
-Subject: [PATCH v2 1/5] hw: Add sockets_specified field in CpuTopology
-Date: Wed, 27 May 2020 11:12:22 +0530
-Message-Id: <20200527054226.232103-2-anup.patel@wdc.com>
+Subject: [PATCH v2 4/5] hw/riscv: Allow creating multiple instances of PLIC
+Date: Wed, 27 May 2020 11:12:25 +0530
+Message-Id: <20200527054226.232103-5-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200527054226.232103-1-anup.patel@wdc.com>
 References: <20200527054226.232103-1-anup.patel@wdc.com>
@@ -104,34 +104,34 @@ Received: from wdc.com (106.51.30.5) by
  MAXPR0101CA0058.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:e::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17 via Frontend
- Transport; Wed, 27 May 2020 05:42:57 +0000
+ Transport; Wed, 27 May 2020 05:43:12 +0000
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [106.51.30.5]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 310b8f55-c395-44f3-7a7d-08d80200d19c
+X-MS-Office365-Filtering-Correlation-Id: 6bd6263b-82e7-4f9e-f850-08d80200da84
 X-MS-TrafficTypeDiagnostic: DM6PR04MB6923:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR04MB692390D59A4847014D5C332D8DB10@DM6PR04MB6923.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM6PR04MB6923B1E53DD2F04D9BBA58588DB10@DM6PR04MB6923.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Oob-TLC-OOBClassifiers: OLM:14;
 X-Forefront-PRVS: 04163EF38A
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6ySXkXKtQO2fQ4wG4Y5KaL5MADMQmPYpl2yXBqD6IyZaiITBXi+CsBFJH0CF0iDFv9kwTpVTPz4IMvhnY23NoMOYNf7WSeaZ/lCEihUCRY0rBcS1TmAFvcP5osFNRAO96jQbNpiRVz+H00zc5TDrtDwvEDcESRFGFr4mU2UJ0bmK1xGX0LoUDJlKKfFRu7Z9OiWs/xyenosaI23gEsS2L60N7BvbixyLqoHY1ypuQYbBDdMxQ9ZWFgkMLihYiUFxfYqCdVlMlKCeyW4TvZDREbsJHjayE50pbF9lLkae684ObmbXqwop5pAqnKIPmmHq
+X-Microsoft-Antispam-Message-Info: Ueej5tGJ196S/q9Xflva3kZoiElPpDVHSQfwm5xA4ylvmnbBd4UFAmjld123dVZpDdsObmitFojVphBOeqoBIaoA0/yDF0KF0X2Vte2OXbiDHJeYVVdlc+jJz9TOlesHMgav6e2dUz4OYwqkqvlGex40vcxH/aJrYkpHPHzqAbsHFUnt1PQcbKAnNOQx3zcos5QRNHGxHZBC987FbJSHGd2Ez78t+65B6fTwiT2AGqHcwzBYoQoWeBqrhWh92KuTqwAtCM2bL8fMry6LwpPgJUEleZxwAn+BY+S+7EsTV0MlU3CfxsCkVXQMauIXJZRvTlTPSYB1bbNASaGlVrzIUQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(366004)(376002)(39860400002)(346002)(396003)(136003)(1006002)(110136005)(6666004)(316002)(1076003)(8676002)(2616005)(5660300002)(956004)(8886007)(8936002)(36756003)(44832011)(4326008)(54906003)(186003)(16526019)(478600001)(26005)(66556008)(2906002)(55236004)(66476007)(7696005)(55016002)(86362001)(52116002)(66946007);
+ SFS:(4636009)(366004)(376002)(39860400002)(346002)(396003)(136003)(1006002)(110136005)(6666004)(316002)(1076003)(8676002)(2616005)(5660300002)(956004)(8886007)(8936002)(36756003)(44832011)(4326008)(54906003)(186003)(16526019)(478600001)(26005)(66556008)(2906002)(55236004)(66476007)(7696005)(55016002)(86362001)(52116002)(66946007)(83380400001);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: C2RrkNkMfFNoKrje/PxtWSxvPnf2nOTFBZ+NqhZ8C+ob9z3L1lV1BVFXPZu90cpVf4VMUDxMJc9dnWDZnbBFJr8dnWUqQn7mER24/9diR93QS/y0GuRoHAi/TPcGZXZ4K4s67EcDMgFY2Ie4M5e+2YEOqsI2LC4QnOURrYrRZCF6gJA6A06flIqXBTkekSOjQ0+EvDX1d70JSSahEFULxD/n63JfMt8JEElvEO0PamsLPgd0ictXPghfJEsrsNWaRauldLLBt1SD6eLmcjxcepEHopHQOgRr5PSJymzCoMXx3RtlF+G6kBa8XDHLhf3muGZiGlStlS6uc8aqmNI3/8IyeFz2wjqgBZC/jpS/QP/96Ssu8tR/6KYkZL7dYvEIdUYeiEaMqDU5H10YbC5tZwuXAue9z5cdkYxembq6o0BIPSBnYKN/8IiavBgjnpwb9jlhX9a1W0iQe83ZncE/te7K+V+c+AQpul0pEBKnSjE=
+X-MS-Exchange-AntiSpam-MessageData: DLvD0w+sK8uSYXIGkjJRCXoeNwtJlqkJThpoelWmv712idYfEw4/hdPfiA7qd0dfnpmfkQNHfD/FNn3CGGVxj2/K7CrHHUc7NSo4w083p77nVi/fXwKZubursX6Gvm/yaui0C1eMXyZzYGUmTA3YxofeqJxn0BIgS9XBTh+JHp/8RtWj5aONwr/k1AMXFTg2vFiE1dOGGFm87SV5aYPR445z1Z4kHHD+cfzMYrpnls/g1cJ9Hi/R+JJgm2FUNdcpDGfpgp7KCpXqiV0lm69d7mP0B3A+2o9s2Hd2tx6wgkvrzgseup1Cs12Y46Z7W2Ii+kAHcLvmeNlWNxDJyKWYM3XfIS7qlh1oy5iAeMEtNnT3BxCcri9DOF9QPYAIHSxrLAlLllM/pMtTzTB43LrEnbSDBTR5x+EGRDL3gCfjNSVwILfUiRHyrxqxIq+564dg05pg148cgYtjEIDhVFFIqNou30bKS+7a8ZJ1b3j6RBA=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 310b8f55-c395-44f3-7a7d-08d80200d19c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2020 05:43:01.4662 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bd6263b-82e7-4f9e-f850-08d80200da84
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2020 05:43:16.4246 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UiNMVxXAd6W2V7N3CihJLMvUUIxTSKGq1G0OpwFBlWB27nAHHqaNNFfYY96sKUxoXsJXQ+NYOwGnULp1zKKoVw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: guc3Qk05TjFPBai93rGY4kZwY+Zubo27q3ZJHWGk+p8D2lsacOq6ard2vfgKto5eqE4M3Wm+nz8UR2ct8ikitQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6923
 Received-SPF: pass client-ip=68.232.141.245;
  envelope-from=prvs=409226bd6=Anup.Patel@wdc.com; helo=esa1.hgst.iphmx.com
@@ -156,61 +156,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
+Cc: Anup Patel <anup.patel@wdc.com>, qemu-riscv@nongnu.org,
+ Anup Patel <anup@brainfault.org>, Palmer Dabbelt <palmerdabbelt@google.com>,
+ qemu-devel@nongnu.org, Atish Patra <atish.patra@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When "sockets" sub-option of "-smp" option is not specified, the
-smp_parse() function will assume one CPU per-socket and set the
-number of sockets equal to number of CPUs.
-
-This is counter-intuitive and we should allow machine emulation to
-decide default number of sockets when "sockets" sub-option is not
-specified. To achieve this, we add boolean flag sockets_specified
-in struct CpuTopology which tells machine emulation whether the
-"sockets" sub-option was specified in command-line.
+We extend PLIC emulation to allow multiple instances of PLIC in
+a QEMU RISC-V machine. To achieve this, we remove first HART id
+zero assumption from PLIC emulation.
 
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/core/machine.c   | 2 ++
- include/hw/boards.h | 2 ++
- 2 files changed, 4 insertions(+)
+ hw/riscv/sifive_e.c            |  2 +-
+ hw/riscv/sifive_plic.c         | 24 +++++++++++++-----------
+ hw/riscv/sifive_u.c            |  2 +-
+ hw/riscv/virt.c                |  2 +-
+ include/hw/riscv/sifive_plic.h | 12 +++++++-----
+ 5 files changed, 23 insertions(+), 19 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index bb3a7b18b1..fd5ef5a4bb 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -706,6 +706,8 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
-         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 1c3b37d0ba..bd122e71ae 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -152,7 +152,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
  
-+         ms->smp.sockets_specified = (sockets == 0) ? false : true;
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
+-        (char *)SIFIVE_E_PLIC_HART_CONFIG,
++        (char *)SIFIVE_E_PLIC_HART_CONFIG, 0,
+         SIFIVE_E_PLIC_NUM_SOURCES,
+         SIFIVE_E_PLIC_NUM_PRIORITIES,
+         SIFIVE_E_PLIC_PRIORITY_BASE,
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index c1e04cbb98..f88bb48053 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -352,6 +352,7 @@ static const MemoryRegionOps sifive_plic_ops = {
+ 
+ static Property sifive_plic_properties[] = {
+     DEFINE_PROP_STRING("hart-config", SiFivePLICState, hart_config),
++    DEFINE_PROP_UINT32("hartid-base", SiFivePLICState, hartid_base, 0),
+     DEFINE_PROP_UINT32("num-sources", SiFivePLICState, num_sources, 0),
+     DEFINE_PROP_UINT32("num-priorities", SiFivePLICState, num_priorities, 0),
+     DEFINE_PROP_UINT32("priority-base", SiFivePLICState, priority_base, 0),
+@@ -400,10 +401,12 @@ static void parse_hart_config(SiFivePLICState *plic)
+     }
+     hartid++;
+ 
+-    /* store hart/mode combinations */
+     plic->num_addrs = addrid;
++    plic->num_harts = hartid;
 +
-         /* compute missing values, prefer sockets over cores over threads */
-         if (cpus == 0 || sockets == 0) {
-             cores = cores > 0 ? cores : 1;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 18815d9be2..59b28ada65 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -244,6 +244,7 @@ typedef struct DeviceMemoryState {
-  * @cores: the number of cores in one package
-  * @threads: the number of threads in one core
-  * @sockets: the number of sockets on the machine
-+ * @sockets_specified: the number of sockets were specified for the machine
-  * @max_cpus: the maximum number of logical processors on the machine
-  */
- typedef struct CpuTopology {
-@@ -251,6 +252,7 @@ typedef struct CpuTopology {
-     unsigned int cores;
-     unsigned int threads;
-     unsigned int sockets;
-+    bool sockets_specified;
-     unsigned int max_cpus;
- } CpuTopology;
++    /* store hart/mode combinations */
+     plic->addr_config = g_new(PLICAddr, plic->num_addrs);
+-    addrid = 0, hartid = 0;
++    addrid = 0, hartid = plic->hartid_base;
+     p = plic->hart_config;
+     while ((c = *p++)) {
+         if (c == ',') {
+@@ -429,8 +432,6 @@ static void sifive_plic_irq_request(void *opaque, int irq, int level)
  
+ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+ {
+-    MachineState *ms = MACHINE(qdev_get_machine());
+-    unsigned int smp_cpus = ms->smp.cpus;
+     SiFivePLICState *plic = SIFIVE_PLIC(dev);
+     int i;
+ 
+@@ -451,8 +452,8 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+      * lost a interrupt in the case a PLIC is attached. The SEIP bit must be
+      * hardware controlled when a PLIC is attached.
+      */
+-    for (i = 0; i < smp_cpus; i++) {
+-        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(i));
++    for (i = 0; i < plic->num_harts; i++) {
++        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(plic->hartid_base + i));
+         if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
+             error_report("SEIP already claimed");
+             exit(1);
+@@ -488,16 +489,17 @@ type_init(sifive_plic_register_types)
+  * Create PLIC device.
+  */
+ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+-    uint32_t num_sources, uint32_t num_priorities,
+-    uint32_t priority_base, uint32_t pending_base,
+-    uint32_t enable_base, uint32_t enable_stride,
+-    uint32_t context_base, uint32_t context_stride,
+-    uint32_t aperture_size)
++    uint32_t hartid_base, uint32_t num_sources,
++    uint32_t num_priorities, uint32_t priority_base,
++    uint32_t pending_base, uint32_t enable_base,
++    uint32_t enable_stride, uint32_t context_base,
++    uint32_t context_stride, uint32_t aperture_size)
+ {
+     DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PLIC);
+     assert(enable_stride == (enable_stride & -enable_stride));
+     assert(context_stride == (context_stride & -context_stride));
+     qdev_prop_set_string(dev, "hart-config", hart_config);
++    qdev_prop_set_uint32(dev, "hartid-base", hartid_base);
+     qdev_prop_set_uint32(dev, "num-sources", num_sources);
+     qdev_prop_set_uint32(dev, "num-priorities", num_priorities);
+     qdev_prop_set_uint32(dev, "priority-base", priority_base);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index c193761916..53e48e2ff5 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -586,7 +586,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+ 
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+-        plic_hart_config,
++        plic_hart_config, 0,
+         SIFIVE_U_PLIC_NUM_SOURCES,
+         SIFIVE_U_PLIC_NUM_PRIORITIES,
+         SIFIVE_U_PLIC_PRIORITY_BASE,
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 51afe7e23b..421815081d 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -584,7 +584,7 @@ static void riscv_virt_board_init(MachineState *machine)
+ 
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[VIRT_PLIC].base,
+-        plic_hart_config,
++        plic_hart_config, 0,
+         VIRT_PLIC_NUM_SOURCES,
+         VIRT_PLIC_NUM_PRIORITIES,
+         VIRT_PLIC_PRIORITY_BASE,
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 4421e81249..ace76d0f1b 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -48,6 +48,7 @@ typedef struct SiFivePLICState {
+     /*< public >*/
+     MemoryRegion mmio;
+     uint32_t num_addrs;
++    uint32_t num_harts;
+     uint32_t bitfield_words;
+     PLICAddr *addr_config;
+     uint32_t *source_priority;
+@@ -58,6 +59,7 @@ typedef struct SiFivePLICState {
+ 
+     /* config */
+     char *hart_config;
++    uint32_t hartid_base;
+     uint32_t num_sources;
+     uint32_t num_priorities;
+     uint32_t priority_base;
+@@ -70,10 +72,10 @@ typedef struct SiFivePLICState {
+ } SiFivePLICState;
+ 
+ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+-    uint32_t num_sources, uint32_t num_priorities,
+-    uint32_t priority_base, uint32_t pending_base,
+-    uint32_t enable_base, uint32_t enable_stride,
+-    uint32_t context_base, uint32_t context_stride,
+-    uint32_t aperture_size);
++    uint32_t hartid_base, uint32_t num_sources,
++    uint32_t num_priorities, uint32_t priority_base,
++    uint32_t pending_base, uint32_t enable_base,
++    uint32_t enable_stride, uint32_t context_base,
++    uint32_t context_stride, uint32_t aperture_size);
+ 
+ #endif
 -- 
 2.25.1
 
