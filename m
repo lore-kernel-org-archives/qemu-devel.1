@@ -1,83 +1,105 @@
 Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A9CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 20:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA82C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:04:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BE0F2088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 20:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78E3B2078C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:04:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tW3F3Ydy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BE0F2088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezm9YqWq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E3B2078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je36t-0004uF-Bb
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 16:57:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37606)
+	id 1je3Dg-0000IZ-NP
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 17:04:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hoychris01@gmail.com>)
- id 1je36G-0004UU-R6
- for qemu-devel@nongnu.org; Wed, 27 May 2020 16:56:32 -0400
-Received: from mail-lj1-x22b.google.com ([2a00:1450:4864:20::22b]:40410)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hoychris01@gmail.com>)
- id 1je36F-0001PZ-86
- for qemu-devel@nongnu.org; Wed, 27 May 2020 16:56:32 -0400
-Received: by mail-lj1-x22b.google.com with SMTP id z13so21001520ljn.7
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 13:56:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=A3ZP7dktoAf/Ss3upPYdDDeiFBdzevienUzcEUz6OZU=;
- b=tW3F3YdyiVb2NQ7AiGOcCbAZ/VT5Ps4vHM55GG+VLz83X9gYX6RfDBjUxaTjtZI+EH
- 1DPnML3ABJRFmoH0iC33fNI+wGofzqnYnSUD6/Nf5w+AePfsEzZVErK3FA0I5esHQck3
- nfcdHgwDHskblcInEyxfCcG2iypW22LnOfL51zEPs/j695Hk2MVeoUV2kQQRzlYg/GRY
- Kjny6OCRtyGj3meiwPKpOS+qQ5lyViUbbp0thY4eyP9pe2KIReD/1zjKg9HHWLDSsdSj
- sZE8rL44/oyYuNCz9jKmWdXZ/HGalyAETuot0xnP5Po3tVLi4U/cOgASu81ZM7f/V1of
- BdGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=A3ZP7dktoAf/Ss3upPYdDDeiFBdzevienUzcEUz6OZU=;
- b=MOLUIPpiW+WRRZ6DZkK+AFZR7FrssS1tXmon/7ZRo5t5OPV0p/RfYF2XrOZvwt9DWF
- 0Ox2rRSCNNkfn1mzocaP5UtcobfcGRIseu0WyIljXKu1ug5k8KZGeR74+l3xtqSXx/Ct
- Rooa1d77OD6YgjhYo+O5DQz2b/9lGsHttKbpreSx59mTVUNcbh8chw5vX0vL/U+O7wdK
- Id5OIH8X727L0CRiku7yNLzN6OkcnR5O8w8FtCFLt6M2+a4KzRRWrXe6rCqYF1VmfGZn
- a6w6HtSaIJUkukuSzZ6Tx4kuFi0Y8VP0498MhhaaJOHcFuo1KgiH79e4lgfRRbhsUvqB
- onZQ==
-X-Gm-Message-State: AOAM530rf9qObOZDxo5lAypiX2zMG3tHi8HWrIXhOu2iuoCFWqV62tZb
- yJG7AsoaIFYG2NuBwdYsAUwTpWA4xmF7PpBRgeCsqfV2
-X-Google-Smtp-Source: ABdhPJyZO6s7xiZfyKZ2k3Akz9v4uCnHOO0+cPw32gx/Dfp66sOmrxcIW4kKymK0qBK/rJNhmouBo+VbjUQ5Xw6VjoA=
-X-Received: by 2002:a2e:870b:: with SMTP id m11mr3506132lji.315.1590612988616; 
- Wed, 27 May 2020 13:56:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je3D7-00083K-51
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 17:03:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39319
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je3D5-0006Wu-J5
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 17:03:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590613414;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=x0JRjjU3dgAIrBxPLDRaH5wHrqMTWl6+2G4BcOeSFds=;
+ b=ezm9YqWqQKLZm5eH8Zp/XVnHKkG1iKP3hQn17seGBwuMozjY+bBEqYVVgWCeQ8EtRYdT6J
+ LJ9khzr3G7Xt2jMQl0HtQE3klTThgesvVqm6lwr9/0OLhpvpEZYe4+3c2UJkL3OBtEX0l7
+ 4P4SD//Z5B8VjL1ckoKm6fB44JcoTMY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-tt9gU6FBNfqvTs1VyXa-Jg-1; Wed, 27 May 2020 17:03:27 -0400
+X-MC-Unique: tt9gU6FBNfqvTs1VyXa-Jg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AED58005AA;
+ Wed, 27 May 2020 21:03:25 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 770ECA1020;
+ Wed, 27 May 2020 21:03:14 +0000 (UTC)
+Subject: Re: [PATCH v6 4/5] block: make size-related BlockConf properties
+ accept size suffixes
+To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, xen-devel@lists.xenproject.org,
+ Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Paul Durrant <paul@xen.org>, Fam Zheng
+ <fam@euphon.net>, John Snow <jsnow@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost
+ <ehabkost@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200527124511.986099-1-rvkagan@yandex-team.ru>
+ <20200527124511.986099-5-rvkagan@yandex-team.ru>
+ <d2ac3549-e63d-d737-41fa-21965c551175@redhat.com>
+ <20200527205311.GA373697@rvkaganb.lan>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <367c42ad-69cf-0ed6-1bbf-ed5ea1b0a957@redhat.com>
+Date: Wed, 27 May 2020 16:03:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-From: Chris Hoy <hoychris01@gmail.com>
-Date: Wed, 27 May 2020 12:52:42 -0700
-Message-ID: <CADAnahmxeveTRvoN9TN3qgi+_gy5PpSCULy+Cp3Rzj0gaE-p7A@mail.gmail.com>
-Subject: Fully operable build post
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="0000000000002968c705a6a77276"
-Received-SPF: pass client-ip=2a00:1450:4864:20::22b;
- envelope-from=hoychris01@gmail.com; helo=mail-lj1-x22b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200527205311.GA373697@rvkaganb.lan>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 17:03:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,38 +116,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002968c705a6a77276
-Content-Type: text/plain; charset="UTF-8"
+On 5/27/20 3:53 PM, Roman Kagan wrote:
 
-Hello all,
+>>> ---
+>>> v5 -> v6:
+>>> - add prop_size32 instead of going with 64bit
+>>
+>> Would it be worth adding prop_size32 as its own patch, before using it here?
+> 
+> I've no strong opinion on this.  Should I better split it out when
+> respinning?
 
-I am proud to see that I have my barebones implementation of qemu finally
-working. After starting earlier this year, I have slowly made progress to
-fully integrate my kernel hardware into a gpu-passthrough vm. I went
-through many settings and templates from various sources and finally have
-something that works for me for a start and would be really interested in
-lining out my experiences. It is my observation that the documentation may
-be a bit unevenly distributed on the official page as far as templates go
-and so if I could help I would like to send my template through the
-official forum. Any help or advice with this would be greatly appreciated.
+Patch splitting is an art-form.  But in general, a long series of 
+smaller patches each easy to review is going to get accepted into the 
+tree faster than a single patch that merges multiple changes into one 
+big blob, even if the net diff is identical.  It's rare that someone 
+will ask you to merge patches because you split too far, so the real 
+tradeoff is whether it will cost you more time to split than what you 
+will save the next reviewer (including the maintainer that will merge 
+your patches, depending on whether the maintainer also reviews it or 
+just trusts my review), if you decide to go with a v7.
 
-Best Regards
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
---0000000000002968c705a6a77276
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hello all,<div><br></div><div>I am proud to see that I hav=
-e my barebones implementation of qemu finally working. After starting earli=
-er this year, I have slowly made progress to fully integrate my kernel hard=
-ware into a gpu-passthrough vm. I went through many settings and templates =
-from various sources and finally have something that works for me for a sta=
-rt and would be really interested in lining out my experiences. It is my ob=
-servation that the documentation may be a bit unevenly distributed on the o=
-fficial page as far as templates go and so if I could help I would like to =
-send my template through the official forum. Any help or advice with this w=
-ould be greatly appreciated.</div><div><br></div><div>Best Regards</div></d=
-iv>
-
---0000000000002968c705a6a77276--
 
