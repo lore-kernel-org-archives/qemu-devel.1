@@ -4,126 +4,113 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B68C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22832C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E60E2078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1B44207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSW44r3P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E60E2078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRhpyv3d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B44207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxSv-0002Hl-C7
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44352)
+	id 1jdxT8-0002oN-2C
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:55:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxRU-00009S-3S
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27169
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jdxS7-00017Z-EO
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:43 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43534
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxRS-00077T-So
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:03 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jdxS6-0007nn-Cm
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590591242;
+ s=mimecast20190719; t=1590591281;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LayDpP1uENphGckZh8jBERvtaCKhk+KyegIwXKRsm3k=;
- b=dSW44r3P4EwHSpYQSFDK4L0de6snwd6Cmjh0ZCoLY2OcZ2KQeXA+XJYWT0H6UDWQP3PhMM
- Hia4/EH7YsAOTsq8OjnBoWCf+Bf+GXdmQ2ZrK+Swg0uil4tFROZPMOSbQCMyqIADWfAek5
- gadtf4GOBVxRFMTs20oZMsy7EN87DNY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-niOMZ_L_MaWOTjbon2JMjQ-1; Wed, 27 May 2020 10:53:59 -0400
-X-MC-Unique: niOMZ_L_MaWOTjbon2JMjQ-1
-Received: by mail-ej1-f71.google.com with SMTP id q2so2674038ejf.6
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:53:58 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references;
+ bh=lEeSe1IRBQZQTY6sUBsPJ4KCOPChUURqmIR/pMWuNyA=;
+ b=YRhpyv3desd4DVSob51BuZRPBVCqumF+2hTYCMafsR4Ci0DzV0SgKZGKOLP4qPGKtdEUpK
+ jRvkP3xLj81FqV1ZyhGxZzobW0XO/1nmcgZLohT1cHmMFKoNvsFukh2zjj0tVOU/GBpoTB
+ L1SVsRHXl/kLv7o/RHKclAiND+WoBcU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-xwDPXHVbPZmxBwn3B1EBfQ-1; Wed, 27 May 2020 10:54:40 -0400
+X-MC-Unique: xwDPXHVbPZmxBwn3B1EBfQ-1
+Received: by mail-ed1-f70.google.com with SMTP id m7so10228581edr.5
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:54:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=LayDpP1uENphGckZh8jBERvtaCKhk+KyegIwXKRsm3k=;
- b=fz/3UggcQL4Srqt5InCx46a23+j9aVA1mPSOew4w/fUyhCEQAoTXwq1WrCBMtcNceD
- +XZaMxd5wVwrttv6PnuicYznEd83QwFGp/kX821t/b2mWFRZefpZCXbug1ny7ENL3S/0
- GDpjw2j49H3vSxpv7XelcxsRHWUrGxmSoZ4RMMi0PQdWqrLUGmP5n3QYxaNbLc2DGvOR
- pVzobv+mg4WAcKSux0TtJ0gPjN+KJ5i7hCXOviOPVysM7Q1DZ5odCEkyuBSKWpkBEBEJ
- MKsT8VLirlUUj9Lam3f8+3j1acp9rC/YpSCRNbVgTKzTiPr5isiY1e+AXfsaEuvIFWIs
- aE0A==
-X-Gm-Message-State: AOAM532eRH+Lj1P65IdMfXPQhAcKfOVXS2L896Yghup6I5hG5pPaJnO7
- 2chUUu2vevzCPrgEriAcTgwIx4TKrHpEF0CHWamNArkK04gWEgqqQw90u+G5s3TdWDvqrjGO+ss
- Bv7iUpBYK0VhDy0E=
-X-Received: by 2002:a05:6402:709:: with SMTP id
- w9mr23435253edx.255.1590591237875; 
- Wed, 27 May 2020 07:53:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbD0CkhllRKfO+iASiW/PHwGccDOwhCm9zOaRllEr9qgYRJLm239gGuSBdQjqOadMryhuu4w==
-X-Received: by 2002:a05:6402:709:: with SMTP id
- w9mr23435238edx.255.1590591237673; 
- Wed, 27 May 2020 07:53:57 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id b23sm2932281ejz.121.2020.05.27.07.53.56
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lEeSe1IRBQZQTY6sUBsPJ4KCOPChUURqmIR/pMWuNyA=;
+ b=Zv2BnbX6KffvrTaRZqS2D24iuEPvxwOcZN6zu76jL0P4Otd5EeWOawiyr+FAqLS8ln
+ t7ARitiaZKKbrYOvcoCrl3mEbdSA1ifh4npfn3bX8QARxtvceQZmV6aCr0AKDG0L4sMo
+ 59Km/dcVMvHsrOk4MvLYt+wS8Z473hJiVFYtDHBglw/gRqc/X2D4y8HPeOOegIrklE3K
+ Sa0HRwmJ7D4hr/y4rRbGuIXhUv3IlH2eUrFewPBiaIwf0ngt1BIx9VoREnKWg3jXFUjY
+ 5xQBURwZ0T4vuZQaUIF26dEns2nd2DXktxTXwAv/WB2kxdg4eR+GhKD/azookechGLNG
+ F1lw==
+X-Gm-Message-State: AOAM530lePeno5gz91/AuGnUMDsobjVEb4tFwUmti66oPSy7apBTM/jx
+ GS9dQZ+LbN2bAYhOCONZo3eveZ63uFHwFz9tn0OoXJwSA6QLe9S0aHQoIfp0udziRiZ21fEvyvN
+ ioSYN8gw6a0JWBcc=
+X-Received: by 2002:a17:906:bce6:: with SMTP id
+ op6mr6320880ejb.337.1590591279023; 
+ Wed, 27 May 2020 07:54:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdhbrUmxczGQ/ob5QYR1T3Va4IS8PRMMQpuS4lQtRgJ1iKJdUQCgy1dGVQzKwtdebmkvwnsg==
+X-Received: by 2002:a17:906:bce6:: with SMTP id
+ op6mr6320854ejb.337.1590591278625; 
+ Wed, 27 May 2020 07:54:38 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8?
+ ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
+ by smtp.gmail.com with ESMTPSA id f4sm3124661ejk.17.2020.05.27.07.54.37
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 May 2020 07:53:57 -0700 (PDT)
-Subject: Re: [PATCH v2 00/11] Record/replay acceptance tests
-To: qemu-devel@nongnu.org, Pavel.Dovgaluk@gmail.com
-References: <159058688028.16318.18277405305142866353@45ef0f9c86ae>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ac997bec-d700-2ee2-8b98-c1e58ab30933@redhat.com>
-Date: Wed, 27 May 2020 16:53:55 +0200
+ Wed, 27 May 2020 07:54:38 -0700 (PDT)
+Subject: Re: [PATCH v3 14/22] microvm: use 2G split unconditionally
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200520132003.9492-1-kraxel@redhat.com>
+ <20200520132003.9492-15-kraxel@redhat.com>
+ <20200521112921.641f12bb@redhat.com>
+ <20200525114508.hhvyzjiqja6knz6l@sirius.home.kraxel.org>
+ <20200525183615.5f8e67d3@redhat.com>
+ <20200526044839.bncj6iltugnzgfmy@sirius.home.kraxel.org>
+ <20200527142545.32e91049@redhat.com>
+ <58ced517-1ad4-c895-afe6-fec690791f4f@redhat.com>
+ <20200527162646.694b2d47@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cdeb8406-eb41-160e-817a-010241ccd457@redhat.com>
+Date: Wed, 27 May 2020 16:54:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <159058688028.16318.18277405305142866353@45ef0f9c86ae>
+In-Reply-To: <20200527162646.694b2d47@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,41 +123,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wrampazz@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru,
- crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/27/20 3:41 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280/
+On 27/05/20 16:26, Igor Mammedov wrote:
+> On Wed, 27 May 2020 15:06:28 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-[...]>
-> ERROR: line over 90 characters
-> #83: FILE: tests/acceptance/replay_linux.py:41:
-> +        vm.add_args('-drive', 'driver=blkreplay,id=disk%s-rr,if=none,image=disk%s' % (id, id))
-> 
-> WARNING: line over 80 characters
-> #84: FILE: tests/acceptance/replay_linux.py:42:
-> +        vm.add_args('-device', '%s,drive=disk%s-rr%s' % (device, id, bus_string))
+>> On 27/05/20 14:25, Igor Mammedov wrote:
+>>>>   (2) we loose a gigabyte page.  
+>>>           I'm not sure waht exactly we loose in this case.
+>>>           Lets assume we allocating guest 5G of continuous RAM using 1G huge pages,
+>>>           in this case I'd think that on host side MMIO overlay won't affect RAM blob
+>>>           on guest side pagetables will be fragmented due to MMIO holes, but guest still
+>>>           could use huge pages smaller ones in fragmented area and 1G where there is no fragmentation.  
+>>
+>> Access to the 3G-4G area would not be able to use 1G EPT pages.
+> Could it use 2Mb pages instead of 1Gb?
 
-Please try to respect the QEMU 80 chars limit (it eases review by blind
-developers) and align methods & arguments to QEMU style.
+Yes, probably a mix of 2 MiB pages and 4 KiB pages around the memslot
+splits.
 
-Otherwise I'm glad to see this series.
+> Do we really care about 1 gigabyte huge page in microvm intended usecase?
+> (fast starting VMs for microservices like FaaS, which unlikely would use much memory to begin with)
 
-So far:
-Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
+I honestly don't think it's measurable, but at least in theory we care
+because such workloads could have more TLB misses (relative to the
+execution time) than long-lasting VMs.
 
-I plan to add R-b on v3 once you addressed Alex's comments.
-
-Good job!
+Paolo
 
 
