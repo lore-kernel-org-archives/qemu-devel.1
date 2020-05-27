@@ -2,70 +2,96 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A570C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D435A207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:13:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D435A207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E5DE3208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:21:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qSSjfRy9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DE3208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdwo7-0004xq-2b
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:13:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
+	id 1jdwva-0000au-4r
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:21:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdwnI-00043Q-NG; Wed, 27 May 2020 10:12:32 -0400
-Resent-Date: Wed, 27 May 2020 10:12:32 -0400
-Resent-Message-Id: <E1jdwnI-00043Q-NG@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21324)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jdwnG-00029Y-M0; Wed, 27 May 2020 10:12:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590588743; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=bZaexx1sXc0b76ZjDrU21Yi4OeED0YA3jM+BB/MnxtaHinOxxTNolAKk7IGTUADxgOOeAA4D/cJxbju3eCYspG91wEla0Rv4BERfPeARedgkYElpO4iKBOdmgmuo9upISdYGUAlz4z66pIzAP6/X/8pfdoPtyl1Ou9vO0EEOLKc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590588743;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WAyzjL3hEXT84H/Z2H6ONVPz1tt8FwSrVRCJOz7nvg8=; 
- b=Ct2cWzPw3/aJnAU8pBJpjwqBeUi9E7Yh9O7XwJfS84a/1hJWtrQkeQVgFsl+UH2C8mh1YrbWq/60wxxw2WR3a+kxb+DnDiJZeQ1qrIlg4V31a0Hq+/v++wXF1HXqkO5x+cjdnvF5oY7kMTmmLQ61hViVLx3eZM4cB5/GT0TvTpo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590588741032122.77576622460163;
- Wed, 27 May 2020 07:12:21 -0700 (PDT)
-Message-ID: <159058873989.16318.11496237609169277676@45ef0f9c86ae>
-In-Reply-To: <20200527100546.29297-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH  v1 0/3] some linux-user guest_base fixes
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdwui-0008FA-NR
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:20:12 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:32945)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdwuh-000714-A3
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:20:12 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j198so2389738wmj.0
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:20:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=A4AReW0H9HvC6ngTxkLLKkfxchUfukerwlsxbZImcKs=;
+ b=qSSjfRy9jKdh8jRSi7GwYuA4AOvhwVDXEdgdSRKkxt+EfTEGWWtrJFuvaVzyiKK3os
+ BEiZtZgb65kUBO+7wTj9tWoKcDoTi9+Owt231tVeOpV0IL9DQDNOvraSiGRHaRDmsKyZ
+ jY2TkjhI3MCAPW0Cs6w2a9Y7ZTlCe+DzwmJQ5lonW97GmlVrKPQKFKByJxSoLznRYd7o
+ PG0SsEfDfkWNxJAXALoRIHCzNdTwiCrjUuQcr0NrFY4m+BQ8o+Ps9A8Aa0RYC6qZu0fJ
+ 8DrNI/r5V8lj6AWnSeH/gdduWewN2nAWXzs31ex33fxkjClLIQWOmm53isZQvgzTpr2S
+ TC3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=A4AReW0H9HvC6ngTxkLLKkfxchUfukerwlsxbZImcKs=;
+ b=hTE6Qm9ZW0pO6E2sCRAbb9egooGrMTeBpZcN8h5nlL9W3ZZy5569ZbcV5CwZnxOmro
+ r24RdKSHiTueRFb5IavS3yFtYDaMS//ESxDC17yMxJccZ2WUDQeKJM5Z9Jaa3ApJRBcs
+ TTKvKWIsHIV83c1tRCk3lGfhsu5It8QbFqKA0Jf+07RhGfPKwUtd9fm8ai1iAZfgVkbq
+ EzU1Ph2sTFOor3RhxwuodDBrZy0TpJsPqJhQZbxZ3gDwJIS1HVumytuCLkblLn0VHbVs
+ KBYhjjgNc8XDc2+3sumcjab41oidr5RN6tJqnlsSm/gaSR8dM4sShreXuX9k8cClRyIi
+ 5/pA==
+X-Gm-Message-State: AOAM5321DZmTTasHOXKtw6hYugYgsv7RiYxgWrdN7UOnvUMlYL0sRG7l
+ UlA6OUwQF0I/4u5t3WC/nKXlKA==
+X-Google-Smtp-Source: ABdhPJyPcsF2N9gKji+BlyodVMebLjk4KMoUB6V6eeSoWkT/Z2oJHijtuWzoxCSHWbvFKi8rFf0Azg==
+X-Received: by 2002:a1c:b0c8:: with SMTP id z191mr4665911wme.165.1590589208780; 
+ Wed, 27 May 2020 07:20:08 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u23sm3260968wmu.20.2020.05.27.07.20.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 May 2020 07:20:07 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5CADE1FF7E;
+ Wed, 27 May 2020 15:20:05 +0100 (BST)
+References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
+ <159057544414.16818.6329438674514481731.stgit@pasha-ThinkPad-X280>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+Subject: Re: [PATCH v2 01/11] tests/acceptance: allow console interaction
+ with specific VMs
+In-reply-to: <159057544414.16818.6329438674514481731.stgit@pasha-ThinkPad-X280>
+Date: Wed, 27 May 2020 15:20:05 +0100
+Message-ID: <874ks1794a.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Wed, 27 May 2020 07:12:21 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 10:12:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,56 +105,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: wrampazz@redhat.com, qemu-devel@nongnu.org, dovgaluk@ispras.ru,
+ pavel.dovgaluk@ispras.ru, crosa@redhat.com, pbonzini@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyNzEwMDU0Ni4yOTI5
-Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMjAwNTI3MTAwNTQ2LjI5Mjk3LTEtYWxleC5i
-ZW5uZWVAbGluYXJvLm9yZwpTdWJqZWN0OiBbUEFUQ0ggIHYxIDAvM10gc29tZSBsaW51eC11c2Vy
-IGd1ZXN0X2Jhc2UgZml4ZXMKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDUyNzEwMDU0Ni4yOTI5Ny0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMDUyNzEwMDU0Ni4yOTI5Ny0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphNTM3ZTEz
-IHRlc3RzL3RjZzogYWRkIHNpbXBsZSBjb21tcGFnZSB0ZXN0IGNhc2UKMjZjNDI0ZSBsaW51eC11
-c2VyOiBkZWFsIHdpdGggYWRkcmVzcyB3cmFwIGZvciBBUk1fQ09NTVBBR0Ugb24gMzIgYml0Cjg4
-MjVjYjEgbGludXgtdXNlcjogcHJvdmlkZSBmYWxsYmFjayBwZ2RfZmluZF9ob2xlIGZvciBiYXJl
-IGNocm9vdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMyBDaGVja2luZyBjb21taXQgODgyNWNi
-MTQ4ZmE4IChsaW51eC11c2VyOiBwcm92aWRlIGZhbGxiYWNrIHBnZF9maW5kX2hvbGUgZm9yIGJh
-cmUgY2hyb290cykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBs
-aW51eC11c2VyL2VsZmxvYWQuYzoyMTE0Ogorc3RhdGljIHVpbnRwdHJfdCBwZ2RfZmluZF9ob2xl
-X2ZhbGxiYWNrKHVpbnRwdHJfdCBndWVzdF9zaXplLCB1aW50cHRyX3QgYnJrLCBsb25nIGFsaWdu
-KQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-LzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8zIENoZWNraW5nIGNvbW1pdCAyNmM0MjRl
-MzQ2ZGYgKGxpbnV4LXVzZXI6IGRlYWwgd2l0aCBhZGRyZXNzIHdyYXAgZm9yIEFSTV9DT01NUEFH
-RSBvbiAzMiBiaXQpCjMvMyBDaGVja2luZyBjb21taXQgYTUzN2UxM2RiZWE1ICh0ZXN0cy90Y2c6
-IGFkZCBzaW1wbGUgY29tbXBhZ2UgdGVzdCBjYXNlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyODogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jv
-bmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiM1NzogRklMRTogdGVzdHMvdGNnL2FybS9jb21tcGFn
-ZS5jOjI1OgordHlwZWRlZiBpbnQgKGNtcHhjaGdfZm4pKGludCBvbGR2YWwsIGludCBuZXd2YWws
-IHZvbGF0aWxlIGludCAqcHRyKTsKCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3
-cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzYzOiBGSUxFOiB0ZXN0cy90Y2cvYXJtL2NvbW1w
-YWdlLmM6MzE6CisgICAgICAgICAgICAgICAgICAgICAgICAgICB2b2xhdGlsZSBpbnQ2NF90ICpw
-dHIpOwoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA2OSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTI3MTAwNTQ2LjI5Mjk3LTEtYWxleC5i
-ZW5uZWVAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+
+Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com> writes:
+
+> Console interaction in avocado scripts was possible only with single
+> default VM.
+> This patch modifies the function parameters to allow passing a specific
+> VM as a parameter to interact with it.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Reviewed-by: Willian Rampazzo <willianr@redhat.com>
+> ---
+>  0 files changed
+>
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+> index 59e7b4f763..77d1c1d9ff 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -69,13 +69,15 @@ def pick_default_qemu_bin(arch=3DNone):
+>=20=20
+>=20=20
+>  def _console_interaction(test, success_message, failure_message,
+> -                         send_string, keep_sending=3DFalse):
+> +                         send_string, keep_sending=3DFalse, vm=3DNone):
+
+is it not possible to make vm=3Dtest.vm to avoid having...
+
+>      assert not keep_sending or send_string
+> -    console =3D test.vm.console_socket.makefile()
+> +    if vm is None:
+> +        vm =3D test.vm
+
+to do this here?
+
+> +    console =3D vm.console_socket.makefile()
+>      console_logger =3D logging.getLogger('console')
+>      while True:
+>          if send_string:
+> -            test.vm.console_socket.sendall(send_string.encode())
+> +            vm.console_socket.sendall(send_string.encode())
+>              if not keep_sending:
+>                  send_string =3D None # send only once
+>          msg =3D console.readline().strip()
+> @@ -115,7 +117,8 @@ def interrupt_interactive_console_until_pattern(test,=
+ success_message,
+>      _console_interaction(test, success_message, failure_message,
+>                           interrupt_string, True)
+>=20=20
+> -def wait_for_console_pattern(test, success_message, failure_message=3DNo=
+ne):
+> +def wait_for_console_pattern(test, success_message, failure_message=3DNo=
+ne,
+> +                             vm=3DNone):
+>      """
+>      Waits for messages to appear on the console, while logging the conte=
+nt
+>=20=20
+> @@ -125,7 +128,7 @@ def wait_for_console_pattern(test, success_message, f=
+ailure_message=3DNone):
+>      :param success_message: if this message appears, test succeeds
+>      :param failure_message: if this message appears, test fails
+>      """
+> -    _console_interaction(test, success_message, failure_message, None)
+> +    _console_interaction(test, success_message, failure_message, None, v=
+m=3Dvm)
+>=20=20
+>  def exec_command_and_wait_for_pattern(test, command,
+>                                        success_message, failure_message=
+=3DNone):
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
