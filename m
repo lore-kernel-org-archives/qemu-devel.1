@@ -2,58 +2,60 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4AA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB8FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 795322078C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0883E2078C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 05:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Uh44WCHJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795322078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YMXg1g7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0883E2078C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdomy-0003Kr-Il
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 01:39:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46180)
+	id 1jdon4-0003aM-7W
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 01:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jdolj-00015T-6m; Wed, 27 May 2020 01:38:23 -0400
-Received: from ozlabs.org ([203.11.71.1]:35639)
+ id 1jdoli-00014y-M4; Wed, 27 May 2020 01:38:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:35859)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jdolg-0001br-RS; Wed, 27 May 2020 01:38:22 -0400
+ id 1jdolg-0001bp-RQ; Wed, 27 May 2020 01:38:22 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49X03q1Gwcz9sSd; Wed, 27 May 2020 15:38:15 +1000 (AEST)
+ id 49X03q3Tj6z9sSk; Wed, 27 May 2020 15:38:15 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1590557895;
- bh=P20zmXgZeVw3tlpqdOCU79Zdnez1v4tVVXdtG7lBac8=;
- h=From:To:Cc:Subject:Date:From;
- b=Uh44WCHJRw8jN97krDHHTwPp5M2GtQCgdN76ADE82EvtbmHXq1uyIxVsAsBZOKdQQ
- nIJUtUWnI/x1TYKkUmt1p/79VvNw2Kwmq0zjFQ4VS2DgGzq2QS9BGGAYAAOXZD3riC
- mTLTK6FhtrQybv4cS+xBDOBuRnDv9kskWKfG58b4=
+ bh=167hnw7FWUOfd27HKDy2X3q5Aj849B09c+brDsAAulw=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=YMXg1g7apy31RoWrONdM/17x1tUgeFt3X3xVXd7HnJsWPeHyu0ROLoiUGQZ+kKIc3
+ /W7xK1pJpOK8BwTyxlzpc/pJLdiTtEC+FVYW1ulCPULJZJfY+bl6/tF+4wyGXgqw/y
+ 5+MUIEaFLXGq0loIgAnJS04HAnrFHcQALof5kzbU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/15] ppc-for-5.1 queue 20200527
-Date: Wed, 27 May 2020 15:37:54 +1000
-Message-Id: <20200527053809.356168-1-david@gibson.dropbear.id.au>
+Subject: [PULL 03/15] target/ppc: Untabify excp_helper.c
+Date: Wed, 27 May 2020 15:37:57 +1000
+Message-Id: <20200527053809.356168-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200527053809.356168-1-david@gibson.dropbear.id.au>
+References: <20200527053809.356168-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:38:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -80,77 +82,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit ddc760832fa8cf5e93b9d9e6e854a5114ac63510:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/gkurz/tags/9p-next-2020-05-26' into staging (2020-05-26 14:05:53 +0100)
+Some tabs crept in with a recent change.
 
-are available in the Git repository at:
+Fixes: 6dc6b557913f "target/ppc: Improve syscall exception logging"
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <158886788307.1560068.14096740175576278978.stgit@bahia.lan>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/excp_helper.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-5.1-20200527
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index f052979664..ace8620026 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -70,16 +70,16 @@ static inline void dump_syscall(CPUPPCState *env)
+ static inline void dump_hcall(CPUPPCState *env)
+ {
+     qemu_log_mask(CPU_LOG_INT, "hypercall r3=%016" PRIx64
+-		  " r4=%016" PRIx64 " r5=%016" PRIx64 " r6=%016" PRIx64
+-		  " r7=%016" PRIx64 " r8=%016" PRIx64 " r9=%016" PRIx64
+-		  " r10=%016" PRIx64 " r11=%016" PRIx64 " r12=%016" PRIx64
++                  " r4=%016" PRIx64 " r5=%016" PRIx64 " r6=%016" PRIx64
++                  " r7=%016" PRIx64 " r8=%016" PRIx64 " r9=%016" PRIx64
++                  " r10=%016" PRIx64 " r11=%016" PRIx64 " r12=%016" PRIx64
+                   " nip=" TARGET_FMT_lx "\n",
+                   ppc_dump_gpr(env, 3), ppc_dump_gpr(env, 4),
+-		  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
+-		  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
+-		  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
+-		  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
+-		  env->nip);
++                  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
++                  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
++                  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
++                  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
++                  env->nip);
+ }
+ 
+ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCState *env, int excp,
+-- 
+2.26.2
 
-for you to fetch changes up to 9c7c0407028355ca83349b8a60fddfad46f2ebd8:
-
-  vfio/nvlink: Remove exec permission to avoid SELinux AVCs (2020-05-27 15:29:36 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2020-05-27
-
-Here's the next pull request for qemu-5.1.  It includes:
- * Support for the scv and rfscv POWER9 instructions in TCG
- * Support for the new SPAPR_LMB_FLAGS_HOTREMOVABLE flag, which
-   provides a way for guests to know memory which should be removable
-   (so the guest can avoid putting immovable allocations there).
- * Some fixes for the recently added partition scope radix translation
-   in softmmu
- * Assorted minor fixes and cleanups
-
-It includes one patch to avoid a clash with SELinux when using NVLink
-VFIO devices.  That's not technically within the files under my
-maintainership, but it is in a section of the VFIO quirks code that's
-specific to the POWER-only NVLink devices, and has an ack from Alex
-Williamson.
-
-----------------------------------------------------------------
-Cédric Le Goater (1):
-      ppc/spapr: add a POWER10 CPU model
-
-Greg Kurz (8):
-      target/ppc: Untabify excp_helper.c
-      target/ppc: Pass const pointer to ppc_radix64_get_prot_amr()
-      target/ppc: Pass const pointer to ppc_radix64_get_fully_qualified_addr()
-      target/ppc: Don't initialize some local variables in ppc_radix64_xlate()
-      target/ppc: Add missing braces in ppc_radix64_partition_scoped_xlate()
-      target/ppc: Fix arguments to ppc_radix64_partition_scoped_xlate()
-      target/ppc: Don't update radix PTE R/C bits with gdbstub
-      target/ppc: Fix argument to ppc_radix64_partition_scoped_xlate() again
-
-Leonardo Bras (2):
-      ppc/spapr: Add hotremovable flag on DIMM LMBs on drmem_v2
-      vfio/nvlink: Remove exec permission to avoid SELinux AVCs
-
-Nicholas Piggin (2):
-      ppc/pnv: Fix NMI system reset SRR1 value
-      target/ppc: Add support for scv and rfscv instructions
-
-Philippe Mathieu-Daudé (2):
-      hw/pci-bridge/dec: Remove dead debug code
-      hw/nvram/mac_nvram: Convert debug printf()s to trace events
-
- hw/nvram/mac_nvram.c            |  17 +-----
- hw/nvram/trace-events           |   4 ++
- hw/pci-bridge/dec.c             |  10 ----
- hw/ppc/pnv.c                    |  26 ++++++--
- hw/ppc/spapr.c                  |   3 +-
- hw/ppc/spapr_cpu_core.c         |   1 +
- hw/vfio/pci-quirks.c            |   4 +-
- include/hw/ppc/spapr.h          |   1 +
- linux-user/ppc/cpu_loop.c       |   1 +
- target/ppc/cpu.h                |  28 ++++++++-
- target/ppc/excp_helper.c        | 130 +++++++++++++++++++++++++++-------------
- target/ppc/helper.h             |   1 +
- target/ppc/mmu-radix64.c        |  53 +++++++++-------
- target/ppc/mmu-radix64.h        |   4 +-
- target/ppc/translate.c          |  53 +++++++++++++++-
- target/ppc/translate_init.inc.c |   3 +-
- 16 files changed, 237 insertions(+), 102 deletions(-)
 
