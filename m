@@ -2,65 +2,78 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D980C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7ED0C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2CDB207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:44:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2CDB207CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 69512207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="GT+rFY3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69512207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdvQU-0007B6-0j
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:44:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52762)
+	id 1jdvS8-0001H9-Hx
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:46:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jdvPx-0006lz-1m
- for qemu-devel@nongnu.org; Wed, 27 May 2020 08:44:21 -0400
-Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:38322)
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jdvR1-00080M-Rz; Wed, 27 May 2020 08:45:27 -0400
+Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:59790)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jdvPv-0000xA-KR
- for qemu-devel@nongnu.org; Wed, 27 May 2020 08:44:20 -0400
-Received: from player778.ha.ovh.net (unknown [10.110.103.168])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id C3487215477
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 14:44:16 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player778.ha.ovh.net (Postfix) with ESMTPSA id 638F312C879E6;
- Wed, 27 May 2020 12:44:08 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G001e6d2c8b5-f5b1-41b8-a6e8-cee2ff1e4530,A19C442F5A36D79893466B97850BD964E95F9B50)
- smtp.auth=clg@kaod.org
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v3] arm/aspeed: Rework NIC attachment
-Date: Wed, 27 May 2020 14:44:06 +0200
-Message-Id: <20200527124406.329503-1-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jdvQy-0001Q8-HS; Wed, 27 May 2020 08:45:25 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 2C5E72E1581;
+ Wed, 27 May 2020 15:45:18 +0300 (MSK)
+Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
+ (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
+ by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ yGuxnAsuRm-jBxmk9RU; Wed, 27 May 2020 15:45:18 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1590583518; bh=42hnJ6RHsswvNBcGuhOx1Vid5BV/7/IOuRuXw9PtENo=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=GT+rFY3/A/0GhjPSqnGNvn8/0KVp00ezEslGbKJi1h1CVFHRFaME8nksjJwjD6zVw
+ raZBgRPM5mlp8y4/rx6hWXKRnNlkNTSuGd95/scuF9tESi9pzKpbstRV6qtHXXiAtn
+ i85pJ9QEsSf4mIai+JIHe8xloikKTWVzzaQUhOKI=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:8308::1:12])
+ by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ bzO5qPtczO-jBWOPpYZ; Wed, 27 May 2020 15:45:11 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/5] block: enhance handling of size-related BlockConf
+ properties
+Date: Wed, 27 May 2020 15:45:06 +0300
+Message-Id: <20200527124511.986099-1-rvkagan@yandex-team.ru>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 6962565027480177425
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddvgedghedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeegtddutdeugeefvefhhfdvgefhjeffvedvtefhkeeiheffhfdvffelleegvdenucffohhmrghinhepohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.33.253.26; envelope-from=clg@kaod.org;
- helo=3.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 08:44:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=95.108.205.193;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 08:45:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,169 +87,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The number of MACs supported by an Aspeed SoC is defined by "macs_num"
-under the SoC model, that is two for the AST2400 and AST2500 and four
-for the AST2600. The model initializes the maximum number of supported
-MACs but the number of realized devices is capped by the number of
-network device back-ends defined on the command line. This can leave
-unrealized devices hanging around in the QOM composition tree.
-
-Modify the machine initialization to define which MACs are attached to
-a network device back-end using a bit-field property "macs-mask" and
-let the SoC realize all network devices.
-
-The default setting of "macs-mask" is "use MAC0" only, which works for
-all our AST2400 and AST2500 machines. The AST2600 machines have
-different configurations. The AST2600 EVB machine activates MAC1, MAC2
-and MAC3 and the Tacoma BMC machine activates MAC2.
-
-Inactive MACs will have no peer and QEMU may warn the user with :
-
-    qemu-system-arm: warning: nic ftgmac100.0 has no peer
-    qemu-system-arm: warning: nic ftgmac100.1 has no peer
-    qemu-system-arm: warning: nic ftgmac100.3 has no peer
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
-
- To be applied on top of patch :
-
- "arm/aspeed: Compute the number of CPUs from the SoC definition" 
- http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.1006073-1-clg@kaod.org/
-
- Markus, do you mind taking this patch in your QOM series also ?
-
- Thanks,
-
- C.
-
- include/hw/arm/aspeed.h |  6 ++++++
- hw/arm/aspeed.c         | 13 +++++++++++++
- hw/arm/aspeed_ast2600.c |  3 +--
- hw/arm/aspeed_soc.c     |  3 +--
- 4 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 18521484b90e..95b4daece86d 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -23,6 +23,11 @@ typedef struct AspeedMachine {
-     bool mmio_exec;
- } AspeedMachine;
- 
-+#define ASPEED_MAC0_ON   (1 << 0)
-+#define ASPEED_MAC1_ON   (1 << 1)
-+#define ASPEED_MAC2_ON   (1 << 2)
-+#define ASPEED_MAC3_ON   (1 << 3)
-+
- #define ASPEED_MACHINE_CLASS(klass) \
-      OBJECT_CLASS_CHECK(AspeedMachineClass, (klass), TYPE_ASPEED_MACHINE)
- #define ASPEED_MACHINE_GET_CLASS(obj) \
-@@ -39,6 +44,7 @@ typedef struct AspeedMachineClass {
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-+    uint32_t macs_mask;
-     void (*i2c_init)(AspeedBoardState *bmc);
- } AspeedMachineClass;
- 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index fd5cc542a584..f8f3ef89d320 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -258,6 +258,7 @@ static void aspeed_machine_init(MachineState *machine)
-     DriveInfo *drive0 = drive_get(IF_MTD, 0, 0);
-     ram_addr_t max_ram_size;
-     int i;
-+    NICInfo *nd = &nd_table[0];
- 
-     bmc = g_new0(AspeedBoardState, 1);
- 
-@@ -277,6 +278,14 @@ static void aspeed_machine_init(MachineState *machine)
-     object_property_set_uint(OBJECT(&bmc->soc), ram_size, "ram-size",
-                              &error_fatal);
- 
-+    for (i = 0; i < sc->macs_num; i++) {
-+        if ((amc->macs_mask & (1 << i)) && nd->used) {
-+            qemu_check_nic_model(nd, TYPE_FTGMAC100);
-+            qdev_set_nic_properties(DEVICE(&bmc->soc.ftgmac100[i]), nd);
-+            nd++;
-+        }
-+    }
-+
-     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap1, "hw-strap1",
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap2, "hw-strap2",
-@@ -556,12 +565,14 @@ static int aspeed_soc_num_cpus(const char *soc_name)
- static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
- 
-     mc->init = aspeed_machine_init;
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->no_parallel = 1;
-     mc->default_ram_id = "ram";
-+    amc->macs_mask = ASPEED_MAC0_ON;
- 
-     aspeed_machine_class_props_init(oc);
- }
-@@ -680,6 +691,7 @@ static void aspeed_machine_ast2600_evb_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "w25q512jv";
-     amc->spi_model = "mx66u51235f";
-     amc->num_cs    = 1;
-+    amc->macs_mask  = ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_ON;
-     amc->i2c_init  = ast2600_evb_i2c_init;
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-@@ -698,6 +710,7 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "mx66l1g45g";
-     amc->spi_model = "mx66l1g45g";
-     amc->num_cs    = 2;
-+    amc->macs_mask  = ASPEED_MAC2_ON;
-     amc->i2c_init  = witherspoon_bmc_i2c_init; /* Same board layout */
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index c6821b332257..b912d19f809f 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -461,8 +461,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index e6f4b59134ba..3ec1257c140b 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -404,8 +404,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
--- 
-2.25.4
-
+BlockConf includes several properties counted in bytes.=0D
+=0D
+Enhance their handling in a some aspects, specifically=0D
+=0D
+- accept common size suffixes (k, m)=0D
+- perform consistency checks on the values=0D
+- lift the upper limit on physical_block_size and logical_block_size=0D
+=0D
+Also fix the accessor for opt_io_size in virtio-blk to make it consistent w=
+ith=0D
+the size of the field.=0D
+=0D
+History:=0D
+v5 -> v6:=0D
+- fix forgotten xen-block and swim=0D
+- add prop_size32 instead of going with 64bit=0D
+=0D
+v4 -> v5:=0D
+- re-split the patches [Philippe]=0D
+- fix/reword error messages [Philippe, Kevin]=0D
+- do early return on failed consistency check [Philippe]=0D
+- use QEMU_IS_ALIGNED instead of open coding [Philippe]=0D
+- make all BlockConf size props support suffixes=0D
+- expand the log for virtio-blk opt_io_size [Michael]=0D
+=0D
+v3 -> v4:=0D
+- add patch to fix opt_io_size width in virtio-blk=0D
+- add patch to perform consistency checks [Kevin]=0D
+- check min_io_size against truncation [Kevin]=0D
+=0D
+v2 -> v3:=0D
+- mention qcow2 cluster size limit in the log and comment [Eric]=0D
+=0D
+v1 -> v2:=0D
+- cap the property at 2 MiB [Eric]=0D
+- accept size suffixes=0D
+=0D
+Roman Kagan (5):=0D
+  virtio-blk: store opt_io_size with correct size=0D
+  block: consolidate blocksize properties consistency checks=0D
+  qdev-properties: blocksize: use same limits in code and description=0D
+  block: make size-related BlockConf properties accept size suffixes=0D
+  block: lift blocksize property limit to 2 MiB=0D
+=0D
+ include/hw/block/block.h     |  14 +-=0D
+ include/hw/qdev-properties.h |   5 +-=0D
+ hw/block/block.c             |  41 ++-=0D
+ hw/block/fdc.c               |   5 +-=0D
+ hw/block/nvme.c              |   5 +-=0D
+ hw/block/swim.c              |   5 +-=0D
+ hw/block/virtio-blk.c        |   9 +-=0D
+ hw/block/xen-block.c         |   6 +-=0D
+ hw/core/qdev-properties.c    |  85 +++++-=0D
+ hw/ide/qdev.c                |   5 +-=0D
+ hw/scsi/scsi-disk.c          |  12 +-=0D
+ hw/usb/dev-storage.c         |   5 +-=0D
+ tests/qemu-iotests/172.out   | 532 +++++++++++++++++------------------=0D
+ 13 files changed, 420 insertions(+), 309 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
