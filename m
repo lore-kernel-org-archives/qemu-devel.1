@@ -2,90 +2,81 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E21E9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 700F120890
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACAC5208B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:34:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iuj1Fwrh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 700F120890
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Posdlr8a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACAC5208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdsMN-0003rl-Ly
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 05:28:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42560)
+	id 1jdsSa-0006qD-Tw
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 05:34:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdsLp-0003MF-Jh
- for qemu-devel@nongnu.org; Wed, 27 May 2020 05:27:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46814
+ (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1jdsS1-0006Qv-Rv
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 05:34:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46979
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdsLo-00075V-5a
- for qemu-devel@nongnu.org; Wed, 27 May 2020 05:27:52 -0400
+ (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1jdsS0-0002x8-PN
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 05:34:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590571670;
+ s=mimecast20190719; t=1590572054;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Gu7tCcOQndpVsfwYXHLEQEBaPS2sslrrMYmtb49HGwc=;
- b=Iuj1FwrhsUOJbB8x2AopA8o1kvCBOhFU0dBzWDTaXhJPYQBC/gJzsU41D8VY5H91N/7/E8
- roUGbjE/Kia1PUwEU7xW0Pcd+2HGQpCB0Erl414R80PVvYzTNTbAlvLxp3jhSYYFvCWmwD
- WxMXOLb8NwcfF5LcHhsP9XXSJEhdlQU=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=63qITC/tJoB5eHEQGa0oIJyr0nvomjx0A1xhaDX0wsE=;
+ b=Posdlr8a9WDGHuCFw+qjh+2WLK4wr5/tDYDvp7DLx+xL4MBzcwLi8C/UlY9Giz0v8vWlvb
+ tPTewPnFrGopriRq9/It0A/bIBFlZH+Mq/4QAM/itLJFx5ztGkMU75mLdUgm1rVSNAcbBL
+ ROafvVJ+qkJ4Dws7HXmalehXcAqc8MQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-gPNSU_juPD2KXFyYqur7xg-1; Wed, 27 May 2020 05:27:49 -0400
-X-MC-Unique: gPNSU_juPD2KXFyYqur7xg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-405-mcCeIyqOOr2aix2-doEsaw-1; Wed, 27 May 2020 05:34:12 -0400
+X-MC-Unique: mcCeIyqOOr2aix2-doEsaw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E73C81855A0D;
- Wed, 27 May 2020 09:27:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 875D412A4D;
- Wed, 27 May 2020 09:27:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0E8E4113864A; Wed, 27 May 2020 11:27:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Alistair Francis <alistair23@gmail.com>
-Subject: Re: [PATCH 01/24] arm/stm32f405: Fix realization of "stm32f2xx-adc"
- devices
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-2-armbru@redhat.com>
- <CAKmqyKOun2FyT+JR8cyrP9eQn9xFDAppFb4W12ym-TPGt9h7Hg@mail.gmail.com>
- <87d0707bri.fsf@dusky.pond.sub.org>
- <CAKmqyKM3oOLfAxupqfabrj_epQCCE_YbwnkU4cRd5mtg8+7_yg@mail.gmail.com>
-Date: Wed, 27 May 2020 11:27:46 +0200
-In-Reply-To: <CAKmqyKM3oOLfAxupqfabrj_epQCCE_YbwnkU4cRd5mtg8+7_yg@mail.gmail.com>
- (Alistair Francis's message of "Tue, 19 May 2020 15:20:15 -0700")
-Message-ID: <87blm9ralp.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02807A0C09
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 09:34:12 +0000 (UTC)
+Received: from foo.home.annexia.org (ovpn-112-79.ams2.redhat.com
+ [10.36.112.79])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 464E019D82;
+ Wed, 27 May 2020 09:34:11 +0000 (UTC)
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] crypto: Remove use of GCRYPT_VERSION macro.
+Date: Wed, 27 May 2020 10:34:09 +0100
+Message-Id: <20200527093409.3588189-1-rjones@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=rjones@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:25:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,86 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alistair Francis <alistair23@gmail.com> writes:
+According to the gcrypt documentation it's intended that
+gcry_check_version() is called with the minimum version of gcrypt
+needed by the program, not the version from the <gcrypt.h> header file
+that happened to be installed when qemu was compiled.  Indeed the
+gcrypt.h header says that you shouldn't use the GCRYPT_VERSION macro.
 
-> On Mon, May 18, 2020 at 10:08 PM Markus Armbruster <armbru@redhat.com> wrote:
->>
->> Alistair Francis <alistair23@gmail.com> writes:
->>
->> > On Sun, May 17, 2020 at 10:06 PM Markus Armbruster <armbru@redhat.com> wrote:
->> >>
->> >> stm32f405_soc_initfn() creates six such devices, but
->> >> stm32f405_soc_realize() realizes only one.  Affects machine
->> >> netduinoplus2.
->> >>
->> >> I wonder how this ever worked.  If the "device becomes real only on
->> >> realize" thing actually works, then we've always been missing five of
->> >> six such devices, yet nobody noticed.
->> >
->> > I must have just been testing the first ADC.
->> >
->> >>
->> >> Fix stm32f405_soc_realize() to realize all six.  Visible in "info
->> >> qtree":
->> >>
->> >>      bus: main-system-bus
->> >>        type System
->> >>        dev: stm32f405-soc, id ""
->> >>          cpu-type = "cortex-m4-arm-cpu"
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>     -    mmio ffffffffffffffff/00000000000000ff
->> >>     +    mmio 0000000040012000/00000000000000ff
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>     -    mmio ffffffffffffffff/00000000000000ff
->> >>     +    mmio 0000000040012000/00000000000000ff
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>     -    mmio ffffffffffffffff/00000000000000ff
->> >>     +    mmio 0000000040012000/00000000000000ff
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>     -    mmio ffffffffffffffff/00000000000000ff
->> >>     +    mmio 0000000040012000/00000000000000ff
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>          mmio 0000000040012000/00000000000000ff
->> >>        dev: stm32f2xx-adc, id ""
->> >>          gpio-out "sysbus-irq" 1
->> >>     -    mmio ffffffffffffffff/00000000000000ff
->> >>     +    mmio 0000000040012000/00000000000000ff
->> >>        dev: armv7m, id ""
->> >>
->> >> The mmio addresses look suspicious.
->> >
->> > Good catch, thanks :)
->>
->> I'd love to squash in corrections, but I don't know the correct
->> addresses.  Can you help?
->
-> Yep, thanks for squashing it in.
->
-> The three addresses are:
->
-> 0x40012000
-> 0x40012100
-> 0x40012200
->
-> and they all share interrupt number 18.
+This causes the following failure:
 
-An the other three?  There are six devices in total...
+  qemu-img: Unable to initialize gcrypt
 
-> Let me know if you want me to do it.
+if a slightly older version of libgcrypt is installed with a newer
+qemu, even though the slightly older version works fine.  This can
+happen with RPM packaging which uses symbol versioning to determine
+automatically which libgcrypt is required by qemu, which caused the
+following bug in RHEL 8:
+
+  https://bugzilla.redhat.com/show_bug.cgi?id=1840485
+
+qemu actually requires libgcrypt >= 1.5.0, so we might put the string
+"1.5.0" here.  However since 1.5.0 was released in 2011, it hardly
+seems we need to check that.  So I replaced GCRYPT_VERSION with NULL.
+Perhaps in future if we move to requiring a newer version of gcrypt we
+could put a literal string here.
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ crypto/init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/init.c b/crypto/init.c
+index b305381ec5..ea233b9192 100644
+--- a/crypto/init.c
++++ b/crypto/init.c
+@@ -122,7 +122,7 @@ int qcrypto_init(Error **errp)
+ #endif
+ 
+ #ifdef CONFIG_GCRYPT
+-    if (!gcry_check_version(GCRYPT_VERSION)) {
++    if (!gcry_check_version(NULL)) {
+         error_setg(errp, "Unable to initialize gcrypt");
+         return -1;
+     }
+-- 
+2.26.2
 
 
