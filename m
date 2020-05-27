@@ -2,83 +2,82 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D701C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B68C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 421602078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:54:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E60E2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sfky8I/y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 421602078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSW44r3P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E60E2078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxRX-0008O5-Ef
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:54:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44180)
+	id 1jdxSv-0002Hl-C7
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:55:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxQl-0007OX-E2
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:53:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41485
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxRU-00009S-3S
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:04 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27169
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxQj-00067D-PD
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:53:19 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxRS-00077T-So
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590591195;
+ s=mimecast20190719; t=1590591242;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/rHDaFadDN4dwN9iPwmVYCAw4liEeBbFDTXaKdUjBF4=;
- b=Sfky8I/yluruoquX5k3wY0WCUOJLzBeKQ9j0WfMQSvHpTIOCUL+pYwpGsNlutGvCM5NH3u
- e1YvemVhQMgiIFF1iJPWjHY9YFsIjBJ7yvsBTetqn0d7aXczEkRGrpj3Ininn52BqfHga6
- 4jNOmpU+FIfuusQ8MWFVerOBW2Du9+Q=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-1kX9HiCWMXmeK1iOcyyIzA-1; Wed, 27 May 2020 10:53:13 -0400
-X-MC-Unique: 1kX9HiCWMXmeK1iOcyyIzA-1
-Received: by mail-ed1-f70.google.com with SMTP id bo26so10131161edb.22
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:53:13 -0700 (PDT)
+ bh=LayDpP1uENphGckZh8jBERvtaCKhk+KyegIwXKRsm3k=;
+ b=dSW44r3P4EwHSpYQSFDK4L0de6snwd6Cmjh0ZCoLY2OcZ2KQeXA+XJYWT0H6UDWQP3PhMM
+ Hia4/EH7YsAOTsq8OjnBoWCf+Bf+GXdmQ2ZrK+Swg0uil4tFROZPMOSbQCMyqIADWfAek5
+ gadtf4GOBVxRFMTs20oZMsy7EN87DNY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-niOMZ_L_MaWOTjbon2JMjQ-1; Wed, 27 May 2020 10:53:59 -0400
+X-MC-Unique: niOMZ_L_MaWOTjbon2JMjQ-1
+Received: by mail-ej1-f71.google.com with SMTP id q2so2674038ejf.6
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:53:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=/rHDaFadDN4dwN9iPwmVYCAw4liEeBbFDTXaKdUjBF4=;
- b=eRBPq0oN1SJ3zp/ywJtzC8l0g0248Rf/nzXL+QrWTrNvecHelN4YxOEIokzyxKRJPN
- BySALN814MSGoO0ySZUZ84z0KiyXmWq27hxU5E16ous71pErgoSLDk0+oiUX4oDbDIMk
- NNcBUL1x1JL7R1kylIvx5poYBGk4L1DLhV9HW9S9vCuQKRc58huBUfu6g8KGcKHsGXpq
- TiTS2YYOaXbbKGNnSpwEQ8L2nN282CGxP3pdZt71ulsoxFEzv6iHWr/lfvMaoEQW3YLu
- uAiGiLvNCI12rG/L4UA2rg5QewHBz0n47PN2DWeJP8co0W0dvcFF1nmOAz9Y2JFBB5/p
- BGlQ==
-X-Gm-Message-State: AOAM530f06UY3DziIyA+owx+d+/ti5xfR2ooXfAqY9PIYz0UpPOuTonb
- vIJ3FQX0BwIm1CFcEkGhcHE4F3PK4S6K3SbPRDxrR23bmZHa/F5hmcCjq94P1wAQlhwAxTLPm7G
- 880bP7kem1qO9+q8=
-X-Received: by 2002:a50:afa2:: with SMTP id h31mr2092099edd.213.1590591192762; 
- Wed, 27 May 2020 07:53:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxHM1YtUFPSu9XGyzHKo657UnGN+ALp+wa2qcYTegL5RxQnsjD2ALcwWyG/A4cUyhGtidNdHA==
-X-Received: by 2002:a50:afa2:: with SMTP id h31mr2092073edd.213.1590591192492; 
- Wed, 27 May 2020 07:53:12 -0700 (PDT)
+ bh=LayDpP1uENphGckZh8jBERvtaCKhk+KyegIwXKRsm3k=;
+ b=fz/3UggcQL4Srqt5InCx46a23+j9aVA1mPSOew4w/fUyhCEQAoTXwq1WrCBMtcNceD
+ +XZaMxd5wVwrttv6PnuicYznEd83QwFGp/kX821t/b2mWFRZefpZCXbug1ny7ENL3S/0
+ GDpjw2j49H3vSxpv7XelcxsRHWUrGxmSoZ4RMMi0PQdWqrLUGmP5n3QYxaNbLc2DGvOR
+ pVzobv+mg4WAcKSux0TtJ0gPjN+KJ5i7hCXOviOPVysM7Q1DZ5odCEkyuBSKWpkBEBEJ
+ MKsT8VLirlUUj9Lam3f8+3j1acp9rC/YpSCRNbVgTKzTiPr5isiY1e+AXfsaEuvIFWIs
+ aE0A==
+X-Gm-Message-State: AOAM532eRH+Lj1P65IdMfXPQhAcKfOVXS2L896Yghup6I5hG5pPaJnO7
+ 2chUUu2vevzCPrgEriAcTgwIx4TKrHpEF0CHWamNArkK04gWEgqqQw90u+G5s3TdWDvqrjGO+ss
+ Bv7iUpBYK0VhDy0E=
+X-Received: by 2002:a05:6402:709:: with SMTP id
+ w9mr23435253edx.255.1590591237875; 
+ Wed, 27 May 2020 07:53:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxbD0CkhllRKfO+iASiW/PHwGccDOwhCm9zOaRllEr9qgYRJLm239gGuSBdQjqOadMryhuu4w==
+X-Received: by 2002:a05:6402:709:: with SMTP id
+ w9mr23435238edx.255.1590591237673; 
+ Wed, 27 May 2020 07:53:57 -0700 (PDT)
 Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id qn17sm2914144ejb.125.2020.05.27.07.53.11
+ by smtp.gmail.com with ESMTPSA id b23sm2932281ejz.121.2020.05.27.07.53.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 May 2020 07:53:11 -0700 (PDT)
-Subject: Re: [PATCH v2 04/11] tests/acceptance: add kernel record/replay test
- for x86_64
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
- <159057546117.16818.15607496040935344350.stgit@pasha-ThinkPad-X280>
+ Wed, 27 May 2020 07:53:57 -0700 (PDT)
+Subject: Re: [PATCH v2 00/11] Record/replay acceptance tests
+To: qemu-devel@nongnu.org, Pavel.Dovgaluk@gmail.com
+References: <159058688028.16318.18277405305142866353@45ef0f9c86ae>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,20 +102,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1510a96e-2768-32c9-44f5-465ed9b0d859@redhat.com>
-Date: Wed, 27 May 2020 16:53:10 +0200
+Message-ID: <ac997bec-d700-2ee2-8b98-c1e58ab30933@redhat.com>
+Date: Wed, 27 May 2020 16:53:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <159057546117.16818.15607496040935344350.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <159058688028.16318.18277405305142866353@45ef0f9c86ae>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -143,51 +142,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/27/20 12:31 PM, Pavel Dovgalyuk wrote:
-> This patch adds a test for record/replay an execution of x86_64 machine.
-> Execution scenario includes simple kernel boot, which allows testing
-> basic hardware interaction in RR mode.
+On 5/27/20 3:41 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280/
 > 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
->  0 files changed
 > 
-> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-> index b8b277ad2f..c7526f1aba 100644
-> --- a/tests/acceptance/replay_kernel.py
-> +++ b/tests/acceptance/replay_kernel.py
-> @@ -55,3 +55,19 @@ class ReplayKernel(LinuxKernelUtils):
->                      True, shift, args)
->          self.run_vm(kernel_path, kernel_command_line, console_pattern,
->                      False, shift, args)
-> +
-> +    def test_x86_64_pc(self):
-> +        """
-> +        :avocado: tags=arch:x86_64
-> +        :avocado: tags=machine:pc
-> +        """
-> +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
-> +                      '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
-> +                      '/vmlinuz')
-> +        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +
-> +        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
-> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
-> +
-> +        self.run_rr(kernel_path, kernel_command_line, console_pattern)
 > 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+[...]>
+> ERROR: line over 90 characters
+> #83: FILE: tests/acceptance/replay_linux.py:41:
+> +        vm.add_args('-drive', 'driver=blkreplay,id=disk%s-rr,if=none,image=disk%s' % (id, id))
+> 
+> WARNING: line over 80 characters
+> #84: FILE: tests/acceptance/replay_linux.py:42:
+> +        vm.add_args('-device', '%s,drive=disk%s-rr%s' % (device, id, bus_string))
 
-This one timeouted (I build with --enable-debug):
+Please try to respect the QEMU 80 chars limit (it eases review by blind
+developers) and align methods & arguments to QEMU style.
 
- (1/1) tests/acceptance/replay_kernel.py:ReplayKernel.test_x86_64_pc:
-replay: recording...
-replay: replaying...
-INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred: Timeout
-reached\nOriginal status: ERROR\n{'name':
-'1-tests/acceptance/replay_kernel.py:ReplayKernel.test_x86_64_pc',
-'logdir':
-'avocado/job-results/job-2020-05-27T16.48-71d7bf4/test-results/1-tes...
-(90.68 s)
+Otherwise I'm glad to see this series.
+
+So far:
+Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
+
+I plan to add R-b on v3 once you addressed Alex's comments.
+
+Good job!
 
 
