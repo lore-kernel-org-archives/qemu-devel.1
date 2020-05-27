@@ -2,115 +2,95 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22832C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1D4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1B44207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0DD0207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:56:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRhpyv3d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B44207CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vhsRSyNv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0DD0207CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxT8-0002oN-2C
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:55:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44436)
+	id 1jdxTu-00041J-Q5
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:56:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jdxS7-00017Z-EO
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43534
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jdxS6-0007nn-Cm
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:54:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590591281;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lEeSe1IRBQZQTY6sUBsPJ4KCOPChUURqmIR/pMWuNyA=;
- b=YRhpyv3desd4DVSob51BuZRPBVCqumF+2hTYCMafsR4Ci0DzV0SgKZGKOLP4qPGKtdEUpK
- jRvkP3xLj81FqV1ZyhGxZzobW0XO/1nmcgZLohT1cHmMFKoNvsFukh2zjj0tVOU/GBpoTB
- L1SVsRHXl/kLv7o/RHKclAiND+WoBcU=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-xwDPXHVbPZmxBwn3B1EBfQ-1; Wed, 27 May 2020 10:54:40 -0400
-X-MC-Unique: xwDPXHVbPZmxBwn3B1EBfQ-1
-Received: by mail-ed1-f70.google.com with SMTP id m7so10228581edr.5
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:54:40 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdxSR-0001jP-1P
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:03 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40550)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdxSP-00086W-Mb
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:02 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r15so3312028wmh.5
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:55:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=B5wSVizEtzyurTRIZ6Q2GLQ/Teo1CaqJnSNxTo1S1og=;
+ b=vhsRSyNvXDVa+nwXEqr4NNxNQAfwb+uFFbXCPOWYE9z+2V70OBW1ph0PA7iaSbpZlM
+ fQdFG800zXWb/gNxt49lN2D8JLjd/rp4L+vwPHRDhBwsvcCycyQQJR0XohPylSszzSnE
+ XCvLqAd8LK5iFj66FNlMeron7f85lby6Ow3+mfPob38J9fgJKLHMxjIhOec724Iru8lx
+ dZKTwTOVFxAsafkMS79/ZDLuAxl4T6i0CL/XmJAdSF1UVH7LmOkoyzqcx5hiAdZQncxV
+ 04Zks0t7Z+QAs1BFtKJN2bBoBLhl51tZLJ8yM1BgtqV3BY51I/kkcgjPJdFdm5W9gK5a
+ 6vTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=lEeSe1IRBQZQTY6sUBsPJ4KCOPChUURqmIR/pMWuNyA=;
- b=Zv2BnbX6KffvrTaRZqS2D24iuEPvxwOcZN6zu76jL0P4Otd5EeWOawiyr+FAqLS8ln
- t7ARitiaZKKbrYOvcoCrl3mEbdSA1ifh4npfn3bX8QARxtvceQZmV6aCr0AKDG0L4sMo
- 59Km/dcVMvHsrOk4MvLYt+wS8Z473hJiVFYtDHBglw/gRqc/X2D4y8HPeOOegIrklE3K
- Sa0HRwmJ7D4hr/y4rRbGuIXhUv3IlH2eUrFewPBiaIwf0ngt1BIx9VoREnKWg3jXFUjY
- 5xQBURwZ0T4vuZQaUIF26dEns2nd2DXktxTXwAv/WB2kxdg4eR+GhKD/azookechGLNG
- F1lw==
-X-Gm-Message-State: AOAM530lePeno5gz91/AuGnUMDsobjVEb4tFwUmti66oPSy7apBTM/jx
- GS9dQZ+LbN2bAYhOCONZo3eveZ63uFHwFz9tn0OoXJwSA6QLe9S0aHQoIfp0udziRiZ21fEvyvN
- ioSYN8gw6a0JWBcc=
-X-Received: by 2002:a17:906:bce6:: with SMTP id
- op6mr6320880ejb.337.1590591279023; 
- Wed, 27 May 2020 07:54:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdhbrUmxczGQ/ob5QYR1T3Va4IS8PRMMQpuS4lQtRgJ1iKJdUQCgy1dGVQzKwtdebmkvwnsg==
-X-Received: by 2002:a17:906:bce6:: with SMTP id
- op6mr6320854ejb.337.1590591278625; 
- Wed, 27 May 2020 07:54:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8?
- ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
- by smtp.gmail.com with ESMTPSA id f4sm3124661ejk.17.2020.05.27.07.54.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 May 2020 07:54:38 -0700 (PDT)
-Subject: Re: [PATCH v3 14/22] microvm: use 2G split unconditionally
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200520132003.9492-1-kraxel@redhat.com>
- <20200520132003.9492-15-kraxel@redhat.com>
- <20200521112921.641f12bb@redhat.com>
- <20200525114508.hhvyzjiqja6knz6l@sirius.home.kraxel.org>
- <20200525183615.5f8e67d3@redhat.com>
- <20200526044839.bncj6iltugnzgfmy@sirius.home.kraxel.org>
- <20200527142545.32e91049@redhat.com>
- <58ced517-1ad4-c895-afe6-fec690791f4f@redhat.com>
- <20200527162646.694b2d47@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cdeb8406-eb41-160e-817a-010241ccd457@redhat.com>
-Date: Wed, 27 May 2020 16:54:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=B5wSVizEtzyurTRIZ6Q2GLQ/Teo1CaqJnSNxTo1S1og=;
+ b=ntFxH/GUD1f2UlKMM2w0ywePFDiw6p2WVj8HyTY9zeSL+gh2IdmiEHS55alJt6+6c7
+ z52UoEpKLX01UR8pr3kbUH12ELBxAe7BiMy4Z6cyBtp0TUicVuep9ymFf68PuGUbCXx7
+ Y3RMYSLHAt6RPBOxOQv6dTOQGwJ2u7J8hYqGA9Sk9EljRXd40QBOnb+kEiWUrhS7m4kf
+ WDRkC+hRvkHN7rKc6hkwzLR+O11GMPizWtJdpq/kTlFbja2NYHy0nNOvya7/sCE816m+
+ esqlp+QmuQ1j4ZXUwRQFMJw8eEuJe1yWfVbIXFBcsg8oHrZyeHaribbU+Lp/dToq833A
+ svyw==
+X-Gm-Message-State: AOAM533SebqRirjwU2GuvFlLdBiQa+GUoqmCSHX93POr1N7M7SWyr20K
+ 7WyPK6/5aLWvySy5gy9AKtrCbA==
+X-Google-Smtp-Source: ABdhPJzQXbwzYL+X/nsczMEDX1vfafI6Qq4oik1ALAHIpfFLwls9QoMz0/JJXMfoNBWNv4fM1VXIWw==
+X-Received: by 2002:a1c:9e8a:: with SMTP id h132mr4660651wme.32.1590591300136; 
+ Wed, 27 May 2020 07:55:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q5sm3243635wmq.36.2020.05.27.07.54.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 May 2020 07:54:58 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3CCDE1FF8C;
+ Wed, 27 May 2020 15:54:56 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 02/12] tests/vm: pass --genisoimage to basevm script
+Date: Wed, 27 May 2020 15:54:45 +0100
+Message-Id: <20200527145455.2550-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200527145455.2550-1-alex.bennee@linaro.org>
+References: <20200527145455.2550-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200527162646.694b2d47@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,40 +103,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/05/20 16:26, Igor Mammedov wrote:
-> On Wed, 27 May 2020 15:06:28 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> On 27/05/20 14:25, Igor Mammedov wrote:
->>>>   (2) we loose a gigabyte page.  
->>>           I'm not sure waht exactly we loose in this case.
->>>           Lets assume we allocating guest 5G of continuous RAM using 1G huge pages,
->>>           in this case I'd think that on host side MMIO overlay won't affect RAM blob
->>>           on guest side pagetables will be fragmented due to MMIO holes, but guest still
->>>           could use huge pages smaller ones in fragmented area and 1G where there is no fragmentation.  
->>
->> Access to the 3G-4G area would not be able to use 1G EPT pages.
-> Could it use 2Mb pages instead of 1Gb?
+If we have an alternative to genisoimage we really need to tell the
+script about it as well so it can use it. It will still default to
+genisoimage in case it is run outside our build machinery.
 
-Yes, probably a mix of 2 MiB pages and 4 KiB pages around the memslot
-splits.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Message-Id: <20200519132259.405-3-robert.foley@linaro.org>
 
-> Do we really care about 1 gigabyte huge page in microvm intended usecase?
-> (fast starting VMs for microservices like FaaS, which unlikely would use much memory to begin with)
-
-I honestly don't think it's measurable, but at least in theory we care
-because such workloads could have more TLB misses (relative to the
-execution time) than long-lasting VMs.
-
-Paolo
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 1bf9693d195..74ab522c55d 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -56,6 +56,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+ 	$(call quiet-command, \
+ 		$(PYTHON) $< \
+ 		$(if $(V)$(DEBUG), --debug) \
++		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
+ 		--image "$@" \
+ 		--force \
+ 		--build-image $@, \
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 756ccf7acae..a2d4054d72b 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -61,8 +61,9 @@ class BaseVM(object):
+     # 4 is arbitrary, but greater than 2,
+     # since we found we need to wait more than twice as long.
+     tcg_ssh_timeout_multiplier = 4
+-    def __init__(self, debug=False, vcpus=None):
++    def __init__(self, debug=False, vcpus=None, genisoimage=None):
+         self._guest = None
++        self._genisoimage = genisoimage
+         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
+                                                          suffix=".tmp",
+                                                          dir="."))
+@@ -381,12 +382,12 @@ class BaseVM(object):
+             udata.writelines(["apt:\n",
+                               "  proxy: %s" % proxy])
+         udata.close()
+-        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
++        subprocess.check_call([self._genisoimage, "-output", "cloud-init.iso",
+                                "-volid", "cidata", "-joliet", "-rock",
+                                "user-data", "meta-data"],
+-                               cwd=cidir,
+-                               stdin=self._devnull, stdout=self._stdout,
+-                               stderr=self._stdout)
++                              cwd=cidir,
++                              stdin=self._devnull, stdout=self._stdout,
++                              stderr=self._stdout)
+ 
+         return os.path.join(cidir, "cloud-init.iso")
+ 
+@@ -424,6 +425,8 @@ def parse_args(vmcls):
+                       help="Interactively run command")
+     parser.add_option("--snapshot", "-s", action="store_true",
+                       help="run tests with a snapshot")
++    parser.add_option("--genisoimage", default="genisoimage",
++                      help="iso imaging tool")
+     parser.disable_interspersed_args()
+     return parser.parse_args()
+ 
+@@ -435,7 +438,8 @@ def main(vmcls):
+             return 1
+         logging.basicConfig(level=(logging.DEBUG if args.debug
+                                    else logging.WARN))
+-        vm = vmcls(debug=args.debug, vcpus=args.jobs)
++        vm = vmcls(debug=args.debug, vcpus=args.jobs,
++                   genisoimage=args.genisoimage)
+         if args.build_image:
+             if os.path.exists(args.image) and not args.force:
+                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+-- 
+2.20.1
 
 
