@@ -2,145 +2,121 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B8AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0458C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:25:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96EDA20657
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:15:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70673207D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KLGjGToR";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ilchk6sl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96EDA20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PpL3i7q8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70673207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jduxX-0003Zd-Od
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47400)
+	id 1jdv7l-0007NW-L1
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:25:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=409226bd6=Anup.Patel@wdc.com>)
- id 1jduv1-0007vq-Im; Wed, 27 May 2020 08:12:23 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:24997)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jdv6h-0006W4-GS; Wed, 27 May 2020 08:24:27 -0400
+Received: from mail-eopbgr40114.outbound.protection.outlook.com
+ ([40.107.4.114]:33029 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=409226bd6=Anup.Patel@wdc.com>)
- id 1jduuy-0004Ed-Tn; Wed, 27 May 2020 08:12:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590581562; x=1622117562;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:content-transfer-encoding:mime-version;
- bh=VkBcWkzaMCt3lF9pDvpCOE8e+fuzVdemLCpQ8T871+I=;
- b=KLGjGToR22G6YEISaht6phOveIJffhXAaGFf/FaeGgc5FWp6yn/heHgy
- 5IGsOvjOuoG8/RZ6YfxysyOccoFBWkUZcmwoWatJbKGN4xnZwLgnNv4gU
- S3MjYGSucR4tEgWn5jQp6ZTKyACzbLdObGjRJZpq2FqEGLJf4/YepkOE3
- SPlPGLVotI1IbN8DASA8h+Ksg7JEVaq1zgSJK+iIuSRuTpcVaoGEyYuIo
- WfJfGF8SIZyJYWEnan+lLhnWemIskyZPKBVp7dVD6UMuNZJwqFs7sAmuk
- KgrNWAAjJfAmVLAxJMiTt55FiO/hmAvjbLhwxC4tg3QG5yWtGBqMs+v4d A==;
-IronPort-SDR: ZZCyu862c1P9JqF4fl50dSY17zy1NjmuJ07MBiIa8Sk7wgykfpm6YhcY9XW6ZmJyD1TO/8ai2s
- 11K57m5qJzqD2gYk0WuDcKppp76zfPyM3qdR4Zg5z5GNVFgyEy7ieAWq3HtACmU0aI/v7A/0PK
- mmpT8Bz40LN337/pt2PXVOUdktQTqQ8bA9t32rHrnJ0VgflrtBNUaa8UPIASiTcmDjmtBD6Scg
- sMSeMzzVRfk+7V5binXdye56kemgGLgPPnBZB3GSiumfxXJvxVQNmkbzDLAjHVwHeQoTETpcKq
- Dno=
-X-IronPort-AV: E=Sophos;i="5.73,441,1583164800"; d="scan'208";a="241425850"
-Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO
- NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
- by ob1.hgst.iphmx.com with ESMTP; 27 May 2020 20:12:39 +0800
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jdv6e-0002r0-0c; Wed, 27 May 2020 08:24:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F/yXGCYWAQQKELEQTwSo6ND2Y9mmcDHKgWoG0dVG7VX/AJzJxe1wTxL2bDo8sgXMsS261qSWDb7KWpmiX49fVfa0R7niy9V4mFzo2Mc2i8lgKJ3yBvXj4iUu2jRmnnP7JRbddqWk8Bve4/XcNZOyCqLRkv5aQCB8pbQpBndlyFmKsDaeo/ML2b0KL6jpBtrFmWHMQK94LaSsSn6lv6EnP2SUvmuei3+hfCXgyIwl4tCuEpFzpoZ944hpCv9tslp2q1s/unf2zOpXz/r901lrW1Kqqf+PSgBWmriO2jG3JUk1nYMO52RlFMaM53DEWzZu9Pa707VzI+jxrIEOcnRd6A==
+ b=ZctSpPlCT4Jh3wDw87PFeF/W8sRXWiG5ZYzdyk2+/sLZwwfeYuCWPv/UOf2GqLJS2gUq+W7Kvn+rESc97HPtrVKOP88GTTSq2fISXa38os0AO4eyGCDTNP0XWR6/zhSz1DWx3of1J9b5d/FBlVfBajFSgHg2voGoMweQq6n+hZFtcR8pOWfpGpsLqzozZhpK6ypJfqA7Jz6QUC74OYvCz+0MQrfj7j1ZyJWcGj/dVBtVwJZOH3sIRjWJ7IX+z4SIcPhJGkRE4qmvY4QmCsI/4TVP4C6BTR9vn8ef6aRjykBTwxgJ5xFIAICN8nrC8Q9mw3jxjouaoKaLKDMKdEJyKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C4hdGHphIoMK6FdiRhaweq6NGWsh/6CxQNgQUoQsBXo=;
- b=QY3QtV3efOokmcqA01oAbW/kVBepDidCaSN5dmuypCk1ePo0wi+Zogb+fFTHgorHwz4dSp5kfrRx4S3jbXfYAAx1tm6PcrxmK9cFwkG17VChAhIrxPGI3Sx5lhNMx1Diz8ZTKa3ly04dKREFhRSAfO9kVprio52TLtC2pWCXkf7iQwwwthOE2kkSupXA+V4ejINzgk6mi1/qQaCNs+lKZJet0+ccpymVt3k5ro9nxCS+fq0SADfieTYK5eccgY+3F8zH1XCnkXVfyOOANTFnTMEFIKhW6gQmBfJO3wEkbfb+4mPEBN8D9jPnNnvVymrhmve53DC1W4uFKcgrwtPCWw==
+ bh=7aNJZEYQNIbq60xv43OLLR+UqbYzMWz0F8vz+w3seAU=;
+ b=IwWei9kQDUkAV4yRBfWA1IO97zxxwtFp5ly34Z63Dc3VMKvV8S7FFYfxWWrNNhFpeqAv7xvki2Um0mttJmfPtzCyYl53rJks4XYxnqZV/qB77VMNQWJwZGlTn7vndBXv0znQtU4Jpp4m+b9dCamX9Ye+seKjgL3gnhCnIg78rYAAFQEndR8nIhwI/3F22kr1AEmYU6RQypk0xQjoCMoz/KqOppb8Nya8ZZ2fNqa2xQ+HfMIByNjzP5g/N8dG2NgzI8+HQuy5jR+PQ0733lMFgcUvSHxNpvnhuqq0dXx0BKEQ1dmnYM4ty6t4YP+lOA86I5pWUoi8pRjGFWHeNAkXbg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C4hdGHphIoMK6FdiRhaweq6NGWsh/6CxQNgQUoQsBXo=;
- b=ilchk6slHtFGrN1NHGnqaydF2mSJiNRQkDTWcYzKza045If6Fgxd7TDH9YviHQIi0doxbUrfFema2rtZpgtIo/BfDbsVuWiNS2T60ClYqpDJ++M+MmKDycEtDPZjpz1kzV8w3HcPQZ2NYFkX5yGALSENE0Us1LceUBQNM05vZgk=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=wdc.com;
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
- by DM6PR04MB4473.namprd04.prod.outlook.com (2603:10b6:5:2e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17; Wed, 27 May
- 2020 12:12:17 +0000
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::f8b3:c124:482b:52e0]) by DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::f8b3:c124:482b:52e0%5]) with mapi id 15.20.3021.030; Wed, 27 May 2020
- 12:12:17 +0000
-From: Anup Patel <anup.patel@wdc.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
-Subject: [PATCH v3 4/4] hw/riscv: virt: Allow creating multiple sockets
-Date: Wed, 27 May 2020 17:41:31 +0530
-Message-Id: <20200527121131.251007-5-anup.patel@wdc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200527121131.251007-1-anup.patel@wdc.com>
-References: <20200527121131.251007-1-anup.patel@wdc.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA1PR0101CA0065.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:20::27) To DM6PR04MB6201.namprd04.prod.outlook.com
- (2603:10b6:5:127::32)
+ bh=7aNJZEYQNIbq60xv43OLLR+UqbYzMWz0F8vz+w3seAU=;
+ b=PpL3i7q8lL89EeGueS5b7VYmDbZrMWsWHOwPRBhCxoll0Jhjx+w0oOh+H7M6yLWGqN2MQ6c62rqNcAB4IDjToF4deAiYEsaQY1Z4d/vTKkF38JC7Frt5WT68ev4tw8l0wvmjDfIYMs/E8qyN74fPkpuK02G5UmpvGNghGXLe9BA=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5304.eurprd08.prod.outlook.com (2603:10a6:20b:10e::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.19; Wed, 27 May
+ 2020 12:24:19 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3045.018; Wed, 27 May 2020
+ 12:24:19 +0000
+Subject: Re: [PATCH v2] iotests: Dump QCOW2 dirty bitmaps metadata
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1590524807-821646-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <59240395-f45d-435a-a534-a6e6e9bd109a@virtuozzo.com>
+Date: Wed, 27 May 2020 15:24:17 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <1590524807-821646-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR03CA0066.eurprd03.prod.outlook.com
+ (2603:10a6:207:5::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (106.51.30.5) by
- MA1PR0101CA0065.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.18 via Frontend
- Transport; Wed, 27 May 2020 12:12:14 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [106.51.30.5]
+Received: from [192.168.100.2] (185.215.60.148) by
+ AM3PR03CA0066.eurprd03.prod.outlook.com (2603:10a6:207:5::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3045.17 via Frontend Transport; Wed, 27 May 2020 12:24:18 +0000
+X-Originating-IP: [185.215.60.148]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 01b92b9f-979f-41f8-795e-08d8023732c3
-X-MS-TrafficTypeDiagnostic: DM6PR04MB4473:
+X-MS-Office365-Filtering-Correlation-Id: acb86b87-9ea3-4055-d790-08d80238e148
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5304:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR04MB447389CFE87D936D0EB533D48DB10@DM6PR04MB4473.namprd04.prod.outlook.com>
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:873;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB53044E8F1DB183D082324FA8C1B10@AM7PR08MB5304.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
 X-Forefront-PRVS: 04163EF38A
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YIRKpRdgjC9/e46fKkpKSqt2Te65VpP57Lk84URBLrw0FLFzSVy7EzOQw6yeh5Ee4+sF75Z11pIvxRuFBNVBeJR5vjaS7wxN6X6EGyxjsaabU8syDvuo6UylVs6ttNH1Xgkqact1b1mn2/k3o7yRob+wgPHuLbqjeNY3kMgdwtlqPYS6MCH0EX+U7i8kJRuOCqboP1RzNNtdineFPaKukoYvX3FneppIG8T5htzvNpErE/kK+HolHErWuQeqngpw4c5VRJAxfj1jrbyzPREsF76FsDQCTygUCZpeYmUPZJeN7sUiCbc80WN3CRNpUKyOYtbMx52ON679Am5f8pM08w==
+X-Microsoft-Antispam-Message-Info: 1T8knMrNbHBLqv/dYa4OX2TA0frV/sdQq4iRbPWeGXrt2yns0TqLdxsfux/s+Igq0E3SVCUd9mGxzI4jRNcsF8TSquwQ3kWIW+yTM6hq/ghGKsqiR1392OH/Lxrz/rlwJeBoRy3F9qXpeAbtuD+N5OrK6aEh6Khu4mteCB5s9FTYj+Fl+uD5DijjK8R6Hn+iZCpQ2Sv1OpQ0cllQrhJc7f2KwatynyPWQw5MrOWI6hgt0OVTAJFAyKJc/2geHy1vk//G3Sgvfv7Dz0X4YBu5RzkSDPbKilk4xhYXitgWHrbBsDnTdN/xDiovUWQrFmHj9Y7EuEjH2au4Z2t+smLvekrKVPb/ytkxM9MPNFlcHm6RTetz6wVA+RMkdjpaOPt27cXzW7w/T90qnCJzhUmb+w==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(366004)(346002)(39860400002)(376002)(396003)(83380400001)(36756003)(5660300002)(55236004)(44832011)(1006002)(16526019)(6666004)(186003)(66946007)(8886007)(316002)(2616005)(110136005)(54906003)(52116002)(7696005)(66476007)(66556008)(86362001)(956004)(2906002)(1076003)(55016002)(8676002)(8936002)(478600001)(26005)(4326008)(30864003);
+ SFS:(4636009)(396003)(346002)(376002)(39840400004)(366004)(136003)(5660300002)(36756003)(2616005)(30864003)(478600001)(31686004)(2906002)(316002)(16576012)(16526019)(52116002)(107886003)(186003)(4326008)(26005)(6486002)(956004)(83380400001)(8936002)(8676002)(66556008)(66476007)(66946007)(31696002)(86362001)(14143004)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: tvFIePoOgQvau7WLwgbsktZuUxy18KWxIJYPoGSsX2GRuDzKJ7RlfO1YGjUOIuZ9yPSScvItKwWxJbEK9S+0DyeCJXTQqriZlg0PT0oVDiG4iJZMBLCB3mVJRWQf0CRtNIQ9pzO2IV5JizZhFJy9rK2jv+LutuWdNfQYhqyCtZnq9tn0FQEk37E60DRTNsxB8EZf4hkobdlzxw3ZymCoECcpb4g3NqXgVqrK0k+HJIQ3SCsC58KlAm8wIH2IoB8MDEqiv6yEWjjLWB/AVJrpAFtrrKjcHlz1G5SJOo0XLEWU9rcV+wkoJsvfyHLncc8utAnJSiRyFjeno0EGVKoKT8C0wtOY0kdCMhkWA5XKxYYr8lJtuENnSNBLxFtQ4rlTHmMOFStWghsOzAdaFBfekW6ojH6jVXAJBXG6JDGjgPLrHjnqoT+eIFUEq7vfI6mNil6XyeY+1Pv1QeKUzeRdKZoLGq/dB+w5VVOLwDD/4QQ=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01b92b9f-979f-41f8-795e-08d8023732c3
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2020 12:12:17.3991 (UTC)
+X-MS-Exchange-AntiSpam-MessageData: vQa2EHTsiC/YJuto+Hjirw3BYdBivebbFtuFroZ6M057ovnlHdQMLSKjcplRONMGkAInTcTaUWOeVGD+nl6vmIhSZXbZxZW0TOOGJi4Mz1M6RJG1hgL+YDXXyoWXWnoGgamVD9gN3iDZ1cOHdvjZ7i8xeRThXgTesXLhOWXs4SQPK/gIAIk88Gy+/QvwGv6MM5KUf6JVtpXSdgh007mVg3LfnMRCZG5tyDW9DHsWuS+ZDuqrc4IbZ4DtwBLQLx4BD7Y3wQ2f9KUUTl3hjH3ZET5sFSl8JqKNibKx/mhD6Q5cOQZqrKniBrjhD6D4Py5kWe9+wkXqrwi1Fxmrmf1csODNPqYDG0Gcq27WXIZQv/2G3sh6BeYEA0vcuhyfDw/lwCmSVG8s+VZzZoRN8iYA6tjYBQe6OTeZmBF84JKcgp8Pk6JN3g8looryIWqDL3rr0mKfonrMBi4BjEig4/2uWAK+r0Nfd8a9gMarlFGtKsLj2mZLlEKlwTTEicBqopO1
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: acb86b87-9ea3-4055-d790-08d80238e148
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2020 12:24:19.5669 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SeqUwCcm52p/DHmvl2sqOV4J/NqRTW2b6XEqi4LDePJmTfcnZFTAGuXiIbMEfZXpVrZ6zSfAmuhLR6tBGPz8jQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4473
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=409226bd6=Anup.Patel@wdc.com; helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 06:55:51
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+X-MS-Exchange-CrossTenant-UserPrincipalName: T70RRyH6M3qE8nFhDXB60szV86lz/5vsc9GHe7pFzynzpE8Mu/0l6mU43BxvCUhbmXwLua9/7gas+cDR1qXnMY/QxxiM9cIEdMGSIYlBIE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5304
+Received-SPF: pass client-ip=40.107.4.114;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 08:24:20
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: 5
+X-Spam_score: 0.5
+X-Spam_bar: /
+X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, RCVD_IN_SBL_CSS=3.335,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -154,725 +130,478 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We extend RISC-V virt machine to allow creating a multi-socket machine.
-Each RISC-V virt machine socket is a set of HARTs, a CLINT instance,
-and a PLIC instance. Other peripherals are shared between all RISC-V
-virt machine sockets. We also update RISC-V virt machine device tree
-to treat each socket as a NUMA node.
+26.05.2020 23:26, Andrey Shinkevich wrote:
+> Add dirty bitmap information to QCOW2 metadata dump in qcow2.py script.
+> The sample output:
+> 
+> Header extension:         Bitmaps
+> magic                     0x23852875
+> length                    24
+> nb_bitmaps                2
+> reserved32                0
+> bitmap_directory_size     0x40
+> bitmap_directory_offset   0x100000
+> 
+> Bitmap name               bitmap-1
+> flag                      "auto"
+> bitmap_table_offset       0x90000
+> bitmap_table_size         8
+> flags                     2
+> type                      1
+> granularity_bits          15
+> name_size                 8
+> extra_data_size           0
+> 
+> Bitmap table
+>     0     serialized, offset 0xa0000
+>     1     all-zeroes, offset 0x0
+>     2     all-zeroes, offset 0x0
+>     3     all-zeroes, offset 0x0
+>     4     all-zeroes, offset 0x0
+>     5     all-zeroes, offset 0x0
+>     6     all-zeroes, offset 0x0
+>     7     all-zeroes, offset 0x0
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+> v2:
+>    01: Refactoring of the Python code in the script qcow2.py.
+>        New methods were added. The bitmap dictionary was instantiated.
+>        The all of bitmaps information is read completely before
+>        printing the dictionary.
+>    02: The outputs of the tests 031, 036 and 061 were modified.
+> 
+>   tests/qemu-iotests/031.out  |  22 +++---
+>   tests/qemu-iotests/036.out  |   4 +-
+>   tests/qemu-iotests/061.out  |  14 ++--
+>   tests/qemu-iotests/qcow2.py | 167 +++++++++++++++++++++++++++++++++++++++++---
+>   4 files changed, 179 insertions(+), 28 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
+> index 46f97c5..0383ebb 100644
+> --- a/tests/qemu-iotests/031.out
+> +++ b/tests/qemu-iotests/031.out
+> @@ -24,7 +24,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             72
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> @@ -52,7 +52,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             72
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> @@ -80,12 +80,12 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             72
+>   
+> -Header extension:
+> +Header extension:         Backing format
+>   magic                     0xe2792aca
+>   length                    11
+>   data                      'host_device'
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> @@ -115,12 +115,12 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> @@ -148,12 +148,12 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> @@ -181,17 +181,17 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Backing format
+>   magic                     0xe2792aca
+>   length                    11
+>   data                      'host_device'
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+>   
+> -Header extension:
+> +Header extension:         Unknown
+>   magic                     0x12345678
+>   length                    31
+>   data                      'This is a test header extension'
+> diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
+> index 23b699c..d305f1a 100644
+> --- a/tests/qemu-iotests/036.out
+> +++ b/tests/qemu-iotests/036.out
+> @@ -24,7 +24,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+>   incompatible_features     []
+>   compatible_features       []
+>   autoclear_features        [63]
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -36,7 +36,7 @@ No errors were found on the image.
+>   incompatible_features     []
+>   compatible_features       []
+>   autoclear_features        []
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+> index 5a8d36d..bb4b236 100644
+> --- a/tests/qemu-iotests/061.out
+> +++ b/tests/qemu-iotests/061.out
+> @@ -24,7 +24,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -82,7 +82,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -138,7 +138,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -193,7 +193,7 @@ autoclear_features        [42]
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -262,7 +262,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -324,7 +324,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> @@ -353,7 +353,7 @@ autoclear_features        []
+>   refcount_order            4
+>   header_length             104
+>   
+> -Header extension:
+> +Header extension:         Feature table
+>   magic                     0x6803f857
+>   length                    288
+>   data                      <binary>
+> diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+> index 94a07b2..483decb 100755
+> --- a/tests/qemu-iotests/qcow2.py
+> +++ b/tests/qemu-iotests/qcow2.py
+> @@ -4,6 +4,132 @@ import sys
+>   import struct
+>   import string
+>   
+> +
+> +class Qcow2BitmapDirEntry:
+> +
+> +    name = ''
+> +    BME_FLAG_IN_USE = 1
+> +    BME_FLAG_AUTO = 1 << 1
+> +
+> +    uint8_t = 'B'
+> +    uint16_t = 'H'
+> +    uint32_t = 'I'
+> +    uint64_t = 'Q'
+> +
+> +    fields = [
+> +        [uint64_t, '%#x', 'bitmap_table_offset'],
+> +        [uint32_t, '%d',  'bitmap_table_size'],
+> +        [uint32_t, '%d',  'flags'],
+> +        [uint8_t,  '%d',  'type'],
+> +        [uint8_t,  '%d',  'granularity_bits'],
+> +        [uint16_t, '%d',  'name_size'],
+> +        [uint32_t, '%d',  'extra_data_size']
+> +    ]
+> +
+> +    fmt = '>' + ''.join(field[0] for field in fields)
+> +
+> +    def __init__(self, data):
+> +
 
-By default, multi-socket support is disabled for RISC-V virt machine.
-To enable multi-socket support, users can pass "multi-socket=on" option
-in machine name.
+extra empty line
 
-The number of sockets in RISC-V virt machine can be specified using
-the "sockets=" sub-option of QEMU "-smp" command-line option.
+> +        entry = struct.unpack(Qcow2BitmapDirEntry.fmt, data)
+> +        self.__dict__ = dict((field[2], entry[i])
+> +                             for i, field in enumerate(
+> +                                 Qcow2BitmapDirEntry.fields))
+> +
+> +        self.bitmap_table_size = self.bitmap_table_size \
+> +            * struct.calcsize(self.uint64_t)
 
-Currently, we only allow creating upto maximum 4 sockets but this
-limit can be changed in future.
+hmm, you multiply it here [...]
 
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
----
- hw/riscv/virt.c         | 523 +++++++++++++++++++++++-----------------
- include/hw/riscv/virt.h |  11 +-
- 2 files changed, 311 insertions(+), 223 deletions(-)
+> +
+> +    def bitmap_dir_entry_raw_size(self):
+> +        return struct.calcsize(self.fmt) + self.name_size + \
+> +            self.extra_data_size
+> +
+> +    def dump_bitmap_dir_entry(self):
+> +        print("%-25s" % 'Bitmap name', self.name)
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 421815081d..40a6185b1c 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -60,7 +60,7 @@ static const struct MemmapEntry {
-     [VIRT_TEST] =        {   0x100000,        0x1000 },
-     [VIRT_RTC] =         {   0x101000,        0x1000 },
-     [VIRT_CLINT] =       {  0x2000000,       0x10000 },
--    [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-+    [VIRT_PLIC] =        {  0xc000000, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * 2) },
-     [VIRT_UART0] =       { 0x10000000,         0x100 },
-     [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
-     [VIRT_FLASH] =       { 0x20000000,     0x4000000 },
-@@ -182,10 +182,15 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     uint64_t mem_size, const char *cmdline)
- {
-     void *fdt;
--    int cpu, i;
--    uint32_t *cells;
--    char *nodename;
--    uint32_t plic_phandle, test_phandle, phandle = 1;
-+    int i, cpu, socket;
-+    uint32_t *clint_cells, *plic_cells;
-+    unsigned long clint_addr, plic_addr;
-+    uint32_t plic_phandle[VIRT_SOCKETS_MAX];
-+    uint32_t cpu_phandle, intc_phandle, test_phandle;
-+    uint32_t phandle = 1, plic_mmio_phandle = 1;
-+    uint32_t plic_pcie_phandle = 1, plic_virtio_phandle = 1;
-+    char *name, *cpu_name, *core_name, *intc_name;
-+    char *clint_name, *plic_name, *clust_name;
-     hwaddr flashsize = virt_memmap[VIRT_FLASH].size / 2;
-     hwaddr flashbase = virt_memmap[VIRT_FLASH].base;
- 
-@@ -206,231 +211,235 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
- 
--    nodename = g_strdup_printf("/memory@%lx",
-+    name = g_strdup_printf("/memory@%lx",
-         (long)memmap[VIRT_DRAM].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_cells(fdt, name, "reg",
-         memmap[VIRT_DRAM].base >> 32, memmap[VIRT_DRAM].base,
-         mem_size >> 32, mem_size);
--    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
--    g_free(nodename);
-+    qemu_fdt_setprop_string(fdt, name, "device_type", "memory");
-+    g_free(name);
- 
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
-                           SIFIVE_CLINT_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-+    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-+
-+    for (socket = (s->num_socs - 1); socket >= 0; socket--) {
-+        clust_name = g_strdup_printf("/cpus/cpu-map/cluster%d", socket);
-+        qemu_fdt_add_subnode(fdt, clust_name);
-+
-+        plic_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
-+        clint_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
- 
--    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
--        int cpu_phandle = phandle++;
--        int intc_phandle;
--        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
--        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
--        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
--        qemu_fdt_add_subnode(fdt, nodename);
-+        for (cpu = s->soc[socket].num_harts - 1; cpu >= 0; cpu--) {
-+            cpu_phandle = phandle++;
-+
-+            cpu_name = g_strdup_printf("/cpus/cpu@%d",
-+                s->soc[socket].hartid_base + cpu);
-+            qemu_fdt_add_subnode(fdt, cpu_name);
- #if defined(TARGET_RISCV32)
--        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-+            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv32");
- #else
--        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv48");
- #endif
--        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
--        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
--        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
--        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
--        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
--        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
--        intc_phandle = phandle++;
--        qemu_fdt_add_subnode(fdt, intc);
--        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
--        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
--        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
--        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
--        g_free(isa);
--        g_free(intc);
--        g_free(nodename);
--    }
-+            name = riscv_isa_string(&s->soc[socket].harts[cpu]);
-+            qemu_fdt_setprop_string(fdt, cpu_name, "riscv,isa", name);
-+            g_free(name);
-+            qemu_fdt_setprop_string(fdt, cpu_name, "compatible", "riscv");
-+            qemu_fdt_setprop_string(fdt, cpu_name, "status", "okay");
-+            qemu_fdt_setprop_cell(fdt, cpu_name, "reg",
-+                s->soc[socket].hartid_base + cpu);
-+            qemu_fdt_setprop_string(fdt, cpu_name, "device_type", "cpu");
-+            qemu_fdt_setprop_cell(fdt, cpu_name, "numa-node-id", socket);
-+            qemu_fdt_setprop_cell(fdt, cpu_name, "phandle", cpu_phandle);
-+
-+            intc_name = g_strdup_printf("%s/interrupt-controller", cpu_name);
-+            qemu_fdt_add_subnode(fdt, intc_name);
-+            intc_phandle = phandle++;
-+            qemu_fdt_setprop_cell(fdt, intc_name, "phandle", intc_phandle);
-+            qemu_fdt_setprop_string(fdt, intc_name, "compatible",
-+                "riscv,cpu-intc");
-+            qemu_fdt_setprop(fdt, intc_name, "interrupt-controller", NULL, 0);
-+            qemu_fdt_setprop_cell(fdt, intc_name, "#interrupt-cells", 1);
-+
-+            clint_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+            clint_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-+            clint_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+            clint_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-+
-+            plic_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+            plic_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-+            plic_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+            plic_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-+
-+            core_name = g_strdup_printf("%s/core%d", clust_name, cpu);
-+            qemu_fdt_add_subnode(fdt, core_name);
-+            qemu_fdt_setprop_cell(fdt, core_name, "cpu", cpu_phandle);
-+
-+            g_free(core_name);
-+            g_free(intc_name);
-+            g_free(cpu_name);
-+        }
- 
--    /* Add cpu-topology node */
--    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
--    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
--    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
--        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
--                                              cpu);
--        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
--        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
--        qemu_fdt_add_subnode(fdt, core_nodename);
--        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
--        g_free(core_nodename);
--        g_free(cpu_nodename);
-+        clint_addr = memmap[VIRT_CLINT].base +
-+            (memmap[VIRT_CLINT].size * socket);
-+        clint_name = g_strdup_printf("/soc/clint@%lx", clint_addr);
-+        qemu_fdt_add_subnode(fdt, clint_name);
-+        qemu_fdt_setprop_string(fdt, clint_name, "compatible", "riscv,clint0");
-+        qemu_fdt_setprop_cells(fdt, clint_name, "reg",
-+            0x0, clint_addr, 0x0, memmap[VIRT_CLINT].size);
-+        qemu_fdt_setprop(fdt, clint_name, "interrupts-extended",
-+            clint_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-+        qemu_fdt_setprop_cell(fdt, clint_name, "numa-node-id", socket);
-+        g_free(clint_name);
-+
-+        plic_phandle[socket] = phandle++;
-+        plic_addr = memmap[VIRT_PLIC].base + (memmap[VIRT_PLIC].size * socket);
-+        plic_name = g_strdup_printf("/soc/plic@%lx", plic_addr);
-+        qemu_fdt_add_subnode(fdt, plic_name);
-+        qemu_fdt_setprop_cell(fdt, plic_name,
-+            "#address-cells", FDT_PLIC_ADDR_CELLS);
-+        qemu_fdt_setprop_cell(fdt, plic_name,
-+            "#interrupt-cells", FDT_PLIC_INT_CELLS);
-+        qemu_fdt_setprop_string(fdt, plic_name, "compatible", "riscv,plic0");
-+        qemu_fdt_setprop(fdt, plic_name, "interrupt-controller", NULL, 0);
-+        qemu_fdt_setprop(fdt, plic_name, "interrupts-extended",
-+            plic_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-+        qemu_fdt_setprop_cells(fdt, plic_name, "reg",
-+            0x0, plic_addr, 0x0, memmap[VIRT_PLIC].size);
-+        qemu_fdt_setprop_cell(fdt, plic_name, "riscv,ndev", VIRTIO_NDEV);
-+        qemu_fdt_setprop_cell(fdt, plic_name, "numa-node-id", socket);
-+        qemu_fdt_setprop_cell(fdt, plic_name, "phandle", plic_phandle[socket]);
-+        g_free(plic_name);
-+
-+        g_free(clint_cells);
-+        g_free(plic_cells);
-+        g_free(clust_name);
-     }
- 
--    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
--    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
--        nodename =
--            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
--        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
--        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
--        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
--        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
--        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
--        g_free(nodename);
--    }
--    nodename = g_strdup_printf("/soc/clint@%lx",
--        (long)memmap[VIRT_CLINT].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
--        0x0, memmap[VIRT_CLINT].base,
--        0x0, memmap[VIRT_CLINT].size);
--    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
--        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
--    g_free(cells);
--    g_free(nodename);
--
--    plic_phandle = phandle++;
--    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
--    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
--        nodename =
--            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
--        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
--        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
--        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
--        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
--        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
--        g_free(nodename);
-+    for (socket = 0; socket < s->num_socs; socket++) {
-+        if (socket == 0) {
-+            plic_mmio_phandle = plic_phandle[socket];
-+            plic_virtio_phandle = plic_phandle[socket];
-+            plic_pcie_phandle = plic_phandle[socket];
-+        }
-+        if (socket == 1) {
-+            plic_virtio_phandle = plic_phandle[socket];
-+            plic_pcie_phandle = plic_phandle[socket];
-+        }
-+        if (socket == 2) {
-+            plic_pcie_phandle = plic_phandle[socket];
-+        }
-     }
--    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
--        (long)memmap[VIRT_PLIC].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
--                          FDT_PLIC_ADDR_CELLS);
--    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
--                          FDT_PLIC_INT_CELLS);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
--    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
--    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
--        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
--        0x0, memmap[VIRT_PLIC].base,
--        0x0, memmap[VIRT_PLIC].size);
--    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
--    qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
--    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
--    g_free(cells);
--    g_free(nodename);
- 
-     for (i = 0; i < VIRTIO_COUNT; i++) {
--        nodename = g_strdup_printf("/virtio_mmio@%lx",
-+        name = g_strdup_printf("/soc/virtio_mmio@%lx",
-             (long)(memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size));
--        qemu_fdt_add_subnode(fdt, nodename);
--        qemu_fdt_setprop_string(fdt, nodename, "compatible", "virtio,mmio");
--        qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        qemu_fdt_add_subnode(fdt, name);
-+        qemu_fdt_setprop_string(fdt, name, "compatible", "virtio,mmio");
-+        qemu_fdt_setprop_cells(fdt, name, "reg",
-             0x0, memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-             0x0, memmap[VIRT_VIRTIO].size);
--        qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
--        qemu_fdt_setprop_cell(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
--        g_free(nodename);
-+        qemu_fdt_setprop_cell(fdt, name, "interrupt-parent",
-+            plic_virtio_phandle);
-+        qemu_fdt_setprop_cell(fdt, name, "interrupts", VIRTIO_IRQ + i);
-+        g_free(name);
-     }
- 
--    nodename = g_strdup_printf("/soc/pci@%lx",
-+    name = g_strdup_printf("/soc/pci@%lx",
-         (long) memmap[VIRT_PCIE_ECAM].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
--                          FDT_PCI_ADDR_CELLS);
--    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
--                          FDT_PCI_INT_CELLS);
--    qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0x2);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible",
--                            "pci-host-ecam-generic");
--    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
--    qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
--    qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
--                           memmap[VIRT_PCIE_ECAM].size /
--                               PCIE_MMCFG_SIZE_MIN - 1);
--    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
--    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0, memmap[VIRT_PCIE_ECAM].base,
--                           0, memmap[VIRT_PCIE_ECAM].size);
--    qemu_fdt_setprop_sized_cells(fdt, nodename, "ranges",
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_cell(fdt, name, "#address-cells", FDT_PCI_ADDR_CELLS);
-+    qemu_fdt_setprop_cell(fdt, name, "#interrupt-cells", FDT_PCI_INT_CELLS);
-+    qemu_fdt_setprop_cell(fdt, name, "#size-cells", 0x2);
-+    qemu_fdt_setprop_string(fdt, name, "compatible", "pci-host-ecam-generic");
-+    qemu_fdt_setprop_string(fdt, name, "device_type", "pci");
-+    qemu_fdt_setprop_cell(fdt, name, "linux,pci-domain", 0);
-+    qemu_fdt_setprop_cells(fdt, name, "bus-range", 0,
-+        memmap[VIRT_PCIE_ECAM].size / PCIE_MMCFG_SIZE_MIN - 1);
-+    qemu_fdt_setprop(fdt, name, "dma-coherent", NULL, 0);
-+    qemu_fdt_setprop_cells(fdt, name, "reg", 0,
-+        memmap[VIRT_PCIE_ECAM].base, 0, memmap[VIRT_PCIE_ECAM].size);
-+    qemu_fdt_setprop_sized_cells(fdt, name, "ranges",
-         1, FDT_PCI_RANGE_IOPORT, 2, 0,
-         2, memmap[VIRT_PCIE_PIO].base, 2, memmap[VIRT_PCIE_PIO].size,
-         1, FDT_PCI_RANGE_MMIO,
-         2, memmap[VIRT_PCIE_MMIO].base,
-         2, memmap[VIRT_PCIE_MMIO].base, 2, memmap[VIRT_PCIE_MMIO].size);
--    create_pcie_irq_map(fdt, nodename, plic_phandle);
--    g_free(nodename);
-+    create_pcie_irq_map(fdt, name, plic_pcie_phandle);
-+    g_free(name);
- 
-     test_phandle = phandle++;
--    nodename = g_strdup_printf("/test@%lx",
-+    name = g_strdup_printf("/soc/test@%lx",
-         (long)memmap[VIRT_TEST].base);
--    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_add_subnode(fdt, name);
-     {
-         const char compat[] = "sifive,test1\0sifive,test0\0syscon";
--        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
-+        qemu_fdt_setprop(fdt, name, "compatible", compat, sizeof(compat));
-     }
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+    qemu_fdt_setprop_cells(fdt, name, "reg",
-         0x0, memmap[VIRT_TEST].base,
-         0x0, memmap[VIRT_TEST].size);
--    qemu_fdt_setprop_cell(fdt, nodename, "phandle", test_phandle);
--    test_phandle = qemu_fdt_get_phandle(fdt, nodename);
--    g_free(nodename);
--
--    nodename = g_strdup_printf("/reboot");
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-reboot");
--    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
--    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
--    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_RESET);
--    g_free(nodename);
--
--    nodename = g_strdup_printf("/poweroff");
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-poweroff");
--    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
--    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
--    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_PASS);
--    g_free(nodename);
--
--    nodename = g_strdup_printf("/uart@%lx",
--        (long)memmap[VIRT_UART0].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "ns16550a");
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+    qemu_fdt_setprop_cell(fdt, name, "phandle", test_phandle);
-+    test_phandle = qemu_fdt_get_phandle(fdt, name);
-+    g_free(name);
-+
-+    name = g_strdup_printf("/soc/reboot");
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-reboot");
-+    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-+    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-+    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_RESET);
-+    g_free(name);
-+
-+    name = g_strdup_printf("/soc/poweroff");
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-poweroff");
-+    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-+    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-+    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_PASS);
-+    g_free(name);
-+
-+    name = g_strdup_printf("/soc/uart@%lx", (long)memmap[VIRT_UART0].base);
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_string(fdt, name, "compatible", "ns16550a");
-+    qemu_fdt_setprop_cells(fdt, name, "reg",
-         0x0, memmap[VIRT_UART0].base,
-         0x0, memmap[VIRT_UART0].size);
--    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
--    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
--    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", UART0_IRQ);
-+    qemu_fdt_setprop_cell(fdt, name, "clock-frequency", 3686400);
-+    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-+    qemu_fdt_setprop_cell(fdt, name, "interrupts", UART0_IRQ);
- 
-     qemu_fdt_add_subnode(fdt, "/chosen");
--    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-+    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", name);
-     if (cmdline) {
-         qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-     }
--    g_free(nodename);
--
--    nodename = g_strdup_printf("/rtc@%lx",
--        (long)memmap[VIRT_RTC].base);
--    qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible",
--        "google,goldfish-rtc");
--    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+    g_free(name);
-+
-+    name = g_strdup_printf("/soc/rtc@%lx", (long)memmap[VIRT_RTC].base);
-+    qemu_fdt_add_subnode(fdt, name);
-+    qemu_fdt_setprop_string(fdt, name, "compatible", "google,goldfish-rtc");
-+    qemu_fdt_setprop_cells(fdt, name, "reg",
-         0x0, memmap[VIRT_RTC].base,
-         0x0, memmap[VIRT_RTC].size);
--    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
--    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", RTC_IRQ);
--    g_free(nodename);
--
--    nodename = g_strdup_printf("/flash@%" PRIx64, flashbase);
--    qemu_fdt_add_subnode(s->fdt, nodename);
--    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "cfi-flash");
--    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
-+    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-+    qemu_fdt_setprop_cell(fdt, name, "interrupts", RTC_IRQ);
-+    g_free(name);
-+
-+    name = g_strdup_printf("/soc/flash@%" PRIx64, flashbase);
-+    qemu_fdt_add_subnode(s->fdt, name);
-+    qemu_fdt_setprop_string(s->fdt, name, "compatible", "cfi-flash");
-+    qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
-                                  2, flashbase, 2, flashsize,
-                                  2, flashbase + flashsize, 2, flashsize);
--    qemu_fdt_setprop_cell(s->fdt, nodename, "bank-width", 4);
--    g_free(nodename);
-+    qemu_fdt_setprop_cell(s->fdt, name, "bank-width", 4);
-+    g_free(name);
- }
- 
--
- static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
-                                           hwaddr ecam_base, hwaddr ecam_size,
-                                           hwaddr mmio_base, hwaddr mmio_size,
-@@ -478,21 +487,92 @@ static void riscv_virt_board_init(MachineState *machine)
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
--    char *plic_hart_config;
-+    char *plic_hart_config, *soc_name;
-     size_t plic_hart_config_len;
-     target_ulong start_addr = memmap[VIRT_DRAM].base;
--    int i;
-+    int i, j;
-     unsigned int smp_cpus = machine->smp.cpus;
-+    unsigned int base_hartid, cpus_per_socket;
-+    DeviceState *mmio_plic, *virtio_plic, *pcie_plic;
-+
-+    /* Figure-out number of sockets */
-+    s->num_socs = (s->multi_socket) ? machine->smp.sockets : 1;
-+
-+    /* Limit the number of sockets */
-+    if (VIRT_SOCKETS_MAX < s->num_socs) {
-+        s->num_socs = VIRT_SOCKETS_MAX;
-+    }
- 
-     /* Initialize SOC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
--    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
--                            &error_abort);
--    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
--                            &error_abort);
--    object_property_set_bool(OBJECT(&s->soc), true, "realized",
--                            &error_abort);
-+    mmio_plic = virtio_plic = pcie_plic = NULL;
-+    for (i = 0; i < s->num_socs; i++) {
-+        base_hartid = i * (smp_cpus / s->num_socs);
-+        if (i == (s->num_socs - 1)) {
-+            cpus_per_socket = smp_cpus - base_hartid;
-+        } else {
-+            cpus_per_socket = smp_cpus / s->num_socs;
-+        }
-+        soc_name = g_strdup_printf("soc%d", i);
-+        object_initialize_child(OBJECT(machine), soc_name, &s->soc[i],
-+            sizeof(s->soc[i]), TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-+        g_free(soc_name);
-+        object_property_set_str(OBJECT(&s->soc[i]),
-+            machine->cpu_type, "cpu-type", &error_abort);
-+        object_property_set_int(OBJECT(&s->soc[i]),
-+            base_hartid, "hartid-base", &error_abort);
-+        object_property_set_int(OBJECT(&s->soc[i]),
-+            cpus_per_socket, "num-harts", &error_abort);
-+        object_property_set_bool(OBJECT(&s->soc[i]),
-+            true, "realized", &error_abort);
-+
-+        /* Per-socket CLINT */
-+        sifive_clint_create(
-+            memmap[VIRT_CLINT].base + i * memmap[VIRT_CLINT].size,
-+            memmap[VIRT_CLINT].size, base_hartid, cpus_per_socket,
-+            SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-+
-+        /* Per-socket PLIC hart topology configuration string */
-+        plic_hart_config_len =
-+            (strlen(VIRT_PLIC_HART_CONFIG) + 1) * cpus_per_socket;
-+        plic_hart_config = g_malloc0(plic_hart_config_len);
-+        for (j = 0; j < cpus_per_socket; j++) {
-+            if (j != 0) {
-+                strncat(plic_hart_config, ",", plic_hart_config_len);
-+            }
-+            strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG,
-+                plic_hart_config_len);
-+            plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
-+        }
-+
-+        /* Per-socket PLIC */
-+        s->plic[i] = sifive_plic_create(
-+            memmap[VIRT_PLIC].base + i * memmap[VIRT_PLIC].size,
-+            plic_hart_config, base_hartid,
-+            VIRT_PLIC_NUM_SOURCES,
-+            VIRT_PLIC_NUM_PRIORITIES,
-+            VIRT_PLIC_PRIORITY_BASE,
-+            VIRT_PLIC_PENDING_BASE,
-+            VIRT_PLIC_ENABLE_BASE,
-+            VIRT_PLIC_ENABLE_STRIDE,
-+            VIRT_PLIC_CONTEXT_BASE,
-+            VIRT_PLIC_CONTEXT_STRIDE,
-+            memmap[VIRT_PLIC].size);
-+        g_free(plic_hart_config);
-+
-+        /* Try to use different PLIC instance based device type */
-+        if (i == 0) {
-+            mmio_plic = s->plic[i];
-+            virtio_plic = s->plic[i];
-+            pcie_plic = s->plic[i];
-+        }
-+        if (i == 1) {
-+            virtio_plic = s->plic[i];
-+            pcie_plic = s->plic[i];
-+        }
-+        if (i == 2) {
-+            pcie_plic = s->plic[i];
-+        }
-+    }
- 
-     /* register system main memory (actual RAM) */
-     memory_region_init_ram(main_mem, NULL, "riscv_virt_board.ram",
-@@ -571,38 +651,14 @@ static void riscv_virt_board_init(MachineState *machine)
-                           memmap[VIRT_MROM].base + sizeof(reset_vec),
-                           &address_space_memory);
- 
--    /* create PLIC hart topology configuration string */
--    plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
--    plic_hart_config = g_malloc0(plic_hart_config_len);
--    for (i = 0; i < smp_cpus; i++) {
--        if (i != 0) {
--            strncat(plic_hart_config, ",", plic_hart_config_len);
--        }
--        strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG, plic_hart_config_len);
--        plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
--    }
--
--    /* MMIO */
--    s->plic = sifive_plic_create(memmap[VIRT_PLIC].base,
--        plic_hart_config, 0,
--        VIRT_PLIC_NUM_SOURCES,
--        VIRT_PLIC_NUM_PRIORITIES,
--        VIRT_PLIC_PRIORITY_BASE,
--        VIRT_PLIC_PENDING_BASE,
--        VIRT_PLIC_ENABLE_BASE,
--        VIRT_PLIC_ENABLE_STRIDE,
--        VIRT_PLIC_CONTEXT_BASE,
--        VIRT_PLIC_CONTEXT_STRIDE,
--        memmap[VIRT_PLIC].size);
--    sifive_clint_create(memmap[VIRT_CLINT].base,
--        memmap[VIRT_CLINT].size, 0, smp_cpus,
--        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-+    /* SiFive Test MMIO device */
-     sifive_test_create(memmap[VIRT_TEST].base);
- 
-+    /* VirtIO MMIO devices */
-     for (i = 0; i < VIRTIO_COUNT; i++) {
-         sysbus_create_simple("virtio-mmio",
-             memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
--            qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-+            qdev_get_gpio_in(DEVICE(virtio_plic), VIRTIO_IRQ + i));
-     }
- 
-     gpex_pcie_init(system_memory,
-@@ -611,14 +667,14 @@ static void riscv_virt_board_init(MachineState *machine)
-                          memmap[VIRT_PCIE_MMIO].base,
-                          memmap[VIRT_PCIE_MMIO].size,
-                          memmap[VIRT_PCIE_PIO].base,
--                         DEVICE(s->plic), true);
-+                         DEVICE(pcie_plic), true);
- 
-     serial_mm_init(system_memory, memmap[VIRT_UART0].base,
--        0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-+        0, qdev_get_gpio_in(DEVICE(mmio_plic), UART0_IRQ), 399193,
-         serial_hd(0), DEVICE_LITTLE_ENDIAN);
- 
-     sysbus_create_simple("goldfish_rtc", memmap[VIRT_RTC].base,
--        qdev_get_gpio_in(DEVICE(s->plic), RTC_IRQ));
-+        qdev_get_gpio_in(DEVICE(mmio_plic), RTC_IRQ));
- 
-     virt_flash_create(s);
- 
-@@ -628,12 +684,37 @@ static void riscv_virt_board_init(MachineState *machine)
-                                   drive_get(IF_PFLASH, 0, i));
-     }
-     virt_flash_map(s, system_memory);
-+}
- 
--    g_free(plic_hart_config);
-+static bool riscv_virt_get_multi_socket(Object *obj, Error **errp)
-+{
-+    RISCVVirtState *s = RISCV_VIRT_MACHINE(obj);
-+
-+    return s->multi_socket;
-+}
-+
-+static void riscv_virt_set_multi_socket(Object *obj, bool value, Error **errp)
-+{
-+    RISCVVirtState *s = RISCV_VIRT_MACHINE(obj);
-+
-+    s->multi_socket = value;
- }
- 
- static void riscv_virt_machine_instance_init(Object *obj)
- {
-+    RISCVVirtState *s = RISCV_VIRT_MACHINE(obj);
-+
-+    /*
-+     * Multi-socket is disabled by default so users have to
-+     * explicitly enable it from command-line.
-+     */
-+    s->multi_socket = false;
-+    object_property_add_bool(obj, "multi-socket",
-+                             riscv_virt_get_multi_socket,
-+                             riscv_virt_set_multi_socket);
-+    object_property_set_description(obj, "multi-socket",
-+                                    "Set on/off to enable/disable the "
-+                                    "multi-socket support");
- }
- 
- static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
-@@ -642,7 +723,7 @@ static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = "RISC-V VirtIO board";
-     mc->init = riscv_virt_board_init;
--    mc->max_cpus = 8;
-+    mc->max_cpus = VIRT_CPUS_MAX;
-     mc->default_cpu_type = VIRT_CPU;
-     mc->pci_allow_0_address = true;
- }
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index e69355efaf..e5fe10ad48 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -23,6 +23,9 @@
- #include "hw/sysbus.h"
- #include "hw/block/flash.h"
- 
-+#define VIRT_CPUS_MAX 8
-+#define VIRT_SOCKETS_MAX 4
-+
- #define TYPE_RISCV_VIRT_MACHINE MACHINE_TYPE_NAME("virt")
- #define RISCV_VIRT_MACHINE(obj) \
-     OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_MACHINE)
-@@ -32,8 +35,10 @@ typedef struct {
-     MachineState parent;
- 
-     /*< public >*/
--    RISCVHartArrayState soc;
--    DeviceState *plic;
-+    bool multi_socket;
-+    unsigned int num_socs;
-+    RISCVHartArrayState soc[VIRT_SOCKETS_MAX];
-+    DeviceState *plic[VIRT_SOCKETS_MAX];
-     PFlashCFI01 *flash[2];
- 
-     void *fdt;
-@@ -74,6 +79,8 @@ enum {
- #define VIRT_PLIC_ENABLE_STRIDE 0x80
- #define VIRT_PLIC_CONTEXT_BASE 0x200000
- #define VIRT_PLIC_CONTEXT_STRIDE 0x1000
-+#define VIRT_PLIC_SIZE(__num_context) \
-+    (VIRT_PLIC_CONTEXT_BASE + (__num_context) * VIRT_PLIC_CONTEXT_STRIDE)
- 
- #define FDT_PCI_ADDR_CELLS    3
- #define FDT_PCI_INT_CELLS     1
+I recommend to use .format() or f-strings instead of old % notation.
+
+> +        if (self.flags & self.BME_FLAG_IN_USE) != 0:
+> +            print("%-25s" % 'flag', '"in-use"')
+> +        if (self.flags & self.BME_FLAG_AUTO) != 0:
+> +            print("%-25s" % 'flag', '"auto"')
+
+Some empty lines around if and for blocks will be nice, IMHO.
+
+> +        for f in Qcow2BitmapDirEntry.fields:
+> +            value = self.__dict__[f[2]]
+> +            value_str = f[1] % value
+> +
+> +            print("%-25s" % f[2], value_str)
+> +        print("")
+> +
+> +    def read_bitmap_table(self, fd):
+> +        fd.seek(self.bitmap_table_offset)
+> +        table_size = self.bitmap_table_size * struct.calcsize(self.uint64_t)
+
+[...] and here. this seems wrong. I'd keep multiplication only here.
+
+> +        table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
+> +        self.bitmap_table = enumerate(table)
+
+enumerate returns an iterator, I think you need list(enumerate(table))
+
+> +
+> +    def print_bitmap_table(self):
+> +        BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
+> +        BME_TABLE_ENTRY_FLAG_ALL_ONES = 1
+> +        bmt_type = ['all-zeroes', 'all-ones', 'serialized']
+> +
+> +        print("Bitmap table")
+> +        for i, entry in self.bitmap_table:
+> +            offset = entry & BME_TABLE_ENTRY_OFFSET_MASK
+> +            if offset != 0:
+> +                index = 2
+> +            else:
+> +                index = entry & BME_TABLE_ENTRY_FLAG_ALL_ONES
+> +            print("   %-4d  %s, offset %#x" % (i, bmt_type[index], offset))
+> +        print("")
+> +
+> +
+> +class Qcow2BitmapExt:
+> +
+> +    uint32_t = 'I'
+> +    uint64_t = 'Q'
+> +
+> +    fields = [
+> +        [uint32_t, '%d',  'nb_bitmaps'],
+> +        [uint32_t, '%d',  'reserved32'],
+> +        [uint64_t, '%#x', 'bitmap_directory_size'],
+> +        [uint64_t, '%#x', 'bitmap_directory_offset']
+> +    ]
+> +
+> +    fmt = '>' + ''.join(field[0] for field in fields)
+
+Would be good to keep common functionality in a parent class somehow.
+
+> +
+> +    def __init__(self, data):
+> +
+> +        extension = struct.unpack(Qcow2BitmapExt.fmt, data)
+> +        self.__dict__ = dict((field[2], extension[i])
+> +                             for i, field in enumerate(Qcow2BitmapExt.fields))
+> +
+> +    def dump_bitmap_ext(self):
+> +        for f in Qcow2BitmapExt.fields:
+> +            value = self.__dict__[f[2]]
+> +            value_str = f[1] % value
+> +
+> +            print("%-25s" % f[2], value_str)
+> +        print("")
+> +
+> +    def read_bitmap_directory(self, fd):
+> +        self.bitmaps = []
+> +        fd.seek(self.bitmap_directory_offset)
+> +        buf_size = struct.calcsize(Qcow2BitmapDirEntry.fmt)
+> +
+> +        for n in range(self.nb_bitmaps):
+> +            buf = fd.read(buf_size)
+> +            dir_entry = Qcow2BitmapDirEntry(buf)
+> +            fd.seek(dir_entry.extra_data_size, 1)
+> +            bitmap_name = fd.read(dir_entry.name_size)
+> +            dir_entry.name = bitmap_name.decode('ascii')
+> +            self.bitmaps.append(dir_entry)
+> +            entry_raw_size = dir_entry.bitmap_dir_entry_raw_size()
+> +            shift = ((entry_raw_size + 7) & ~7) - entry_raw_size
+> +            fd.seek(shift, 1)
+> +
+> +        for bm in self.bitmaps:
+> +            bm.read_bitmap_table(fd)
+> +
+> +    def print_bitmaps(self):
+> +        for bm in self.bitmaps:
+> +            bm.dump_bitmap_dir_entry()
+> +            bm.print_bitmap_table()
+> +
+> +
+>   class QcowHeaderExtension:
+>   
+>       def __init__(self, magic, length, data):
+> @@ -21,6 +147,11 @@ class QcowHeaderExtension:
+>   
+>   class QcowHeader:
+>   
+> +    QCOW2_EXT_MAGIC_BACKING_FORMAT = 0xE2792ACA
+> +    QCOW2_EXT_MAGIC_FEATURE_TABLE = 0x6803f857
+> +    QCOW2_EXT_MAGIC_CRYPTO_HEADER = 0x0537be77
+> +    QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+> +    QCOW2_EXT_MAGIC_DATA_FILE = 0x44415441
+>       uint32_t = 'I'
+>       uint64_t = 'Q'
+>   
+> @@ -127,6 +258,15 @@ class QcowHeader:
+>           buf = buf[0:header_bytes-1]
+>           fd.write(buf)
+>   
+> +    def extension_name(self, magic):
+> +        return {
+> +            self.QCOW2_EXT_MAGIC_BACKING_FORMAT: 'Backing format',
+> +            self.QCOW2_EXT_MAGIC_FEATURE_TABLE: 'Feature table',
+> +            self.QCOW2_EXT_MAGIC_CRYPTO_HEADER: 'Crypto header',
+> +            self.QCOW2_EXT_MAGIC_BITMAPS: 'Bitmaps',
+> +            self.QCOW2_EXT_MAGIC_DATA_FILE: 'Data file',
+> +        }.get(magic, 'Unknown')
+> +
+>       def dump(self):
+>           for f in QcowHeader.fields:
+>               value = self.__dict__[f[2]]
+> @@ -142,30 +282,41 @@ class QcowHeader:
+>               print("%-25s" % f[2], value_str)
+>           print("")
+>   
+> -    def dump_extensions(self):
+> +    def dump_extensions(self, fd):
+>           for ex in self.extensions:
+>   
+> +            print("%-25s %s" % ("Header extension:", self.extension_name(
+> +                ex.magic)))
+
+Could you do this improvement together with iotests change in a separate preparation patch?
+
+> +            print("%-25s %#x" % ("magic", ex.magic))
+> +            print("%-25s %d" % ("length", ex.length))
+> +
+>               data = ex.data[:ex.length]
+>               if all(c in string.printable.encode('ascii') for c in data):
+>                   data = "'%s'" % data.decode('ascii')
+> +                print("%-25s %s" % ("data", data))
+>               else:
+> -                data = "<binary>"
+> +                self.dump_extension_data(fd, ex)
+>   
+> -            print("Header extension:")
+> -            print("%-25s %#x" % ("magic", ex.magic))
+> -            print("%-25s %d" % ("length", ex.length))
+> -            print("%-25s %s" % ("data", data))
+>               print("")
+>   
+> +    def dump_extension_data(self, fd, ext):
+> +        if ext.magic == self.QCOW2_EXT_MAGIC_BITMAPS:
+> +            b_ext = Qcow2BitmapExt(ext.data)
+> +            b_ext.dump_bitmap_ext()
+> +            b_ext.read_bitmap_directory(fd)
+> +            b_ext.print_bitmaps()
+> +        else:
+> +            print("%-25s %s" % ("data", "<binary>"))
+> +
+>   
+>   def cmd_dump_header(fd):
+>       h = QcowHeader(fd)
+>       h.dump()
+> -    h.dump_extensions()
+> +    h.dump_extensions(fd)
+>   
+>   def cmd_dump_header_exts(fd):
+>       h = QcowHeader(fd)
+> -    h.dump_extensions()
+> +    h.dump_extensions(fd)
+>   
+>   def cmd_set_header(fd, name, value):
+>       try:
+> 
+
+
 -- 
-2.25.1
-
+Best regards,
+Vladimir
 
