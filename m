@@ -2,86 +2,89 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC30AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A56C5206F1
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25F85206F1
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:49:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WKFskxuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56C5206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAb+grsz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F85206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdrk1-0006us-RY
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 04:48:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33102)
+	id 1jdrkm-0008Nx-CZ
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 04:49:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdrjH-00063q-Cg
- for qemu-devel@nongnu.org; Wed, 27 May 2020 04:48:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23372
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jdrjv-00072H-Vr
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 04:48:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57897
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdrjG-00035C-K8
- for qemu-devel@nongnu.org; Wed, 27 May 2020 04:48:03 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jdrju-0003sG-DQ
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 04:48:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590569282;
+ s=mimecast20190719; t=1590569321;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mkLidLYMI/hYlZ/RLPHB3aO0IzGW92pcRxzL41t8cow=;
- b=WKFskxuD2prMJA1EEdp6osYjzP/hkfIFzrEFQaeHCTOLs1ean5e8fxtXlfxaVX1db75nSd
- Q+se3KYnIZaVddh+PC0RrEde/eQymYqMqK9ADS05kWxFaPOIB2vuKjLh0QhwZWfYwm+rOl
- yyhy4yFoxbPwdx12nrRqqhwqlgvKd50=
+ bh=0T7rmjvC6+RdYDSWsM9zFDoO3jG2AAbHjwTSfoD/mvY=;
+ b=dAb+grsz+mZuDdrQe4D7hlWspfptcBHaRRiDmB5SUuUW4UJBOo464n6PAQIBCGYNPR49lA
+ t0Ftv9PsRtoz5vdpw6HIs9t2aahjwKia6s2W1X0+xPnp2O8pYrGUEieP4G7JjpWsmpXFr6
+ uQ6DB2Dk5RtzO2CtIS1wVP5qozIYrBk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-6CpgoGUFODWRKWsHYbNt-A-1; Wed, 27 May 2020 04:48:00 -0400
-X-MC-Unique: 6CpgoGUFODWRKWsHYbNt-A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-242-lsstOR5BMjymMzMEOZtCeA-1; Wed, 27 May 2020 04:48:36 -0400
+X-MC-Unique: lsstOR5BMjymMzMEOZtCeA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C832107ACCA;
- Wed, 27 May 2020 08:47:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C768D74E82;
- Wed, 27 May 2020 08:47:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 30F6C11386A3; Wed, 27 May 2020 10:47:54 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] qom: Make "info qom-tree" show children sorted
-Date: Wed, 27 May 2020 10:47:54 +0200
-Message-Id: <20200527084754.7531-3-armbru@redhat.com>
-In-Reply-To: <20200527084754.7531-1-armbru@redhat.com>
-References: <20200527084754.7531-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8592C107ACCA;
+ Wed, 27 May 2020 08:48:33 +0000 (UTC)
+Received: from work-vm (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CBF8D19D61;
+ Wed, 27 May 2020 08:48:24 +0000 (UTC)
+Date: Wed, 27 May 2020 09:48:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200527084822.GC3001@work-vm>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200527062358.GD19560@joy-OptiPlex-7040>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:25:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,73 +97,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, philmd@redhat.com,
- mark.cave-ayland@ilande.co.uk, pbonzini@redhat.com
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Alex Williamson <alex.williamson@redhat.com>, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"info qom-tree" prints children in unstable order.  This is a pain
-when diffing output for different versions to find change.  Print it
-sorted.
+* Yan Zhao (yan.y.zhao@intel.com) wrote:
+> On Tue, May 26, 2020 at 02:19:39PM -0600, Alex Williamson wrote:
+> > On Mon, 25 May 2020 18:50:54 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > 
+> > > On 5/25/2020 12:29 PM, Yan Zhao wrote:
+> > > > On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:  
+> > > >> Hi folks,
+> > > >>
+> > > >> My impression is that we're getting pretty close to a workable
+> > > >> implementation here with v22 plus respins of patches 5, 6, and 8.  We
+> > > >> also have a matching QEMU series and a proposal for a new i40e
+> > > >> consumer, as well as I assume GVT-g updates happening internally at
+> > > >> Intel.  I expect all of the latter needs further review and discussion,
+> > > >> but we should be at the point where we can validate these proposed
+> > > >> kernel interfaces.  Therefore I'd like to make a call for reviews so
+> > > >> that we can get this wrapped up for the v5.8 merge window.  I know
+> > > >> Connie has some outstanding documentation comments and I'd like to make
+> > > >> sure everyone has an opportunity to check that their comments have been
+> > > >> addressed and we don't discover any new blocking issues.  Please send
+> > > >> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
+> > > >> interface and implementation.  Thanks!
+> > > >>  
+> > > > hi Alex
+> > > > after porting gvt/i40e vf migration code to kernel/qemu v23, we spoted
+> > > > two bugs.
+> > > > 1. "Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
+> > > >     This is a qemu bug that the dirty bitmap query range is not the same
+> > > >     as the dma map range. It can be fixed in qemu. and I just have a little
+> > > >     concern for kernel to have this restriction.
+> > > >   
+> > > 
+> > > I never saw this unaligned size in my testing. In this case if you can 
+> > > provide vfio_* event traces, that will helpful.
+> > 
+> > Yeah, I'm curious why we're hitting such a call path, I think we were
+> > designing this under the assumption we wouldn't see these.  I also
+> that's because the algorithm for getting dirty bitmap query range is still not exactly
+> matching to that for dma map range in vfio_dma_map().
+> 
+> 
+> > wonder if we really need to enforce the dma mapping range for getting
+> > the dirty bitmap with the current implementation (unmap+dirty obviously
+> > still has the restriction).  We do shift the bitmap in place for
+> > alignment, but I'm not sure why we couldn't shift it back and only
+> > clear the range that was reported.  Kirti, do you see other issues?  I
+> > think a patch to lift that restriction is something we could plan to
+> > include after the initial series is included and before we've committed
+> > to the uapi at the v5.8 release.
+> >  
+> > > > 2. migration abortion, reporting
+> > > > "qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
+> > > > qemu-system-x86_64-lm: error while loading state section id 49(vfio)
+> > > > qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
+> > > > 
+> > > > It's still a qemu bug and we can fixed it by
+> > > > "
+> > > > if (migration->pending_bytes == 0) {
+> > > > +            qemu_put_be64(f, 0);
+> > > > +            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > > > "  
+> > > 
+> > > In which function in QEMU do you have to add this?
+> > 
+> > I think this is relative to QEMU path 09/ where Yan had the questions
+> > below on v16 and again tried to get answers to them on v22:
+> > 
+> > https://lore.kernel.org/qemu-devel/20200520031323.GB10369@joy-OptiPlex-7040/
+> > 
+> > Kirti, please address these questions.
+> > 
+> > > > and actually there are some extra concerns about this part, as reported in
+> > > > [1][2].
+> > > > 
+> > > > [1] data_size should be read ahead of data_offset
+> > > > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02795.html.
+> > > > [2] should not repeatedly update pending_bytes in vfio_save_iterate()
+> > > > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02796.html.
+> > > > 
+> > > > but as those errors are all in qemu, and we have finished basic tests in
+> > > > both gvt & i40e, we're fine with the kernel part interface in general now.
+> > > > (except for my concern [1], which needs to update kernel patch 1)
+> > > >   
+> > > 
+> > >  >> what if pending_bytes is not 0, but vendor driver just does not want  to
+> > >  >> send data in this iteration? isn't it right to get data_size first   
+> > > before
+> > >  >> getting data_offset?  
+> > > 
+> > > If vendor driver doesn't want to send data but still has data in staging 
+> > > buffer, vendor driver still can control to send pending_bytes for this 
+> > > iteration as 0 as this is a trap field.
+> > > 
+> > > I would defer this to Alex.
+> > 
+> > This is my understanding of the protocol as well, when the device is
+> > running, pending_bytes might drop to zero if no internal state has
+> > changed and may be non-zero on the next iteration due to device
+> > activity.  When the device is not running, pending_bytes reporting zero
+> > indicates the device is done, there is no further state to transmit.
+> > Does that meet your need/expectation?
+> >
+> (1) on one side, as in vfio_save_pending(),
+> vfio_save_pending()
+> {
+>     ...
+>     ret = vfio_update_pending(vbasedev);
+>     ...
+>     *res_precopy_only += migration->pending_bytes;
+>     ...
+> }
+> the pending_bytes tells migration thread how much data is still hold in
+> device side.
+> the device data includes
+> device internal data + running device dirty data + device state.
+> 
+> so the pending_bytes should include device state as well, right?
+> if so, the pending_bytes should never reach 0 if there's any device
+> state to be sent after device is stopped.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qom/qom-hmp-cmds.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+I hadn't expected the pending-bytes to include a fixed offset for device
+state (If you mean a few registers etc) - I'd expect pending to drop
+possibly to zero;  the heuristic as to when to switch from iteration to
+stop, is based on the total pending across all iterated devices; so it's
+got to be allowed to drop otherwise you'll never transition to stop.
 
-diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
-index cd08233a4c..94bdee9a90 100644
---- a/qom/qom-hmp-cmds.c
-+++ b/qom/qom-hmp-cmds.c
-@@ -69,22 +69,25 @@ typedef struct QOMCompositionState {
- 
- static void print_qom_composition(Monitor *mon, Object *obj, int indent);
- 
--static int print_qom_composition_child(Object *obj, void *opaque)
-+static int qom_composition_compare(const void *a, const void *b, void *ignore)
- {
--    QOMCompositionState *s = opaque;
-+    return g_strcmp0(a ? object_get_canonical_path_component(a) : NULL,
-+                     b ? object_get_canonical_path_component(b) : NULL);
-+}
- 
--    print_qom_composition(s->mon, obj, s->indent);
-+static int insert_qom_composition_child(Object *obj, void *opaque)
-+{
-+    GQueue *children = opaque;
- 
-+    g_queue_insert_sorted(children, obj, qom_composition_compare, NULL);
-     return 0;
- }
- 
- static void print_qom_composition(Monitor *mon, Object *obj, int indent)
- {
--    QOMCompositionState s = {
--        .mon = mon,
--        .indent = indent + 2,
--    };
-     char *name;
-+    GQueue children;
-+    Object *child;
- 
-     if (obj == object_get_root()) {
-         name = g_strdup("");
-@@ -94,7 +97,12 @@ static void print_qom_composition(Monitor *mon, Object *obj, int indent)
-     monitor_printf(mon, "%*s/%s (%s)\n", indent, "", name,
-                    object_get_typename(obj));
-     g_free(name);
--    object_child_foreach(obj, print_qom_composition_child, &s);
-+
-+    g_queue_init(&children);
-+    object_child_foreach(obj, insert_qom_composition_child, &children);
-+    while ((child = g_queue_pop_head(&children))) {
-+        print_qom_composition(mon, child, indent + 2);
-+    }
- }
- 
- void hmp_info_qom_tree(Monitor *mon, const QDict *dict)
--- 
-2.21.3
+> (2) on the other side,
+> along side we updated the pending_bytes in vfio_save_pending() and
+> enter into the vfio_save_iterate(), if we repeatedly update
+> pending_bytes in vfio_save_iterate(), it would enter into a scenario
+> like
+> 
+> initially pending_bytes=500M.
+> vfio_save_iterate() -->
+>   round 1: transmitted 500M.
+>   round 2: update pending bytes, pending_bytes=50M (50M dirty data).
+>   round 3: update pending bytes, pending_bytes=50M.
+>   ...
+>   round N: update pending bytes, pending_bytes=50M.
+> 
+> If there're two vfio devices, the vfio_save_iterate() for the second device
+> may never get chance to be called because there's always pending_bytes
+> produced by the first device, even the size if small.
+
+And between RAM and the vfio devices?
+
+> > > > so I wonder which way in your mind is better, to give our reviewed-by to
+> > > > the kernel part now, or hold until next qemu fixes?
+> > > > and as performance data from gvt is requested from your previous mail, is
+> > > > that still required before the code is accepted?
+> > 
+> > The QEMU series does not need to be perfect, I kind of expect we might
+> > see a few iterations of that beyond the kernel portion being accepted.
+> > We should have the QEMU series to the point that we've resolved any
+> > uapi issues though, which it seems like we're pretty close to having.
+> > Ideally I'd like to get the kernel series into my next branch before
+> > the merge window opens, where it seems like upstream is on schedule to
+> > have that happen this Sunday.  If you feel we're to the point were we
+> > can iron a couple details out during the v5.8 development cycle, then
+> > please provide your reviewed-by.  We haven't fully committed to a uapi
+> > until we've committed to it for a non-rc release.
+> > 
+> got it.
+> 
+> > I think the performance request was largely due to some conversations
+> > with Dave Gilbert wondering if all this actually works AND is practical
+> > for a LIVE migration.  I think we're all curious about things like how
+> > much data does a GPU have to transfer in each phase of migration, and
+> > particularly if the final phase is going to be a barrier to claiming
+> > the VM is actually sufficiently live.  I'm not sure we have many
+> > options if a device simply has a very large working set, but even
+> > anecdotal evidence that the stop-and-copy phase transfers abMB from the
+> > device while idle or xyzMB while active would give us some idea what to
+> for intel vGPU, the data is
+> single-round dirty query:
+> data to be transferred at stop-and-copy phase: 90MB+ ~ 900MB+, including
+> - device state: 9MB
+> - system dirty memory: 80MB+ ~ 900MB+ (depending on workload type)
+> 
+> multi-round dirty query :
+> -each iteration data: 60MB ~ 400MB
+> -data to be transferred at stop-and-copy phase: 70MB ~ 400MB
+> 
+> 
+> 
+> BTW, for viommu, the downtime data is as below. under the same network
+> condition and guest memory size, and no running dirty data/memory produced
+> by device.
+> (1) viommu off
+> single-round dirty query: downtime ~100ms 
+
+Fine.
+
+> (2) viommu on
+> single-round dirty query: downtime 58s 
+
+Youch.
+
+Dave
+
+> 
+> Thanks
+> Yan
+> > expect.  Kirti, have you done any of those sorts of tests for NVIDIA's
+> > driver?
+> > 
+> > > > BTW, we have also conducted some basic tests when viommu is on, and found out
+> > > > errors like
+> > > > "qemu-system-x86_64-dt: vtd_iova_to_slpte: detected slpte permission error (iova=0x0, level=0x3, slpte=0x0, write=1)
+> > > > qemu-system-x86_64-dt: vtd_iommu_translate: detected translation failure (dev=00:03:00, iova=0x0)
+> > > > qemu-system-x86_64-dt: New fault is not recorded due to compression of faults".
+> > > >   
+> > > 
+> > > I saw these errors, I'm looking into it.
+> > 
+> > Let's try to at least determine if this is a uapi issue or just a QEMU
+> > implementation bug for progressing the kernel series.  Thanks,
+> > 
+> > Alex
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
