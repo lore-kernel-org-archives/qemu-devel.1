@@ -2,86 +2,79 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F273DC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFBEE207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48FAF207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:07:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y4aApPJX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFBEE207CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sW+4cDGd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48FAF207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxdH-0000bH-0C
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 11:06:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44574)
+	id 1jdxeG-00020W-Hw
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 11:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdxSc-00021U-W0
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:15 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51171)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jdxcY-0008Q4-Be
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 11:05:31 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41113)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdxSb-0008G4-KM
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:14 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id v19so3351786wmj.0
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:55:13 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jdxcV-000771-SY
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 11:05:29 -0400
+Received: by mail-oi1-x243.google.com with SMTP id 23so20767053oiq.8
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 08:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Hyh91ojyztqE2sZmXe5ULEmyNIFPWUmO5p3g1DDRWRY=;
- b=Y4aApPJXQcXVbJh6nUI63OeAs6XKVLi3Kiv4CXNqDbxgoxzp235vX/ZSRCSgkKh4Kg
- AGSaU3AvdznhIDAnnKg0VB7CjLpFTePwxXLRqNJK0QFNT2utBEoLpqp2o88TqnqsClx5
- O/6Q97yt21LonmIdgN7UFp824zRn79wu6bFAYp+8KpNtN9NBCi/QS0ZiW1I8gbkZIwVz
- pAXwYjTBSdhVuwNBOcT+LvJacf9qjDy2xOQ8/7Z/wL4X4NUFg9HFl8zXmfiniXg3DKvW
- CT6jOCYBKYka5YpFSN+dyFahiQqNy84VibWzA0AYCvIVwk7wUTpD1TuW38e9ZzuBXaQv
- F1ZQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Dyrz/8dGRzaAncUEaq6xyK4el1L3Q9/hNtf4U4CU7t4=;
+ b=sW+4cDGdqER7eUyLRX8+YHiKQKiueP/na32GTe1ZzVI4j+j5zpZcUu4np1xzIwBvyB
+ jB39grR39Bx78WRGGNmEdj7qnth1lRxRjmkPa9IWbCsuzBAQ1kReFVlDfyqk7T8KJ9B4
+ 6rcVnPINySo2iG08twJ8ue9lSG1coI5/siTVGUwA4zwdtTSA/pHGinvqzPdhXsfdhDDz
+ T5tyUCNHwC/Lk4SLoQ/teiWE3Xz0nV5KTvEmBgU0WIjmGAqAe1ZFg020zDUnlp93LRLG
+ I2rO5WlAJqJR1kiOS7RJSTm5RPmEmS6hcYBrm7gMEFmO7fREvZ8YzsRxxmkStmP51lEl
+ b+dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Hyh91ojyztqE2sZmXe5ULEmyNIFPWUmO5p3g1DDRWRY=;
- b=WhhG8e3UT8eH6Au8zQO3T+5oQy5gLba8FpnBabzMm6+DzBFdeM+gUrv0ZtJ2ju+oXP
- XxLY9BSoxV4zybr2MrNRRMcWNfneTDsHTfV8maX8A+P20KvZk1O3BsKNshVtGswoP/zX
- 5sKbR+YIwxoZ16LOMtSGz7PVaSbkcDyRy/9UFEaiY3YrXtRcdl0TiUC8YTTqYCO9GKp5
- in/8C2oy2Ni3WNfx5S4kBGKQ5Ap0wGjTOBCYoRTfYLHDyIfdEhQgz5ecX8Yj2mYO7JIk
- nJbMUhPdeOemELBbRqfvPD4ngC/0kUcdaQSE5/So07NtvTfHRo+rNKDLO/1/b0hbNidq
- HVuw==
-X-Gm-Message-State: AOAM531MVy1Pqx6pR5+HmPYfM1xT6A+pXpwc2ozY5/CKHayZ2WntjgUv
- fvDETxbl0kIIuKjar+oRHy87qA==
-X-Google-Smtp-Source: ABdhPJybrduI4iysO2J9g1/L2HoQluTusk0GwwQWn/XAaS4oHzskJgtiiGoQ3/pB9TOUeVOIWsUBsQ==
-X-Received: by 2002:a1c:a3c1:: with SMTP id m184mr5003912wme.91.1590591312078; 
- Wed, 27 May 2020 07:55:12 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r5sm3194036wrq.0.2020.05.27.07.55.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 May 2020 07:55:04 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2B7C51FF9B;
- Wed, 27 May 2020 15:54:57 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 12/12] tests/tcg: add new threadcount test
-Date: Wed, 27 May 2020 15:54:55 +0100
-Message-Id: <20200527145455.2550-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200527145455.2550-1-alex.bennee@linaro.org>
-References: <20200527145455.2550-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Dyrz/8dGRzaAncUEaq6xyK4el1L3Q9/hNtf4U4CU7t4=;
+ b=dIR0Czk27DPNM+uvsYfkSClkdQe5c7gcrrh/Ea207yqKrPexKdmJUSYLmYgA+grMhK
+ K7keAcwLOolpyhT7vilCi6CXA0zD5TkzSPoG8x98q1DbJo3ZdovcpdhccdAgMep5d/ul
+ w2JzGuhygzEk6BPdi4vc3gC57a1XHt1uBLj5GUPyyz51+fYpqFABT7mHMdZiVnMOUxlL
+ XSBLD13LI3y4WOi0eKb5ZO+ronctt6xmV7Yj+gnVvrwfgOTMTeZVkxquwCRYcADaysTJ
+ tIhNUZQYgOyn6WDe1pOYo2rR9njbL/CMuaZ9XrRa3vX/03lekPFf/G+1iOzGGaZ9pbuM
+ qLxQ==
+X-Gm-Message-State: AOAM532igC2SixUam1c74NOhW4IqNMeKbu95pJjlmbdWFy+I0/lszfLc
+ 8K2Dx5H1sPdvBZMcds/5y5Pq9s18CQEnk+zBMyWFlw==
+X-Google-Smtp-Source: ABdhPJw5C2Z75OyuqPS9wvoA2+dHkgypujOr27ZfQnDOOnmoNWvZABJ5wwNLO9CQRWmv4LrUUHCt0jARXP1RgMsODHw=
+X-Received: by 2002:a54:469a:: with SMTP id k26mr3001742oic.163.1590591926081; 
+ Wed, 27 May 2020 08:05:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
+References: <20200518050408.4579-1-armbru@redhat.com>
+ <20200518050408.4579-10-armbru@redhat.com>
+ <CAFEAcA_S_JsuPG4UN-_zhhdZppBhiwm3-4bocO7O1XdjxC9bAw@mail.gmail.com>
+ <87wo4xxya0.fsf@dusky.pond.sub.org>
+In-Reply-To: <87wo4xxya0.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 27 May 2020 16:05:15 +0100
+Message-ID: <CAFEAcA-9CU8QPeafAf_VSh-Gu2WxLpEoRdUZpv+TOF0Rpq-MXQ@mail.gmail.com>
+Subject: Re: [PATCH 09/24] macio: Fix to realize "mos6522-cuda" and
+ "mos6522-pmu" devices
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,104 +96,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Nikolay Igotti <igotti@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based on the original testcase by Nikolay Igotti.
+On Wed, 27 May 2020 at 15:12, Markus Armbruster <armbru@redhat.com> wrote:
+> * PATCH 08: in a realize method.  Can't actually fail, so let's use
+>   &error_abort.
+>
+> * PATCH 09 (this one): likewise.
 
-Message-ID: <CAEme+7GLKg_dNsHizzTKDymX9HyD+Ph2iZ=WKhOw2XG+zhViXg@mail.gmail.com>
-Signed-off-by: Nikolay Igotti <igotti@gmail.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+I disagree with these. We're in a realize function, the API
+says "on errors, report them via the Error* you got passed",
+so we should do that, not blow up. &error_abort only makes
+sense if (a) we have no better way to report errors than
+to abort (which isn't the case here) or (b) if we can guarantee
+that in fact the thing we're doing won't ever fail
+(which we can't here without knowing more about the internal
+implementation details of the MOS6522 device than we
+really ought to).
 
-Message-Id: <20200520140541.30256-15-alex.bennee@linaro.org>
-
-diff --git a/tests/tcg/multiarch/threadcount.c b/tests/tcg/multiarch/threadcount.c
-new file mode 100644
-index 00000000000..545a1c81466
---- /dev/null
-+++ b/tests/tcg/multiarch/threadcount.c
-@@ -0,0 +1,64 @@
-+/*
-+ * Thread Exerciser
-+ *
-+ * Unlike testthread which is mainly concerned about testing thread
-+ * semantics this test is used to exercise the thread creation and
-+ * accounting. A version of this test found a problem with clashing
-+ * cpu_indexes which caused a break in plugin handling.
-+ *
-+ * Based on the original test case by Nikolay Igotti.
-+ *
-+ * Copyright (c) 2020 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <pthread.h>
-+
-+int max_threads = 10;
-+
-+typedef struct {
-+    int delay;
-+} ThreadArg;
-+
-+static void *thread_fn(void* varg)
-+{
-+    ThreadArg *arg = varg;
-+    usleep(arg->delay);
-+    free(arg);
-+    return NULL;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int i;
-+    pthread_t *threads;
-+
-+    if (argc > 1) {
-+        max_threads = atoi(argv[1]);
-+    }
-+    threads = calloc(sizeof(pthread_t), max_threads);
-+
-+    for (i = 0; i < max_threads; i++) {
-+        ThreadArg *arg = calloc(sizeof(ThreadArg), 1);
-+        arg->delay = i * 100;
-+        pthread_create(threads + i, NULL, thread_fn, arg);
-+    }
-+
-+    printf("Created %d threads\n", max_threads);
-+
-+    /* sleep until roughly half the threads have "finished" */
-+    usleep(max_threads * 50);
-+
-+    for (i = 0; i < max_threads; i++) {
-+        pthread_join(threads[i], NULL);
-+    }
-+
-+    printf("Done\n");
-+
-+    return 0;
-+}
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 51fb75ecfdd..cb49cc9ccb2 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -28,6 +28,8 @@ run-float_%: float_%
- 
- testthread: LDFLAGS+=-lpthread
- 
-+threadcount: LDFLAGS+=-lpthread
-+
- # We define the runner for test-mmap after the individual
- # architectures have defined their supported pages sizes. If no
- # additional page sizes are defined we only run the default test.
--- 
-2.20.1
-
+thanks
+-- PMM
 
