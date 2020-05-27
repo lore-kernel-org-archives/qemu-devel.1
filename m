@@ -2,90 +2,71 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 105FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B56C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C491A207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:04:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsvLXCHV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C491A207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E39020707
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:26:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E39020707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je49b-0001Ec-1F
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 18:04:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49192)
+	id 1je4Vg-0003sU-9p
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 18:26:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je48r-0000l3-EM
- for qemu-devel@nongnu.org; Wed, 27 May 2020 18:03:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38077
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1je4V0-0003On-Mn; Wed, 27 May 2020 18:26:10 -0400
+Resent-Date: Wed, 27 May 2020 18:26:10 -0400
+Resent-Message-Id: <E1je4V0-0003On-Mn@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21723)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je48q-0005Y8-Oc
- for qemu-devel@nongnu.org; Wed, 27 May 2020 18:03:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590616995;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K1IwVlxHPxGgOB9GLbLcrf33dPgOilrvVCROjMpr0XI=;
- b=dsvLXCHVzYnIYTr8onQBqbi4yDUGbzZO3yA7CgCGqBtaZUEFVmw7D+o1sZq2aHspLl8d2f
- xqWxFHJ4nxgwjE6xSBTR+gP/Y+ndhX5GIeuz126DvrHrZz2urJOEUY+DIm4s6nksdNJMvT
- dxDtiPgeCrqH98Lpqf3BvVdUEBwRHh0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-KyCLVAD5MF2BwhPc7RlKDQ-1; Wed, 27 May 2020 18:03:10 -0400
-X-MC-Unique: KyCLVAD5MF2BwhPc7RlKDQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EC0F80183C;
- Wed, 27 May 2020 22:03:09 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AEF0B579A5;
- Wed, 27 May 2020 22:03:05 +0000 (UTC)
-Subject: Re: [PATCH v5 1/7] block: return error-code from bdrv_invalidate_cache
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200527203733.16129-1-vsementsov@virtuozzo.com>
- <20200527203733.16129-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0039753b-04bc-9208-d7f1-6ca24826440c@redhat.com>
-Date: Wed, 27 May 2020 17:03:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1je4Uy-0001ob-Ub; Wed, 27 May 2020 18:26:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590618350; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=MR13ahQWoYKLpTONNygstXltYztpgpzCIE4dMDUEENi14gLh6l1ZHwKCvK7FBcuL0YyfMTpBejWvJdppfF5DdKGuKHQIKYV8IK/bkMckaE8EBxTT0Ztvy2DcdxNASdPc89sp5/Sae/Y5eo65OGHzYaPlxDYFs1qdKf9Yvu38F3Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590618350;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=GT2gI+9p4NYgSr05AduGX1oDpLy9x47qv2KtzZ9fry4=; 
+ b=BQcvMJiYkmyG2kfdgrEgLY8jsBr7qO31msTIK3we4J0FVTkak2F1vwJrxrTc18q8NNg9t4Yhmo5Zt9rfRJKNZhsUvAjaMXC8URL4OKSMrP6IA28UC6CaGcZFf6g+vqsHDBnUzm94WWYs2HyM/tOWJS9ezVIdsMZw2YMUUa3ci8w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 159061834771718.559097711072354;
+ Wed, 27 May 2020 15:25:47 -0700 (PDT)
+Message-ID: <159061834567.16318.5485396578708032441@45ef0f9c86ae>
+In-Reply-To: <20200527203733.16129-1-vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v5 0/7] coroutines: generate wrapper code
 MIME-Version: 1.0
-In-Reply-To: <20200527203733.16129-2-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vsementsov@virtuozzo.com
+Date: Wed, 27 May 2020 15:25:47 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 17:46:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,53 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- crosa@redhat.com, den@openvz.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/27/20 3:37 PM, Vladimir Sementsov-Ogievskiy wrote:
-> This is the only coroutine wrapper from block.c and block/io.c which
-> doesn't return value, so let's convert it to the common behavior, to
-
-s/value/a value/
-
-> simplify moving to generated coroutine wrappers in further commit.
-
-s/in/in a/
-
-> 
-> Also, bdrv_invalidate_cache is a void function, returning error only
-> through **errp parameter, which considered to be bad practice, as it
-
-s/which/which is/
-
-> forces callers to define and propagate local_err variable, so
-> conversion is good anyway.
-> 
-> This patch leaves convertion of .bdrv_co_invalidate_cache() driver
-
-s/convertion/the conversion/
-
-> callbacks and bdrv_invalidate_cache_all() for another-day refactoring.
-
-s/another-day refactoring/another day/
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   include/block/block.h |  2 +-
->   block.c               | 32 ++++++++++++++++++--------------
->   2 files changed, 19 insertions(+), 15 deletions(-)
-> 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyNzIwMzczMy4xNjEy
+OS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
+Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
+Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogICAgd2l0aCBQb3Bl
+bigqcG9wZW5hcmdzLCAqKmt3YXJncykgYXMgcHJvY2VzczoKVHlwZUVycm9yOiBfX2luaXRfXygp
+IGdvdCBhbiB1bmV4cGVjdGVkIGtleXdvcmQgYXJndW1lbnQgJ2NhcHR1cmVfb3V0cHV0JwogIEND
+ICAgICAgL3RtcC9xZW11LXRlc3QvYnVpbGQvc2xpcnAvc3JjL2FycF90YWJsZS5vCm1ha2U6ICoq
+KiBbYmxvY2svYmxvY2stZ2VuLmNdIEVycm9yIDEKbWFrZTogKioqIERlbGV0aW5nIGZpbGUgYGJs
+b2NrL2Jsb2NrLWdlbi5jJwogIENDICAgICAgL3RtcC9xZW11LXRlc3QvYnVpbGQvc2xpcnAvc3Jj
+L3V0aWwubwptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgotLS0KICAg
+IHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVk
+UHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICct
+LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZTk4MDFkYjZjODE5NDZiOGI3MDA3Y2Qz
+MTc5YTZkMTgnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
+ZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
+VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
+JywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
+LCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2Fj
+aGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZWphOGh6c3Yvc3JjL2Rv
+Y2tlci1zcmMuMjAyMC0wNS0yNy0xOC4yMy40NC45NzUxOi92YXIvdG1wL3FlbXU6eixybycsICdx
+ZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5l
+ZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUu
+aW5zdGFuY2UudXVpZD1lOTgwMWRiNmM4MTk0NmI4YjcwMDdjZDMxNzlhNmQxOAptYWtlWzFdOiAq
+KiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC1lamE4aHpzdi9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1
+bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMm0xLjM5M3MKdXNlciAgICAw
+bTcuODQ3cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAyMDA1MjcyMDM3MzMuMTYxMjktMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vdGVz
+dGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
