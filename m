@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B215C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95688C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21EEB20899
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 560EC207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 12:46:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="NI0AJsTT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21EEB20899
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="WYnlLphK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 560EC207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdvSD-0001TF-7t
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:46:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52942)
+	id 1jdvSJ-0001iZ-D5
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 08:46:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jdvR1-00082J-UV; Wed, 27 May 2020 08:45:27 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:34548)
+ id 1jdvRD-0008S2-7S; Wed, 27 May 2020 08:45:39 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:50708)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jdvQz-0001Sl-Mh; Wed, 27 May 2020 08:45:26 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::162])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 693EE2E15B2;
- Wed, 27 May 2020 15:45:22 +0300 (MSK)
+ id 1jdvRB-0001cY-Lo; Wed, 27 May 2020 08:45:38 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id BD9702E156F;
+ Wed, 27 May 2020 15:45:33 +0300 (MSK)
 Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
  (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
- by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- NncoSmAIxp-jIF4FJjI; Wed, 27 May 2020 15:45:22 +0300
+ by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ RSC1xPiAcU-jSxK4aYo; Wed, 27 May 2020 15:45:33 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1590583522; bh=oIN03DAZ4lQYUkl3lhide6Xs43zEdrUrV/56BgwHQX0=;
+ t=1590583533; bh=A0YhPbFgXOi7Ibarq6sWTVZlCf7rqVdJcWDX7rNnVYU=;
  h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=NI0AJsTTemllPECSfi+BL/N/9mtkS20hZ1UfRKA0K7Uhqy5GZMQwxjcKYKDr7hmtr
- //+nYgUXvj6RJUl+sDbsrRYAVCdOTsWshvGUgRhw/6Gd/7gE0esW0D/P+hHpqQqIKu
- j16B7hxVho1S7RMx409aZaf2tvAyPB6vHESIDjaQ=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ b=WYnlLphKioMSFrz8oFbRygNduQl/bL8tD6c/NiJkHcDsYzLrYS1UyEnm0fIViPBRC
+ /i9nB2GRviU/5H+9Xcv960vEViNd1mWl+0a99WkYzXHvzkDmt9FWAhM9XHz7hkxcjF
+ P31LzMOyFKBdeJy8/Rew0UG3//wx5+hR5FCg/rl4=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b080:8308::1:12])
  by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- bzO5qPtczO-jIWOql5q; Wed, 27 May 2020 15:45:18 +0300
+ bzO5qPtczO-jSWO478g; Wed, 27 May 2020 15:45:28 +0300
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
  (Client certificate not present)
 From: Roman Kagan <rvkagan@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 1/5] virtio-blk: store opt_io_size with correct size
-Date: Wed, 27 May 2020 15:45:07 +0300
-Message-Id: <20200527124511.986099-2-rvkagan@yandex-team.ru>
+Subject: [PATCH v6 3/5] qdev-properties: blocksize: use same limits in code
+ and description
+Date: Wed, 27 May 2020 15:45:09 +0300
+Message-Id: <20200527124511.986099-4-rvkagan@yandex-team.ru>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527124511.986099-1-rvkagan@yandex-team.ru>
 References: <20200527124511.986099-1-rvkagan@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=77.88.29.217; envelope-from=rvkagan@yandex-team.ru;
- helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 08:45:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,36 +103,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The width of opt_io_size in virtio_blk_config is 32bit.  However, it's
-written with virtio_stw_p; this may result in value truncation, and on
-big-endian systems with legacy virtio in completely bogus readings in
-the guest.
-
-Use the appropriate accessor to store it.
+Make it easier (more visible) to maintain the limits on the blocksize
+properties in sync with the respective description, by using macros both
+in the code and in the description.
 
 Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
 v4 -> v5:
-- expand the log [Michael]
+- split out into separate patch [Philippe]
 
- hw/block/virtio-blk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/core/qdev-properties.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index f5f6fc925e..413083e62f 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -918,7 +918,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
-     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
-     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
--    virtio_stw_p(vdev, &blkcfg.opt_io_size, conf->opt_io_size / blk_size);
-+    virtio_stl_p(vdev, &blkcfg.opt_io_size, conf->opt_io_size / blk_size);
-     blkcfg.geometry.heads = conf->heads;
-     /*
-      * We must ensure that the block device capacity is a multiple of
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index cc924815da..249dc69bd8 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -729,6 +729,13 @@ const PropertyInfo qdev_prop_pci_devfn = {
+ 
+ /* --- blocksize --- */
+ 
++/* lower limit is sector size */
++#define MIN_BLOCK_SIZE          512
++#define MIN_BLOCK_SIZE_STR      stringify(MIN_BLOCK_SIZE)
++/* upper limit is the max power of 2 that fits in uint16_t */
++#define MAX_BLOCK_SIZE          32768
++#define MAX_BLOCK_SIZE_STR      stringify(MAX_BLOCK_SIZE)
++
+ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp)
+ {
+@@ -736,8 +743,6 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+     Property *prop = opaque;
+     uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
+     Error *local_err = NULL;
+-    const int64_t min = 512;
+-    const int64_t max = 32768;
+ 
+     if (dev->realized) {
+         qdev_prop_set_after_realize(dev, name, errp);
+@@ -750,9 +755,12 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+     /* value of 0 means "unset" */
+-    if (value && (value < min || value > max)) {
+-        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
+-                   dev->id ? : "", name, (int64_t)value, min, max);
++    if (value && (value < MIN_BLOCK_SIZE || value > MAX_BLOCK_SIZE)) {
++        error_setg(errp,
++                   "Property %s.%s doesn't take value %" PRIu16
++                   " (minimum: " MIN_BLOCK_SIZE_STR
++                   ", maximum: " MAX_BLOCK_SIZE_STR ")",
++                   dev->id ? : "", name, value);
+         return;
+     }
+ 
+@@ -769,7 +777,8 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+ 
+ const PropertyInfo qdev_prop_blocksize = {
+     .name  = "uint16",
+-    .description = "A power of two between 512 and 32768",
++    .description = "A power of two between " MIN_BLOCK_SIZE_STR
++                   " and " MAX_BLOCK_SIZE_STR,
+     .get   = get_uint16,
+     .set   = set_blocksize,
+     .set_default_value = set_default_value_uint,
 -- 
 2.26.2
 
