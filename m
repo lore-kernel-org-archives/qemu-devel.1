@@ -2,91 +2,98 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE052C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF258C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD1720873
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7472020787
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:15:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fhi/ZH/v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD1720873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vYVwyxA2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7472020787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdycw-0000c8-O2
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56370)
+	id 1jdyiV-0002nM-Li
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:15:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdycI-00008I-KC
- for qemu-devel@nongnu.org; Wed, 27 May 2020 12:09:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49287
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdybo-0007Dw-UB
- for qemu-devel@nongnu.org; Wed, 27 May 2020 12:09:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590595726;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sn6AfBL39USHD1b+hTiVbPfKRNcoYZw5du1Uh0pkzVU=;
- b=Fhi/ZH/vtH6iVgInIpc2qdhcuixv874Zn/Yz4uJNK9rxsHfFansPSgqIGTob1ptByKryQs
- ClltkUT4Zqf4PgZ/GxzbGMqTzFlFd7oWR3shdbrJe/Wc0i1UNPMdWeCY0Afb3Yxiz9mHfO
- FjRErIi4mM2R/hHCvlkVTgipsKGm7Qo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-JkEOzvkEMTq_v4b4w_mtIA-1; Wed, 27 May 2020 12:08:42 -0400
-X-MC-Unique: JkEOzvkEMTq_v4b4w_mtIA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 482071B18BC2;
- Wed, 27 May 2020 16:08:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E8FA21A8F1;
- Wed, 27 May 2020 16:08:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 75CB3113864A; Wed, 27 May 2020 18:08:39 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 09/24] macio: Fix to realize "mos6522-cuda" and
- "mos6522-pmu" devices
-References: <20200518050408.4579-1-armbru@redhat.com>
- <20200518050408.4579-10-armbru@redhat.com>
- <CAFEAcA_S_JsuPG4UN-_zhhdZppBhiwm3-4bocO7O1XdjxC9bAw@mail.gmail.com>
- <87wo4xxya0.fsf@dusky.pond.sub.org>
- <CAFEAcA-9CU8QPeafAf_VSh-Gu2WxLpEoRdUZpv+TOF0Rpq-MXQ@mail.gmail.com>
-Date: Wed, 27 May 2020 18:08:39 +0200
-In-Reply-To: <CAFEAcA-9CU8QPeafAf_VSh-Gu2WxLpEoRdUZpv+TOF0Rpq-MXQ@mail.gmail.com>
- (Peter Maydell's message of "Wed, 27 May 2020 16:05:15 +0100")
-Message-ID: <87pnapwebc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdyhc-0002CV-80
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 12:14:48 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35349)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdyha-0003I3-W4
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 12:14:47 -0400
+Received: by mail-wm1-x342.google.com with SMTP id n5so3665763wmd.0
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 09:14:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=r8qHJIgWhppAFYzAUdm3/h/5yqURBHPwJMJOPlqcDok=;
+ b=vYVwyxA2hKwfSaCjuaqmHjF1R3W8XoTfrf5ifvgynJ77ZijqR6a8vUXDudkAbhgdNm
+ wW0QjiDy9mabTzziZHQKgjoAKqXNNJLW1BCYobiW98cwAhzgY1BU5zWPlVPviNrHGMYX
+ HSxCiyVeVR5U/Pr1mAlk6ebuS6gH95duhipHS8THMcrdfnwV63nyXUDnywREfdQFlc5K
+ PPw8xQWERZ5OSW8iV1DKdhQADkJE7mllmRwxL9pYMELIN6KF3oF4RNBYFS89GvrEZqc+
+ l0Cadarsu3WEIIiUR0NvMjIt10Z0Axx88rGMVRFhhLaJsGAZSUuvpAQFQ7twK+EwUYJR
+ p7zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=r8qHJIgWhppAFYzAUdm3/h/5yqURBHPwJMJOPlqcDok=;
+ b=WWQ+iUz4m+3hQBtpq0sg89KYeSZQS6PzBNa/YzxlG+B0jAwVReIdoHi1BOTY0RohZV
+ AZf92jZJ2Z4J0JkmG8KnDfScwvrA0znjrUGYfi60tEwpOItFAw3tWTp+t3xZ1qAL+xPh
+ TLLiur8nIJa+dua5xdF1D1jx3fyZN9u4zF1Z9K5UnkFEhQrc4Ma2jGQlbNvWqBAaYpEw
+ M36BTIhv7d9gyiRelBxa9ppaJpCxsZi2nNoXElTUD8fC64JOb8ZJ1ejTprCg/EJjw/73
+ RKxn2BfcHnHDBDxCEILhhZuCa39hgx9w1k+31roKfSwhr5BefDc/RHhDbfeXem3hS6CO
+ lUWQ==
+X-Gm-Message-State: AOAM5326ZE9FBbG1OLPPsuwerWOarJYX86u/3HFh1H22Jpajs44eSDQw
+ IC5MKZ18tOqSEOe8iB1Ct+ytEw==
+X-Google-Smtp-Source: ABdhPJxXyk7Hykq+74h27qZMVFMOouFma2isjlhuj+K/DmeRFycu6Jhra6Do5UQZQSEOJPl4Oaha7g==
+X-Received: by 2002:a1c:f207:: with SMTP id s7mr4904348wmc.123.1590596085420; 
+ Wed, 27 May 2020 09:14:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l5sm3080420wml.27.2020.05.27.09.14.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 May 2020 09:14:43 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 430821FF7E;
+ Wed, 27 May 2020 17:14:43 +0100 (BST)
+References: <20200527100546.29297-1-alex.bennee@linaro.org>
+ <20200527100546.29297-3-alex.bennee@linaro.org>
+ <CAHiYmc7EJVxKXZ4G96cL-Bm3tT8UR_dgr7y3oisUMnuJ0u3zaw@mail.gmail.com>
+ <CAHiYmc7TYHMcitiG9ELxfz-EC8DSG1b7FeFsxXxTbu-7FSih=Q@mail.gmail.com>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: Re: [PATCH v1 2/3] linux-user: deal with address wrap for
+ ARM_COMMPAGE on 32 bit
+In-reply-to: <CAHiYmc7TYHMcitiG9ELxfz-EC8DSG1b7FeFsxXxTbu-7FSih=Q@mail.gmail.com>
+Date: Wed, 27 May 2020 17:14:43 +0100
+Message-ID: <87pnap5p8s.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,39 +106,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Bug 1880225 <1880225@bugs.launchpad.net>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On Wed, 27 May 2020 at 15:12, Markus Armbruster <armbru@redhat.com> wrote:
->> * PATCH 08: in a realize method.  Can't actually fail, so let's use
->>   &error_abort.
+Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
+
+> =D1=81=D1=80=D0=B5, 27. =D0=BC=D0=B0=D1=98 2020. =D1=83 14:05 Aleksandar =
+Markovic
+> <aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >>
->> * PATCH 09 (this one): likewise.
+>> =D1=81=D1=80=D0=B5, 27. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:07 Alex Benn=
+=C3=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>> >
+>> > We rely on the pointer to wrap when accessing the high address of the
+>> > COMMPAGE so it lands somewhere reasonable. However on 32 bit hosts we
+>> > cannot afford just to map the entire 4gb address range. The old mmap
+>> > trial and error code handled this by just checking we could map both
+>> > the guest_base and the computed COMMPAGE address.
+>> >
+>> > We can't just manipulate loadaddr to get what we want so we introduce
+>> > an offset which pgb_find_hole can apply when looking for a gap for
+>> > guest_base that ensures there is space left to map the COMMPAGE
+>> > afterwards.
+>> >
+>> > This is arguably a little inefficient for the one 32 bit
+>> > value (kuser_helper_version) we need to keep there given all the
+>> > actual code entries are picked up during the translation phase.
+>> >
+>> > Fixes: ee94743034b
+>> > Bug: https://bugs.launchpad.net/qemu/+bug/1880225
+>>
+>> For the scenario in this bug report, for today's master, before and after
+>> applying this patch:
+>>
 >
-> I disagree with these. We're in a realize function, the API
-> says "on errors, report them via the Error* you got passed",
-> so we should do that, not blow up. &error_abort only makes
-> sense if (a) we have no better way to report errors than
-> to abort (which isn't the case here) or (b) if we can guarantee
-> that in fact the thing we're doing won't ever fail
+> I am not sure how significant is this info, but I executed the test
+> without applying patch 1/3, so only 2/3 was applied in the case
+> "AFTER".
 
-I detest impossible (and therefore untestable) error paths.
+That is expected. The other fix only affects binaries run inside a
+/proc-less chroot and the final patch is a test case for COMMPAGE
+support.
 
-> (which we can't here without knowing more about the internal
-> implementation details of the MOS6522 device than we
-> really ought to).
-
-At least the child devices are all defined in the same file.
-
-My second line of defense: my patches are strict improvments.  If you
-want further improvements, I'd prefer you propose them as patches on top
-of mine.
-
+--=20
+Alex Benn=C3=A9e
 
