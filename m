@@ -2,86 +2,87 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4187C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B2BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:59:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 814932088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CEBF207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c0rAkQ25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 814932088E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uqJr3GeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CEBF207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxVP-0007Ye-IX
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:58:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44524)
+	id 1jdxWP-0001DX-S6
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:59:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdxSV-0001oo-Dq
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:07 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37084)
+ id 1jdxSS-0001lU-HK
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:04 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51980)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdxSU-000899-1p
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:07 -0400
-Received: by mail-wm1-x334.google.com with SMTP id f5so3334963wmh.2
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:55:05 -0700 (PDT)
+ id 1jdxSQ-00087K-M0
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:55:04 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id u13so3350664wml.1
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QvhGNTeRA8q78PxbK23cSE9XvqC4pZ+Nj6yuRj0xIqM=;
- b=c0rAkQ25bQMBk/E31Bg12O8rDqZwfBdYiMvt4incWMn/iOIhs7+cRub9+gW9Gezl+T
- OEheBLqKRZZK+b8q+/ZQTdglYAZ1hn11YlcGPp0FcF1iIBEqSvx2J9GOrhfJljVfxB22
- WBInBC91cJG4y4n78mbpOMCm4QMFGebEM7wEZBYiUtQXxv01Ch/tZVA8WGv9WkASxo6e
- 8YdI/mdHv0HXDTHMAh7I8/a+XFyiCS6jsitVJVZU+xg97fogPjWXAKl7SLl1IQYbPvzk
- DEcgl9Gn2hQ77QW60c2bvV3Hg8ZgDNf00xkS/i67FDs2s1zS1Ct9cX4+7Q8vhepIGCAS
- Wfkw==
+ bh=jrUkHAApHhp6xANTyxUoK7alihevxNR/A5+KN9e47UQ=;
+ b=uqJr3GeBau4h3aIY5NIeHOjiOc3unA0hnmD5veTwEuuG/w0EU0UpjfBOENDFyl1xb+
+ jrN7KuHhTSuABTEhCyFg5kCl+MEdusFkuQI5tVTQsSGMhCW4NsubDN/V1Yiyv6gqgbZp
+ xGR4slW0RP6TNcR5Hq4WuR1hRhgmVIz/2bmBUifcS15T2rKKDtGVHKG3ktn/DipB/Lg6
+ mdsaPSIbZ7mc5hqWC69Mlr2H+ycbf1fAi9jZgFu+AY4CnW5biCpAR5zm173e7mvZzOx+
+ lVIbnqBV9J0gmr1CVDZyYoJsIXY1gITo+rNEa6SHZbB2d6jSuIFyUeffmwVfQdU37yLg
+ D6Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QvhGNTeRA8q78PxbK23cSE9XvqC4pZ+Nj6yuRj0xIqM=;
- b=KFTM2U25KSBWmUlbMdiRRmrm1iaiUh31tCGhk9oUTL/flDYKuhGleuY5umPYEnEIqK
- wYdSP5wR+d57M8jEqVeG1O9Xsaojx1BsBRaUeiSXBKwoaQqE14cTB3TxNm7uHsn8JHcB
- vPRIocxXxJ0fw4ZasHBe1dLST6aMn907pKMCwt4kVj3QJSSNi5JpwBOZy6AsIz/rNcSM
- ZEdKRdCFUxnrCm97Z4oB2PB5e4Kx6h2lzQ5Cu0LoyYNuyXDy2llhblmIlRRSFzX1Htnp
- 7lHFY6GE730fIoYAxJqP9YkaP0klvbBHQqy9DbJDEbAX2+tq4xA8iafnb250s7sFdBLK
- PxAA==
-X-Gm-Message-State: AOAM532eTqsvwx/madQtdYrFHSBv/MFD2oXnreh2xSXXHD3BSmU/AjLY
- SResbL4AIfY1D8ljjnW8+H2pfLympkA=
-X-Google-Smtp-Source: ABdhPJy1X5elrHhjBImmEGiPFq43gWC7kX6ksWJAAU2wjMp1XQE+Lsghx3upAc0Ktv70luYYXswVMg==
-X-Received: by 2002:a7b:c7d8:: with SMTP id z24mr4456676wmk.28.1590591304616; 
- Wed, 27 May 2020 07:55:04 -0700 (PDT)
+ bh=jrUkHAApHhp6xANTyxUoK7alihevxNR/A5+KN9e47UQ=;
+ b=LXe0v1Qs4CvOlnyu9ruPxs6HEYIccviMAQQvm6dMV/++flOaiGxuIYdCdf7wVyycpv
+ Q6oyaNxZ4lNpSQoDBpa04IdZ2RAR3MJLJM5T9P65r4P3n0bMLQq/8N+rgwIGSKpJTx9k
+ QCk6XH7MM5poCc/wN4p8IEbvy3v0Dl2XPeGbebrjZ6ppX8gHoAc8bRh3902K8YaX/qD7
+ VhLH9QPlyWUfR3dk4rJO85NyT0vAkspn0yo64zutzXYQVysoxHYn7B7qgkM4+eYCHTmZ
+ AKcui71MPrn7uJ6jrH6qkh1EkpViD3cWcWz/CZm3rSOih0wyizTAOeIrY+iVCY/1XkBH
+ ukXw==
+X-Gm-Message-State: AOAM530bfFFnS/LCqp4aKATkonsW3hULwi0qGONsrM3TOvyRoaeIy6qh
+ 5YSu+F17eHR1a2ScxjWg/Uyl/g==
+X-Google-Smtp-Source: ABdhPJwpmROQj5Uk33IFFo8KdKUflXj0yd3Lop7lrVF5brXXq4Q4feo7GqZH/ZNc43MoLQyZ7T4f+w==
+X-Received: by 2002:a05:600c:1146:: with SMTP id
+ z6mr4554192wmz.179.1590591301136; 
+ Wed, 27 May 2020 07:55:01 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 23sm2862954wmg.10.2020.05.27.07.54.58
+ by smtp.gmail.com with ESMTPSA id z7sm3030126wrt.6.2020.05.27.07.54.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 27 May 2020 07:54:58 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9743D1FF92;
+ by zen.linaroharston (Postfix) with ESMTP id 54D891FF8F;
  Wed, 27 May 2020 15:54:56 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 06/12] tests/fp: split and audit the conversion tests
-Date: Wed, 27 May 2020 15:54:49 +0100
-Message-Id: <20200527145455.2550-7-alex.bennee@linaro.org>
+Subject: [PULL 03/12] travis.yml: Use clang++ in the Clang tests
+Date: Wed, 27 May 2020 15:54:46 +0100
+Message-Id: <20200527145455.2550-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200527145455.2550-1-alex.bennee@linaro.org>
 References: <20200527145455.2550-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,105 +104,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split the float conversion tests into separate groups and audit the
-tests to check what is still broken. I was able to enable a bunch of
-tests that had been missed before:
+From: Thomas Huth <thuth@redhat.com>
 
-  all the float to float conversions
-  ui32_to_extF80
-  ui64_to_extF80
-  extF80_to_ui32
-  extF80_to_ui32_r_minMag
-  extF80_to_ui64
-  extF80_to_ui64_r_minMag
+Our configure script does not look for clang++ automatically, so we
+should use --cxx=clang++ to make sure that we test our C++ code with
+Clang, too. And while we're at it, also use --host-cc=clang here
+to avoid that we use the normal "cc" as host C compiler.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200520140541.30256-7-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200518083316.25065-1-thuth@redhat.com>
+Message-Id: <20200520140541.30256-4-alex.bennee@linaro.org>
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e6d87fcbf0e..a00ccc94b8b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -687,11 +687,26 @@ test-softfloat = $(call quiet-command, \
- 			(cat $2.out && exit 1;), \
- 			"FLOAT TEST", $2)
+diff --git a/.travis.yml b/.travis.yml
+index 1ec8a7b4657..564be50a3c1 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -205,14 +205,15 @@ jobs:
+     # Test with Clang for compile portability (Travis uses clang-5.0)
+     - name: "Clang (user)"
+       env:
+-        - CONFIG="--disable-system"
++        - CONFIG="--disable-system --host-cc=clang --cxx=clang++"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
+       compiler: clang
  
--# Conversion Routines:
-+# Conversion Routines: Float to Float
-+# FIXME: f32_to_f128 (broken), f64_to_f128 (broken)
-+# FIXME: f128_to_f32(broken), f128_to_f64 (broken)
-+# FIXME: f128_to_extF80 (broken)
-+check-softfloat-conv-f2f: $(FP_TEST_BIN)
-+	$(call test-softfloat, \
-+		f16_to_f32 f16_to_f64 \
-+		f16_to_extF80 f16_to_f128 \
-+		f32_to_f16 f32_to_f64 \
-+		f32_to_extF80 \
-+		f64_to_f16 f64_to_f32 \
-+		extF80_to_f16 extF80_to_f32 \
-+		extF80_to_f64 extF80_to_f128 \
-+		f128_to_f16, \
-+		float-to-float)
-+
-+# Conversion Routines: Int and Uint to Float
- # FIXME: i32_to_extF80 (broken), i64_to_extF80 (broken)
--#        ui32_to_f128 (not implemented), extF80_roundToInt (broken)
--#
--check-softfloat-conv: $(FP_TEST_BIN)
-+#        ui32_to_f128 (not implemented)
-+check-softfloat-conv-to-float: $(FP_TEST_BIN)
- 	$(call test-softfloat, \
- 		i32_to_f16 i64_to_f16 \
- 		i32_to_f32 i64_to_f32 \
-@@ -701,7 +716,12 @@ check-softfloat-conv: $(FP_TEST_BIN)
- 		ui32_to_f16 ui64_to_f16 \
- 		ui32_to_f32 ui64_to_f32 \
- 		ui32_to_f64 ui64_to_f64 \
-+		ui32_to_extF80 ui64_to_extF80 \
- 		ui64_to_f128, uint-to-float)
-+
-+# Conversion Routines: Float to integers
-+# FIXME: extF80_roundToInt (broken)
-+check-softfloat-conv-to-int: $(FP_TEST_BIN)
- 	$(call test-softfloat, \
- 		f16_to_i32 f16_to_i32_r_minMag \
- 		f32_to_i32 f32_to_i32_r_minMag \
-@@ -718,10 +738,12 @@ check-softfloat-conv: $(FP_TEST_BIN)
- 		f16_to_ui32 f16_to_ui32_r_minMag \
- 		f32_to_ui32 f32_to_ui32_r_minMag \
- 		f64_to_ui32 f64_to_ui32_r_minMag \
-+		extF80_to_ui32 extF80_to_ui32_r_minMag \
- 		f128_to_ui32 f128_to_ui32_r_minMag \
- 		f16_to_ui64 f16_to_ui64_r_minMag \
- 		f32_to_ui64 f32_to_ui64_r_minMag \
- 		f64_to_ui64 f64_to_ui64_r_minMag \
-+		extF80_to_ui64 extF80_to_ui64_r_minMag \
- 		f128_to_ui64 f128_to_ui64_r_minMag, \
- 		float-to-uint)
- 	$(call test-softfloat, \
-@@ -729,9 +751,14 @@ check-softfloat-conv: $(FP_TEST_BIN)
- 		f64_roundToInt f128_roundToInt, \
- 		round-to-integer)
  
-+.PHONY: check-softfloat-conv
-+check-softfloat-conv: check-softfloat-conv-f2f
-+check-softfloat-conv: check-softfloat-conv-to-float
-+check-softfloat-conv: check-softfloat-conv-to-int
-+
- # Generic rule for all float operations
- #
--# Some patterns are overidden due to broken or missing tests.
-+# Some patterns are overridden due to broken or missing tests.
- # Hopefully these can be removed over time.
+     - name: "Clang (main-softmmu)"
+       env:
+-        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
++        - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS}
++                  --host-cc=clang --cxx=clang++"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
+       compiler: clang
+       before_script:
+@@ -222,7 +223,8 @@ jobs:
  
- check-softfloat-%: $(FP_TEST_BIN)
+     - name: "Clang (other-softmmu)"
+       env:
+-        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
++        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}
++                  --host-cc=clang --cxx=clang++"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
+       compiler: clang
+ 
 -- 
 2.20.1
 
