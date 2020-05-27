@@ -2,88 +2,83 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 598DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 19:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D07C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 20:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DDD820835
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 19:52:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B93CC2089D
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 20:08:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+kt0LV/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDD820835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bybw7Ev3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B93CC2089D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je26U-0008TP-95
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 15:52:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
+	id 1je2LP-0007Fs-Th
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 16:08:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1je25s-0007k4-AE
- for qemu-devel@nongnu.org; Wed, 27 May 2020 15:52:04 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51228)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1je2Kd-0005o0-3c
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 16:07:19 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42435)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1je25r-0006d9-Fg
- for qemu-devel@nongnu.org; Wed, 27 May 2020 15:52:04 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u13so752677wml.1
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 12:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1je2Kb-0004Cm-Sn
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 16:07:18 -0400
+Received: by mail-oi1-x242.google.com with SMTP id l6so22884760oic.9
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 13:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tQfh5E3DggoTgfjWD8kR8V2egDetz3Y8KURmb7J6yfA=;
- b=q+kt0LV/ylkJru81cfqTQIIr0wf6oxqb+1Wu6n3ZLe0aeAohtgsHgmB2xjVrIuPBJS
- V53Q7Wq4crvAKkgdJA3kyuNOUNGNU6UC+p9c/8GUWtQLcxY4Pgi/+wVz+BHHmZ4RLoPP
- evV8FRur7OsS5nxCf7pBIV7Y4VczSP4jRsimas9NNimzPQ55c06j7R4+lKGNtmUjs5wT
- BetUHE2OZRrCl0MksAigVDTwxrnmHWJixoTE/pTIcZbzXJ7IESf1s85C+xvkrp3zaFCh
- vVG5LliGwvGruD34q3yjFQFTob5v0qHPG8k4KHUf8y1QKS/sfdJnh6zy8v6H6v4gWHov
- 8ZVA==
+ :cc; bh=2TS1eRfgqhmzoUX81Qz+ToFgWPsvcwaQKJ/hqzNjhDI=;
+ b=bybw7Ev3QzUN2zWL+EKoySuw4oK/4m0JqV+Wl6J6u+8+iyniBSzZNZzDr1361+grhe
+ DpcRMmxwndcIQttAkcN/ONP4pm+UJ9j6TPfaSVYSUxXBhn6n93SzWPtpTbBIlHrk5t53
+ 9qjj6649HXO+10nhicRA4pVR4FhymhZjJJWAAMzZOwDIUiB/KHAWsd9nYyvz8QNUg/FX
+ zojGvaCbvKPZeutdB5G4jJY+QT1/Rh+UPzOHaTMj4nfHRMZpWM41qFc9Vq39mC4AMpCJ
+ 9DooMTFKKtwjW51hjd3qKS17NrZnc4MgJBcq/MGupaBx6TRTaEMU96n8lOsoXuJyldjx
+ fofQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=tQfh5E3DggoTgfjWD8kR8V2egDetz3Y8KURmb7J6yfA=;
- b=nYw5L77olnWa8MgUANy9G2lJlieit9F7i6SOVqKh8vVxzRZI6SgZC9T8/d/vW4tX5P
- q+c62fC1614pgD7F5GVHpAieKAzU84DVFkilXBgGiVM4MotO9oSsyv9SMSYiRNwPOVZj
- oZ3hDFtXnNH9DW5JMEtthhPTLfVpuuMlbhMVCL7R772uhvWSyD/pxjWtUvhaJdH7d6k6
- 7our/LLOt3NrOorOxuQHBweg84UwtoWS7YbI+zbQo5NuRSeg4DaBsQgdEgJwUsO2OxW7
- IMZH7+7qKd7Ld1ggeaKsh7LGKb1etuzXe+5sHIgVyK+3CMBHiFA9H4z0HRKB7AbqubOY
- HyXg==
-X-Gm-Message-State: AOAM5334PhRr0/Klf3gZu1Hb+bvtIM9FA/S/NkGI7kpihNPIUyEWKU61
- 5NHw2PhyQitL6PqoCjMJfg1BPQAjFZh5ZypkFmI=
-X-Google-Smtp-Source: ABdhPJwHsaiarh7a5PVl6uZ68JsU9Hqx2tLVuHgmRf1Ry0pHRnQTf7lOJlZ9SijDE8pY4MVAVv/48veWlQmo/Vtr9Zg=
-X-Received: by 2002:a1c:6182:: with SMTP id v124mr5688849wmb.30.1590609121535; 
- Wed, 27 May 2020 12:52:01 -0700 (PDT)
+ bh=2TS1eRfgqhmzoUX81Qz+ToFgWPsvcwaQKJ/hqzNjhDI=;
+ b=ZxMEG8xTrL8V0a5yv22rQU2jDGmH8bD69s/zTEDz2klfC6Ho72FZKkF95CiKhc2DH6
+ xtyL6Z7blScMj2uyGTv7tx4Id4krc/hmJWslkcHOzKwuFErVq8sOlug8pHnw3lIoWVuf
+ RkOB09oKE6TJ5NSdlSmI16IUoeU56eTf7OS8rSJGCa+TMqBoD2LKNki+NOF/0BAU9C+/
+ wSA2+HbwSpI4FJLZsjjVJUeYpWR/8Q5ZeSLPpvUsBPBoO4nONn56rGQ5V+TeIYLfx5jg
+ 4OcpMSMP5K7PnGnffXIRH31ATQaEiLGsgt6iDyD21rliRD6h/LRhkylhDJOYbIuY/4jC
+ aldQ==
+X-Gm-Message-State: AOAM533y0AGS17xL+kd5Ki3U2d0eGXN4D3VrTVcA4O/NugCcXx4vPibA
+ adST8+/qc0RkT4Jym22gFEFisMlV3OXg9+e4WI81VA==
+X-Google-Smtp-Source: ABdhPJxuYtuQbn7XshhLBLst8Q0r6g6a1RtM3BcLfa/D26yLwJE0wxJGwEZzFPUi09kSnn63rM1JBpxnWln+rMvvGQA=
+X-Received: by 2002:aca:eb96:: with SMTP id j144mr3693502oih.48.1590610036449; 
+ Wed, 27 May 2020 13:07:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200525084511.51379-1-david@redhat.com>
- <20200526132840.GD108774@redhat.com>
- <dddadb61-b0af-a9c0-64f8-ac3c47d37566@redhat.com>
- <20200526142219.GE108774@redhat.com>
- <32210631-5933-088c-52e5-9e9eb2d800e3@redhat.com>
-In-Reply-To: <32210631-5933-088c-52e5-9e9eb2d800e3@redhat.com>
-From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date: Wed, 27 May 2020 21:51:50 +0200
-Message-ID: <CAM9Jb+hxR2Q22YpBcA0-Rv=gbbawVhZLR-Ld7_YT7hn7S9-UsA@mail.gmail.com>
-Subject: Re: [PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on
- all buses
-To: David Hildenbrand <david@redhat.com>
+References: <20200526164211.1569366-1-eblake@redhat.com>
+In-Reply-To: <20200526164211.1569366-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 27 May 2020 21:07:05 +0100
+Message-ID: <CAFEAcA_zO06wPw=iZ-AGMF1YJp1htMJOy0_Nensn3GhWafr=EQ@mail.gmail.com>
+Subject: Re: [PULL 00/11] bitmaps patches for 2020-05-26
+To: Eric Blake <eblake@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -98,65 +93,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David, Vivek,
-s
-> >> Hi Vivek,
-> >>
-> >> you have to declare the maxMemory option. Memory devices like
-> >> virtio-pmem-pci reside in RAM like a pc-dimm or a nvdimm. If your
-> >> virtio-pmem device will be 4GB, you have to add that to maxMemory.
-> >>
-> >>   <memory unit='GiB'>64</memory>
-> >>   <maxMemory unit='GiB'>68</maxMemory>
-> >>   <currentMemory unit='GiB'>64</currentMemory>
-> >>
-> >> (you might have to add "slots='0'" or "slots='1'" to maxMemory to make
-> >> libvirt happy)
-> >
-> > Ok, tried that.
-> >
-> > <maxMemory slots='1' unit='KiB'>134217728</maxMemory>
-> >
-> > And now it complains about.
-> >
-> > error: unsupported configuration: At least one numa node has to be configured when enabling memory hotplug
-> >
-> > So ultimately it seems to be wanting me to somehow enable memory hotplug
-> > to be able to use virtio-pmem?
+On Tue, 26 May 2020 at 17:43, Eric Blake <eblake@redhat.com> wrote:
 >
-> That's a libvirt error message. Maybe I am confused how libvirt maps
-> these parameters to QEMU ...
+> The following changes since commit 8f72c75cfc9b3c84a9b5e7a58ee5e471cb2f19c8:
 >
-> NVDIMMs under libvirt seem to be easy:
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20200526-pull-request' into staging (2020-05-26 10:59:01 +0100)
 >
-> https://www.redhat.com/archives/libvir-list/2016-August/msg00055.html
+> are available in the Git repository at:
 >
-> Maybe the issue is that virtio-pmem has not been properly integrated
-> into libvirt yet:
+>   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-05-26
 >
-> https://www.redhat.com/archives/libvir-list/2019-August/msg00007.html
+> for you to fetch changes up to 9f2bcd08bce234f67239aaf6f4b881ccf0a76d55:
 >
-> And you attempts to force virtio-pmem in via qemu args does not work
-> properly.
+>   iotests: Add test 291 to for qemu-img bitmap coverage (2020-05-26 11:28:24 -0500)
 >
-> Maybe maxMemory in libvirt does not directly map to the QEMU variant to
-> define the maximum physical address space reserved also for any memory
-> devices (DIMMs, NVDIMMs, virtio-pmem, ...). Any libvirt experts that can
-> help?
+> ----------------------------------------------------------------
+> bitmaps patches for 2020-05-26
 >
-> @Pankaj, did you ever get it to run with libvirt?
+> - fix non-blockdev migration of bitmaps when mirror job is in use
+> - add bitmap sizing to 'qemu-img measure'
+> - add 'qemu-img convert --bitmaps'
+>
+> ----------------------------------------------------------------
 
-I did not run virtio-pmem with libvirt. That requires work at libvirt side.
-Created [1] document to run from Qemu command line.
 
-[1] https://github.com/qemu/qemu/blob/master/docs/virtio-pmem.rst
+iotest 190 failed on freebsd:
+
+  TEST    iotest-qcow2: 190 [fail]
+QEMU          --
+"/home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
+-nodefaults -d
+isplay none -machine virt -accel qtest
+QEMU_IMG      --
+"/home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/../../qemu-io"
+--cache writeback --aio threads -f qcow2
+QEMU_NBD      --
+"/home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- NetBSD/amd64 localhost 9.0
+TEST_DIR      -- /home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/mktemp.MJWbGXjT
+SOCKET_SCM_HELPER --
+
+--- /home/qemu/qemu-test.BE3Bvf/src/tests/qemu-iotests/190.out
+2020-05-27 15:13:27.000000000 +0000
++++ /home/qemu/qemu-test.BE3Bvf/build/tests/qemu-iotests/190.out.bad
+ 2020-05-27 15:30:50.377759533 +0000
+@@ -17,7 +17,7 @@
+ fully allocated size: 10813440
+ required size: 2199023255552
+ fully allocated size: 2199023255552
+-required size: 7012352
++required size: 17170432
+ fully allocated size: 17170432
+ required size: 335806464
+ fully allocated size: 2199359062016
+
+NetBSD failed too but I'm not sure if it was the same thing
+or just that it's being very unreliable currently.
+
+thanks
+-- PMM
 
