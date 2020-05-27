@@ -2,95 +2,89 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BD9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAF0C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:16:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB422084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:12:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 857442084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 09:16:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mNOn3xJM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB422084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZTWoYlf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857442084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jds75-0005Tf-6t
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 05:12:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38606)
+	id 1jdsAo-0007R7-PI
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 05:16:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jds6W-00053s-Nc
- for qemu-devel@nongnu.org; Wed, 27 May 2020 05:12:04 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55223)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jds6U-0005GD-Le
- for qemu-devel@nongnu.org; Wed, 27 May 2020 05:12:04 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id h4so2313579wmb.4
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 02:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=mZow7RQ3uNc/fOilqH1nl0tQUuXD+nGtJtXzvmxT8bw=;
- b=mNOn3xJMgOIAu2sCmsH2p/cwqcU1/DvJ9n2Pmhk15xRMeLaKoVGYyNISbNwzbnCZLM
- IQN08fqnOp5Sn3POH6cSAGShhpy0O6tjDLTZdMfDHVWebud1xS1WFPDDTgSrzHJjXtkX
- 7/E7gEAYfLznF/6psiWU12ohXW0duYn7+IentLWa721gejUpljNT8Y0dSc4KeQiyXbgv
- sgh+rD3BgoE7jzXrPa9rilOrca5kmLhSjAzkZ4ruPfqZzT+sk9W+eTAk0bZru0cLKdlX
- nXP+XYeXQ5kHibFMakeYHN+Ee85q07ZywqludCoj0v9HaJWEsAWPe9dABa5cI1e2GEj/
- 4cxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=mZow7RQ3uNc/fOilqH1nl0tQUuXD+nGtJtXzvmxT8bw=;
- b=lwdDVt3kiR+/5ITTWEo210UUi4lmL5r7YSXrk25p4w/yk3aiaAuw0hsBi2PDBGASOh
- x7HfN/B1CGnkpxbSk1aoF7sQ3UokVuU9EjarnfiWs1liW+dfiYofIPVnyO+fHq2FnibM
- a0PSUXCKWIseLUsWM9R5OgPznH58bhvoqCv+sroVOPHRDJNqLLRNj0qtwJMyERTsaNuD
- rbrwEY+GKKd9LxwGILDba7n3lso/khLP/pF1IxvBvD67aUNVt5BvVz9Pjo92pNGWDt0a
- jctKHST3p34ck5yv1Zn4RUAwgQLGxruk/pTspe7mf0kj6CVKM9WwOUdzvmXUhXe2EPwN
- gHAQ==
-X-Gm-Message-State: AOAM532nJ8C6uxC7Mlr7QnOVEeQRrDSHUCXhToVOg/70toZ9Xc1wJZOx
- WjcFp0G+i66aASblgk41Sq3KYynRTZ4=
-X-Google-Smtp-Source: ABdhPJxQA7C2VJZxJctsw/3cI5Uc40E+wRjNclJtBfKSjW3VeJOFes0ihGNQO8F3+KB8Mv4pBX4xLg==
-X-Received: by 2002:a05:600c:2215:: with SMTP id
- z21mr3418903wml.48.1590570719636; 
- Wed, 27 May 2020 02:11:59 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 10sm2198077wmw.26.2020.05.27.02.11.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 May 2020 02:11:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 492851FF7E;
- Wed, 27 May 2020 10:11:57 +0100 (BST)
-References: <tencent_86D9DB902C46CBAC4F3A6FD5B4CDA93B7506@qq.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: casmac <1482995675@qq.com>
-Subject: Re: GDB get wrong debug infos on TI DSP architecture extension
-In-reply-to: <tencent_86D9DB902C46CBAC4F3A6FD5B4CDA93B7506@qq.com>
-Date: Wed, 27 May 2020 10:11:57 +0100
-Message-ID: <87a71t7ndu.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdsAE-00071k-8q
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 05:15:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44444
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jdsAD-00077Z-1T
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 05:15:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590570951;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=m3I/Hpf7vR/w9E30qxcEWUpL3xlOG9KSxOfemQq2g5Q=;
+ b=JZTWoYlfYzrReq73K670HQ6NliWD98HOIpzlwXdOppcfWWIl/P1MmIrQRLdntg6nRT/56Q
+ fonsDGbkr0Pi4yU+i7mhxGYwD7fdnXfwos+IDi4Ke0R1nwwR2WN4ydbtr4fHLEKHHY3dBB
+ WK4kmBYjlp30SvL/n2pBY/2scUUFdbU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-8HogX4juM7y6qjFfM_bS4w-1; Wed, 27 May 2020 05:15:48 -0400
+X-MC-Unique: 8HogX4juM7y6qjFfM_bS4w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9789800688;
+ Wed, 27 May 2020 09:15:46 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
+ [10.36.113.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD4D65C1B0;
+ Wed, 27 May 2020 09:15:45 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 4E42B16E16; Wed, 27 May 2020 11:15:44 +0200 (CEST)
+Date: Wed, 27 May 2020 11:15:44 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH v2 5/7] sm501: Replace hand written implementation with
+ pixman where possible
+Message-ID: <20200527091544.j6uvyyxsbhin5viy@sirius.home.kraxel.org>
+References: <cover.1590089984.git.balaton@eik.bme.hu>
+ <58666389b6cae256e4e972a32c05cf8aa51bffc0.1590089984.git.balaton@eik.bme.hu>
+ <20200526104318.wmsqqtia3h52l454@sirius.home.kraxel.org>
+ <alpine.BSF.2.22.395.2005261434540.87757@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <alpine.BSF.2.22.395.2005261434540.87757@zero.eik.bme.hu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,54 +97,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+  Hi,
 
-casmac <1482995675@qq.com> writes:
+> > Well, the advantage of *not* using pixman is that you can easily switch
+> > the code to use offsets instead of pointers, then apply the mask to the
+> > *final* offset to avoid oob data access:
+> 
+> The mask applied to src_base is not to prevent overflow but to implement
+> register limits.
 
-> Hi all,
-> &nbsp;&nbsp; I am working on a TI DSP architecture extension for QEMU. No=
-w, we are adding GDB debugging features.=20
-> &nbsp;&nbsp; We have done the following, but not sure we are on the right=
- track :
-> &nbsp;&nbsp; - add a xml description file in gdb-xml, without
-> understanding the purpose of the file, why some architectures don't
-> provide such xml file?
+Yea, that was just a quick sketch to outline the idea without checking
+all details.
 
-XML descriptions are an extension to the GDB protocol which avoids
-having to have knowledge baked into GDB itself. The older well supported
-architectures don't need to send them for their base config as GDB
-already knows what they should have. However most extensions are
-reported as XML.
+> This patch basically does
+> that by changing parameters to unsigned to prevent them being negative,
+> checking values we multiply by to prevent them to be zero and then
+> calculating first and last offset and check if they are within vram.
 
-You may well need to have logic in your target code which decides which
-XML variant to send.
+Well.  With cirrus this proved to be fragile.  The checks missed corner
+cases and we've got a series of CVEs in the blitter code.  Switching to
+offsets + masking every vram access (see commit ffaf85777828) stopped
+that.
 
-> &nbsp;&nbsp; - add ***_cpu_gdb_read_register(), ***_cpu_gdb_write_registe=
-r();
-> &nbsp;&nbsp; - added&nbsp; dsp_cpu_get_phys_page_attrs_debug(), but uncer=
-tain about what to return
-> &nbsp; &nbsp;&nbsp; dsp_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr=
- addr, MemTxAttrs *attrs)=20
-> &nbsp; &nbsp;&nbsp; {
-> &nbsp; &nbsp; &nbsp; &nbsp; return addr &amp; TARGET_PAGE_MASK;&nbsp;&nbs=
-p;
-> &nbsp; &nbsp;&nbsp; }
-> &nbsp;&nbsp;=20
-> &nbsp;&nbsp; We run QEMU with the these arguments
-> &nbsp;&nbsp; qemu-system-dsp ... -kernel filename.out -S -s
-> &nbsp;&nbsp;=20
-> &nbsp;&nbsp; It turns out that gdb reads incorrect register values,
-> and complains : "warning: Target-supplied registers are not supported
-> by the current architecture".
+> (Unless
+> of course I've made a mistake somewhere.)
 
-> <feature name=3D"org.gnu.gdb.tic3x.core"&gt;
+Exactly ...
 
-Does this match something in gdb?
+> This should prevent overflow with
+> one check and does not need to apply a mask at every step. The vram size can
+> also be different so it's not a fixed mask anyway.
+> 
+> If not using pixman then I'd need to reimplement optimised 2D ops that will
+> likely never be as good as pixman and no point in doing it several times for
+> every device model so I'd rather try to use pixman where possible unless a
+> better library is available.
 
---=20
-Alex Benn=C3=A9e
+Yes, performance-wise pixman is clearly the better choice.  At the end
+of the day it is a security vs performance trade off.
+
+> > > +            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+> > > +                /* regions may overlap: copy via temporary */
+> > 
+> > The usual way for a hardware blitter is to have a direction bit, i.e.
+> > the guest os can ask to blit in top->bottom or bottom->top scanline
+> > ordering.  The guest can use that to make sure the blit does not
+> 
+> Yes, this is the rtl above (right to left) and AmigaOS sets this most of the
+> time so only relying on that to detect overlaps is not efficient.
+
+Hmm, checking rtl like that doesn't look correct to me then.  When using
+the blitter to move a window you have to set/clear rtl depending on
+whenever you move the window up or down on the screen, and src+dst
+regions can overlap in both cases ...
+
+> > overwrite things.  But note the guest can also intentionally use
+> > overlapping regions, i.e. memset(0) the first scanline, then use a blit
+> > with overlap to clear the whole screen.  The later will surely break if
+> > you blit via temporary image ...
+> 
+> Fortunately no guest code seems to do that so unless we find one needing it
+> I don't worry much about such rare cases.
+
+Ok.
+
+> > > +                pixman_blt((uint32_t *)&s->local_mem[src_base],
+> > > +                           (uint32_t *)&s->local_mem[dst_base],
+> > > +                           src_pitch * (1 << format) / sizeof(uint32_t),
+> > > +                           dst_pitch * (1 << format) / sizeof(uint32_t),
+> > > +                           8 * (1 << format), 8 * (1 << format),
+> > > +                           src_x, src_y, dst_x, dst_y, width, height);
+> > 
+> > See above, i'm not convinced pixman is the best way here.
+> > When using pixman I'd suggest:
+> > 
+> >  (1) src = pixman_image_create_bits_no_clear(...);
+> >  (2) dst = pixman_image_create_bits_no_clear(...);
+> >  (3) pixman_image_composite(PIXMAN_OP_SRC, src, NULL, dst, ...);
+> >  (4) pixman_image_unref(src);
+> >  (5) pixman_image_unref(dst);
+> > 
+> > pixman_blt() is probably doing basically the same.
+> 
+> Actually not the same, pixman_blt is faster operating directly on pointers
+> while we need all the pixman_image overhead to use pixman_image_composite.
+
+Ok (I didn't check the pixman code).
+
+Given the use case (run a computer museum ;) I think we can live with
+the flaws of the pixman approach.  Security shouldn't be that much of an
+issue here.  The behavior and blitter use pattern of the guests is known
+too and unlikely to change.
+
+take care,
+  Gerd
+
 
