@@ -2,92 +2,83 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B96C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44419C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86697207D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 21:58:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EoZfmTPG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86697207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11D40207D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 22:02:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11D40207D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je43m-0006XF-Pu
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 17:58:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48600)
+	id 1je47g-00006P-70
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 18:02:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je43D-00062V-Mf
- for qemu-devel@nongnu.org; Wed, 27 May 2020 17:57:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42400
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je43C-00031k-Ns
- for qemu-devel@nongnu.org; Wed, 27 May 2020 17:57:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590616645;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4pK4jn+BYsB1qOIxTLAxcF3bth0mdXmTa3m+/eKpxfA=;
- b=EoZfmTPGj3AnSc3l0hyTYkF2dYvs1BSW6lElEeTROkHuqFk1Qskx89paq6fRUy/wKiAvf9
- DSWs6aL05sCIuNvClzVoeeL/7jFjNiC0PeoWe2695n4OZG2Qckc+8QvVmOzarY0doNg5j0
- g2Z3Ek/W+1gxotRJTquTB25RqBDXsWs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-sPsNHMB1PIm2B9vovwaTEQ-1; Wed, 27 May 2020 17:57:19 -0400
-X-MC-Unique: sPsNHMB1PIm2B9vovwaTEQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E2AE1005510;
- Wed, 27 May 2020 21:57:18 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B26F819D71;
- Wed, 27 May 2020 21:57:14 +0000 (UTC)
-Subject: Re: [PATCH v5 0/7] coroutines: generate wrapper code
-To: qemu-devel@nongnu.org, vsementsov@virtuozzo.com
-References: <159061599705.16318.11961887809600256765@45ef0f9c86ae>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <4a4d5dc4-4cab-ad59-a4d3-6f84de1aa1e3@redhat.com>
-Date: Wed, 27 May 2020 16:57:14 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1je46U-00086I-BK
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 18:00:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50910)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1je46S-0004Oi-Ch
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 18:00:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1je46Q-0001Dl-MJ
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 22:00:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A54CE2E80E7
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 22:00:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <159061599705.16318.11961887809600256765@45ef0f9c86ae>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 May 2020 21:54:31 -0000
+From: Eric Blake <1881004@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eblake philmd pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Eric Blake (eblake)
+References: <159060681483.5838.13632051970488338647.malonedeb@wampee.canonical.com>
+ <CAFEAcA_NTEUoWfqpG9uhPY0pE697F-_MDLNexq75k0tYdEuuYg@mail.gmail.com>
+Message-ID: <ee41069e-5e6f-d4f5-22ed-795deb4b7ba5@redhat.com>
+Subject: Re: [Bug 1881004] [NEW] fpu/softfloat.c: error: bitwise negation of a
+ boolean expression
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="275d46a24253e557e4403d52832837e4bfa425b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 67c45a39ac4bc005b6f55325c6517563fa2ac8f1
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 17:45:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,58 +87,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
- qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- crosa@redhat.com, den@openvz.org
+Reply-To: Bug 1881004 <1881004@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200527215431.8JLaqOO5Judtqv0LYi9fCz-JZQM9rEI-PmzfzFrzqNI@z>
 
-On 5/27/20 4:46 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200527203733.16129-1-vsementsov@virtuozzo.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
-> TypeError: __init__() got an unexpected keyword argument 'capture_output'
->    CC      /tmp/qemu-test/build/slirp/src/bootp.o
->    GEN     ui/input-keymap-usb-to-qcode.c
-> make: *** [block/block-gen.c] Error 1
-> make: *** Deleting file `block/block-gen.c'
-> make: *** Waiting for unfinished jobs....
->    GEN     ui/input-keymap-win32-to-qcode.c
+On 5/27/20 4:40 PM, Peter Maydell wrote:
+> On Wed, 27 May 2020 at 20:21, Philippe Mathieu-Daud=C3=A9
+> <1881004@bugs.launchpad.net> wrote:
+>>
+>> Public bug reported:
+>>
+>> Last time I built QEMU was on commit d5c75ec500d96f1d93447f990cd5a4ef5ba=
+27fae,
+>> I just pulled to fea8f3ed739536fca027cf56af7f5576f37ef9cd and now get:
+>>
+>>    CC      lm32-softmmu/fpu/softfloat.o
+>> fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expression=
+; did you mean logical negation? [-Werror,-Wbool-operation]
+>>      absZ &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven =
+);
+>>              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>              !
+> =
 
-The more interesting part of the failure:
+> =
 
-   File "/tmp/qemu-test/src/scripts/coroutine-wrapper.py", line 173, in 
-<module>
-     print(gen_wrappers_file(sys.stdin.read()))
-   File "/tmp/qemu-test/src/scripts/coroutine-wrapper.py", line 169, in 
-gen_wrappers_file
-     return prettify(res)  # prettify to wrap long lines
-   File "/tmp/qemu-test/src/scripts/coroutine-wrapper.py", line 40, in 
-prettify
-     encoding='utf-8', input=code, capture_output=True)
-   File "/usr/lib64/python3.6/subprocess.py", line 423, in run
-     with Popen(*popenargs, **kwargs) as process:
-TypeError: __init__() got an unexpected keyword argument 'capture_output'
+> "(x & y)" is not a boolean expression, so we should report this to clang
+> as a bug (I assume what they actually are trying to complain about is
+> bitwise AND with a boolean expression).
 
-which indeed looks like a bug in the patch.
+We have:
 
--- 
+uint64_t &=3D ~ ( ( ( int8_t ^ int ) =3D=3D int ) & bool )
+
+which is
+
+uint64_t &=3D ~ ( bool & bool )
+
+which is then
+
+uint64_t &=3D ~ ( int )
+
+resulting in one of:
+
+uint64_t &=3D 0xffffffffffffffff
+uint64_t &=3D 0xfffffffffffffffe
+
+It is a very odd way of stating that 'if this condition is true, mask =
+
+out the least-significant-bit'.  In general, 'bool & bool' is used where =
+
+the side-effect-skipping 'bool && bool' is inappropriate; I'm a bit =
+
+surprised that clang is not questioning whether we meant '&&' instead of =
+
+'&' (the two operators give the same effect in this case).
+
+You are right that clang is fishy for calling it logical negation of a =
+
+bool, when it is really logical negation of an int, but we are also =
+
+fishy in that we are using bitwise AND of two bools as an int in the =
+
+first place.
+
+Regardless of whether clang changes, would it be better to write the =
+
+code as:
+
+if (((roundBits ^ 0x40) =3D=3D 0) && roundNearestEven) {
+     absZ &=3D ~1;
+}
+
+-- =
+
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1881004
+
+Title:
+  fpu/softfloat.c: error: bitwise negation of a boolean expression
+
+Status in QEMU:
+  New
+
+Bug description:
+  Last time I built QEMU was on commit d5c75ec500d96f1d93447f990cd5a4ef5ba2=
+7fae,
+  I just pulled to fea8f3ed739536fca027cf56af7f5576f37ef9cd and now get:
+   =
+
+    CC      lm32-softmmu/fpu/softfloat.o
+  fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+      absZ &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven );
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              !
+  fpu/softfloat.c:3423:18: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+          absZ0 &=3D ~ ( ( (uint64_t) ( absZ1<<1 ) =3D=3D 0 ) & roundNeares=
+tEven );
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   !
+  fpu/softfloat.c:3483:18: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+          absZ0 &=3D ~(((uint64_t)(absZ1<<1) =3D=3D 0) & roundNearestEven);
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   !
+  fpu/softfloat.c:3606:13: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+      zSig &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven );
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              !
+  fpu/softfloat.c:3760:13: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+      zSig &=3D ~ ( ( ( roundBits ^ 0x200 ) =3D=3D 0 ) & roundNearestEven );
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              !
+  fpu/softfloat.c:3987:21: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+                      ~ ( ( (uint64_t) ( zSig1<<1 ) =3D=3D 0 ) & roundNeare=
+stEven );
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~
+                      !
+  fpu/softfloat.c:4003:22: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+              zSig0 &=3D ~ ( ( (uint64_t) ( zSig1<<1 ) =3D=3D 0 ) & roundNe=
+arestEven );
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~
+                       !
+  fpu/softfloat.c:4273:18: error: bitwise negation of a boolean expression;=
+ did you mean logical negation? [-Werror,-Wbool-operation]
+          zSig1 &=3D ~ ( ( zSig2 + zSig2 =3D=3D 0 ) & roundNearestEven );
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   !
+  8 errors generated.
+
+  $ clang -v
+  clang version 10.0.0-4ubuntu1 =
+
+  Target: aarch64-unknown-linux-gnu
+
+  $ lsb_release -a
+  No LSB modules are available.
+  Distributor ID: Ubuntu
+  Description:    Ubuntu 20.04 LTS
+  Release:        20.04
+  Codename:       focal
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1881004/+subscriptions
 
