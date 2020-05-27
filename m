@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E13DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625EBC433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:28:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C8CC20C56
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:27:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8CC20C56
+	by mail.kernel.org (Postfix) with ESMTPS id 2D65F20C56
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:28:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D65F20C56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdqTA-0007EC-DP
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:27:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42174)
+	id 1jdqUL-0008WU-EV
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:28:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdqRe-0005nE-Ck
+ id 1jdqRe-0005nK-O6
  for qemu-devel@nongnu.org; Wed, 27 May 2020 03:25:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53838)
+Received: from indium.canonical.com ([91.189.90.7]:53886)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jdqRc-00020F-Ht
+ id 1jdqRd-00021I-Jq
  for qemu-devel@nongnu.org; Wed, 27 May 2020 03:25:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jdqRb-0007hO-6W
+ id 1jdqRb-0007cs-S3
  for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:25:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2BC602E8053
+ by loganberry.canonical.com (Postfix) with ESMTP id D2D7C2E8107
  for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:25:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 May 2020 07:15:19 -0000
+Date: Wed, 27 May 2020 07:18:10 -0000
 From: P J P <1880822@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: pjps
 X-Launchpad-Bug-Reporter: P J P (pjps)
 X-Launchpad-Bug-Modifier: P J P (pjps)
 References: <159056340380.1780.3709038768569765525.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159056371953.757.12012716067130572032.malone@chaenomeles.canonical.com>
+Message-Id: <159056389061.20502.16510101827815274019.malone@soybean.canonical.com>
 Subject: [Bug 1880822] Re: CVE-2020-13253 QEMU: sd: OOB access could crash the
  guest resulting in DoS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1f7bc749b40714a4cc10f5e4d787118a78037035";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 06860c8db0f672063b1483a4da790dcf2df97eda
+X-Launchpad-Hash: b6778732ddb4efce0679fcffdb5132ed835a40db
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 01:00:55
@@ -91,32 +91,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-#!/bin/sh
+This bug and the reproducer above is shared by - Alexander Bulekov
+<alxndr@bu.edu>
 
-cat << EOF > inp
-outl 0xcf8 0x80001810
-outl 0xcfc 0xe1068000
-outl 0xcf8 0x80001814
-outl 0xcf8 0x80001804
-outw 0xcfc 0x7
-outl 0xcf8 0x8000fa20
-write 0xe106802c 0x1 0x6d
-write 0xe106800f 0x1 0xf7
-write 0xe106800a 0x6 0x9b4b9b5a9b69
-write 0xe1068028 0x3 0x6d6d6d
-write 0xe106800f 0x1 0x02
-write 0xe1068005 0xb 0x055cfbffffff000000ff03
-write 0xe106800c 0x1d 0x050bc6c6c6c6c6c6c6c6762e4c5e0bc603040000000000e1020=
-0110000
-write 0xe1068003 0xd 0x2b6de02c3a6de02c496de02c58
-EOF
- =
-
-../bin/qemu-system-x86_64 -qtest stdio -enable-kvm -monitor none \
-     -serial none -M pc-q35-5.0 -device sdhci-pci,sd-spec-version=3D3 \
-     -device sd-card,drive=3Dmydrive -nographic \
-     -drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive <=
- inp
+Upstream patch thread
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05877.html
 
 -- =
 
