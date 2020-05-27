@@ -2,90 +2,97 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65643C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B810C433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A12D2088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A9FF2071A
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:34:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T12OWb0T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A12D2088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ilr8QJJI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A9FF2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdzWq-0006NP-B3
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 13:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36072)
+	id 1jdzx7-0007Mw-GS
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 13:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jdzWH-0005us-LR
- for qemu-devel@nongnu.org; Wed, 27 May 2020 13:07:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47067
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jdzWF-0007Sy-Pz
- for qemu-devel@nongnu.org; Wed, 27 May 2020 13:07:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590599225;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1tNaPSuO9evRluMaVay++VePm2O5up6S7qgQIgSWAt8=;
- b=T12OWb0TzV2Jz+qW+MNyK2eQJF21wgz1sOg3nZnZb8qZFIgF1rA4iAD5/Fu30OYl68y1x/
- 0EuM7vhE+f/AOLQSHBVzzvpgobuEqtEldoPQfzyOW9U59d0LUJygxK4nZfp1tvlukpTYCz
- BMoRQVX8IElk6qC6ldcRi4EzlMtpyv4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-bpv-kA4dP4CybWKwRI5uEA-1; Wed, 27 May 2020 13:07:04 -0400
-X-MC-Unique: bpv-kA4dP4CybWKwRI5uEA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38DD7107ACF5
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 17:07:03 +0000 (UTC)
-Received: from gondolin (ovpn-114-205.ams2.redhat.com [10.36.114.205])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F8931A913;
- Wed, 27 May 2020 17:06:53 +0000 (UTC)
-Date: Wed, 27 May 2020 19:06:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] hw/vfio/common: Trace in which mode a IOMMU is opened
-Message-ID: <20200527190651.2a9ee6ea.cohuck@redhat.com>
-In-Reply-To: <20200527165330.GG1194141@xz-x1>
-References: <20200526173542.28710-1-philmd@redhat.com>
- <6c7c445d-0335-f67d-bb72-5b0c046bb247@redhat.com>
- <24f88212-9b32-b6dc-fcd4-685cde8bf5d7@redhat.com>
- <864ac8ab-e21e-393e-d1eb-08b3c4579bbf@redhat.com>
- <20200527161603.GF1194141@xz-x1>
- <3e364895-e5e5-09fe-ee8c-782f3632e2b8@redhat.com>
- <20200527165330.GG1194141@xz-x1>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdzwP-0006en-S0
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 13:34:09 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43953)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jdzwO-0007nf-Or
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 13:34:09 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l10so2131217wrr.10
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 10:34:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=oREaau9QqRVp9GscW0MET/vrUxVWeklB/WTcKCSWNs8=;
+ b=Ilr8QJJIZS5qB9M+XPC9y65mF68BHBLIpT+jG5yn6Dh1kn0FNsofY3F5DKf9td32gK
+ mMKPjiARDyHFPxLW1NA80ee3gadZ89fyzbm0MHmr7FQMW/FGROirz5zjgg3abc+hU6gC
+ bM9+dJXKt8bbJ2GkDe96TwmTARWGLVGJCECfhvxWzA3Bwr5ANkjdq9noGaxMFb2IHWr8
+ 6G93XXtJtvYTJ2Nv/bOYIIhYR9+koNhu7KR4X2ym2esspQXSz2gusWq8evG5POx2fbtb
+ bA19mdjimzayMgzDvzdYZQjnXqEV1nhQC0KevLpNts/kj0/Vizg9icxX66llSx97y1cL
+ enIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=oREaau9QqRVp9GscW0MET/vrUxVWeklB/WTcKCSWNs8=;
+ b=GbuYOATxrdVGWYPf4dbaLfUdCuuWBwJltbt9Lb1YslQhnWmFO5kVJyyTYjuhO4J/Q+
+ W+YPIKtYacmbloDhs6B2GeqdQLZ99h3I/OR4bsqcWqcS69wUBMfksrlQzzKtMZW1LF4A
+ WGQhffXTeVpCysuHxbt6bBrdoFmeqGkA7o+yQ031wCXioC4j64zkc8N2nXyVYZiZEokg
+ HOBfeVS4CtHT1t6C/xrZeG1hFO/8eikTXyonTLBl0+qdrnxkCSHM+0+piAkGk3n2DEJg
+ 6XRrerKtQ2Ifjbgv++bisgV0L4yDsq8r7AXDFw5rOG+Rbky1YYVBfUrM8QKiNV88hJUj
+ oxyw==
+X-Gm-Message-State: AOAM533N4BPbxYMG7Of+eYsFuVBs91/d3RLJyCKVl6nNOMq1oa1JydiN
+ /wAbyZVPcW9cK0bzRowkb7krb0guL9w=
+X-Google-Smtp-Source: ABdhPJyO/CnJcTvdzwD5gPH+pK/JjKF38tQ2eqM2SD55IDgq1teSkAf0pKESqqzn6zjtzhzS4qEy2Q==
+X-Received: by 2002:a5d:4d05:: with SMTP id z5mr25215472wrt.130.1590600845886; 
+ Wed, 27 May 2020 10:34:05 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p16sm2976600wru.27.2020.05.27.10.34.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 May 2020 10:34:04 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 839491FF7E;
+ Wed, 27 May 2020 18:34:03 +0100 (BST)
+References: <20200525131823.715-1-thuth@redhat.com>
+ <20200525131823.715-5-thuth@redhat.com>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 4/7] gitlab-ci: Move edk2 and opensbi YAML files to
+ .gitlab-ci.d folder
+In-reply-to: <20200525131823.715-5-thuth@redhat.com>
+Date: Wed, 27 May 2020 18:34:03 +0100
+Message-ID: <877dwx5lkk.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,85 +105,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Auger Eric <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 27 May 2020 12:53:30 -0400
-Peter Xu <peterx@redhat.com> wrote:
 
-> On Wed, May 27, 2020 at 06:27:38PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > On 5/27/20 6:16 PM, Peter Xu wrote: =20
-> > > On Wed, May 27, 2020 at 05:53:16PM +0200, Philippe Mathieu-Daud=C3=A9=
- wrote: =20
-> > >>>>> +    for (i =3D 0; i < ARRAY_SIZE(iommu); i++) {
-> > >>>>> +        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu[i].=
-type)) {
-> > >>>>> +            trace_vfio_get_iommu_type(iommu[i].type, iommu[i].na=
-me); =20
-> > >>>> Just wondering why you want to trace the type as you now have the =
-name
-> > >>>> string. =20
-> > >>>
-> > >>> You are right :)
-> > >>> =20
-> > >>>>> +            return iommu[i].type;
-> > >>>>>          }
-> > >>>>>      }
-> > >>>>> +    trace_vfio_get_iommu_type(-1, "Not available or not supporte=
-d"); =20
-> > >>>> nit: from a debugging pov, this may be not needed as
-> > >>>> vfio_get_group/vfio_connect_container() fails and this leads to an=
- error
-> > >>>> output. =20
-> > >>
-> > >> But you can reach this for example using No-IOMMU. If you don't mind=
-, I
-> > >> find having this information in the trace log clearer. =20
-> > >=20
-> > > I kinda agree with Eric - AFAICT QEMU vfio-pci don't work with no-iom=
-mu, then
-> > > it seems meaningless to trace it...
-> > >=20
-> > > I'm not sure whether this trace is extremely helpful because syscalls=
- like this
-> > > could be easily traced by things like strace or bpftrace as general t=
-ools (and
-> > > this information should be a one-time thing rather than dynamically c=
-hanging),
-> > > no strong opinion though.  Also, if we want to dump something, maybe =
-it's
-> > > better to do in vfio_init_container() after vfio_get_iommu_type() suc=
-ceeded, so
-> > > we dump which container is enabled with what type of iommu. =20
-> >=20
-> > OK. I'm a recent VFIO user so maybe I am not using the good information=
-.
-> >=20
-> > This trace helps me while working on a new device feature, I didn't
-> > thought about gathering it in a production because there I'd expect
-> > things to work.
-> >=20
-> > Now in my case what I want is to know is if I'm using a v1 or v2 type.
-> > Maybe this information is already available in /proc or /sys and we
-> > don't need this patch... =20
->=20
-> I don't know such /proc or /sys, so maybe it's still useful. I guess Alex=
- would
-> have the best judgement. The strace/bpftrace things are not really reason=
-s I
-> found to nak this patch, but just something I thought first that could be
-> easier when any of us wants to peak at those information, probably someth=
-ing
-> just FYI. :-)
+Thomas Huth <thuth@redhat.com> writes:
 
-Personally, I find traces to be quite handy, and it's nice if you can
-just enable more of them if they are in your debugging workflow anyway.
-Probably boils down to a matter of preference :)
+> We have a dedicated folder for the gitlab-ci - so there is no need
+> to clutter the top directory with these .yml files.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml       | 0
+>  .gitlab-ci-opensbi.yml =3D> .gitlab-ci.d/opensbi.yml | 0
+>  .gitlab-ci.yml                                     | 4 ++--
+>  MAINTAINERS                                        | 2 +-
+>  4 files changed, 3 insertions(+), 3 deletions(-)
+>  rename .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml (100%)
+>  rename .gitlab-ci-opensbi.yml =3D> .gitlab-ci.d/opensbi.yml (100%)
+>
+> diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci.d/edk2.yml
+> similarity index 100%
+> rename from .gitlab-ci-edk2.yml
+> rename to .gitlab-ci.d/edk2.yml
+> diff --git a/.gitlab-ci-opensbi.yml b/.gitlab-ci.d/opensbi.yml
+> similarity index 100%
+> rename from .gitlab-ci-opensbi.yml
+> rename to .gitlab-ci.d/opensbi.yml
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index bc6aee6aba..5208d93ff8 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -1,6 +1,6 @@
+>  include:
+> -  - local: '/.gitlab-ci-edk2.yml'
+> -  - local: '/.gitlab-ci-opensbi.yml'
+> +  - local: '/.gitlab-ci.d/edk2.yml'
+> +  - local: '/.gitlab-ci.d/opensbi.yml'
+>=20=20
+>  .update_apt_template: &before_script_apt
+>   before_script:
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index bde5fd480f..d43c98115c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2534,7 +2534,7 @@ F: roms/edk2
+>  F: roms/edk2-*
+>  F: tests/data/uefi-boot-images/
+>  F: tests/uefi-test-tools/
+> -F: .gitlab-ci-edk2.yml
+> +F: .gitlab-ci.d/edk2.yml
+>  F: .gitlab-ci.d/edk2/
+>=20=20
+>  Usermode Emulation
+
+
+--=20
+Alex Benn=C3=A9e
 
