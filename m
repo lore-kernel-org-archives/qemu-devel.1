@@ -2,44 +2,44 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FA4C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF7CFC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:35:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E425207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:34:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E425207CB
+	by mail.kernel.org (Postfix) with ESMTPS id B13A32084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:35:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13A32084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdtOf-00089Z-H2
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 06:34:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56128)
+	id 1jdtPh-0002SI-Rp
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 06:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jdtKs-0000k5-NS
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:59 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33520)
+ id 1jdtL8-000174-OK
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:14 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33592)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtKr-0001pr-QE
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:58 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtL7-0001ts-OC
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:14 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id E0D34CD462;
- Wed, 27 May 2020 13:30:55 +0300 (MSK)
-Subject: [PATCH v2 03/11] tests/acceptance: add base class record/replay
- kernel tests
+ by mail.ispras.ru (Postfix) with ESMTPSA id 9D25ACD463;
+ Wed, 27 May 2020 13:31:12 +0300 (MSK)
+Subject: [PATCH v2 06/11] tests/acceptance: add record/replay test for arm
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 27 May 2020 13:30:55 +0300
-Message-ID: <159057545565.16818.10615781697342502198.stgit@pasha-ThinkPad-X280>
+Date: Wed, 27 May 2020 13:31:12 +0300
+Message-ID: <159057547239.16818.850423603268442335.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,99 +75,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a base for testing kernel boot recording and replaying.
-Each test has the phase of recording and phase of replaying.
-Virtual machines just boot the kernel and do not interact with
-the network.
-Structure and image links for the tests are borrowed from boot_linux_console.py
-Testing controls the message pattern at the end of the kernel
-boot for both record and replay modes. In replay mode QEMU is also
-intended to finish the execution automatically.
+This patch adds a test for record/replay of the kernel
+image boot for two different arm platforms.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
---
-
-v2:
- - changed default value of args to None (suggested by Willian Rampazzo)
- - inherited common functions from boot_linux_console (suggested by Willian Rampazzo)
 ---
  0 files changed
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 47ef3139e6..e9a9ce4f66 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2497,6 +2497,7 @@ F: net/filter-replay.c
- F: include/sysemu/replay.h
- F: docs/replay.txt
- F: stubs/replay.c
-+F: tests/acceptance/replay_kernel.py
- 
- IOVA Tree
- M: Peter Xu <peterx@redhat.com>
 diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-new file mode 100644
-index 0000000000..b8b277ad2f
---- /dev/null
+index deca69d6cb..d715ee7ca9 100644
+--- a/tests/acceptance/replay_kernel.py
 +++ b/tests/acceptance/replay_kernel.py
-@@ -0,0 +1,57 @@
-+# Record/replay test that boots a Linux kernel
-+#
-+# Copyright (c) 2020 ISP RAS
-+#
-+# Author:
-+#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
+@@ -89,3 +89,49 @@ class ReplayKernel(LinuxKernelUtils):
+ 
+         self.run_rr(kernel_path, kernel_command_line, console_pattern,
+             args=('-cpu', 'cortex-a53'))
 +
-+import os
-+import gzip
++    def test_arm_virt(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:virt
++        """
++        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
++                      '/linux/releases/29/Everything/armhfp/os/images/pxeboot'
++                      '/vmlinuz')
++        kernel_hash = 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
 +
-+from avocado_qemu import wait_for_console_pattern
-+from avocado.utils import process
-+from avocado.utils import archive
-+from boot_linux_console import LinuxKernelUtils
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyAMA0')
++        console_pattern = 'Kernel command line: %s' % kernel_command_line
 +
-+class ReplayKernel(LinuxKernelUtils):
-+    """
-+    Boots a Linux kernel in record mode and checks that the console
-+    is operational and the kernel command line is properly passed
-+    from QEMU to the kernel.
-+    Then replays the same scenario and verifies, that QEMU correctly
-+    terminates.
-+    """
++        self.run_rr(kernel_path, kernel_command_line, console_pattern)
 +
-+    timeout = 90
++    def test_arm_cubieboard_initrd(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:cubieboard
++        """
++        deb_url = ('https://apt.armbian.com/pool/main/l/'
++                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
++        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        kernel_path = self.extract_from_deb(deb_path,
++                                            '/boot/vmlinuz-4.20.7-sunxi')
++        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
++        dtb_path = self.extract_from_deb(deb_path, dtb_path)
++        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
++                      '2eb0a73b5d5a28df3170c546ddaaa9757e1e0848/rootfs/'
++                      'arm/rootfs-armv5.cpio.gz')
++        initrd_hash = '2b50f1873e113523967806f4da2afe385462ff9b'
++        initrd_path_gz = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
++        initrd_path = os.path.join(self.workdir, 'rootfs.cpio')
++        archive.gzip_uncompress(initrd_path_gz, initrd_path)
 +
-+    def run_vm(self, kernel_path, kernel_command_line, console_pattern,
-+               record, shift, args):
-+        vm = self.get_vm()
-+        vm.set_console()
-+        if record:
-+            mode = 'record'
-+        else:
-+            mode = 'replay'
-+        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s' %
-+                    (shift, mode, os.path.join(self.workdir, 'replay.bin')),
-+                    '-kernel', kernel_path,
-+                    '-append', kernel_command_line,
-+                    '-net', 'none')
-+        if args:
-+            vm.add_args(*args)
-+        vm.launch()
-+        self.wait_for_console_pattern(console_pattern, vm)
-+        if record:
-+            vm.shutdown()
-+        else:
-+            vm.wait()
-+
-+    def run_rr(self, kernel_path, kernel_command_line, console_pattern,
-+        shift=7, args=None):
-+        self.run_vm(kernel_path, kernel_command_line, console_pattern,
-+                    True, shift, args)
-+        self.run_vm(kernel_path, kernel_command_line, console_pattern,
-+                    False, shift, args)
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'usbcore.nousb '
++                               'panic=-1 noreboot')
++        console_pattern = 'Boot successful.'
++        self.run_rr(kernel_path, kernel_command_line, console_pattern,
++            args=('-dtb', dtb_path, '-initrd', initrd_path, '-no-reboot'))
 
 
