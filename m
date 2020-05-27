@@ -2,98 +2,89 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932A1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:41:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BBAE2084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D305120721
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 16:41:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mef5W4UC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BBAE2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8zqqdMh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D305120721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdz3Y-0000dX-FJ
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60014)
+	id 1jdz78-0002ZP-05
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 12:41:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdz2w-000079-PM
- for qemu-devel@nongnu.org; Wed, 27 May 2020 12:36:50 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35456)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdz2v-0007AJ-K9
- for qemu-devel@nongnu.org; Wed, 27 May 2020 12:36:50 -0400
-Received: by mail-wm1-x342.google.com with SMTP id n5so49531wmd.0
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 09:36:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=RJNApYvDySDQ1uNPsNpysqX69qiIb5CmpiDaP6Dtwnk=;
- b=Mef5W4UCv4uO3gYZIUL9gj1RDx5S6k8HvIGPgipG4Fn9ewOHrAgHeA6NrrjTrCyMVn
- pgjcXccx+BmK32/WH6rmiCEzq6tN+Sp5X+AXOgpZmYNlnlimDmARkIpZUNt4Z/47Z1h5
- D8lRXfFTi3wgr9zgaanOVb6YvhumdbOlJPQs8jA5yp1AJFMvmomyA3CbyEH6Y+Y06+hT
- ViWrFfqSmlj0ayg5U8xByMS5LCkV1R1eXch41sNkwQedIyPxeu9MvLFkixkYE2PQEO5P
- K3MM6ST3G1WxNePfAMPCficUUT+zuut/Rqo0FkyUKnZMWKtALGVcS/Rpi2I7oMy9VK2X
- TkmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=RJNApYvDySDQ1uNPsNpysqX69qiIb5CmpiDaP6Dtwnk=;
- b=rdsXR4auDgkuqO2c+hubgC6IY/8dm3osh5uSFtXnRNWq+BcXB7xqHIMGOlmwhE4ZL7
- cMYP4quktuFJy9tvRer4A24M/vtXHLn3wjT3XOWZnxh5YnRSIhNHLfVK+KdZ1R3hRi8c
- zYXn9IvONPJYYO1DiulIEXM7zpC48D2sfGV4yBMk3mMIj7NnlnLJd02umFfbPgIugcSE
- Ly/9ABezgq4H6moKfAIcAClZ9TrvH44THlBoq6tOCralWetDw0LEWyFw6mlM8pFsnk4q
- rA23RZed1SwDGLql3OYkwNDmlK3oRCZpnuvyjxIAEnRrZBLMLxRQiDxU/Wf62EU/X2zW
- fjEw==
-X-Gm-Message-State: AOAM5315PUcmZ8qCnvMt/CUrqersVD0ksRt437wZWhoWPeRGUgYKcmFw
- nW5WnVdsjNtFzTEIiXHlY0kqsRwHvLY=
-X-Google-Smtp-Source: ABdhPJzvDPMirilAL7ZIlto9vH3mDVbczrmGESZiUcr7uFMWzdzpsihxn7dKWWKHSr4MO/2JD/EBgA==
-X-Received: by 2002:a1c:9d96:: with SMTP id g144mr4923531wme.126.1590597407244; 
- Wed, 27 May 2020 09:36:47 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 190sm3605537wmb.23.2020.05.27.09.36.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 May 2020 09:36:45 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 411AF1FF7E;
- Wed, 27 May 2020 17:36:45 +0100 (BST)
-References: <20200525131823.715-1-thuth@redhat.com>
- <20200525131823.715-8-thuth@redhat.com>
- <1b050c61-0cd3-bc91-7610-856a28a27175@vivier.eu>
- <ab17e3cd-5117-b54b-6460-60c595d97033@redhat.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 7/7] linux-user: limit check to HOST_LONG_BITS <
- TARGET_ABI_BITS
-In-reply-to: <ab17e3cd-5117-b54b-6460-60c595d97033@redhat.com>
-Date: Wed, 27 May 2020 17:36:45 +0100
-Message-ID: <87imgh5o82.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdz6O-00022V-BR
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 12:40:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37231
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdz6J-0001vT-Hm
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 12:40:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590597617;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+Ji38yc1GI0PNLaEF5E2l/hzkNnAU4bsFkp9akPtilA=;
+ b=W8zqqdMhgskhlPOBv4//wdPesZSpf/z5emED+sd3jShWtYxZg05LJ9QcIHu6BQT8/hTBgi
+ ja9x1A/mK47Dr5NxS1L4UEbTRndVxHG/zVASxxjqj7vQrEjbh0ChMjDa1rmcwxnScJFdl3
+ Eumf2IP4X0DvhApFbzhV5uFLZKA/wu8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-o9rHW-xkN1KCVAIoCjKcnA-1; Wed, 27 May 2020 12:40:09 -0400
+X-MC-Unique: o9rHW-xkN1KCVAIoCjKcnA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2563118FF660;
+ Wed, 27 May 2020 16:40:08 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44C6E5D9F1;
+ Wed, 27 May 2020 16:40:07 +0000 (UTC)
+Subject: Re: [PATCH v7 21/32] qcow2: Add subcluster support to
+ qcow2_get_host_offset()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1590429901.git.berto@igalia.com>
+ <46add38625edc8ffec0056018d2cc512efda9a55.1590429901.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0ba75da9-5a39-a24b-068e-ed7b20cd5b27@redhat.com>
+Date: Wed, 27 May 2020 11:40:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <46add38625edc8ffec0056018d2cc512efda9a55.1590429901.git.berto@igalia.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,84 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/25/20 1:08 PM, Alberto Garcia wrote:
+> The logic of this function remains pretty much the same, except that
+> it uses count_contiguous_subclusters(), which combines the logic of
+> count_contiguous_clusters() / count_contiguous_clusters_unallocated()
+> and checks individual subclusters.
+> 
+> qcow2_cluster_to_subcluster_type() is not necessary as a separate
+> function anymore so it's inlined into its caller.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   block/qcow2.h         |  38 ++++-------
+>   block/qcow2-cluster.c | 150 ++++++++++++++++++++++--------------------
+>   2 files changed, 92 insertions(+), 96 deletions(-)
+> 
 
-Thomas Huth <thuth@redhat.com> writes:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> On 27/05/2020 16.44, Laurent Vivier wrote:
->> Le 25/05/2020 =C3=A0 15:18, Thomas Huth a =C3=A9crit :
->>> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>
->>> Newer clangs rightly spot that you can never exceed the full address
->>> space of 64 bit hosts with:
->>>
->>>   linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
->>>   long' > 18446744073709551615 is always false
->>>   [-Werror,-Wtautological-type-limit-compare]
->>>   4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
->>>   4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
->>>   4687 1 error generated.
->>>
->>> So lets limit the check to 32 bit hosts only.
->>>
->>> Fixes: ee94743034bf
->>> Reported-by: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> [thuth: Use HOST_LONG_BITS < TARGET_ABI_BITS instead of HOST_LONG_BITS =
-=3D=3D 32]
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  linux-user/elfload.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
->>> index 01a9323a63..ebc663ea0b 100644
->>> --- a/linux-user/elfload.c
->>> +++ b/linux-user/elfload.c
->>> @@ -2073,12 +2073,14 @@ static void pgb_have_guest_base(const char *ima=
-ge_name, abi_ulong guest_loaddr,
->>>              exit(EXIT_FAILURE);
->>>          }
->>>      } else {
->>> +#if HOST_LONG_BITS < TARGET_ABI_BITS
->>>          if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
->>>              error_report("%s: requires more virtual address space "
->>>                           "than the host can provide (0x%" PRIx64 ")",
->>>                           image_name, (uint64_t)guest_hiaddr - guest_ba=
-se);
->>>              exit(EXIT_FAILURE);
->>>          }
->>> +#endif
->>>      }
->>>=20=20
->>>      /*
->>>
->>=20
->> Philippe sent the same patch:
->>=20
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg699796.html
->
-> Indeed, but looking more closely, he's using slightly different
-> locations for the #if and #endif ... not sure what's better though...?
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Richard was more inclined to suppress the warning:
-
-  Subject: Re: [PATCH v2] linux-user: limit check to HOST_LONG_BITS =3D=3D =
-32
-  From: Richard Henderson <richard.henderson@linaro.org>
-  Message-ID: <3069bc1b-115d-f361-8271-c775bf6957ea@linaro.org>
-  Date: Thu, 21 May 2020 20:15:51 -0700
-
-One reason I dropped the f32 patch from my last PR was because this
-wasn't the only warning the latest clang picks up.
-
---=20
-Alex Benn=C3=A9e
 
