@@ -2,56 +2,60 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 204B3C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F2CC433DF
 	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 03:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB18A2073B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 03:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 731692073B
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 03:17:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N3Cdz195"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB18A2073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="chNlic/b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 731692073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdmZi-0003vL-37
+	id 1jdmZi-0003wT-H1
 	for qemu-devel@archiver.kernel.org; Tue, 26 May 2020 23:17:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45110)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jdmYV-000278-UM; Tue, 26 May 2020 23:16:35 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51979 helo=ozlabs.org)
+ id 1jdmYY-00029T-AO
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 23:16:38 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:35057 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jdmYR-00009n-NE; Tue, 26 May 2020 23:16:35 -0400
+ id 1jdmYR-00009q-BT
+ for qemu-devel@nongnu.org; Tue, 26 May 2020 23:16:37 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49Www41y3Pz9sSd; Wed, 27 May 2020 13:16:20 +1000 (AEST)
+ id 49Www43K9dz9sSW; Wed, 27 May 2020 13:16:20 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1590549380;
- bh=BZkQL3QRcclK3i1HhJaa7ebNzlXSHK9ubyEOnZTi6tY=;
+ bh=D1n5U/uC5esw8SdPJg7fZimoG4KzZoxD/ZWxwU6H7+I=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=N3Cdz1958+YCcNQYA5zZ4TkdHzc69Wvm1EK4JiROOnQO1NcojSs3RCujEM+ItNSCH
- qzVViaXpA0ZY8jQ52WBNgSHaSmohXqTR/p6FzXwrUDvl3NUuottt4vM9CgF0lwj8Qd
- 7AAaSuqTOcelsWeAR82LUziiuek0P79CURR4F//Y=
-Date: Wed, 27 May 2020 10:40:32 +1000
+ b=chNlic/bscqzy5azmhkZYeis0Lq7m339Agw5NhXKVitW+cAn+V262G/Ipn0fu1ezv
+ AgiMpqyuY7ICo6i7QEABTvPCV5UhAGe7qU2FN2mrO7Uvs+79Z9KzJyQqEXxjgpWg66
+ WrROP7chT3DuAGOY7wUp2ZQlOYqFAnmssoScKfAU=
+Date: Wed, 27 May 2020 10:42:45 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] target/ppc: Fix argument to
- ppc_radix64_partition_scoped_xlate() again
-Message-ID: <20200527004032.GG23110@umbus.fritz.box>
-References: <159051003729.407106.10610703877543955831.stgit@bahia.lan>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RESEND PATCH 1/1] vfio/nvlink: Remove exec permission to avoid
+ SELinux AVCs
+Message-ID: <20200527004245.GH23110@umbus.fritz.box>
+References: <8f5ae1658103b71b09555d3ab499edaf3f36a15d.camel@gmail.com>
+ <20200526144343.7c6c6def@x1.home>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TdkiTnkLhLQllcMS"
+ protocol="application/pgp-signature"; boundary="VbfcI4OLZ4XW0yH2"
 Content-Disposition: inline
-In-Reply-To: <159051003729.407106.10610703877543955831.stgit@bahia.lan>
+In-Reply-To: <20200526144343.7c6c6def@x1.home>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -75,63 +79,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Leonardo Bras <leobras.c@gmail.com>,
+ qemu-devel@nongnu.org, dgibson@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TdkiTnkLhLQllcMS
+--VbfcI4OLZ4XW0yH2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 26, 2020 at 06:20:37PM +0200, Greg Kurz wrote:
-> The penultimate argument of function ppc_radix64_partition_scoped_xlate()
-> has the bool type.
+On Tue, May 26, 2020 at 02:43:43PM -0600, Alex Williamson wrote:
+> On Mon, 18 May 2020 12:05:24 -0300
+> Leonardo Bras <leobras.c@gmail.com> wrote:
 >=20
-> Fixes: d04ea940c597 "target/ppc: Add support for Radix partition-scoped t=
-ranslation"
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> > If SELinux is setup without 'execmem' permission for qemu, all mmap
+> > with (PROT_WRITE | PROT_EXEC) will fail and print a warning in
+> > SELinux log.
+> >=20
+> > If "nvlink2-mr" memory allocation fails (fist diff), it will cause
+> > guest NUMA nodes to not be correctly configured (V100 memory will
+> > not be visible for guest, nor its NUMA nodes).
+> >=20
+> > Not having 'execmem' permission is intesting for virtual machines to
+> > avoid buffer-overflow based attacks, and it's adopted in distros
+> > like RHEL.
+> >=20
+> > So, removing the PROT_EXEC flag seems the right thing to do.
+> >=20
+> > Browsing some other code that mmaps memory for usage with
+> > memory_region_init_ram_device_ptr, I could notice it's usual to
+> > not have PROT_EXEC (only PROT_READ | PROT_WRITE), so it should be
+> > no problem around this.
+> >=20
+> > Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+> > Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >=20
+> > ---
+>=20
+> Seems David Gibson might be in a position to send a pull request
+> including this before I can, so:
 
-Applied, thanks.
-
-> ---
->=20
-> A patch fixing the same issue in other places was merged recently in
-> ppc-for-5.1. Maybe worth squashing the two patches into one ?
-
-I haven't done this, because it ran into some conflicts that I didn't
-want to spend time resolving.
+Merged to ppc-for-5.1, thanks.
 
 >=20
-> commit 372ef6e9b803ef10c3200c45311d218e2c97b218
-> Author: Greg Kurz <groug@kaod.org>
-> Date:   Thu May 14 00:57:13 2020 +0200
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
 >=20
->     target/ppc: Fix arguments to ppc_radix64_partition_scoped_xlate()
-> ---
->  target/ppc/mmu-radix64.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index 0d3922537c4c..c60bf3135734 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -513,7 +513,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr e=
-addr, int rwx,
-> =20
->              ret =3D ppc_radix64_partition_scoped_xlate(cpu, rwx, eaddr, =
-g_raddr,
->                                                       pate, raddr, &prot,=
- &psize,
-> -                                                     0, guest_visible);
-> +                                                     false, guest_visibl=
-e);
->              if (ret) {
->                  return ret;
->              }
+> > - Alexey's review is here: https://lists.nongnu.org/archive/html/qemu-d=
+evel/2020-05/msg00006.html
+> >=20
+> >  hw/vfio/pci-quirks.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> > index 2d348f8237..124d4f57e1 100644
+> > --- a/hw/vfio/pci-quirks.c
+> > +++ b/hw/vfio/pci-quirks.c
+> > @@ -1620,7 +1620,7 @@ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *=
+vdev, Error **errp)
+> >      }
+> >      cap =3D (void *) hdr;
+> > =20
+> > -    p =3D mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
+> > +    p =3D mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE,
+> >               MAP_SHARED, vdev->vbasedev.fd, nv2reg->offset);
+> >      if (p =3D=3D MAP_FAILED) {
+> >          ret =3D -errno;
+> > @@ -1680,7 +1680,7 @@ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Er=
+ror **errp)
+> > =20
+> >      /* Some NVLink bridges may not have assigned ATSD */
+> >      if (atsdreg->size) {
+> > -        p =3D mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE | PROT_=
+EXEC,
+> > +        p =3D mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE,
+> >                   MAP_SHARED, vdev->vbasedev.fd, atsdreg->offset);
+> >          if (p =3D=3D MAP_FAILED) {
+> >              ret =3D -errno;
+> >=20
+>=20
 >=20
 
 --=20
@@ -140,25 +169,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TdkiTnkLhLQllcMS
+--VbfcI4OLZ4XW0yH2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7Ntv0ACgkQbDjKyiDZ
-s5K8BQ//Z0A+DH2/2XL03R2aM66lpNK5CXHioIj4J3BVfSHour7vZuWWOIQOjoC+
-urcv6tuzNbA/+oWgHQ1IivJb2zOvGv93uBuGoNgh7zoSEbAX1W4EF4B4lwZIPqwd
-rdgELWyptjdM0L+DtSo5VjhN3mgiSfBbyy4TdJP5CwdhBwGMdaxEkBNSEyZYl82W
-AD2M3EenYsNYakKVhW0E93DIsmgMzD8rSn4wFEzuuFdW6XBAxjrh+NtqNoOeM/uV
-ic40hHqQn6a3/Z7SlXG24EYWYt+z3lmMklRPM9lxpPmLp/dX/T9RCMmUZJwVWN2K
-xm4oVfiwyu23yZM2dAlmaZjBsLfQEZalA+h75hCoZQ9CWHcXjokhA8HKfdjq2c74
-U9UQo1ttIAOqfuovQ7wmIaFs9CtkF8GoPZ12h1b5DkP6BRk93vdt1bp20VptMV1Z
-GCWJk4YPgpDRiuGcll0hMs1ns0/mGf3fYYoFZNcx+TPY/M1kBjnU6fx4aderBDjn
-1+nMDKj7pjkt6rhulv+wjtOqSaGaY3+s5HlJ7R0Wj+uWkhRKYcO7G+HIYQKtUJ+C
-DFgxwNtgPC/5IBOx3iBfoLTPpuOLcEc+vl7xoM28QJBGjo/Tl0sFOg6xmx8G6EVN
-8Ebbvv//yyHq4OCfggJl0z6lgqc/RHG1DZh9ugmXbV/euIli2Ek=
-=u2hR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7Nt4UACgkQbDjKyiDZ
+s5K5FQ/+PEPCEEluXbvtnu9yaA6bQ43d1BXg9LekD4WBlgMQgdaj4DAT6MWhUKcA
+8085DI46QLEc2qeW+DjVkS7N2Sf+x4PcvikjXvmaT6nnL1WVGDeiQvXJZPnqAfIX
+EWlrY6NtBYGUtnthOHgtIbpethzXf3FN/79AnQ+RbPDMiWTgkl0uLLlKGyHmjcZU
+osyDyHGMUFYRYurOHKYc6gyT+QGWmRmQab4sq3uXUClslHoOLj7WPRlUZZTWlDrc
+tEMLGc/AsI88aWSY8EqZuI3GTwdF40X+0ueCWk534v6Y9nwFivoC9OJZT7+UcO4j
++piOU/ZWciPEYbl56PSa0UugnY5dJtVD/Q+3lYKlY6vj9bz1ipY92lnpeFP8INdE
+JP6FPizsfRSsGixI+VS+3o3Z0wkzPE6spBv28xuYuJQny2CjpjTKOFdJg74jQXWm
+wfVB/m3uW3SzFWDjKCynx631jFrQWmK+3vPneuumvtEa4MIZtMacImVgrV5zmtjK
+JJm3E/Wn43fgH7Kjz8Sd4jHNHB2D3d26vEe9GDrHm3rSy8IoijrWcDWDi3HQR+DF
+3IfWs/6z2AdSX6swnx/GfjBXpGL7s/u4z2Wr9cguNsbK+HEquEZGD/Fxwxp1JpV9
+ygmXCYxdG92TQJn4ELoDh9zsQqgedERYzByEbYt1DABnrIzWjyo=
+=f9KY
 -----END PGP SIGNATURE-----
 
---TdkiTnkLhLQllcMS--
+--VbfcI4OLZ4XW0yH2--
 
