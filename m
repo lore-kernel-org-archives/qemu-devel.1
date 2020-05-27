@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F252C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86859C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6817D20776
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:41:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52E7320776
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 15:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EjPllqdF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6817D20776
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BAeG4ImL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E7320776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdyBG-00030j-KL
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 11:41:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51842)
+	id 1jdyBp-0003vw-I6
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 11:41:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdyAe-0001hB-K9
- for qemu-devel@nongnu.org; Wed, 27 May 2020 11:40:44 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55139)
+ id 1jdyBC-000367-Rm
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 11:41:18 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44510)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jdyAb-00006H-Ot
- for qemu-devel@nongnu.org; Wed, 27 May 2020 11:40:44 -0400
-Received: by mail-wm1-x342.google.com with SMTP id h4so3494292wmb.4
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 08:40:41 -0700 (PDT)
+ id 1jdyBB-0000N6-Pe
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 11:41:18 -0400
+Received: by mail-wr1-x444.google.com with SMTP id y17so16079517wrn.11
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 08:41:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=E5o6ebt2h3zUMApK2FVuSTW+9BSPEODuK0pM4vlNU5E=;
- b=EjPllqdFm7CaPp0fX1nz3W3M/46/DMirCg9MxDgLDK2n8uAFgco7VLf8KLONBRK2VD
- rH0Ei/fMpjLNSlcLEd499BtXC65dM6xz2TaFs/ZDLGAMo9OoA6tcnnl3DHz5j4XaoBdO
- aO3t/szA771lZXsGbjAfVSiP1vTmLTT7LJ06YZCEMF/7VFjU0TvcjqHwcYwE06ugoqcA
- nMALJBQm5+bB5obMMJVe6fwExn2wls1+TkRR5f4JTP5awKA+YaSD0rwaLMD8xd5LyHHr
- vXxjMJojW+Wqkl1ZUALbDqPm6bjdwCCAcaEcbJzAOHOq0uqQk/2i99NqRQvYB4Okpb5M
- /vQQ==
+ bh=oCO3KeaO4/ERd1QfTeyL1QZSWauitZiDDj2f5mc2Jtw=;
+ b=BAeG4ImLmQ5jdNe8rPeEWL8k9F/P3cP+AMWY14Uw3JQBHTba3OIQM0Lt4s5jLiNCOn
+ sjDF1n+rIukZKrIi/3PrfAiGqT/uvME3wxRCS+FOXyKwiSZ5CeH9IVewHgQrf7qRRR4R
+ zSHjuBDK9+NBOn9li83RvYDTPzN92pB7yTSgb+cW0uSVApVvF0TFrZs48YGO7GGHrvUv
+ TG8I7Fhk29qu4+uAagdHu2kDokc9R7PDD36Cqqocl+uNbHq3tC/KO0CFioT3UVh6sLoF
+ LXaNOj7WYoxfoOheUu6JBomYKj2w+YGsa+ncnyScW55bVwG9tQWX6AWwB1KS0RHbkpy5
+ XCcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=E5o6ebt2h3zUMApK2FVuSTW+9BSPEODuK0pM4vlNU5E=;
- b=YVOUHJYpK5Pj19Sanc4eTXi18i/fPURlH2SAO/6hMoVYZ3i2/aP2PJHZ5E34oHl8Nb
- 6nrAb5gFRRDyvgfTVIDxkTb2uHb4PQo3uaGtEGj8sWCA0/3aNmjNXmZZ2Qe2HU7j4Kum
- aufHrzZi9GpTzInMF+fMHTvt9o0r07nhq9jtJH3Z7tybqvU4W4H4MNeu79Y0aGQFykB7
- 7SZbebtBahwytfA/qHMdRL81hW5B4UeMqbQB5aeeQzM1smFXf9IVftHa3KBuOZQrRDZf
- nrk2a1a2SGeOEKG0cSG24r6l41gCgGh4fBUzE0YWKD5Yk8YOPCPkcWUz9Ivqv6Qr1BE/
- GWyA==
-X-Gm-Message-State: AOAM532QES1jF0Bmn93F4t8enIQPlxk05kLPC9DujZ5LJH6PAdYGIEcW
- 7fGwFdhye76KRFRY9REwptsAdQ==
-X-Google-Smtp-Source: ABdhPJzF4UywOxw/hS7nlx1zxzfWpT0HfVo6i+3ywLCuBQMUU0wpTESTs8jwMstl2/OpKcN9vlf2LA==
-X-Received: by 2002:a1c:230a:: with SMTP id j10mr4802547wmj.124.1590594040067; 
- Wed, 27 May 2020 08:40:40 -0700 (PDT)
+ bh=oCO3KeaO4/ERd1QfTeyL1QZSWauitZiDDj2f5mc2Jtw=;
+ b=TOWuBIFW/Fu8VLTzCNYW0pNIrUKelFIQRkkaRyjoH6gtQQ9xReioRcjlmq3JW63Nl6
+ OgYvvd7QkJ2Ix73egvhhNKJNPITcUgmtCtDKFPSmWy2Z6AGCzKvs6eR/0PWXj2BuF48x
+ KK1pQpS3L3i9S3rSfPN4r0q+Wr9H6j2ZUOFECZRx/ZE+E34X6zpnhCywiv6qPtenuv1G
+ W+4pSDB7zJRseVdDIOUR0CU7g2hJvli+JlzIvZyEbGnAgEWOUap+RkBN6XzD6ZkNCdQY
+ BlOFSWsC2Gf6jlFhcWR9NtuIaJ7WTm/ueLQZ/8S6kFMH2kcf9VRny+fy3RXLYEVbvKrI
+ It0w==
+X-Gm-Message-State: AOAM5325IHVcg+Ck6olnDU1fmUVCL89Em68EkUd/BNDC4klZaiTl9cgZ
+ BMxlDFx+0Y2aZvMz+eFZLWIZDQ==
+X-Google-Smtp-Source: ABdhPJxFLS0hJPPxEZSfWqGiwgHo+PmfUZJ5CECC43c0+tZZwNqnaMQ7r4+YO2zIVuxhErhuozMZTQ==
+X-Received: by 2002:a5d:694a:: with SMTP id r10mr15917058wrw.266.1590594076292; 
+ Wed, 27 May 2020 08:41:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o15sm2934569wmh.35.2020.05.27.08.40.38
+ by smtp.gmail.com with ESMTPSA id g10sm3134618wrx.4.2020.05.27.08.41.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 May 2020 08:40:38 -0700 (PDT)
+ Wed, 27 May 2020 08:41:15 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E7EFF1FF7E;
- Wed, 27 May 2020 16:40:37 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 8E3341FF7E;
+ Wed, 27 May 2020 16:41:14 +0100 (BST)
 References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
  <159057546117.16818.15607496040935344350.stgit@pasha-ThinkPad-X280>
 User-agent: mu4e 1.5.1; emacs 28.0.50
@@ -77,13 +77,13 @@ To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 Subject: Re: [PATCH v2 04/11] tests/acceptance: add kernel record/replay
  test for x86_64
 In-reply-to: <159057546117.16818.15607496040935344350.stgit@pasha-ThinkPad-X280>
-Date: Wed, 27 May 2020 16:40:37 +0100
-Message-ID: <87v9kh5qtm.fsf@linaro.org>
+Date: Wed, 27 May 2020 16:41:14 +0100
+Message-ID: <87sgfl5qsl.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -147,21 +147,75 @@ eboot'
 > +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
 _hash)
 > +
-> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE +
-> 'console=3DttyS0'
-
-I note that:
-
-  KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-
-and given we are looking for repeatability here maybe we should use our
-own command line so we can compare the recorded and replayed boot?
-
+> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
+le=3DttyS0'
 > +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
 ine
 > +
-> +        self.run_rr(kernel_path, kernel_command_line,
-> console_pattern)
+> +        self.run_rr(kernel_path, kernel_command_line, console_pattern)
+
+This test fails for me on the replay:
+
+  2020-05-27 16:22:21,658 machine          L0326 DEBUG| VM launch command: =
+'x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,=
+id=3Dmon,path=3D/var/tmp/tmp4n_geosi/qemu-9516-monitor.sock -mon chardev=3D=
+mon,mode=3Dcontrol -machine pc -chardev socket,id=3Dconsole,path=3D/var/tmp=
+/tmp4n_geosi/qemu-9516-console.sock,server,nowait -serial chardev:console -=
+icount shift=3D7,rr=3Dreplay,rrfile=3D/var/tmp/avocado_b85h3ycg/avocado_job=
+_8xrxksgj/1-._tests_acceptance_replay_kernel.py_ReplayKernel.test_x86_64_pc=
+/replay.bin -kernel /home/alex/avocado/data/cache/by_location/df533120a0e0f=
+fda2626bed6e8a975d3b07e3f05/vmlinuz -append printk.time=3D0 console=3DttyS0=
+ -net none'
+  2020-05-27 16:22:21,725 qmp              L0194 DEBUG| >>> {'execute': 'qm=
+p_capabilities'}
+  2020-05-27 16:22:21,736 qmp              L0202 DEBUG| <<< {'return': {}}
+  2020-05-27 16:23:49,372 stacktrace       L0039 ERROR|
+  2020-05-27 16:23:49,372 stacktrace       L0042 ERROR| Reproduced tracebac=
+k from: /home/alex/lsrc/qemu.git/builds/all/tests/venv/lib/python3.7/site-p=
+ackages/avocado/core/test.py:860
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR| Traceback (most rec=
+ent call last):
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/replay_kernel.py", line 73, in te=
+st_x86_64_pc
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|     self.run_rr(ker=
+nel_path, kernel_command_line, console_pattern)
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/replay_kernel.py", line 57, in ru=
+n_rr
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|     False, shift, a=
+rgs)
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/replay_kernel.py", line 46, in ru=
+n_vm
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|     self.wait_for_c=
+onsole_pattern(console_pattern, vm)
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/boot_linux_console.py", line 37, =
+in wait_for_console_pattern
+  2020-05-27 16:23:49,373 stacktrace       L0045 ERROR|     vm=3Dvm)
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/avocado_qemu/__init__.py", line 1=
+31, in wait_for_console_pattern
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|     _console_intera=
+ction(test, success_message, failure_message, None, vm=3Dvm)
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/acceptance/avocado_qemu/__init__.py", line 8=
+3, in _console_interaction
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|     msg =3D console=
+.readline().strip()
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|   File "/usr/lib/py=
+thon3.7/socket.py", line 589, in readinto
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|     return self._so=
+ck.recv_into(b)
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|   File "/home/alex/=
+lsrc/qemu.git/builds/all/tests/venv/lib/python3.7/site-packages/avocado/plu=
+gins/runner.py", line 89, in sigterm_handler
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR|     raise RuntimeEr=
+ror("Test interrupted by SIGTERM")
+  2020-05-27 16:23:49,374 stacktrace       L0045 ERROR| RuntimeError: Test =
+interrupted by SIGTERM
+
 
 --=20
 Alex Benn=C3=A9e
