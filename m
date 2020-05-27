@@ -2,131 +2,119 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28584C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9330CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6FC620873
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:45:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcOSe5SJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6FC620873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63893207D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:45:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63893207D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdxIu-0005Re-28
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:45:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42824)
+	id 1jdxJ1-0005ht-Gh
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:45:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxI0-0004OP-VV
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:44:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34860
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jdxHz-0000fP-R8
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:44:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590590654;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=bfhzntkupzY5ZPm4Qivvt4NQxfLM8G8Ia2gmJpZZqRE=;
- b=KcOSe5SJ5Hmr7yjKd/mP3AnxR6u7zJGbnNYDuHdIXBR91Z4UD2nh5+oSH00LY285rs2wlZ
- RUa8xSu8imQ2CleLxLl/EJYz1CnFx6kvKzAA1DcDnGwVns2bj4gSDR7rYIjFr2uKudtyC3
- HlDukD/GNNQPeF7BzWqdFpE7jto0xmg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-kNkYE6ybPVWO24q1rDOPqQ-1; Wed, 27 May 2020 10:44:08 -0400
-X-MC-Unique: kNkYE6ybPVWO24q1rDOPqQ-1
-Received: by mail-ej1-f72.google.com with SMTP id qo26so9085985ejb.1
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 07:44:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=bfhzntkupzY5ZPm4Qivvt4NQxfLM8G8Ia2gmJpZZqRE=;
- b=ESZKQdFFR11QaSRzhaXDE6shhnbp4yfwcg05PBEMBQtQkrBDBJUjEVgB44+MrvtUfT
- zWBTLhO1bssHSM5Ooo3E0oPGgrPdZg/7kkyeQsfhi3aLxLykQk6JOUHmOjlee4U0O7w1
- n3bflr9qDtf3NLGiYcrC7Tv06/IzdU6PWOL7mYfUNwoLA6T6ltK7cvTSkqJtbivS4w1m
- kzlBSbeVS+qU5g/eAtlD9w6z9hTP6JIxM4ppUBJ62OBIm8OlNRyz3+2pni4q1yZhSvI0
- bKYX9PF4ywbE1EzKsPFEQEmPAMT1Eff4lUeLKuQ+u0f6xh5wbHAS5OSHCbpHBoYWD1mk
- UPxA==
-X-Gm-Message-State: AOAM531VOub25T9aeQ4IsuTTnJZ3AVfSgZt2f8DbGyTk5wyxUkBenn/8
- MEdNA8zQJHKoiPcz6iN6lheETvKF76bhdlI9sXrnddBCfDUK2fy/SDy/2qWRD8rsNBtQ3ONayjR
- skE3haCXQQeyb5Tg=
-X-Received: by 2002:a05:6402:177c:: with SMTP id
- da28mr23959414edb.378.1590590647075; 
- Wed, 27 May 2020 07:44:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzjvdTZ/6DK0E6VG8OW2RxbcbBDfsBmucP5q4ko8ZedLHPL70roUQ3ugGMg+gQr6JB+JbcovA==
-X-Received: by 2002:a05:6402:177c:: with SMTP id
- da28mr23959395edb.378.1590590646906; 
- Wed, 27 May 2020 07:44:06 -0700 (PDT)
-Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id p10sm2970126ejn.64.2020.05.27.07.44.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 May 2020 07:44:06 -0700 (PDT)
-Subject: Re: [PATCH v2 05/11] tests/acceptance: add record/replay test for
- aarch64
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
- <159057546689.16818.17382569698039249168.stgit@pasha-ThinkPad-X280>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <41b97e99-a4b5-123f-49de-9fbad1f0821f@redhat.com>
-Date: Wed, 27 May 2020 16:44:04 +0200
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jdxIE-0004VN-6N
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:44:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:35395)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jdxID-0000gv-1N
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:44:29 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MKd92-1jIyUs3UrM-00Kysl; Wed, 27 May 2020 16:44:23 +0200
+Subject: Re: [PATCH 7/7] linux-user: limit check to HOST_LONG_BITS <
+ TARGET_ABI_BITS
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200525131823.715-1-thuth@redhat.com>
+ <20200525131823.715-8-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1b050c61-0cd3-bc91-7610-856a28a27175@vivier.eu>
+Date: Wed, 27 May 2020 16:44:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <159057546689.16818.17382569698039249168.stgit@pasha-ThinkPad-X280>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200525131823.715-8-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:tZHl0TDJMEXS/+/oU+/sZXdJ04nT4njTLzyLqhoayJ6Nl7DwyVL
+ 8E8vnayGpi/fkr/14A7fOEE+T3lXAvV6J/sPglzemNRh6NSo034qIer1jcO8UM7cV5/GKSa
+ MHjUdw1xxGhgyp9zlqdGXDR8Ybjvg5uC5taofOSwZRxqgzoJMy4jGjtzcUM7ym+W4ldD0tT
+ suXv7H1+y007LaWQbMR6A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:huaF3AL6uT4=:gAjjgOnXQIdwgG/lqNjOS7
+ NPqx2x5AwIFdxt79X3xKBamt/u9+qfFw0a/6MdbtlmAi4XbPe9SvJYIOOfNlOyU4kZrDQoTWI
+ CAnhnru/W7crBjxMm+n7c3X7eLk99hpPW3DSebOlSX5olgRHelZOOVYt4iTqMTut2pO7/1OnX
+ uSOVgUAmboLYDXT5CQRl3ybam9NsCtid1feI1jcABkhORzUsbUmU95AqEnQ96PVjjio7RhJ66
+ T7p2pXHGuIx8VvXB6HIe1w0TddS0dnjnhp5+8W6S+pzUw0AwgGtKAkjmUYTU/tHnsE1qpgtnR
+ bR5bL5bkSUkDhaf/j6x5AGG0dMJY/o2j2iO1wAibXJiUhx4P3c4jr01mOJh0jtMA+4Yo0Oe77
+ CFv2T81tUN8GJ1+pKClK8RmL+57I7NtTEl9HXeDMC/EZxVuRc0AdVr6jlKLJltGKPWG0MFgKi
+ saBVO50XbEhka6GJCtzbE3CfPGvzejohL3EmphL7cARtqo54/FfLd2oVHTihXPKLV0G2hYr+4
+ FhMt1CdezCeVNthOKBlD8aXvuSwnNxnj5+hZkOitIx/rvnNRygdUfKFhB20eJ/sM+o+Ce3pnb
+ t5uhMaWV7sVesS2SDyM7x8Cs7uRvSg3/HtS1Ks+eeDjWJWavZCuqvz0LFGp235+kcQ4LUOI6Z
+ 6g6/leiEGQ5Q7AL0ytI12LQJmZuCxJ2nPxFje0DjH6ksTsJnjpLVrVO2BRgNSH4rBbms4sEWX
+ QXuBPt/FXQWpNP4CQUMVklOqM65lECs/imHbxDvlYQ//moHJYQIICpvM25+Mfi2i/jeQ1Ml7K
+ D6bqDlCjFgqDmicvkouXCSyKqa8xbcs3hVNBwTfZdnhqXnRk9hfTfY6jQ8MSvmVGN5PSFHd
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 10:32:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,52 +127,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wrampazz@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru,
- crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/27/20 12:31 PM, Pavel Dovgalyuk wrote:
-> This patch adds a test for record/replay of the kernel
-> image boot for aarch64 platform.
+Le 25/05/2020 à 15:18, Thomas Huth a écrit :
+> From: Alex Bennée <alex.bennee@linaro.org>
 > 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Newer clangs rightly spot that you can never exceed the full address
+> space of 64 bit hosts with:
+> 
+>   linux-user/elfload.c:2076:41: error: result of comparison 'unsigned
+>   long' > 18446744073709551615 is always false
+>   [-Werror,-Wtautological-type-limit-compare]
+>   4685         if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>   4686             ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~
+>   4687 1 error generated.
+> 
+> So lets limit the check to 32 bit hosts only.
+> 
+> Fixes: ee94743034bf
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> [thuth: Use HOST_LONG_BITS < TARGET_ABI_BITS instead of HOST_LONG_BITS == 32]
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  0 files changed
+>  linux-user/elfload.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-> index c7526f1aba..deca69d6cb 100644
-> --- a/tests/acceptance/replay_kernel.py
-> +++ b/tests/acceptance/replay_kernel.py
-> @@ -71,3 +71,21 @@ class ReplayKernel(LinuxKernelUtils):
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 01a9323a63..ebc663ea0b 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2073,12 +2073,14 @@ static void pgb_have_guest_base(const char *image_name, abi_ulong guest_loaddr,
+>              exit(EXIT_FAILURE);
+>          }
+>      } else {
+> +#if HOST_LONG_BITS < TARGET_ABI_BITS
+>          if ((guest_hiaddr - guest_base) > ~(uintptr_t)0) {
+>              error_report("%s: requires more virtual address space "
+>                           "than the host can provide (0x%" PRIx64 ")",
+>                           image_name, (uint64_t)guest_hiaddr - guest_base);
+>              exit(EXIT_FAILURE);
+>          }
+> +#endif
+>      }
 >  
->          self.run_rr(kernel_path, kernel_command_line, console_pattern)
-> +
-> +    def test_aarch64_virt(self):
-> +        """
-> +        :avocado: tags=arch:aarch64
-> +        :avocado: tags=machine:virt
-> +        """
-> +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
-> +                      '/linux/releases/29/Everything/aarch64/os/images/pxeboot'
-> +                      '/vmlinuz')
-> +        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +
-> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-> +                               'console=ttyAMA0')
-> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
-> +
-> +        self.run_rr(kernel_path, kernel_command_line, console_pattern,
-> +            args=('-cpu', 'cortex-a53'))
+>      /*
+> 
 
-I thought this would be ':avocado: tags=cpu:cortex-a53' consumed by the
-base class before starting the machine, but not (yet). Still, please add
-the tag (for filtering).
+Philippe sent the same patch:
 
-Thanks.
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg699796.html
 
-
+Thanks,
+Laurent
 
