@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946FAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF39CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 18:05:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6814720835
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:59:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F74F2075A
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 18:05:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7Wtqlis"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6814720835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDcIJeVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F74F2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je0Kw-0003xW-J4
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 13:59:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42884)
+	id 1je0QT-00075S-Lu
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 14:05:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je0Jt-0003Hv-9v
- for qemu-devel@nongnu.org; Wed, 27 May 2020 13:58:25 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20904
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je0P5-0006GN-On
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 14:03:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32083
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je0Jq-0008NZ-Pk
- for qemu-devel@nongnu.org; Wed, 27 May 2020 13:58:25 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1je0P4-0002KJ-NK
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 14:03:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590602301;
+ s=mimecast20190719; t=1590602625;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j3PgqNyZ78y/7rR+Bt0L455cKG/Yt6kEKLnM9X8+Vzo=;
- b=I7Wtqlisd+3hOc/hwps7SWCT02N7EC/fuXelcrHhmvTqhhmAhGhIsZxqKU0mMSUyBDegxN
- mgq6aGYNIZBN4ahU2o7siNHuiaJR/aVd0fVQ4APl34yBTLr51zhgKJTm0YSdbTF6RPgmeg
- O99o5cRLwg0iicFn+DCT0mLUZWw9W+g=
+ bh=FuscnFNRftXBaMIkB+D9D587vWhtsROHbG5zEMIwO0I=;
+ b=YDcIJeVA6uIcAwoYFWUI7K5tD45sEtUvKbAjetL07Ub1MQvknlNsDsUFNWDbIrIYiHXb3I
+ 3W4KJo6ihDLT96d4PuUMKPwIkk2HSXb87CLTnqmYaKUEzJ6v13f0CFw3OqE/y3wgdzJCVh
+ 9bDzfnx0y1ItwLTqqxrGgNoFRY2D1ik=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-dvu-gze3Mi-lzYcwhc0tGg-1; Wed, 27 May 2020 13:58:15 -0400
-X-MC-Unique: dvu-gze3Mi-lzYcwhc0tGg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-422-ObOzxQj2Ns-ZNXdDx1zhDQ-1; Wed, 27 May 2020 14:03:41 -0400
+X-MC-Unique: ObOzxQj2Ns-ZNXdDx1zhDQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 944D6107ACCA;
- Wed, 27 May 2020 17:58:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C8F68014D4;
+ Wed, 27 May 2020 18:03:40 +0000 (UTC)
 Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C9E8879C46;
- Wed, 27 May 2020 17:58:10 +0000 (UTC)
-Subject: Re: [PATCH v7 28/32] qcow2: Add subcluster support to
- qcow2_co_pwrite_zeroes()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CB1E60E1C;
+ Wed, 27 May 2020 18:03:39 +0000 (UTC)
+Subject: Re: [PATCH v7 30/32] qcow2: Add the 'extended_l2' option and the
+ QCOW2_INCOMPAT_EXTL2 bit
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1590429901.git.berto@igalia.com>
- <e037ed54599e7bf4d76bf8cd8db1904a20ffc6dd.1590429901.git.berto@igalia.com>
+ <bc451fb9fec15dc03a233436ae5720cd6b3cf44f.1590429902.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <467e4184-2cee-a9e9-9cf0-ee6050ea4319@redhat.com>
-Date: Wed, 27 May 2020 12:58:10 -0500
+Message-ID: <087f02e1-3e52-b129-835b-97c407f440e7@redhat.com>
+Date: Wed, 27 May 2020 13:03:38 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <e037ed54599e7bf4d76bf8cd8db1904a20ffc6dd.1590429901.git.berto@igalia.com>
+In-Reply-To: <bc451fb9fec15dc03a233436ae5720cd6b3cf44f.1590429902.git.berto@igalia.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -106,47 +106,12 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/25/20 1:08 PM, Alberto Garcia wrote:
-> This works now at the subcluster level and pwrite_zeroes_alignment is
-> updated accordingly.
-> 
-> qcow2_cluster_zeroize() is turned into qcow2_subcluster_zeroize() with
-> the following changes:
-> 
->     - The request can now be subcluster-aligned.
-> 
->     - The cluster-aligned body of the request is still zeroized using
->       zero_in_l2_slice() as before.
-> 
->     - The subcluster-aligned head and tail of the request are zeroized
->       with the new zero_l2_subclusters() function.
-> 
-> There is just one thing to take into account for a possible future
-> improvement: compressed clusters cannot be partially zeroized so
-> zero_l2_subclusters() on the head or the tail can return -ENOTSUP.
-> This makes the caller repeat the *complete* request and write actual
-> zeroes to disk. This is sub-optimal because
-> 
->     1) if the head area was compressed we would still be able to use
->        the fast path for the body and possibly the tail.
-> 
->     2) if the tail area was compressed we are writing zeroes to the
->        head and the body areas, which are already zeroized.
-
-Is this true?  The block layer tries hard to break zero requests up so 
-that any non-cluster-aligned requests do not cross cluster boundaries. 
-In practice, that means that when you have an unaligned request, the 
-head and tail cluster will be the same cluster, and there is no body in 
-play, so that returning -ENOTSUP is correct because there really is no 
-other work to do and repeating the entire request (which is less than a 
-cluster in length) is the right approach.
-
+> Now that the implementation of subclusters is complete we can finally
+> add the necessary options to create and read images with this feature,
+> which we call "extended L2 entries".
 > 
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->   block/qcow2.h         |  4 +--
->   block/qcow2-cluster.c | 80 +++++++++++++++++++++++++++++++++++++++----
->   block/qcow2.c         | 27 ++++++++-------
->   3 files changed, 90 insertions(+), 21 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
