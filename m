@@ -2,94 +2,90 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E00C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65643C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3457120873
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A12D2088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 17:07:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QhNpxD5A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3457120873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T12OWb0T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A12D2088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdzVJ-0004KS-Dk
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 13:06:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35196)
+	id 1jdzWq-0006NP-B3
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 13:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=40961fbaf=alistair.francis@wdc.com>)
- id 1jdzOf-0002GT-5Q; Wed, 27 May 2020 12:59:17 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:63672)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=40961fbaf=alistair.francis@wdc.com>)
- id 1jdzOe-0002MX-0Q; Wed, 27 May 2020 12:59:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590598756; x=1622134756;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=J6jGr0+YJ7cXlecgOOQm6t/fd9FbxppC8Hh5YeUeVt4=;
- b=QhNpxD5A1IWxkzYdtnVDC79yr9dS2/mkKcmj3rgpln6pXjJ2rXSzLZlz
- zao/BjzVI/40WYZ1dQv6nUQPefSduty+jGuaQr52qePVtiCu/UuJt26dy
- xNY4c3IEGp24z1UFoS3OzSty4kKN8UrRGly8v2ojIrsXQIO5fI+wNpuZ5
- wDjwQLpqHaio0i2+XQG5OzbejSOcElQ2umfdJCel1nVAPAhn2/jFI/VA2
- O1fFtIZ99BqdMuSyzt4Js5HncW/iULRnq0D7g5h1OrIHDyg3X8kllF7yX
- s1lbAXKjc16tYzw3VQ20bg3tHPAjjNQuH8kRSaKR5+TX74fZx98K4eQgp w==;
-IronPort-SDR: zpJUZM0PaDGUfM1KRcVUj4SV41E7lpVH9T/vO0C2JDg70vrTKuZek2LMvHNCz0IdcWchVzWRbQ
- 9DxNI1GjwGxSqDRWzJjV3E3qOTvD/iqnizt6BNw4sWAKJU8ozadbtXNHUHH297zb/wLKP6cnQo
- oKwRxXhNkKJCwqyWQfw0YNqNx8v3aaRSaRtdynnEdFtrHWprSbQ6fwsW3nkX1NHW9liUfKukVx
- rNHrW7ryqjq5JHclkbPp+Jqnqkib92IC/8JMHYtT8sCbm5Iti1WEbHm3UDKzSYN02dGF7PCaF/
- aNI=
-X-IronPort-AV: E=Sophos;i="5.73,442,1583164800"; d="scan'208";a="140062138"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 28 May 2020 00:59:14 +0800
-IronPort-SDR: CqAF9OiC5vhkhvsee3L812rCMdxH+oA5I/jUolZ86xKiB65aeY1mokP0x/NQW4Qvy/LTpiUj0E
- IG4hk4tpIkmTHC/OApxKi7vL9eahumV3s=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 May 2020 09:48:31 -0700
-IronPort-SDR: C9/SQ0N/OM3LBWaMoRLQQpJzWI4VHuUdUgLkyoiEW87ShefIOdaNwNupSwrRrm1vkvZ3VJusdr
- xOYiflTM7Gqw==
-WDCIronportException: Internal
-Received: from 71vjjc2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.57.96])
- by uls-op-cesaip01.wdc.com with ESMTP; 27 May 2020 09:59:14 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v4 09/10] riscv/opentitan: Connect the UART device
-Date: Wed, 27 May 2020 09:50:39 -0700
-Message-Id: <411322bc2870c735e4657bf27f5123bcc42b30ea.1590598125.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1590598125.git.alistair.francis@wdc.com>
-References: <cover.1590598125.git.alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jdzWH-0005us-LR
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 13:07:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47067
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jdzWF-0007Sy-Pz
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 13:07:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590599225;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1tNaPSuO9evRluMaVay++VePm2O5up6S7qgQIgSWAt8=;
+ b=T12OWb0TzV2Jz+qW+MNyK2eQJF21wgz1sOg3nZnZb8qZFIgF1rA4iAD5/Fu30OYl68y1x/
+ 0EuM7vhE+f/AOLQSHBVzzvpgobuEqtEldoPQfzyOW9U59d0LUJygxK4nZfp1tvlukpTYCz
+ BMoRQVX8IElk6qC6ldcRi4EzlMtpyv4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-bpv-kA4dP4CybWKwRI5uEA-1; Wed, 27 May 2020 13:07:04 -0400
+X-MC-Unique: bpv-kA4dP4CybWKwRI5uEA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38DD7107ACF5
+ for <qemu-devel@nongnu.org>; Wed, 27 May 2020 17:07:03 +0000 (UTC)
+Received: from gondolin (ovpn-114-205.ams2.redhat.com [10.36.114.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F8931A913;
+ Wed, 27 May 2020 17:06:53 +0000 (UTC)
+Date: Wed, 27 May 2020 19:06:51 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH] hw/vfio/common: Trace in which mode a IOMMU is opened
+Message-ID: <20200527190651.2a9ee6ea.cohuck@redhat.com>
+In-Reply-To: <20200527165330.GG1194141@xz-x1>
+References: <20200526173542.28710-1-philmd@redhat.com>
+ <6c7c445d-0335-f67d-bb72-5b0c046bb247@redhat.com>
+ <24f88212-9b32-b6dc-fcd4-685cde8bf5d7@redhat.com>
+ <864ac8ab-e21e-393e-d1eb-08b3c4579bbf@redhat.com>
+ <20200527161603.GF1194141@xz-x1>
+ <3e364895-e5e5-09fe-ee8c-782f3632e2b8@redhat.com>
+ <20200527165330.GG1194141@xz-x1>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.45;
- envelope-from=prvs=40961fbaf=alistair.francis@wdc.com;
- helo=esa6.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 12:58:55
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 05:46:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,99 +98,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
- alistair23@gmail.com
+Cc: Auger Eric <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/riscv/opentitan.h | 13 +++++++++++++
- hw/riscv/opentitan.c         | 24 ++++++++++++++++++++++--
- 2 files changed, 35 insertions(+), 2 deletions(-)
+On Wed, 27 May 2020 12:53:30 -0400
+Peter Xu <peterx@redhat.com> wrote:
 
-diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
-index 8d6a09b696..825a3610bc 100644
---- a/include/hw/riscv/opentitan.h
-+++ b/include/hw/riscv/opentitan.h
-@@ -21,6 +21,7 @@
- 
- #include "hw/riscv/riscv_hart.h"
- #include "hw/intc/ibex_plic.h"
-+#include "hw/char/ibex_uart.h"
- 
- #define TYPE_RISCV_IBEX_SOC "riscv.lowrisc.ibex.soc"
- #define RISCV_IBEX_SOC(obj) \
-@@ -33,6 +34,7 @@ typedef struct LowRISCIbexSoCState {
-     /*< public >*/
-     RISCVHartArrayState cpus;
-     IbexPlicState plic;
-+    IbexUartState uart;
- 
-     MemoryRegion flash_mem;
-     MemoryRegion rom;
-@@ -63,4 +65,15 @@ enum {
-     IBEX_USBDEV,
- };
- 
-+enum {
-+    IBEX_UART_RX_PARITY_ERR_IRQ = 0x28,
-+    IBEX_UART_RX_TIMEOUT_IRQ = 0x27,
-+    IBEX_UART_RX_BREAK_ERR_IRQ = 0x26,
-+    IBEX_UART_RX_FRAME_ERR_IRQ = 0x25,
-+    IBEX_UART_RX_OVERFLOW_IRQ = 0x24,
-+    IBEX_UART_TX_EMPTY_IRQ = 0x23,
-+    IBEX_UART_RX_WATERMARK_IRQ = 0x22,
-+    IBEX_UART_TX_WATERMARK_IRQ = 0x21
-+};
-+
- #endif
-diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-index 3926321d8c..a6c0b949ca 100644
---- a/hw/riscv/opentitan.c
-+++ b/hw/riscv/opentitan.c
-@@ -96,6 +96,9 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "plic", &s->plic,
-                           sizeof(s->plic), TYPE_IBEX_PLIC);
-+
-+    sysbus_init_child_obj(obj, "uart", &s->uart,
-+                          sizeof(s->uart), TYPE_IBEX_UART);
- }
- 
- static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-@@ -137,8 +140,25 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-     busdev = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(busdev, 0, memmap[IBEX_PLIC].base);
- 
--    create_unimplemented_device("riscv.lowrisc.ibex.uart",
--        memmap[IBEX_UART].base, memmap[IBEX_UART].size);
-+    /* UART */
-+    dev = DEVICE(&(s->uart));
-+    qdev_prop_set_chr(dev, "chardev", serial_hd(0));
-+    object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    busdev = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(busdev, 0, memmap[IBEX_UART].base);
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(&s->plic),
-+                       IBEX_UART_TX_WATERMARK_IRQ));
-+    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(&s->plic),
-+                       IBEX_UART_RX_WATERMARK_IRQ));
-+    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(&s->plic),
-+                       IBEX_UART_TX_EMPTY_IRQ));
-+    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(DEVICE(&s->plic),
-+                       IBEX_UART_RX_OVERFLOW_IRQ));
-+
-     create_unimplemented_device("riscv.lowrisc.ibex.gpio",
-         memmap[IBEX_GPIO].base, memmap[IBEX_GPIO].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.spi",
--- 
-2.26.2
+> On Wed, May 27, 2020 at 06:27:38PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > On 5/27/20 6:16 PM, Peter Xu wrote: =20
+> > > On Wed, May 27, 2020 at 05:53:16PM +0200, Philippe Mathieu-Daud=C3=A9=
+ wrote: =20
+> > >>>>> +    for (i =3D 0; i < ARRAY_SIZE(iommu); i++) {
+> > >>>>> +        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu[i].=
+type)) {
+> > >>>>> +            trace_vfio_get_iommu_type(iommu[i].type, iommu[i].na=
+me); =20
+> > >>>> Just wondering why you want to trace the type as you now have the =
+name
+> > >>>> string. =20
+> > >>>
+> > >>> You are right :)
+> > >>> =20
+> > >>>>> +            return iommu[i].type;
+> > >>>>>          }
+> > >>>>>      }
+> > >>>>> +    trace_vfio_get_iommu_type(-1, "Not available or not supporte=
+d"); =20
+> > >>>> nit: from a debugging pov, this may be not needed as
+> > >>>> vfio_get_group/vfio_connect_container() fails and this leads to an=
+ error
+> > >>>> output. =20
+> > >>
+> > >> But you can reach this for example using No-IOMMU. If you don't mind=
+, I
+> > >> find having this information in the trace log clearer. =20
+> > >=20
+> > > I kinda agree with Eric - AFAICT QEMU vfio-pci don't work with no-iom=
+mu, then
+> > > it seems meaningless to trace it...
+> > >=20
+> > > I'm not sure whether this trace is extremely helpful because syscalls=
+ like this
+> > > could be easily traced by things like strace or bpftrace as general t=
+ools (and
+> > > this information should be a one-time thing rather than dynamically c=
+hanging),
+> > > no strong opinion though.  Also, if we want to dump something, maybe =
+it's
+> > > better to do in vfio_init_container() after vfio_get_iommu_type() suc=
+ceeded, so
+> > > we dump which container is enabled with what type of iommu. =20
+> >=20
+> > OK. I'm a recent VFIO user so maybe I am not using the good information=
+.
+> >=20
+> > This trace helps me while working on a new device feature, I didn't
+> > thought about gathering it in a production because there I'd expect
+> > things to work.
+> >=20
+> > Now in my case what I want is to know is if I'm using a v1 or v2 type.
+> > Maybe this information is already available in /proc or /sys and we
+> > don't need this patch... =20
+>=20
+> I don't know such /proc or /sys, so maybe it's still useful. I guess Alex=
+ would
+> have the best judgement. The strace/bpftrace things are not really reason=
+s I
+> found to nak this patch, but just something I thought first that could be
+> easier when any of us wants to peak at those information, probably someth=
+ing
+> just FYI. :-)
+
+Personally, I find traces to be quite handy, and it's nice if you can
+just enable more of them if they are in your debugging workflow anyway.
+Probably boils down to a matter of preference :)
 
 
