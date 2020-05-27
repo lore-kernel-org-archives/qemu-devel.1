@@ -2,95 +2,149 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D607C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6C4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:24:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29499207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:16:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mc7QfmnG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29499207CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 416712078C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 11:24:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416712078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdu3K-0004KH-CG
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 07:16:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36214)
+	id 1jduAN-0007Sb-Eh
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 07:24:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jdu2f-0003p4-3v
- for qemu-devel@nongnu.org; Wed, 27 May 2020 07:16:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37746)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jdu2e-0002iE-AX
- for qemu-devel@nongnu.org; Wed, 27 May 2020 07:16:12 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x13so8943749wrv.4
- for <qemu-devel@nongnu.org>; Wed, 27 May 2020 04:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=R3cM8aKxHLy75Pz1U+Vsw+e80lnIJU8Go4GIMUYt1ng=;
- b=mc7QfmnGb1HsBouMrk3C9398vDwimKJeNUBsbh4jTMBiYVVyIlVrXjQT0jaw0Lu514
- Z0FX5BniJA+/8EY8fVtUkRHZM3IVukfAz9H8oh/AIO8w+Bu7od+b4JsbibWcEdTSpowA
- KTDy3fjiV407DS15o10DrdYs8nIhSLQIWVeiqKjtfNprh0M3jZwg0nfrATXvCkNz2Bq0
- J7CoUFBl8wRM+2B2mi3lw2b6goZrSbm6YoYlPHipkU1r8mQoaEMPfKnknfJceqd8ejAs
- uBQlAA3apCpxANToJGE6GDLT+a9nAgT5G5DZ25pnV2r8T0mmt40fxXlSsjZipna7hxvW
- Nsiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=R3cM8aKxHLy75Pz1U+Vsw+e80lnIJU8Go4GIMUYt1ng=;
- b=o5Il1EZ5TBYie4iaa8scA4BdGsRCACgElXQN7YX0GKFn5tBmvyWkMDzjnI2q3CFmSs
- GapLnOWYKBndEBN8s58nCV7UX7CtdIGnwJuenofOmWQgxD8XIyG/RlkJ9DUxQ/R3Uyaj
- kLBgFC2SMrDJT4sY5EpfM+m5nxa8UUPbfQ91goCNWZ/mVEV/1weKPpGPB41Elx0PCjMV
- zE0myfping99l4WgZbHJUceog3MFrXOrNRhnVwgYi43hmA6trM95QS8FcVpuTAmeLdkP
- HFGBL/YQfR6ZkDidaZVniMu3J8AlnSOtn8KIqqAq2UspJouFwPh/TVh3rXvBdOsPPOnG
- QURA==
-X-Gm-Message-State: AOAM5328YdZuPpO9z40eXAoK9eDk2HO4SNRf5ujXrafZhulk052nGv1z
- fjFnhbQzz05H8mnTp5TOvY8h2JMFoRg=
-X-Google-Smtp-Source: ABdhPJxgRPHmHY/vlMT6H1M6Owvs04TCMVQqD7/895QVBeEKlqkieccrMB6mW59qJh5mOKQoO3WvKg==
-X-Received: by 2002:adf:dccc:: with SMTP id x12mr15007609wrm.72.1590578170875; 
- Wed, 27 May 2020 04:16:10 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id r2sm2833653wrg.68.2020.05.27.04.16.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 May 2020 04:16:10 -0700 (PDT)
-Date: Wed, 27 May 2020 12:16:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH] virtiofsd: Use clone() and not unshare(), support non-root
-Message-ID: <20200527111608.GE29137@stefanha-x1.localdomain>
-References: <348d4774-bd5f-4832-bd7e-a21491fdac8d@www.fastmail.com>
- <20200506191614.GR2743@work-vm>
- <20200507092832.GA1104082@redhat.com>
- <20200521101923.GF251811@stefanha-x1.localdomain>
- <20200521104344.GD2211791@redhat.com>
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jdu9h-00071P-Lr; Wed, 27 May 2020 07:23:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60952)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jdu9e-0006El-VD; Wed, 27 May 2020 07:23:29 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04RB9mLc149054; Wed, 27 May 2020 07:23:24 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 316ygc7aqv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 07:23:23 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04RAXVOw150484;
+ Wed, 27 May 2020 07:23:23 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 316ygc7apy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 07:23:23 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04RBFKr1005598;
+ Wed, 27 May 2020 11:23:21 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma04ams.nl.ibm.com with ESMTP id 316uf8yscm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 27 May 2020 11:23:21 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04RBNIuj26607828
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 27 May 2020 11:23:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A8AA7AE056;
+ Wed, 27 May 2020 11:23:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4EBB8AE04D;
+ Wed, 27 May 2020 11:23:18 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.21.239])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 27 May 2020 11:23:18 +0000 (GMT)
+Subject: Re: [PATCH v3 4/9] pc-bios: s390x: Get rid of magic offsets into the
+ lowcore
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+References: <20200527074920.43669-1-frankja@linux.ibm.com>
+ <20200527074920.43669-5-frankja@linux.ibm.com>
+ <a69f12b8-4ade-698a-b8cf-fd1f370a7c16@de.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d02ec3bf-e74e-ea55-d05c-c701acff2673@linux.ibm.com>
+Date: Wed, 27 May 2020 13:23:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <a69f12b8-4ade-698a-b8cf-fd1f370a7c16@de.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LSp5EJdfMPwZcMS1"
-Content-Disposition: inline
-In-Reply-To: <20200521104344.GD2211791@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ protocol="application/pgp-signature";
+ boundary="kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-05-27_03:2020-05-27,
+ 2020-05-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 impostorscore=0
+ cotscore=-2147483648 spamscore=0 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015 malwarescore=0
+ adultscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005270077
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 07:23:24
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,86 +157,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Colin Walters <walters@verbum.org>
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz
+Content-Type: multipart/mixed; boundary="zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a"
 
---LSp5EJdfMPwZcMS1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 21, 2020 at 11:43:44AM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, May 21, 2020 at 11:19:23AM +0100, Stefan Hajnoczi wrote:
-> > On Thu, May 07, 2020 at 10:28:32AM +0100, Daniel P. Berrang=E9 wrote:
-> > > If the person in the host launching virtiofsd is non-root, then
-> > > user namespaces mean they can offer the guest the full range of
-> > > POSIX APIs wrt access control & file ownership, since they're
-> > > no longer restricted to their single host UID when inside the
-> > > container.
-> >=20
-> > What installs the uid_map/gid_map for virtiofsd?
-> >=20
-> > My machine has /etc/subuid and /etc/subgid, but how would this come into
-> > play with these patches applied?
+On 5/27/20 10:50 AM, Christian Borntraeger wrote:
 >=20
-> AFAICT, nothing is setting up the mapping, hence my question in the first
-> review of this patch, that this patch seems incomplete.
 >=20
-> The subuid/subgid files are essentially just reserving a range of IDs
-> for each user. Something then needs to read & honour those IDs.
+> On 27.05.20 09:49, Janosch Frank wrote:
+>> If we have a lowcore struct that has members for offsets that we want
+>> to touch, why not use it?
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/cio.h  | 17 +++++++++++------
+>>  pc-bios/s390-ccw/main.c |  8 +++-----
+>>  2 files changed, 14 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+>> index aaa432dedd..1e5d4e92e1 100644
+>> --- a/pc-bios/s390-ccw/cio.h
+>> +++ b/pc-bios/s390-ccw/cio.h
+>> @@ -122,12 +122,17 @@ typedef struct schib {
+>>  } __attribute__ ((packed, aligned(4))) Schib;
+>> =20
+>>  typedef struct subchannel_id {
+>> -        __u32 cssid:8;
+>> -        __u32:4;
+>> -        __u32 m:1;
+>> -        __u32 ssid:2;
+>> -        __u32 one:1;
+>> -        __u32 sch_no:16;
+>> +    union {
+>> +        struct {
+>> +            __u16 cssid:8;
+>> +            __u16 reserved:4;
+>> +            __u16 m:1;
+>> +            __u16 ssid:2;
+>> +            __u16 one:1;
+>> +        };
+>> +        __u16 sch_id;
+>> +    };
+>> +    __u16 sch_no;
+>>  } __attribute__ ((packed, aligned(4))) SubChannelId;
+>>  >  struct chsc_header {
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 4e65b411e1..8b912454c9 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -36,11 +36,9 @@ LowCore *lowcore; /* Yes, this *is* a pointer to ad=
+dress 0 */
+>>   */
+>>  void write_subsystem_identification(void)
+>>  {
+>> -    SubChannelId *schid =3D (SubChannelId *) 184;
+>> -    uint32_t *zeroes =3D (uint32_t *) 188;
+>> -
+>> -    *schid =3D blk_schid;
+>> -    *zeroes =3D 0;
+>> +    lowcore->subchannel_id =3D blk_schid.sch_id;
+>> +    lowcore->subchannel_nr =3D blk_schid.sch_no;
+>> +    lowcore->io_int_parm =3D 0;
+>>  }
+>> =20
+>>  void write_iplb_location(void)
 >=20
-> The rules on setting up a mapping are complex though, to avoid a user
-> from creating a new user namespace, and defining a mapping that lets
-> them elevate privileges to read files in the host they wouldn't otherwise
-> be permitted to access.
+> As an alternative, why not change the definition of Lowcore and replace=
+ both 16bit
+> fields lowcore->subchannel_id and lowcore->subchannel_nr with SubChanne=
+lID.
+> You can then simply assign lowcore->schid=3D blk_schid;
 >=20
-> IIUC, applying the range of IDs from subuid/subgid will require the
-> process defining the mapping to have CAP_SETUID *outside* the container.
-> As an unprivileged host user, you won't have that, so I think the only
-> thing you can do is setup a mapping for your own UID/GID, which would
-> allow the container to read/write files owned by the host user that
-> started it. That should be ok for virtiofsd's needs at least for simple
-> file sharing. If virtiofsd needs to expose its full range of features
-> though, something privileged in the host needs to setup a full mapping
-> based on subuid/subgid
+> ?
 >=20
-> BTW, "man user_namespaces" gives many more details on UID mapping
-> rules.
->=20
-> > What happens when an unprivileged user who is not listed in /etc/subuid
-> > runs virtiofsd?
->=20
-> The UID map inside the container will be empty, which should result in
-> all files being remapped to (uid_t)-1 or whatever is shown in the
-> /proc/sys/kernel/overflow{u,g}id files.
->=20
-> So virtiofsd would not have any write access, and only have read access
-> to files which have world-read bit set. =20
+I think Pierre voted against that in the internal review if I remember
+correctly.
 
-Okay. Enabling user namespaces for virtiofsd is valuable. I think the
-behavior should be documented though so users know what needs to be
-configured. That is missing from this patch series.
 
-Stefan
+--zLS7YZK2mtTI7K9bvvXZ5mNr7Z3CYtv7a--
 
---LSp5EJdfMPwZcMS1
+--kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7OS/gACgkQnKSrs4Gr
-c8hSCgf/c/hBUXfeINuXnzL1o6gEq6vGrlwe/+ctA8v6/zcM6SDwyqXfhjUBB7T9
-IGfyjjuafnuOkcD4KaWI2Ufaiv5U5Q5WptrjazKMTRk+MkHvPKSF5KSUUpWlfhH9
-LqX7SmPWXFafLXOvHpgyPWeaSCnTwnmhTE842Y/O71SrJFb0Y1k6mEDwNM0Za0oo
-5fQ4dygUoDAwjohJmYJSilNPEfwrxES55wlrmdL4Q9ULVA6vWDwsLZFPfgtDUIyC
-QiIlFBbYd65kDyxzG97Ebwgffxj3p5TRonclbscMEm0f8hFrDzX8O43bBWrD1oQz
-0JpZ5qQcxQp/0QRftaZ65SikG2yX8A==
-=d5zl
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7OTaUACgkQ41TmuOI4
+ufgleA//WgNHRpTNekN/DInEimxRfToK3iUt62pswBQWOgCjpn0FHW3RJT1cKP73
+HVThLhtNUdnphQDRTHw1AhAW2RtdFw3VqUl30PKnX76mVxoNs/LMJj22rNrH2ejb
+8sZdYTlNNdMDg/q/zDDJ72yf+I0LdKRxRURNszHDy/fXQ8ZplMFnobPUrSe+HscV
+phBE2IAI0CJn8Xw2ZCFNTD97ChWXJg5LtNlhWCz3UXnxDaeCTVoJ/7qy5j9FhcFq
+H1+bdie4Ddont8Rt+kN6bRndNqKJ3fRtOBWoAWtejfOVlBnFRR/l+ICJINlJG+NJ
+vNVEwb2PJrJFqCLWP1LpZmSNvwetWOy3mgCJGdfTanukae4ToFmH1++DIuWkRoUH
+06xO8A8hFJln0n+RagzvevBD4FF7hP6mrme1NZ6+qxO8n5Z2Hknm2eUTinRAb9dk
+k3uSlmwPY2RPHuZtgP5YwPWG46b2rH3NVCUK0dWwj/foB9Zw/gZ2L0CHOY7J2WJR
+Dx6tkrYKSm+f3dWSWO6e4TTxgRh427ituE2cZ7kEbeWWB22fYUyCsrHOfeKCLeKv
+vUrDLiwqmYXlppev/GCMnxZ7LvFs5vFImqGJfdAMqCdr0XqIiM76hwTgxGGF3pRa
+13aTq3wP7AhRigh94Hs4tSUdjuBS4o1CaFPWHkv1Me6jVhsz410=
+=3REW
 -----END PGP SIGNATURE-----
 
---LSp5EJdfMPwZcMS1--
+--kgo1YMMxjC76mbUbwlO1FOCci5BBLVBuz--
+
 
