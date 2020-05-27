@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42209C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FA4C433E1
 	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AA5D207CB
+	by mail.kernel.org (Postfix) with ESMTPS id 5E425207CB
 	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:34:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA5D207CB
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E425207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdtOf-00087d-6N
+	id 1jdtOf-00089Z-H2
 	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 06:34:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56254)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jdtLP-0001mc-CL
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:31 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33686)
+ id 1jdtKs-0000k5-NS
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:59 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33520)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtLO-00021w-95
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:31 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtKr-0001pr-QE
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:58 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 33EB6CD463;
- Wed, 27 May 2020 13:31:29 +0300 (MSK)
-Subject: [PATCH v2 09/11] tests/acceptance: record/replay tests with advcal
- images
+ by mail.ispras.ru (Postfix) with ESMTPSA id E0D34CD462;
+ Wed, 27 May 2020 13:30:55 +0300 (MSK)
+Subject: [PATCH v2 03/11] tests/acceptance: add base class record/replay
+ kernel tests
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 27 May 2020 13:31:28 +0300
-Message-ID: <159057548896.16818.10761568499206774337.stgit@pasha-ThinkPad-X280>
+Date: Wed, 27 May 2020 13:30:55 +0300
+Message-ID: <159057545565.16818.10615781697342502198.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,129 +75,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds more record/replay tests with kernel images.
+This patch adds a base for testing kernel boot recording and replaying.
+Each test has the phase of recording and phase of replaying.
+Virtual machines just boot the kernel and do not interact with
+the network.
+Structure and image links for the tests are borrowed from boot_linux_console.py
+Testing controls the message pattern at the end of the kernel
+boot for both record and replay modes. In replay mode QEMU is also
+intended to finish the execution automatically.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
 --
 
 v2:
- - make download path fixed to allow pre-test downloading (suggested by Willian Rampazzo)
+ - changed default value of args to None (suggested by Willian Rampazzo)
+ - inherited common functions from boot_linux_console (suggested by Willian Rampazzo)
 ---
  0 files changed
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 47ef3139e6..e9a9ce4f66 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2497,6 +2497,7 @@ F: net/filter-replay.c
+ F: include/sysemu/replay.h
+ F: docs/replay.txt
+ F: stubs/replay.c
++F: tests/acceptance/replay_kernel.py
+ 
+ IOVA Tree
+ M: Peter Xu <peterx@redhat.com>
 diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-index 0d629d1ee7..cbc6e9742e 100644
---- a/tests/acceptance/replay_kernel.py
+new file mode 100644
+index 0000000000..b8b277ad2f
+--- /dev/null
 +++ b/tests/acceptance/replay_kernel.py
-@@ -168,3 +168,108 @@ class ReplayKernel(LinuxKernelUtils):
-                                'console=ttyS0 vga=off')
-         console_pattern = 'No filesystem could mount root'
-         self.run_rr(kernel_path, kernel_command_line, console_pattern)
+@@ -0,0 +1,57 @@
++# Record/replay test that boots a Linux kernel
++#
++# Copyright (c) 2020 ISP RAS
++#
++# Author:
++#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
-+    def do_test_advcal_2018(self, file_path, kernel_name, args=None):
-+        archive.extract(file_path, self.workdir)
++import os
++import gzip
 +
-+        for entry in os.scandir(self.workdir):
-+            if entry.name.startswith('day') and entry.is_dir():
-+                kernel_path = entry.path + '/' + kernel_name
-+                break
++from avocado_qemu import wait_for_console_pattern
++from avocado.utils import process
++from avocado.utils import archive
++from boot_linux_console import LinuxKernelUtils
 +
-+        kernel_command_line = ''
-+        console_pattern = 'QEMU advent calendar'
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern,
-+            args=args)
++class ReplayKernel(LinuxKernelUtils):
++    """
++    Boots a Linux kernel in record mode and checks that the console
++    is operational and the kernel command line is properly passed
++    from QEMU to the kernel.
++    Then replays the same scenario and verifies, that QEMU correctly
++    terminates.
++    """
 +
-+    def test_arm_vexpressa9(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:vexpress-a9
-+        """
-+        tar_hash = '32b7677ce8b6f1471fb0059865f451169934245b'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day16.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'winter.zImage',
-+            ('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.dtb'))
++    timeout = 90
 +
-+    def test_m68k_mcf5208evb(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:mcf5208evb
-+        """
-+        tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day07.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'sanity-clause.elf')
++    def run_vm(self, kernel_path, kernel_command_line, console_pattern,
++               record, shift, args):
++        vm = self.get_vm()
++        vm.set_console()
++        if record:
++            mode = 'record'
++        else:
++            mode = 'replay'
++        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s' %
++                    (shift, mode, os.path.join(self.workdir, 'replay.bin')),
++                    '-kernel', kernel_path,
++                    '-append', kernel_command_line,
++                    '-net', 'none')
++        if args:
++            vm.add_args(*args)
++        vm.launch()
++        self.wait_for_console_pattern(console_pattern, vm)
++        if record:
++            vm.shutdown()
++        else:
++            vm.wait()
 +
-+    def test_microblaze_s3adsp1800(self):
-+        """
-+        :avocado: tags=arch:microblaze
-+        :avocado: tags=machine:petalogix-s3adsp1800
-+        """
-+        tar_hash = '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day17.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'ballerina.bin')
-+
-+    def test_ppc64_e500(self):
-+        """
-+        :avocado: tags=arch:ppc64
-+        :avocado: tags=machine:ppce500
-+        """
-+        tar_hash = '6951d86d644b302898da2fd701739c9406527fe1'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day19.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'uImage', ('-cpu', 'e5500'))
-+
-+    def test_ppc_g3beige(self):
-+        """
-+        :avocado: tags=arch:ppc
-+        :avocado: tags=machine:g3beige
-+        """
-+        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day15.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'invaders.elf',
-+            ('-M', 'graphics=off'))
-+
-+    def test_ppc_mac99(self):
-+        """
-+        :avocado: tags=arch:ppc
-+        :avocado: tags=machine:mac99
-+        """
-+        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day15.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'invaders.elf',
-+            ('-M', 'graphics=off'))
-+
-+    def test_sparc_ss20(self):
-+        """
-+        :avocado: tags=arch:sparc
-+        :avocado: tags=machine:SS-20
-+        """
-+        tar_hash = 'b18550d5d61c7615d989a06edace051017726a9f'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day11.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'zImage.elf')
-+
-+    def test_xtensa_lx60(self):
-+        """
-+        :avocado: tags=arch:xtensa
-+        :avocado: tags=machine:lx60
-+        """
-+        tar_hash = '49e88d9933742f0164b60839886c9739cb7a0d34'
-+        tar_url = ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day02.tar.xz')
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        self.do_test_advcal_2018(file_path, 'santas-sleigh-ride.elf',
-+            ('-cpu', 'dc233c'))
++    def run_rr(self, kernel_path, kernel_command_line, console_pattern,
++        shift=7, args=None):
++        self.run_vm(kernel_path, kernel_command_line, console_pattern,
++                    True, shift, args)
++        self.run_vm(kernel_path, kernel_command_line, console_pattern,
++                    False, shift, args)
 
 
