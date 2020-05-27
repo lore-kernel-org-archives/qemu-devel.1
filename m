@@ -6,72 +6,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BEDC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8471FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDE77208FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE77208FE
+	by mail.kernel.org (Postfix) with ESMTPS id 58A2A20C56
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 07:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A2A20C56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdqpz-0006bK-Ub
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
+	id 1jdqq3-0006l7-Fo
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 03:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jdqom-0004pG-8v; Wed, 27 May 2020 03:49:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14546)
+ id 1jdqok-0004nO-Ut; Wed, 27 May 2020 03:49:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38972)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jdqol-0003dW-Ah; Wed, 27 May 2020 03:49:39 -0400
+ id 1jdqok-0003d1-3z; Wed, 27 May 2020 03:49:38 -0400
 Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04R7WM9K093814; Wed, 27 May 2020 03:49:37 -0400
+ 04R7WLdm093691; Wed, 27 May 2020 03:49:36 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 316ywnjt63-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 316ywnjt5j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 03:49:37 -0400
+ Wed, 27 May 2020 03:49:36 -0400
 Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04R7jUMG160755;
- Wed, 27 May 2020 03:49:37 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 316ywnjt4t-1
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04R7WL8Z093716;
+ Wed, 27 May 2020 03:49:36 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 316ywnjt4e-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 03:49:37 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04R7fJcd005300;
- Wed, 27 May 2020 07:49:34 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma04ams.nl.ibm.com with ESMTP id 316uf8yf29-1
+ Wed, 27 May 2020 03:49:35 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04R7fkno011259;
+ Wed, 27 May 2020 07:49:33 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma03ams.nl.ibm.com with ESMTP id 316uf87e5w-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 07:49:34 +0000
+ Wed, 27 May 2020 07:49:33 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 04R7mITS51380654
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 04R7nVug64422334
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 27 May 2020 07:48:18 GMT
+ Wed, 27 May 2020 07:49:31 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4B92FA4054;
- Wed, 27 May 2020 07:49:32 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 953E2A405B;
+ by IMSVA (Postfix) with ESMTP id 6D48DA405C;
  Wed, 27 May 2020 07:49:31 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B7B80A405F;
+ Wed, 27 May 2020 07:49:30 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 27 May 2020 07:49:31 +0000 (GMT)
+ Wed, 27 May 2020 07:49:30 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/9] pc-bios: s390x: Rename and use PSW_MASK_ZMODE constant
-Date: Wed, 27 May 2020 03:49:16 -0400
-Message-Id: <20200527074920.43669-6-frankja@linux.ibm.com>
+Subject: [PATCH v3 4/9] pc-bios: s390x: Get rid of magic offsets into the
+ lowcore
+Date: Wed, 27 May 2020 03:49:15 -0400
+Message-Id: <20200527074920.43669-5-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200527074920.43669-1-frankja@linux.ibm.com>
 References: <20200527074920.43669-1-frankja@linux.ibm.com>
@@ -83,7 +84,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  2020-05-27 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  suspectscore=1
- mlxlogscore=999 phishscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ mlxlogscore=754 phishscore=0 malwarescore=0 impostorscore=0 spamscore=0
  bulkscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 clxscore=1015
  priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
  reason=mlx scancount=1 engine=8.12.0-2004280000
@@ -116,56 +117,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZMODE has a lot of ambiguity with the ESAME architecture mode, but is
-actually 64 bit addressing.
-
-As PSW_MASK_64 is now effectively 33 bit long and the PSWLegacy struct
-has 2 32 bit members, let's also use a unsigned long pointer in
-dasd-ipl.c instead when oring the constant into a 8 byte PSW.
+If we have a lowcore struct that has members for offsets that we want
+to touch, why not use it?
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- pc-bios/s390-ccw/dasd-ipl.c  | 5 ++---
- pc-bios/s390-ccw/s390-arch.h | 2 +-
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/cio.h  | 17 +++++++++++------
+ pc-bios/s390-ccw/main.c |  8 +++-----
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-index 0fc879bb8e..0dbad051a2 100644
---- a/pc-bios/s390-ccw/dasd-ipl.c
-+++ b/pc-bios/s390-ccw/dasd-ipl.c
-@@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index aaa432dedd..1e5d4e92e1 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -122,12 +122,17 @@ typedef struct schib {
+ } __attribute__ ((packed, aligned(4))) Schib;
+ 
+ typedef struct subchannel_id {
+-        __u32 cssid:8;
+-        __u32:4;
+-        __u32 m:1;
+-        __u32 ssid:2;
+-        __u32 one:1;
+-        __u32 sch_no:16;
++    union {
++        struct {
++            __u16 cssid:8;
++            __u16 reserved:4;
++            __u16 m:1;
++            __u16 ssid:2;
++            __u16 one:1;
++        };
++        __u16 sch_id;
++    };
++    __u16 sch_no;
+ } __attribute__ ((packed, aligned(4))) SubChannelId;
+ 
+ struct chsc_header {
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 4e65b411e1..8b912454c9 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -36,11 +36,9 @@ LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
   */
- void dasd_ipl(SubChannelId schid, uint16_t cutype)
+ void write_subsystem_identification(void)
  {
--    PSWLegacy *pswl = (PSWLegacy *) 0x00;
-+    unsigned long *pswl = 0x0;
-     uint32_t ipl2_addr;
- 
-     /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
-@@ -229,7 +229,6 @@ void dasd_ipl(SubChannelId schid, uint16_t cutype)
-     run_ipl2(schid, cutype, ipl2_addr);
- 
-     /* Transfer control to the guest operating system */
--    pswl->mask |= PSW_MASK_EAMODE;   /* Force z-mode */
--    pswl->addr |= PSW_MASK_BAMODE;   /* ...          */
-+    *pswl |= PSW_MASK_64;   /* Force 64 bit addressing */
-     jump_to_low_kernel();
+-    SubChannelId *schid = (SubChannelId *) 184;
+-    uint32_t *zeroes = (uint32_t *) 188;
+-
+-    *schid = blk_schid;
+-    *zeroes = 0;
++    lowcore->subchannel_id = blk_schid.sch_id;
++    lowcore->subchannel_nr = blk_schid.sch_no;
++    lowcore->io_int_parm = 0;
  }
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-index 5f36361c02..73852029d4 100644
---- a/pc-bios/s390-ccw/s390-arch.h
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -29,7 +29,7 @@ _Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
- #define PSW_MASK_WAIT       0x0002000000000000ULL
- #define PSW_MASK_EAMODE     0x0000000100000000ULL
- #define PSW_MASK_BAMODE     0x0000000080000000ULL
--#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-+#define PSW_MASK_64         (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
  
- /* Low core mapping */
- typedef struct LowCore {
+ void write_iplb_location(void)
 -- 
 2.25.1
 
