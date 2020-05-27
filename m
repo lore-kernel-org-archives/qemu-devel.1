@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBD1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9D1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B58042073B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:36:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58042073B
+	by mail.kernel.org (Postfix) with ESMTPS id 0225E2084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 10:36:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0225E2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdtPw-0002kz-TY
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 06:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56078)
+	id 1jdtQP-0003JF-4S
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 06:36:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jdtKg-0000ah-8y
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:46 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33476)
+ id 1jdtL3-0000t7-1S
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:09 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33564)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtKf-0001dR-Dq
- for qemu-devel@nongnu.org; Wed, 27 May 2020 06:30:45 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jdtL2-0001rH-4J
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 06:31:08 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 6CD19CD463;
- Wed, 27 May 2020 13:30:44 +0300 (MSK)
-Subject: [PATCH v2 01/11] tests/acceptance: allow console interaction with
- specific VMs
+ by mail.ispras.ru (Postfix) with ESMTPSA id 2988ECD463;
+ Wed, 27 May 2020 13:31:07 +0300 (MSK)
+Subject: [PATCH v2 05/11] tests/acceptance: add record/replay test for aarch64
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 27 May 2020 13:30:44 +0300
-Message-ID: <159057544414.16818.6329438674514481731.stgit@pasha-ThinkPad-X280>
+Date: Wed, 27 May 2020 13:31:06 +0300
+Message-ID: <159057546689.16818.17382569698039249168.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,57 +74,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Console interaction in avocado scripts was possible only with single
-default VM.
-This patch modifies the function parameters to allow passing a specific
-VM as a parameter to interact with it.
+This patch adds a test for record/replay of the kernel
+image boot for aarch64 platform.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
 ---
  0 files changed
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index 59e7b4f763..77d1c1d9ff 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -69,13 +69,15 @@ def pick_default_qemu_bin(arch=None):
+diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
+index c7526f1aba..deca69d6cb 100644
+--- a/tests/acceptance/replay_kernel.py
++++ b/tests/acceptance/replay_kernel.py
+@@ -71,3 +71,21 @@ class ReplayKernel(LinuxKernelUtils):
+         console_pattern = 'Kernel command line: %s' % kernel_command_line
  
- 
- def _console_interaction(test, success_message, failure_message,
--                         send_string, keep_sending=False):
-+                         send_string, keep_sending=False, vm=None):
-     assert not keep_sending or send_string
--    console = test.vm.console_socket.makefile()
-+    if vm is None:
-+        vm = test.vm
-+    console = vm.console_socket.makefile()
-     console_logger = logging.getLogger('console')
-     while True:
-         if send_string:
--            test.vm.console_socket.sendall(send_string.encode())
-+            vm.console_socket.sendall(send_string.encode())
-             if not keep_sending:
-                 send_string = None # send only once
-         msg = console.readline().strip()
-@@ -115,7 +117,8 @@ def interrupt_interactive_console_until_pattern(test, success_message,
-     _console_interaction(test, success_message, failure_message,
-                          interrupt_string, True)
- 
--def wait_for_console_pattern(test, success_message, failure_message=None):
-+def wait_for_console_pattern(test, success_message, failure_message=None,
-+                             vm=None):
-     """
-     Waits for messages to appear on the console, while logging the content
- 
-@@ -125,7 +128,7 @@ def wait_for_console_pattern(test, success_message, failure_message=None):
-     :param success_message: if this message appears, test succeeds
-     :param failure_message: if this message appears, test fails
-     """
--    _console_interaction(test, success_message, failure_message, None)
-+    _console_interaction(test, success_message, failure_message, None, vm=vm)
- 
- def exec_command_and_wait_for_pattern(test, command,
-                                       success_message, failure_message=None):
+         self.run_rr(kernel_path, kernel_command_line, console_pattern)
++
++    def test_aarch64_virt(self):
++        """
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:virt
++        """
++        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
++                      '/linux/releases/29/Everything/aarch64/os/images/pxeboot'
++                      '/vmlinuz')
++        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyAMA0')
++        console_pattern = 'Kernel command line: %s' % kernel_command_line
++
++        self.run_rr(kernel_path, kernel_command_line, console_pattern,
++            args=('-cpu', 'cortex-a53'))
 
 
