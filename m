@@ -2,90 +2,73 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5F0C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AA5C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:42:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1C6207CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:37:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pj1bMnHY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1C6207CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3ECFB207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:42:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ECFB207CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdwFT-0004Tn-Se
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 09:37:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32876)
+	id 1jdwK6-0008DH-Bt
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 09:42:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdwEf-0003WY-MW
- for qemu-devel@nongnu.org; Wed, 27 May 2020 09:36:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51822
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jdwJZ-0007ni-KE
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 09:41:49 -0400
+Resent-Date: Wed, 27 May 2020 09:41:49 -0400
+Resent-Message-Id: <E1jdwJZ-0007ni-KE@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21731)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdwEd-0002Gy-Ie
- for qemu-devel@nongnu.org; Wed, 27 May 2020 09:36:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590586601;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZBuOzhkSMa4jTSlzlkfDTcaOnRT4FiitzG5grCTJKzY=;
- b=Pj1bMnHYDhSBCGme3bPf73KnB/a5mb/aWziTRaGrN2mDOsKBfYKMBV4Y9XQbNBIysYzgIq
- MA6pCo69tvJwgL2W1vW6mgQEPxL1MK7eM8IYkGFV71uuynWHwb/6uavxy+eUkF1aUJLepx
- Tk7czfKcPDYVnMqDvZo2WTJRsLIK+yk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-za3VZAiAOY-dNw7fSHrCgw-1; Wed, 27 May 2020 09:36:37 -0400
-X-MC-Unique: za3VZAiAOY-dNw7fSHrCgw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 725D41005510;
- Wed, 27 May 2020 13:36:35 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
- [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB4AD5D9E5;
- Wed, 27 May 2020 13:36:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6891E113864A; Wed, 27 May 2020 15:36:33 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v3] arm/aspeed: Rework NIC attachment
-References: <20200527124406.329503-1-clg@kaod.org>
-Date: Wed, 27 May 2020 15:36:33 +0200
-In-Reply-To: <20200527124406.329503-1-clg@kaod.org> (=?utf-8?Q?=22C=C3=A9d?=
- =?utf-8?Q?ric?= Le Goater"'s
- message of "Wed, 27 May 2020 14:44:06 +0200")
-Message-ID: <87lfldzehq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jdwJX-0006wo-Kf
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 09:41:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590586885; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=kWQq5A3RNS9oAbW0E2fqo4uNuUDR+WiGj/zFgsae+wyM+/UQoCKCgDQVblnJI9kkDWO3I+eGPCLNHf21RzCG/SVOSWRiGagq7/xVKPDyUQE+gPMD5Ad41tsrn3HfT8tq+mtJ/bUJMXqbAh9CJua0dKLJelrEYMZV3w4GRocJwmg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590586885;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=7pLJQooeO8RmaF61bBEnyduWippjbeDUtEUePOub8zs=; 
+ b=OqwQIDVArGcYJ6chaOg0Ar4ILlo81xIG8iH1WAhr7jSpbzEPjMcwKCYl0MX1v1aZVTECORd1d81C6mMC7dKEhCHkto0zJ1veNWrrLdjiaGTIj8Jew3f+Jjj4JH6hqiIwUQB1BwI/Q1Z+q4A9nMe4KNHvgcQtj9gtoY0IbDAGFAQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1590586881896415.8310295949061;
+ Wed, 27 May 2020 06:41:21 -0700 (PDT)
+Message-ID: <159058688028.16318.18277405305142866353@45ef0f9c86ae>
+In-Reply-To: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
+Subject: Re: [PATCH v2 00/11] Record/replay acceptance tests
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: Pavel.Dovgaluk@gmail.com
+Date: Wed, 27 May 2020 06:41:21 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 09:41:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,134 +81,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: wrampazz@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org,
+ dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, crosa@redhat.com,
+ pbonzini@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-C=C3=A9dric Le Goater <clg@kaod.org> writes:
-
-> The number of MACs supported by an Aspeed SoC is defined by "macs_num"
-> under the SoC model, that is two for the AST2400 and AST2500 and four
-> for the AST2600. The model initializes the maximum number of supported
-> MACs but the number of realized devices is capped by the number of
-> network device back-ends defined on the command line. This can leave
-> unrealized devices hanging around in the QOM composition tree.
->
-> Modify the machine initialization to define which MACs are attached to
-> a network device back-end using a bit-field property "macs-mask" and
-> let the SoC realize all network devices.
->
-> The default setting of "macs-mask" is "use MAC0" only, which works for
-> all our AST2400 and AST2500 machines. The AST2600 machines have
-> different configurations. The AST2600 EVB machine activates MAC1, MAC2
-> and MAC3 and the Tacoma BMC machine activates MAC2.
-
-Let's be more clear on what this means, and "This is actually a device
-modelling fix for these two machines."  Okay?
-
-> Inactive MACs will have no peer and QEMU may warn the user with :
->
->     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->     qemu-system-arm: warning: nic ftgmac100.3 has no peer
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Here's the "info qom-tree" change for tacoma-bmc:
-
-     /machine (tacoma-bmc-machine)
-       /peripheral (container)
-       /peripheral-anon (container)
-       /soc (ast2600-a1)
-         [...]
-         /ftgmac100[0] (ftgmac100)
-           /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[1] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[2] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[3] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         [...]
-         /mii[0] (aspeed-mmi)
-           /aspeed-mmi[0] (qemu:memory-region)
-         /mii[1] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-         /mii[2] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-         /mii[3] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-
-These changes are due to realizing MAC1, MAC2, MAC3.  Looks good.
-
-Here's "info qtree":
-
-       dev: ftgmac100, id ""
-         gpio-out "sysbus-irq" 1
-         aspeed =3D true
-    -    mac =3D "52:54:00:12:34:56"
-    -    netdev =3D "hub0port0"
-    +    mac =3D "52:54:00:12:34:57"
-    +    netdev =3D ""
-         mmio 000000001e660000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed =3D false
-    -    mac =3D "00:00:00:00:00:00"
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed =3D true
-    +    mac =3D "52:54:00:12:34:58"
-         netdev =3D ""
-    +    mmio 000000001e680000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed =3D false
-    -    mac =3D "00:00:00:00:00:00"
-    -    netdev =3D ""
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed =3D true
-    +    mac =3D "52:54:00:12:34:56"
-    +    netdev =3D "hub0port0"
-    +    mmio 000000001e670000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed =3D false
-    -    mac =3D "00:00:00:00:00:00"
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed =3D true
-    +    mac =3D "52:54:00:12:34:59"
-         netdev =3D ""
-    +    mmio 000000001e690000/0000000000002000
-       [...]
-       dev: aspeed-mmi, id ""
-         mmio 000000001e650000/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650008/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650010/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650018/0000000000000008
-
-Here we can see the network backend now gets connected to MAC2 instead
-of MAC0.
-
-This is without any networking-related options, i.e. we get just the
-single default network backend.
-
-> ---
->
->  To be applied on top of patch :
->
->  "arm/aspeed: Compute the number of CPUs from the SoC definition"=20
->  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.1006=
-073-1-clg@kaod.org/
->
->  Markus, do you mind taking this patch in your QOM series also ?
-
-On the contrary!
-
-I'll work my "info qom-tree" and "info qtree" diffs into the commit
-message, if you don't mind.
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTkwNTc1NDM4NDAuMTY4MTgu
+MTQzOTM0MzM5OTY4OTk1MjE3ODQuc3RnaXRAcGFzaGEtVGhpbmtQYWQtWDI4MC8KCgoKSGksCgpU
+aGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUg
+b3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTU5MDU3NTQz
+ODQwLjE2ODE4LjE0MzkzNDMzOTk2ODk5NTIxNzg0LnN0Z2l0QHBhc2hhLVRoaW5rUGFkLVgyODAK
+U3ViamVjdDogW1BBVENIIHYyIDAwLzExXSBSZWNvcmQvcmVwbGF5IGFjY2VwdGFuY2UgdGVzdHMK
+VHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
+ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
+aGV3L2NvdmVyLjE1OTA0Mjk5MDEuZ2l0LmJlcnRvQGlnYWxpYS5jb20gLT4gcGF0Y2hldy9jb3Zl
+ci4xNTkwNDI5OTAxLmdpdC5iZXJ0b0BpZ2FsaWEuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKY2VlZDUzYyB0ZXN0cy9hY2NlcHRhbmNlOiBMaW51eCBib290IHRlc3QgZm9yIHJl
+Y29yZC9yZXBsYXkKMTRiZjRiYyB0ZXN0cy9hY2NlcHRhbmNlOiByZWZhY3RvciBib290X2xpbnV4
+IHRvIGFsbG93IGNvZGUgcmV1c2UKZTE5MmZiMCB0ZXN0cy9hY2NlcHRhbmNlOiByZWNvcmQvcmVw
+bGF5IHRlc3RzIHdpdGggYWR2Y2FsIGltYWdlcwowZDQ4YWFjIHRlc3RzL2FjY2VwdGFuY2U6IGFk
+ZCByZWNvcmQvcmVwbGF5IHRlc3QgZm9yIG02OGsKMTY2MDM5NSB0ZXN0cy9hY2NlcHRhbmNlOiBh
+ZGQgcmVjb3JkL3JlcGxheSB0ZXN0IGZvciBwcGM2NAo4ODFlMWNmIHRlc3RzL2FjY2VwdGFuY2U6
+IGFkZCByZWNvcmQvcmVwbGF5IHRlc3QgZm9yIGFybQo5MWMzYzFmIHRlc3RzL2FjY2VwdGFuY2U6
+IGFkZCByZWNvcmQvcmVwbGF5IHRlc3QgZm9yIGFhcmNoNjQKMmEyMzZhMCB0ZXN0cy9hY2NlcHRh
+bmNlOiBhZGQga2VybmVsIHJlY29yZC9yZXBsYXkgdGVzdCBmb3IgeDg2XzY0CmJkNjhiNzggdGVz
+dHMvYWNjZXB0YW5jZTogYWRkIGJhc2UgY2xhc3MgcmVjb3JkL3JlcGxheSBrZXJuZWwgdGVzdHMK
+NjlhMThiOSB0ZXN0cy9hY2NlcHRhbmNlOiByZWZhY3RvciBib290X2xpbnV4X2NvbnNvbGUgdGVz
+dCB0byBhbGxvdyBjb2RlIHJldXNlCmY3ZGI0OWUgdGVzdHMvYWNjZXB0YW5jZTogYWxsb3cgY29u
+c29sZSBpbnRlcmFjdGlvbiB3aXRoIHNwZWNpZmljIFZNcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+MS8xMSBDaGVja2luZyBjb21taXQgZjdkYjQ5ZWY0MDNiICh0ZXN0cy9hY2NlcHRhbmNlOiBhbGxv
+dyBjb25zb2xlIGludGVyYWN0aW9uIHdpdGggc3BlY2lmaWMgVk1zKQoyLzExIENoZWNraW5nIGNv
+bW1pdCA2OWExOGI5MjQyNmYgKHRlc3RzL2FjY2VwdGFuY2U6IHJlZmFjdG9yIGJvb3RfbGludXhf
+Y29uc29sZSB0ZXN0IHRvIGFsbG93IGNvZGUgcmV1c2UpCjMvMTEgQ2hlY2tpbmcgY29tbWl0IGJk
+NjhiNzg5MGFlNCAodGVzdHMvYWNjZXB0YW5jZTogYWRkIGJhc2UgY2xhc3MgcmVjb3JkL3JlcGxh
+eSBrZXJuZWwgdGVzdHMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+My8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0LzExIENoZWNraW5nIGNvbW1pdCAyYTIz
+NmEwMTFhMWIgKHRlc3RzL2FjY2VwdGFuY2U6IGFkZCBrZXJuZWwgcmVjb3JkL3JlcGxheSB0ZXN0
+IGZvciB4ODZfNjQpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IDkxYzNjMWYzODk2OCAodGVzdHMvYWNj
+ZXB0YW5jZTogYWRkIHJlY29yZC9yZXBsYXkgdGVzdCBmb3IgYWFyY2g2NCkKNi8xMSBDaGVja2lu
+ZyBjb21taXQgODgxZTFjZmQ1MWU5ICh0ZXN0cy9hY2NlcHRhbmNlOiBhZGQgcmVjb3JkL3JlcGxh
+eSB0ZXN0IGZvciBhcm0pCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDE2NjAzOTViNTY0NSAodGVzdHMv
+YWNjZXB0YW5jZTogYWRkIHJlY29yZC9yZXBsYXkgdGVzdCBmb3IgcHBjNjQpCjgvMTEgQ2hlY2tp
+bmcgY29tbWl0IDBkNDhhYWMwZGJmYSAodGVzdHMvYWNjZXB0YW5jZTogYWRkIHJlY29yZC9yZXBs
+YXkgdGVzdCBmb3IgbTY4aykKOS8xMSBDaGVja2luZyBjb21taXQgZTE5MmZiMDZhYmM4ICh0ZXN0
+cy9hY2NlcHRhbmNlOiByZWNvcmQvcmVwbGF5IHRlc3RzIHdpdGggYWR2Y2FsIGltYWdlcykKMTAv
+MTEgQ2hlY2tpbmcgY29tbWl0IDE0YmY0YmM2NTY1NiAodGVzdHMvYWNjZXB0YW5jZTogcmVmYWN0
+b3IgYm9vdF9saW51eCB0byBhbGxvdyBjb2RlIHJldXNlKQoxMS8xMSBDaGVja2luZyBjb21taXQg
+Y2VlZDUzYzBiYzhkICh0ZXN0cy9hY2NlcHRhbmNlOiBMaW51eCBib290IHRlc3QgZm9yIHJlY29y
+ZC9yZXBsYXkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
+TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODM6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+cmVwbGF5X2xpbnV4LnB5OjQxOgorICAgICAgICB2bS5hZGRfYXJncygnLWRyaXZlJywgJ2RyaXZl
+cj1ibGtyZXBsYXksaWQ9ZGlzayVzLXJyLGlmPW5vbmUsaW1hZ2U9ZGlzayVzJyAlIChpZCwgaWQp
+KQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg0OiBGSUxFOiB0ZXN0cy9hY2Nl
+cHRhbmNlL3JlcGxheV9saW51eC5weTo0MjoKKyAgICAgICAgdm0uYWRkX2FyZ3MoJy1kZXZpY2Un
+LCAnJXMsZHJpdmU9ZGlzayVzLXJyJXMnICUgKGRldmljZSwgaWQsIGJ1c19zdHJpbmcpKQoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwNTogRklMRTogdGVzdHMvYWNjZXB0YW5j
+ZS9yZXBsYXlfbGludXgucHk6NjM6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgbG9nZ2VyPXNlbGYubG9nLmdldENoaWxkKCdjb25zb2xlJyksCgpFUlJP
+UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNjogRklMRTogdGVzdHMvYWNjZXB0YW5jZS9y
+ZXBsYXlfbGludXgucHk6NjQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgc3RvcF9jaGVjaz0obGFtYmRhIDogbm90IHZtLmlzX3J1bm5pbmcoKSkpCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA5OiBGSUxFOiB0ZXN0cy9hY2NlcHRh
+bmNlL3JlcGxheV9saW51eC5weTo2NzoKKyAgICAgICAgICAgIHNlbGYubG9nLmluZm8oJ1ZNIGxh
+dW5jaGVkLCB3YWl0aW5nIGZvciBib290IGNvbmZpcm1hdGlvbiBmcm9tIGd1ZXN0JykKCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTA6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+cmVwbGF5X2xpbnV4LnB5OjY4OgorICAgICAgICAgICAgY2xvdWRpbml0LndhaXRfZm9yX3Bob25l
+X2hvbWUoKCcwLjAuMC4wJywgc2VsZi5waG9uZV9ob21lX3BvcnQpLCBzZWxmLm5hbWUpCgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTEzOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNl
+L3JlcGxheV9saW51eC5weTo3MToKKyAgICAgICAgICAgIHNlbGYubG9nLmluZm8oJ1ZNIGxhdW5j
+aGVkLCB3YWl0aW5nIHRoZSByZWNvcmRlZCBleGVjdXRpb24gdG8gYmUgcmVwbGF5ZWQnKQoKdG90
+YWw6IDIgZXJyb3JzLCA2IHdhcm5pbmdzLCAxMDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTEg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1OTA1NzU0Mzg0MC4xNjgxOC4xNDM5MzQzMzk5Njg5OTUy
+MTc4NC5zdGdpdEBwYXNoYS1UaGlua1BhZC1YMjgwL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
