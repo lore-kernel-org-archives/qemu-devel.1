@@ -2,83 +2,82 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DF7C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5F0C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:37:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D2FF20899
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:28:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D1C6207CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 13:37:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJHUf0Y3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D2FF20899
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pj1bMnHY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1C6207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdw6G-0000b7-T3
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 09:28:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59580)
+	id 1jdwFT-0004Tn-Se
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 09:37:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdw5j-00005D-LK
- for qemu-devel@nongnu.org; Wed, 27 May 2020 09:27:31 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29791
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdwEf-0003WY-MW
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 09:36:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51822
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jdw5i-0005Qd-GL
- for qemu-devel@nongnu.org; Wed, 27 May 2020 09:27:31 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdwEd-0002Gy-Ie
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 09:36:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590586049;
+ s=mimecast20190719; t=1590586601;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eBlHYRr+2Dh8pEH404jcIq99PLQqY8QrTlAXqVTDhS8=;
- b=RJHUf0Y39xZrlTlXLqy8w19FlcJHJ5A/HApu7mNlYploDq2cjfX7hqJQh6aEXH1kPxdFYj
- UbjZAA+fclv3phdZB34eGx0COpHH+LkOjIuOvHRiy/BVeS9st7+rOBP51ek86xD8xdy5Gp
- 9BratT4AhnixYiiu666JNbbEFp0hZl8=
+ bh=ZBuOzhkSMa4jTSlzlkfDTcaOnRT4FiitzG5grCTJKzY=;
+ b=Pj1bMnHYDhSBCGme3bPf73KnB/a5mb/aWziTRaGrN2mDOsKBfYKMBV4Y9XQbNBIysYzgIq
+ MA6pCo69tvJwgL2W1vW6mgQEPxL1MK7eM8IYkGFV71uuynWHwb/6uavxy+eUkF1aUJLepx
+ Tk7czfKcPDYVnMqDvZo2WTJRsLIK+yk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-zVGhS5a3MQCqtzRdiYPJ-Q-1; Wed, 27 May 2020 09:27:25 -0400
-X-MC-Unique: zVGhS5a3MQCqtzRdiYPJ-Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-326-za3VZAiAOY-dNw7fSHrCgw-1; Wed, 27 May 2020 09:36:37 -0400
+X-MC-Unique: za3VZAiAOY-dNw7fSHrCgw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAB3B460;
- Wed, 27 May 2020 13:27:23 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0427A60C84;
- Wed, 27 May 2020 13:27:21 +0000 (UTC)
-Subject: Re: [PATCH v7 14/32] qcow2: Add QCow2SubclusterType and
- qcow2_get_subcluster_type()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1590429901.git.berto@igalia.com>
- <961e6f3e3af13a25c666859b391b7ed147873d8b.1590429901.git.berto@igalia.com>
- <c423bd22-cfd3-48c6-1129-eb784017cb8a@redhat.com>
- <w51k10xk8nf.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <ddd2085b-e8bb-932b-fbb4-5fbed6064132@redhat.com>
-Date: Wed, 27 May 2020 08:27:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 725D41005510;
+ Wed, 27 May 2020 13:36:35 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
+ [10.36.112.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EB4AD5D9E5;
+ Wed, 27 May 2020 13:36:34 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6891E113864A; Wed, 27 May 2020 15:36:33 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v3] arm/aspeed: Rework NIC attachment
+References: <20200527124406.329503-1-clg@kaod.org>
+Date: Wed, 27 May 2020 15:36:33 +0200
+In-Reply-To: <20200527124406.329503-1-clg@kaod.org> (=?utf-8?Q?=22C=C3=A9d?=
+ =?utf-8?Q?ric?= Le Goater"'s
+ message of "Wed, 27 May 2020 14:44:06 +0200")
+Message-ID: <87lfldzehq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <w51k10xk8nf.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:49:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -99,51 +98,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/27/20 4:51 AM, Alberto Garcia wrote:
-> On Tue 26 May 2020 10:32:08 PM CEST, Eric Blake wrote:
->>> +/* The subcluster X [0..31] is allocated */
->>> +#define QCOW_OFLAG_SUB_ALLOC(X)   (1ULL << (X))
->>> +/* The subcluster X [0..31] reads as zeroes */
->>> +#define QCOW_OFLAG_SUB_ZERO(X)    (QCOW_OFLAG_SUB_ALLOC(X) << 32)
->>> +/* Subclusters [X, Y) (0 <= X <= Y <= 32) are allocated */
->>
->> As you are now using a half-open range, should this be:
->>    (0 <= X < Y <= 32)
-> 
-> I changed the macros because I wanted to allow cases where X == Y.
-> 
-> The reason is the new qcow2_get_subcluster_range_type() function:
-> 
->      case QCOW2_SUBCLUSTER_NORMAL:
->          val = l2_bitmap | QCOW_OFLAG_SUB_ALLOC_RANGE(0, sc_from);
->          return cto32(val) - sc_from;
-> 
-> If sc_from is 0 then the result of the macro is also 0, and 'val' equals
-> the lower 32 bits (allocation status bits) of the L2 bitmap, as
-> expected.
-> 
->>> +#define QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) \
->>> +    (QCOW_OFLAG_SUB_ALLOC(Y) - QCOW_OFLAG_SUB_ALLOC(X))
->>
->> with <= instead of <, then it is impossible to distinguish between
->> QCOW_OFLAG_SUB_ALLOC_RANGE(0,0) and QCOW_OFLAG_SUB_ALLOC_RANGE(31,31)
->> which both resolve to 0.
-> 
-> Exactly, there is no difference and there should not be.
+C=C3=A9dric Le Goater <clg@kaod.org> writes:
 
-Okay, then with that explanation, I agree that the comment is correct as 
-written.
+> The number of MACs supported by an Aspeed SoC is defined by "macs_num"
+> under the SoC model, that is two for the AST2400 and AST2500 and four
+> for the AST2600. The model initializes the maximum number of supported
+> MACs but the number of realized devices is capped by the number of
+> network device back-ends defined on the command line. This can leave
+> unrealized devices hanging around in the QOM composition tree.
+>
+> Modify the machine initialization to define which MACs are attached to
+> a network device back-end using a bit-field property "macs-mask" and
+> let the SoC realize all network devices.
+>
+> The default setting of "macs-mask" is "use MAC0" only, which works for
+> all our AST2400 and AST2500 machines. The AST2600 machines have
+> different configurations. The AST2600 EVB machine activates MAC1, MAC2
+> and MAC3 and the Tacoma BMC machine activates MAC2.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Let's be more clear on what this means, and "This is actually a device
+modelling fix for these two machines."  Okay?
+
+> Inactive MACs will have no peer and QEMU may warn the user with :
+>
+>     qemu-system-arm: warning: nic ftgmac100.0 has no peer
+>     qemu-system-arm: warning: nic ftgmac100.1 has no peer
+>     qemu-system-arm: warning: nic ftgmac100.3 has no peer
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Here's the "info qom-tree" change for tacoma-bmc:
+
+     /machine (tacoma-bmc-machine)
+       /peripheral (container)
+       /peripheral-anon (container)
+       /soc (ast2600-a1)
+         [...]
+         /ftgmac100[0] (ftgmac100)
+           /ftgmac100[0] (qemu:memory-region)
+         /ftgmac100[1] (ftgmac100)
+    +      /ftgmac100[0] (qemu:memory-region)
+         /ftgmac100[2] (ftgmac100)
+    +      /ftgmac100[0] (qemu:memory-region)
+         /ftgmac100[3] (ftgmac100)
+    +      /ftgmac100[0] (qemu:memory-region)
+         [...]
+         /mii[0] (aspeed-mmi)
+           /aspeed-mmi[0] (qemu:memory-region)
+         /mii[1] (aspeed-mmi)
+    +      /aspeed-mmi[0] (qemu:memory-region)
+         /mii[2] (aspeed-mmi)
+    +      /aspeed-mmi[0] (qemu:memory-region)
+         /mii[3] (aspeed-mmi)
+    +      /aspeed-mmi[0] (qemu:memory-region)
+
+These changes are due to realizing MAC1, MAC2, MAC3.  Looks good.
+
+Here's "info qtree":
+
+       dev: ftgmac100, id ""
+         gpio-out "sysbus-irq" 1
+         aspeed =3D true
+    -    mac =3D "52:54:00:12:34:56"
+    -    netdev =3D "hub0port0"
+    +    mac =3D "52:54:00:12:34:57"
+    +    netdev =3D ""
+         mmio 000000001e660000/0000000000002000
+       dev: ftgmac100, id ""
+    -    aspeed =3D false
+    -    mac =3D "00:00:00:00:00:00"
+    +    gpio-out "sysbus-irq" 1
+    +    aspeed =3D true
+    +    mac =3D "52:54:00:12:34:58"
+         netdev =3D ""
+    +    mmio 000000001e680000/0000000000002000
+       dev: ftgmac100, id ""
+    -    aspeed =3D false
+    -    mac =3D "00:00:00:00:00:00"
+    -    netdev =3D ""
+    +    gpio-out "sysbus-irq" 1
+    +    aspeed =3D true
+    +    mac =3D "52:54:00:12:34:56"
+    +    netdev =3D "hub0port0"
+    +    mmio 000000001e670000/0000000000002000
+       dev: ftgmac100, id ""
+    -    aspeed =3D false
+    -    mac =3D "00:00:00:00:00:00"
+    +    gpio-out "sysbus-irq" 1
+    +    aspeed =3D true
+    +    mac =3D "52:54:00:12:34:59"
+         netdev =3D ""
+    +    mmio 000000001e690000/0000000000002000
+       [...]
+       dev: aspeed-mmi, id ""
+         mmio 000000001e650000/0000000000000008
+       dev: aspeed-mmi, id ""
+    +    mmio 000000001e650008/0000000000000008
+       dev: aspeed-mmi, id ""
+    +    mmio 000000001e650010/0000000000000008
+       dev: aspeed-mmi, id ""
+    +    mmio 000000001e650018/0000000000000008
+
+Here we can see the network backend now gets connected to MAC2 instead
+of MAC0.
+
+This is without any networking-related options, i.e. we get just the
+single default network backend.
+
+> ---
+>
+>  To be applied on top of patch :
+>
+>  "arm/aspeed: Compute the number of CPUs from the SoC definition"=20
+>  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200519091631.1006=
+073-1-clg@kaod.org/
+>
+>  Markus, do you mind taking this patch in your QOM series also ?
+
+On the contrary!
+
+I'll work my "info qom-tree" and "info qtree" diffs into the commit
+message, if you don't mind.
 
 
