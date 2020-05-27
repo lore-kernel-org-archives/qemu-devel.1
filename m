@@ -2,117 +2,98 @@ Return-Path: <SRS0=ACoC=7J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A2C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CAC92084C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:31:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CAC92084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id AE4272084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 14:32:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvt8XGsx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE4272084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdx5v-0000Ak-Fk
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:31:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40456)
+	id 1jdx6l-0001Ys-SD
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 10:32:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jdx3P-0005g4-TB
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:29:12 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:47045)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jdx3O-0005nU-6O
- for qemu-devel@nongnu.org; Wed, 27 May 2020 10:29:11 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MIKs0-1jq0Ge03sK-00ENRr; Wed, 27 May 2020 16:29:00 +0200
-Subject: Re: [PATCH] linux-user, alpha: fix oldumount syscall
-To: qemu-devel@nongnu.org
-References: <20200502194642.32823-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <5bd08ea4-bff9-d28f-8b7d-110717a7b505@vivier.eu>
-Date: Wed, 27 May 2020 16:28:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jdx5e-0000Ai-AW
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:31:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21142
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jdx5b-0000Gu-9o
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 10:31:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590589883;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NuMoZKKJfFF9i+2gxTmSdlbk0RJ0ivCytmCd98IeTAA=;
+ b=cvt8XGsxIhSCrJu8omXOF4mVE1EB083qeUTE7oIOQD+qqmYT40Sdjt41MMo26+VEOEk1dj
+ SIdDn/ErdR8wQbiOBKDZW8yz+W4gMucycKtgXmMGuJFHIpI+9dPLQ3npsWTMSJEMAzQX4J
+ tqbkUaD5gPQdjbQO+OnFEVesIXP5wAU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-jEFqVgI3N7GzuCPmHaTKQA-1; Wed, 27 May 2020 10:31:09 -0400
+X-MC-Unique: jEFqVgI3N7GzuCPmHaTKQA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 688DD107ACF7;
+ Wed, 27 May 2020 14:31:08 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1572D5C1C5;
+ Wed, 27 May 2020 14:31:04 +0000 (UTC)
+Date: Wed, 27 May 2020 15:31:01 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
+Message-ID: <20200527143101.GN2665520@redhat.com>
+References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-2-jsnow@redhat.com>
+ <b4618eb0-5303-40ab-b5e2-5a08d5738a81@virtuozzo.com>
+ <20b3fb10-8028-eb12-49a9-a3cc9dd45ed0@redhat.com>
+ <07ff57d4-8348-4409-ca8a-ff4c5278b973@virtuozzo.com>
+ <45dc0bb0-6b22-1703-0435-9d49d3df9978@redhat.com>
+ <20200526152207.GK2496524@redhat.com>
+ <169ab716-1013-e65b-be9f-9f73f65515c4@redhat.com>
+ <20200526152551.GL2496524@redhat.com>
+ <914a39b5-a5b6-7a6e-12ea-e8c60802b07c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200502194642.32823-1-laurent@vivier.eu>
+In-Reply-To: <914a39b5-a5b6-7a6e-12ea-e8c60802b07c@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:eyeW4cH4f+88Yn4xICeBMDTSnkl1tFbHoVqQK8jZYsx0uysSUHL
- Vcdloj1a96cmItFk2lwC1yNK5308hD425l0Qh5tNCvqwL87dQp1WSW9b2nufl4Whszc6AUq
- DZoJ3RrSJ3v5idwBbLqriZqtHJIgAhO1hL1yI0xM5CJ+WLZU2jlc2mOMOuiJGelIat5KL6f
- JlJtEjKRAueXOkohZW1vA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kGscLtug8No=:7MO7/290NJmFXQVC2Ed8Qx
- YlJga954jrC4yePySBM4rIST183fYSRFXMMbqHGOA8yLI5y6/ekCcjcSKrI7MkCx+viG90A5b
- BNUEHQjbbg3HHwZ/olcQzO14VztrfRuHqFuTM/CR4yKGlSmdr68bSkNTP5QNy0EAb2p6ZbOjt
- v+zaLhVWmDG5H7Rk1ZkmvfswDMBnWqfFJ1cLLMeDLqiq65N4GwRws2UCAeVRT5mRzduCIfXQA
- Xoyb+PLLW+L4ImtVwzlwEFWa1IZ4tYkwbl+baqjYR3QJytUqPYO0hkKvuXohb8TOjNgEUJvGE
- LeUJlavT0V/n22lI1YEFg3j1KDIkhC2V3iMKXQjiPspWDgnwWpsBH2GXUQZsFDBgwP6Nb3+SO
- wOnIrxPOFhtDJxDC++eUVsFCXqYU/PX78a+bkS22VYP9B/iIJ9ou2++he5n7acngUvLlwdPrt
- tXqZg1QeoidgJn46/KYbKQY0lioIwifQA52URYldXZcZXkgtrlA8TqxAh88R9Z+CJ5Lfdhp0U
- NRFYNWn1UqwmoTfn2GaV/rxTfLanBBizmnKhOf6LKfvqE1IAUoTRl8zmxxvlu52cBvBR+bI82
- 7PhLl0J4xiygivgMhO0NQDxdvpLu+MStMbiB0D1pp3Ft6tMgHLG1pyJLyifQA0EUs4Y2kJELj
- Pjv9iY8UwcFa3S3w54gzk/TrbrdshtwOaWNNJi7P1pOezfyYBhNHc4+QO+en42H6ht395e0k4
- 6AQzVZq/E2sSPoMLPU9cxTYxfow3rCPwFiLxGdmioDHOsfFjpJXrDCcsW7JdTLmca+rR68DlP
- EevZvDgz+HnJz0fAtXhrEATgqb4xgi46yWLiVPO0RjPlb1FRncUoB60rUVLLZXX5yCVsaA5
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 10:29:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,64 +106,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/05/2020 à 21:46, Laurent Vivier a écrit :
-> When we try to bootstrap debian/lenny for alpha, it fails because
-> it cannot umount /.root directory:
-> 
->   ...
->   Setting up initscripts (2.86.ds1-61) ...
->   umount: /.root: Function not implemented
->   dpkg: error processing initscripts (--configure):
->    subprocess post-installation script returned error exit status 1
->   dpkg: sysvinit: dependency problems, but configuring anyway as you request:
->    sysvinit depends on initscripts; however:
->     Package initscripts is not configured yet.
-> 
-> This is because, when we switched from syscall_nr.h to syscall.tbl,
-> the syscall #321 has been renamed from umount to oldumount and
-> syscall.c has not been updated to manage the new name.
-> 
-> oldumount has been introduced in linux 2.1.116pre1 by:
->   7d32756b2 ("Import 2.1.116pre1")
-> ...
->  * We now support a flag for forced unmount like the other 'big iron'
->  * unixes. Our API is identical to OSF/1 to avoid making a mess of AMD
-> ...
-> 
-> Fixes: 6116aea994 ("linux-user, alpha: add syscall table generation support")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/syscall.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff07..e89b815ce983 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -8028,8 +8028,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              }
->          }
->          return ret;
-> -#ifdef TARGET_NR_umount
-> +#if defined(TARGET_NR_umount) || defined(TARGET_NR_oldumount)
-> +#if defined(TARGET_NR_umount)
->      case TARGET_NR_umount:
-> +#endif
-> +#if defined(TARGET_NR_oldumount)
-> +    case TARGET_NR_oldumount:
-> +#endif
->          if (!(p = lock_user_string(arg1)))
->              return -TARGET_EFAULT;
->          ret = get_errno(umount(p));
-> 
+On Wed, May 27, 2020 at 10:28:44AM -0400, John Snow wrote:
+>=20
+>=20
+> On 5/26/20 11:25 AM, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, May 26, 2020 at 05:23:42PM +0200, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> >> On 5/26/20 5:22 PM, Daniel P. Berrang=C3=A9 wrote:
+> >>> On Mon, May 18, 2020 at 08:27:54PM -0400, John Snow wrote:
+> >>>>
+> >>>>
+> >>>> On 5/18/20 3:33 PM, Vladimir Sementsov-Ogievskiy wrote:
+> >>>>> 18.05.2020 21:23, John Snow wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>> On 5/18/20 2:14 PM, Vladimir Sementsov-Ogievskiy wrote:
+> >>>>>>> 14.05.2020 08:53, John Snow wrote:
+> >>>>>>>> move python/qemu/*.py to python/qemu/lib/*.py.
+> >>>>>>>>
+> >>>>>>>> To create a namespace package, the 'qemu' directory itself shoul=
+dn't
+> >>>>>>>> have module files in it. Thus, these files will go under a 'lib'
+> >>>>>>>> package
+> >>>>>>>> directory instead.
+> >>>>>>>
+> >>>>>>> Hmm..
+> >>>>>>>
+> >>>>>>> On the first glance, it looks better to have
+> >>>>>>>
+> >>>>>>> =C2=A0=C2=A0 from qemu import QEMUMachine
+> >>>>>>>
+> >>>>>>> than
+> >>>>>>> =C2=A0 =C2=A0=C2=A0 from qemu.lib import QEMUMachine
+> >>>>>>>
+> >>>>>>> why do we need this extra ".lib" part?
+> >>>>>>>
+> >>>>>>> Is it needed only for internal use?
+> >>>>>>>
+> >>>>>>> Assume we have installed qemu package. Can we write
+> >>>>>>>
+> >>>>>>> =C2=A0=C2=A0 from qemu import QEMUMachine
+> >>>>>>>
+> >>>>>>> ? Or we still need qemu.lib ?
+> >>>>>>>
+> >>>>>>> I don't remember any python package, which made me to write "impo=
+rt from
+> >>>>>>> package_name.lib ..."
+> >>>>>>>
+> >>>>>>>
+> >>>>>>
+> >>>>>> It's a strategy to create "qemu" as a PEP420 namespace package; i.=
+e.
+> >>>>>> "qemu" forms a namespace, but you need a name for the actual packa=
+ge
+> >>>>>> underneath it.
+> >>>>>>
+> >>>>>> "qemu.lib" is one package, with qmp, qtest, and machine modules. "=
+qemu"
+> >>>>>> isn't really a package in this system, it's just a namespace.
+> >>>>>>
+> >>>>>> The idea is that this allows us to create a more modular rollout o=
+f
+> >>>>>> various python scripts and services as desired instead of monolith=
+ically
+> >>>>>> bundling them all inside of a "qemu" package.
+> >>>>>>
+> >>>>>> It also allows us to fork or split out the sub-packages to separat=
+e
+> >>>>>> repos, if we wish. i.e., let's say we create a "qemu.sdk" subpacka=
+ge, we
+> >>>>>> can eventually fork it off into its own repo with its own installe=
+r and
+> >>>>>> so forth. These subpackages can be installed and managed separatel=
+y.
+> >>>>>>
+> >>>>>
+> >>>>> Okay, I understand.. No real objections than.
+> >>>>>
+> >>>>> Still, maybe, everything should not go into lib, maybe something li=
+ke
+> >>>>>
+> >>>>> qemu/vm/=C2=A0 - qmp, QEMUMachine, etc
+> >>>>> qemu/qtest/=C2=A0 - qtest
+> >>>>>
+> >>>>> would be more user friendly? But I'm not sure. I just thought that =
+"lib"
+> >>>>> is too generic.
+> >>>>>
+> >>>>
+> >>>> lib is a very generic name, I agree.
+> >>>>
+> >>>> Splitting accel, qmp and QEMUMachine in one package and keeping qtes=
+t in
+> >>>> another is fine too. I'm not sure if I like "vm" for the name of tha=
+t
+> >>>> core package, though.
+> >>>>
+> >>>> I want to avoid using "qemu/sdk" because I have some plans for tryin=
+g to
+> >>>> generate and package a "real" SDK using that namespace.
+> >>>>
+> >>>> "devkit"? "testkit"? "core"? Naming things is always the worst part.
+> >>>
+> >>> I'd suggest  "machine", as in
+> >>>
+> >>>   from qemu.machine import  kvm_available, QEMUMachine
+> >>>
+> >>> I wouldn't over-think the module naming as it has so little impact on
+> >>> the code usage - it usually only appears in the "import" statement.
+> >>
+> >> Don't forget linux-user binaries.
+> >=20
+> > That's why I suggested ".machine", as all the APIs there currently
+> > are focused on the machine emulators, and the linx-user binaries
+> > share essentially nothing in common with softmmu binaries in terms
+> > of control APIs / CLI config. We can add a "qemu.user" package
+> > later if we have stuff related to that to expose
+> >=20
+> I'm re-ordering the series to front-load the linting and type-checking;
+> and the package organization will now come second, in a separate series.
+>=20
+> Module naming isn't a big deal right now, but if we package it and
+> upload to PyPI it will be something we shouldn't change frivolously.
+>=20
+> Daniel, are you suggesting we split it like this? --
+>=20
+> - qemu.machine (machine.py, qtest.py, accel.py?)
+> - qemu.monitor (qmp.py)
 
-Applied to my linux-user branch.
+I was actually suggesting  everything in qemu.machine, but I guess
+qemu.monitor makes sense, given that this is an interface both for
+controlling QEMU and the guest agent.
 
-Thanks,
-Laurent
+> the only one that's really truly weird is accel.py?, which is just kind
+> of a misc function. I guess it can go in `qemu.machine` for now and if
+> we adopt a `qemu.user` later, we can pull it out into a common area if
+> we need to.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
