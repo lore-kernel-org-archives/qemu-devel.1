@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44611C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBA0C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:35:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 187592078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:25:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187592078B
+	by mail.kernel.org (Postfix) with ESMTPS id 38C4B2084C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 08:35:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C4B2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdrNO-0001Sq-B6
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 04:25:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56546)
+	id 1jdrWe-0004zB-8E
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 04:35:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jdrMq-0000a5-2s; Wed, 27 May 2020 04:24:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15672)
+ id 1jdrVu-0004WL-5X; Wed, 27 May 2020 04:34:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32488)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jdrMo-0007XB-Lq; Wed, 27 May 2020 04:24:51 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ id 1jdrVs-0002we-Sy; Wed, 27 May 2020 04:34:13 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04R82arA063900; Wed, 27 May 2020 04:24:46 -0400
+ 04R8XD5k052561; Wed, 27 May 2020 04:34:10 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31947h5mb7-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3170c6u3j5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 04:24:46 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04R83oo8070922;
- Wed, 27 May 2020 04:24:46 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31947h5maf-1
+ Wed, 27 May 2020 04:34:10 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04R8XRil053704;
+ Wed, 27 May 2020 04:34:10 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3170c6u3gc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 04:24:46 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04R8LVJS028548;
- Wed, 27 May 2020 08:24:43 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma01fra.de.ibm.com with ESMTP id 316uf8k2km-1
+ Wed, 27 May 2020 04:34:09 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04R8WbZ4022749;
+ Wed, 27 May 2020 08:34:07 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma05fra.de.ibm.com with ESMTP id 316uf8k1mj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 27 May 2020 08:24:43 +0000
+ Wed, 27 May 2020 08:34:07 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04R8Of869240960
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 04R8Wp5G66781524
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 27 May 2020 08:24:41 GMT
+ Wed, 27 May 2020 08:32:51 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 42BDC4C044;
- Wed, 27 May 2020 08:24:41 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 2CFF34C059;
+ Wed, 27 May 2020 08:34:05 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E3FB44C046;
- Wed, 27 May 2020 08:24:40 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D27B64C052;
+ Wed, 27 May 2020 08:34:04 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.10.46])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 27 May 2020 08:24:40 +0000 (GMT)
-Subject: Re: [PATCH v3 1/9] pc-bios: s390x: cio.c cleanup and compile fix
+ Wed, 27 May 2020 08:34:04 +0000 (GMT)
+Subject: Re: [PATCH v3 3/9] pc-bios: s390x: Move sleep and yield to helper.h
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200527074920.43669-1-frankja@linux.ibm.com>
- <20200527074920.43669-2-frankja@linux.ibm.com>
+ <20200527074920.43669-4-frankja@linux.ibm.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -115,26 +115,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <78361bb8-5ec5-05f9-4460-76a086c06832@de.ibm.com>
-Date: Wed, 27 May 2020 10:24:40 +0200
+Message-ID: <a4ac24a7-12c5-4ba8-8e44-0b1b73f1b7ff@de.ibm.com>
+Date: Wed, 27 May 2020 10:34:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200527074920.43669-2-frankja@linux.ibm.com>
+In-Reply-To: <20200527074920.43669-4-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-05-27_02:2020-05-26,
  2020-05-27 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 cotscore=-2147483648 spamscore=0
- clxscore=1015 priorityscore=1501 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005270058
+ malwarescore=0 bulkscore=0
+ cotscore=-2147483648 priorityscore=1501 impostorscore=0 clxscore=1015
+ suspectscore=0 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ phishscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005270062
 Received-SPF: pass client-ip=148.163.156.1;
  envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 03:49:33
@@ -166,73 +165,108 @@ Sender: "Qemu-devel"
 
 
 On 27.05.20 09:49, Janosch Frank wrote:
-> Let's initialize the structs at the beginning to ease reading and also
-> zeroing all other fields. This also makes the compiler stop
-> complaining about sense_id_ccw.flags being ored into when it's not
-> initialized.
+> They are definitely helper functions.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
 > ---
->  pc-bios/s390-ccw/cio.c | 40 ++++++++++++++++++++++------------------
->  1 file changed, 22 insertions(+), 18 deletions(-)
+>  pc-bios/s390-ccw/helper.h      | 17 +++++++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h    | 16 ----------------
+>  pc-bios/s390-ccw/virtio-net.c  |  1 +
+>  pc-bios/s390-ccw/virtio-scsi.c |  1 +
+>  4 files changed, 19 insertions(+), 16 deletions(-)
 > 
-> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
-> index 339ec5fbe7..dbae1e240e 100644
-> --- a/pc-bios/s390-ccw/cio.c
-> +++ b/pc-bios/s390-ccw/cio.c
-> @@ -49,13 +49,13 @@ void enable_subchannel(SubChannelId schid)
+> diff --git a/pc-bios/s390-ccw/helper.h b/pc-bios/s390-ccw/helper.h
+> index 78d5bc7442..d1b8b14d30 100644
+> --- a/pc-bios/s390-ccw/helper.h
+> +++ b/pc-bios/s390-ccw/helper.h
+> @@ -14,6 +14,7 @@
+>  #define S390_CCW_HELPER_H
 >  
->  uint16_t cu_type(SubChannelId schid)
->  {
-> -    Ccw1 sense_id_ccw;
->      SenseId sense_data;
-> -
-> -    sense_id_ccw.cmd_code = CCW_CMD_SENSE_ID;
-> -    sense_id_ccw.cda = ptr2u32(&sense_data);
-> -    sense_id_ccw.count = sizeof(sense_data);
-> -    sense_id_ccw.flags |= CCW_FLAG_SLI;
-> +    Ccw1 sense_id_ccw = {
-> +        .cmd_code = CCW_CMD_SENSE_ID,
-> +        .count = sizeof(sense_data),
-> +        .flags = CCW_FLAG_SLI,
-> +        .cda = ptr2u32(&sense_data),
-> +    };
-
-nitpicking, since you change the order anyway you _could_ swap count and flag
-to match the order of struct Ccw. Only necessary when redoing.
-
-
+>  #include "s390-ccw.h"
+> +#include "time.h"
 >  
->      if (do_cio(schid, CU_TYPE_UNKNOWN, ptr2u32(&sense_id_ccw), CCW_FMT1)) {
->          panic("Failed to run SenseID CCw\n");
-> @@ -67,13 +67,13 @@ uint16_t cu_type(SubChannelId schid)
->  int basic_sense(SubChannelId schid, uint16_t cutype, void *sense_data,
->                   uint16_t data_size)
->  {
-> -    Ccw1 senseCcw;
-> +    Ccw1 senseCcw = {
-> +        .cmd_code = CCW_CMD_BASIC_SENSE,
-> +        .count = data_size,
-> +        .cda = ptr2u32(sense_data),
-> +    };
->      Irb irb;
+>  /* Avoids compiler warnings when casting a pointer to a u32 */
+>  static inline uint32_t ptr2u32(void *ptr)
+> @@ -28,4 +29,20 @@ static inline void *u32toptr(uint32_t n)
+>      return (void *)(uint64_t)n;
+>  }
 >  
-> -    senseCcw.cmd_code = CCW_CMD_BASIC_SENSE;
-> -    senseCcw.cda = ptr2u32(sense_data);
-> -    senseCcw.count = data_size;
-> -
+> +static inline void yield(void)
+> +{
+> +    asm volatile ("diag 0,0,0x44"
+> +                  : :
+> +                  : "memory", "cc");
+> +}
+> +
+> +static inline void sleep(unsigned int seconds)
+> +{
+> +    ulong target = get_time_seconds() + seconds;
+> +
+> +    while (get_time_seconds() < target) {
+> +        yield();
+> +    }
 
-here it is fine, due to the lack of flags. 
-Was this actually a bug before that senseCcw.flags was
-not zeroed out?
+This actually asks for a future cleanup patch to replace the busy wait with a sleeping wait.
 
+Anyway,
 
-[...]
-
-Other than that
 Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
+> +}
+> +
+>  #endif
+> diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+> index 9514b76596..c5820e43ae 100644
+> --- a/pc-bios/s390-ccw/s390-ccw.h
+> +++ b/pc-bios/s390-ccw/s390-ccw.h
+> @@ -142,24 +142,8 @@ static inline void debug_print_addr(const char *desc, void *p)
+>  #define KVM_S390_VIRTIO_SET_STATUS      2
+>  #define KVM_S390_VIRTIO_CCW_NOTIFY      3
+>  
+> -static inline void yield(void)
+> -{
+> -    asm volatile ("diag 0,0,0x44"
+> -                  : :
+> -                  : "memory", "cc");
+> -}
+> -
+>  #define MAX_SECTOR_SIZE 4096
+>  
+> -static inline void sleep(unsigned int seconds)
+> -{
+> -    ulong target = get_second() + seconds;
+> -
+> -    while (get_second() < target) {
+> -        yield();
+> -    }
+> -}
+> -
+>  static inline void IPL_assert(bool term, const char *message)
+>  {
+>      if (!term) {
+> diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
+> index 4de03728bb..f018d58994 100644
+> --- a/pc-bios/s390-ccw/virtio-net.c
+> +++ b/pc-bios/s390-ccw/virtio-net.c
+> @@ -20,6 +20,7 @@
+>  #include "s390-ccw.h"
+>  #include "virtio.h"
+>  #include "time.h"
+> +#include "helper.h"
+>  
+>  #ifndef DEBUG_VIRTIO_NET
+>  #define DEBUG_VIRTIO_NET 0
+> diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+> index 0620651da8..907f8a08bd 100644
+> --- a/pc-bios/s390-ccw/virtio-scsi.c
+> +++ b/pc-bios/s390-ccw/virtio-scsi.c
+> @@ -15,6 +15,7 @@
+>  #include "scsi.h"
+>  #include "virtio-scsi.h"
+>  #include "time.h"
+> +#include "helper.h"
+>  
+>  static ScsiDevice default_scsi_device;
+>  static VirtioScsiCmdReq req;
+> 
 
