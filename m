@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A171C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F46C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:05:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED251207D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:05:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 029D4207D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 May 2020 06:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yb0OBybW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED251207D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fj7lst8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029D4207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jdpC0-0002C8-2F
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:05:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51316)
+	id 1jdpC2-0002Iq-6b
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 02:05:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdp6e-0002cL-NP
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdp6d-0002bW-3j
  for qemu-devel@nongnu.org; Wed, 27 May 2020 02:00:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25436
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41525)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdp6b-0004Gc-6e
- for qemu-devel@nongnu.org; Wed, 27 May 2020 02:00:00 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jdp6X-0004F1-Sx
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 01:59:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590559196;
+ s=mimecast20190719; t=1590559192;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j6YgtXDpCWCf9KnSRhU+LICwWG5pFJTKsR57WPE8YO4=;
- b=Yb0OBybWCBSsK2Ta7LtTuLAlMgZqXjfwcP3UNeVcrGQ81fjQy7sXpL+hDj9eIpkbjZweec
- mwBRnIiRwljom/M00iSM/XiuzFFOVMUTsB5ZaumNwuq9RhwiMf0lCZlFNMZJdWOw7D4d0c
- 7gXFvEOXtn1CZ6/T/vOkME7epy6PEKo=
+ bh=/ZP0qJvOwAC4h1HCMRaDbDRJbB+KSn/nLPEOMovO5Cs=;
+ b=fj7lst8P4PsdsgMokekIJNeZ0CvqOkq69M+UyLVUKHsdj4sP0+Tm6Y+AO+N9Ul+lcuo3oP
+ CLqDATK4i764Jxd0710exmVYiQkCY31jih2ey9gex8Rfm9Ptp0qqNtMo1Hg1AvKdmcUiiN
+ OPrz8R/4l7r5mRBs0i2CrkZj4Pka9wU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-eEH0X-D4OE60pRaysMOMXQ-1; Wed, 27 May 2020 01:59:51 -0400
-X-MC-Unique: eEH0X-D4OE60pRaysMOMXQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-21-phsY-FpCNqSgX9IDqPgYaw-1; Wed, 27 May 2020 01:59:50 -0400
+X-MC-Unique: phsY-FpCNqSgX9IDqPgYaw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 710038014D4;
- Wed, 27 May 2020 05:59:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 685FA1005512;
+ Wed, 27 May 2020 05:59:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C56279C5C;
- Wed, 27 May 2020 05:59:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 064565D9E8;
+ Wed, 27 May 2020 05:59:49 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E4B9E11386A3; Wed, 27 May 2020 07:59:45 +0200 (CEST)
+ id 0869411358C0; Wed, 27 May 2020 07:59:46 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/10] xen: Fix and improve handling of device_add usb-host
- errors
-Date: Wed, 27 May 2020 07:59:37 +0200
-Message-Id: <20200527055945.6774-3-armbru@redhat.com>
+Subject: [PULL 09/10] arm/sabrelite: Consistently use &error_fatal in
+ sabrelite_init()
+Date: Wed, 27 May 2020 07:59:44 +0200
+Message-Id: <20200527055945.6774-10-armbru@redhat.com>
 In-Reply-To: <20200527055945.6774-1-armbru@redhat.com>
 References: <20200527055945.6774-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/27 00:45:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
@@ -96,78 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Paul Durrant <paul@xen.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-usbback_portid_add() leaks the error when qdev_device_add() fails.
-Fix that.  While there, use the error to improve the error message.
-
-The qemu_opts_from_qdict() similarly leaks on failure.  But any
-failure there is a programming error.  Pass &error_abort.
-
-Fixes: 816ac92ef769f9ffc534e49a1bb6177bddce7aa2
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: xen-devel@lists.xenproject.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200505101908.6207-3-armbru@redhat.com>
-Acked-by: Paul Durrant <paul@xen.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200505101908.6207-10-armbru@redhat.com>
+[Straightforward conflict with resolved d2623129a7 "qom: Drop
+parameter @errp of object_property_add() & friends"]
 ---
- hw/usb/xen-usb.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ hw/arm/sabrelite.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
-index 961190d0f7..4d266d7bb4 100644
---- a/hw/usb/xen-usb.c
-+++ b/hw/usb/xen-usb.c
-@@ -30,6 +30,7 @@
- #include "hw/usb.h"
- #include "hw/xen/xen-legacy-backend.h"
- #include "monitor/qdev.h"
-+#include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
+diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+index 6f0e233d77..96cb30aa3c 100644
+--- a/hw/arm/sabrelite.c
++++ b/hw/arm/sabrelite.c
+@@ -41,7 +41,6 @@ static void sabrelite_reset_secondary(ARMCPU *cpu,
+ static void sabrelite_init(MachineState *machine)
+ {
+     FslIMX6State *s;
+-    Error *err = NULL;
  
-@@ -755,13 +756,16 @@ static void usbback_portid_add(struct usbback_info *usbif, unsigned port,
-     qdict_put_int(qdict, "port", port);
-     qdict_put_int(qdict, "hostbus", atoi(busid));
-     qdict_put_str(qdict, "hostport", portname);
--    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
--    if (local_err) {
--        goto err;
+     /* Check the amount of memory is compatible with the SOC */
+     if (machine->ram_size > FSL_IMX6_MMDC_SIZE) {
+@@ -52,11 +51,7 @@ static void sabrelite_init(MachineState *machine)
+ 
+     s = FSL_IMX6(object_new(TYPE_FSL_IMX6));
+     object_property_add_child(OBJECT(machine), "soc", OBJECT(s));
+-    object_property_set_bool(OBJECT(s), true, "realized", &err);
+-    if (err != NULL) {
+-        error_report("%s", error_get_pretty(err));
+-        exit(1);
 -    }
-+    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict,
-+                                &error_abort);
-     usbif->ports[port - 1].dev = USB_DEVICE(qdev_device_add(opts, &local_err));
-     if (!usbif->ports[port - 1].dev) {
--        goto err;
-+        qobject_unref(qdict);
-+        xen_pv_printf(&usbif->xendev, 0,
-+                      "device %s could not be opened: %s\n",
-+                      busid, error_get_pretty(local_err));
-+        error_free(local_err);
-+        return;
-     }
-     qobject_unref(qdict);
-     speed = usbif->ports[port - 1].dev->speed;
-@@ -793,11 +797,6 @@ static void usbback_portid_add(struct usbback_info *usbif, unsigned port,
-     usbback_hotplug_enq(usbif, port);
++    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
  
-     TR_BUS(&usbif->xendev, "port %d attached\n", port);
--    return;
--
--err:
--    qobject_unref(qdict);
--    xen_pv_printf(&usbif->xendev, 0, "device %s could not be opened\n", busid);
- }
- 
- static void usbback_process_port(struct usbback_info *usbif, unsigned port)
+     memory_region_add_subregion(get_system_memory(), FSL_IMX6_MMDC_ADDR,
+                                 machine->ram);
 -- 
 2.21.3
 
