@@ -2,40 +2,39 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37554C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 063DEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04A0720721
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:11:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A0720721
+	by mail.kernel.org (Postfix) with ESMTPS id D281020721
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:14:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D281020721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeM3p-0005uM-6H
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:11:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47794)
+	id 1jeM6h-00087Z-0n
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:14:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeM34-0004Nx-FA
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:10:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:56543)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeM5f-0007Be-Hu
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:13:11 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:37497)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeM32-0000O7-Rw
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:10:30 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeM5e-0002kX-IX
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:13:11 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MpCz1-1jE3hB0Ssx-00qjGc; Thu, 28 May 2020 19:10:22 +0200
-Subject: Re: [PATCH v2] linux-user: support of semtimedop syscall
-To: Matus Kysel <mkysel@tachyum.com>
-References: <20200512074510.40215-1-mkysel@tachyum.com>
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N2Ujn-1is0WT2jU7-013zP8; Thu, 28 May 2020 19:13:06 +0200
+Subject: Re: [PATCH] linux-user/sparc64: Translate flushw opcode
+To: LemonBoy <thatlemon@gmail.com>
+References: <894ec93e-05dd-2110-a0c2-e0afa2fa6fd5@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,41 +78,41 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <caea3425-af6f-0857-3a81-f51dfb63f5b6@vivier.eu>
-Date: Thu, 28 May 2020 19:10:20 +0200
+Message-ID: <61e6f953-8b6c-a10b-8604-92e300146a93@vivier.eu>
+Date: Thu, 28 May 2020 19:13:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200512074510.40215-1-mkysel@tachyum.com>
+In-Reply-To: <894ec93e-05dd-2110-a0c2-e0afa2fa6fd5@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:9oimq8ybwYxKzBhPF3/Vw9cD6J7s8dlC+iMbUmIDZFkULcA3+X9
- qJRPM9xsWfzAD9mtlYGgjnl3Zo3Y2zIdO1u4cfO+Nx8Puil+628ig0tT/YvK6d70epAsH3+
- FaYnqLyT7rELuvuc8y57Nrw1rTvTMhZ97dP9mghgy4JD0r1Wn6P1N3wh8k+SCku4Nq+xeZC
- Dr3YRcCb7s8boNwlz15OA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:vCYFXGQQ7T0=:nSjNqL1Mhom0tRNjeWw6QW
- qQGRy3cfzpEfmZ7tnIR/L772oMysT7fDRt5FS/gJXsoVCOcI5jGdv5BHJzNDw78afZFTSeJEh
- uapnyz14hWzvMKZWTKaLyTGgJFYGtbf0NZFY2367Bl3KgfPtRo2V+gTldOGKjpGd5iuI+ZCs0
- h4RuXuiEReecmNazOi7qqvPEFxWcpxEGEFTZG/1VdD1Eijl1210olGmCOqTvVmHknded+2lLo
- bOjZmRB4MHGbF3Ewgi/VfF0/qGleBhbRGM9WIgjCDS6GOMheDJJNyzYRsLMMZgBih+gV/ZY1K
- F3umB/5DgYNDY7/ImmZ/dt8ikpQIf8Mxdv8kzSMSLV295JnNBae/lMlbeqSw6s+1XPX6MtuU5
- R1nzUtfGq129ICUs8HDlFYXHk/60LNi+3rfKpA6JyArmATY7avgQ5N80LZmPOY8WOgi0ePy4o
- Dl+nPN4wa6MV/u+FUBvKhKx7iPKJ/3lrsCspHiD9Jm/tvnFO0T2yomkRgm0lFop/I6uiZ9oNM
- K9Xbq5Ll0+PXwazRcrddewYsaPz+RlEHJdUKOqRcM7OxglIcPE+5WMbkxxjOkxCKU1CcsAV1D
- yZOoicozriz4q/Ouz5ScfjWuXFn7qg01SZjAQFunNYSPOWQmRVsZunnebLztCCCdgAtL5u+nf
- 9hsJ7nGyuWFC0B5SAna5qPP5e3m2VQy2J+3iDGs6Nn/JSun7sH2ChmXKrX/rqx5Vv+hOgDb5z
- HIz/afpFoWEfZjiQTZp77XCgtJlbP2OnQEq/hUzoN0zmw7G9bFt9Vhos1v1B3x0ehlTTkEqne
- noj1qe8bL5iOzTQ6Ka/fihlxPH1Hh9tBAONO3ukOGczl3DLVjKZAMuJm5/u9jAPBT+GkOC2
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:B4xSfI1dCuTqroBHIkiRmix8Vp3SrlhM9ZzhVU2gtijBObtk1ef
+ t9j6+6T/AwyKfTDGqNT1RMCWtkl6cjXhFIA03iRzZRTA+2eL/ymHloe8EmDYv6ly5DIpCRK
+ 4wS3lz/cfKUR1YBNcq/FvVnCESgxc4qF2tj7zGyh6G0wbJwEjpzefzjgiLFriOLER3B7Brb
+ PK7YIOXb7r62OFML7DQMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3Egk2p3E59A=:t96YE1PdauF9uBkMrpU+bo
+ K8RonRdDygAFywOFhwlGj3pwWReldDLAIGORA5DlNWQ2V0shreHgv+ul0A0EZe7K/PE/auZip
+ n2wn3tklWaRfZ8IjKAlDWNXo8yO8vwzGW1qGecQMyh5b7nuC4K83a6RBCzm0e9NqhEy0/k0is
+ vicM6tPbiicwDOvEujy6unDZXBNdNPqnQyE2suZJ84XR1OoTJLLDHeeANN34cMua/DKBvhiSb
+ Fhm2A1FU0w36m1yMWRSqJaAY32bvAt+xS4zksLj0s2OEIFmd2rGzwxel7peGPkM0sjmgX8gtM
+ yhAgZQ1aQuuMXMC5roXU67KqGDU7NeucPCrkyfUbwqrTUDjPjBHYsTRDO0Vo3VCEn8au3y5MS
+ agWyyS+ZtH2Ak+TYeTNlU68xnpZI91NtOqRYnp/1Uh0/8qGkAvOxqdz1pElX4r+saDWHCnaAL
+ DZ8NBrigkX+vR2UJxFaKrAJxI7bHtsU4kmwNs4km3Rj97F38AG/br8oIm45vYI89QUifqgi2h
+ eAKHTqb/7mxHXkX5mJUkK+3EAksWpMuX6KU+3TNoJRZi1mvqxYs+WQNaeWzTfzTJyU4j47RLi
+ FmNPgAvWgSve4JN8tOzU35EIkcVMr6oIwsTl5gSY05Zif4G2/dvAZEUll9UN53VSP1iQeL5fo
+ EwSZd5DDMQInOirdgKwvwcG8IPwQdfNleVIAYYwslMduH1kUaz0H/fV4TVBDx82Of4vtaC0k+
+ mCCB1hp+g0Xl3Fc08Pkj0ucvz4303dkNy0kyZGnSE0gcJi29REoUTEVbaIeHZj6emhk+WmVO1
+ yJR9DDnXQJyKg3JOrTCJmbskNvHD6xtWN4/LM3rQnAWTc2KhwjjU9i6BYG+M/kOrvlCttpX
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 13:10:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 13:13:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,110 +125,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/05/2020 à 09:45, Matus Kysel a écrit :
-> We should add support of semtimedop syscall as new version of
-> glibc 2.31 uses semop based on semtimedop (commit: https://gitlab.com/freedesktop-sdk/mirrors/sourceware/glibc/-/commit/765cdd0bffd77960ae852104fc4ea5edcdb8aed3 ).
-> 
-> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
-> ---
->  linux-user/syscall.c | 34 ++++++++++++++++++++++++++++------
->  1 file changed, 28 insertions(+), 6 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..7c6f9439e0 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1227,7 +1227,8 @@ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
->      defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6) || \
->      defined(TARGET_NR_nanosleep) || defined(TARGET_NR_clock_settime) || \
->      defined(TARGET_NR_utimensat) || defined(TARGET_NR_mq_timedsend) || \
-> -    defined(TARGET_NR_mq_timedreceive)
-> +    defined(TARGET_NR_mq_timedreceive) || defined(TARGET_NR_ipc) || \
-> +    defined(TARGET_NR_semop) || defined(TARGET_NR_semtimedop)
->  static inline abi_long target_to_host_timespec(struct timespec *host_ts,
->                                                 abi_ulong target_addr)
->  {
-> @@ -3875,25 +3876,39 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
->      return 0;
->  }
-> 
-> -static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
-> +#if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
-> +    defined(TARGET_NR_semtimedop)
-> +static inline abi_long do_semtimedop(int semid,
-> +                                     abi_long ptr,
-> +                                     unsigned nsops,
-> +                                     abi_long timeout)
->  {
->      struct sembuf sops[nsops];
-> +    struct timespec ts, *pts = NULL;
->      abi_long ret;
-> 
-> +    if (timeout) {
-> +        pts = &ts;
-> +        if (target_to_host_timespec(pts, timeout)) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +    }
-> +
->      if (target_to_host_sembuf(sops, ptr, nsops))
->          return -TARGET_EFAULT;
-> 
->      ret = -TARGET_ENOSYS;
->  #ifdef __NR_semtimedop
-> -    ret = get_errno(safe_semtimedop(semid, sops, nsops, NULL));
-> +    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
->  #endif
->  #ifdef __NR_ipc
->      if (ret == -TARGET_ENOSYS) {
-> -        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, 0));
-> +        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, pts));
->      }
->  #endif
->      return ret;
->  }
-> +#endif
-> 
->  struct target_msqid_ds
->  {
-> @@ -4369,7 +4384,10 @@ static abi_long do_ipc(CPUArchState *cpu_env,
-> 
->      switch (call) {
->      case IPCOP_semop:
-> -        ret = do_semop(first, ptr, second);
-> +        ret = do_semtimedop(first, ptr, second, 0);
-> +        break;
-> +    case IPCOP_semtimedop:
-> +        ret = do_semtimedop(first, ptr, second, third);
->          break;
-> 
->      case IPCOP_semget:
-> @@ -9594,7 +9612,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  #endif
->  #ifdef TARGET_NR_semop
->      case TARGET_NR_semop:
-> -        return do_semop(arg1, arg2, arg3);
-> +        return do_semtimedop(arg1, arg2, arg3, 0);
-> +#endif
-> +#ifdef TARGET_NR_semtimedop
-> +    case TARGET_NR_semtimedop:
-> +        return do_semtimedop(arg1, arg2, arg3, arg4);
->  #endif
->  #ifdef TARGET_NR_semctl
->      case TARGET_NR_semctl:
-> --
-> 2.17.1
-> 
-> 
+LemonBoy,
 
-Applied to my linux-user branch.
+could you resend a series of two patches modified as said by Richard?
+
+Changes should be only cosmetic.
 
 Thanks,
 Laurent
+
+Le 10/04/2020 à 23:14, LemonBoy a écrit :
+> From 11d0cfe58d12e0f191b435ade88622cfceb2098a Mon Sep 17 00:00:00 2001
+> From: LemonBoy <thatlemon@gmail.com>
+> Date: Fri, 10 Apr 2020 22:55:26 +0200
+> Subject: [PATCH] linux-user/sparc64: Translate flushw opcode
+> 
+> The ifdef logic should unconditionally compile in the `xop == 0x2b` case
+> when targeting sparc64.
+> 
+> Fix the handling of window spill traps by keeping cansave into account
+> when calculating the new CWP.
+> 
+> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+> ---
+>  bsd-user/main.c             | 4 +++-
+>  linux-user/sparc/cpu_loop.c | 4 +++-
+>  target/sparc/translate.c    | 2 ++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/bsd-user/main.c b/bsd-user/main.c
+> index 770c2b267a..d6b1c997e3 100644
+> --- a/bsd-user/main.c
+> +++ b/bsd-user/main.c
+> @@ -413,7 +413,9 @@ static void save_window(CPUSPARCState *env)
+>      save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
+>      env->wim = new_wim;
+>  #else
+> -    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
+> +    /* cansave is zero if the spill trap handler is triggered by `save` and */
+> +    /* nonzero if triggered by a `flushw` */
+> +    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
+>      env->cansave++;
+>      env->canrestore--;
+>  #endif
+> diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
+> index 7645cc04ca..20a7401126 100644
+> --- a/linux-user/sparc/cpu_loop.c
+> +++ b/linux-user/sparc/cpu_loop.c
+> @@ -69,7 +69,9 @@ static void save_window(CPUSPARCState *env)
+>      save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
+>      env->wim = new_wim;
+>  #else
+> -    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
+> +    /* cansave is zero if the spill trap handler is triggered by `save` and */
+> +    /* nonzero if triggered by a `flushw` */
+> +    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
+>      env->cansave++;
+>      env->canrestore--;
+>  #endif
+> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+> index 9416a551cf..1a4efd4ed6 100644
+> --- a/target/sparc/translate.c
+> +++ b/target/sparc/translate.c
+> @@ -3663,6 +3663,8 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+>  #endif
+>                  gen_store_gpr(dc, rd, cpu_tmp0);
+>                  break;
+> +#endif
+> +#if defined(TARGET_SPARC64) || !defined(CONFIG_USER_ONLY)
+>              } else if (xop == 0x2b) { /* rdtbr / V9 flushw */
+>  #ifdef TARGET_SPARC64
+>                  gen_helper_flushw(cpu_env);
+> 
+
 
