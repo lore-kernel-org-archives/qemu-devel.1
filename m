@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 289E3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6D3C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2644206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:49:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62614206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:50:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POKOjD1e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2644206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hkkgMXlb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62614206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeHyS-0002qz-3i
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 08:49:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33700)
+	id 1jeHzM-0003rO-IY
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 08:50:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHlz-0001tf-GQ
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40049
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHm0-0001w7-Ee
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32554
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHls-0005E0-BT
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:35 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHlt-0005Fd-Ex
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590669387;
+ s=mimecast20190719; t=1590669388;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H/6seJUaK2U1QNuJEnB6P9QD85AsJH8sJzJwLeDEzLE=;
- b=POKOjD1elzK1+9E2TrR45qg4hQ5tmLW1qPdjq/iMDRsVlyEWpxJ5FG/YSySRKfGDVYBCxP
- zDQKypCNg5zcfDDmLvpY1N9RtFQuu1lTmtDafdATUqxHODVLlJxcv/FAxc6r/fOal7JZVC
- W7+Q/NGu60Snvxudxy8BVfexP5BzLdc=
+ bh=vhaGpItVAJY0Kh28EoW+iZj4wIKFYfoIVL8Ul9ZNK3k=;
+ b=hkkgMXlbdb0Oepm/iBUriTasZTFEI2ZdEAQG8t8l5O9NJLoB+GPaCg9YvpFAaU5+KY5pTG
+ FkbIBaoCFLSfbz7NeI07SaKibkoBMRZO8vApL8YTaRyKXDzUmnWuaA0kGj0p8p6VewqAK1
+ po8e/eHDmQ2sFof7fiV22b3pHwCel3o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-OlkcRaAEMI-HYdXL3Mt_tg-1; Thu, 28 May 2020 08:36:23 -0400
-X-MC-Unique: OlkcRaAEMI-HYdXL3Mt_tg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-441-613lVL-COoqGZLJCqhXdvQ-1; Thu, 28 May 2020 08:36:19 -0400
+X-MC-Unique: 613lVL-COoqGZLJCqhXdvQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E79E8018A7;
- Thu, 28 May 2020 12:36:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D7DC8015CF;
+ Thu, 28 May 2020 12:36:18 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
  [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 846915C1D6;
- Thu, 28 May 2020 12:36:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D3242A102D;
+ Thu, 28 May 2020 12:36:17 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9155C9D55; Thu, 28 May 2020 14:36:09 +0200 (CEST)
+ id AE16D9D58; Thu, 28 May 2020 14:36:09 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/21] hw/display/cirrus_vga: Convert debug printf() to trace
- event
-Date: Thu, 28 May 2020 14:35:54 +0200
-Message-Id: <20200528123609.27362-7-kraxel@redhat.com>
+Subject: [PULL 09/21] hw/display/xlnx_dp: Replace disabled DPRINTF() by
+ error_report()
+Date: Thu, 28 May 2020 14:35:57 +0200
+Message-Id: <20200528123609.27362-10-kraxel@redhat.com>
 In-Reply-To: <20200528123609.27362-1-kraxel@redhat.com>
 References: <20200528123609.27362-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 01:51:20
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 02:50:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -109,71 +109,78 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Convert the final bit of DEBUG_BITBLT to a tracepoint.
+DPRINTF() calls are disabled by default, so when unexpected
+data is used, the whole process abort without information.
+
+Display a bit of information with error_report() before crashing.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200526062252.19852-7-f4bug@amsat.org
+Message-id: 20200526062252.19852-10-f4bug@amsat.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/cirrus_vga.c | 24 ++++++++++--------------
- hw/display/trace-events |  1 +
- 2 files changed, 11 insertions(+), 14 deletions(-)
+ hw/display/xlnx_dp.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 76e2dc5bb604..92c197cdde1d 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -53,7 +53,6 @@
-  */
- 
- //#define DEBUG_CIRRUS
--//#define DEBUG_BITBLT
- 
- /***************************************
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index 3e5fb44e06ee..8d940cd8d1a5 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -1,5 +1,5 @@
+ /*
+- * xlnx_dp.c
++ * Xilinx Display Port
   *
-@@ -950,19 +949,16 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
-     s->cirrus_blt_dstaddr &= s->cirrus_addr_mask;
-     s->cirrus_blt_srcaddr &= s->cirrus_addr_mask;
+  *  Copyright (C) 2015 : GreenSocs Ltd
+  *      http://www.greensocs.com/ , email: info@greensocs.com
+@@ -24,6 +24,7 @@
  
--#ifdef DEBUG_BITBLT
--    printf("rop=0x%02x mode=0x%02x modeext=0x%02x w=%d h=%d dpitch=%d spitch=%d daddr=0x%08x saddr=0x%08x writemask=0x%02x\n",
--           blt_rop,
--           s->cirrus_blt_mode,
--           s->cirrus_blt_modeext,
--           s->cirrus_blt_width,
--           s->cirrus_blt_height,
--           s->cirrus_blt_dstpitch,
--           s->cirrus_blt_srcpitch,
--           s->cirrus_blt_dstaddr,
--           s->cirrus_blt_srcaddr,
--           s->vga.gr[0x2f]);
--#endif
-+    trace_vga_cirrus_bitblt_start(blt_rop,
-+                                  s->cirrus_blt_mode,
-+                                  s->cirrus_blt_modeext,
-+                                  s->cirrus_blt_width,
-+                                  s->cirrus_blt_height,
-+                                  s->cirrus_blt_dstpitch,
-+                                  s->cirrus_blt_srcpitch,
-+                                  s->cirrus_blt_dstaddr,
-+                                  s->cirrus_blt_srcaddr,
-+                                  s->vga.gr[0x2f]);
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "hw/display/xlnx_dp.h"
+@@ -465,7 +466,7 @@ static uint8_t xlnx_dp_aux_pop_tx_fifo(XlnxDPState *s)
+     uint8_t ret;
  
-     switch (s->cirrus_blt_mode & CIRRUS_BLTMODE_PIXELWIDTHMASK) {
-     case CIRRUS_BLTMODE_PIXELWIDTH8:
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index c3043e4ced19..bb089a5f5e0c 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -134,6 +134,7 @@ vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
- vga_cirrus_write_gr(uint8_t index, uint8_t val) "GR addr 0x%02x, val 0x%02x"
-+vga_cirrus_bitblt_start(uint8_t blt_rop, uint8_t blt_mode, uint8_t blt_modeext, int blt_width, int blt_height, int blt_dstpitch, int blt_srcpitch, uint32_t blt_dstaddr, uint32_t blt_srcaddr, uint8_t gr_val) "rop=0x%02x mode=0x%02x modeext=0x%02x w=%d h=%d dpitch=%d spitch=%d daddr=0x%08"PRIx32" saddr=0x%08"PRIx32" writemask=0x%02x"
+     if (fifo8_is_empty(&s->tx_fifo)) {
+-        DPRINTF("tx_fifo underflow..\n");
++        error_report("%s: TX_FIFO underflow", __func__);
+         abort();
+     }
+     ret = fifo8_pop(&s->tx_fifo);
+@@ -525,6 +526,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+         qemu_log_mask(LOG_UNIMP, "xlnx_dp: Write i2c status not implemented\n");
+         break;
+     default:
++        error_report("%s: invalid command: %u", __func__, cmd);
+         abort();
+     }
  
- # sii9022.c
- sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+@@ -631,8 +633,8 @@ static void xlnx_dp_change_graphic_fmt(XlnxDPState *s)
+         s->g_plane.format = PIXMAN_b8g8r8;
+         break;
+     default:
+-        DPRINTF("error: unsupported graphic format %u.\n",
+-                s->avbufm_registers[AV_BUF_FORMAT] & DP_GRAPHIC_MASK);
++        error_report("%s: unsupported graphic format %u", __func__,
++                     s->avbufm_registers[AV_BUF_FORMAT] & DP_GRAPHIC_MASK);
+         abort();
+     }
+ 
+@@ -647,8 +649,8 @@ static void xlnx_dp_change_graphic_fmt(XlnxDPState *s)
+         s->v_plane.format = PIXMAN_x8b8g8r8;
+         break;
+     default:
+-        DPRINTF("error: unsupported video format %u.\n",
+-                s->avbufm_registers[AV_BUF_FORMAT] & DP_NL_VID_FMT_MASK);
++        error_report("%s: unsupported video format %u", __func__,
++                     s->avbufm_registers[AV_BUF_FORMAT] & DP_NL_VID_FMT_MASK);
+         abort();
+     }
+ 
 -- 
 2.18.4
 
