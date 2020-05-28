@@ -2,76 +2,90 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D628C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:14:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C4DC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:20:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFD8220721
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6500207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:20:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hp8z38oL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFD8220721
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IDg3Ke69"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6500207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeM6m-0008H5-32
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:14:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48364)
+	id 1jeMCs-0004E0-RT
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:20:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jeM5j-0007Dn-U3
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:13:15 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46646)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jeMBt-0003Zc-1H
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:19:37 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:37964)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jeM5i-0002m5-7y
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:13:15 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g25so2898282otp.13
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 10:13:13 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jeMBr-0007oq-F2
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:19:36 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id f185so3086132wmf.3
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 10:19:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JBZQS/xipNxsRrPiLmffKhBVrhoA56phva5dn0SuPKo=;
- b=Hp8z38oLyvmTazCu4NtVOGcxcj5Pem3FvbS/I4+Vc6RzRTsZp3H02cyxhfwUfWNAdL
- fAj5vVOl1pgI2OjOJ8ft6taXA9UKWEX5GuWkBDbh0unWV5DfEmKfrRrSOX5ePig1FSXY
- Lzd2FPDhw4NenQVATrB6wOt5wKu+0x+hUZIryHupib3/s9BzAPmmGLn6a5GEbEn6rsZj
- vvmgyJYarI9Meb7jmCavbv+C80V7iyaJ15gODR7HmxX9hRZDvPBSwziB4hCafzblkc1D
- k7teY/49G8pBu4HH9JDo+EKXqwhxgQcb66pLtHDLj01fDx/AvTRvaoq+qY0gKOcnuEsH
- OdMA==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=rChDjX1koIKuBkiHmvCNose3ExYQuzyWL7z4JzRZkr0=;
+ b=IDg3Ke69mZkO7/6ik5WuNEWhabYu/pGFTR0/0P3qEX7MsDP4UJO8Fqvweh2+dNfYRz
+ wieYJKj0FAJEZF7N6O/o8vHXOCI6zpmtS0T8KyX4f3e94g49D9TBdQ+BQUBCEKGnPqpS
+ AMccbj+6G1pOPnsX/E+TGUArF6Red8yjnOL2stR2t/xKmSmyUDuSjWP0BGvi65/E17sM
+ 71Nuwgnn+3/JyEGgpv0jhywfYn89Jx9CEPIoYK+yX0tvUAg6z/QLJAksABdMIsY/Jsos
+ Q0b6YSRsZ7XBiIO4CfL8bqk4bVKLgKiXo2abKuG4bJiT4Tc8pPYXKBMuBKNDDFlcpZtK
+ 0pFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JBZQS/xipNxsRrPiLmffKhBVrhoA56phva5dn0SuPKo=;
- b=NEbTeTfFumh848x5Nqe25+WJ62zWUOSac71QhXBMtjolfxgKBT0rLzuIVpiIMEZfyA
- XT0cpZd2L+Eo/geBqFf0+ssxX5P25ShenobM2GdSjbmXeZg/GOrMOegxJ4r1rQJaocI2
- nNXG6SH9lactx9smFA6234+muTxp4QNwgCCfL4qEP5H5ju2yrz02FW6dqxUNFghSENSx
- RFmBqd6HNT/NXueSHFLXeIVvM5wFjZg/Ybal05168kSNgTTyhEYU8nyCH5Flnt5qyrM4
- 3oWIMP66AUoF92k5ZRw8Fpx7LGw8sJrp23rht8dJOX3zMgEMDZ/OILCw634aUEbJ48gZ
- jPfw==
-X-Gm-Message-State: AOAM532GJV3YOrKc2crfcU6sXWWgpWZxqU7wjZr6lOLqe0HcqnCGxCx3
- 3ankXRI5G7sORP6y1ip7HlGsVwbQ196GanUxpsxvZw==
-X-Google-Smtp-Source: ABdhPJwVaXrVHBh69fmXzG3J5kD90ivX6nV+JpzpesavjvxktwU+q9AefGI5+K/RC178DbcQicfhpmMjmGSHTykhK3A=
-X-Received: by 2002:a9d:4e83:: with SMTP id v3mr123697otk.135.1590685992314;
- Thu, 28 May 2020 10:13:12 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=rChDjX1koIKuBkiHmvCNose3ExYQuzyWL7z4JzRZkr0=;
+ b=nL+fMHTY64K131626LdI7sSfMGZ/vknXhF9ozRlhwFhvv/f4SDqQ1/RrV+X7bx6lo3
+ v2dc3HDghb/S76CicSthvRIEJcaH4LgWIa+ClerdA9+W4W6yq2CJA5AhD9lew/HZFW1W
+ q0wnrC2GZrK7YMTMXSMTT607RjBiMlMpbj2MB/w58dLPtRbwqUocZpTEtqiBzjBfQw+q
+ u6eszKMVX0kUa/8Xbw6HgZswrlwsSHCD/GpCCTKlNPzjBRAVRll3YJI4qdSktt8nUoJp
+ Q4EZA/MJNZSVECFGVVvoCRgpRZl/9aSSX1wArmqZm85KJFM5czucQqmgIqnyWlFvTLlN
+ jsHw==
+X-Gm-Message-State: AOAM533eCy1MC3M6fQ6u8zL+fuSBUY2nda9qYDyTIzsEwoIj/+F6I2b2
+ 8A5V/5au/owUjz7lfycZZXW3SA==
+X-Google-Smtp-Source: ABdhPJwK+LyDzPqopUq2RjUApJ9a1oBJdHy3xGwvCrPrY8P3iPNPISYVaIIIT1zwDJ4xSrQJPxrsgQ==
+X-Received: by 2002:a1c:dc02:: with SMTP id t2mr4315988wmg.8.1590686373780;
+ Thu, 28 May 2020 10:19:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 88sm7096050wre.45.2020.05.28.10.19.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 28 May 2020 10:19:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3D4A11FF7E;
+ Thu, 28 May 2020 18:19:31 +0100 (BST)
+References: <20200527145455.2550-1-alex.bennee@linaro.org>
+ <CAFEAcA_LrZjBY_y3UR=fdOtDvnY=zGG-10Yeq0ZjbBc=EsvRfw@mail.gmail.com>
+ <87blm83y5v.fsf@linaro.org>
+ <CAFEAcA_QTkWA7eBwORWMmpcH1E5bF4A3mFtkzdstkucd-2+p3A@mail.gmail.com>
+ <591d2690-c2e7-98aa-8569-5f99737c5f71@redhat.com>
+ <CAFEAcA-EZ_c01599j+NJH1Vd0aJ4cQzwPYynx=rBZP7x_3h3jg@mail.gmail.com>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/12] testing and plugin fixes
+In-reply-to: <CAFEAcA-EZ_c01599j+NJH1Vd0aJ4cQzwPYynx=rBZP7x_3h3jg@mail.gmail.com>
+Date: Thu, 28 May 2020 18:19:31 +0100
+Message-ID: <877dww3rks.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200527213708.1783644-1-eblake@redhat.com>
-In-Reply-To: <20200527213708.1783644-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 May 2020 18:13:01 +0100
-Message-ID: <CAFEAcA-30_q6ZtFnpocVh9PH8qroZbqem6NYSRsGRCD7dzp8Ew@mail.gmail.com>
-Subject: Re: [PULL v2 00/11] bitmaps patches for 2020-05-26
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,85 +107,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 27 May 2020 at 22:38, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 06539ebc76b8625587aa78d646a9d8d5fddf84f3:
->
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/mips-hw-next-20200526' into staging (2020-05-26 20:25:06 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-05-26-v2
->
-> for you to fetch changes up to 958796e47d3af10ece329294a7bb41d5853667db:
->
->   iotests: Add test 291 to for qemu-img bitmap coverage (2020-05-27 16:19:59 -0500)
->
-> v2: fix iotest 190 to not be as sensitive to different sparseness of
-> qcow2 file on various filesystems, such as FreeBSD (sending only the
-> changed patch)
->
-> ----------------------------------------------------------------
-> bitmaps patches for 2020-05-26
->
-> - fix non-blockdev migration of bitmaps when mirror job is in use
-> - add bitmap sizing to 'qemu-img measure'
-> - add 'qemu-img convert --bitmaps'
->
 
-Your fix for iotest 190 doesn't seem to work. Here's the new output
-(same on openbsd, freebsd, netbsd):
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-  TEST    iotest-qcow2: 190 [fail]
-QEMU          --
-"/home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
--nodefaults -display none -machine virt -accel qtest
-QEMU_IMG      --
-"/home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/../../qemu-io"
---cache writeback --aio threads -f qcow2
-QEMU_NBD      --
-"/home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- OpenBSD/amd64 openbsd 6.6
-TEST_DIR      -- /home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.9459w4OTae
-SOCKET_SCM_HELPER --
+> On Thu, 28 May 2020 at 16:18, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>>
+>> +Gerd
+>>
+>> On 5/28/20 5:09 PM, Peter Maydell wrote:
+>> > Yes. I see them also now on the next pullreq I'm trying to
+>> > process. How do I get back to an environment that doesn't
+>> > produce all these warnings?
+>>
+>> Maybe building back NetBSD 8.1?
+>
+> Did that change not itself trigger the VM to be rebuilt ?
+> If not, can we make it so that updates to the images always
+> do trigger rebuilds, so that we can catch new warnings
+> that they introduce at the time rather than later?
 
---- /home/qemu/qemu-test.B2aJfj/src/tests/qemu-iotests/190.out  Thu
-May 28 16:06:04 2020
-+++ /home/qemu/qemu-test.B2aJfj/build/tests/qemu-iotests/190.out.bad
- Thu May 28 16:31:13 2020
-@@ -17,7 +17,7 @@
- fully allocated size: 10813440
- required size: 2199023255552
- fully allocated size: 2199023255552
--required size: SIZE
-+required size: 17170432
- fully allocated size: 17170432
- required size: 335806464
- fully allocated size: 2199359062016
+$(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
 
-I think this is an issue with your sed expression:
-+$QEMU_IMG measure -O qcow2 -f raw "$TEST_IMG" |
-+    sed '/^required size:/ s/[0-9]\+/SIZE/'
+So netbsdb.img should have been rebuilt when tests/vm/netbsd was
+touched. However maybe the packages have been updated upstream since? As
+we also have:
 
-BSD sed seems to strictly implement POSIX basic regexes,
-in which '+' is not handled. Compare:
+			$(SRC_PATH)/tests/vm/basevm.py \
+			$(SRC_PATH)/tests/vm/Makefile.include
 
-$ echo "required size: 17170432" | sed '/^required size:/ s/[0-9]+/SIZE/'
-required size: 17170432
-$
-$ echo "required size: 17170432" | sed '/^required size:/ s/[0-9][0-9]*/SIZE/'
-required size: SIZE
+I suspect the genisoimage change to basevm triggered a re-build grabbing
+the latest packages.
 
-thanks
--- PMM
+--=20
+Alex Benn=C3=A9e
 
