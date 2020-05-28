@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7400AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41075206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24F44206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:44:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BalwCH6Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41075206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anW+UX7S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F44206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeHsf-0008H1-Bu
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 08:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33730)
+	id 1jeHtB-0000qx-7U
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 08:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHm1-0001zU-IC
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57583
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHlu-0001ev-Cl
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32278
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHlt-0005Ff-Mm
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:37 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHlq-0005BU-57
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590669388;
+ s=mimecast20190719; t=1590669385;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RfYTyIs8StHB7o2N0JQA2LgTuiRGRst0nDa6SImXiJ0=;
- b=BalwCH6Qxn5cfkkuH4UIDXCh7YN0rt+vDF5V7mZRDOKljm29p/Wtq0YmM1On2dekjYkrgL
- eN5H8kfNKCb/hG5PkcjSPvXTHIzQvN7q0kMKEsz5VRa1Y7zQzSQr/qzcb8Lx14yNS0pkA4
- rKVVnytP7AUlNGeVrd65K8CwXEdfFTs=
+ bh=8zuMngQZU8wsMJJzzn87mFKfgSzNEuoYrJxuRpPwZpE=;
+ b=anW+UX7S8As6WzXrOCAwv1XsCYarfucORu99jGu8tN8+SQcYvwv7OsoyoojMRIG6Fitwx2
+ f5/D1hF7kaRb7BgOJ18yz64XSu1oPko+f3WRqqvHUgJJo978onvSPRzcIW5SHH87xwrUJt
+ 0WmuXBB3oAXM3Ls5kZbRs6nTCnE2ymc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-dWZhFjqXPP2CTOPKbzhjyw-1; Thu, 28 May 2020 08:36:23 -0400
-X-MC-Unique: dWZhFjqXPP2CTOPKbzhjyw-1
+ us-mta-155-itd3Z1xaPyCXT-Sct2-5iw-1; Thu, 28 May 2020 08:36:22 -0400
+X-MC-Unique: itd3Z1xaPyCXT-Sct2-5iw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DD511855A08;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28B9D461;
  Thu, 28 May 2020 12:36:21 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
  [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19E3E2B4CC;
- Thu, 28 May 2020 12:36:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0467F2657D;
+ Thu, 28 May 2020 12:36:18 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id DA5479D61; Thu, 28 May 2020 14:36:09 +0200 (CEST)
+ id BFAA79D5A; Thu, 28 May 2020 14:36:09 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/21] hw/display/pxa2xx_lcd: Replace printf() call by
- qemu_log_mask()
-Date: Thu, 28 May 2020 14:36:02 +0200
-Message-Id: <20200528123609.27362-15-kraxel@redhat.com>
+Subject: [PULL 11/21] hw/display/vmware_vga: Let the PCI device own its I/O
+ MemoryRegion
+Date: Thu, 28 May 2020 14:35:59 +0200
+Message-Id: <20200528123609.27362-12-kraxel@redhat.com>
 In-Reply-To: <20200528123609.27362-1-kraxel@redhat.com>
 References: <20200528123609.27362-1-kraxel@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +73,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 01:51:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 03:11:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,76 +109,29 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Replace printf() calls by qemu_log_mask(UNIMP), which is
-disabled by default. This avoid flooding the terminal when
-fuzzing the device.
+To avoid the orphan I/O memory region being added in the /unattached
+QOM container, register the PCI device as its owner.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200526062252.19852-15-f4bug@amsat.org
+Message-id: 20200526062252.19852-12-f4bug@amsat.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/pxa2xx_lcd.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ hw/display/vmware_vga.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
-index d5f2e82a4ec3..ff90104b8011 100644
---- a/hw/display/pxa2xx_lcd.c
-+++ b/hw/display/pxa2xx_lcd.c
-@@ -426,9 +426,10 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr offset,
-         if ((s->control[0] & LCCR0_ENB) && !(value & LCCR0_ENB))
-             s->status[0] |= LCSR0_QD;
+diff --git a/hw/display/vmware_vga.c b/hw/display/vmware_vga.c
+index 5c0fc49d9d6e..2579f6b218dc 100644
+--- a/hw/display/vmware_vga.c
++++ b/hw/display/vmware_vga.c
+@@ -1306,7 +1306,7 @@ static void pci_vmsvga_realize(PCIDevice *dev, Error **errp)
+     dev->config[PCI_LATENCY_TIMER] = 0x40;
+     dev->config[PCI_INTERRUPT_LINE] = 0xff;          /* End */
  
--        if (!(s->control[0] & LCCR0_LCDT) && (value & LCCR0_LCDT))
--            printf("%s: internal frame buffer unsupported\n", __func__);
--
-+        if (!(s->control[0] & LCCR0_LCDT) && (value & LCCR0_LCDT)) {
-+            qemu_log_mask(LOG_UNIMP,
-+                          "%s: internal frame buffer unsupported\n", __func__);
-+        }
-         if ((s->control[3] & LCCR3_API) &&
-                 (value & LCCR0_ENB) && !(value & LCCR0_LCDT))
-             s->status[0] |= LCSR0_ABC;
-@@ -462,9 +463,9 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr offset,
-         break;
- 
-     case OVL1C1:
--        if (!(s->ovl1c[0] & OVLC1_EN) && (value & OVLC1_EN))
--            printf("%s: Overlay 1 not supported\n", __func__);
--
-+        if (!(s->ovl1c[0] & OVLC1_EN) && (value & OVLC1_EN)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: Overlay 1 not supported\n", __func__);
-+        }
-         s->ovl1c[0] = value & 0x80ffffff;
-         s->dma_ch[1].up = (value & OVLC1_EN) || (s->control[0] & LCCR0_SDS);
-         break;
-@@ -474,9 +475,9 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr offset,
-         break;
- 
-     case OVL2C1:
--        if (!(s->ovl2c[0] & OVLC1_EN) && (value & OVLC1_EN))
--            printf("%s: Overlay 2 not supported\n", __func__);
--
-+        if (!(s->ovl2c[0] & OVLC1_EN) && (value & OVLC1_EN)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: Overlay 2 not supported\n", __func__);
-+        }
-         s->ovl2c[0] = value & 0x80ffffff;
-         s->dma_ch[2].up = !!(value & OVLC1_EN);
-         s->dma_ch[3].up = !!(value & OVLC1_EN);
-@@ -488,9 +489,10 @@ static void pxa2xx_lcdc_write(void *opaque, hwaddr offset,
-         break;
- 
-     case CCR:
--        if (!(s->ccr & CCR_CEN) && (value & CCR_CEN))
--            printf("%s: Hardware cursor unimplemented\n", __func__);
--
-+        if (!(s->ccr & CCR_CEN) && (value & CCR_CEN)) {
-+            qemu_log_mask(LOG_UNIMP,
-+                          "%s: Hardware cursor unimplemented\n", __func__);
-+        }
-         s->ccr = value & 0x81ffffe7;
-         s->dma_ch[5].up = !!(value & CCR_CEN);
-         break;
+-    memory_region_init_io(&s->io_bar, NULL, &vmsvga_io_ops, &s->chip,
++    memory_region_init_io(&s->io_bar, OBJECT(dev), &vmsvga_io_ops, &s->chip,
+                           "vmsvga-io", 0x10);
+     memory_region_set_flush_coalesced(&s->io_bar);
+     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io_bar);
 -- 
 2.18.4
 
