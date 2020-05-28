@@ -1,121 +1,105 @@
 Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.6 required=3.0 tests=CHARSET_FARAWAY_HEADER,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 484C2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 09:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E88FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 09:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C242B207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 09:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EFD1207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 09:51:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sxJpWk7i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C242B207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="geu5FJGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFD1207F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeFB2-0003AM-GC
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 05:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37726)
+	id 1jeFCF-0004Uv-CW
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 05:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jeF5h-00006Z-4C; Thu, 28 May 2020 05:44:45 -0400
-Received: from mail-eopbgr80134.outbound.protection.outlook.com
- ([40.107.8.134]:2978 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <1482995675@qq.com>) id 1jeFBL-0003Ti-EE
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 05:50:35 -0400
+Received: from smtpbgsg2.qq.com ([54.254.200.128]:57072)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jeF5b-0002k0-Ho; Thu, 28 May 2020 05:44:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HeR7UTkYyWqWZ3Gmnl3TFMto+r1gRYnhp5vFmaUksVWsYHIH8G9bMd1fGbh375d/jkZRvoJyh1vBtdodmquG4yRF/B74M8vE9zOu1dpEiVruAtSi3eEB5QhOQ952POwOvR9flioQwmSX1nuDuhGZxWBrY45gyAg6lCK/elIaaFrhg/rHKORvNl2wnXctdbKHsp5960NawfHREnexvT1+EHRIYSJMPSY9yVZ9yYIvj4NkQ/cjLuTzLPt6Yb68KDxU+26Kt9koX8WaYbGQ4Cz6W42tz47GKvjMT9CpIvS2+LzbkaJRz8S3TIUF32r93+5HNzA5qr2gljykoeOTHkT/pQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+aE2yYUwYV4BpjdOm1rjPDIEmnj2o3YLrx3WA1dK4PE=;
- b=YrqujVMVlAasfIMzgk1+wQKC/B2DXRFpvvCwzZnApNb0QrVqDL3ozQLzwT00EkDx6UpdfBaDY+N9TDft7/3UM1acK13JIDaS1Ua6sCqD0P7I8NkZYbjrgL/hgdMIL9/yeYy887ZYvONiJxxOtwzIrOp+uQsZ3/mW5etfUvxU0RfTOPN1+N0gE7wiWgsSHh29VYtgY5A4DVsJh7bG0p9UaDzZXyhA5+1qQROiC+tcs4Z0Nc1RgeVZPKGMjuIcgckt6g03QQMQLpw0Hp88fhu4EOK/Ru2xuJiIquu7unR9wPXjjYwmmvD76OqyPcfWQNsP9gg/mrC4q2YQOms5jFr74A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+aE2yYUwYV4BpjdOm1rjPDIEmnj2o3YLrx3WA1dK4PE=;
- b=sxJpWk7iROFvDBkDenal8Sgq6ELSOP/kIOPFd3DozHe7dX8h8FNl4I0F7uB36jUO+HuR+Sp15keKfOkHgWqlZntzppRzigSl7OjUKG7IhVUTPaA9K5xEy0BILK8Y0Z/sz5mflSwe6jlk2GfkwrcCyPJ6jr2TA2kCxfchCmq8RAw=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5366.eurprd08.prod.outlook.com (2603:10a6:20b:10b::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17; Thu, 28 May
- 2020 09:44:30 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3045.018; Thu, 28 May 2020
- 09:44:30 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 10/10] qed: Simplify backing reads
-Date: Thu, 28 May 2020 12:44:05 +0300
-Message-Id: <20200528094405.145708-11-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20200528094405.145708-1-vsementsov@virtuozzo.com>
-References: <20200528094405.145708-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain
-X-ClientProxiedBy: AM3PR05CA0089.eurprd05.prod.outlook.com
- (2603:10a6:207:1::15) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.localdomain (185.215.60.178) by
- AM3PR05CA0089.eurprd05.prod.outlook.com (2603:10a6:207:1::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3045.19 via Frontend Transport; Thu, 28 May 2020 09:44:29 +0000
-X-Mailer: git-send-email 2.18.0
-X-Originating-IP: [185.215.60.178]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 892a2302-1733-48fc-1df0-08d802ebb800
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5366:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53660E73E7AC04DE298EC95FC18E0@AM7PR08MB5366.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
-X-Forefront-PRVS: 0417A3FFD2
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I+P5QLGL4jdEFRvEPUZWI7xbkXaI7X2XlR5BqQ7VCY2OOjdLhFK4sPEmTKfx+VJ6S/gVHILv/Qyk+3bQLwlDn5pvf8ISK2gHETb6hzFkJoxRtxbNXYhZ2sUTkIvRlk09oD/w2OZDEKOMcf+EumydWjA0H25tkgPeGpzbwbBg5qFg48NjmQ/2hTglsTiT19SukBWqWBbVKTD8x81kgHmmJMxtoPi5t+RLBsN5lQTDr35mVH0rrPUq2BQnQfzuKPPZt3wdHrItjVcb5seYVzoTCfpjWrEP5lYU9eAXLhQbAuFt3xldJx7FMB/2qaqMtzdOd2J4uWmnFWUSd+Vp7/G9Lw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39850400004)(366004)(136003)(346002)(376002)(396003)(2616005)(86362001)(316002)(5660300002)(7416002)(956004)(1076003)(6916009)(66946007)(83380400001)(6666004)(66476007)(66556008)(8936002)(4326008)(6512007)(36756003)(478600001)(8676002)(26005)(186003)(16526019)(2906002)(52116002)(6486002)(6506007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eInFMrdpYytw5fJ+ODj9Woun7XulAFQuJjL0PIlh4QiJbxJTL64SwK39scoUqF0HO8ywLiEWxa8+03ERSesYVK6h2WWwzDUtkjudLg7PWf5gAQlkYCLtN7xTvd4B5u/kDAYHE0S5X7cRY72mvz00rApJswGCK3SlTIEN9szYl+aBLo7FRn6Vwt1POiJMH7B6/ylguqf9ckcMT6Tw2ioVW97niA4oJSpol0UxN/9JyB4N2ZH9DHPAiA1dMUDxe1193tnwKEOM2ymkG7fCySydgDIfzKKt7+JbyWujX9ad+C02ED/vi9eCormAG/2rgyTH8SvAtWwNiFSSrlPiboKqXsDGDGbxg+putB1WKcR5O6d4zkHqWMY5D9GnHQOBhEEA2pUUI5wng4xiR8qYtFsnWvOobUeZZpiwDSmi41K39X+YSmVm32ET3gs91CQEspfTx+79Zo0PBUdsN1achZVE6GVWwqi8/jurH4Mi0xTj+Tk=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 892a2302-1733-48fc-1df0-08d802ebb800
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2020 09:44:30.2800 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K8mattUKXvaxPiLuPhG0zbNcVy6A5YTov8tV3y3s/1k93c/NN1qgOf2a0j3xBGQ4YY8xtosL6HSyD9GAidxc0JRzI6piYRw0iQh9YvLmeVg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5366
-Received-SPF: pass client-ip=40.107.8.134;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 05:44:18
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <1482995675@qq.com>) id 1jeFBF-0000AE-By
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 05:50:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+ t=1590659360; bh=44Z24dqlDFsZqELSQzWek1sgoarAwm/bdlz3ZnDiGAE=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=geu5FJGFw2pW2qfrf8lNo4J6KGPgpI4oFX2mgrjjbKK0SzzZO08hEjuoPpr3JunO1
+ ODQSztMxrrC6WH5zC7kQR3YJwc/O1cp2FDM1+Y7yMED+jA35zAaKpRS+xXKIqhEoaS
+ J2Oq/0aDgvcOs+wPOFPrQNOwDMoQ5uxsFzaHj8fU=
+X-QQ-FEAT: x+dxIIhayxc7bWx795aFCB++y2HmnqaeIPZilhPwexkJA2Zgd/8XHPse6E2Iw
+ SNsMkJxdtaxLFJplm9LDr9b7jaVqOrLgGhWmy3phxO97QcuTI1CWvzHpFbBbAUSCTXQH8oE
+ orpJ76xHQO1pHEIArTitTqlBV3nxBwdenzTfmjGU7ZOsYCqDDQO+KGoYtS6pK/lrgwOZRvS
+ T2gyZFnoOSeH+42YBtIBCb4L2Yvx1bkpvoPu6EUCdeO/yw6eV5ugqB87DUSslXpNSKijGUV
+ vrh+KjjUdQU1eN3d4I3iOYjkxGdfVBViQyrQ==
+X-QQ-SSF: 00010000000000F000000000000000D
+X-QQ-XMAILINFO: MoPlkZp6QhD4jiIcaunVKoWp0mUXcD3x4E12ELeDOGpRx1L/eswa/4CUxaZiJl
+ gkVtsahP7LkPRk4yUAIRCBtt2kF3tQmBiUUzq4CvRxRB3gJJDBHR5/2jb+Z90dLmjKoJjFZuNOXrY
+ 5bK94379mSEs2W2rEi0Y8KNr1U3eBlMKlKHIwnU5tz8Q+O+S6bDOROe9FyXQWEZv/xxYRzU3RFIgi
+ 4PGWF0kfNeQ4xt7oyQZFEZCS0QEiKZuya5UFb8hWZ+YS63CrnU4SH2AFR34X28m2jRTOCWkmPywX5
+ i9vsnyuD/YPx9b+jcieuT8ZvkcKp9u+6yHJmg3bTfzYiMARmCKudU1KCn3vtUwUdBnzb5EVW28rmM
+ N3BIiIN0hzosQ0MlOhFol3MSuTyKznhtxfqD5OgbwPFXl/+y9O/gczKe0+dAlcfFJaXWoPccw6/kR
+ 3Jw7kRIlKzOuvBUntbaOu1IYEldRz74r7rfmfh4oStQe5ZHurXJibBR9AYR5H9GyPO0GahQuFto6z
+ TYzSxfhK3+8vqnf9vRHUirWTbVydYUUFmGUxZIjvZfan7VmdOpjJH/yKMoZlCV+F/8Gor2nb+wL/h
+ QBIeM3Vm4VoogOt7U19o7Xb+5OeNTvcXCfWQ65jxvvib+7hmMQ8rlxE9qWHuDavcfc+nhYlCRjGSK
+ WTP7Ex27eSvGBG3sL7qc+hrMBIloGsz8u2UMZADfuWaapLDt6AsvA5DwWn+w==
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 124.64.70.219
+In-Reply-To: <87v9kg4fw4.fsf@linaro.org>
+References: <tencent_86D9DB902C46CBAC4F3A6FD5B4CDA93B7506@qq.com>
+ <8b83e11b-e593-b7db-48b6-252e23c599da@amsat.org>
+ <tencent_B0E453026AE8377459F3162D9F7D5ECE6907@qq.com>
+ <87v9kg4fw4.fsf@linaro.org>
+X-QQ-STYLE: 
+X-QQ-mid: webmail725t1590659359t7467700
+From: "=?gb18030?B?eGlhb2xlaQ==?=" <1482995675@qq.com>
+To: "=?gb18030?B?QWxleCBCZW5uqKZl?=" <alex.bennee@linaro.org>,
+ "=?gb18030?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
+Subject: =?gb18030?B?u9i4tKO6IEdEQiBnZXQgd3JvbmcgZGVidWcgaW5m?=
+ =?gb18030?B?b3Mgb24gVEkgRFNQIGFyY2hpdGVjdHVyZSBleHRl?=
+ =?gb18030?B?bnNpb24=?=
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+Date: Thu, 28 May 2020 17:49:19 +0800
+X-Priority: 3
+Message-ID: <tencent_1EBC79D30BA701D4EC6F31B2442DFE3E5C08@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 2160357922
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Thu, 28 May 2020 17:49:20 +0800 (CST)
+Feedback-ID: webmail:qq.com:bgforeign:bgforeign12
+X-QQ-Bgrelay: 1
+Received-SPF: pass client-ip=54.254.200.128; envelope-from=1482995675@qq.com;
+ helo=smtpbgsg2.qq.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 05:50:24
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: 48
+X-Spam_score: 4.8
+X-Spam_bar: ++++
+X-Spam_report: (4.8 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, FROM_EXCESS_BASE64=0.979,
+ MIME_CHARSET_FARAWAY=2.45, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,152 +112,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- ronniesahlberg@gmail.com, codyprime@gmail.com, sw@weilnetz.de, pl@kamp.de,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+SGkgLAogICBUaGFua3MgZm9yIHRoZSBoaW50LgogICBJIGhhdmUgYmVlbiBsb29raW5nIGZv
+ciBob3cgUUVNVSBkZXRlcm1pbmUgdGhlIHRhcmdldCBwcm9ncmFtIHRlcm1pbmF0ZXMgYnkg
+Y2hlY2tpbmcgdGhlIGhvc3QgaW1wbGVtZW50YXRpb24gKGVnICBpMzg2KS4gSSB0aG91Z2h0
+IHRoZSB0YXJnZXQgcHJvZ3JhbSB0ZXJtaW5hdGlvbiBpcyBjb25uZWN0ZWQgdG8gdGhlIGlu
+aXRpYWwgRlAgcHVzaGVkIHRvIHN0YWNrLCBJIGFtIG5vdCBzdXJlIHRoaXMgaXMgaG93IFFF
+TVUgZG9lcy4gIENvdWxkIHlvdSBiZSBtb3JlIHNwZWNpZmljIG9uIHRoZSB0ZXJtaW5hdGlv
+biBjaGVjayA/ICBpcyBpdCB0YXJnZXQgIGFyY2hpdGVjdHVyZSBkZXBlbmRlbnQoIGFuIGFk
+ZGVkIERTUCB0YXJnZXQgYXJjaGl0ZWN0dXJlIHNob3VsZCBkZWFsIHdpdGggaXQgZXhwbGlj
+aXRseSk/CiAgIFRoYW5rcyBhZ2FpbgoKeGlhb2xlaSAKCi0tLS0tLS0tLS0tLS0tLS0tLSDU
+rcq808q8/iAtLS0tLS0tLS0tLS0tLS0tLS0Kt6K8/sjLOiAiQWxleCBCZW5uqKZlIjxhbGV4
+LmJlbm5lZUBsaW5hcm8ub3JnPjsKt6LLzcqxvOQ6IDIwMjDE6jXUwjI4yNUo0MfG2svEKSDP
+ws7nNDozNArK1bz+yMs6ICJjYXNtYWMiPDE0ODI5OTU2NzVAcXEuY29tPjsKs63LzTogIlBo
+aWxpcHBlIE1hdGhpZXUtRGF1ZKimIjxmNGJ1Z0BhbXNhdC5vcmc+OyJxZW11LWRldmVsIjxx
+ZW11LWRldmVsQG5vbmdudS5vcmc+OwrW98ziOiBSZTogR0RCIGdldCB3cm9uZyBkZWJ1ZyBp
+bmZvcyBvbiBUSSBEU1AgYXJjaGl0ZWN0dXJlIGV4dGVuc2lvbgoKCmNhc21hYyA8MTQ4Mjk5
+NTY3NUBxcS5jb20+IHdyaXRlczoKCj4gSGksClRoYW5rIHlvdSBmb3IgZm9yd2FyZGluZyBt
+eSBxdWVzdGlvbiB0byBkZXZlbG9wZXJzIGFuZCBzaGFyaW5nIHRoZSBDNnggaW1wbGVtZW50
+YXRpb24uCj4gJm5ic3A7Jm5ic3A7IFBlcmhhcHMgSSBzaG91bGQgZm9sbG93IHVwIHdpdGgg
+YW5vdGhlciBwcm9ibGVtIEkgZW5jb3VudGVyZWQuIFRoZSBzZW5lcmlvIGlzIHRoZSZuYnNw
+OyBlbXVsYXRvciBrZWVwcyBydW5uaW5nIGV2ZW50aG91Z2ggdGhlIHByb2dyYW0gaXQgZW11
+bGF0ZXMgaGFzIGFscmVhZHkgZXhpdGVkLiBBbmQgaXQga2VlcHMgcmV0cmlldmluZyBpbnN0
+cnVjdGlvbnMgd2hpY2ggYXJlIGFsbCB6ZXJvICJpbnN0cnVjdGlvbiIoMHgwMDAwMDAwMCku
+IAo+Cj4gIEl0IGxvb2tzIHRvIG1lIHRoYXQgaW4gZnVuY3Rpb24gY3B1X2V4ZWMoQ1BVU3Rh
+dGUgKmNwdSksIHRoZSBmb2xsb3dpbmcgbG9vcCBuZXZlciB0ZXJtaW5hdGU6Cj4gd2hpbGUg
+KCFjcHVfaGFuZGxlX2V4Y2VwdGlvbihjcHUsICZhbXA7cmV0KSkgewo+IFRyYW5zbGF0aW9u
+QmxvY2sgKmxhc3RfdGIgPSBOVUxMOwogPiBpbnQgdGJfZXhpdCA9IDA7Cj4gd2hpbGUgKCFj
+cHVfaGFuZGxlX2ludGVycnVwdChjcHUsICZhbXA7bGFzdF90YikpIHsgLi4uIH0KPiBJcyBp
+dCBiZWNhdXNlIGNwdS0mZ3Q7ZXhpdF9yZXF1ZXN0IHJlbWFpbnMgMCA/Cj4KPiBBdCB3aGF0
+IHBvaW50IHNob3VsZCB3ZSBtYWtlIGNwdS0mZ3Q7ZXhpdF9yZXF1ZXN0PTEgPwoKY3B1LT5l
+eGl0X3JlcXVlc3QgaXMgc2V0IGZvciBhc3luY2hyb251cyBjb25kaXRpb25zIChlLmcuIHRp
+bWVyIElSUXMgb3IKSU8gZXZlbnRzKS4gQSBudW1iZXIgb2YgaGVscGVycyB3aWxsICJraWNr
+IiB0aGUgY3B1IGJ5IGNhbGxpbmcKY3B1X2V4aXQoKS4KCj4gJm5ic3A7Jm5ic3A7IFRoYW5r
+cyBhZ2FpbiEhCj4KPgo+IHJlZ2FyZHMKPiB4aWFvbGVpCj4KPgo+
 
-The other four drivers that support backing files (qcow, qcow2,
-parallels, vmdk) all rely on the block layer to populate zeroes when
-reading beyond EOF of a short backing file.  We can simplify the qed
-code by doing likewise.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qed.h |  1 -
- block/qed.c | 64 +++++------------------------------------------------
- 2 files changed, 6 insertions(+), 59 deletions(-)
-
-diff --git a/block/qed.h b/block/qed.h
-index 42c115d822..3d12bf78d4 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -140,7 +140,6 @@ typedef struct QEDAIOCB {
- 
-     /* Current cluster scatter-gather list */
-     QEMUIOVector cur_qiov;
--    QEMUIOVector *backing_qiov;
-     uint64_t cur_pos;               /* position on block device, in bytes */
-     uint64_t cur_cluster;           /* cluster offset in image file */
-     unsigned int cur_nclusters;     /* number of clusters being accessed */
-diff --git a/block/qed.c b/block/qed.c
-index a2dd952699..ece8b9bb60 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -849,56 +849,18 @@ static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
-  * @s:              QED state
-  * @pos:            Byte position in device
-  * @qiov:           Destination I/O vector
-- * @backing_qiov:   Possibly shortened copy of qiov, to be allocated here
-- * @cb:             Completion function
-- * @opaque:         User data for completion function
-  *
-  * This function reads qiov->size bytes starting at pos from the backing file.
-  * If there is no backing file then zeroes are read.
-  */
- static int coroutine_fn qed_read_backing_file(BDRVQEDState *s, uint64_t pos,
--                                              QEMUIOVector *qiov,
--                                              QEMUIOVector **backing_qiov)
-+                                              QEMUIOVector *qiov)
- {
--    uint64_t backing_length = 0;
--    size_t size;
--    int ret;
--
--    /* If there is a backing file, get its length.  Treat the absence of a
--     * backing file like a zero length backing file.
--     */
-     if (s->bs->backing) {
--        int64_t l = bdrv_getlength(s->bs->backing->bs);
--        if (l < 0) {
--            return l;
--        }
--        backing_length = l;
--    }
--
--    /* Zero all sectors if reading beyond the end of the backing file */
--    if (pos >= backing_length ||
--        pos + qiov->size > backing_length) {
--        qemu_iovec_memset(qiov, 0, 0, qiov->size);
--    }
--
--    /* Complete now if there are no backing file sectors to read */
--    if (pos >= backing_length) {
--        return 0;
--    }
--
--    /* If the read straddles the end of the backing file, shorten it */
--    size = MIN((uint64_t)backing_length - pos, qiov->size);
--
--    assert(*backing_qiov == NULL);
--    *backing_qiov = g_new(QEMUIOVector, 1);
--    qemu_iovec_init(*backing_qiov, qiov->niov);
--    qemu_iovec_concat(*backing_qiov, qiov, 0, size);
--
--    BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
--    ret = bdrv_co_preadv(s->bs->backing, pos, size, *backing_qiov, 0);
--    if (ret < 0) {
--        return ret;
-+        BLKDBG_EVENT(s->bs->file, BLKDBG_READ_BACKING_AIO);
-+        return bdrv_co_preadv(s->bs->backing, pos, qiov->size, qiov, 0);
-     }
-+    qemu_iovec_memset(qiov, 0, 0, qiov->size);
-     return 0;
- }
- 
-@@ -915,7 +877,6 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
-                                                    uint64_t offset)
- {
-     QEMUIOVector qiov;
--    QEMUIOVector *backing_qiov = NULL;
-     int ret;
- 
-     /* Skip copy entirely if there is no work to do */
-@@ -925,13 +886,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
- 
-     qemu_iovec_init_buf(&qiov, qemu_blockalign(s->bs, len), len);
- 
--    ret = qed_read_backing_file(s, pos, &qiov, &backing_qiov);
--
--    if (backing_qiov) {
--        qemu_iovec_destroy(backing_qiov);
--        g_free(backing_qiov);
--        backing_qiov = NULL;
--    }
-+    ret = qed_read_backing_file(s, pos, &qiov);
- 
-     if (ret) {
-         goto out;
-@@ -1339,8 +1294,7 @@ static int coroutine_fn qed_aio_read_data(void *opaque, int ret,
-         qemu_iovec_memset(&acb->cur_qiov, 0, 0, acb->cur_qiov.size);
-         r = 0;
-     } else if (ret != QED_CLUSTER_FOUND) {
--        r = qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
--                                  &acb->backing_qiov);
-+        r = qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov);
-     } else {
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
-         r = bdrv_co_preadv(bs->file, offset, acb->cur_qiov.size,
-@@ -1365,12 +1319,6 @@ static int coroutine_fn qed_aio_next_io(QEDAIOCB *acb)
-     while (1) {
-         trace_qed_aio_next_io(s, acb, 0, acb->cur_pos + acb->cur_qiov.size);
- 
--        if (acb->backing_qiov) {
--            qemu_iovec_destroy(acb->backing_qiov);
--            g_free(acb->backing_qiov);
--            acb->backing_qiov = NULL;
--        }
--
-         acb->qiov_offset += acb->cur_qiov.size;
-         acb->cur_pos += acb->cur_qiov.size;
-         qemu_iovec_reset(&acb->cur_qiov);
--- 
-2.18.0
 
 
