@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C557C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB664C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:59:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225F92074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:59:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 917082074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="SnBI9IKb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225F92074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="E2ZNZMdN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 917082074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRUM-0004M0-Aw
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:59:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49010)
+	id 1jeRUT-0004ZH-LC
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:59:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jeRRD-0007ig-LU; Thu, 28 May 2020 18:55:48 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:43990)
+ id 1jeRRA-0007fz-Kb; Thu, 28 May 2020 18:55:44 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:43810)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jeRRB-0008Gs-D3; Thu, 28 May 2020 18:55:47 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
- [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 925782E0E4D;
- Fri, 29 May 2020 01:55:42 +0300 (MSK)
+ id 1jeRR8-0008ED-Ng; Thu, 28 May 2020 18:55:44 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 9F3C62E14E9;
+ Fri, 29 May 2020 01:55:39 +0300 (MSK)
 Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
  (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
- by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- 8FKAi2zKzd-tex0vN3w; Fri, 29 May 2020 01:55:42 +0300
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ bzLrH8MH3J-tbeu8N5G; Fri, 29 May 2020 01:55:39 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1590706542; bh=jZjZvWgRCwmhlfFa7bumuR0eozqg540D/Q+LuGee5IQ=;
+ t=1590706539; bh=vg3Jrxy+SnwHMQrKPD58GmqliyjIcv2SrK/yR09VWLc=;
  h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=SnBI9IKbDRTF4vvxqHoqoTFMnQUlJCk+8D1m7FNWSTvAa/UTvtp+e6/dXw3I+Lzj3
- oycmaxScqeIySlf14+pJHiQNpxHawDh3hVQO58cR0kpiSUz9+hc0viN/gZpfp/ykt5
- jIdgHapwCEdCuxup82PXmt25PQLrc1uqHksljX6g=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ b=E2ZNZMdNOofhSOUyHHPBJfOZuzXCKqwLmFqkVobSyW8BwxMMkbaSzOJm/MBo4poYG
+ zlqwfqK5Cdg62coMaaJQdc4oyBpIaFRZCK6nhGIGyL3/Cp5vZr/Dvda+Hm6WdiytsF
+ Sklx23sOAl5XhWa5N7zmZmwT2UDkdO9rNWWiO3ps=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b081:1318::1:10])
  by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- tdfEhvD3Vg-tdWSLP5D; Fri, 29 May 2020 01:55:39 +0300
+ tdfEhvD3Vg-taWSAwaa; Fri, 29 May 2020 01:55:37 +0300
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
  (Client certificate not present)
 From: Roman Kagan <rvkagan@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 5/8] qdev-properties: make blocksize accept size suffixes
-Date: Fri, 29 May 2020 01:55:13 +0300
-Message-Id: <20200528225516.1676602-6-rvkagan@yandex-team.ru>
+Subject: [PATCH v8 4/8] qdev-properties: add size32 property type
+Date: Fri, 29 May 2020 01:55:12 +0300
+Message-Id: <20200528225516.1676602-5-rvkagan@yandex-team.ru>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
 References: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
- envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:55:33
+X-ACL-Warn: Detected OS   = ???
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -102,80 +103,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It appears convenient to be able to specify physical_block_size and
-logical_block_size using common size suffixes.
+Introduce size32 property type which handles size suffixes (k, m, g)
+just like size property, but is uint32_t rather than uint64_t.  It's
+going to be useful for properties that are byte sizes but are inherently
+32bit, like BlkConf.opt_io_size or .discard_granularity (they are
+switched to this new property type in a followup commit).
 
-Teach the blocksize property setter to interpret them.  Also express the
-upper and lower limits in the respective units.
+The getter for size32 is left out for a separate patch as its benefit is
+less obvious, and it affects test output; for now the regular uint32
+getter is used.
 
 Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/core/qdev-properties.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+v7 -> v8:
+- replace stringify with %u in the error message [Eric]
+- fix wording in the log [Eric]
 
+ include/hw/qdev-properties.h |  3 +++
+ hw/core/qdev-properties.c    | 40 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index f161604fb6..c03eadfad6 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -29,6 +29,7 @@ extern const PropertyInfo qdev_prop_drive;
+ extern const PropertyInfo qdev_prop_drive_iothread;
+ extern const PropertyInfo qdev_prop_netdev;
+ extern const PropertyInfo qdev_prop_pci_devfn;
++extern const PropertyInfo qdev_prop_size32;
+ extern const PropertyInfo qdev_prop_blocksize;
+ extern const PropertyInfo qdev_prop_pci_host_devaddr;
+ extern const PropertyInfo qdev_prop_uuid;
+@@ -196,6 +197,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+                         BlockdevOnError)
+ #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
++#define DEFINE_PROP_SIZE32(_n, _s, _f, _d)                       \
++    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_size32, uint32_t)
+ #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+ #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 40c13f6ebe..c9af6a1341 100644
+index 249dc69bd8..40c13f6ebe 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -14,6 +14,7 @@
- #include "qapi/visitor.h"
- #include "chardev/char.h"
- #include "qemu/uuid.h"
-+#include "qemu/units.h"
+@@ -727,6 +727,46 @@ const PropertyInfo qdev_prop_pci_devfn = {
+     .set_default_value = set_default_value_int,
+ };
  
- void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-                                   Error **errp)
-@@ -771,17 +772,18 @@ const PropertyInfo qdev_prop_size32 = {
++/* --- 32bit unsigned int 'size' type --- */
++
++static void set_size32(Object *obj, Visitor *v, const char *name, void *opaque,
++                       Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    uint32_t *ptr = qdev_get_prop_ptr(dev, prop);
++    uint64_t value;
++    Error *local_err = NULL;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_size(v, name, &value, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    if (value > UINT32_MAX) {
++        error_setg(errp,
++                   "Property %s.%s doesn't take value %" PRIu64
++                   " (maximum: %u)",
++                   dev->id ? : "", name, value, UINT32_MAX);
++        return;
++    }
++
++    *ptr = value;
++}
++
++const PropertyInfo qdev_prop_size32 = {
++    .name  = "size",
++    .get = get_uint32,
++    .set = set_size32,
++    .set_default_value = set_default_value_uint,
++};
++
+ /* --- blocksize --- */
  
  /* lower limit is sector size */
- #define MIN_BLOCK_SIZE          512
--#define MIN_BLOCK_SIZE_STR      stringify(MIN_BLOCK_SIZE)
-+#define MIN_BLOCK_SIZE_STR      "512 B"
- /* upper limit is the max power of 2 that fits in uint16_t */
--#define MAX_BLOCK_SIZE          32768
--#define MAX_BLOCK_SIZE_STR      stringify(MAX_BLOCK_SIZE)
-+#define MAX_BLOCK_SIZE          (32 * KiB)
-+#define MAX_BLOCK_SIZE_STR      "32 KiB"
- 
- static void set_blocksize(Object *obj, Visitor *v, const char *name,
-                           void *opaque, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-     Property *prop = opaque;
--    uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
-+    uint16_t *ptr = qdev_get_prop_ptr(dev, prop);
-+    uint64_t value;
-     Error *local_err = NULL;
- 
-     if (dev->realized) {
-@@ -789,7 +791,7 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    visit_type_uint16(v, name, &value, &local_err);
-+    visit_type_size(v, name, &value, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -797,7 +799,7 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
-     /* value of 0 means "unset" */
-     if (value && (value < MIN_BLOCK_SIZE || value > MAX_BLOCK_SIZE)) {
-         error_setg(errp,
--                   "Property %s.%s doesn't take value %" PRIu16
-+                   "Property %s.%s doesn't take value %" PRIu64
-                    " (minimum: " MIN_BLOCK_SIZE_STR
-                    ", maximum: " MAX_BLOCK_SIZE_STR ")",
-                    dev->id ? : "", name, value);
-@@ -816,7 +818,7 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
- }
- 
- const PropertyInfo qdev_prop_blocksize = {
--    .name  = "uint16",
-+    .name  = "size",
-     .description = "A power of two between " MIN_BLOCK_SIZE_STR
-                    " and " MAX_BLOCK_SIZE_STR,
-     .get   = get_uint16,
 -- 
 2.26.2
 
