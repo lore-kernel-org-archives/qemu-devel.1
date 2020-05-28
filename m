@@ -2,65 +2,92 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1184CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 494B1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:54:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC04220721
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC04220721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14D492074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:54:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4XUUBc0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D492074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRGb-0002jj-1b
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:44:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56462)
+	id 1jeRPy-0006te-78
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:54:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeR75-00044d-D9
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:34:59 -0400
-Received: from mga14.intel.com ([192.55.52.115]:41310)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeR6z-0007vj-BY
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:34:59 -0400
-IronPort-SDR: YtzSeLxoQvU9XQPqLX6rNKGsp7kM1qPpLUrUbaps76LZ58uiDiqXxUAvZCZFkmThQW7uaNth6b
- G230Uu7j9LHg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 May 2020 15:34:49 -0700
-IronPort-SDR: eBb8xL9QU/glFNIdEl8w7NISHJf3A/St9TcdeufUaJJrjHfkZbqbxa4EHyHEC5LXQg3LrizVvZ
- rYqM8rnwi9SQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,446,1583222400"; d="scan'208";a="256314828"
-Received: from vverma7-mobl4.lm.intel.com ([10.251.139.189])
- by orsmga007.jf.intel.com with ESMTP; 28 May 2020 15:34:48 -0700
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v4 0/3] account for NVDIMM nodes during SRAT generation
-Date: Thu, 28 May 2020 16:34:34 -0600
-Message-Id: <20200528223437.12568-1-vishal.l.verma@intel.com>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jeRPN-0006TZ-Bx
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:53:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29244
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jeRPL-0005bo-M5
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:53:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590706430;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0fP2ApTtN9i4VyxWY+o5Q36Obi7PmYNpALvuVo0SLA8=;
+ b=f4XUUBc0/Xymv24TTXQ1LcWPWeu5x7xFTSj4xQJHf/qDkRavDhvR1HTK8Rj6XwGxgFDDLV
+ rYl2I8sUL0YlOR/mMfxGi5kmuFc/DG3HGW42/XBiMGHCy4xkjij+ACIJcal4zU+WOT1kKF
+ WsuuOdb8thh1cCLLEJLTqdhXd6fqfVs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-LeE-_7KEOYCMqSIgEvVNUQ-1; Thu, 28 May 2020 18:53:46 -0400
+X-MC-Unique: LeE-_7KEOYCMqSIgEvVNUQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 133148014D7;
+ Thu, 28 May 2020 22:53:43 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E9CFA7A8BB;
+ Thu, 28 May 2020 22:53:40 +0000 (UTC)
+Date: Thu, 28 May 2020 16:53:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200528165340.53a57e22@x1.home>
+In-Reply-To: <20200528080101.GD1378@joy-OptiPlex-7040>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
+ <20200527084822.GC3001@work-vm>
+ <20200528080101.GD1378@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=192.55.52.115;
- envelope-from=vishal.l.verma@intel.com; helo=mga14.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:34:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:46:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,65 +100,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jingqi.liu@intel.com,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Dan Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes since v3:
-- Add the SRAT augmentation for ARM's virt-acpi-build as well (Igor)
-- Update patches 1 and 3 for the test binaries to include ARM tests.
+On Thu, 28 May 2020 04:01:02 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Changes since v2:
-- Change a repetitive OBJECT(dev) to a stored 'Object' (Igor)
-- No need to return 'numamem' back to build_srat (Igor)
+> > > > This is my understanding of the protocol as well, when the device is
+> > > > running, pending_bytes might drop to zero if no internal state has
+> > > > changed and may be non-zero on the next iteration due to device
+> > > > activity.  When the device is not running, pending_bytes reporting zero
+> > > > indicates the device is done, there is no further state to transmit.
+> > > > Does that meet your need/expectation?
+> > > >  
+> > > (1) on one side, as in vfio_save_pending(),
+> > > vfio_save_pending()
+> > > {
+> > >     ...
+> > >     ret = vfio_update_pending(vbasedev);
+> > >     ...
+> > >     *res_precopy_only += migration->pending_bytes;
+> > >     ...
+> > > }
+> > > the pending_bytes tells migration thread how much data is still hold in
+> > > device side.
+> > > the device data includes
+> > > device internal data + running device dirty data + device state.
+> > > 
+> > > so the pending_bytes should include device state as well, right?
+> > > if so, the pending_bytes should never reach 0 if there's any device
+> > > state to be sent after device is stopped.  
+> > 
+> > I hadn't expected the pending-bytes to include a fixed offset for device
+> > state (If you mean a few registers etc) - I'd expect pending to drop
+> > possibly to zero;  the heuristic as to when to switch from iteration to
+> > stop, is based on the total pending across all iterated devices; so it's
+> > got to be allowed to drop otherwise you'll never transition to stop.
+> >   
+> ok. got it.
 
-Changes since v1:
-- Use error_abort for getters (Igor)
-- Free the device list (Igor)
-- Refactor the NVDIMM related portion into hw/acpi/nvdimm.c (Igor)
-- Rebase onto latest master
-- Add Jingqi's Reviewed-by
+Yeah, as I understand it, a device is not required to participate in
+reporting data available while (_SAVING | _RUNNING), there will always
+be an iteration while the device is !_RUNNING.  Therefore if you have
+fixed device state that you're always going to send, it should only be
+sent once when called during !_RUNNING.  The iterative phase should be
+used where you have a good chance to avoid re-sending data at the
+stop-and-copy phase.  Thanks,
 
-On the command line, one can specify a NUMA node for NVDIMM devices. If
-we set up the topology to give NVDIMMs their own nodes, i.e. not
-containing any CPUs or regular memory, qemu doesn't populate SRAT memory
-affinity structures for these nodes. However the NFIT does reference
-those proximity domains.
-
-As a result, Linux, while parsing the SRAT, fails to initialize node
-related structures for these nodes, and they never end up in the
-nodes_possible map. When these are onlined at a later point (via
-hotplug), this causes problems.
-
-I've followed the instructions in bios-tables-test.c to update the
-expected SRAT binary, and the tests (make check) pass. Patches 1 and 3
-are the relevant ones for the binary update.
-
-Patch 2 is the main patch which changes SRAT generation.
-
-
-Vishal Verma (3):
-  diffs-allowed: add the SRAT AML to diffs-allowed
-  hw/acpi/nvdimm: add a helper to augment SRAT generation
-  tests/acpi: update expected SRAT files
-
- hw/acpi/nvdimm.c                 |  23 +++++++++++++++++++++++
- hw/arm/virt-acpi-build.c         |   4 ++++
- hw/i386/acpi-build.c             |   5 +++++
- include/hw/mem/nvdimm.h          |   1 +
- tests/data/acpi/pc/SRAT.dimmpxm  | Bin 392 -> 392 bytes
- tests/data/acpi/q35/SRAT.dimmpxm | Bin 392 -> 392 bytes
- tests/data/acpi/virt/SRAT.memhp  | Bin 186 -> 226 bytes
- 7 files changed, 33 insertions(+)
-
--- 
-2.26.2
+Alex
 
 
