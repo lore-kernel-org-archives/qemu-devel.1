@@ -6,73 +6,77 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D06BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 650762072D
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:05:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 650762072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E184B20776
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:07:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E184B20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRaa-0004ig-If
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 19:05:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56536)
+	id 1jeRcB-000832-4M
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 19:07:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jeRZb-00039m-Bz
- for qemu-devel@nongnu.org; Thu, 28 May 2020 19:04:27 -0400
-Resent-Date: Thu, 28 May 2020 19:04:27 -0400
-Resent-Message-Id: <E1jeRZb-00039m-Bz@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21793)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jeRZZ-0004tN-9c
- for qemu-devel@nongnu.org; Thu, 28 May 2020 19:04:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590707033; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=SrSrkSRvU02sLWu+7J3PvSzn6+0BXb+FKVX4USUTtaNnyWpKAWvNYUq/eNm+9ijXX8ba6GCuO0OWIiAugL7ckey8izDaV72edUk7yxM55h3zUaTnVg10bGY2bDDHQMTGbJRM9+jEcs6z0yGsgnFdWDfUlN6r+pauCafc5Gi2hBw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590707033;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=CVJnMxEvhShZN3AJodtOpnT/U3wXSo5RN7R5cO0jHUY=; 
- b=buQmWK2J9uSGg/uoTDe57ZCn+orlr1vKnTmu5I+Ff90n78+KnM7xJ1jskzJNN2CTSOqF7rOZsfoLqDY6aiXe490xiwDEkFo1zjm7tNOnBXmw67krqMd3KZAVsciCjzgdTdY1pfBlUpKOcg/N2gulx0FT7groRbMNyVp9UPgyLfc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590707031720854.0051021062983;
- Thu, 28 May 2020 16:03:51 -0700 (PDT)
-Message-ID: <159070702972.20666.6607729006861632036@45ef0f9c86ae>
-In-Reply-To: <20200528162011.16258-1-vishal.l.verma@intel.com>
-Subject: Re: [PATCH v3 0/3] account for NVDIMM nodes during SRAT generation
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jeRam-0006Vn-QF
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 19:05:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45624)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jeRal-0006O6-IQ
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 19:05:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jeRaj-0001AP-Gv
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 23:05:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7EBFB2E8033
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 23:05:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vishal.l.verma@intel.com
-Date: Thu, 28 May 2020 16:03:51 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 19:04:21
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 May 2020 22:55:54 -0000
+From: John Snow <1872790@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jnsnow sxtf
+X-Launchpad-Bug-Reporter: a (sxtf)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <158688621326.6027.1278663333852888209.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159070655430.5073.1052279742416408045.malone@wampee.canonical.com>
+Subject: [Bug 1872790] Re: empty qcow2
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="275d46a24253e557e4403d52832837e4bfa425b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 020b5612c4f81116fe9727eed17dd221cad572bb
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:25:41
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,49 +85,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, xiaoguangrong.eric@gmail.com,
- mst@redhat.com, jingqi.liu@intel.com, dave.hansen@linux.intel.com,
- qemu-devel@nongnu.org, imammedo@redhat.com, vishal.l.verma@intel.com,
- pbonzini@redhat.com, dan.j.williams@intel.com, rth@twiddle.net,
- ehabkost@redhat.com
+Reply-To: Bug 1872790 <1872790@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyODE2MjAxMS4xNjI1
-OC0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MjgxNjIwMTEuMTYyNTgtMS12aXNo
-YWwubC52ZXJtYUBpbnRlbC5jb20KU3ViamVjdDogW1BBVENIIHYzIDAvM10gYWNjb3VudCBmb3Ig
-TlZESU1NIG5vZGVzIGR1cmluZyBTUkFUIGdlbmVyYXRpb24KVHlwZTogc2VyaWVzCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYv
-bnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJh
-c2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo3ZTlmYTYyIHRlc3RzL2FjcGk6IHVwZGF0ZSBleHBlY3RlZCBTUkFUIGZpbGVzCmU4YzM0
-MjcgaHcvYWNwaS1idWlsZDogYWNjb3VudCBmb3IgTlZESU1NIG51bWEgbm9kZXMgaW4gU1JBVAo3
-NTk4ZGM5IGRpZmZzLWFsbG93ZWQ6IGFkZCB0aGUgU1JBVCBBTUwgdG8gZGlmZnMtYWxsb3dlZAoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zIENoZWNraW5nIGNvbW1pdCA3NTk4ZGM5YmM5ODQgKGRp
-ZmZzLWFsbG93ZWQ6IGFkZCB0aGUgU1JBVCBBTUwgdG8gZGlmZnMtYWxsb3dlZCkKMi8zIENoZWNr
-aW5nIGNvbW1pdCBlOGMzNDI3NDA2MTAgKGh3L2FjcGktYnVpbGQ6IGFjY291bnQgZm9yIE5WRElN
-TSBudW1hIG5vZGVzIGluIFNSQVQpCjMvMyBDaGVja2luZyBjb21taXQgN2U5ZmE2MmU5ZDI2ICh0
-ZXN0cy9hY3BpOiB1cGRhdGUgZXhwZWN0ZWQgU1JBVCBmaWxlcykKRVJST1I6IERvIG5vdCBhZGQg
-ZXhwZWN0ZWQgZmlsZXMgdG9nZXRoZXIgd2l0aCB0ZXN0cywgZm9sbG93IGluc3RydWN0aW9ucyBp
-biB0ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6IGJvdGggdGVzdHMvZGF0YS9hY3BpL3Ez
-NS9TUkFULmRpbW1weG0gYW5kIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QtYWxsb3dlZC1k
-aWZmLmggZm91bmQKCkVSUk9SOiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0aGVyIHdp
-dGggdGVzdHMsIGZvbGxvdyBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMt
-dGVzdC5jOiBib3RoIHRlc3RzL2RhdGEvYWNwaS9xMzUvU1JBVC5kaW1tcHhtIGFuZCB0ZXN0cy9x
-dGVzdC9iaW9zLXRhYmxlcy10ZXN0LWFsbG93ZWQtZGlmZi5oIGZvdW5kCgp0b3RhbDogMiBlcnJv
-cnMsIDAgd2FybmluZ3MsIDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8zIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDIwMDUyODE2MjAxMS4xNjI1OC0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS90
-ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+It sounds like maybe these disks have been partitioned in a format that
+only Windows understands. Can you tell me what the windows disk manager
+claims the partition table format to be?
+
+If you still think that maybe there's a QEMU bug, please give more
+details:
+
+- host kernel version
+
+- qemu version
+
+- qemu command line
+
+- how were these qcow2 files created?
+
+- What version of qcow2 file does `qemu-img info` say they are?
+
+- What version of windows? (10?)
+
+- Can you name one of the third party disk managers so we can try to
+reproduce it?
+
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1872790
+
+Title:
+  empty qcow2
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I plugged multiple qcow2 to a Windows guest. On the Windows disk
+  manager all disks are listed perfectly, with their data, their real
+  space, I even can explore all files on the Explorer, all cool
+
+  On third party disk manager (all of them), I only have the C:\ HDD who
+  act normally, all the other plugged qcow2 are seen as fully
+  unallocated, so I can't manipulate them
+
+  I want to move some partitions, create others, but on Windows disk
+  manager I can't extend or create partition and on third party I didn't
+  see the partitions at all
+
+  Even guestfs doesn't recognize any partition table `libguestfs: error:
+  inspect_os: /dev/sda: not a partitioned device`
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1872790/+subscriptions
 
