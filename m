@@ -2,88 +2,67 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10024C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B2CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 13:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D13BA206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 12:51:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MuLaLznV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D13BA206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9614207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 13:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9614207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeI0a-0004xd-1q
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 08:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33772)
+	id 1jeIMJ-0006Yl-3n
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 09:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHmB-0002Sr-Jo
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40691
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeHm7-0005NW-59
- for qemu-devel@nongnu.org; Thu, 28 May 2020 08:36:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590669402;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=alJWWguzMdAxzeeZpfBMp4t+t9rEX1QSKuKtB7IIv5E=;
- b=MuLaLznVahQ31texZ5QnalElOdTj0/3a71rltmXwcR5hs8nobjojtb0YYPvYNjVRFiWG3a
- oEZNRKDXry7I0S70yNJYlr5Nn6puh79dZBoyPD6alBHYluybptmxVWKE9ltNgPhU+ZVIOm
- iYWpZIlabnhEvHU8GM+r/qJgJcObjj4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-JuWgx9MlNF20MyKJL9fEuA-1; Thu, 28 May 2020 08:36:22 -0400
-X-MC-Unique: JuWgx9MlNF20MyKJL9fEuA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFD301855A10;
- Thu, 28 May 2020 12:36:20 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7179A60FC2;
- Thu, 28 May 2020 12:36:17 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 871139D54; Thu, 28 May 2020 14:36:09 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 05/21] hw/display/cirrus_vga: Use qemu_log_mask(ERROR) instead
- of debug printf
-Date: Thu, 28 May 2020 14:35:53 +0200
-Message-Id: <20200528123609.27362-6-kraxel@redhat.com>
-In-Reply-To: <20200528123609.27362-1-kraxel@redhat.com>
-References: <20200528123609.27362-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <piaojun@huawei.com>)
+ id 1jeILD-0005v8-Fl
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 09:12:59 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35274 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <piaojun@huawei.com>)
+ id 1jeIL8-0000nY-PC
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 09:12:58 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 3F7CA3DA090C1B1B3566
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 21:12:42 +0800 (CST)
+Received: from [10.174.149.79] (10.174.149.79) by smtp.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server (TLS) id 14.3.487.0; Thu, 28 May
+ 2020 21:12:37 +0800
+Subject: Re: [QUESTION]: vhost-user-gpu: Unable to find a satisfying
+ vhost-user-gpu
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+References: <f176ccff-4988-8ba0-e3db-d859cde0db20@huawei.com>
+ <CAJ+F1CKS1EBuQTWqAhhiGLC0=9N_DxWXhcm6ZjHw2U2wham+SA@mail.gmail.com>
+From: Jun Piao <piaojun@huawei.com>
+Message-ID: <3bc20cdd-84f2-01a2-7e07-1c3c8eac0d72@huawei.com>
+Date: Thu, 28 May 2020 21:12:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJ+F1CKS1EBuQTWqAhhiGLC0=9N_DxWXhcm6ZjHw2U2wham+SA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 06:31:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Originating-IP: [10.174.149.79]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=piaojun@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 09:12:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,203 +75,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Replace some debug printf() calls by qemu_log_mask(LOG_GUEST_ERROR).
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200526062252.19852-6-f4bug@amsat.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 77 ++++++++++++++++++-----------------------
- 1 file changed, 33 insertions(+), 44 deletions(-)
+在 2020/5/27 20:29, Marc-André Lureau 写道:
+> Hi
+> 
+> On Wed, May 27, 2020 at 11:18 AM Jun Piao <piaojun@huawei.com <mailto:piaojun@huawei.com>> wrote:
+> 
+>     Hi Marc-André,
+> 
+>     I encounter a problem when trying to use vhost-user-gpu as below. And
+>     I'm not familiar to the libvirt code. Could you please help find out
+>     the reason?
+> 
+>     # virsh create snap1.xml
+>     error: Failed to create domain from snap1.xml
+>     error: operation failed: Unable to find a satisfying vhost-user-gpu
+> 
+> 
+> Libvirt implements the logic described in: https://git.qemu.org/?p=qemu.git;a=blob;f=docs/interop/vhost-user.json;h=ef8ac5941f5c8d14402566a984a0a0876d768c19;hb=HEAD#l171
+> 
+> Check if you have  /usr/share/qemu/vhost-user/50-qemu-gpu.json and if the binary location is correct.
+> 
+> If it fails after that, enable libvirt debugging for more details.
+> 
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index f9f837b8508c..76e2dc5bb604 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -978,9 +978,8 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
- 	s->cirrus_blt_pixelwidth = 4;
- 	break;
-     default:
--#ifdef DEBUG_BITBLT
--	printf("cirrus: bitblt - pixel width is unknown\n");
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: bitblt - pixel width is unknown\n");
- 	goto bitblt_ignore;
-     }
-     s->cirrus_blt_mode &= ~CIRRUS_BLTMODE_PIXELWIDTHMASK;
-@@ -1037,7 +1036,9 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
-         } else {
- 	    if (s->cirrus_blt_mode & CIRRUS_BLTMODE_TRANSPARENTCOMP) {
- 		if (s->cirrus_blt_pixelwidth > 2) {
--		    printf("src transparent without colorexpand must be 8bpp or 16bpp\n");
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "cirrus: src transparent without colorexpand "
-+                          "must be 8bpp or 16bpp\n");
- 		    goto bitblt_ignore;
- 		}
- 		if (s->cirrus_blt_mode & CIRRUS_BLTMODE_BACKWARDS) {
-@@ -1135,10 +1136,9 @@ static uint32_t cirrus_get_bpp16_depth(CirrusVGAState * s)
- 	ret = 16;
- 	break;			/* XGA HiColor */
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: invalid DAC value %x in 16bpp\n",
--	       (s->cirrus_hidden_dac_data & 0xf));
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: invalid DAC value 0x%x in 16bpp\n",
-+                      (s->cirrus_hidden_dac_data & 0xf));
- 	ret = 15;		/* XXX */
- 	break;
-     }
-@@ -1307,11 +1307,9 @@ static int cirrus_vga_read_sr(CirrusVGAState * s)
- #endif
- 	return s->vga.sr[s->vga.sr_index];
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: inport sr_index %02x\n", s->vga.sr_index);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: inport sr_index 0x%02x\n", s->vga.sr_index);
- 	return 0xff;
--	break;
-     }
- }
- 
-@@ -1400,10 +1398,9 @@ static void cirrus_vga_write_sr(CirrusVGAState * s, uint32_t val)
-         cirrus_update_memory_access(s);
-         break;
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: outport sr_index %02x, sr_value %02x\n",
--               s->vga.sr_index, val);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: outport sr_index 0x%02x, sr_value 0x%02x\n",
-+                      s->vga.sr_index, val);
- 	break;
-     }
- }
-@@ -1501,9 +1498,8 @@ static int cirrus_vga_read_gr(CirrusVGAState * s, unsigned reg_index)
-     if (reg_index < 0x3a) {
- 	return s->vga.gr[reg_index];
-     } else {
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: inport gr_index %02x\n", reg_index);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: inport gr_index 0x%02x\n", reg_index);
- 	return 0xff;
-     }
- }
-@@ -1590,10 +1586,9 @@ cirrus_vga_write_gr(CirrusVGAState * s, unsigned reg_index, int reg_value)
- 	cirrus_write_bitblt(s, reg_value);
- 	break;
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: outport gr_index %02x, gr_value %02x\n", reg_index,
--	       reg_value);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: outport gr_index 0x%02x, gr_value 0x%02x\n",
-+                      reg_index, reg_value);
- 	break;
-     }
- }
-@@ -1648,9 +1643,8 @@ static int cirrus_vga_read_cr(CirrusVGAState * s, unsigned reg_index)
- 	return s->vga.ar_index & 0x3f;
- 	break;
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: inport cr_index %02x\n", reg_index);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: inport cr_index 0x%02x\n", reg_index);
- 	return 0xff;
-     }
- }
-@@ -1721,10 +1715,9 @@ static void cirrus_vga_write_cr(CirrusVGAState * s, int reg_value)
- 	break;
-     case 0x25:			// Part Status
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: outport cr_index %02x, cr_value %02x\n",
--               s->vga.cr_index, reg_value);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: outport cr_index 0x%02x, cr_value 0x%02x\n",
-+                      s->vga.cr_index, reg_value);
- 	break;
-     }
- }
-@@ -1834,9 +1827,8 @@ static uint8_t cirrus_mmio_blt_read(CirrusVGAState * s, unsigned address)
- 	value = cirrus_vga_read_gr(s, 0x31);
- 	break;
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: mmio read - address 0x%04x\n", address);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: mmio read - address 0x%04x\n", address);
- 	break;
-     }
- 
-@@ -1946,10 +1938,9 @@ static void cirrus_mmio_blt_write(CirrusVGAState * s, unsigned address,
- 	cirrus_vga_write_gr(s, 0x31, value);
- 	break;
-     default:
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: mmio write - addr 0x%04x val 0x%02x (ignored)\n",
--	       address, value);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: mmio write - addr 0x%04x val 0x%02x (ignored)\n",
-+                      address, value);
- 	break;
-     }
- }
-@@ -2047,9 +2038,8 @@ static uint64_t cirrus_vga_mem_read(void *opaque,
- 	}
-     } else {
- 	val = 0xff;
--#ifdef DEBUG_CIRRUS
--	printf("cirrus: mem_readb " TARGET_FMT_plx "\n", addr);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: mem_readb 0x" TARGET_FMT_plx "\n", addr);
-     }
-     return val;
- }
-@@ -2112,10 +2102,9 @@ static void cirrus_vga_mem_write(void *opaque,
- 	    cirrus_mmio_blt_write(s, addr & 0xff, mem_value);
- 	}
-     } else {
--#ifdef DEBUG_CIRRUS
--        printf("cirrus: mem_writeb " TARGET_FMT_plx " value 0x%02" PRIu64 "\n", addr,
--               mem_value);
--#endif
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "cirrus: mem_writeb 0x" TARGET_FMT_plx " "
-+                      "value 0x%02" PRIu64 "\n", addr, mem_value);
-     }
- }
- 
--- 
-2.18.4
+Thanks for your reply, and I did as you said, but another error happend:
 
+50-qemu-gpu.json:
+{
+  "description": "QEMU vhost-user-gpu",
+  "type": "gpu",
+  "binary": "/usr/local/libexec/vhost-user-gpu"
+}
+
+# virsh create /home/vm/snap1.xml
+error: Failed to create domain from /home/vm/snap1.xml
+error: internal error: Could not get process id of vhost-user-gpu
+
+libvirt log:
+----------------------------------------------------------------------
+2020-05-28 13:10:48.345+0000: Starting external device: vhost-user-gpu
+/usr/local/libexec/vhost-user-gpu
+2020-05-28 13:10:48.374+0000: starting up libvirt version: 5.8.0, qemu version: 4.1.1, kernel: 4.18.0, hostname: localhost.localdomain
+LC_ALL=C \
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin \
+HOME=/var/lib/libvirt/qemu/domain-1-snap1 \
+XDG_DATA_HOME=/var/lib/libvirt/qemu/domain-1-snap1/.local/share \
+XDG_CACHE_HOME=/var/lib/libvirt/qemu/domain-1-snap1/.cache \
+XDG_CONFIG_HOME=/var/lib/libvirt/qemu/domain-1-snap1/.config \
+QEMU_AUDIO_DRV=spice \
+/home/code/qemu-4.1.1/aarch64-softmmu/qemu-system-aarch64 \
+-name guest=snap1,debug-threads=on \
+-S \
+-object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-snap1/master-key.aes \
+-machine virt-2.8,accel=kvm,usb=off,dump-guest-core=off,gic-version=3 \
+-cpu host \
+-drive file=/usr/share/edk2.git/aarch64/QEMU_EFI-pflash.raw,if=pflash,format=raw,unit=0,readonly=on \
+-drive file=/var/lib/libvirt/qemu/nvram/euler_VARS.fd,if=pflash,format=raw,unit=1 \
+-m 4096 \
+-overcommit mem-lock=off \
+-smp 4,sockets=4,cores=1,threads=1 \
+-uuid 3eb97356-8642-4282-88de-8de0a36d3bc1 \
+-smbios 'type=1,manufacturer=OpenStack Foundation,product=OpenStack Nova,version=13.0.1-517.11,family=Virtual Machine' \
+-smbios 'type=3,manufacturer=Dell Inc.,version=2.12,serial=65X0XF2,asset=40000101,sku=Type3Sku1' \
+-no-user-config \
+-nodefaults \
+-chardev socket,id=charmonitor,fd=34,server,nowait \
+-mon chardev=charmonitor,id=monitor,mode=control \
+-rtc base=2020-05-29T01:10:48,clock=vm,driftfix=slew \
+-no-shutdown \
+-no-acpi \
+-boot strict=on \
+-device pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1 \
+-device pcie-pci-bridge,id=pci.2,bus=pci.1,addr=0x0 \
+-device pcie-root-port,port=0x9,chassis=3,id=pci.3,bus=pcie.0,addr=0x1.0x1 \
+-device pcie-root-port,port=0xa,chassis=4,id=pci.4,bus=pcie.0,addr=0x1.0x2 \
+-device pcie-root-port,port=0xb,chassis=5,id=pci.5,bus=pcie.0,addr=0x1.0x3 \
+-device usb-ehci,id=usb,bus=pci.2,addr=0x3 \
+-device virtio-scsi-pci,id=scsi0,bus=pci.4,addr=0x0 \
+-device ahci,id=sata0,bus=pci.2,addr=0x2 \
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.2,addr=0x4 \
+-drive file=/home/vm/snap1.img,format=qcow2,if=none,id=drive-scsi0-0-0-0,cache=none,aio=native \
+-device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,device_id=drive-scsi0-0-0-0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1,write-cache=on \
+-netdev tap,fd=37,id=hostnet0,vhost=on,vhostfd=40 \
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:69:17:b1,bus=pci.5,addr=0x0 \
+-chardev pty,id=charserial0 \
+-serial chardev:charserial0 \
+-device usb-tablet,id=input0,bus=usb.0,port=1 \
+-device usb-kbd,id=input1,bus=usb.0,port=2 \
+-spice unix,addr=/tmp/spice.socket1,disable-ticketing,gl=on,rendernode=/dev/dri/renderD128,seamless-migration=on \
+-chardev socket,id=chr-vu-video0,fd=36 \
+-device vhost-user-gpu-pci,id=video0,max_outputs=1,chardev=chr-vu-video0,bus=pci.3,addr=0x0 \
+-device virtio-balloon-pci,id=balloon0,bus=pci.2,addr=0x5 \
+-msg timestamp=on
+2020-05-28 13:10:48.374+0000: Domain id=1 is tainted: host-cpu
+libvirt:  error : libvirtd quit during handshake: Input/output error
+2020-05-28 13:10:48.389+0000: shutting down, reason=failed
+
+thanks,
+Jun
 
