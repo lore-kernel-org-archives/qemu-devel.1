@@ -2,68 +2,71 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9084BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38546C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C3F7207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09154207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rSD4dLSu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3F7207BC
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="AahGP9Ke"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09154207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeOOH-0004uK-Hq
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 15:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49268)
+	id 1jeOOK-00050J-1y
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 15:40:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jeOLv-00006E-RG
- for qemu-devel@nongnu.org; Thu, 28 May 2020 15:38:07 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:35458 helo=mta-01.yadro.com)
+ id 1jeOLw-00006O-8d
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 15:38:08 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:35502 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jeOLt-00071j-OY
- for qemu-devel@nongnu.org; Thu, 28 May 2020 15:38:07 -0400
+ id 1jeOLu-000737-8F
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 15:38:08 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 70C024C861;
- Thu, 28 May 2020 19:38:00 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id 0EDB14C86A;
+ Thu, 28 May 2020 19:38:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
  content-type:content-type:content-transfer-encoding:mime-version
- :x-mailer:message-id:date:date:subject:subject:from:from
- :received:received:received; s=mta-01; t=1590694679; x=
- 1592509080; bh=jAf6p9MycTcNFZhY/r1wSMZiqT5f9w7Rh+JqM9akOzM=; b=r
- SD4dLSumrZesjW6kelkA2SAutibRz9kWznb/adkjstD0h+MA1DlTP0fDTonlEUGX
- iARxuU2ClOmjQ/KpRTYmz6sOC6NpYOjriL5wDysK9bFMTNbhHwa4COQE/xVcJOWb
- KPKEoYQx9n86k3xR9O3URC9WEDNgoSAn3KhEUTEZbo=
+ :references:in-reply-to:x-mailer:message-id:date:date:subject
+ :subject:from:from:received:received:received; s=mta-01; t=
+ 1590694682; x=1592509083; bh=FYq1VPMqZAipbMnr+8xKfor5/R7QwuFU9b+
+ kj1fVnB0=; b=AahGP9Ke5JAlOwe11Nc/azsCj3jYdjxZzhPtDx1yy4NaDMaMnVU
+ gq6fKchhHcoHdo7vsOUR5s6U6qwXmiFZebwCiv9b67LTeczcpbkQ9dwshOFN/1CI
+ XvKLl8pEE/uVsTsTS7sqG/ixf1vomjvH186e/OCjbDA+2wAXTCf6DF3w=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ae_vWPOQIGz4; Thu, 28 May 2020 22:37:59 +0300 (MSK)
+ with ESMTP id Ej_Pys-bcGwK; Thu, 28 May 2020 22:38:02 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 0084F41227;
- Thu, 28 May 2020 22:37:58 +0300 (MSK)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 35A094C865;
+ Thu, 28 May 2020 22:38:01 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 28
- May 2020 22:38:00 +0300
+ May 2020 22:38:02 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH 00/13] i386: hvf: Remove HVFX86EmulatorState
-Date: Thu, 28 May 2020 22:37:45 +0300
-Message-ID: <20200528193758.51454-1-r.bolshakov@yadro.com>
+Subject: [PATCH 04/13] i386: hvf: Drop unused variable
+Date: Thu, 28 May 2020 22:37:49 +0300
+Message-ID: <20200528193758.51454-5-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.26.1
+In-Reply-To: <20200528193758.51454-1-r.bolshakov@yadro.com>
+References: <20200528193758.51454-1-r.bolshakov@yadro.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -92,70 +95,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>, Cameron Esfahani <dirty@apple.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cameron Esfahani <dirty@apple.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+---
+ target/i386/hvf/x86.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-This is a cleanup series for HVF accel.
-
-HVF is using two emulator states CPUX86State and HVFX86EmulatorState
-simultaneously. HVFX86EmulatorState is used for instruction emulation.
-CPUX86State is used in all other places. Sometimes the states are in
-sync, sometimes they're not. It complicates reasoning about emulator
-behaviour given that there's a third state - VMCS.
-
-The series tries to leverage CPUX86State for instruction decoding and
-removes HVFX86EmulatorState. I had to add two new hvf-specific fields to
-CPUX86State: lazy_flags and mmio_buf. It's likely that cc_op, cc_dst,
-etc could be reused for lazy_flags but it'd require major rework of flag
-processing during instruction emulation. Hopefully that'll happen too in
-the future.
-
-I tried to include sysemu/hvf.h into target/i386/cpu.h to add definition
-of hvf lazy flags but couldn't do that at first it because it introduced
-circular dependency between existing sysemu/hvf.h and cpu.h. The first
-three patches untangle and prune sysemu/hvf.h to the bare minimum to
-allow inclusion of sysemu/hvf.h into target/i386/cpu.h.
-
-This might conflict with [1], but merge/rebase should be trivial.
-
-1. https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg07449.html
-
-Thanks,
-Roman
-
-Roman Bolshakov (13):
-  i386: hvf: Move HVFState definition into hvf
-  i386: hvf: Drop useless declarations in sysemu
-  i386: hvf: Clean stray includes in sysemu
-  i386: hvf: Drop unused variable
-  i386: hvf: Use ins_len to advance IP
-  i386: hvf: Use IP from CPUX86State
-  i386: hvf: Drop fetch_rip from HVFX86EmulatorState
-  i386: hvf: Drop rflags from HVFX86EmulatorState
-  i386: hvf: Drop copy of RFLAGS defines
-  i386: hvf: Drop regs in HVFX86EmulatorState
-  i386: hvf: Move lazy_flags into CPUX86State
-  i386: hvf: Move mmio_buf into CPUX86State
-  i386: hvf: Drop HVFX86EmulatorState
-
- include/qemu/typedefs.h      |   1 -
- include/sysemu/hvf.h         |  73 ++-------------------
- target/i386/cpu.h            |   4 +-
- target/i386/hvf/hvf-i386.h   |  35 ++++++++++
- target/i386/hvf/hvf.c        |  30 ++++-----
- target/i386/hvf/x86.c        |   2 +-
- target/i386/hvf/x86.h        |  89 ++-----------------------
- target/i386/hvf/x86_decode.c |  25 ++++---
- target/i386/hvf/x86_emu.c    | 122 +++++++++++++++++------------------
- target/i386/hvf/x86_flags.c  |  81 ++++++++++++-----------
- target/i386/hvf/x86_task.c   |  10 +--
- target/i386/hvf/x86hvf.c     |   6 +-
- 12 files changed, 186 insertions(+), 292 deletions(-)
-
+diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+index c95d5b2116..56fcde13c6 100644
+--- a/target/i386/hvf/x86.h
++++ b/target/i386/hvf/x86.h
+@@ -293,7 +293,6 @@ typedef struct lazy_flags {
+ 
+ /* Definition of hvf_x86_state is here */
+ struct HVFX86EmulatorState {
+-    int interruptable;
+     uint64_t fetch_rip;
+     uint64_t rip;
+     struct x86_register regs[16];
 -- 
 2.26.1
 
