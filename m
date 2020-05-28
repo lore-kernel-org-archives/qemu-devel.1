@@ -2,86 +2,87 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DC7C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D30BC208B8
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48D87208B8
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RHYsUqWC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30BC208B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FFJk/WWQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D87208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeR6Z-0002qe-Tw
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:34:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
+	id 1jeR6b-0002t7-Ed
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQvw-0003Mn-Gk; Thu, 28 May 2020 18:23:28 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:15473)
+ id 1jeQxN-0005P8-0O; Thu, 28 May 2020 18:24:58 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:17153)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQvj-00064j-FA; Thu, 28 May 2020 18:23:28 -0400
+ id 1jeQxD-0008AD-NU; Thu, 28 May 2020 18:24:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590704595; x=1622240595;
+ t=1590704687; x=1622240687;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=Bvwri5Zp6ypKxEBHfELl3xgsE3Zz5p1AOKRot2+qvMI=;
- b=RHYsUqWCIbVyEP6DIJDC3ozQWbWD7KQxIXKsdQIwNbRPf/pROGqNuOv1
- 29+oRCWtPS6DpC0dio6NqGL9XOY76wEhVufC3kARrDM4v46O0EcQGLsCi
- y81D/n5EqtOOvSpCbOSsOV0v6bDeD+i5Wnq/IinJxVXyWgOYONPEAlpC0
- arerxKOogJ3HyU6nzfcRX95NDrtK0KfDWVfxT4qS11U6+k8hXVIWlO+X+
- Fg6V4pewiHFdLx+pZV/UXz7c/NlSR9j4OiAAImm4o5EdJy48kmCyuhLcJ
- VWkFD6w2HrEtkudgO4C0POvK3Q85Ew8zYlXyX+Tiom+fKHFysFO+kfPgb w==;
-IronPort-SDR: Wns6Oli53qmNWwVuqRUpUX8euEl9/OCmJ2i0gxm068qjHJsmXoVa4jQsCrWJbIY3GRFO4zb+UF
- b/ax/eq9rjbdGiXj49XzTRiT2GQrvM8oLdzQn5VsEL1fOnSPW4fh5j+vmLKlQPMFQFgsrKbRsi
- j0mXc+HB23SCXgCfpE37hAS9pj5QbFuTZPjdruMnn+95avrl19GbcZ/WMrQnhGxnKts+B6bak9
- ajj4ymw65HurOvuLcHgk6LYWjIvccdNDqTRWizzWBdM6K7BSYZ1yw3FxpFTa7EU5hBodycsQeX
- LSY=
-X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="143076000"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ bh=XRfgytYTyR08nkfffQ++DnxIYSd95DyOzyU+qaA7vEI=;
+ b=FFJk/WWQDC98+blzOgS7EpwY14d7fDQdEmAwLXGc+RYc1exT8jbkjAdv
+ WuO4pJYjnxoh/dc+ttD+7p4ouX8mfjOj3y843I/OfA9U2jo286SuWQzLC
+ jpPHJxYh2vo7xSM2ymn/SUW+hDmxOYDt3rXCNIxlFw8A8zAY1KborhR+a
+ EdiTL8zz7PORtZcIewbdPvDrcoYbSeYf7c7AXUXsAIhsCWJSVCLByHU1W
+ DSK5YmD2n9kJ7Y3TU7/qScVXu3kp3/FJgBKMi6SfSGzkj29X4UjbHfgC6
+ atm35biZnJBwx0b0E9K/ia4U0932zxv+yUg6b1IckIVWTHBELi5iizSib w==;
+IronPort-SDR: sAGEPwC9iKvBJFQUez0Q2AjgXMgEqmLwwsdGFGMxm4ns9hTIpQjWOGt1NGmqZunPLNuuq3lio7
+ YYvwQU4RatT9TeIrFi6/zjtjIN8IkXuft7LQa3x1WFiJ5jj8FCzfQiuu5zCvnZ9D+RCDN+Y3NB
+ GMtZAlPr8tcii7H1GGTzMT8CAe01TbzI5URMySH/cOzvxiI2aRXq8jQIiYT4+v0NrCobb86qqr
+ 2GawJzaQXNnjkj+wFlPDeH6BIDnK5HXP65IssiCmpqa0K8ghqwbRuhHE4jmsNWyHHveBm+dXz2
+ sVc=
+X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="247810977"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:23:05 +0800
-IronPort-SDR: 364b1cxoxDmxO/qimifdG/XxMNpE6QBNQd3/Esj3wz8up8TmZ7zDQiNLtCqIq+wtv+j69gxWQJ
- ynIaOtqxn8OR5OzFFKfJIRwh4AMnHnM7M=
+ by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:24:44 +0800
+IronPort-SDR: Ok52Fi4TUMkIyN1LcEyW4l1mhcOHNpOG+Dh9qQsAWVzcN+eihKTU5eAPMLpZ99ydcuxOw6GCDH
+ 46pCVlIG2Hwv7zlDALdqDeOsnQUPaWZP0=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 May 2020 15:12:20 -0700
-IronPort-SDR: w1TmiYuA0XDny548qkIocyTfE9pgIByM/fsewdefvm+WJpjptldfjVOWVqH9ODhJ/CxV7uFG4Z
- /uwrZwGsFD/w==
+ 28 May 2020 15:13:59 -0700
+IronPort-SDR: A3pyHwMkr9vruLjJ8kK5mgXAnEkCIVArmLvX2RCFjna6vPXQsVg2AzaEVcLAtbpcllzW5odYy6
+ ec1FlGOXWaEg==
 WDCIronportException: Internal
 Received: from 6xf7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.123])
- by uls-op-cesaip02.wdc.com with ESMTP; 28 May 2020 15:23:04 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 28 May 2020 15:24:44 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v5 08/11] hw/intc: Initial commit of lowRISC Ibex PLIC
-Date: Thu, 28 May 2020 15:14:28 -0700
-Message-Id: <b2a2f70eed173de4ae1d5a66ffff7df90822b216.1590704015.git.alistair.francis@wdc.com>
+Subject: [PATCH v4 1/4] hw/riscv: spike: Remove deprecated ISA specific
+ machines
+Date: Thu, 28 May 2020 15:16:08 -0700
+Message-Id: <bf556e99b3e7cc1b5388641117858e11b147f9b3.1590704110.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1590704015.git.alistair.francis@wdc.com>
-References: <cover.1590704015.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1590704110.git.alistair.francis@wdc.com>
+References: <cover.1590704110.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
+Received-SPF: pass client-ip=68.232.141.245;
  envelope-from=prvs=4104b2603=alistair.francis@wdc.com;
- helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:23:00
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:24:44
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -108,386 +109,304 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Ibex core contains a PLIC that although similar to the RISC-V spec
-is not RISC-V spec compliant.
-
-This patch implements a Ibex PLIC in a somewhat generic way.
-
-As the current RISC-V PLIC needs tidying up, my hope is that as the Ibex
-PLIC move towards spec compliance this PLIC implementation can be
-updated until it can replace the current PLIC.
+The ISA specific Spike machines have been deprecated in QEMU since 4.1,
+let's finally remove them.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
 ---
- include/hw/intc/ibex_plic.h |  63 +++++++++
- hw/intc/ibex_plic.c         | 261 ++++++++++++++++++++++++++++++++++++
- MAINTAINERS                 |   2 +
- hw/intc/Makefile.objs       |   1 +
- 4 files changed, 327 insertions(+)
- create mode 100644 include/hw/intc/ibex_plic.h
- create mode 100644 hw/intc/ibex_plic.c
+ docs/system/deprecated.rst |  17 +--
+ include/hw/riscv/spike.h   |   6 +-
+ hw/riscv/spike.c           | 217 -------------------------------------
+ 3 files changed, 12 insertions(+), 228 deletions(-)
 
-diff --git a/include/hw/intc/ibex_plic.h b/include/hw/intc/ibex_plic.h
-new file mode 100644
-index 0000000000..ddc7909903
---- /dev/null
-+++ b/include/hw/intc/ibex_plic.h
-@@ -0,0 +1,63 @@
-+/*
-+ * QEMU RISC-V lowRISC Ibex PLIC
-+ *
-+ * Copyright (c) 2020 Western Digital
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_IBEX_PLIC_H
-+#define HW_IBEX_PLIC_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_IBEX_PLIC "ibex-plic"
-+#define IBEX_PLIC(obj) \
-+    OBJECT_CHECK(IbexPlicState, (obj), TYPE_IBEX_PLIC)
-+
-+typedef struct IbexPlicState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion mmio;
-+
-+    uint32_t *pending;
-+    uint32_t *source;
-+    uint32_t *priority;
-+    uint32_t *enable;
-+    uint32_t threshold;
-+    uint32_t claim;
-+
-+    /* config */
-+    uint32_t num_cpus;
-+    uint32_t num_sources;
-+
-+    uint32_t pending_base;
-+    uint32_t pending_num;
-+
-+    uint32_t source_base;
-+    uint32_t source_num;
-+
-+    uint32_t priority_base;
-+    uint32_t priority_num;
-+
-+    uint32_t enable_base;
-+    uint32_t enable_num;
-+
-+    uint32_t threshold_base;
-+
-+    uint32_t claim_base;
-+} IbexPlicState;
-+
-+#endif /* HW_IBEX_PLIC_H */
-diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
-new file mode 100644
-index 0000000000..41079518c6
---- /dev/null
-+++ b/hw/intc/ibex_plic.c
-@@ -0,0 +1,261 @@
-+/*
-+ * QEMU RISC-V lowRISC Ibex PLIC
-+ *
-+ * Copyright (c) 2020 Western Digital
-+ *
-+ * Documentation avaliable: https://docs.opentitan.org/hw/ip/rv_plic/doc/
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/core/cpu.h"
-+#include "hw/boards.h"
-+#include "hw/pci/msi.h"
-+#include "target/riscv/cpu_bits.h"
-+#include "target/riscv/cpu.h"
-+#include "hw/intc/ibex_plic.h"
-+
-+static bool addr_between(uint32_t addr, uint32_t base, uint32_t num)
-+{
-+    uint32_t end = base + (num * 0x04);
-+
-+    if (addr >= base && addr < end) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
-+static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
-+{
-+    int pending_num = irq / 32;
-+
-+    s->pending[pending_num] |= level << (irq % 32);
-+}
-+
-+static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
-+{
-+    int i;
-+
-+    for (i = 0; i < s->pending_num; i++) {
-+        uint32_t irq_num = ctz64(s->pending[i]) + (i * 32);
-+
-+        if (!(s->pending[i] & s->enable[i])) {
-+            /* No pending and enabled IRQ */
-+            continue;
-+        }
-+
-+        if (s->priority[irq_num] > s->threshold) {
-+            if (!s->claim) {
-+                s->claim = irq_num;
-+            }
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+static void ibex_plic_update(IbexPlicState *s)
-+{
-+    CPUState *cpu;
-+    int level, i;
-+
-+    for (i = 0; i < s->num_cpus; i++) {
-+        cpu = qemu_get_cpu(i);
-+
-+        if (!cpu) {
-+            continue;
-+        }
-+
-+        level = ibex_plic_irqs_pending(s, 0);
-+
-+        riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
-+    }
-+}
-+
-+static void ibex_plic_reset(DeviceState *dev)
-+{
-+    IbexPlicState *s = IBEX_PLIC(dev);
-+
-+    s->threshold = 0x00000000;
-+    s->claim = 0x00000000;
-+}
-+
-+static uint64_t ibex_plic_read(void *opaque, hwaddr addr,
-+                               unsigned int size)
-+{
-+    IbexPlicState *s = opaque;
-+    int offset;
-+    uint32_t ret = 0;
-+
-+    if (addr_between(addr, s->pending_base, s->pending_num)) {
-+        offset = (addr - s->pending_base) / 4;
-+        ret = s->pending[offset];
-+    } else if (addr_between(addr, s->source_base, s->source_num)) {
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Interrupt source mode not supported\n", __func__);
-+    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
-+        offset = (addr - s->priority_base) / 4;
-+        ret = s->priority[offset];
-+    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
-+        offset = (addr - s->enable_base) / 4;
-+        ret = s->enable[offset];
-+    } else if (addr_between(addr, s->threshold_base, 1)) {
-+        ret = s->threshold;
-+    } else if (addr_between(addr, s->claim_base, 1)) {
-+        int pending_num = s->claim / 32;
-+        s->pending[pending_num] &= ~(1 << (s->claim % 32));
-+
-+        ret = s->claim;
-+    }
-+
-+    return ret;
-+}
-+
-+static void ibex_plic_write(void *opaque, hwaddr addr,
-+                            uint64_t value, unsigned int size)
-+{
-+    IbexPlicState *s = opaque;
-+
-+    if (addr_between(addr, s->pending_base, s->pending_num)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Pending registers are read only\n", __func__);
-+    } else if (addr_between(addr, s->source_base, s->source_num)) {
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Interrupt source mode not supported\n", __func__);
-+    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
-+        uint32_t irq = ((addr - s->priority_base) >> 2) + 1;
-+        s->priority[irq] = value & 7;
-+    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
-+        uint32_t enable_reg = (addr - s->enable_base) / 4;
-+
-+        s->enable[enable_reg] = value;
-+    } else if (addr_between(addr, s->threshold_base, 1)) {
-+        s->threshold = value & 3;
-+    } else if (addr_between(addr, s->claim_base, 1)) {
-+        if (s->claim == value) {
-+            /* Interrupt was completed */
-+            s->claim = 0;
-+        }
-+    }
-+
-+    ibex_plic_update(s);
-+}
-+
-+static const MemoryRegionOps ibex_plic_ops = {
-+    .read = ibex_plic_read,
-+    .write = ibex_plic_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void ibex_plic_irq_request(void *opaque, int irq, int level)
-+{
-+    IbexPlicState *s = opaque;
-+
-+    ibex_plic_irqs_set_pending(s, irq, level > 0);
-+    ibex_plic_update(s);
-+}
-+
-+static Property ibex_plic_properties[] = {
-+    DEFINE_PROP_UINT32("num-cpus", IbexPlicState, num_cpus, 1),
-+    DEFINE_PROP_UINT32("num-sources", IbexPlicState, num_sources, 80),
-+
-+    DEFINE_PROP_UINT32("pending-base", IbexPlicState, pending_base, 0),
-+    DEFINE_PROP_UINT32("pending-num", IbexPlicState, pending_num, 3),
-+
-+    DEFINE_PROP_UINT32("source-base", IbexPlicState, source_base, 0x0c),
-+    DEFINE_PROP_UINT32("source-num", IbexPlicState, source_num, 3),
-+
-+    DEFINE_PROP_UINT32("priority-base", IbexPlicState, priority_base, 0x18),
-+    DEFINE_PROP_UINT32("priority-num", IbexPlicState, priority_num, 80),
-+
-+    DEFINE_PROP_UINT32("enable-base", IbexPlicState, enable_base, 0x200),
-+    DEFINE_PROP_UINT32("enable-num", IbexPlicState, enable_num, 3),
-+
-+    DEFINE_PROP_UINT32("threshold-base", IbexPlicState, threshold_base, 0x20c),
-+
-+    DEFINE_PROP_UINT32("claim-base", IbexPlicState, claim_base, 0x210),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void ibex_plic_init(Object *obj)
-+{
-+    IbexPlicState *s = IBEX_PLIC(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &ibex_plic_ops, s,
-+                          TYPE_IBEX_PLIC, 0x400);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+}
-+
-+static void ibex_plic_realize(DeviceState *dev, Error **errp)
-+{
-+    IbexPlicState *s = IBEX_PLIC(dev);
-+    int i;
-+
-+    s->pending = g_new0(uint32_t, s->pending_num);
-+    s->source = g_new0(uint32_t, s->source_num);
-+    s->priority = g_new0(uint32_t, s->priority_num);
-+    s->enable = g_new0(uint32_t, s->enable_num);
-+
-+    qdev_init_gpio_in(dev, ibex_plic_irq_request, s->num_sources);
-+
-+    /*
-+     * We can't allow the supervisor to control SEIP as this would allow the
-+     * supervisor to clear a pending external interrupt which will result in
-+     * a lost interrupt in the case a PLIC is attached. The SEIP bit must be
-+     * hardware controlled when a PLIC is attached.
-+     */
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-+    for (i = 0; i < smp_cpus; i++) {
-+        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(i));
-+        if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
-+            error_report("SEIP already claimed");
-+            exit(1);
-+        }
-+    }
-+
-+    msi_nonbroken = true;
-+}
-+
-+static void ibex_plic_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = ibex_plic_reset;
-+    device_class_set_props(dc, ibex_plic_properties);
-+    dc->realize = ibex_plic_realize;
-+}
-+
-+static const TypeInfo ibex_plic_info = {
-+    .name          = TYPE_IBEX_PLIC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IbexPlicState),
-+    .instance_init = ibex_plic_init,
-+    .class_init    = ibex_plic_class_init,
-+};
-+
-+static void ibex_plic_register_types(void)
-+{
-+    type_register_static(&ibex_plic_info);
-+}
-+
-+type_init(ibex_plic_register_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a1ce186a7e..d6b2819e44 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1246,8 +1246,10 @@ L: qemu-riscv@nongnu.org
- S: Supported
- F: hw/riscv/opentitan.c
- F: hw/char/ibex_uart.c
-+F: hw/intc/ibex_plic.c
- F: include/hw/riscv/opentitan.h
- F: include/hw/char/ibex_uart.h
-+F: include/hw/intc/ibex_plic.h
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index f0061f94aa..50927bad74 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -379,13 +379,6 @@ This machine has been renamed ``fuloong2e``.
+ These machine types are very old and likely can not be used for live migration
+ from old QEMU versions anymore. A newer machine type should be used instead.
  
- SH4 Machines
- ------------
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index f726d87532..a61e6728fe 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) += arm_gicv3_cpuif.o
- obj-$(CONFIG_MIPS_CPS) += mips_gic.o
- obj-$(CONFIG_NIOS2) += nios2_iic.o
- obj-$(CONFIG_OMPIC) += ompic.o
-+obj-$(CONFIG_IBEX) += ibex_plic.o
+-``spike_v1.9.1`` and ``spike_v1.10`` (since 4.1)
+-''''''''''''''''''''''''''''''''''''''''''''''''
+-
+-The version specific Spike machines have been deprecated in favour of the
+-generic ``spike`` machine. If you need to specify an older version of the RISC-V
+-spec you can use the ``-cpu rv64gcsu,priv_spec=v1.9.1`` command line argument.
+-
+ Device options
+ --------------
+ 
+@@ -493,6 +486,16 @@ The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (removed in 5.0
+ The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
+ 'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
+ 
++System emulator machines
++------------------------
++
++``spike_v1.9.1`` and ``spike_v1.10`` (removed in 5.1)
++'''''''''''''''''''''''''''''''''''''''''''''''''''''
++
++The version specific Spike machines have been removed in favour of the
++generic ``spike`` machine. If you need to specify an older version of the RISC-V
++spec you can use the ``-cpu rv64gcsu,priv_spec=v1.10.0`` command line argument.
++
+ Related binaries
+ ----------------
+ 
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index dc770421bc..1cd72b85d6 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -39,11 +39,9 @@ enum {
+ };
+ 
+ #if defined(TARGET_RISCV32)
+-#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+-#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
++#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_BASE32
+ #elif defined(TARGET_RISCV64)
+-#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV64GCSU_V1_09_1
+-#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV64GCSU_V1_10_0
++#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_BASE64
+ #endif
+ 
+ #endif
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index d0c4843712..7bbbdb5036 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -257,221 +257,6 @@ static void spike_board_init(MachineState *machine)
+         false);
+ }
+ 
+-static void spike_v1_10_0_board_init(MachineState *machine)
+-{
+-    const struct MemmapEntry *memmap = spike_memmap;
+-
+-    SpikeState *s = g_new0(SpikeState, 1);
+-    MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+-    int i;
+-    unsigned int smp_cpus = machine->smp.cpus;
+-
+-    if (!qtest_enabled()) {
+-        info_report("The Spike v1.10.0 machine has been deprecated. "
+-                    "Please use the generic spike machine and specify the ISA "
+-                    "versions using -cpu.");
+-    }
+-
+-    /* Initialize SOC */
+-    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+-                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+-    object_property_set_str(OBJECT(&s->soc), SPIKE_V1_10_0_CPU, "cpu-type",
+-                            &error_abort);
+-    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+-                            &error_abort);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+-                            &error_abort);
+-
+-    /* register system main memory (actual RAM) */
+-    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+-                           machine->ram_size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
+-        main_mem);
+-
+-    /* create device tree */
+-    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+-
+-    /* boot rom */
+-    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
+-                           memmap[SPIKE_MROM].size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
+-                                mask_rom);
+-
+-    if (machine->kernel_filename) {
+-        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
+-    }
+-
+-    /* reset vector */
+-    uint32_t reset_vec[8] = {
+-        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+-        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+-        0xf1402573,                  /*     csrr   a0, mhartid  */
+-#if defined(TARGET_RISCV32)
+-        0x0182a283,                  /*     lw     t0, 24(t0) */
+-#elif defined(TARGET_RISCV64)
+-        0x0182b283,                  /*     ld     t0, 24(t0) */
+-#endif
+-        0x00028067,                  /*     jr     t0 */
+-        0x00000000,
+-        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
+-        0x00000000,
+-                                     /* dtb: */
+-    };
+-
+-    /* copy in the reset vector in little_endian byte order */
+-    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+-        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+-    }
+-    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+-                          memmap[SPIKE_MROM].base, &address_space_memory);
+-
+-    /* copy in the device tree */
+-    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+-            memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
+-        error_report("not enough space to store device-tree");
+-        exit(1);
+-    }
+-    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+-    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+-                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
+-                          &address_space_memory);
+-
+-    /* initialize HTIF using symbols found in load_kernel */
+-    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+-
+-    /* Core Local Interruptor (timer and IPI) */
+-    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+-        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
+-        false);
+-}
+-
+-static void spike_v1_09_1_board_init(MachineState *machine)
+-{
+-    const struct MemmapEntry *memmap = spike_memmap;
+-
+-    SpikeState *s = g_new0(SpikeState, 1);
+-    MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+-    int i;
+-    unsigned int smp_cpus = machine->smp.cpus;
+-
+-    if (!qtest_enabled()) {
+-        info_report("The Spike v1.09.1 machine has been deprecated. "
+-                    "Please use the generic spike machine and specify the ISA "
+-                    "versions using -cpu.");
+-    }
+-
+-    /* Initialize SOC */
+-    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+-                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+-    object_property_set_str(OBJECT(&s->soc), SPIKE_V1_09_1_CPU, "cpu-type",
+-                            &error_abort);
+-    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+-                            &error_abort);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+-                            &error_abort);
+-
+-    /* register system main memory (actual RAM) */
+-    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+-                           machine->ram_size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
+-        main_mem);
+-
+-    /* boot rom */
+-    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
+-                           memmap[SPIKE_MROM].size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
+-                                mask_rom);
+-
+-    if (machine->kernel_filename) {
+-        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
+-    }
+-
+-    /* reset vector */
+-    uint32_t reset_vec[8] = {
+-        0x297 + memmap[SPIKE_DRAM].base - memmap[SPIKE_MROM].base, /* lui */
+-        0x00028067,                   /* jump to DRAM_BASE */
+-        0x00000000,                   /* reserved */
+-        memmap[SPIKE_MROM].base + sizeof(reset_vec), /* config string pointer */
+-        0, 0, 0, 0                    /* trap vector */
+-    };
+-
+-    /* part one of config string - before memory size specified */
+-    const char *config_string_tmpl =
+-        "platform {\n"
+-        "  vendor ucb;\n"
+-        "  arch spike;\n"
+-        "};\n"
+-        "rtc {\n"
+-        "  addr 0x%" PRIx64 "x;\n"
+-        "};\n"
+-        "ram {\n"
+-        "  0 {\n"
+-        "    addr 0x%" PRIx64 "x;\n"
+-        "    size 0x%" PRIx64 "x;\n"
+-        "  };\n"
+-        "};\n"
+-        "core {\n"
+-        "  0" " {\n"
+-        "    " "0 {\n"
+-        "      isa %s;\n"
+-        "      timecmp 0x%" PRIx64 "x;\n"
+-        "      ipi 0x%" PRIx64 "x;\n"
+-        "    };\n"
+-        "  };\n"
+-        "};\n";
+-
+-    /* build config string with supplied memory size */
+-    char *isa = riscv_isa_string(&s->soc.harts[0]);
+-    char *config_string = g_strdup_printf(config_string_tmpl,
+-        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIME_BASE,
+-        (uint64_t)memmap[SPIKE_DRAM].base,
+-        (uint64_t)ram_size, isa,
+-        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIMECMP_BASE,
+-        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_SIP_BASE);
+-    g_free(isa);
+-    size_t config_string_len = strlen(config_string);
+-
+-    /* copy in the reset vector in little_endian byte order */
+-    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+-        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+-    }
+-    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+-                          memmap[SPIKE_MROM].base, &address_space_memory);
+-
+-    /* copy in the config string */
+-    rom_add_blob_fixed_as("mrom.reset", config_string, config_string_len,
+-                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
+-                          &address_space_memory);
+-
+-    /* initialize HTIF using symbols found in load_kernel */
+-    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+-
+-    /* Core Local Interruptor (timer and IPI) */
+-    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+-        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
+-        false);
+-
+-    g_free(config_string);
+-}
+-
+-static void spike_v1_09_1_machine_init(MachineClass *mc)
+-{
+-    mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
+-    mc->init = spike_v1_09_1_board_init;
+-    mc->max_cpus = 1;
+-}
+-
+-static void spike_v1_10_0_machine_init(MachineClass *mc)
+-{
+-    mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
+-    mc->init = spike_v1_10_0_board_init;
+-    mc->max_cpus = 1;
+-}
+-
+ static void spike_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V Spike Board";
+@@ -481,6 +266,4 @@ static void spike_machine_init(MachineClass *mc)
+     mc->default_cpu_type = SPIKE_V1_10_0_CPU;
+ }
+ 
+-DEFINE_MACHINE("spike_v1.9.1", spike_v1_09_1_machine_init)
+-DEFINE_MACHINE("spike_v1.10", spike_v1_10_0_machine_init)
+ DEFINE_MACHINE("spike", spike_machine_init)
 -- 
 2.26.2
 
