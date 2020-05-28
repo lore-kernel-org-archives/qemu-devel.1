@@ -2,80 +2,80 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A284C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 11:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 11:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45EEE2088E
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 11:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 834D22088E
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 11:13:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMHV9hVz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45EEE2088E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4rZm87N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834D22088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeGTg-0006fx-Fm
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 07:13:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49872)
+	id 1jeGTq-00075V-NH
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 07:13:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jeGLP-0005u0-6c
- for qemu-devel@nongnu.org; Thu, 28 May 2020 07:05:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57698
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jeGLU-0005wh-3u
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 07:05:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57535
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jeGLG-0006lK-7N
- for qemu-devel@nongnu.org; Thu, 28 May 2020 07:05:02 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jeGLJ-0006qG-Fl
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 07:05:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590663893;
+ s=mimecast20190719; t=1590663895;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OYidYnDI2p3H7kKvYlxCHJA+V3LjwOLpkoIpU+UA0lU=;
- b=CMHV9hVz9di9rsVsDA6Lk2wnBDDszPHXEk83dH/h6iokxF1WcSYUtAu5tabqBi5iIBqVpq
- PwFFPCoPmiYmnb2+Zi1e7+u9NeTKUaeV2RxPz/sFLCrW60ndAPxfxkuzgwAOqHnTGlFbOO
- zr3BQdBU+9HMRdLgsWeZfI6NyPWe1k0=
+ bh=rvgscpl/ug0EhOZFSapnCmqCdDrH7i6DVH0Hl3rM9oE=;
+ b=J4rZm87NsHmUXElq46RfNEr4yspPUm/B1mx2AuOX8FxX7IN5F22YkB7pqKg8Igs0XJ5XuE
+ hkgCyCo+Vqo+/Oe9GXRCAr9VXwUph8Ks6j+2tmq23Zucj5D4eOmY+0R6j6k7GrqBE38xWu
+ UICC80sjhu0x6pzLUJWMmu5yrGaJZuk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-sl6wnlhTMSWaWEUsoNA2Cw-1; Thu, 28 May 2020 07:04:48 -0400
-X-MC-Unique: sl6wnlhTMSWaWEUsoNA2Cw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-268-mwtVeu1dP-mYa0lJeoRnyA-1; Thu, 28 May 2020 07:04:50 -0400
+X-MC-Unique: mwtVeu1dP-mYa0lJeoRnyA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB51D835B42;
- Thu, 28 May 2020 11:04:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C99601009441
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 11:04:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7DD060CD1;
- Thu, 28 May 2020 11:04:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 71D83768B0;
+ Thu, 28 May 2020 11:04:49 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D2B5611358C0; Thu, 28 May 2020 13:04:44 +0200 (CEST)
+ id 3666C11358D6; Thu, 28 May 2020 13:04:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/24] macio: Fix to realize "mos6522-cuda" and
- "mos6522-pmu" devices
-Date: Thu, 28 May 2020 13:04:29 +0200
-Message-Id: <20200528110444.20456-10-armbru@redhat.com>
+Subject: [PATCH v2 23/24] sd: Hide the qdev-but-not-quite thing created by
+ sd_init()
+Date: Thu, 28 May 2020 13:04:43 +0200
+Message-Id: <20200528110444.20456-24-armbru@redhat.com>
 In-Reply-To: <20200528110444.20456-1-armbru@redhat.com>
 References: <20200528110444.20456-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 02:50:32
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 01:51:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -83,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,104 +97,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- Laurent Vivier <laurent@vivier.eu>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cuda_init() creates a "mos6522-cuda" device, but it's never realized.
-Affects machines mac99 with via=cuda (default) and g3beige.
+Commit 260bc9d8aa "hw/sd/sd.c: QOMify" QOMified only the device
+itself, not its users.  It kept sd_init() around for non-QOMified
+users.
 
-pmu_init() creates a "mos6522-pmu" device, but it's never realized.
-Affects machine mac99 with via=pmu and via=pmu-adb,
+More than four years later, three such users remain: omap1 (machines
+cheetah, sx1, sx1-v1) and omap2 (machines n800, n810) are not
+QOMified, and pl181 (machines integratorcp, realview-eb,
+realview-eb-mpcore, realview-pb-a8 realview-pbx-a9, versatileab,
+versatilepb, vexpress-a15, vexpress-a9) is not QOMified properly.
 
-In theory, a device becomes real only on realize.  In practice, the
-transition from unreal to real is a fuzzy one.  The work to make a
-device real can be spread between realize methods (fine),
-instance_init methods (wrong), and board code wiring up the device
-(fine as long as it effectively happens on realize).  Depending on
-what exactly is done where, a device can work even when we neglect
-to realize it.
+The issue I presently have with this: an "sd-card" device should plug
+into an "sd-bus" (its DeviceClass member bus_type says so), but
+sd_init() leaves it unplugged.  This is normally a bug (I just fixed
+some instances), and I'd like to assert proper pluggedness to prevent
+regressions.  However, the qdev-but-not-quite thing returned by
+sd_init() would fail the assertion.  Meh.
 
-These onetwo appear to work.  Nevertheless, it's a clear misuse of the
-interface.  Even when it works today (more or less by chance), it can
-break tomorrow.
+Make sd_init() hide it from QOM/qdev.  Visible in "info qom-tree",
+here's the change for cheetah:
 
-Fix by realizing them in cuda_realize() and pmu_realize(),
-respectively.
+     /machine (cheetah-machine)
+       [...]
+       /unattached (container)
+         [...]
+         /device[5] (serial-mm)
+           /serial (serial)
+           /serial[0] (qemu:memory-region)
+    -    /device[6] (sd-card)
+    -    /device[7] (omap-gpio)
+    +    /device[6] (omap-gpio)
+         [rest of device[*] renumbered...]
 
-Fixes: 6dca62a0000f95e0b7020aa00d0ca9b2c421f341
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/misc/macio/cuda.c | 10 +++++-----
- hw/misc/macio/pmu.c  | 10 +++++-----
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ hw/sd/sd.c | 40 ++++++++++++++++++++++++++++------------
+ 1 file changed, 28 insertions(+), 12 deletions(-)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index e0cc0aac5d..763a785f1a 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -33,6 +33,7 @@
- #include "hw/misc/macio/cuda.h"
- #include "qemu/timer.h"
- #include "sysemu/runstate.h"
-+#include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-@@ -523,15 +524,14 @@ static void cuda_realize(DeviceState *dev, Error **errp)
- {
-     CUDAState *s = CUDA(dev);
-     SysBusDevice *sbd;
--    MOS6522State *ms;
--    DeviceState *d;
-     struct tm tm;
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 3c06a0ac6d..7070a116ea 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -83,6 +83,10 @@ enum SDCardStates {
+ struct SDState {
+     DeviceState parent_obj;
  
-+    object_property_set_bool(OBJECT(&s->mos6522_cuda), true, "realized",
-+                             &error_abort);
++    /* If true, created by sd_init() for a non-qdevified caller */
++    /* TODO purge them with fire */
++    bool me_no_qdev_me_kill_mammoth_with_rocks;
 +
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_cuda);
--    ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
--    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_cuda));
+     /* SD Memory Card Registers */
+     uint32_t ocr;
+     uint8_t scr[8];
+@@ -129,6 +133,8 @@ struct SDState {
+     bool cmd_line;
+ };
  
-     qemu_get_timedate(&tm, 0);
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index 9a9cd427e1..4264779396 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -40,6 +40,7 @@
- #include "hw/misc/macio/pmu.h"
- #include "qemu/timer.h"
- #include "sysemu/runstate.h"
-+#include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-@@ -740,15 +741,14 @@ static void pmu_realize(DeviceState *dev, Error **errp)
- {
-     PMUState *s = VIA_PMU(dev);
-     SysBusDevice *sbd;
--    MOS6522State *ms;
--    DeviceState *d;
-     struct tm tm;
- 
-+    object_property_set_bool(OBJECT(&s->mos6522_pmu), true, "realized",
-+                             &error_abort);
++static void sd_realize(DeviceState *dev, Error **errp);
 +
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_pmu);
--    ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
--    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_pmu));
+ static const char *sd_state_name(enum SDCardStates state)
+ {
+     static const char *state_name[] = {
+@@ -590,7 +596,7 @@ static void sd_cardchange(void *opaque, bool load, Error **errp)
+ {
+     SDState *sd = opaque;
+     DeviceState *dev = DEVICE(sd);
+-    SDBus *sdbus = SD_BUS(qdev_get_parent_bus(dev));
++    SDBus *sdbus;
+     bool inserted = sd_get_inserted(sd);
+     bool readonly = sd_get_readonly(sd);
  
-     qemu_get_timedate(&tm, 0);
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+@@ -601,19 +607,17 @@ static void sd_cardchange(void *opaque, bool load, Error **errp)
+         trace_sdcard_ejected();
+     }
+ 
+-    /* The IRQ notification is for legacy non-QOM SD controller devices;
+-     * QOMified controllers use the SDBus APIs.
+-     */
+-    if (sdbus) {
+-        sdbus_set_inserted(sdbus, inserted);
+-        if (inserted) {
+-            sdbus_set_readonly(sdbus, readonly);
+-        }
+-    } else {
++    if (sd->me_no_qdev_me_kill_mammoth_with_rocks) {
+         qemu_set_irq(sd->inserted_cb, inserted);
+         if (inserted) {
+             qemu_set_irq(sd->readonly_cb, readonly);
+         }
++    } else {
++        sdbus = SD_BUS(qdev_get_parent_bus(dev));
++        sdbus_set_inserted(sdbus, inserted);
++        if (inserted) {
++            sdbus_set_readonly(sdbus, readonly);
++        }
+     }
+ }
+ 
+@@ -697,6 +701,7 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+ {
+     Object *obj;
+     DeviceState *dev;
++    SDState *sd;
+     Error *err = NULL;
+ 
+     obj = object_new(TYPE_SD_CARD);
+@@ -707,13 +712,24 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+         return NULL;
+     }
+     qdev_prop_set_bit(dev, "spi", is_spi);
+-    object_property_set_bool(obj, true, "realized", &err);
++
++    /*
++     * Realizing the device properly would put it into the QOM
++     * composition tree even though it is not plugged into an
++     * appropriate bus.  That's a no-no.  Hide the device from
++     * QOM/qdev, and call its qdev realize callback directly.
++     */
++    object_ref(obj);
++    object_unparent(obj);
++    sd_realize(dev, &err);
+     if (err) {
+         error_reportf_err(err, "sd_init failed: ");
+         return NULL;
+     }
+ 
+-    return SD_CARD(dev);
++    sd = SD_CARD(dev);
++    sd->me_no_qdev_me_kill_mammoth_with_rocks = true;
++    return sd;
+ }
+ 
+ void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert)
 -- 
 2.21.3
 
