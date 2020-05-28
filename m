@@ -2,83 +2,93 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1116FC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA622C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFEF7207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 942C4207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gb20MqkK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFEF7207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KVu9jZnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942C4207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeQvt-0002Ve-TV
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42882)
+	id 1jeQwx-0004Rw-N8
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:24:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jeQuA-0000MU-GC
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:21:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45858
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jeQu8-0004gC-32
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:21:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590704495;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/AbJ9wUwnkTOKUcHN+ez0/X3K8UeS4tPYQIww476n9I=;
- b=Gb20MqkKofHHodTPdjpDutEi8PoH89U3hy77BtMXBeCKXbIB173VmgnhxLsm8fHb+L2LQs
- P6sRo9UTDRF6BZ2xr9vohzgbi7dfmt39gi5IqW8JVTmhIx1bGvqwpJD8YBb/6gKhCbOvd9
- XyGtMvv66l9x9dFbGL+v337gaXQ7oSA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-sEwiPGZ_PzaChWtTxSI6BQ-1; Thu, 28 May 2020 18:21:33 -0400
-X-MC-Unique: sEwiPGZ_PzaChWtTxSI6BQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 367E81085933
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 22:21:32 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C5CA5D9CD;
- Thu, 28 May 2020 22:21:31 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] scripts/qmp: Fix shebang and imports
-Date: Thu, 28 May 2020 18:21:26 -0400
-Message-Id: <20200528222129.23826-2-jsnow@redhat.com>
-In-Reply-To: <20200528222129.23826-1-jsnow@redhat.com>
-References: <20200528222129.23826-1-jsnow@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
+ id 1jeQvN-00027r-K4; Thu, 28 May 2020 18:22:55 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:48464)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
+ id 1jeQvK-0005hu-SS; Thu, 28 May 2020 18:22:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1590704572; x=1622240572;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=vDZd4fWZoZGped8sJN4wTNf8wH4Xep9G/tkQsk69CK0=;
+ b=KVu9jZnn9/C41Vw5nsrLVZCtpIaDfCRtJPoFx1Zc9oXPigZt9OALyFjk
+ aCalVVD3U6INQ6HXjIEUqMD1yE6IjY/YTk6Uq1joe7020vwx73G61klfi
+ S7E5fU6dymCUjHLjR074i25o+oOmZUTU8NfVBkxBYD0vImH/Yp6kEHhK6
+ TZh0YvamG+tdUjfKIMX8ozZZ25nvZ+tTyOyOMMlMGP/pSMrRI+kaj47QO
+ a5oiZSnXXDrqyoqXfq6KDlpIzmk9495Tfe1/jphgOgd5EVjUoYx4+wHwG
+ wZf0Qw/L4g1zBI9k1FoZwvuK0uHL/1N7Pi6qxjApfNAVnfzY9Wgei58UC g==;
+IronPort-SDR: cGlkGdL4KITIdHBwzHNoNWwTDIuCsVQqSpm0TeoUMRj/3jqVl8pywhxOUCSQPXhuOt1ePcLy0L
+ cZGFeM0LN3nR6D/gsmWgCpuzfOIV6u46BHCQVe/Jm2KS6SQWxkLRaCbrVv3MPEq32RArRli3Yg
+ IWTxbHnJucbPdn3yU1vyqxxAxMRvzDv3dX6zQndEj/zYKkObInJb5SPyAg85ZreyP1IFvCbN24
+ M+joBRK5fyp9uQbFXZBgPg4CcCY5nu066vynKWO0vP4fEtNyuu2SBA8P0DfeyJmBKogWxHM8ev
+ dH8=
+X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="139073329"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:22:49 +0800
+IronPort-SDR: JRngCyMcOIBzqaR6oa+WNnesprRBcC6zo/QK9pSWH87FUz8ezXCLOzejYq4XzPmbzJqdXR6s9a
+ 6KZV51RZdmuYm6w1eJNvwyOsKv3Gi8ddQ=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 28 May 2020 15:12:03 -0700
+IronPort-SDR: VMFvLY5S7qLuPZeUU9YEfHUupRUayj4a9hNENTlBBehMh3lyJKHxZacFNp2FyoA7wJx+k2ViqG
+ m229gVsY5/eA==
+WDCIronportException: Internal
+Received: from 6xf7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.123])
+ by uls-op-cesaip02.wdc.com with ESMTP; 28 May 2020 15:22:48 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v5 02/11] target/riscv: Don't overwrite the reset vector
+Date: Thu, 28 May 2020 15:14:12 -0700
+Message-Id: <c8efc9d0e31270d831a267e8ff78a2a70cda7d39.1590704015.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1590704015.git.alistair.francis@wdc.com>
+References: <cover.1590704015.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:46:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=216.71.153.144;
+ envelope-from=prvs=4104b2603=alistair.francis@wdc.com;
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:22:43
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,145 +101,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- philmd@redhat.com, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
+ alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There's more wrong with these scripts; They are in various stages of
-disrepair. That's beyond the scope of this current patchset.
+The reset vector is set in the init function don't set it again in
+realize.
 
-This just mechanically corrects the imports and the shebangs, as part of
-ensuring that the python/qemu/lib refactoring didn't break anything
-needlessly.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
 ---
- scripts/qmp/qmp      | 4 +++-
- scripts/qmp/qom-fuse | 4 +++-
- scripts/qmp/qom-get  | 6 ++++--
- scripts/qmp/qom-list | 6 ++++--
- scripts/qmp/qom-set  | 6 ++++--
- scripts/qmp/qom-tree | 6 ++++--
- 6 files changed, 22 insertions(+), 10 deletions(-)
+ target/riscv/cpu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
-index 0625fc2abac..8e52e4a54de 100755
---- a/scripts/qmp/qmp
-+++ b/scripts/qmp/qmp
-@@ -11,7 +11,9 @@
- # See the COPYING file in the top-level directory.
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 059d71f2c7..5eb3c02735 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -133,6 +133,7 @@ static void riscv_base32_cpu_init(Object *obj)
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     /* We set this in the realise function */
+     set_misa(env, 0);
++    set_resetvec(env, DEFAULT_RSTVEC);
+ }
  
- import sys, os
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
+ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
+@@ -180,6 +181,7 @@ static void riscv_base64_cpu_init(Object *obj)
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     /* We set this in the realise function */
+     set_misa(env, 0);
++    set_resetvec(env, DEFAULT_RSTVEC);
+ }
  
- def print_response(rsp, prefix=[]):
-     if type(rsp) == list:
-diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-index 6bada2c33d3..5fa6b3bf64d 100755
---- a/scripts/qmp/qom-fuse
-+++ b/scripts/qmp/qom-fuse
-@@ -15,7 +15,9 @@ import fuse, stat
- from fuse import Fuse
- import os, posix
- from errno import *
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
+ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+@@ -399,7 +401,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+     }
  
- fuse.fuse_python_api = (0, 2)
+     set_priv_version(env, priv_version);
+-    set_resetvec(env, DEFAULT_RSTVEC);
  
-diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
-index 007b4cd442e..666df718320 100755
---- a/scripts/qmp/qom-get
-+++ b/scripts/qmp/qom-get
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-@@ -13,7 +13,9 @@
- 
- import sys
- import os
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
-index 03bda3446b7..5074fd939f4 100755
---- a/scripts/qmp/qom-list
-+++ b/scripts/qmp/qom-list
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-@@ -13,7 +13,9 @@
- 
- import sys
- import os
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-index c37fe78b000..240a78187f9 100755
---- a/scripts/qmp/qom-set
-+++ b/scripts/qmp/qom-set
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-@@ -13,7 +13,9 @@
- 
- import sys
- import os
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
-index 1c8acf61e79..25b0781323c 100755
---- a/scripts/qmp/qom-tree
-+++ b/scripts/qmp/qom-tree
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-@@ -15,7 +15,9 @@
- 
- import sys
- import os
--from qmp import QEMUMonitorProtocol
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-+from qemu.qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
+     if (cpu->cfg.mmu) {
+         set_feature(env, RISCV_FEATURE_MMU);
 -- 
-2.21.3
+2.26.2
 
 
