@@ -2,82 +2,118 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7BCC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 15:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285C3C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 15:46:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49B9F20888
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 15:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E59C4207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 15:46:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XuMqPH8W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B9F20888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jr+uOD/j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59C4207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeKj4-00059o-By
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 11:45:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32982)
+	id 1jeKjX-0005hD-26
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 11:46:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeKcD-0004oU-II
- for qemu-devel@nongnu.org; Thu, 28 May 2020 11:38:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44480
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeKiC-0003yK-2u
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 11:44:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47477
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jeKcC-00044f-HO
- for qemu-devel@nongnu.org; Thu, 28 May 2020 11:38:41 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeKi8-0007DC-Mw
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 11:44:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590680319;
+ s=mimecast20190719; t=1590680686;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RQu9URXHm3TK36XSaXCSttgLb+YQkStVK7BwXFtJ4rc=;
- b=XuMqPH8WId7B6hvUuIsWfK3aBzm4G8+0BLmgDttzt4Q56a2GAY9V5GUUUBr3KZYFRGMCJj
- hb5nhiwPj4aLINfIbmoQpO8smDszJrze6CW2WWTIiGrFP0VWnSxkIKY3+26Y0dpAW40zCl
- 1X9wAVxTwGPdmjJDT+ZUftJhD/KqxEU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-MvlcRy1wMiCzEHjQPxum0g-1; Thu, 28 May 2020 11:38:37 -0400
-X-MC-Unique: MvlcRy1wMiCzEHjQPxum0g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F10941B18BEE;
- Thu, 28 May 2020 15:38:36 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E9D45C221;
- Thu, 28 May 2020 15:38:36 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 5A74616E2C; Thu, 28 May 2020 17:38:35 +0200 (CEST)
-Date: Thu, 28 May 2020 17:38:35 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PULL 00/12] testing and plugin fixes
-Message-ID: <20200528153835.d7rn2uswoivqjpqz@sirius.home.kraxel.org>
-References: <20200527145455.2550-1-alex.bennee@linaro.org>
- <CAFEAcA_LrZjBY_y3UR=fdOtDvnY=zGG-10Yeq0ZjbBc=EsvRfw@mail.gmail.com>
- <87blm83y5v.fsf@linaro.org>
- <CAFEAcA_QTkWA7eBwORWMmpcH1E5bF4A3mFtkzdstkucd-2+p3A@mail.gmail.com>
- <591d2690-c2e7-98aa-8569-5f99737c5f71@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=vBvZTAGxsHj9eMYkBUsAC8Fy4l2ONrVzxiu0OVyZHXg=;
+ b=Jr+uOD/jt4Pd401LyVpSGoyRyuIa7fTtaXKoodkpTS+3WskbP3LgQui6MSEVUeTjF5/Fs4
+ 8V9IxsN04i8HBXtElXbSancKbae+GIVREuqTxOPAhpYmnl791cAuDmgaewvre1FJZQM0GT
+ M8WRIYDvE6JRD28d71u/G6tMYdB+FYo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-u04v6QyXNxG3ZUbdMDhPrA-1; Thu, 28 May 2020 11:44:45 -0400
+X-MC-Unique: u04v6QyXNxG3ZUbdMDhPrA-1
+Received: by mail-wm1-f71.google.com with SMTP id t9so1127187wml.4
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 08:44:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=vBvZTAGxsHj9eMYkBUsAC8Fy4l2ONrVzxiu0OVyZHXg=;
+ b=Cfwv0zqZ5fSpTvdqqKUOXKA3eTvh6bwgCFC/X7AIDZmF66R4LIrfhSl1jtsBT8QhFx
+ jXPZvua0oEPevLWD0FjHtXSMOv6+upBI/g/Mz6xYTwJJzPT+DUGhakvt7/X59WX/x6xa
+ dY1SV6tIEYcXI9PnXiTNCZWYE/LBo+EFbW34pdgwqGGb9nhmgLPbQvpGjW3kFeT7nNav
+ 36hiom2NrSDuA+C37tO0Tw51awRkgqBrG9MpQ8TDVJKeW0TwE45Uq4T0EwTpXXozN+x0
+ IVX/Q4KRgoT8qHSKA3caieT525BKuHDHG8/FnFkwDI2jrL2miOxnszm2iW5KhEiHH2MM
+ K63g==
+X-Gm-Message-State: AOAM5328+4JimJiO/VN7cXzbZS4ZdzYpAZWlXhXvMguV8mehxC44KlbD
+ BRvf9FpT/WW3H5rRVvYuP5jiYlFxY9do38rPYDY65N1ece/DR6rqwi41abtOn58HGQ2d/3LuStY
+ fLBrKNQjsB7mmfEA=
+X-Received: by 2002:a1c:9cd4:: with SMTP id f203mr4251418wme.26.1590680683287; 
+ Thu, 28 May 2020 08:44:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsRQsLluOvpmS37WiuGtNjfMApuwgGQj/rMe1UR7nXm4T2orQeOJ+HWN4yr53f0OGaUVo9pA==
+X-Received: by 2002:a1c:9cd4:: with SMTP id f203mr4251394wme.26.1590680683066; 
+ Thu, 28 May 2020 08:44:43 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
+ [88.21.204.71])
+ by smtp.gmail.com with ESMTPSA id s8sm3252722wrm.96.2020.05.28.08.44.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 28 May 2020 08:44:41 -0700 (PDT)
+Subject: Re: [PATCH v6 08/20] hw/block/nvme: allow use of any valid msix vector
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+References: <20200514044611.734782-1-its@irrelevant.dk>
+ <20200514044611.734782-9-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <6b607877-a45f-6c44-45ae-180ce0100fed@redhat.com>
+Date: Thu, 28 May 2020 17:44:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <591d2690-c2e7-98aa-8569-5f99737c5f71@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200514044611.734782-9-its@irrelevant.dk>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 01:51:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -100,45 +136,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 28, 2020 at 05:18:42PM +0200, Philippe Mathieu-Daudé wrote:
-> +Gerd
+On 5/14/20 6:45 AM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> On 5/28/20 5:09 PM, Peter Maydell wrote:
-> > On Thu, 28 May 2020 at 15:57, Alex Bennée <alex.bennee@linaro.org> wrote:
-> >> I get these on commit ddc760832fa8cf5e93b9d9e6e854a5114ac63510:
-> >>
-> >>     LINK    arm-softmmu/qemu-system-arm
-> >>   ld: /usr/lib/libc.so and /usr/lib/crt0.o: warning: multiple common of `environ'
-> >>   ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may conflict with libintl.so.8
-> >>   ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may conflict with libintl.so.8
-> >>   ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may conflict with libintl.so.8
-> >>   ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may conflict with libintl.so.8
-> >>   ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may conflict with libintl.so.8
-
-Hmm, on a quick glance this looks like a netbsd packaging bug ...
-
-> Maybe building back NetBSD 8.1?
+> If the device uses MSI-X, any of the 2048 MSI-X interrupt vectors are
+> valid. If the device is not using MSI-X, vector will and can only be
+> zero at this point.
 > 
-> $ git checkout 2cc3e591b3321a~ tests/vm/netbsd
-> $ make vm-build-netbsd
-> $ git checkout HEAD tests/vm/netbsd
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>  hw/block/nvme.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index c9d10df1f763..a2e6734c7a25 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -657,7 +657,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>          trace_pci_nvme_err_invalid_create_cq_vector(vector);
+>          return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+>      }
+> -    if (unlikely(vector > n->params.num_queues)) {
+> +    if (unlikely(vector > PCI_MSIX_FLAGS_QSIZE)) {
+>          trace_pci_nvme_err_invalid_create_cq_vector(vector);
+>          return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+>      }
+> 
 
-The *nsd installs fetch and install a bunch of addon packages, so when
-these are updated a netbsd image rebuild will use the newer versions.
+Is it worth adding this?
 
-IIRC both tests/vm/netbsd and tests/vm/basevm.py changes will trigger
-and netbsd image rebuild.  If you want avoid that you have to touch the
-disk image after git checkout so make thinks it is up-to-date and
-doesn't try to rebuild it.
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -613,6 +613,8 @@ static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeCmd *cmd)
+ static void nvme_init_cq(NvmeCQueue *cq, NvmeCtrl *n, uint64_t dma_addr,
+     uint16_t cqid, uint16_t vector, uint16_t size, uint16_t irq_enabled)
+ {
++    int ret;
++
+     cq->ctrl = n;
+     cq->cqid = cqid;
+     cq->size = size;
+@@ -623,7 +625,8 @@ static void nvme_init_cq(NvmeCQueue *cq, NvmeCtrl
+*n, uint64_t dma_addr,
+     cq->head = cq->tail = 0;
+     QTAILQ_INIT(&cq->req_list);
+     QTAILQ_INIT(&cq->sq_list);
+-    msix_vector_use(&n->parent_obj, cq->vector);
++    ret = msix_vector_use(&n->parent_obj, cq->vector);
++    assert(ret == 0);
+     n->cq[cqid] = cq;
+     cq->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, nvme_post_cqes, cq);
+ }
 
-take care,
-  Gerd
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
