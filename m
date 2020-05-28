@@ -2,93 +2,67 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CBEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69261C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 670C9206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:38:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YywRZXug"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670C9206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 32B4520721
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:41:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32B4520721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRAw-0002g7-KK
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:38:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47020)
+	id 1jeRDf-0006Rt-5q
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:41:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQxP-0005Pz-6k; Thu, 28 May 2020 18:24:59 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:17156)
+ (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
+ id 1jeR75-000444-4p
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:34:59 -0400
+Received: from mga14.intel.com ([192.55.52.115]:41313)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQxM-0008AZ-D9; Thu, 28 May 2020 18:24:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590704696; x=1622240696;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=NjPOYFEQFKl1eDrJ+jkixdVdYqTQohhSFG4I212I6CI=;
- b=YywRZXug6CFMHr9qm4kDqt/GWndU7nilABGDHrwwFAAR8QJXftL7Lbt2
- Kw+rBP3HjYQUI7KG3Jz3P+jISmgIWCPvQWF62map2QKq4RfMG3vPWo2pF
- FBCtggxbVfK51fHHX77zDJDkwTMBL8xjqbT/FTgrBpR+5w0tvFN3uFjHS
- glpyCWuHlflbUVFjIjW4go7RbbNg2X24OoNU0LDC/fWjVepFJprSntKBG
- yTjvI/6q6wZy/DpiKH8KWwPeFi41xxsZLbzPxNZGNxhbIVBbGcejcHive
- 5ZCVDtaA1wp3PozaxRv+zKLAT8SlXt+aY4IwGQvmP24FmD8I5CcVpt9X9 w==;
-IronPort-SDR: bPYxfKRPkkpMPXTUG1rI+yaXeyGhT7ljtjZbYpgUqj9rzwCsDO9p+QLbnUUrFYOV/UGRRESrkT
- /6ToX3yZrFiRbcNN6RyHLD5xXVt0ctJlJ8/Oo6Jlb5+nfil9u+iaLmd+hkaLXb1IigdHFo27JQ
- zT9XP/YUel8yTHfh+yahe0TH7HbcuMEGSAIG4o/8ZVKWvTIwcL/Kp0kYVAP1zCPX3dUM0QKdA5
- U/Hgb+orji49GrJmr++Tawh+DuvLOlF+wWGo1WYAxH9hvxzY7GT/SOok9DcYKGqAX6xovo7lb8
- rps=
-X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="247810980"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:24:47 +0800
-IronPort-SDR: zaXfS8+J/wsCKgUssDVkomACZqbb3meWC8543DYNPopBQmD9QKy4tFheIENVEHWIPBs4xisTeG
- jXNv9vRhcgl8I5tblykQNZN425AOoMSUs=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 May 2020 15:14:02 -0700
-IronPort-SDR: i/mcBkNFQq+Vq6sLjDP/u9jCsgWmVRJbfDnUCuaeun2mrJSErgBQid47Tv3JH2RLLcagcRn/P7
- QfbAw9TsnikA==
-WDCIronportException: Internal
-Received: from 6xf7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.57.123])
- by uls-op-cesaip01.wdc.com with ESMTP; 28 May 2020 15:24:47 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v4 2/4] target/riscv: Remove the deprecated CPUs
-Date: Thu, 28 May 2020 15:16:10 -0700
-Message-Id: <0cc377a397d5e22123545e397a9bd443fadaf43f.1590704110.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1590704110.git.alistair.francis@wdc.com>
-References: <cover.1590704110.git.alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
+ id 1jeR73-0007z6-IE
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:34:58 -0400
+IronPort-SDR: 1JtdQTfw2ooQYeEnDEN/moc9a0NiJxaPufoMIjlnW4O2NldkonOIG6h0nSa4IrsSCG/3pF6Tmr
+ 3x/DLaFJzylA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 28 May 2020 15:34:55 -0700
+IronPort-SDR: LSOLIQeCs2IU+RHnLqESUzWfRpFGeXkfjFh8bOqtvsCX7mW6VVkFc60c9RJHPfIIhPWuuXJ/RO
+ X4qTqR6mJ82w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,446,1583222400"; d="scan'208";a="256314850"
+Received: from vverma7-mobl4.lm.intel.com ([10.251.139.189])
+ by orsmga007.jf.intel.com with ESMTP; 28 May 2020 15:34:54 -0700
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v4 3/3] tests/acpi: update expected SRAT files
+Date: Thu, 28 May 2020 16:34:37 -0600
+Message-Id: <20200528223437.12568-4-vishal.l.verma@intel.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200528223437.12568-1-vishal.l.verma@intel.com>
+References: <20200528223437.12568-1-vishal.l.verma@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=4104b2603=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:24:44
+Received-SPF: pass client-ip=192.55.52.115;
+ envelope-from=vishal.l.verma@intel.com; helo=mga14.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:34:49
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,162 +75,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
- alistair23@gmail.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jingqi.liu@intel.com,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Dan Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
----
- docs/system/deprecated.rst      | 33 ++++++++++++++++++---------------
- target/riscv/cpu.h              |  7 -------
- target/riscv/cpu.c              | 28 ----------------------------
- tests/qtest/machine-none-test.c |  4 ++--
- 4 files changed, 20 insertions(+), 52 deletions(-)
+Update expected SRAT files for the change to account for NVDIMM NUMA
+nodes in the SRAT.
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 50927bad74..a6664bfca9 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -314,21 +314,6 @@ should be used instead of the 1.09.1 version.
- System emulator CPUS
- --------------------
- 
--RISC-V ISA CPUs (since 4.1)
--'''''''''''''''''''''''''''
--
--The RISC-V cpus with the ISA version in the CPU name have been depcreated. The
--four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
--``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
--option when using the ``rv32`` or ``rv64`` CPUs.
--
--RISC-V ISA CPUs (since 4.1)
--'''''''''''''''''''''''''''
--
--The RISC-V no MMU cpus have been depcreated. The two CPUs: ``rv32imacu-nommu`` and
--``rv64imacu-nommu`` should no longer be used. Instead the MMU status can be specified
--via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
--
- ``compat`` property of server class POWER CPUs (since 5.0)
- ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
- 
-@@ -486,6 +471,24 @@ The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (removed in 5.0
- The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
- 'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
- 
-+System emulator CPUS
-+--------------------
+AML diffs:
+
+tests/data/acpi/pc/SRAT.dimmpxm:
+--- /tmp/asl-3P2IL0.dsl	2020-05-28 15:11:02.326439263 -0600
++++ /tmp/asl-1N4IL0.dsl	2020-05-28 15:11:02.325439280 -0600
+@@ -3,7 +3,7 @@
+  * AML/ASL+ Disassembler version 20190509 (64-bit version)
+  * Copyright (c) 2000 - 2019 Intel Corporation
+  *
+- * Disassembly of tests/data/acpi/pc/SRAT.dimmpxm, Thu May 28 15:11:02 2020
++ * Disassembly of /tmp/aml-4D4IL0, Thu May 28 15:11:02 2020
+  *
+  * ACPI Data Table [SRAT]
+  *
+@@ -13,7 +13,7 @@
+ [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+ [004h 0004   4]                 Table Length : 00000188
+ [008h 0008   1]                     Revision : 01
+-[009h 0009   1]                     Checksum : 80
++[009h 0009   1]                     Checksum : 68
+ [00Ah 0010   6]                       Oem ID : "BOCHS "
+ [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+ [018h 0024   4]                 Oem Revision : 00000001
+@@ -140,15 +140,15 @@
+ [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
+ [139h 0313   1]                       Length : 28
+
+-[13Ah 0314   4]             Proximity Domain : 00000000
++[13Ah 0314   4]             Proximity Domain : 00000002
+ [13Eh 0318   2]                    Reserved1 : 0000
+-[140h 0320   8]                 Base Address : 0000000000000000
+-[148h 0328   8]               Address Length : 0000000000000000
++[140h 0320   8]                 Base Address : 0000000108000000
++[148h 0328   8]               Address Length : 0000000008000000
+ [150h 0336   4]                    Reserved2 : 00000000
+-[154h 0340   4]        Flags (decoded below) : 00000000
+-                                     Enabled : 0
++[154h 0340   4]        Flags (decoded below) : 00000005
++                                     Enabled : 1
+                                Hot Pluggable : 0
+-                                Non-Volatile : 0
++                                Non-Volatile : 1
+ [158h 0344   8]                    Reserved3 : 0000000000000000
+
+ [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
+
+tests/data/acpi/q35/SRAT.dimmpxm:
+--- /tmp/asl-HW2LL0.dsl	2020-05-28 15:11:05.446384514 -0600
++++ /tmp/asl-8MYLL0.dsl	2020-05-28 15:11:05.445384532 -0600
+@@ -3,7 +3,7 @@
+  * AML/ASL+ Disassembler version 20190509 (64-bit version)
+  * Copyright (c) 2000 - 2019 Intel Corporation
+  *
+- * Disassembly of tests/data/acpi/q35/SRAT.dimmpxm, Thu May 28 15:11:05 2020
++ * Disassembly of /tmp/aml-2CYLL0, Thu May 28 15:11:05 2020
+  *
+  * ACPI Data Table [SRAT]
+  *
+@@ -13,7 +13,7 @@
+ [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+ [004h 0004   4]                 Table Length : 00000188
+ [008h 0008   1]                     Revision : 01
+-[009h 0009   1]                     Checksum : 80
++[009h 0009   1]                     Checksum : 68
+ [00Ah 0010   6]                       Oem ID : "BOCHS "
+ [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+ [018h 0024   4]                 Oem Revision : 00000001
+@@ -140,15 +140,15 @@
+ [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
+ [139h 0313   1]                       Length : 28
+
+-[13Ah 0314   4]             Proximity Domain : 00000000
++[13Ah 0314   4]             Proximity Domain : 00000002
+ [13Eh 0318   2]                    Reserved1 : 0000
+-[140h 0320   8]                 Base Address : 0000000000000000
+-[148h 0328   8]               Address Length : 0000000000000000
++[140h 0320   8]                 Base Address : 0000000108000000
++[148h 0328   8]               Address Length : 0000000008000000
+ [150h 0336   4]                    Reserved2 : 00000000
+-[154h 0340   4]        Flags (decoded below) : 00000000
+-                                     Enabled : 0
++[154h 0340   4]        Flags (decoded below) : 00000005
++                                     Enabled : 1
+                                Hot Pluggable : 0
+-                                Non-Volatile : 0
++                                Non-Volatile : 1
+ [158h 0344   8]                    Reserved3 : 0000000000000000
+
+ [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
+
+tests/data/acpi/virt/SRAT.memhp:
+--- /tmp/asl-E32WL0.dsl	2020-05-28 15:19:56.976095582 -0600
++++ /tmp/asl-Y69WL0.dsl	2020-05-28 15:19:56.974095617 -0600
+@@ -3,7 +3,7 @@
+  * AML/ASL+ Disassembler version 20190509 (64-bit version)
+  * Copyright (c) 2000 - 2019 Intel Corporation
+  *
+- * Disassembly of tests/data/acpi/virt/SRAT.memhp, Thu May 28 15:19:56 2020
++ * Disassembly of /tmp/aml-2CCXL0, Thu May 28 15:19:56 2020
+  *
+  * ACPI Data Table [SRAT]
+  *
+@@ -11,9 +11,9 @@
+  */
+
+ [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+-[004h 0004   4]                 Table Length : 000000BA
++[004h 0004   4]                 Table Length : 000000E2
+ [008h 0008   1]                     Revision : 03
+-[009h 0009   1]                     Checksum : 43
++[009h 0009   1]                     Checksum : 5C
+ [00Ah 0010   6]                       Oem ID : "BOCHS "
+ [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+ [018h 0024   4]                 Oem Revision : 00000001
+@@ -65,18 +65,32 @@
+
+ [094h 0148   4]             Proximity Domain : 00000001
+ [098h 0152   2]                    Reserved1 : 0000
+-[09Ah 0154   8]                 Base Address : 0000000080000000
+-[0A2h 0162   8]               Address Length : 00000000F0000000
++[09Ah 0154   8]                 Base Address : 0000000088000000
++[0A2h 0162   8]               Address Length : 0000000008000000
+ [0AAh 0170   4]                    Reserved2 : 00000000
+-[0AEh 0174   4]        Flags (decoded below) : 00000003
++[0AEh 0174   4]        Flags (decoded below) : 00000005
++                                     Enabled : 1
++                               Hot Pluggable : 0
++                                Non-Volatile : 1
++[0B2h 0178   8]                    Reserved3 : 0000000000000000
 +
-+RISC-V ISA CPUs (removed in 5.1)
-+''''''''''''''''''''''''''''''''
++[0BAh 0186   1]                Subtable Type : 01 [Memory Affinity]
++[0BBh 0187   1]                       Length : 28
 +
-+The RISC-V cpus with the ISA version in the CPU name have been removed. The
-+four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
-+``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
-+option when using the ``rv32`` or ``rv64`` CPUs.
-+
-+RISC-V ISA CPUs (removed in 5.1)
-+''''''''''''''''''''''''''''''''
-+
-+The RISC-V no MMU cpus have been removed. The two CPUs: ``rv32imacu-nommu`` and
-+``rv64imacu-nommu`` can no longer be used. Instead the MMU status can be specified
-+via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
-+
- System emulator machines
- ------------------------
- 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index d0e7f5b9c5..76b98d7a33 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -40,13 +40,6 @@
- #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
- #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
- #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
--/* Deprecated */
--#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
--#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
--#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
--#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu-nommu")
--#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.9.1")
--#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.10.0")
- 
- #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
- #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 059d71f2c7..112f2e3a2f 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -135,16 +135,6 @@ static void riscv_base32_cpu_init(Object *obj)
-     set_misa(env, 0);
- }
- 
--static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
--{
--    CPURISCVState *env = &RISCV_CPU(obj)->env;
--    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_priv_version(env, PRIV_VERSION_1_09_1);
--    set_resetvec(env, DEFAULT_RSTVEC);
--    set_feature(env, RISCV_FEATURE_MMU);
--    set_feature(env, RISCV_FEATURE_PMP);
--}
--
- static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-@@ -182,16 +172,6 @@ static void riscv_base64_cpu_init(Object *obj)
-     set_misa(env, 0);
- }
- 
--static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
--{
--    CPURISCVState *env = &RISCV_CPU(obj)->env;
--    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_priv_version(env, PRIV_VERSION_1_09_1);
--    set_resetvec(env, DEFAULT_RSTVEC);
--    set_feature(env, RISCV_FEATURE_MMU);
--    set_feature(env, RISCV_FEATURE_PMP);
--}
--
- static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-@@ -621,18 +601,10 @@ static const TypeInfo riscv_cpu_type_infos[] = {
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
--    /* Depreacted */
--    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init)
- #elif defined(TARGET_RISCV64)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
--    /* Deprecated */
--    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init)
- #endif
- };
- 
-diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-test.c
-index 8bb54a6360..b52311ec2e 100644
---- a/tests/qtest/machine-none-test.c
-+++ b/tests/qtest/machine-none-test.c
-@@ -54,8 +54,8 @@ static struct arch2cpu cpus_map[] = {
-     { "xtensa", "dc233c" },
-     { "xtensaeb", "fsf" },
-     { "hppa", "hppa" },
--    { "riscv64", "rv64gcsu-v1.10.0" },
--    { "riscv32", "rv32gcsu-v1.9.1" },
-+    { "riscv64", "sifive-u54" },
-+    { "riscv32", "sifive-u34" },
-     { "rx", "rx62n" },
- };
- 
++[0BCh 0188   4]             Proximity Domain : 00000001
++[0C0h 0192   2]                    Reserved1 : 0000
++[0C2h 0194   8]                 Base Address : 0000000080000000
++[0CAh 0202   8]               Address Length : 00000000F0000000
++[0D2h 0210   4]                    Reserved2 : 00000000
++[0D6h 0214   4]        Flags (decoded below) : 00000003
+                                      Enabled : 1
+                                Hot Pluggable : 1
+                                 Non-Volatile : 0
+-[0B2h 0178   8]                    Reserved3 : 0000000000000000
++[0DAh 0218   8]                    Reserved3 : 0000000000000000
+
+Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+---
+ tests/data/acpi/pc/SRAT.dimmpxm             | Bin 392 -> 392 bytes
+ tests/data/acpi/q35/SRAT.dimmpxm            | Bin 392 -> 392 bytes
+ tests/data/acpi/virt/SRAT.memhp             | Bin 186 -> 226 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   3 ---
+ 4 files changed, 3 deletions(-)
+
+diff --git a/tests/data/acpi/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
+index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+GIT binary patch
+delta 51
+scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+
+delta 51
+icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+
+diff --git a/tests/data/acpi/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
+index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+GIT binary patch
+delta 51
+scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+
+delta 51
+icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+
+diff --git a/tests/data/acpi/virt/SRAT.memhp b/tests/data/acpi/virt/SRAT.memhp
+index 1b57db2072e7f7e2085c4a427aa31c7383851b71..9a35adb40c6f7cd822e5af37abba8aad033617cb 100644
+GIT binary patch
+delta 43
+rcmdnR_=u4!ILI;N5d#AQbIe4p$wD1K76@=aC<X@BiSc3+=gI;A(y0ha
+
+delta 21
+dcmaFFxQmf1ILI+%7Xt$Wv-3o*$rF#t0suzv27~|r
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index e8f2766a63..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,4 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/SRAT.dimmpxm",
+-"tests/data/acpi/q35/SRAT.dimmpxm",
+-"tests/data/acpi/virt/SRAT.memhp",
 -- 
 2.26.2
 
