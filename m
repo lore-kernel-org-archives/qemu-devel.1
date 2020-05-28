@@ -2,97 +2,84 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 354A0C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 14:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6636BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 14:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F40082075F
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 14:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 334472075F
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 14:19:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jADyyfEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F40082075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDkoCwWC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334472075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeJLy-0004TF-7X
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 10:17:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49098)
+	id 1jeJNm-0007ls-Eq
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 10:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeJKp-0003qh-Ag
- for qemu-devel@nongnu.org; Thu, 28 May 2020 10:16:39 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33440)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1jeJN6-0006OA-Qw; Thu, 28 May 2020 10:19:00 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40811)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeJKn-0006qC-SN
- for qemu-devel@nongnu.org; Thu, 28 May 2020 10:16:38 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l11so28143967wru.0
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 07:16:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=JpmGLWtCaiqLNcqlylgX1iNZHZ4Sj2lAuU2BKosx9+s=;
- b=jADyyfEbIPMEXgDmYRfzwYc85vq6dLRtXXTp1AYFDilOv+HKQEEKMTzrdxH1gVTRjq
- otkSBrtopvGYYzy1N+YRQXDTDFznKzEheCl3AH7NkOvZXkUNjr9PePRPbl62vx4PaRqk
- gDHvOImM0Swk/GKsmABdxW99foW2zjADTKPGwpJpWyt4KW71hbSWzPRhrChVNQoBibO1
- fCklxPm/im1xaPd1B6H3tVQm1BLj0hJsOM0ayOHMB2KGAOZG/Lmt3+cw2OVzNYNrLOrK
- GlTgjkrE39f4do1B/CCtW7yzRZpdu/hvRGJf/4kuOToEFgVS8S1DWpbDsY71qvJYInPC
- F7Xw==
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1jeJN5-0007w5-OZ; Thu, 28 May 2020 10:19:00 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r15so3338229wmh.5;
+ Thu, 28 May 2020 07:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1XUzSo1oYepawlt3Ngrdk2CNaXO8nxoc6ho/bZlzT4Q=;
+ b=dDkoCwWC88WeaqMSEBxb/dl7o5RQ3YY519R015l43bRAEfOJe9W/LyFKq5tlOMIH3A
+ EGSnHXRY/o9+fFDfaz1RAN2owfblAPWd0k4kxz9OLWkKRP88Q9x3+lCnp24wIEgs/Fvm
+ KfI2z6O9fstR0RY0BGpHC9c16b+UCCMuTdZlju28uOyEKxvyruZHGZZ4TxvoskLCeswo
+ kyeqWZjdE7GKuIVCaHsClEmtiexR0daPWh39ihHQ6GQtFWjSn43LSOx0tcCtWi7AM5Mz
+ E12o+JE8Pqx5yR5R55brjdXQM2e9kFPiS3+GzoN9TxL0UdodEyZ5hbzfIEWGFmptYtP5
+ IwVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=JpmGLWtCaiqLNcqlylgX1iNZHZ4Sj2lAuU2BKosx9+s=;
- b=TQwairYaG8Q0l8kWLOliyvn9cvDfYOpFVouKZj4VnZ8tDBM8AERf6Hah+t+RvMZcP1
- m9hXj1wy7nuWSwyyj6pezrfs7m1SaK063GchpVuEmnWi3RbvQ4fWZa//I6KFz2Kg/GP0
- 2u7YiLu7Z5ftYzv1K66MYWmTRl8wZMJF4D+N0zuhzJO7Wiu5rqK3nrwU+LrbU48qd9II
- 0yKu17oX6+D6D2Q8BvJ+sqjlwUTVtGGsloVL9glQhsy7duXY8niPQcw2n9PcQWrRlcGM
- glBg7EE/R7jPfwLTUo6ZJ+Yxzm1ycuTu7A+qguOjZLjc5JIzLQ5FYLDsZwrLcL8p/+cT
- Yr6A==
-X-Gm-Message-State: AOAM530wBiUnM6/HyE9HHjHTbIsDsVd7QVtRH3fv4LOZJ/r6D+olqTxy
- RtsHXUyKE9jaMFsoO1DDvK2acw==
-X-Google-Smtp-Source: ABdhPJyfYn0843Z40gLi+4DBW5Gku1QJY2XexEtRQh/VgWyKLAPQO6/c4tO4lwGo3xa7+k2sRI1HeQ==
-X-Received: by 2002:a05:6000:ce:: with SMTP id
- q14mr4075402wrx.105.1590675395190; 
- Thu, 28 May 2020 07:16:35 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g82sm7024032wmf.1.2020.05.28.07.16.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 07:16:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 93AF21FF7E;
- Thu, 28 May 2020 15:16:31 +0100 (BST)
-References: <20200527145455.2550-1-alex.bennee@linaro.org>
- <CAFEAcA_LrZjBY_y3UR=fdOtDvnY=zGG-10Yeq0ZjbBc=EsvRfw@mail.gmail.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 00/12] testing and plugin fixes
-In-reply-to: <CAFEAcA_LrZjBY_y3UR=fdOtDvnY=zGG-10Yeq0ZjbBc=EsvRfw@mail.gmail.com>
-Date: Thu, 28 May 2020 15:16:31 +0100
-Message-ID: <87eer4401s.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1XUzSo1oYepawlt3Ngrdk2CNaXO8nxoc6ho/bZlzT4Q=;
+ b=Jhe1mX7ASjiIImAzuoTGdBrG6MfYaTvxJXgDgciSHL1exdqvvFU/NWrt2NbCDyamsG
+ MXV0IU2zBV8N+KpbFNeDvFzLCVHB4iqW6/nL/Xil6pBJM84zv256YMil2OGM5smMPWf1
+ HR4hc+dZLmlAS0b9Tk5XE1vpxv68sYX+/SFmGLdf1UMvqvXdl+/a8cVKCtQxz83wNn94
+ IPi1JOTMXcc5TXYdnZ92uFcX6S47QXZkz3ZoCHVnqej5J1J3usvxqi31YCXps+mwSv3F
+ jlwQ0kzRl7hlioXe0+XTQsxwo93JYh1Ohe/BE5KQ8MuQsvnksXC8zi3paiyAOprxMJB6
+ OcWQ==
+X-Gm-Message-State: AOAM533yLj1ncx1rsSvk3VmOedwLHfZUzk/9DQar7Nw79ubaMOTm3AG9
+ Pdj+uRIYb8UPI4eRwhvsP5MFhGgtW55vyJIJ2FU=
+X-Google-Smtp-Source: ABdhPJzmqKxOEtXI33QN7Tq7ffUZ/+T85NE6Au4aAfTVUKgZaCzSsG7KbDgEm+Vx6wabBwbjABcOGgf8WGb3eNnmuI0=
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr3483768wmh.164.1590675537711; 
+ Thu, 28 May 2020 07:18:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+References: <20200527102925.128013-1-stefanha@redhat.com>
+ <20200527102925.128013-3-stefanha@redhat.com>
+In-Reply-To: <20200527102925.128013-3-stefanha@redhat.com>
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date: Thu, 28 May 2020 16:18:46 +0200
+Message-ID: <CAM9Jb+jFbcEFvAwMxo-1pn1vOFARr7sZmK68-rgTp3Js5N3v4w@mail.gmail.com>
+Subject: Re: [PATCH v4 2/5] virtio-scsi: introduce a constant for fixed
+ virtqueues
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,63 +92,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Wed, 27 May 2020 at 15:54, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> The following changes since commit ddc760832fa8cf5e93b9d9e6e854a5114ac63=
-510:
->>
->>   Merge remote-tracking branch 'remotes/gkurz/tags/9p-next-2020-05-26' i=
-nto staging (2020-05-26 14:05:53 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-testing-tcg-plugins-2705=
-20-1
->>
->> for you to fetch changes up to 919bfbf5d6569b63a374332292cf3d2355a6d6c3:
->>
->>   tests/tcg: add new threadcount test (2020-05-27 14:26:49 +0100)
->>
->> ----------------------------------------------------------------
->> Testing and one plugin fix:
->>
->>   - support alternates for genisoimage to test/vm
->>   - add clang++ to clang tests
->>   - fix record/replay smoke test
->>   - enable more softfloat tests
->>   - better detection of hung gdb
->>   - upgrade aarch64 tcg test x-compile to gcc-10
->>   - fix plugin cpu_index clash vs threads
+> The event and control virtqueues are always present, regardless of the
+> multi-queue configuration.  Define a constant so that virtqueue number
+> calculations are easier to read.
 >
-> This makes the NetBSD tests/vm setup spit out a huge pile of extra warnin=
-gs:
-> every link has something like:
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  include/hw/virtio/virtio-scsi.h | 3 +++
+>  hw/scsi/vhost-user-scsi.c       | 2 +-
+>  hw/scsi/virtio-scsi.c           | 7 ++++---
+>  hw/virtio/vhost-scsi-pci.c      | 3 ++-
+>  hw/virtio/vhost-user-scsi-pci.c | 3 ++-
+>  hw/virtio/virtio-scsi-pci.c     | 3 ++-
+>  6 files changed, 14 insertions(+), 7 deletions(-)
 >
-> ld: warning: libintl.so.1, needed by /usr/pkg/lib/libglib-2.0.so, may
-> conflict with libintl.so.8
+> diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+> index 24e768909d..9f293bcb80 100644
+> --- a/include/hw/virtio/virtio-scsi.h
+> +++ b/include/hw/virtio/virtio-scsi.h
+> @@ -36,6 +36,9 @@
+>  #define VIRTIO_SCSI_MAX_TARGET  255
+>  #define VIRTIO_SCSI_MAX_LUN     16383
 >
-> or some variant like:
-> ld: warning: libintl.so.1, needed by /usr/pkg/lib/libcurl.so, may
-> conflict with libintl.so.8
-> ld: warning: libintl.so.1, needed by /usr/pkg/lib/libgio-2.0.so, may
-> conflict with libintl.so.8
-
-Weird... I'll have a look at whats going on.
-
+> +/* Number of virtqueues that are always present */
+> +#define VIRTIO_SCSI_VQ_NUM_FIXED    2
+> +
+>  typedef struct virtio_scsi_cmd_req VirtIOSCSICmdReq;
+>  typedef struct virtio_scsi_cmd_resp VirtIOSCSICmdResp;
+>  typedef struct virtio_scsi_ctrl_tmf_req VirtIOSCSICtrlTMFReq;
+> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+> index cbb5d97599..f8bd158c31 100644
+> --- a/hw/scsi/vhost-user-scsi.c
+> +++ b/hw/scsi/vhost-user-scsi.c
+> @@ -115,7 +115,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+>          goto free_virtio;
+>      }
 >
-> thanks
-> -- PMM
+> -    vsc->dev.nvqs = 2 + vs->conf.num_queues;
+> +    vsc->dev.nvqs = VIRTIO_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
+>      vsc->dev.vqs = g_new0(struct vhost_virtqueue, vsc->dev.nvqs);
+>      vsc->dev.vq_index = 0;
+>      vsc->dev.backend_features = 0;
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index 9b72094a61..f3d60683bd 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -191,7 +191,7 @@ static void virtio_scsi_save_request(QEMUFile *f, SCSIRequest *sreq)
+>      VirtIOSCSIReq *req = sreq->hba_private;
+>      VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(req->dev);
+>      VirtIODevice *vdev = VIRTIO_DEVICE(req->dev);
+> -    uint32_t n = virtio_get_queue_index(req->vq) - 2;
+> +    uint32_t n = virtio_get_queue_index(req->vq) - VIRTIO_SCSI_VQ_NUM_FIXED;
+>
+>      assert(n < vs->conf.num_queues);
+>      qemu_put_be32s(f, &n);
+> @@ -892,10 +892,11 @@ void virtio_scsi_common_realize(DeviceState *dev,
+>                  sizeof(VirtIOSCSIConfig));
+>
+>      if (s->conf.num_queues == 0 ||
+> -            s->conf.num_queues > VIRTIO_QUEUE_MAX - 2) {
+> +            s->conf.num_queues > VIRTIO_QUEUE_MAX - VIRTIO_SCSI_VQ_NUM_FIXED) {
+>          error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+>                           "must be a positive integer less than %d.",
+> -                   s->conf.num_queues, VIRTIO_QUEUE_MAX - 2);
+> +                   s->conf.num_queues,
+> +                   VIRTIO_QUEUE_MAX - VIRTIO_SCSI_VQ_NUM_FIXED);
+>          virtio_cleanup(vdev);
+>          return;
+>      }
+> diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
+> index 5da6bb6449..2b25db9a3c 100644
+> --- a/hw/virtio/vhost-scsi-pci.c
+> +++ b/hw/virtio/vhost-scsi-pci.c
+> @@ -50,7 +50,8 @@ static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+>
+>      if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> +        vpci_dev->nvectors = vs->conf.num_queues +
+> +                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+>      }
+>
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> diff --git a/hw/virtio/vhost-user-scsi-pci.c b/hw/virtio/vhost-user-scsi-pci.c
+> index 6f3375fe55..80710ab170 100644
+> --- a/hw/virtio/vhost-user-scsi-pci.c
+> +++ b/hw/virtio/vhost-user-scsi-pci.c
+> @@ -56,7 +56,8 @@ static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+>
+>      if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> +        vpci_dev->nvectors = vs->conf.num_queues +
+> +                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+>      }
+>
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pci.c
+> index e82e7e5680..c52d68053a 100644
+> --- a/hw/virtio/virtio-scsi-pci.c
+> +++ b/hw/virtio/virtio-scsi-pci.c
+> @@ -51,7 +51,8 @@ static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>      char *bus_name;
+>
+>      if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> +        vpci_dev->nvectors = vs->conf.num_queues +
+> +                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+>      }
+>
+>      /*
+> --
+Better readability with no change in logic. Code looks good to me.
 
-
---=20
-Alex Benn=C3=A9e
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
