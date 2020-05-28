@@ -2,92 +2,80 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 494B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41332C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14D492074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:54:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 086B22074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4XUUBc0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D492074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="PIqY1z+L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086B22074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRPy-0006te-78
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:54:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46748)
+	id 1jeRSW-0000t5-4l
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jeRPN-0006TZ-Bx
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:53:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29244
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jeRPL-0005bo-M5
- for qemu-devel@nongnu.org; Thu, 28 May 2020 18:53:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590706430;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0fP2ApTtN9i4VyxWY+o5Q36Obi7PmYNpALvuVo0SLA8=;
- b=f4XUUBc0/Xymv24TTXQ1LcWPWeu5x7xFTSj4xQJHf/qDkRavDhvR1HTK8Rj6XwGxgFDDLV
- rYl2I8sUL0YlOR/mMfxGi5kmuFc/DG3HGW42/XBiMGHCy4xkjij+ACIJcal4zU+WOT1kKF
- WsuuOdb8thh1cCLLEJLTqdhXd6fqfVs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-LeE-_7KEOYCMqSIgEvVNUQ-1; Thu, 28 May 2020 18:53:46 -0400
-X-MC-Unique: LeE-_7KEOYCMqSIgEvVNUQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 133148014D7;
- Thu, 28 May 2020 22:53:43 +0000 (UTC)
-Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9CFA7A8BB;
- Thu, 28 May 2020 22:53:40 +0000 (UTC)
-Date: Thu, 28 May 2020 16:53:40 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200528165340.53a57e22@x1.home>
-In-Reply-To: <20200528080101.GD1378@joy-OptiPlex-7040>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home>
- <20200525065925.GA698@joy-OptiPlex-7040>
- <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
- <20200526141939.2632f100@x1.home>
- <20200527062358.GD19560@joy-OptiPlex-7040>
- <20200527084822.GC3001@work-vm>
- <20200528080101.GD1378@joy-OptiPlex-7040>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jeRR3-0007bO-8C; Thu, 28 May 2020 18:55:38 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:57178)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jeRR1-00084u-8M; Thu, 28 May 2020 18:55:36 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 01E682E15D2;
+ Fri, 29 May 2020 01:55:30 +0300 (MSK)
+Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
+ (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
+ by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ N6lERP3yVg-tNI0lfAA; Fri, 29 May 2020 01:55:29 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1590706529; bh=VwPc7pvzSa3b+JOMa0v3fJ6046neqwas8Bvboo3VPpQ=;
+ h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
+ b=PIqY1z+L9AK0bvYc8ga7KCWy7TpIWnCsKikcjXTNqsqx/zP8RS5orA9hTANdjmSnb
+ J3Qyw5xOs2tgehyy13fV/QGIdhEze9K9yVX60Sugx0LCVBUipaglE071B7U+wnYHSr
+ FClBfEC+CRiGhiyAdKl6D5apcb3QhKrkpiFqIKsY=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:1318::1:10])
+ by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ tdfEhvD3Vg-tNWSxwCw; Fri, 29 May 2020 01:55:23 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 1/8] virtio-blk: store opt_io_size with correct size
+Date: Fri, 29 May 2020 01:55:09 +0300
+Message-Id: <20200528225516.1676602-2-rvkagan@yandex-team.ru>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
+References: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:46:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,61 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, John Snow <jsnow@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 28 May 2020 04:01:02 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+The width of opt_io_size in virtio_blk_config is 32bit.  However, it's
+written with virtio_stw_p; this may result in value truncation, and on
+big-endian systems with legacy virtio in completely bogus readings in
+the guest.
 
-> > > > This is my understanding of the protocol as well, when the device is
-> > > > running, pending_bytes might drop to zero if no internal state has
-> > > > changed and may be non-zero on the next iteration due to device
-> > > > activity.  When the device is not running, pending_bytes reporting zero
-> > > > indicates the device is done, there is no further state to transmit.
-> > > > Does that meet your need/expectation?
-> > > >  
-> > > (1) on one side, as in vfio_save_pending(),
-> > > vfio_save_pending()
-> > > {
-> > >     ...
-> > >     ret = vfio_update_pending(vbasedev);
-> > >     ...
-> > >     *res_precopy_only += migration->pending_bytes;
-> > >     ...
-> > > }
-> > > the pending_bytes tells migration thread how much data is still hold in
-> > > device side.
-> > > the device data includes
-> > > device internal data + running device dirty data + device state.
-> > > 
-> > > so the pending_bytes should include device state as well, right?
-> > > if so, the pending_bytes should never reach 0 if there's any device
-> > > state to be sent after device is stopped.  
-> > 
-> > I hadn't expected the pending-bytes to include a fixed offset for device
-> > state (If you mean a few registers etc) - I'd expect pending to drop
-> > possibly to zero;  the heuristic as to when to switch from iteration to
-> > stop, is based on the total pending across all iterated devices; so it's
-> > got to be allowed to drop otherwise you'll never transition to stop.
-> >   
-> ok. got it.
+Use the appropriate accessor to store it.
 
-Yeah, as I understand it, a device is not required to participate in
-reporting data available while (_SAVING | _RUNNING), there will always
-be an iteration while the device is !_RUNNING.  Therefore if you have
-fixed device state that you're always going to send, it should only be
-sent once when called during !_RUNNING.  The iterative phase should be
-used where you have a good chance to avoid re-sending data at the
-stop-and-copy phase.  Thanks,
+Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/block/virtio-blk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Alex
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index f5f6fc925e..413083e62f 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -918,7 +918,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+-    virtio_stw_p(vdev, &blkcfg.opt_io_size, conf->opt_io_size / blk_size);
++    virtio_stl_p(vdev, &blkcfg.opt_io_size, conf->opt_io_size / blk_size);
+     blkcfg.geometry.heads = conf->heads;
+     /*
+      * We must ensure that the block device capacity is a multiple of
+-- 
+2.26.2
 
 
