@@ -2,97 +2,62 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5CFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A14C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CDDC207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:23:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lr7SjPYK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDDC207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E214207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:27:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E214207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeCse-0001c7-BQ
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 03:23:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49828)
+	id 1jeCwv-0005Bx-Cj
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 03:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jeCs5-00016c-59; Thu, 28 May 2020 03:22:33 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:32898)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jeCs3-0007Z5-La; Thu, 28 May 2020 03:22:32 -0400
-Received: by mail-wr1-x434.google.com with SMTP id l11so26820540wru.0;
- Thu, 28 May 2020 00:22:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=lG1goK+j76bC1xgzoN5RNMDZSAMph60A5AtJ8km1I0o=;
- b=Lr7SjPYKWCR+htcjVxHMvdv+mCpf1sadXNCcM9IFhKuaKLja69ldRd2SOn3LRNumSu
- HRSg1cxgh7W92gTWYjP0WAAl8iw4Ec1h0JEttKppapN7tTaDDZ+XiBubDhrDO/IK28+B
- XXu54Cn1gEhQVSVHDdAZC7dPzTbYzBfm2UAjNieTSvnYITzTYC04GpSVnNWLHzN7Ekhc
- e+KEvumqJUPxWUosz5wPdY8LTeJa/1ztP6iYJF/9LLc3M5o6pGYHm9uDMCKKqFgW10zY
- h7W+gODx9k3RU3FpuI/s0JYIgDZY7JsGmU7N0iAGJr6+ZXwLIakFqWDJo0GYa+DoJV6h
- 6/uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=lG1goK+j76bC1xgzoN5RNMDZSAMph60A5AtJ8km1I0o=;
- b=T9VxOw3D4n2uKJiWwwrJr93tenGzUrLXD12BnM+6pK7OXU5OHs5hiW739an17RBOR+
- qHVC5J3POGQsbm3hf+XNlULI5R85U+ghX8xCaDZcwll4kE5r2H9N8Bdm/bjCbYHl9SEi
- JX2T1XtiZXoZ6GHQUyG2aqMQBNdNq1RcvB4saHrUJmPTom8seudHSSRdJ5m9mYbPuMOs
- o1257uoNs79fLgg2dZHcfQ/tHjKgLorba3FlLoSOGYNndo5vyeoPUNa4bjiKjqtyenIy
- rXyVXtCTMvwnh6okeXGsYYh8w+6um+YLCXmTmqASH0V7m4Ikh5C1gkKZ2lHprlPu44Jw
- 2wAA==
-X-Gm-Message-State: AOAM533i5p5hcBj7VKQCcJ6Y4STog8GbXLValrgLpH6++VUdeT6Zl2NH
- bY8VIdyoBYr7dl8h3tmceOY=
-X-Google-Smtp-Source: ABdhPJzZeepf4f9Lhk6hcKohahXMsHQAxqVj1ZuAYT/Mm4ajGdUstVvT/LRiUMw5ohCj4bzJ7lehzg==
-X-Received: by 2002:adf:eb47:: with SMTP id u7mr2142080wrn.14.1590650549215;
- Thu, 28 May 2020 00:22:29 -0700 (PDT)
-Received: from CBGR90WXYV0 ([54.239.6.186])
- by smtp.gmail.com with ESMTPSA id p1sm5125372wrx.44.2020.05.28.00.22.26
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 28 May 2020 00:22:28 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: "'Roman Kagan'" <rvkagan@yandex-team.ru>,
-	<qemu-devel@nongnu.org>
-References: <20200527124511.986099-1-rvkagan@yandex-team.ru>
- <20200527124511.986099-3-rvkagan@yandex-team.ru>
-In-Reply-To: <20200527124511.986099-3-rvkagan@yandex-team.ru>
-Subject: RE: [PATCH v6 2/5] block: consolidate blocksize properties
- consistency checks
-Date: Thu, 28 May 2020 08:22:25 +0100
-Message-ID: <009a01d634c0$be65dc00$3b319400$@xen.org>
+ (Exim 4.90_1) (envelope-from <dovgaluk@ispras.ru>)
+ id 1jeCwA-0004Xj-N8
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 03:26:46 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:57540)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <dovgaluk@ispras.ru>) id 1jeCw9-0000ul-C7
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 03:26:46 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 2600DCD462;
+ Thu, 28 May 2020 10:26:42 +0300 (MSK)
+Subject: Re: [PATCH v2 04/11] tests/acceptance: add kernel record/replay test
+ for x86_64
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
+ <159057546117.16818.15607496040935344350.stgit@pasha-ThinkPad-X280>
+ <87v9kh5qtm.fsf@linaro.org> <87lfld5ozj.fsf@linaro.org>
+From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <bb6c3804-256b-d8cb-7535-dbd90ab176dd@ispras.ru>
+Date: Thu, 28 May 2020 10:26:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQIXeuT69nnYcgltbfOkY7MAd59asgG7AZYfqCyzbjA=
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=xadimgnik@gmail.com; helo=mail-wr1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <87lfld5ozj.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=83.149.199.45; envelope-from=dovgaluk@ispras.ru;
+ helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 02:12:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,57 +71,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Kevin Wolf' <kwolf@redhat.com>, 'Fam Zheng' <fam@euphon.net>,
- 'Stefano Stabellini' <sstabellini@kernel.org>,
- "=?utf-8?Q?'Daniel_P._Berrang=C3=A9'?=" <berrange@redhat.com>,
- 'Eduardo Habkost' <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "'Michael S. Tsirkin'" <mst@redhat.com>, 'Laurent Vivier' <laurent@vivier.eu>,
- 'Max Reitz' <mreitz@redhat.com>, 'John Snow' <jsnow@redhat.com>,
- 'Keith Busch' <kbusch@kernel.org>, 'Gerd Hoffmann' <kraxel@redhat.com>,
- 'Stefan Hajnoczi' <stefanha@redhat.com>, 'Paolo Bonzini' <pbonzini@redhat.com>,
- 'Anthony Perard' <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
+Cc: wrampazz@redhat.com, qemu-devel@nongnu.org, pavel.dovgaluk@ispras.ru,
+ crosa@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Roman Kagan <rvkagan@yandex-team.ru>
-> Sent: 27 May 2020 13:45
-> To: qemu-devel@nongnu.org
-> Cc: Kevin Wolf <kwolf@redhat.com>; xen-devel@lists.xenproject.org; =
-Gerd Hoffmann <kraxel@redhat.com>;
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com>; Paolo Bonzini =
-<pbonzini@redhat.com>; Anthony Perard
-> <anthony.perard@citrix.com>; Laurent Vivier <laurent@vivier.eu>; Max =
-Reitz <mreitz@redhat.com>; qemu-
-> block@nongnu.org; Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>; =
-Eric Blake <eblake@redhat.com>; Paul
-> Durrant <paul@xen.org>; Fam Zheng <fam@euphon.net>; John Snow =
-<jsnow@redhat.com>; Michael S. Tsirkin
-> <mst@redhat.com>; Eduardo Habkost <ehabkost@redhat.com>; Keith Busch =
-<kbusch@kernel.org>; Stefano
-> Stabellini <sstabellini@kernel.org>; Stefan Hajnoczi =
-<stefanha@redhat.com>
-> Subject: [PATCH v6 2/5] block: consolidate blocksize properties =
-consistency checks
->=20
-> Several block device properties related to blocksize configuration =
-must
-> be in certain relationship WRT each other: physical block must be no
-> smaller than logical block; min_io_size, opt_io_size, and
-> discard_granularity must be a multiple of a logical block.
->=20
-> To ensure these requirements are met, add corresponding consistency
-> checks to blkconf_blocksizes, adjusting its signature to communicate
-> possible error to the caller.  Also remove the now redundant =
-consistency
-> checks from the specific devices.
->=20
-> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+On 27.05.2020 19:20, Alex Bennée wrote:
+> Alex Bennée <alex.bennee@linaro.org> writes:
+>
+>> Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com> writes:
+>>
+>>> This patch adds a test for record/replay an execution of x86_64 machine.
+>>> Execution scenario includes simple kernel boot, which allows testing
+>>> basic hardware interaction in RR mode.
+>>>
+>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>>> ---
+>>>   0 files changed
+>>>
+>>> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
+>>> index b8b277ad2f..c7526f1aba 100644
+>>> --- a/tests/acceptance/replay_kernel.py
+>>> +++ b/tests/acceptance/replay_kernel.py
+>>> @@ -55,3 +55,19 @@ class ReplayKernel(LinuxKernelUtils):
+>>>                       True, shift, args)
+>>>           self.run_vm(kernel_path, kernel_command_line, console_pattern,
+>>>                       False, shift, args)
+>>> +
+>>> +    def test_x86_64_pc(self):
+>>> +        """
+>>> +        :avocado: tags=arch:x86_64
+>>> +        :avocado: tags=machine:pc
+>>> +        """
+>>> +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
+>>> +                      '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
+>>> +                      '/vmlinuz')
+>>> +        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
+>>> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+>>> +
+>>> +        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE +
+>>> 'console=ttyS0'
+>> I note that:
+>>
+>>    KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
+>>
+>> and given we are looking for repeatability here maybe we should use our
+>> own command line so we can compare the recorded and replayed boot?
+> To build on that I think a command line like:
+>
+>    KERNEL_COMMON_COMMAND_LINE = 'printk.time=1 panic=-1 '
+>
+> called with --no-reboot and a pattern:
+>
+>    console_pattern = 'VFS: Cannot open root device'
+>
+> You will run more of the kernel (importantly with timestamps > 0.000) so
+> we can have a better compare between the recorded and replayed run.
+>
+This is reasonable, thank you.
 
 
 
