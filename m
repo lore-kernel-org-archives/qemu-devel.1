@@ -2,95 +2,132 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 275C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF1D5C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E942D207D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:54:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89A24207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:04:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u6Igfaqc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E942D207D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is+rC6jm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A24207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeLn8-0002NI-2Q
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 12:54:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44480)
+	id 1jeLxE-0000Ag-Kk
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:04:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jeLmH-0001NT-Ti
- for qemu-devel@nongnu.org; Thu, 28 May 2020 12:53:09 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:40076)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jeLmH-00058x-0V
- for qemu-devel@nongnu.org; Thu, 28 May 2020 12:53:09 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id r15so4063806wmh.5
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 09:53:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=K/nysHAqgFCs6bMEH8BvGy1RP6HKrbBmm6plo1b4lp4=;
- b=u6Igfaqc1Uryrk4pb7w5BtfIk3lrCxY1sssNd6FcABDLIia/2jctL0Zd6kO+Gih+cC
- 9RU12ZH8VmdsQrP5PMESfHLTzyutUliPVNM4VFsTSHgWl8jAX4Mp6jzbP1/zpip4ya8A
- t3qFRm2a2O5fJFRniZz2Yi46pu19gEaF+vhbK5RVZCpC/hfBrrYo+xFNUuefVvKOGjtK
- wsKNT1B+Yu1UhDpWEy81Qj1hSYu3Vl1Wn4nbTLjVT+dOdgy1cT/Lzd75u+vyzwCYxEWi
- lcutkyxGHzLLC8u/CTZZh5BuVqwoRkwltSqKCWWtQd9zMGye+ImAY8rXo2YwJY9Rqx6V
- qi1A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeLwF-0007Qg-O9
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:03:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50625
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeLwE-0002gc-8w
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 13:03:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590685404;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=DmXWHfkP0U4ta8rhjy/zffnfHCjr1W8oBOwpoSpa7IE=;
+ b=is+rC6jmeRw8lEu4LQFRiZwWrjkhrDko/DYBO/ZgN+NlbWejXYPQ7bvgzfir+MNERhRzGI
+ lfmnMEpsC/kSwLRmJEvipyzifmWj9AniQ9RHDBMY1UMbBr/3HFfD0veu2F1PUAHe3L49Ai
+ qXTJLUI1w+UK9knTNu9veX9suO5JBJU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-APqIwUgcN9-rIg7C2aRrKw-1; Thu, 28 May 2020 13:03:23 -0400
+X-MC-Unique: APqIwUgcN9-rIg7C2aRrKw-1
+Received: by mail-wr1-f72.google.com with SMTP id o1so1274497wrm.17
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 10:03:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=K/nysHAqgFCs6bMEH8BvGy1RP6HKrbBmm6plo1b4lp4=;
- b=Kvu1u1YrE6FiPBCewCjTTrI2sPAZbiugKzyTnYhMUGfqIC21aQNiAS0Nc6h16y3znW
- HWDdSakBgCwSjlrCDlwvNEh063bXm+OniJjdVlmofVUlzQcpJkGWV3KxDh26W/S6omZM
- ePHP+RemJo8n+ZYnQBIMokdcC7+wL2z4xTlfsu4piDfGUUr9nwhcylW3cs6SB5b0L/0K
- dl5ECpMDMiCgY6W5JxJ1IdKqr4DfyapVd36++C3O+DblR4m9DXkOas9K7GEcsbfc1GZL
- 9jtBhD5sBY3mo54IbRR5fYG2lBpuR1gSccwR7qQ2+UhOYAJ4SPF9wMjrx74ey/QQkbDi
- uvxg==
-X-Gm-Message-State: AOAM532TLA28MzBsGCR1Ub4MBg2JZVSYkuJZ+6xVK/uvSgjt8SaPL+dU
- vCZrmIPpbk3CHNwVkDaPH4ncVY9D
-X-Google-Smtp-Source: ABdhPJwtj0QzkqutMiQd2bAZKpnpOacId9n+bkgGwVBfg34qi4h4WQHA94m21mGqUfZT5FQLRpZeJg==
-X-Received: by 2002:a7b:cbd0:: with SMTP id n16mr4461132wmi.38.1590684787183; 
- Thu, 28 May 2020 09:53:07 -0700 (PDT)
-Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=DmXWHfkP0U4ta8rhjy/zffnfHCjr1W8oBOwpoSpa7IE=;
+ b=qfpRSwXZKrGJX9tJKIptJSktsq3DJbVWpYBNIk2pWvBxC2l7V4p+dmoQWw7ixeGJ5X
+ G69rKI+t+Ta2eY0mDArH1lilOfCrpaO4UMSmA8IOWlLBuy8uXwZc61cJVhNVd8v0nE/x
+ c444+dptGvjtRDJuUqd8I3ZKFVubqavhWMU/94+x6hIY3CXjF2WK7zQuZA6SRAAUW1LP
+ Lh9lqR6hhGLHhwHsHLW1VRB7Y06QR+Gw21xPhKgMLRX344nBv8WxDCKlv/BI0TjfYj0U
+ 2Q0nsYEXgoH30d0t6GLYmnSncbGwBsVO3AHbNaj90m1+4G6gflC+JlHcw/w6INoExGAS
+ 72qA==
+X-Gm-Message-State: AOAM530L3YXdnIY6O5Uqx92BZCJrdJ8sGMm5co9wFX1pPe8hGSw6KYtd
+ 7x8D4RLuYgRr3yp/K4mN/gSNLJTIiDYhoRFeXtwLSPsuUQnfInOXYdkpbqvwK25pc7fnStw84Iy
+ gwGsOg+U0FZHSSLk=
+X-Received: by 2002:a05:600c:21d7:: with SMTP id
+ x23mr4497121wmj.95.1590685400926; 
+ Thu, 28 May 2020 10:03:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzuY5D6DmWBEDc3aFHpx913YmRaDT0LDeZ42pDcjFy6Ulx+D0ZmnGSurbPCFVWGjY3Py1SDjw==
+X-Received: by 2002:a05:600c:21d7:: with SMTP id
+ x23mr4497101wmj.95.1590685400681; 
+ Thu, 28 May 2020 10:03:20 -0700 (PDT)
+Received: from [192.168.1.36] (71.red-88-21-204.staticip.rima-tde.net.
  [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id o15sm7445447wmm.31.2020.05.28.09.53.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 09:53:06 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/1] tests/qtest/fuzz: Add faster virtio tests
-Date: Thu, 28 May 2020 18:53:03 +0200
-Message-Id: <20200528165303.1877-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200528165303.1877-1-f4bug@amsat.org>
-References: <20200528165303.1877-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id f11sm1013131wrj.2.2020.05.28.10.03.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 28 May 2020 10:03:19 -0700 (PDT)
+Subject: Re: [RFC PATCH v6 3/5] softmmu/vl: Allow -fw_cfg 'blob_id' option to
+ set any file pathname
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+References: <20200519182024.14638-1-philmd@redhat.com>
+ <20200519182024.14638-4-philmd@redhat.com>
+ <3225db1c-1dcb-8bec-18a5-0ea7fe890508@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <70be0748-0cb7-e493-53b9-f3c1d13077fd@redhat.com>
+Date: Thu, 28 May 2020 19:03:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <3225db1c-1dcb-8bec-18a5-0ea7fe890508@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 03:11:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,225 +140,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need to serialize over QTest chardev when we can
-directly access the MMIO address space via the first
-registered CPU view.
-Rename the currents tests as $TEST-qtest, add add faster
-tests that don't use the qtest chardev.
+On 5/20/20 12:45 AM, Laszlo Ersek wrote:
+> On 05/19/20 20:20, Philippe Mathieu-Daudé wrote:
+>> This is to silent:
+>>
+>>   $ qemu-system-x86_64 \
+>>     -object tls-cipher-suites,id=ciphersuite0,priority=@SYSTEM \
+>>     -fw_cfg name=etc/edk2/https/ciphers,blob_id=ciphersuite0
+>>   qemu-system-x86_64: -fw_cfg name=etc/edk2/https/ciphers,blob_id=ciphersuite0: warning: externally provided fw_cfg item names should be prefixed with "opt/"
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  softmmu/vl.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/softmmu/vl.c b/softmmu/vl.c
+>> index f76c53ad2e..3b77dcc00d 100644
+>> --- a/softmmu/vl.c
+>> +++ b/softmmu/vl.c
+>> @@ -2052,7 +2052,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+>>                     FW_CFG_MAX_FILE_PATH - 1);
+>>          return -1;
+>>      }
+>> -    if (strncmp(name, "opt/", 4) != 0) {
+>> +    if (!nonempty_str(blob_id) && strncmp(name, "opt/", 4) != 0) {
+>>          warn_report("externally provided fw_cfg item names "
+>>                      "should be prefixed with \"opt/\"");
+>>      }
+>>
+> 
+> Hmmm, difficult question! Is "ciphersuite0" now externally provided or not?
+> 
+> Because, ciphersuite0 is populated internally to QEMU alright (and so we
+> can think it's internal), but its *association with the name* is external.
+> 
+> What if we keep the same "-object" switch, but use a different (bogus)
+> "name" with "-fw_cfg"? IMO that kind of invalidates "-object" too.
+> 
+> Should the fw_cfg generator interface dictate the fw_cfg filename too?
+> Because that would eliminate this problem. Put differently, we now have
+> a possibility to label the "ciphersuite0" object in the fw_cfg file
+> directory any way we want -- but is that freedom *useful* for anything?
 
-virtio-net-socket gets ~50% performance improvement.
+Good point. Not now.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/qtest/fuzz/virtio_net_fuzz.c  | 42 ++++++++++++++++++++---
- tests/qtest/fuzz/virtio_scsi_fuzz.c | 53 +++++++++++++++++++++++++----
- 2 files changed, 84 insertions(+), 11 deletions(-)
+> 
+> I guess we might want multiple "tls-cipher-suites" objects one day, so
+> hard-coding the fw_cfg names on that level could cause conflicts.
 
-diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
-index d08a47e278..7a39cfbb75 100644
---- a/tests/qtest/fuzz/virtio_net_fuzz.c
-+++ b/tests/qtest/fuzz/virtio_net_fuzz.c
-@@ -19,6 +19,8 @@
- #include "fork_fuzz.h"
- #include "qos_fuzz.h"
- 
-+#include "exec/address-spaces.h"
-+#include "hw/core/cpu.h"
- 
- #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
- #define QVIRTIO_RX_VQ 0
-@@ -29,7 +31,9 @@ static int sockfds[2];
- static bool sockfds_initialized;
- 
- static void virtio_net_fuzz_multi(QTestState *s,
--        const unsigned char *Data, size_t Size, bool check_used)
-+                                  const unsigned char *Data, size_t Size,
-+                                  bool check_used, bool use_qtest_chardev)
-+
- {
-     typedef struct vq_action {
-         uint8_t queue;
-@@ -69,8 +73,13 @@ static void virtio_net_fuzz_multi(QTestState *s,
-              * If checking used ring, ensure that the fuzzer doesn't trigger
-              * trivial asserion failure on zero-zied buffer
-              */
--            qtest_memwrite(s, req_addr, Data, vqa.length);
--
-+            if (use_qtest_chardev) {
-+                qtest_memwrite(s, req_addr, Data, vqa.length);
-+            } else {
-+                address_space_write(first_cpu->as, req_addr,
-+                                     MEMTXATTRS_UNSPECIFIED,
-+                                     &Data, vqa.length);
-+            }
- 
-             free_head = qvirtqueue_add(s, q, req_addr, vqa.length,
-                     vqa.write, vqa.next);
-@@ -118,7 +127,20 @@ static void virtio_net_fork_fuzz(QTestState *s,
-         const unsigned char *Data, size_t Size)
- {
-     if (fork() == 0) {
--        virtio_net_fuzz_multi(s, Data, Size, false);
-+        virtio_net_fuzz_multi(s, Data, Size, false, false);
-+        flush_events(s);
-+        _Exit(0);
-+    } else {
-+        wait(NULL);
-+    }
-+}
-+
-+static void virtio_net_fork_fuzz_qtest(QTestState *s,
-+                                       const unsigned char *Data,
-+                                       size_t Size)
-+{
-+    if (fork() == 0) {
-+        virtio_net_fuzz_multi(s, Data, Size, false, true);
-         flush_events(s);
-         _Exit(0);
-     } else {
-@@ -130,7 +152,7 @@ static void virtio_net_fork_fuzz_check_used(QTestState *s,
-         const unsigned char *Data, size_t Size)
- {
-     if (fork() == 0) {
--        virtio_net_fuzz_multi(s, Data, Size, true);
-+        virtio_net_fuzz_multi(s, Data, Size, true, false);
-         flush_events(s);
-         _Exit(0);
-     } else {
-@@ -173,6 +195,16 @@ static void register_virtio_net_fuzz_targets(void)
-             &(QOSGraphTestOptions){.before = virtio_net_test_setup_socket}
-             );
- 
-+    fuzz_add_qos_target(&(FuzzTarget){
-+            .name = "virtio-net-socket-qtest",
-+            .description = "Fuzz the virtio-net virtual queues. Fuzz incoming "
-+            "traffic using the socket backend (over a qtest chardev)",
-+            .pre_fuzz = &virtio_net_pre_fuzz,
-+            .fuzz = virtio_net_fork_fuzz_qtest,},
-+            "virtio-net",
-+            &(QOSGraphTestOptions){.before = virtio_net_test_setup_socket}
-+            );
-+
-     fuzz_add_qos_target(&(FuzzTarget){
-             .name = "virtio-net-socket-check-used",
-             .description = "Fuzz the virtio-net virtual queues. Wait for the "
-diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-index 3b95247f12..27b63b2e32 100644
---- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
-+++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-@@ -23,6 +23,9 @@
- #include "fork_fuzz.h"
- #include "qos_fuzz.h"
- 
-+#include "exec/address-spaces.h"
-+#include "hw/core/cpu.h"
-+
- #define PCI_SLOT                0x02
- #define PCI_FN                  0x00
- #define QVIRTIO_SCSI_TIMEOUT_US (1 * 1000 * 1000)
-@@ -63,7 +66,8 @@ static QVirtioSCSIQueues *qvirtio_scsi_init(QVirtioDevice *dev, uint64_t mask)
- }
- 
- static void virtio_scsi_fuzz(QTestState *s, QVirtioSCSIQueues* queues,
--        const unsigned char *Data, size_t Size)
-+                             const unsigned char *Data, size_t Size,
-+                             bool use_qtest_chardev)
- {
-     /*
-      * Data is a sequence of random bytes. We split them up into "actions",
-@@ -108,7 +112,13 @@ static void virtio_scsi_fuzz(QTestState *s, QVirtioSCSIQueues* queues,
- 
-         /* Copy the data into ram, and place it on the virtqueue */
-         uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
--        qtest_memwrite(s, req_addr, Data, vqa.length);
-+        if (use_qtest_chardev) {
-+            qtest_memwrite(s, req_addr, Data, vqa.length);
-+        } else {
-+            address_space_write(first_cpu->as, req_addr,
-+                                 MEMTXATTRS_UNSPECIFIED,
-+                                 &Data, vqa.length);
-+        }
-         if (vq_touched[vqa.queue] == 0) {
-             vq_touched[vqa.queue] = 1;
-             free_head[vqa.queue] = qvirtqueue_add(s, q, req_addr, vqa.length,
-@@ -141,7 +151,25 @@ static void virtio_scsi_fork_fuzz(QTestState *s,
-         queues = qvirtio_scsi_init(scsi->vdev, 0);
-     }
-     if (fork() == 0) {
--        virtio_scsi_fuzz(s, queues, Data, Size);
-+        virtio_scsi_fuzz(s, queues, Data, Size, false);
-+        flush_events(s);
-+        _Exit(0);
-+    } else {
-+        wait(NULL);
-+    }
-+}
-+
-+static void virtio_scsi_fork_fuzz_qtest(QTestState *s,
-+                                        const unsigned char *Data,
-+                                        size_t Size)
-+{
-+    QVirtioSCSI *scsi = fuzz_qos_obj;
-+    static QVirtioSCSIQueues *queues;
-+    if (!queues) {
-+        queues = qvirtio_scsi_init(scsi->vdev, 0);
-+    }
-+    if (fork() == 0) {
-+        virtio_scsi_fuzz(s, queues, Data, Size, true);
-         flush_events(s);
-         _Exit(0);
-     } else {
-@@ -159,7 +187,9 @@ static void virtio_scsi_with_flag_fuzz(QTestState *s,
-         if (Size >= sizeof(uint64_t)) {
-             queues = qvirtio_scsi_init(scsi->vdev, *(uint64_t *)Data);
-             virtio_scsi_fuzz(s, queues,
--                             Data + sizeof(uint64_t), Size - sizeof(uint64_t));
-+                             Data + sizeof(uint64_t),
-+                             Size - sizeof(uint64_t),
-+                             false);
-             flush_events(s);
-         }
-         _Exit(0);
-@@ -189,7 +219,7 @@ static void register_virtio_scsi_fuzz_targets(void)
- {
-     fuzz_add_qos_target(&(FuzzTarget){
-                 .name = "virtio-scsi-fuzz",
--                .description = "Fuzz the virtio-scsi virtual queues, forking"
-+                .description = "Fuzz the virtio-scsi virtual queues, forking "
-                                 "for each fuzz run",
-                 .pre_vm_init = &counter_shm_init,
-                 .pre_fuzz = &virtio_scsi_pre_fuzz,
-@@ -198,9 +228,20 @@ static void register_virtio_scsi_fuzz_targets(void)
-                 &(QOSGraphTestOptions){.before = virtio_scsi_test_setup}
-                 );
- 
-+    fuzz_add_qos_target(&(FuzzTarget){
-+                .name = "virtio-scsi-fuzz-qtest",
-+                .description = "Fuzz the virtio-scsi virtual queues, forking "
-+                                "for each fuzz run (over a qtest chardev)",
-+                .pre_vm_init = &counter_shm_init,
-+                .pre_fuzz = &virtio_scsi_pre_fuzz,
-+                .fuzz = virtio_scsi_fork_fuzz_qtest,},
-+                "virtio-scsi",
-+                &(QOSGraphTestOptions){.before = virtio_scsi_test_setup}
-+                );
-+
-     fuzz_add_qos_target(&(FuzzTarget){
-                 .name = "virtio-scsi-flags-fuzz",
--                .description = "Fuzz the virtio-scsi virtual queues, forking"
-+                .description = "Fuzz the virtio-scsi virtual queues, forking "
-                 "for each fuzz run (also fuzzes the virtio flags)",
-                 .pre_vm_init = &counter_shm_init,
-                 .pre_fuzz = &virtio_scsi_pre_fuzz,
--- 
-2.21.3
+I haven't thought of that. If we set a limit today, we can relax it
+tomorrow. That won't break anything.
+
+> On the
+> other hand, I wouldn't like "blob_id" to generally circumvent the "etc/"
+> namespace protection.
+
+Eh, that was too easy.
+
+> 
+> I'm leaning towards agreeing with this patch, but I'd appreciate some
+> convincing arguments.
+
+OK. I'll think about it. Maybe keep this as single-RFC patch & repost
+the rest so review can go on until we settle on this.
+
+> 
+> Thanks
+> Laszlo
+> 
 
 
