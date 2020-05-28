@@ -4,63 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 814C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 278E4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BC562075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9D362075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXYiSjgh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC562075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fr8Si3E3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9D362075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeFXh-000408-Gv
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 06:13:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42594)
+	id 1jeFY2-0004dv-5C
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 06:14:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jeFVN-00086x-4h
- for qemu-devel@nongnu.org; Thu, 28 May 2020 06:11:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46672
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jeFV6-0007cJ-Gg
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 06:11:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25625
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jeFVM-0003Tq-3m
- for qemu-devel@nongnu.org; Thu, 28 May 2020 06:11:16 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jeFV5-0003Jl-LB
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 06:11:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590660675;
+ s=mimecast20190719; t=1590660658;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fA/aOdTZYOe4tkHV6oQL79sbDJCrso6VigZdl6PZCk0=;
- b=YXYiSjghuNUa2OLvSmcd8Aa/s/4uhwX/kNKtIV5sqqnL+bZny4tOJGh1plmYBFPgLxAVFd
- S1sJCzLzS8+CNgAhuOkzRA4q9E7WjuRDB47iiSy0iq46vpBR6dIvleWpLXY/3fyMOeZOhp
- AFaWhFw0IkKPlHECa1AU8D0oATcbAw0=
+ bh=ISNUBebYHMOeYOtKuFQEVz+SmdilO0J3UiKNssiiE8w=;
+ b=fr8Si3E3SqKKqy9gF9alrgC8rpfjGtOYvxO7oyWF+G9lQwr+ou9/27vck9MHpyR84QARnT
+ s2mXDhWFV6RrIvI/xI9jt4qPxwXV302RU4j/1Tp6vr/g3XRP9KpYecXG0XYAcliV1q/a7Q
+ vfOVLrfzyWn/9ETeVszeiSozp7c2vIg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-IMDzrXp5Pwqb9WM2TXuWXw-1; Thu, 28 May 2020 06:11:13 -0400
-X-MC-Unique: IMDzrXp5Pwqb9WM2TXuWXw-1
+ us-mta-173-dg77ewWAMMik0i1nDMLkNg-1; Thu, 28 May 2020 06:10:55 -0400
+X-MC-Unique: dg77ewWAMMik0i1nDMLkNg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 636BA835B40;
- Thu, 28 May 2020 10:11:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28EEA474;
+ Thu, 28 May 2020 10:10:54 +0000 (UTC)
 Received: from thuth.com (ovpn-112-213.ams2.redhat.com [10.36.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A51B5D9EF;
- Thu, 28 May 2020 10:11:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 31E6C5D9EF;
+ Thu, 28 May 2020 10:10:50 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 7/7] gitlab-ci: Determine the number of jobs dynamically
-Date: Thu, 28 May 2020 12:10:39 +0200
-Message-Id: <20200528101039.24600-8-thuth@redhat.com>
+Subject: [PULL 2/7] MAINTAINERS: Add Philippe,
+ Alex and Wainer to the Gitlab-CI section
+Date: Thu, 28 May 2020 12:10:34 +0200
+Message-Id: <20200528101039.24600-3-thuth@redhat.com>
 In-Reply-To: <20200528101039.24600-1-thuth@redhat.com>
 References: <20200528101039.24600-1-thuth@redhat.com>
 MIME-Version: 1.0
@@ -100,108 +102,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some people might want to run the gitlab CI pipelines in an environment
-where multiple CPUs are available to the runners, so let's rather get
-the number for "-j" from the "nproc" program (increased by 1 to compensate
-for jobs that wait for I/O) instead of hard-coding it.
+Initially, I was the only one who was using Gitlab while most developers
+had their git trees still on other systems, but that has changed nowadays.
+There is now much more interest in the Gitlab-CI today, so it would be
+good to have more than only one maintainer / reviewer for the gitlab-ci.yml
+file. Alex, Wainer and Philippe kindly offered their help here, so let's
+add them to the corresponding section in the MAINTAINERS file now.
 
-Message-Id: <20200525131823.715-7-thuth@redhat.com>
+Message-Id: <20200210155115.9371-1-thuth@redhat.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.yml | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ MAINTAINERS | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 559ec2ab4d..349c77aa58 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -7,12 +7,14 @@ include:
-   - apt-get update -qq
-   - apt-get install -y -qq git gcc libglib2.0-dev libpixman-1-dev make
-         genisoimage
-+  - JOBS=$(expr $(nproc) + 1)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a209b5d8ce..71a0438843 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2901,6 +2901,9 @@ W: https://cirrus-ci.com/github/qemu/qemu
  
- .update_dnf_template: &before_script_dnf
-  before_script:
-   - dnf update -y
-   - dnf install -y bzip2 diffutils gcc git genisoimage findutils glib2-devel
-         make python3 perl-podlators perl-Test-Harness pixman-devel zlib-devel
-+  - JOBS=$(expr $(nproc) + 1)
+ GitLab Continuous Integration
+ M: Thomas Huth <thuth@redhat.com>
++M: Philippe Mathieu-Daudé <philmd@redhat.com>
++M: Alex Bennée <alex.bennee@linaro.org>
++R: Wainer dos Santos Moschetta <wainersm@redhat.com>
+ S: Maintained
+ F: .gitlab-ci.yml
  
- build-system1:
-  image: ubuntu:19.10
-@@ -25,8 +27,8 @@ build-system1:
-  - ../configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
-       cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
-       mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-softmmu"
-- - make -j2
-- - make -j2 check
-+ - make -j"$JOBS"
-+ - make -j"$JOBS" check
- 
- build-system2:
-  image: fedora:latest
-@@ -40,8 +42,8 @@ build-system2:
-  - ../configure --enable-werror --target-list="tricore-softmmu unicore32-softmmu
-       microblaze-softmmu mips-softmmu riscv32-softmmu s390x-softmmu sh4-softmmu
-       sparc64-softmmu x86_64-softmmu xtensa-softmmu nios2-softmmu or1k-softmmu"
-- - make -j2
-- - make -j2 check
-+ - make -j"$JOBS"
-+ - make -j"$JOBS" check
- 
- build-disabled:
-  image: fedora:latest
-@@ -56,8 +58,8 @@ build-disabled:
-       --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
-       --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
-       --target-list="i386-softmmu ppc64-softmmu mips64-softmmu i386-linux-user"
-- - make -j2
-- - make -j2 check-qtest SPEED=slow
-+ - make -j"$JOBS"
-+ - make -j"$JOBS" check-qtest SPEED=slow
- 
- build-tcg-disabled:
-  image: centos:8
-@@ -67,7 +69,7 @@ build-tcg-disabled:
-  - mkdir build
-  - cd build
-  - ../configure --cc=clang --enable-werror --disable-tcg --audio-drv-list=""
-- - make -j2
-+ - make -j"$JOBS"
-  - make check-unit
-  - make check-qapi-schema
-  - cd tests/qemu-iotests/
-@@ -86,7 +88,7 @@ build-user:
-  - cd build
-  - ../configure --enable-werror --disable-system --disable-guest-agent
-                --disable-capstone --disable-slirp --disable-fdt
-- - make -j2
-+ - make -j"$JOBS"
-  - make run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
- 
- build-clang:
-@@ -100,8 +102,8 @@ build-clang:
-  - ../configure --cc=clang --cxx=clang++ --enable-werror
-       --target-list="alpha-softmmu arm-softmmu m68k-softmmu mips64-softmmu
-                      ppc-softmmu s390x-softmmu x86_64-softmmu arm-linux-user"
-- - make -j2
-- - make -j2 check
-+ - make -j"$JOBS"
-+ - make -j"$JOBS" check
- 
- build-tci:
-  image: centos:8
-@@ -112,7 +114,7 @@ build-tci:
-  - cd build
-  - ../configure --enable-tcg-interpreter
-       --target-list="$(for tg in $TARGETS; do echo -n ${tg}'-softmmu '; done)"
-- - make -j2
-+ - make -j"$JOBS"
-  - make run-tcg-tests-x86_64-softmmu
-  - make tests/qtest/boot-serial-test tests/qtest/cdrom-test tests/qtest/pxe-test
-  - for tg in $TARGETS ; do
 -- 
 2.18.1
 
