@@ -2,91 +2,71 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7421DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C06C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:27:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49865207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:12:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ACVFIa7n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49865207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8326208A7
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:27:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8326208A7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeNwu-0004FP-CZ
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 15:12:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37010)
+	id 1jeOBU-0001oK-0V
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 15:27:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeNwL-0003oe-FZ
- for qemu-devel@nongnu.org; Thu, 28 May 2020 15:11:41 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57720
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jeOAJ-0000oF-UQ; Thu, 28 May 2020 15:26:07 -0400
+Resent-Date: Thu, 28 May 2020 15:26:07 -0400
+Resent-Message-Id: <E1jeOAJ-0000oF-UQ@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21715)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeNwJ-00081w-RG
- for qemu-devel@nongnu.org; Thu, 28 May 2020 15:11:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590693097;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qoHmuYITB9VyuergFeembIQ/Eu1kdKqmFCwJpoJQo6Q=;
- b=ACVFIa7nd89/u9PVxo7A0vprAxJSDUGCNro6GgOKgpEgk7r8XL+yX5AjLkCpsx2NijNNcJ
- hRM7HFL2IpArudjOs9rpgo5ks98PP8yMVeXIrY8BA+/Wi7kRdYWsQD8FxeR2pF9hklZQDo
- sZMnrJKctrph7No4IIH2/B3Yx9tskng=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109--9JgHaspPL6-Rs8eLNVe4Q-1; Thu, 28 May 2020 15:11:10 -0400
-X-MC-Unique: -9JgHaspPL6-Rs8eLNVe4Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EC5D1005510;
- Thu, 28 May 2020 19:11:09 +0000 (UTC)
-Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D15DD1A91F;
- Thu, 28 May 2020 19:11:07 +0000 (UTC)
-Subject: Re: [PATCH v7 28/32] qcow2: Add subcluster support to
- qcow2_co_pwrite_zeroes()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1590429901.git.berto@igalia.com>
- <e037ed54599e7bf4d76bf8cd8db1904a20ffc6dd.1590429901.git.berto@igalia.com>
- <467e4184-2cee-a9e9-9cf0-ee6050ea4319@redhat.com>
- <w51sgfkt81f.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0adafac6-15e8-96eb-6c3f-bb9c182fb2d1@redhat.com>
-Date: Thu, 28 May 2020 14:11:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jeOAH-0007NP-O2; Thu, 28 May 2020 15:26:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590693953; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=c2EFVQrXCFZPyfF/aWO15Q1diSWjFcqkFbtxOd9SQtHcRX4tCBbRpBaaNMGEWiCmCI6XW+vclFZZhSg+XAavE9Pu++n4S6hUhGMYjwL5jxClx0PCoDyttzj2PKb4++RGV1MLvW+3Dxum5cHN9yCtm65MACL1TqSJaomyezYjLoM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590693953;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=asCDpoXj7AVedWp8mswn8KD3YetPHszID9FN6AclA1Q=; 
+ b=K02Kv+Qz3TK1QbwHefv9wx1LOOQmupI2eecYUOt8uODdzBB9BU7tkqDxKdOvhZ/n4Fpn4fHF0Azk7atZhXeeR4fkjE0yXSf4FA1/naz+LyPcVAp1FvR+vzjwqqVWcz0zkCsJnxc3RCoGE8KP2YzpA+lT8OG3iYz5BQAu4j40OvM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1590693950039299.8939020208626;
+ Thu, 28 May 2020 12:25:50 -0700 (PDT)
+Message-ID: <159069394828.20666.8800325140315031525@45ef0f9c86ae>
+In-Reply-To: <20200528123609.27362-1-kraxel@redhat.com>
+Subject: Re: [PULL 00/21] Vga 20200528 patches
 MIME-Version: 1.0
-In-Reply-To: <w51sgfkt81f.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 02:50:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kraxel@redhat.com
+Date: Thu, 28 May 2020 12:25:50 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 15:26:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,95 +79,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, i.mitsyanko@gmail.com, alistair@alistair23.me,
+ mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, kraxel@redhat.com, edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/28/20 10:04 AM, Alberto Garcia wrote:
-> On Wed 27 May 2020 07:58:10 PM CEST, Eric Blake wrote:
->>> There is just one thing to take into account for a possible future
->>> improvement: compressed clusters cannot be partially zeroized so
->>> zero_l2_subclusters() on the head or the tail can return -ENOTSUP.
->>> This makes the caller repeat the *complete* request and write actual
->>> zeroes to disk. This is sub-optimal because
->>>
->>>      1) if the head area was compressed we would still be able to use
->>>         the fast path for the body and possibly the tail.
->>>
->>>      2) if the tail area was compressed we are writing zeroes to the
->>>         head and the body areas, which are already zeroized.
->>
->> Is this true?  The block layer tries hard to break zero requests up so
->> that any non-cluster-aligned requests do not cross cluster boundaries.
->> In practice, that means that when you have an unaligned request, the
->> head and tail cluster will be the same cluster, and there is no body in
->> play, so that returning -ENOTSUP is correct because there really is no
->> other work to do and repeating the entire request (which is less than a
->> cluster in length) is the right approach.
-> 
-> Let's use an example.
-> 
-> cluster size is 64KB, subcluster size is 2KB, and we get this request:
-> 
->     write -z 31k 130k
-> 
-> Since pwrite_zeroes_alignment equals the cluster size (64KB), this
-> would result in 3 calls to qcow2_co_pwrite_zeroes():
-> 
->     offset=31k  size=33k    [-ENOTSUP, writes actual zeros]
->     offset=64k  size=64k    [zeroized using the relevant metadata bits]
->     offset=128k size=33k    [-ENOTSUP, writes actual zeros]
-> 
-> However this patch changes the alignment:
-> 
->      bs->bl.pwrite_zeroes_alignment = s->subcluster_size;
-
-Ah, I missed that trick.  But it is nice, and indeed...
-
-> 
-> so we get these instead:
-> 
->     offset=31k  size=1k     [-ENOTSUP, writes actual zeros]
->     offset=32k  size=128k   [zeroized using the relevant metadata bits]
->     offset=160k size=1k     [-ENOTSUP, writes actual zeros]
-> 
-> So far, so good. Reducing the alignment requirements allows us to
-> maximize the number of subclusters to zeroize.
-
-...we can now hit a request that is not cluster-aligned.
-
-> 
-> Now let's suppose we have this request:
-> 
->     write -z 32k 128k
-> 
-> This one is aligned so it goes directly to qcow2_co_pwrite_zeroes().
-> However if the third cluster is compressed then the function will
-> return -ENOTSUP after having zeroized the first 96KB of the request,
-> forcing the caller to repeat it completely using the slow path.
-> 
-> I think the problem also exists in the current code (without my
-> patches). If you zeroize 10 clusters and the last one is compressed
-> you have to repeat the request after having zeroized 9 clusters.
-
-Hmm. In the pre-patch code, qcow2_co_pwrite_zeroes() calls 
-qcow2_cluster_zeroize() which can fail with -ENOTSUP up front, but not 
-after the fact.  Once it starts the while loop over clusters, its use of 
-zero_in_l2_slice() handles compressed clusters just fine; as far as I 
-can tell, only your new subcluster handling lets it now fail with 
--ENOTSUP after earlier clusters have been visited.
-
-But isn't this something we could solve recursively?  Instead of 
-returning -ENOTSUP, we could have zero_in_l2_slice() call 
-bdrv_pwrite_zeroes() on the (sub-)clusters associated with a compressed 
-cluster.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyODEyMzYwOS4yNzM2
+Mi0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUyODEyMzYwOS4yNzM2Mi0xLWtyYXhlbEByZWRo
+YXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzIxXSBWZ2EgMjAyMDA1MjggcGF0Y2hlcwpUeXBlOiBz
+ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
+ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAy
+MDA1MjgxNTM3NDIuMjc0MTY0LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNTI4
+MTUzNzQyLjI3NDE2NC0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0Jwo5ZjJkZThjIHNtNTAxOiBSZW1vdmUgb2Jzb2xldGUgY2hhbmdlbG9nIGFuZCB0b2Rv
+IGNvbW1lbnQKNDBjNjE3OSBzbTUwMTogT3B0aW1pemUgc21hbGwgb3ZlcmxhcHBpbmcgYmxpdHMK
+YTU3ZjU0OSBzbTUwMTogUmVwbGFjZSBoYW5kIHdyaXR0ZW4gaW1wbGVtZW50YXRpb24gd2l0aCBw
+aXhtYW4gd2hlcmUgcG9zc2libGUKNzU3ZWI5NCBzbTUwMTogQ2xlYW4gdXAgbG9jYWwgdmFyaWFi
+bGVzIGluIHNtNTAxXzJkX29wZXJhdGlvbgo4ZDhlM2JlIHNtNTAxOiBVc2UgQklUKHgpIG1hY3Jv
+IHRvIHNob3J0ZW4gY29uc3RhbnQKZTdiYWEwYiBzbTUwMTogU2hvcnRlbiBsb25nIHZhcmlhYmxl
+IG5hbWVzIGluIHNtNTAxXzJkX29wZXJhdGlvbgpiMDM4NTkwIHNtNTAxOiBDb252ZXJ0IHByaW50
+ZiArIGFib3J0IHRvIHFlbXVfbG9nX21hc2sKYTUyNGIxMSBody9kaXNwbGF5L3B4YTJ4eF9sY2Q6
+IFJlcGxhY2UgcHJpbnRmKCkgY2FsbCBieSBxZW11X2xvZ19tYXNrKCkKNDEwMDBmMSBody9kaXNw
+bGF5L29tYXBfZHNzOiBSZXBsYWNlIGZwcmludGYoKSBjYWxsIGJ5IHFlbXVfbG9nX21hc2soTE9H
+X1VOSU1QKQpkYWQzMmYzIGh3L2Rpc3BsYXkvZXh5bm9zNDIxMF9maW1kOiBVc2UgcWVtdV9sb2df
+bWFzayhHVUVTVF9FUlJPUikKOThiNmQxYiBody9kaXNwbGF5L3Ztd2FyZV92Z2E6IExldCB0aGUg
+UENJIGRldmljZSBvd24gaXRzIEkvTyBNZW1vcnlSZWdpb24KZjFlYWRhYyBody9kaXNwbGF5L3Zt
+d2FyZV92Z2E6IFJlcGxhY2UgcHJpbnRmKCkgY2FsbHMgYnkgcWVtdV9sb2dfbWFzayhFUlJPUikK
+NmFkMWUzOSBody9kaXNwbGF5L3hsbnhfZHA6IFJlcGxhY2UgZGlzYWJsZWQgRFBSSU5URigpIGJ5
+IGVycm9yX3JlcG9ydCgpCjNjZmZjNTkgaHcvZGlzcGxheS9kcGNkOiBDb252ZXJ0IGRlYnVnIHBy
+aW50ZigpcyB0byB0cmFjZSBldmVudHMKZTM1OTA4NCBody9kaXNwbGF5L2RwY2Q6IEZpeCBtZW1v
+cnkgcmVnaW9uIHNpemUKMGUxOTk3MyBody9kaXNwbGF5L2NpcnJ1c192Z2E6IENvbnZlcnQgZGVi
+dWcgcHJpbnRmKCkgdG8gdHJhY2UgZXZlbnQKOTdmMzY5ZiBody9kaXNwbGF5L2NpcnJ1c192Z2E6
+IFVzZSBxZW11X2xvZ19tYXNrKEVSUk9SKSBpbnN0ZWFkIG9mIGRlYnVnIHByaW50ZgowNzU4NTY2
+IGh3L2Rpc3BsYXkvY2lycnVzX3ZnYTogVXNlIHFlbXVfbG9nX21hc2soVU5JTVApIGluc3RlYWQg
+b2YgZGVidWcgcHJpbnRmCjQ2ZjQ3ODIgaHcvZGlzcGxheS9jaXJydXNfdmdhOiBDb252ZXJ0IGRl
+YnVnIHByaW50ZigpIHRvIHRyYWNlIGV2ZW50CjRlMmQ0N2YgaHcvZGlzcGxheS9jZzM6IENvbnZl
+cnQgZGVidWcgcHJpbnRmKClzIHRvIHRyYWNlIGV2ZW50cwo2MGE0MTQ2IGh3L2Rpc3BsYXkvZWRp
+ZDogQWRkIG1pc3NpbmcgJ3FkZXYtcHJvcGVydGllcy5oJyBoZWFkZXIKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CjEvMjEgQ2hlY2tpbmcgY29tbWl0IDYwYTQxNDZkZmYzNCAoaHcvZGlzcGxheS9lZGlk
+OiBBZGQgbWlzc2luZyAncWRldi1wcm9wZXJ0aWVzLmgnIGhlYWRlcikKMi8yMSBDaGVja2luZyBj
+b21taXQgNGUyZDQ3ZjgyYzFlIChody9kaXNwbGF5L2NnMzogQ29udmVydCBkZWJ1ZyBwcmludGYo
+KXMgdG8gdHJhY2UgZXZlbnRzKQozLzIxIENoZWNraW5nIGNvbW1pdCA0NmY0NzgyMmVmZWEgKGh3
+L2Rpc3BsYXkvY2lycnVzX3ZnYTogQ29udmVydCBkZWJ1ZyBwcmludGYoKSB0byB0cmFjZSBldmVu
+dCkKNC8yMSBDaGVja2luZyBjb21taXQgMDc1ODU2NmI1YTA5IChody9kaXNwbGF5L2NpcnJ1c192
+Z2E6IFVzZSBxZW11X2xvZ19tYXNrKFVOSU1QKSBpbnN0ZWFkIG9mIGRlYnVnIHByaW50ZikKNS8y
+MSBDaGVja2luZyBjb21taXQgOTdmMzY5ZjI0NzlkIChody9kaXNwbGF5L2NpcnJ1c192Z2E6IFVz
+ZSBxZW11X2xvZ19tYXNrKEVSUk9SKSBpbnN0ZWFkIG9mIGRlYnVnIHByaW50ZikKRVJST1I6IHN1
+c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDE2LCAxMikKIzM0
+OiBGSUxFOiBody9kaXNwbGF5L2NpcnJ1c192Z2EuYzoxMDM4OgogICAgICAgICAgICAgICAgaWYg
+KHMtPmNpcnJ1c19ibHRfcGl4ZWx3aWR0aCA+IDIpIHsKKyAgICAgICAgICAgIHFlbXVfbG9nX21h
+c2soTE9HX0dVRVNUX0VSUk9SLAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTYgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggNS8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi8yMSBD
+aGVja2luZyBjb21taXQgMGUxOTk3MzY2MTVlIChody9kaXNwbGF5L2NpcnJ1c192Z2E6IENvbnZl
+cnQgZGVidWcgcHJpbnRmKCkgdG8gdHJhY2UgZXZlbnQpCjcvMjEgQ2hlY2tpbmcgY29tbWl0IGUz
+NTkwODQyY2M2MyAoaHcvZGlzcGxheS9kcGNkOiBGaXggbWVtb3J5IHJlZ2lvbiBzaXplKQo4LzIx
+IENoZWNraW5nIGNvbW1pdCAzY2ZmYzU5MGRkYzEgKGh3L2Rpc3BsYXkvZHBjZDogQ29udmVydCBk
+ZWJ1ZyBwcmludGYoKXMgdG8gdHJhY2UgZXZlbnRzKQo5LzIxIENoZWNraW5nIGNvbW1pdCA2YWQx
+ZTM5OGIzYTEgKGh3L2Rpc3BsYXkveGxueF9kcDogUmVwbGFjZSBkaXNhYmxlZCBEUFJJTlRGKCkg
+YnkgZXJyb3JfcmVwb3J0KCkpCjEwLzIxIENoZWNraW5nIGNvbW1pdCBmMWVhZGFjYmYxN2IgKGh3
+L2Rpc3BsYXkvdm13YXJlX3ZnYTogUmVwbGFjZSBwcmludGYoKSBjYWxscyBieSBxZW11X2xvZ19t
+YXNrKEVSUk9SKSkKMTEvMjEgQ2hlY2tpbmcgY29tbWl0IDk4YjZkMWIyODRiMSAoaHcvZGlzcGxh
+eS92bXdhcmVfdmdhOiBMZXQgdGhlIFBDSSBkZXZpY2Ugb3duIGl0cyBJL08gTWVtb3J5UmVnaW9u
+KQoxMi8yMSBDaGVja2luZyBjb21taXQgZGFkMzJmM2IyZDdhIChody9kaXNwbGF5L2V4eW5vczQy
+MTBfZmltZDogVXNlIHFlbXVfbG9nX21hc2soR1VFU1RfRVJST1IpKQoxMy8yMSBDaGVja2luZyBj
+b21taXQgNDEwMDBmMTk4NzJjIChody9kaXNwbGF5L29tYXBfZHNzOiBSZXBsYWNlIGZwcmludGYo
+KSBjYWxsIGJ5IHFlbXVfbG9nX21hc2soTE9HX1VOSU1QKSkKMTQvMjEgQ2hlY2tpbmcgY29tbWl0
+IGE1MjRiMTFhMmNiMyAoaHcvZGlzcGxheS9weGEyeHhfbGNkOiBSZXBsYWNlIHByaW50ZigpIGNh
+bGwgYnkgcWVtdV9sb2dfbWFzaygpKQoxNS8yMSBDaGVja2luZyBjb21taXQgYjAzODU5MDE2NDY3
+IChzbTUwMTogQ29udmVydCBwcmludGYgKyBhYm9ydCB0byBxZW11X2xvZ19tYXNrKQoxNi8yMSBD
+aGVja2luZyBjb21taXQgZTdiYWEwYjRiZGRlIChzbTUwMTogU2hvcnRlbiBsb25nIHZhcmlhYmxl
+IG5hbWVzIGluIHNtNTAxXzJkX29wZXJhdGlvbikKMTcvMjEgQ2hlY2tpbmcgY29tbWl0IDhkOGUz
+YmU0MDc5NiAoc201MDE6IFVzZSBCSVQoeCkgbWFjcm8gdG8gc2hvcnRlbiBjb25zdGFudCkKMTgv
+MjEgQ2hlY2tpbmcgY29tbWl0IDc1N2ViOTRiZDAwNyAoc201MDE6IENsZWFuIHVwIGxvY2FsIHZh
+cmlhYmxlcyBpbiBzbTUwMV8yZF9vcGVyYXRpb24pCjE5LzIxIENoZWNraW5nIGNvbW1pdCBhNTdm
+NTQ5ODQ2YTEgKHNtNTAxOiBSZXBsYWNlIGhhbmQgd3JpdHRlbiBpbXBsZW1lbnRhdGlvbiB3aXRo
+IHBpeG1hbiB3aGVyZSBwb3NzaWJsZSkKMjAvMjEgQ2hlY2tpbmcgY29tbWl0IDQwYzYxNzk5MjVm
+MCAoc201MDE6IE9wdGltaXplIHNtYWxsIG92ZXJsYXBwaW5nIGJsaXRzKQoyMS8yMSBDaGVja2lu
+ZyBjb21taXQgOWYyZGU4YzcwMmEzIChzbTUwMTogUmVtb3ZlIG9ic29sZXRlIGNoYW5nZWxvZyBh
+bmQgdG9kbyBjb21tZW50KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDUyODEyMzYwOS4yNzM2Mi0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
