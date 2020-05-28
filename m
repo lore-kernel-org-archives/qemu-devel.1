@@ -2,82 +2,76 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3833C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E76C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E88C207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 07:28:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="gtJlR3TF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E88C207BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A34672088E
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A34672088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeCxi-0006Ae-8X
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 03:28:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50288)
+	id 1jeDdi-0006hc-S2
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:11:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jeCvT-0004DS-5g; Thu, 28 May 2020 03:26:03 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38765)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jeCvR-0000RG-FU; Thu, 28 May 2020 03:26:02 -0400
-Received: by mail-ed1-x542.google.com with SMTP id c35so6034529edf.5;
- Thu, 28 May 2020 00:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UyKF229qgjHG717Dm40mZ4mp6YV3xxxM/oUcFKIsZ30=;
- b=gtJlR3TFpbCXwPCQ/mHvnXQy+yNU55dciiB+iywBKJBUWbiBqK5LqrJRmq0F853DIh
- bwzws1yLnibNb7Gy5maEmWegbv7edOGWDrIsd4gxGsR4ZTu9de8up/el81LeSttC/DFG
- 8Dx8aW9QMKhrHaTcnLvZgBdIRKLrYj/BEkDiE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UyKF229qgjHG717Dm40mZ4mp6YV3xxxM/oUcFKIsZ30=;
- b=ZQZdvIYu1+THooVJW4zC2V51K4DDxdq+kTvn5kVLWyUl+b4YxmnqgRon74X3oqrMpP
- gBtGccJLY0VNyiLrGnpgFTCYNQYv1vd0yh5/tGEChihQkimy1iVcScWNCAfOnUb5LO7s
- ifjhTEnZ0Uda16WiGrYNKbf/pk5khmX7JGT8Rs0PwGfwI+Q6wc9QPZf/TjqU9+qV8RW2
- ONL8xXPHe5ljpWKBuNrb82ftYIS1E/Hxm1jReDWgz93baDiN+U5/ktmK8XIsVBZCGaQ9
- 6jaCB0ONkOqk9xwEHtVsOtOiXEmnu6bwBPNPRWfKXf35mHQXdaR3uMKt3/MHdLztq18p
- cbAQ==
-X-Gm-Message-State: AOAM531nA8qohvE6O6z/krNdqBeo10y1SZFBKgK8DSKayvEpy6lD0U6f
- H5CMuWXbN4ucGdqqxzcPDArTC7DOkf6ibDsOc4M=
-X-Google-Smtp-Source: ABdhPJxlLjyCrSLccfBVA2fYAf0Iiaa+1Me0dANqa07pjZ0UJorYXWaokdDmfYRauHoFYeTCORKTEqK8gRayDkZp+Wk=
-X-Received: by 2002:a50:e08c:: with SMTP id f12mr1667557edl.233.1590650758836; 
- Thu, 28 May 2020 00:25:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jeDdA-0005cN-V3
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:11:13 -0400
+Received: from mga12.intel.com ([192.55.52.136]:24438)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jeDd8-0008Um-KV
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:11:12 -0400
+IronPort-SDR: ROr7wZyacJah5MbawAOiQjsvv0hRb6P/Ul5OHWsbHazCFUNIYMDgJvdAJCVBRImnKnr0FgYB9E
+ oaZJiJufF1Hg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 28 May 2020 01:11:00 -0700
+IronPort-SDR: bRgydiOtZ9X+tvZBEcFWcYWu54Zt+rX1J2USsgGjc8eh1+jjQqAJPCDIfAEtsekT/rDVTO77Ok
+ B1JIGWLyQ/RQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,444,1583222400"; d="scan'208";a="291916623"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by fmsmga004.fm.intel.com with ESMTP; 28 May 2020 01:10:55 -0700
+Date: Thu, 28 May 2020 04:01:02 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200528080101.GD1378@joy-OptiPlex-7040>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
+ <20200527084822.GC3001@work-vm>
 MIME-Version: 1.0
-References: <20200527124406.329503-1-clg@kaod.org>
-In-Reply-To: <20200527124406.329503-1-clg@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 28 May 2020 07:25:47 +0000
-Message-ID: <CACPK8Xd5TXG1iBV=Ygi_B3hJKNPRz=dhSuqMUHvLopjKAEi-tw@mail.gmail.com>
-Subject: Re: [PATCH v3] arm/aspeed: Rework NIC attachment
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=joel.stan@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200527084822.GC3001@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.136; envelope-from=yan.y.zhao@intel.com;
+ helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 04:11:00
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,53 +84,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Alex Williamson <alex.williamson@redhat.com>, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 27 May 2020 at 12:44, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> The number of MACs supported by an Aspeed SoC is defined by "macs_num"
-> under the SoC model, that is two for the AST2400 and AST2500 and four
-> for the AST2600. The model initializes the maximum number of supported
-> MACs but the number of realized devices is capped by the number of
-> network device back-ends defined on the command line. This can leave
-> unrealized devices hanging around in the QOM composition tree.
->
-> Modify the machine initialization to define which MACs are attached to
-> a network device back-end using a bit-field property "macs-mask" and
-> let the SoC realize all network devices.
->
-> The default setting of "macs-mask" is "use MAC0" only, which works for
-> all our AST2400 and AST2500 machines. The AST2600 machines have
-> different configurations. The AST2600 EVB machine activates MAC1, MAC2
-> and MAC3 and the Tacoma BMC machine activates MAC2.
->
-> Inactive MACs will have no peer and QEMU may warn the user with :
->
->     qemu-system-arm: warning: nic ftgmac100.0 has no peer
->     qemu-system-arm: warning: nic ftgmac100.1 has no peer
->     qemu-system-arm: warning: nic ftgmac100.3 has no peer
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> > > This is my understanding of the protocol as well, when the device is
+> > > running, pending_bytes might drop to zero if no internal state has
+> > > changed and may be non-zero on the next iteration due to device
+> > > activity.  When the device is not running, pending_bytes reporting zero
+> > > indicates the device is done, there is no further state to transmit.
+> > > Does that meet your need/expectation?
+> > >
+> > (1) on one side, as in vfio_save_pending(),
+> > vfio_save_pending()
+> > {
+> >     ...
+> >     ret = vfio_update_pending(vbasedev);
+> >     ...
+> >     *res_precopy_only += migration->pending_bytes;
+> >     ...
+> > }
+> > the pending_bytes tells migration thread how much data is still hold in
+> > device side.
+> > the device data includes
+> > device internal data + running device dirty data + device state.
+> > 
+> > so the pending_bytes should include device state as well, right?
+> > if so, the pending_bytes should never reach 0 if there's any device
+> > state to be sent after device is stopped.
+> 
+> I hadn't expected the pending-bytes to include a fixed offset for device
+> state (If you mean a few registers etc) - I'd expect pending to drop
+> possibly to zero;  the heuristic as to when to switch from iteration to
+> stop, is based on the total pending across all iterated devices; so it's
+> got to be allowed to drop otherwise you'll never transition to stop.
+> 
+ok. got it.
 
-Reviewed-by: Joel Stanley <joel@jms.id.au>
+> > (2) on the other side,
+> > along side we updated the pending_bytes in vfio_save_pending() and
+> > enter into the vfio_save_iterate(), if we repeatedly update
+> > pending_bytes in vfio_save_iterate(), it would enter into a scenario
+> > like
+> > 
+> > initially pending_bytes=500M.
+> > vfio_save_iterate() -->
+> >   round 1: transmitted 500M.
+> >   round 2: update pending bytes, pending_bytes=50M (50M dirty data).
+> >   round 3: update pending bytes, pending_bytes=50M.
+> >   ...
+> >   round N: update pending bytes, pending_bytes=50M.
+> > 
+> > If there're two vfio devices, the vfio_save_iterate() for the second device
+> > may never get chance to be called because there's always pending_bytes
+> > produced by the first device, even the size if small.
+> 
+> And between RAM and the vfio devices?
 
-This is a good usability improvement, thanks C=C3=A9dric.
+yes, is that right?
 
-> @@ -680,6 +691,7 @@ static void aspeed_machine_ast2600_evb_class_init(Obj=
-ectClass *oc, void *data)
->      amc->fmc_model =3D "w25q512jv";
->      amc->spi_model =3D "mx66u51235f";
->      amc->num_cs    =3D 1;
-> +    amc->macs_mask  =3D ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_ON=
-;
-
-In the future we could enable all four. The A0 silicon had a broken
-MAC4 but it is working on A1.
+Thanks
+Yan
 
