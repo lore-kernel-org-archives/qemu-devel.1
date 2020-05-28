@@ -2,38 +2,40 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6B3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 939D7C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:33:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5247208A7
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5247208A7
+	by mail.kernel.org (Postfix) with ESMTPS id 64794208A7
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 10:33:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64794208A7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeFkW-00036N-Qe
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 06:26:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45384)
+	id 1jeFqV-0005gQ-JS
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 06:33:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeFjq-0002hJ-RP
- for qemu-devel@nongnu.org; Thu, 28 May 2020 06:26:14 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:55601)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeFps-0005FQ-Rr
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 06:32:28 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:41121)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeFjo-0005EV-Gg
- for qemu-devel@nongnu.org; Thu, 28 May 2020 06:26:14 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jeFpr-0007ya-QS
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 06:32:28 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MQ6C0-1jR6b23uQy-00M4rY; Thu, 28 May 2020 12:26:01 +0200
-To: chengang@emindsoft.com.cn, riku.voipio@iki.fi
-References: <20200523132442.22538-1-chengang@emindsoft.com.cn>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MkYHO-1j9ukh11B8-00m3Km; Thu, 28 May 2020 12:32:25 +0200
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20200519194452.9009-1-richard.henderson@linaro.org>
+ <CAFEAcA8q-4o3yWX2kwS1inPiajP1yzc3NOLBjzQUubKzDNGhhw@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -77,33 +79,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH v3] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Message-ID: <767ce983-c676-9d0b-3167-5165ceb48262@vivier.eu>
-Date: Thu, 28 May 2020 12:25:57 +0200
+Subject: Re: [PATCH 0/2] linux-user: Load a vdso for x86_64
+Message-ID: <e985a1cb-e4e3-6faa-f158-5e797d0b5e92@vivier.eu>
+Date: Thu, 28 May 2020 12:32:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200523132442.22538-1-chengang@emindsoft.com.cn>
+In-Reply-To: <CAFEAcA8q-4o3yWX2kwS1inPiajP1yzc3NOLBjzQUubKzDNGhhw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ki2H0vQodCzp4KsJUUKI65OVi4LjYo/fwNIns7BDK2vuNpJhsKW
- Wq7UwU3zy+C/SkfE/CzyNW19cK50Kf4/+1e03qkm5eFyDNLHqWZwYGlTBTx2UCXqUNtpK+v
- Enmpd5bhifBXNYIJD5O7+EOwFZk0YbpfWuSAEeD4JP4F/sOR5V0NY5BXv2ML/7fl2AiV+9a
- cAKd/3niM4TqZa0YAtLuA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PhjNH53SNWg=:iouNPlBuqyHp+G2gE3IpXO
- CB4eZYCyf+vb2rR6VdpldS96SdRnAGQvmgQ0bSm9AJQ6g1BpUuJ1G8Z66E91eIZlc1iicQss8
- 8Ubbk2wU7ARnuUy97SymbWP2SHptwz4JZx9mgZORyIjTWQG26ampfI8KJh0+MrA/LlYH9LRvq
- /q7OBXbSFIRyw0pIOBPH5rvoTlVtkHCSKlhoQGAULcyiIaIsyr5nxVJ/iIKXBquK+A9EzMJCJ
- BOB5SsmseeYNcCW8Om0aoGfAfo6G/v9KfOTHJTqihVhx49QeQ/ugNlXxBIvhEAmO1rIkKyJe4
- 5y+2qwNDKAE7qNN5SABwTohhlgdGd4T90DaqLeosdp7dkmJQrWXSsY4eXZkXzSHicx3hL4ovq
- iC201+HlisOPNYjMv1eo8Fg/Fl0dvCBNIjlJYDyoNaoLsgHHQ1YO1vCmV15YJIe0DbkjzP3Ja
- Uvrr+7mz9S1deqhRy+rrrAlbMxoSFmn+HsasH8+llETap1B1P+/hC2ev+qzHdDKII7PRH7yK+
- Nzod/CzHR/Vd920NzJo/FNZm1hkzZSL0BWipN+LY1JJ6v4oFF7/Q7hravpmAi5YCmwNz1cOKc
- WF6zahRjSykrv0njXTTBbZCBGWxULg+q7eh53ZP9wCawATBvnBvz6O2A8KxxNuQa1nny/bakO
- KWe25odwCwusYM5HYczebAf0syRJpCs7HdzuEG328xluEGWsZIJw/JxpQrIVjlJhoguQ7A097
- w4WADXcNt6eWzINjH/7Lfz4r9P7wVQutndgV9AULieEmp0kCJVCxUSAjOrr5qZbieRA7Q3Kn3
- ECsX71x5bOTkZx1A2W1Ad2Zm61byjeQ+OI5MFa6UJZGX5yKbZEbcbkvPP3f2w1XDFUsVM+T
+X-Provags-ID: V03:K1:IiPeY5UyJNxWWSHjPY3fLXpnNQsoAsPa+dAxwOrYTWkWYOEv3Cd
+ eFz/sZO28Wcmlb/EnXMpeJyKdP8L0AJUwpsrH2zpwXCkDj3IrUdJDg0vRJ4K0oFsyAauS/d
+ rvrvAbUbWPxxxUftHb4yw1CV/SVdPZz2o5ToaCx4rvrYBbfS2v4Q7ON3v74R/UxyNUxZhlp
+ asMtJbRbdYEaiVvEMaNyA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6Et3x+OlySI=:rYlJ1Lwe4tSgXETkyZ5iZz
+ ePIVjYcnz7pME5fuU+xee3VBhS9M/gI/zODlmPlBQofwUZNFkBcC+Gf14AypozgS8RQ+rN1z3
+ V0iOAyHT9UBqQHD6MIMhVnRVw/Jf2XtXlJan89tREC72JZ+al48i7VMvHwxhEVRqI2NIKWl2n
+ 2NyTGwcC4vADY4tRcAo0fsXVop2diRfGzLSNpSe5EPHpln00g6gxnrQiSvgCcziFePY/gkSne
+ 2bMmTRBrU/S4xUVQW4UMkY/58JsVvqVcwVnp6+zWbUIh4CyRbSV84hXDH0MXotzvKcXe2MDrV
+ QFSvBmFM6K9+gOIfLcE6NQlu5vRY87dxPt83+IRkOBPSHBLy6KN4vCrfkRBumOEXpY+MKIH3t
+ CJAlgWDp6ui3Q3UKny8/3QKB7XmyO8KlSeEZvjccSae9iS216Iv46oYvs+OnQIt4DtJ/+SR4i
+ YGyHt8zyk0XW79stVc5pMpBSQd56CyoGhmqii6WzYx0xBeFHXdmuM7L+YHZZkmaTSdbkWUjay
+ lLYMkhmJCyvU8fzsw1/f3XZ9vw9YHoeUXD7tQ1Zh5T0PgpPU+HeDDsVYjZk1OxoNqFT9FoFga
+ mu1xv8jPUH3wSr2GAMQcTNEH6TFiWpBS+2JhgR0ynHoPonLa6131uVJOghkUWNaeODyVga/n4
+ K8sfD/eAWqISHPHzl5Ijkm5qVbTSF9bCrxyHku75lPHciVMNfP/OXGJZClSnK+b2yU2Tv45jS
+ 6cTO8eF77kfurGVcB62F884lBZYQHzXy6154QjY/nVqP3n4jrO1HY3Mk3cEpEHDo3jvWR9HL/
+ wVh3ReSqyfCJaBXFhHRM6P5w5gpS0hv9tND/g0OoOmj0hfxdFVhQZbdhXUXP+miHjiVbxW4
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 05:34:18
@@ -125,73 +127,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/05/2020 à 15:24, chengang@emindsoft.com.cn a écrit :
-> From: Chen Gang <chengang@emindsoft.com.cn>
+Le 28/05/2020 à 12:08, Peter Maydell a écrit :
+> On Tue, 19 May 2020 at 20:45, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>  Makefile                  |   4 +-
+>>  linux-user/elfload.c      | 203 +++++++++++++++++++++++++++++++++++++-
+>>  pc-bios/Makefile          |   5 +
+>>  pc-bios/vdso-linux-x64.S  | 115 +++++++++++++++++++++
+>>  pc-bios/vdso-linux-x64.ld |  81 +++++++++++++++
+>>  pc-bios/vdso-linux-x64.so | Bin 0 -> 7500 bytes
 > 
-> Another DRM_IOCTL_* commands will be done later.
-> 
-> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
-> ---
->  configure                  | 18 +++++++++++
->  linux-user/ioctls.h        |  3 ++
->  linux-user/syscall.c       | 61 ++++++++++++++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  | 15 ++++++++++
->  linux-user/syscall_types.h | 11 +++++++
->  5 files changed, 108 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index e225a1e3ff..2c2c489d1e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3912,6 +3912,24 @@ EOF
->      fi
->  fi
->  
-> +#########################################
-> +# libdrm check
-> +
-> +cat > $TMPC << EOF
-> +#include <libdrm/drm.h>
-> +#include <sys/ioctl.h>
-> +int main(void)
-> +{
-> +        struct drm_version version;
-> +        ioctl(-1, DRM_IOCTL_VERSION, &version);
-> +        return 0;
-> +}
-> +EOF
-> +if ! compile_prog "" ; then
-> +    error_exit "libdrm check failed" \
-> +        "Make sure to have the libdrm/drm.h installed."
-> +fi
+> I'm not really a fan of binaries in source control :-(
 
-You break the build of qemu if libdrm is not available, not a good idea.
+Can't we see that as a firmware or a ROM?
+It's only 7,4 KB and needs a cross-compilation env to be rebuilt.
 
-In fact, you should only check for the include with something like
-"check_include libdrm/drm.h" and then define a HAVE_DRM_H to use it
-around the new code:
+Do you have another solution?
 
-#ifdef HAVE_DRM_H
-#include <libdrm/drm.h>
-#endif
-
-...
-#ifdef HAVE_DRM_H
-static inline abi_long target_to_host_drmversion(...
-...
-#endif
-...
-
-#ifdef HAVE_DRM_H
-IOCTL_SPECIAL(DRM_IOCTL_VERSION,...
-...
-#endif
+If you don't like this I can remove the series. Let me know.
 
 Thanks,
 Laurent
+
 
