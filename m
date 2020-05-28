@@ -6,50 +6,51 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65008C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 03:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D105DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 03:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E6D420C56
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 03:20:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E6D420C56
+	by mail.kernel.org (Postfix) with ESMTPS id 9E44A208B8
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 03:20:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E44A208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1je95P-0002Ho-CI
-	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 23:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52110)
+	id 1je95T-0002R5-So
+	for qemu-devel@archiver.kernel.org; Wed, 27 May 2020 23:20:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1je94e-0000wP-Ms
- for qemu-devel@nongnu.org; Wed, 27 May 2020 23:19:16 -0400
+ id 1je94h-000171-JY
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 23:19:19 -0400
 Received: from mga05.intel.com ([192.55.52.43]:32183)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1je94d-00022M-Mn
- for qemu-devel@nongnu.org; Wed, 27 May 2020 23:19:16 -0400
-IronPort-SDR: uDNvtHWw+Vys11J2XUU7M7QBONXWu/H3sv69OLn9wTnIiHQ6jgrvh9gcX6xWz8kMrCy2J/F4uR
- 4Yfl3HZhkHRw==
+ id 1je94e-00022M-Vn
+ for qemu-devel@nongnu.org; Wed, 27 May 2020 23:19:19 -0400
+IronPort-SDR: kHmnFzon/1VaZDywm9Gqo6VwQI8tAtTdJ5Ct5c3du4rAxKjFdFfDZfYDu9CxMQjIdpgPMyF+0e
+ /JhZX5cGrU1g==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  27 May 2020 20:19:04 -0700
-IronPort-SDR: mVqD7UuuK0pzlLigxY/k0WKh8Iixj1jQRE7w5ekg2DqCtwPlLJTcwGT/+v6XwhEmzgOB38Ohik
- cx/1CayNELNw==
+IronPort-SDR: LjFKusOUpCdcMzwd/6vY5dknjYysVFJ9uKGPyE6ATNDYCOsWRcbWrA20KhYNtHtrZily4xC4yt
+ lbfVVgG7PdJQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,443,1583222400"; d="scan'208";a="310775944"
+X-IronPort-AV: E=Sophos;i="5.73,443,1583222400"; d="scan'208";a="310775953"
 Received: from unknown (HELO localhost.lm.intel.com) ([10.232.116.74])
- by FMSMGA003.fm.intel.com with ESMTP; 27 May 2020 20:19:03 -0700
+ by FMSMGA003.fm.intel.com with ESMTP; 27 May 2020 20:19:04 -0700
 From: Jon Derrick <jonathan.derrick@intel.com>
 To: <linux-pci@vger.kernel.org>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 FOR QEMU v3] hw/vfio: Add VMD Passthrough Quirk
-Date: Wed, 27 May 2020 23:02:38 -0400
-Message-Id: <20200528030240.16024-2-jonathan.derrick@intel.com>
+Subject: [PATCH v3 2/2] PCI: vmd: Use Shadow MEMBAR registers for QEMU/KVM
+ guests
+Date: Wed, 27 May 2020 23:02:40 -0400
+Message-Id: <20200528030240.16024-4-jonathan.derrick@intel.com>
 X-Mailer: git-send-email 2.18.1
 In-Reply-To: <20200528030240.16024-1-jonathan.derrick@intel.com>
 References: <20200528030240.16024-1-jonathan.derrick@intel.com>
@@ -84,132 +85,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The VMD endpoint provides a real PCIe domain to the guest, including
-bridges and endpoints. Because the VMD domain is enumerated by the guest
-kernel, the guest kernel will assign Guest Physical Addresses to the
-downstream endpoint BARs and bridge windows.
+VMD device 28C0 natively assists guest passthrough of the VMD endpoint
+through the use of shadow registers that provide Host Physical Addresses
+to correctly assign bridge windows. These shadow registers are only
+available if VMD config space register 0x70, bit 1 is set.
 
-When the guest kernel performs MMIO to VMD sub-devices, MMU will
-translate from the guest address space to the physical address space.
-Because the bridges have been programmed with guest addresses, the
-bridges will reject the transaction containing physical addresses.
+In order to support this mode in existing VMD devices which don't
+natively support the shadow register, it was decided that the hypervisor
+could offer the shadow registers in a vendor-specific PCI capability.
 
-VMD device 28C0 natively assists passthrough by providing the Host
-Physical Address in shadow registers accessible to the guest for bridge
-window assignment. The shadow registers are valid if bit 1 is set in VMD
-VMLOCK config register 0x70.
-
-In order to support existing VMDs, this quirk provides the shadow
-registers in a vendor-specific PCI capability to the vfio-passthrough
-device for all VMD device ids which don't natively assist with
-passthrough. The Linux VMD driver is updated to check for this new
-vendor-specific capability.
+QEMU has been modified to create this vendor-specific capability and
+supply the shadow membar registers for VMDs which don't natively support
+this feature. This patch adds this mode and updates the supported device
+list to allow this feature to be used on these VMDs.
 
 Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- hw/vfio/pci-quirks.c | 84 +++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 72 insertions(+), 12 deletions(-)
+ drivers/pci/controller/vmd.c | 44 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 38 insertions(+), 6 deletions(-)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 3bd05fed12..6b8c1edfd5 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1567,18 +1567,6 @@ static int vfio_add_nv_gpudirect_cap(VFIOPCIDevice *vdev, Error **errp)
-     return 0;
- }
+diff --git a/drivers/pci/controller/vmd.c b/drivers/pci/controller/vmd.c
+index e386d4e..76d8acb 100644
+--- a/drivers/pci/controller/vmd.c
++++ b/drivers/pci/controller/vmd.c
+@@ -40,13 +40,19 @@ enum vmd_features {
+ 	 * membars, in order to allow proper address translation during
+ 	 * resource assignment to enable guest virtualization
+ 	 */
+-	VMD_FEAT_HAS_MEMBAR_SHADOW	= (1 << 0),
++	VMD_FEAT_HAS_MEMBAR_SHADOW		= (1 << 0),
  
--int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp)
--{
--    int ret;
--
--    ret = vfio_add_nv_gpudirect_cap(vdev, errp);
--    if (ret) {
--        return ret;
--    }
--
--    return 0;
--}
--
- static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
-                                      const char *name,
-                                      void *opaque, Error **errp)
-@@ -1709,3 +1697,75 @@ free_exit:
+ 	/*
+ 	 * Device may provide root port configuration information which limits
+ 	 * bus numbering
+ 	 */
+-	VMD_FEAT_HAS_BUS_RESTRICTIONS	= (1 << 1),
++	VMD_FEAT_HAS_BUS_RESTRICTIONS		= (1 << 1),
++
++	/*
++	 * Device contains physical location shadow registers in
++	 * vendor-specific capability space
++	 */
++	VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP	= (1 << 2),
+ };
  
-     return ret;
- }
+ /*
+@@ -454,6 +460,28 @@ static int vmd_enable_domain(struct vmd_dev *vmd, unsigned long features)
+ 		}
+ 	}
+ 
++	if (features & VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP) {
++		int pos = pci_find_capability(vmd->dev, PCI_CAP_ID_VNDR);
++		u32 reg, regu;
 +
-+/*
-+ * The VMD endpoint provides a real PCIe domain to the guest and the guest
-+ * kernel performs enumeration of the VMD sub-device domain. Guest transactions
-+ * to VMD sub-devices go through MMU translation from guest addresses to
-+ * physical addresses. When MMIO goes to an endpoint after being translated to
-+ * physical addresses, the bridge rejects the transaction because the window
-+ * has been programmed with guest addresses.
-+ *
-+ * VMD can use the Host Physical Address in order to correctly program the
-+ * bridge windows in its PCIe domain. VMD device 28C0 has HPA shadow registers
-+ * located at offset 0x2000 in MEMBAR2 (BAR 4). This quirk provides the HPA
-+ * shadow registers in a vendor-specific capability register for devices
-+ * without native support. The position of 0xE8-0xFF is in the reserved range
-+ * of the VMD device capability space following the Power Management
-+ * Capability.
-+ */
-+#define VMD_SHADOW_CAP_VER 1
-+#define VMD_SHADOW_CAP_LEN 24
-+static int vfio_add_vmd_shadow_cap(VFIOPCIDevice *vdev, Error **errp)
-+{
-+    uint8_t membar_phys[16];
-+    int ret, pos = 0xE8;
++		pci_read_config_dword(vmd->dev, pos + 4, &reg);
 +
-+    if (!(vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, 0x201D) ||
-+          vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, 0x467F) ||
-+          vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, 0x4C3D) ||
-+          vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, 0x9A0B))) {
-+        return 0;
-+    }
++		/* "SHDW" */
++		if (pos && reg == 0x53484457) {
++			pci_read_config_dword(vmd->dev, pos + 8, &reg);
++			pci_read_config_dword(vmd->dev, pos + 12, &regu);
++			offset[0] = vmd->dev->resource[VMD_MEMBAR1].start -
++					(((u64) regu << 32 | reg) &
++					 PCI_BASE_ADDRESS_MEM_MASK);
 +
-+    ret = pread(vdev->vbasedev.fd, membar_phys, 16,
-+                vdev->config_offset + PCI_BASE_ADDRESS_2);
-+    if (ret != 16) {
-+        error_report("VMD %s cannot read MEMBARs (%d)",
-+                     vdev->vbasedev.name, ret);
-+        return -EFAULT;
-+    }
++			pci_read_config_dword(vmd->dev, pos + 16, &reg);
++			pci_read_config_dword(vmd->dev, pos + 20, &regu);
++			offset[1] = vmd->dev->resource[VMD_MEMBAR2].start -
++					(((u64) regu << 32 | reg) &
++					 PCI_BASE_ADDRESS_MEM_MASK);
++		}
++	}
 +
-+    ret = pci_add_capability(&vdev->pdev, PCI_CAP_ID_VNDR, pos,
-+                             VMD_SHADOW_CAP_LEN, errp);
-+    if (ret < 0) {
-+        error_prepend(errp, "Failed to add VMD MEMBAR Shadow cap: ");
-+        return ret;
-+    }
-+
-+    memset(vdev->emulated_config_bits + pos, 0xFF, VMD_SHADOW_CAP_LEN);
-+    pos += PCI_CAP_FLAGS;
-+    pci_set_byte(vdev->pdev.config + pos++, VMD_SHADOW_CAP_LEN);
-+    pci_set_byte(vdev->pdev.config + pos++, VMD_SHADOW_CAP_VER);
-+    pci_set_long(vdev->pdev.config + pos, 0x53484457); /* SHDW */
-+    memcpy(vdev->pdev.config + pos + 4, membar_phys, 16);
-+
-+    return 0;
-+}
-+
-+int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp)
-+{
-+    int ret;
-+
-+    ret = vfio_add_nv_gpudirect_cap(vdev, errp);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = vfio_add_vmd_shadow_cap(vdev, errp);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    return 0;
-+}
+ 	/*
+ 	 * Certain VMD devices may have a root port configuration option which
+ 	 * limits the bus range to between 0-127, 128-255, or 224-255
+@@ -716,16 +744,20 @@ static int vmd_resume(struct device *dev)
+ static SIMPLE_DEV_PM_OPS(vmd_dev_pm_ops, vmd_suspend, vmd_resume);
+ 
+ static const struct pci_device_id vmd_ids[] = {
+-	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_201D),},
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_201D),
++		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP,},
+ 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_28C0),
+ 		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
+ 				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
+ 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x467f),
+-		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
++		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP |
++				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
+ 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x4c3d),
+-		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
++		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP |
++				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
+ 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_9A0B),
+-		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
++		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW_VSCAP |
++				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
+ 	{0,}
+ };
+ MODULE_DEVICE_TABLE(pci, vmd_ids);
 -- 
-2.18.1
+1.8.3.1
 
 
