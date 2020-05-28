@@ -2,94 +2,87 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 366ECC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4478FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:51:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC00C2088E
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BBB32088E
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:51:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iljc1xHz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC00C2088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OPAFaA2C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBB32088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeEFS-0002lz-3P
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:50:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59584)
+	id 1jeEGR-0004No-6d
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:51:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeEDZ-0001QG-Uq
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:48:49 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51441)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeEDY-0001mK-V9
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:48:49 -0400
-Received: by mail-wm1-x343.google.com with SMTP id u13so2284760wml.1
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 01:48:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xL7qK8ZWbzy4gxK/GIFYPzu7RMggLz9h6RNZ0CrW790=;
- b=iljc1xHzcQLyi1uWBs1zHxjLgEYHLFyxYYlAGxYLqontJnLm0198VJvZ4EQYiBD38u
- 6HiA6KCPqIPfs3TgU72YpNwtLfH7x9anzMLuBZckj/9ZXSQvH41bup8qksudTYOsS4JQ
- 8hoHsZ55EDTOjWHAZSs7JLZ/b520Ifr4OCrR03ZWVLaCIwj7Jc97MhJwugAunJgtgmXM
- PGWcYlZXxCtAIRH89iiLOTN3ts/Lgm5YBIYzJAb01IfuE/xd7WUIogdpx9X5GwnLZPiY
- Mg/+f/ctlemaUVMf3GBwSMaD+W7pxbNMRtk73o+YMc/VV+JFb/lbblnofoTIVwe7aqRW
- DAIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xL7qK8ZWbzy4gxK/GIFYPzu7RMggLz9h6RNZ0CrW790=;
- b=VDg0Pi81WCK1XscOikB+/9uQS746IipW9lrPqkzd0ToMEtQDKF9tIpOxh/Zl2be53l
- ZMpy01WDjZSJRxSYGXuPcdTci5KGYHQgS7xMwvA5iRpK5ydNpBJtm6WYBeKqjHqy7ojN
- Hu5tihtTRvc4g8/Tye45WKiFUnnj0ITj3qy+aBpj3r02bz9enAfVODuiKHbRkLZRrtwt
- 49HM3ejQiV9MnKynJB4BVVNYUnB/pIvZZeO4Vcsi5Q9sm1aKc4bbg6j80+yAer/l0PJy
- Y2jAhk3NZ0/kShLnafooieOhsjFAvoS8soMI7GImkhuBAAcWeBxHWQKUaBjlB0dzlkzv
- +aFQ==
-X-Gm-Message-State: AOAM533AnHy/lmwuTCQ9S4eNvK5roQPKFnMKgcQW+Bbwro3uZJotii8q
- XaCIGqPdFyyn6LxYWP2UY7XScZdE8Sw=
-X-Google-Smtp-Source: ABdhPJxhFGCEHVKkTrwOXXeOlh/0Wjgpi5MZMZkiOmwXJZ3frGtTPlOillzpmtewycsKcHGeEVeeVw==
-X-Received: by 2002:a7b:cc06:: with SMTP id f6mr2289132wmh.119.1590655727052; 
- Thu, 28 May 2020 01:48:47 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n9sm5427367wmj.5.2020.05.28.01.48.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 01:48:45 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0158F1FF7E;
- Thu, 28 May 2020 09:48:44 +0100 (BST)
-References: <CADAnahmxeveTRvoN9TN3qgi+_gy5PpSCULy+Cp3Rzj0gaE-p7A@mail.gmail.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Chris Hoy <hoychris01@gmail.com>
-Subject: Re: Fully operable build post
-In-reply-to: <CADAnahmxeveTRvoN9TN3qgi+_gy5PpSCULy+Cp3Rzj0gaE-p7A@mail.gmail.com>
-Date: Thu, 28 May 2020 09:48:44 +0100
-Message-ID: <87mu5s4f83.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jeEFj-00035h-JU
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:51:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55784
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jeEFh-0002i5-OA
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:51:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590655860;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=1C6BG9c/JaMiOIm41N7LYwcVaqkjDcuIb5Ie7fT48xw=;
+ b=OPAFaA2CtRNiTl/YD1dsUtkJbw4hm8M4EHEZi13cs7PZ+i3S1XlOHvy06qxU3+uTJojrwp
+ Z5Z8jLw1f/uKsqh5Eeisojohr6jY4qlqs+WnbUFixIb8Tzxx4n+RDpCvj3x4bPltjt+prz
+ hQmV2o4O6Rbfma5WidY7VfZcRjEGrKI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-UU0POPhrMgO765xHNJN4vA-1; Thu, 28 May 2020 04:50:58 -0400
+X-MC-Unique: UU0POPhrMgO765xHNJN4vA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D586107ACCA;
+ Thu, 28 May 2020 08:50:57 +0000 (UTC)
+Received: from localhost (ovpn-114-90.ams2.redhat.com [10.36.114.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FB795D9EF;
+ Thu, 28 May 2020 08:50:53 +0000 (UTC)
+Date: Thu, 28 May 2020 09:50:52 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v4 3/5] virtio-scsi: default num_queues to -smp N
+Message-ID: <20200528085052.GA148227@stefanha-x1.localdomain>
+References: <20200527102925.128013-1-stefanha@redhat.com>
+ <20200527102925.128013-4-stefanha@redhat.com>
+ <20200527103817.GI2665520@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200527103817.GI2665520@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 03:11:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,48 +95,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--NzB8fVQJ5HfG6fxh
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Chris Hoy <hoychris01@gmail.com> writes:
+On Wed, May 27, 2020 at 11:38:17AM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, May 27, 2020 at 11:29:23AM +0100, Stefan Hajnoczi wrote:
+> > Automatically size the number of virtio-scsi-pci, vhost-scsi-pci, and
+> > vhost-user-scsi-pci request virtqueues to match the number of vCPUs.
+> > Other transports continue to default to 1 request virtqueue.
+>=20
+> IIRC this was raised on earlier versions of the series, but i don't
+> recall the outcome and no caveats are mentioned here...
+>=20
+> Is this default still valid for very large $vCPUs. eg if I run QEMU
+> with "-smp 512" or even larger (I've seen people discussing 1000's of
+> CPUs), is this going to cause problems with the virtio-scsi default
+> queue counts ? Is there such a thing as "too large" for the num
+> of queues setting ?   num vectors defaults to a value derived from
+> num queues, so is there concept of "too large" for num of vectors
+> setting ?
+>=20
+> Ideally the commit message would answer these questions for future
+> reference.  Same for the next patch to virtio-blk
 
-> Hello all,
->
-> I am proud to see that I have my barebones implementation of qemu finally
-> working. After starting earlier this year, I have slowly made progress to
-> fully integrate my kernel hardware into a gpu-passthrough vm. I went
-> through many settings and templates from various sources and finally have
-> something that works for me for a start and would be really interested in
-> lining out my experiences. It is my observation that the documentation may
-> be a bit unevenly distributed on the official page as far as templates go
-> and so if I could help I would like to send my template through the
-> official forum. Any help or advice with this would be greatly
-> appreciated.
+Good point. Actually this patch and the virtio-blk ones no longer
+contain the queue number policy. The new virtio_pci_optimal_num_queues()
+function encapsulates the policy to avoid duplication. I'll resend and
+update that patch with the full rationale.
 
-We have a top level page on contribution here:
+Thanks!
 
-  https://www.qemu.org/contribute/
+--NzB8fVQJ5HfG6fxh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-specifically the page:
+-----BEGIN PGP SIGNATURE-----
 
-  https://wiki.qemu.org/Contribute/SubmitAPatch
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7Pe2wACgkQnKSrs4Gr
+c8gjewf7BFjphWoBtrZIEwZIUOEaV0uAPweq3FBBkF8RyL2CuIbJvefAMqidt3xC
+/Y4edJpqoItQcw+6wocsZtu0dsA39ZD2fi7wDIKluRPI84fY2MzidlKQ51dDNOxH
+DQvtKdA3BFNMFN5VvoCC5RO2KRDCW9kCwBlektSJ785MgxDuD3oK+TgGwwW8gV1G
+ZcfaSFkZ0hzZ7JoVDh4wJuZL5MkqOpXBh8U/aXZpO7pDt998WcnV+1zqdHVOYn+3
+M6AC1r666PoYFckAVb1qMCKV9tQK9Z7Wg05LoQim1OT7aQ3pih3RGRoOYdfg14jn
+/CEptjyYM/ohjf0p5F5FCMHBux0XLQ==
+=3y6w
+-----END PGP SIGNATURE-----
 
-goes into some detail on how to prepare, format and submit your patches.
-Specifically it has notes on basing on master, breaking up a long series
-for easy review and how to submit to the mailing list using git
-send-email.
+--NzB8fVQJ5HfG6fxh--
 
-If there is something you don't understand in those pages or something
-that could be made clearer then please ask for clarification here or on
-the IRC channel.
-
->
-> Best Regards
-
-
---=20
-Alex Benn=C3=A9e
 
