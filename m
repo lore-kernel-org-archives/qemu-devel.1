@@ -2,54 +2,53 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6D7C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C30FC433E0
 	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 05:49:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CDE720899
+	by mail.kernel.org (Postfix) with ESMTPS id 6F2DB20899
 	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 05:49:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDE720899
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2DB20899
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeBPz-0001XW-91
+	id 1jeBPz-0001XA-Jq
 	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 01:49:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37270)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeBPA-0008HX-AN
+ id 1jeBPA-0008He-MH
  for qemu-devel@nongnu.org; Thu, 28 May 2020 01:48:36 -0400
-Received: from mga02.intel.com ([134.134.136.20]:8381)
+Received: from mga02.intel.com ([134.134.136.20]:8378)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeBP9-0001M4-9Z
+ id 1jeBP9-0001Lm-Jv
  for qemu-devel@nongnu.org; Thu, 28 May 2020 01:48:36 -0400
-IronPort-SDR: Y2Y1GCQ+GpVtxpLkcuR7Tv+VpQFhNkRYDhzzSIk44kRbRZ3yebUzXCHtzeBcJCxd9FCyf2Y/xg
- +BRnkx3aMrMA==
+IronPort-SDR: FswJgQz07s1aibU9D4PRVAaPmMwjRF2PzSWRVchg1N/9la1zK6goJIKdaBjEQjxiM5kNWgzV/Y
+ +StDc/SUJnbQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 May 2020 22:48:32 -0700
-IronPort-SDR: 1EYWfMEzbi8C6LozMMzNGf3p/3TkPNHT0VMCOxNrQBKXRA4REOomfA7gJShMelnvUzn+8r+QGn
- C+zURv3MIZKA==
+ 27 May 2020 22:48:33 -0700
+IronPort-SDR: mMRXkf37Q7e+l/NlV31UXirdQRoRXTHCuSi2utKoubVT4a/e2RvwaM6rsr/nWVyg1KG5r8fBoC
+ ruwdZFpheZcQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,443,1583222400"; d="scan'208";a="255696227"
+X-IronPort-AV: E=Sophos;i="5.73,443,1583222400"; d="scan'208";a="255696233"
 Received: from vverma7-mobl4.lm.intel.com ([10.251.137.143])
- by fmsmga007.fm.intel.com with ESMTP; 27 May 2020 22:48:31 -0700
+ by fmsmga007.fm.intel.com with ESMTP; 27 May 2020 22:48:32 -0700
 From: Vishal Verma <vishal.l.verma@intel.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 2/3] hw/acpi-build: account for NVDIMM numa nodes in SRAT
-Date: Wed, 27 May 2020 23:48:06 -0600
-Message-Id: <20200528054807.21278-3-vishal.l.verma@intel.com>
+Subject: [PATCH v2 3/3] tests/acpi: update expected SRAT files
+Date: Wed, 27 May 2020 23:48:07 -0600
+Message-Id: <20200528054807.21278-4-vishal.l.verma@intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200528054807.21278-1-vishal.l.verma@intel.com>
 References: <20200528054807.21278-1-vishal.l.verma@intel.com>
@@ -88,117 +87,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-NVDIMMs can belong to their own proximity domains, as described by the
-NFIT. In such cases, the SRAT needs to have Memory Affinity structures
-in the SRAT for these NVDIMMs, otherwise Linux doesn't populate node
-data structures properly during NUMA initialization. See the following
-for an example failure case.
+Update the expected SRAT files for the change to account for NVDIMM numa
+nodes in the SRAT.
 
-https://lore.kernel.org/linux-nvdimm/20200416225438.15208-1-vishal.l.verma@intel.com/
+AML Diff:
+  --- /tmp/asl-V49YJ0.dsl	2020-04-27 18:50:52.680043327 -0600
+  +++ /tmp/asl-48AZJ0.dsl	2020-04-27 18:50:52.679043344 -0600
+  @@ -3,7 +3,7 @@
+    * AML/ASL+ Disassembler version 20190509 (64-bit version)
+    * Copyright (c) 2000 - 2019 Intel Corporation
+    *
+  - * Disassembly of tests/data/acpi/pc/SRAT.dimmpxm, Mon Apr 27 18:50:52 2020
+  + * Disassembly of /tmp/aml-U3BZJ0, Mon Apr 27 18:50:52 2020
+    *
+    * ACPI Data Table [SRAT]
+    *
+  @@ -13,7 +13,7 @@
+   [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+   [004h 0004   4]                 Table Length : 00000188
+   [008h 0008   1]                     Revision : 01
+  -[009h 0009   1]                     Checksum : 80
+  +[009h 0009   1]                     Checksum : 68
+   [00Ah 0010   6]                       Oem ID : "BOCHS "
+   [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+   [018h 0024   4]                 Oem Revision : 00000001
+  @@ -140,15 +140,15 @@
+   [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
+   [139h 0313   1]                       Length : 28
 
-Fix this by adding device address range and node information from
-NVDIMMs to the SRAT in build_srat().
+  -[13Ah 0314   4]             Proximity Domain : 00000000
+  +[13Ah 0314   4]             Proximity Domain : 00000002
+   [13Eh 0318   2]                    Reserved1 : 0000
+  -[140h 0320   8]                 Base Address : 0000000000000000
+  -[148h 0328   8]               Address Length : 0000000000000000
+  +[140h 0320   8]                 Base Address : 0000000108000000
+  +[148h 0328   8]               Address Length : 0000000008000000
+   [150h 0336   4]                    Reserved2 : 00000000
+  -[154h 0340   4]        Flags (decoded below) : 00000000
+  -                                     Enabled : 0
+  +[154h 0340   4]        Flags (decoded below) : 00000005
+  +                                     Enabled : 1
+                                  Hot Pluggable : 0
+  -                                Non-Volatile : 0
+  +                                Non-Volatile : 1
+   [158h 0344   8]                    Reserved3 : 0000000000000000
 
-The relevant command line options to exercise this are below. Nodes 0-1
-contain CPUs and regular memory, and nodes 2-3 are the NVDIMM address
-space.
+   [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
+  @@ -167,7 +167,7 @@
 
-  -numa node,nodeid=0,mem=2048M,
-  -numa node,nodeid=1,mem=2048M,
-  -numa node,nodeid=2,mem=0,
-  -object memory-backend-file,id=nvmem0,share,mem-path=nvdimm-0,size=16384M,align=128M
-  -device nvdimm,memdev=nvmem0,id=nv0,label-size=2M,node=2
-  -numa node,nodeid=3,mem=0,
-  -object memory-backend-file,id=nvmem1,share,mem-path=nvdimm-1,size=16384M,align=128M
-  -device nvdimm,memdev=nvmem1,id=nv1,label-size=2M,node=3
+   Raw Table Data: Length 392 (0x188)
 
-Cc: Jingqi Liu <jingqi.liu@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+  -    0000: 53 52 41 54 88 01 00 00 01 80 42 4F 43 48 53 20  // SRAT......BOCHS
+  +    0000: 53 52 41 54 88 01 00 00 01 68 42 4F 43 48 53 20  // SRAT.....hBOCHS
+       0010: 42 58 50 43 53 52 41 54 01 00 00 00 42 58 50 43  // BXPCSRAT....BXPC
+       0020: 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  // ................
+       0030: 00 10 00 00 01 00 00 00 00 00 00 00 00 00 00 00  // ................
+  @@ -186,9 +186,9 @@
+       0100: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  // ................
+       0110: 01 28 03 00 00 00 00 00 00 00 00 06 00 00 00 00  // .(..............
+       0120: 00 00 00 02 00 00 00 00 00 00 00 00 01 00 00 00  // ................
+  -    0130: 00 00 00 00 00 00 00 00 01 28 00 00 00 00 00 00  // .........(......
+  -    0140: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  // ................
+  -    0150: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  // ................
+  +    0130: 00 00 00 00 00 00 00 00 01 28 02 00 00 00 00 00  // .........(......
+  +    0140: 00 00 00 08 01 00 00 00 00 00 00 08 00 00 00 00  // ................
+  +    0150: 00 00 00 00 05 00 00 00 00 00 00 00 00 00 00 00  // ................
+       0160: 01 28 03 00 00 00 00 00 00 00 00 00 01 00 00 00  // .(..............
+       0170: 00 00 00 F8 00 00 00 00 00 00 00 00 03 00 00 00  // ................
+       0180: 00 00 00 00 00 00 00 00                          // ........
+
 Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 ---
- hw/acpi/nvdimm.c        | 26 ++++++++++++++++++++++++++
- hw/i386/acpi-build.c    | 10 ++++++++++
- include/hw/mem/nvdimm.h |  1 +
- 3 files changed, 37 insertions(+)
+ tests/data/acpi/pc/SRAT.dimmpxm             | Bin 392 -> 392 bytes
+ tests/data/acpi/q35/SRAT.dimmpxm            | Bin 392 -> 392 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+ 3 files changed, 1 deletion(-)
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 9316d12b70..d322c6a7a7 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -28,6 +28,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/uuid.h"
-+#include "qapi/error.h"
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/bios-linker-loader.h"
-@@ -1334,6 +1335,31 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
-     free_aml_allocator();
- }
- 
-+void *nvdimm_build_srat(GArray *table_data)
-+{
-+    AcpiSratMemoryAffinity *numamem = NULL;
-+    GSList *device_list = nvdimm_get_device_list();
-+
-+    for (; device_list; device_list = device_list->next) {
-+        DeviceState *dev = device_list->data;
-+        uint64_t addr, size;
-+        int node;
-+
-+        node = object_property_get_int(OBJECT(dev), PC_DIMM_NODE_PROP,
-+                                       &error_abort);
-+        addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-+                                        &error_abort);
-+        size = object_property_get_uint(OBJECT(dev), PC_DIMM_SIZE_PROP,
-+                                        &error_abort);
-+
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+        build_srat_memory(numamem, addr, size, node,
-+                          MEM_AFFINITY_ENABLED | MEM_AFFINITY_NON_VOLATILE);
-+    }
-+    g_slist_free(device_list);
-+    return numamem;
-+}
-+
- void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
-                        BIOSLinker *linker, NVDIMMState *state,
-                        uint32_t ram_slots)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2e15f6848e..1461d8a718 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2428,6 +2428,16 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-                               MEM_AFFINITY_ENABLED);
-         }
-     }
-+
-+    if (machine->nvdimms_state->is_enabled) {
-+        void *ret;
-+
-+        ret = nvdimm_build_srat(table_data);
-+        if (ret != NULL) {
-+            numamem = ret;
-+        }
-+    }
-+
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
-         numamem = acpi_data_push(table_data, sizeof *numamem);
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index a3c08955e8..fbe56509b8 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -155,6 +155,7 @@ typedef struct NVDIMMState NVDIMMState;
- void nvdimm_init_acpi_state(NVDIMMState *state, MemoryRegion *io,
-                             struct AcpiGenericAddress dsm_io,
-                             FWCfgState *fw_cfg, Object *owner);
-+void *nvdimm_build_srat(GArray *table_data);
- void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
-                        BIOSLinker *linker, NVDIMMState *state,
-                        uint32_t ram_slots);
+diff --git a/tests/data/acpi/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
+index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+GIT binary patch
+delta 51
+scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+
+delta 51
+icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+
+diff --git a/tests/data/acpi/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
+index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+GIT binary patch
+delta 51
+scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+
+delta 51
+icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index 83d3ea5032..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,2 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/SRAT.dimmpxm",
 -- 
 2.26.2
 
