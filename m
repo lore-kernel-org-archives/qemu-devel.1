@@ -2,80 +2,91 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C28C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8E4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 987722074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B4CA2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 23:03:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="QxWGv/p1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 987722074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OSXhydIc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B4CA2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeRXh-0000Fe-QY
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 19:02:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49070)
+	id 1jeRZ4-0002FL-8r
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 19:03:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jeRRM-00080y-6w; Thu, 28 May 2020 18:55:56 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:42272)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jeRRL-0008QY-4Q; Thu, 28 May 2020 18:55:55 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 32C8B2E129E;
- Fri, 29 May 2020 01:55:53 +0300 (MSK)
-Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
- (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- khWQ9a8QXE-tmImd9j8; Fri, 29 May 2020 01:55:53 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1590706553; bh=itQBN5U3tIfrRjr7457Zr+edY1y64XE74HVeivo86lM=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=QxWGv/p1mseN6guUFN5KYndvGTq4k0mrL5Ss9GRClWK210Mu68nWVZwYo4tHdwoJs
- d+lIK5E30z/7U6EHatw/dmi9UaDzWYrjqjwwQL53PdI5ERCeRwPNvvOGheMBrtWdGx
- Fynmct87UZBGpabgcraQ8zfOg+ZRm9zywA7JMFI4=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:1318::1:10])
- by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- tdfEhvD3Vg-tlWSL1MN; Fri, 29 May 2020 01:55:48 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 8/8] block: lift blocksize property limit to 2 MiB
-Date: Fri, 29 May 2020 01:55:16 +0300
-Message-Id: <20200528225516.1676602-9-rvkagan@yandex-team.ru>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
-References: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jeRUe-000566-AE
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:59:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20250
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jeRUc-000519-T6
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 18:59:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590706755;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Jzbxq2mlHqD0DlEQ0FYL4cGWSmL4FdNDgfV81d/7bRI=;
+ b=OSXhydIcoQhjWIWdGJqBnDzfjm8S4libiA16Hzq3z9l/TCzFi/aDSsipJNz0Dcc6pcTRwZ
+ P1NuzQldT9pi2RQcOxZdRcAKLwKVfK17XhowL3Z2HInzKeG7xfq+/l4Eec+uJr+O6Up4Tw
+ rbBIntq+O9mWt8LM4J5uqDKSAVdX0ws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-sNEQlx0IOQOQbn7UfuparQ-1; Thu, 28 May 2020 18:59:11 -0400
+X-MC-Unique: sNEQlx0IOQOQbn7UfuparQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 812C7107ACF4;
+ Thu, 28 May 2020 22:59:09 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4229C10013D0;
+ Thu, 28 May 2020 22:59:07 +0000 (UTC)
+Date: Thu, 28 May 2020 16:59:06 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200528165906.7d03f689@x1.home>
+In-Reply-To: <20200527084822.GC3001@work-vm>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
+ <20200527084822.GC3001@work-vm>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=77.88.29.217; envelope-from=rvkagan@yandex-team.ru;
- helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:40:18
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:46:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,56 +99,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, John Snow <jsnow@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+ zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, Yan Zhao <yan.y.zhao@intel.com>,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Logical and physical block sizes in QEMU are limited to 32 KiB.
+On Wed, 27 May 2020 09:48:22 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > BTW, for viommu, the downtime data is as below. under the same network
+> > condition and guest memory size, and no running dirty data/memory produced
+> > by device.
+> > (1) viommu off
+> > single-round dirty query: downtime ~100ms   
+> 
+> Fine.
+> 
+> > (2) viommu on
+> > single-round dirty query: downtime 58s   
+> 
+> Youch.
 
-This appears unnecessarily tight, and we've seen bigger block sizes
-handy at times.
+Double Youch!  But we believe this is because we're getting the dirty
+bitmap one IOMMU leaf page at a time, right?  We've enable the kernel
+to get a dirty bitmap across multiple mappings, but QEMU isn't yet
+taking advantage of it.  Do I have this correct?  Thanks,
 
-Lift the limitation up to 2 MiB which appears to be good enough for
-everybody, and matches the qcow2 cluster size limit.
-
-Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- hw/core/qdev-properties.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 63d48db70c..ead35d7ffd 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -784,9 +784,12 @@ const PropertyInfo qdev_prop_size32 = {
- /* lower limit is sector size */
- #define MIN_BLOCK_SIZE          512
- #define MIN_BLOCK_SIZE_STR      "512 B"
--/* upper limit is the max power of 2 that fits in uint16_t */
--#define MAX_BLOCK_SIZE          (32 * KiB)
--#define MAX_BLOCK_SIZE_STR      "32 KiB"
-+/*
-+ * upper limit is arbitrary, 2 MiB looks sufficient for all sensible uses, and
-+ * matches qcow2 cluster size limit
-+ */
-+#define MAX_BLOCK_SIZE          (2 * MiB)
-+#define MAX_BLOCK_SIZE_STR      "2 MiB"
- 
- static void set_blocksize(Object *obj, Visitor *v, const char *name,
-                           void *opaque, Error **errp)
--- 
-2.26.2
+Alex
 
 
