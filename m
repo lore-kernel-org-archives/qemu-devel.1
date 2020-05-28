@@ -2,101 +2,123 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2950AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF1CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:39:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBC22207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBA92207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 17:39:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZDJ3dWp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC22207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="e6sIqBeR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBA92207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeMSF-0001U4-3O
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:36:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52166)
+	id 1jeMV1-0004kB-Uk
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 13:39:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeMO4-000258-Gh
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:32:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44537
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeMO3-0006dr-47
- for qemu-devel@nongnu.org; Thu, 28 May 2020 13:32:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590687129;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kekca5TgxhCTuA3iWE5rHj7nsO0dupRjp/t2vrZeRK4=;
- b=RZDJ3dWp7l4lc8H4F3q0NKY6P6Kkcu8eKvSH+kmhI8gaCCJMGQTSibuMy3BuheymM8Kmc3
- emGDTcvF490t5pyD4K849R+p3X2GiAKeAoLKQ7I16TWCA5QROzM0x6lkEAdsrFR1LMOfSF
- kMv/aRS6wt9UNDxkM0un1BdP4GReWFQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-_LXV9mj1M-6yc-6ugOujjw-1; Thu, 28 May 2020 13:32:04 -0400
-X-MC-Unique: _LXV9mj1M-6yc-6ugOujjw-1
-Received: by mail-wr1-f69.google.com with SMTP id y7so12828430wrd.12
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 10:32:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=kekca5TgxhCTuA3iWE5rHj7nsO0dupRjp/t2vrZeRK4=;
- b=G8kr6Mo03vE7kK16eCIYYCG7IFKxdxOVVPRy7xRu8EXPAL2YRvs+0XPYuzFSlsKGQd
- EeFM+OF8Btyy8WpkVzh5EH/J7G8/v5VmZZnJHZ3P1DPFbCm6XrLl5zjCyqzOhihr6g/z
- ao20h0TErmNWYRlOCftWtrwPHuCfmp9LkDRSvDQVVkbZdKc1bMVJhba8ejFBD+3XJE6v
- 0Q+ZakkkY93wiXgtfCjm5h3lqZnAASw/6e0yDinuTjIMJ9vF/gt3kX/GlOlSrY9mWKhX
- 1P7IAeZKftXY8HknPGHaaqzsDaAKKekaqpJ8anG16JSZbDJuMIeumWh2nd2UQ97np3o4
- rWYQ==
-X-Gm-Message-State: AOAM532FfEbwwB2Olim3nqcvi0qcLK+T/aihdFSk4YtKf17v9fDA/yWw
- JjPoTC/lkwjjmO5huuImcPAmfnUJeyGfsSo4/kkA9Hbb4K7MmoAxZs61uUtY5P0Aa9y+9QkNxgL
- h3O+8ZfSiNUQAzn4=
-X-Received: by 2002:adf:e2c9:: with SMTP id d9mr4499823wrj.227.1590687122709; 
- Thu, 28 May 2020 10:32:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCR+XP9GZCWEFHntH0IImBUe06vsnB3EZU4XdWvfrgyWmk0qvjChUNte4mWsMBMMqLbjChZw==
-X-Received: by 2002:adf:e2c9:: with SMTP id d9mr4499797wrj.227.1590687122378; 
- Thu, 28 May 2020 10:32:02 -0700 (PDT)
-Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id 186sm2203453wma.45.2020.05.28.10.32.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 10:32:01 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 4/5] crypto: Add tls-cipher-suites object
-Date: Thu, 28 May 2020 19:31:40 +0200
-Message-Id: <20200528173141.17495-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200528173141.17495-1-philmd@redhat.com>
-References: <20200528173141.17495-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jeMTr-0003KT-UM; Thu, 28 May 2020 13:38:11 -0400
+Received: from mail-eopbgr20114.outbound.protection.outlook.com
+ ([40.107.2.114]:46945 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jeMTp-0008QX-63; Thu, 28 May 2020 13:38:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JVUD41F7wYYniNKTwK3WG6piN2LBoze03MwiHgqXAxTqQN1q42/YTfXaXh11eyacwKb5gQ4/6BqNbZmjJZrZtOttNqBbVDVk7BtkUGp++7ArzxsplvffPtyX9/TAj6WOKTuZ6EdFmFDdNGEIwotjnRHowf+0xRkyg0l0sgNucsnRdtS/n4hbbMY9BNxFusx9yBaN/wDQvRgYeGHpFViuPWOpxWnZLbjz/CVRwCQRBDVdtXvZoDnXqfRIaQtod29wloSec39BgiBatVxk8ZMJck6lTtbS0/jrqbu24efg6RkzjvjZK6Pma5o3Ah+f6vr5vPqPK1PHsxW7D/LvohYF4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w518G8faY498IqbjpCAoUCqSewfxNeRfNHRxeYJROL8=;
+ b=SESX2IgdJ1939iCoZyMFu7ytEyMCI4GBH6Rzhuu7tLWRkUq5BSoTRF8m+Jqw2/zewjx98SZedyZQHaLIsdRkZAE2hzm7AfVR0p7byWpG3Zw2kv9pcygUwE7uOg2OzdXPtKTHbwRTYBwfEqjMuGlgYolGxGiDqT4hrso5PFEAlDatpIOlWzV1KipX12xb9WrNgxVmcUhoIxr/GWUcxQS+E6A62QNIssX77vbEubDFaTTeM30oD1fT20m5oudifJmpzkBxSuMRdynC97Oj3cuGKTuRZMVQDfGajCwqAI+NzAADrtHi5WOy/y24+uHmwTCjAbnsUYJKHO8FYVGBZd6nlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w518G8faY498IqbjpCAoUCqSewfxNeRfNHRxeYJROL8=;
+ b=e6sIqBeRpbBYfvArmr0ZzfyDqbji40q0JX7EZzoH1p43mEdj9jYx6y1QKMc1Lxq5nVOX0msFOJIwb+YqInwMsarsIljjPDLbf/ZbDfHhQpZBAgUJOV+hCLYruys0N9ZdyLl6wy41Dmmf/f/3zq2gLCXCr7EpnoXYGcJglkaC+OY=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5413.eurprd08.prod.outlook.com (2603:10a6:20b:10a::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.19; Thu, 28 May
+ 2020 17:38:06 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3045.018; Thu, 28 May 2020
+ 17:38:06 +0000
+Subject: Re: [PATCH v3] block: Factor out bdrv_run_co()
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200520144901.16589-1-vsementsov@virtuozzo.com>
+ <20200528151707.GH158218@stefanha-x1.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <99f13039-ae61-fc5e-43fa-8cbc3f3e1bab@virtuozzo.com>
+Date: Thu, 28 May 2020 20:38:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200528151707.GH158218@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR06CA0119.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 06:31:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.178) by
+ AM0PR06CA0119.eurprd06.prod.outlook.com (2603:10a6:208:ab::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3045.17 via Frontend Transport; Thu, 28 May 2020 17:38:05 +0000
+X-Originating-IP: [185.215.60.178]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2c594b08-ba84-4ec3-d7f5-08d8032de107
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5413:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB541317D61B0AD9843C387F73C18E0@AM7PR08MB5413.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0417A3FFD2
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n7fQ6SIgydNmtvOKQ9ZuTTKIs5TOmk2OJ0C6m3X7KcnMs6XmZDApRW9MXzxGDrX12vuPga/mKdV4Y6CWKOmDZv8UZbO/f5F0BauBQ0TDUp8M2Ragl9t51DZeODN130Ry9PPwTB/Dybmz6DjAji9EuO6UfRXXjLFKaChx6uVIY0JBbwZb2F/HoFpAKuxHC282sssmLZI20xhskADvsGnBw9qpoEgVSv3b00klXHohKv4hfjI49+Hn4AfvHCeZ15p9vTmnh30ptPoqTG216RxP0SfnTPGyDaN8UYT3bYQva+v41tSz6C/F2vAa092z1e6KSGpgwcm+YTRGEeVovjN7uBf5ICSGnJRJbSYuqSRwKOO1Hm21ilxcPPXyMd5RIknEosqrViK1A+zPQnyBNqEAYiypK+w5KZ5oFaKAi31KFMlkECyI9B9/yuQjG9kNdmLsTLXr8Hq4KWqv23n7iUobLQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(346002)(136003)(396003)(39850400004)(376002)(52116002)(6486002)(16576012)(107886003)(66556008)(66476007)(6916009)(4326008)(316002)(66946007)(36756003)(5660300002)(31686004)(8676002)(8936002)(26005)(83380400001)(31696002)(186003)(16526019)(2616005)(86362001)(956004)(478600001)(2906002)(966005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: gZERXyBISDYCgzVrHkzSSaWS07mcHzcQrV4IL82vfYE0yE0omp54t//7e/uyoL9M9M4caORYpU6qp8ceHGCJMBIg/IMMeOH+lrqGeuHkWgL46E2da1sWXFh0p2cjl4ZezlwXsw2yDtKNdsNqVQVv6cVR4sRrdxG+aVQkVVXpecLZ6ha7jXrmrq9CZYDTc2BbsFKbDcU7LDVHmpFpoJIc6Bvm20Xr4ZhAqdIcbN2aGk2S3vXl+j/YZzBWn5T0IE7yaHfmxbfrDGiOAx8OFjoBCoKQx9ruJjgVnja52kpZi+KzJIHU5XsxYDnUS5P+OfCCMXzbQ65jdR3DdIPsoFBl2p/u/ce8wDWjk4L61rQmyPtS2HwaxrtnuGgyt500X+NV6k0ZQubF62Zp2RR85LuPtDQuQM17GsTOcQeeQnCTapPzItBTpQIzMWto+XMUhXxFMO0/J6F8yfDFWuBT4ziA/j5lYhlMMVMJWJjT1PcE6eQcsCw1Wisk9lQjeV8thfUQ
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c594b08-ba84-4ec3-d7f5-08d8032de107
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2020 17:38:05.8845 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TipISg4+NGnavHMOiLk/EqIuI/wUocueFpOq2hNhjC7GZ4vliztgJtnY+X//bsHa9LTcNyWHYCyOqTB52MeEamhEaH4+/rU10EJo0Qa1Jpw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5413
+Received-SPF: pass client-ip=40.107.2.114;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 13:38:06
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,269 +132,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, philmd@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Example of use to dump:
+28.05.2020 18:17, Stefan Hajnoczi wrote:
+> On Wed, May 20, 2020 at 05:49:01PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>> We have a few bdrv_*() functions that can either spawn a new coroutine
+>> and wait for it with BDRV_POLL_WHILE() or use a fastpath if they are
+>> alreeady running in a coroutine. All of them duplicate basically the
+>> same code.
+>>
+>> Factor the common code into a new function bdrv_run_co().
+>>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>     [Factor out bdrv_run_co_entry too]
+>> ---
+>>
+>> v3: keep created coroutine in BdrvRunCo struct for debugging [Kevin]
+>>
+>>   block/io.c | 193 ++++++++++++++++++++---------------------------------
+>>   1 file changed, 72 insertions(+), 121 deletions(-)
+> 
+> Thanks, applied to my block tree:
+> https://github.com/stefanha/qemu/commits/block
+> 
+> Stefan
+> 
 
-  $ qemu-system-x86_64 -S \
-    -object tls-cipher-suites,id=mysuite,priority=@SYSTEM \
-    -trace qcrypto\*
-  1590664444.197123:qcrypto_tls_cipher_suite_priority priority: @SYSTEM
-  1590664444.197219:qcrypto_tls_cipher_suite_info data:[0x13, 0x02] version:TLS1.3 name:TLS_AES_256_GCM_SHA384
-  1590664444.197228:qcrypto_tls_cipher_suite_info data:[0x13, 0x03] version:TLS1.3 name:TLS_CHACHA20_POLY1305_SHA256
-  1590664444.197233:qcrypto_tls_cipher_suite_info data:[0x13, 0x01] version:TLS1.3 name:TLS_AES_128_GCM_SHA256
-  1590664444.197236:qcrypto_tls_cipher_suite_info data:[0x13, 0x04] version:TLS1.3 name:TLS_AES_128_CCM_SHA256
-  1590664444.197240:qcrypto_tls_cipher_suite_info data:[0xc0, 0x30] version:TLS1.2 name:TLS_ECDHE_RSA_AES_256_GCM_SHA384
-  1590664444.197245:qcrypto_tls_cipher_suite_info data:[0xcc, 0xa8] version:TLS1.2 name:TLS_ECDHE_RSA_CHACHA20_POLY1305
-  1590664444.197250:qcrypto_tls_cipher_suite_info data:[0xc0, 0x14] version:TLS1.0 name:TLS_ECDHE_RSA_AES_256_CBC_SHA1
-  1590664444.197254:qcrypto_tls_cipher_suite_info data:[0xc0, 0x2f] version:TLS1.2 name:TLS_ECDHE_RSA_AES_128_GCM_SHA256
-  1590664444.197258:qcrypto_tls_cipher_suite_info data:[0xc0, 0x13] version:TLS1.0 name:TLS_ECDHE_RSA_AES_128_CBC_SHA1
-  1590664444.197261:qcrypto_tls_cipher_suite_info data:[0xc0, 0x2c] version:TLS1.2 name:TLS_ECDHE_ECDSA_AES_256_GCM_SHA384
-  1590664444.197266:qcrypto_tls_cipher_suite_info data:[0xcc, 0xa9] version:TLS1.2 name:TLS_ECDHE_ECDSA_CHACHA20_POLY1305
-  1590664444.197270:qcrypto_tls_cipher_suite_info data:[0xc0, 0xad] version:TLS1.2 name:TLS_ECDHE_ECDSA_AES_256_CCM
-  1590664444.197274:qcrypto_tls_cipher_suite_info data:[0xc0, 0x0a] version:TLS1.0 name:TLS_ECDHE_ECDSA_AES_256_CBC_SHA1
-  1590664444.197278:qcrypto_tls_cipher_suite_info data:[0xc0, 0x2b] version:TLS1.2 name:TLS_ECDHE_ECDSA_AES_128_GCM_SHA256
-  1590664444.197283:qcrypto_tls_cipher_suite_info data:[0xc0, 0xac] version:TLS1.2 name:TLS_ECDHE_ECDSA_AES_128_CCM
-  1590664444.197287:qcrypto_tls_cipher_suite_info data:[0xc0, 0x09] version:TLS1.0 name:TLS_ECDHE_ECDSA_AES_128_CBC_SHA1
-  1590664444.197291:qcrypto_tls_cipher_suite_info data:[0x00, 0x9d] version:TLS1.2 name:TLS_RSA_AES_256_GCM_SHA384
-  1590664444.197296:qcrypto_tls_cipher_suite_info data:[0xc0, 0x9d] version:TLS1.2 name:TLS_RSA_AES_256_CCM
-  1590664444.197300:qcrypto_tls_cipher_suite_info data:[0x00, 0x35] version:TLS1.0 name:TLS_RSA_AES_256_CBC_SHA1
-  1590664444.197304:qcrypto_tls_cipher_suite_info data:[0x00, 0x9c] version:TLS1.2 name:TLS_RSA_AES_128_GCM_SHA256
-  1590664444.197308:qcrypto_tls_cipher_suite_info data:[0xc0, 0x9c] version:TLS1.2 name:TLS_RSA_AES_128_CCM
-  1590664444.197312:qcrypto_tls_cipher_suite_info data:[0x00, 0x2f] version:TLS1.0 name:TLS_RSA_AES_128_CBC_SHA1
-  1590664444.197316:qcrypto_tls_cipher_suite_info data:[0x00, 0x9f] version:TLS1.2 name:TLS_DHE_RSA_AES_256_GCM_SHA384
-  1590664444.197320:qcrypto_tls_cipher_suite_info data:[0xcc, 0xaa] version:TLS1.2 name:TLS_DHE_RSA_CHACHA20_POLY1305
-  1590664444.197325:qcrypto_tls_cipher_suite_info data:[0xc0, 0x9f] version:TLS1.2 name:TLS_DHE_RSA_AES_256_CCM
-  1590664444.197329:qcrypto_tls_cipher_suite_info data:[0x00, 0x39] version:TLS1.0 name:TLS_DHE_RSA_AES_256_CBC_SHA1
-  1590664444.197333:qcrypto_tls_cipher_suite_info data:[0x00, 0x9e] version:TLS1.2 name:TLS_DHE_RSA_AES_128_GCM_SHA256
-  1590664444.197337:qcrypto_tls_cipher_suite_info data:[0xc0, 0x9e] version:TLS1.2 name:TLS_DHE_RSA_AES_128_CCM
-  1590664444.197341:qcrypto_tls_cipher_suite_info data:[0x00, 0x33] version:TLS1.0 name:TLS_DHE_RSA_AES_128_CBC_SHA1
-  1590664444.197345:qcrypto_tls_cipher_suite_count count: 29
+Actually, [PATCH v5 0/7] coroutines: generate wrapper code
+substites this patch.. What do you think of it, could we take it instead?
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-v7:
-- Use Laszlo's loop with enum mode (lersek)
-- Convert debug printf to trace events (danpb)
-- Use buildsys CONFIG_GNUTLS instead of C ifdef'ry (danpb)
----
- include/crypto/tls-cipher-suites.h |  38 +++++++++
- crypto/tls-cipher-suites.c         | 127 +++++++++++++++++++++++++++++
- crypto/Makefile.objs               |   1 +
- crypto/trace-events                |   5 ++
- 4 files changed, 171 insertions(+)
- create mode 100644 include/crypto/tls-cipher-suites.h
- create mode 100644 crypto/tls-cipher-suites.c
 
-diff --git a/include/crypto/tls-cipher-suites.h b/include/crypto/tls-cipher-suites.h
-new file mode 100644
-index 0000000000..20a7c74edf
---- /dev/null
-+++ b/include/crypto/tls-cipher-suites.h
-@@ -0,0 +1,38 @@
-+/*
-+ * QEMU TLS Cipher Suites
-+ *
-+ * Copyright (c) 2019 Red Hat, Inc.
-+ *
-+ * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef QCRYPTO_TLSCIPHERSUITES_H
-+#define QCRYPTO_TLSCIPHERSUITES_H
-+
-+#include "qom/object.h"
-+#include "crypto/tlscreds.h"
-+
-+#define TYPE_QCRYPTO_TLS_CIPHER_SUITES "tls-cipher-suites"
-+#define QCRYPTO_TLS_CIPHER_SUITES(obj) \
-+    OBJECT_CHECK(QCryptoTLSCipherSuites, (obj), TYPE_QCRYPTO_TLS_CIPHER_SUITES)
-+
-+/*
-+ * IANA registered TLS ciphers:
-+ * https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
-+ */
-+typedef struct {
-+    uint8_t data[2];
-+} QEMU_PACKED IANA_TLS_CIPHER;
-+
-+typedef struct QCryptoTLSCipherSuites {
-+    /* <private> */
-+    QCryptoTLSCreds parent_obj;
-+
-+    /* <public> */
-+    IANA_TLS_CIPHER *cipher_list;
-+    unsigned cipher_count;
-+} QCryptoTLSCipherSuites;
-+
-+#endif /* QCRYPTO_TLSCIPHERSUITES_H */
-diff --git a/crypto/tls-cipher-suites.c b/crypto/tls-cipher-suites.c
-new file mode 100644
-index 0000000000..f02a041f9a
---- /dev/null
-+++ b/crypto/tls-cipher-suites.c
-@@ -0,0 +1,127 @@
-+/*
-+ * QEMU TLS Cipher Suites
-+ *
-+ * Copyright (c) 2019 Red Hat, Inc.
-+ *
-+ * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "qemu/error-report.h"
-+#include "crypto/tlscreds.h"
-+#include "crypto/tls-cipher-suites.h"
-+#include "trace.h"
-+
-+static void parse_cipher_suites(QCryptoTLSCipherSuites *s,
-+                                const char *priority_name, Error **errp)
-+{
-+    int ret;
-+    const char *err;
-+    gnutls_priority_t pcache;
-+    enum { M_ENUMERATE, M_GENERATE, M_DONE } mode;
-+
-+    assert(priority_name);
-+    trace_qcrypto_tls_cipher_suite_priority(priority_name);
-+    ret = gnutls_priority_init(&pcache, priority_name, &err);
-+    if (ret < 0) {
-+        error_setg(errp, "Syntax error using priority '%s': %s",
-+                   priority_name, gnutls_strerror(ret));
-+        return;
-+    }
-+
-+    for (mode = M_ENUMERATE; mode < M_DONE; mode++) {
-+        size_t i;
-+
-+        for (i = 0;; i++) {
-+            int ret;
-+            unsigned idx;
-+            const char *name;
-+            IANA_TLS_CIPHER cipher;
-+            gnutls_protocol_t protocol;
-+
-+            ret = gnutls_priority_get_cipher_suite_index(pcache, i, &idx);
-+            if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-+                break;
-+            }
-+            if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE) {
-+                continue;
-+            }
-+
-+            name = gnutls_cipher_suite_info(idx, (unsigned char *)&cipher,
-+                                            NULL, NULL, NULL, &protocol);
-+            if (name == NULL) {
-+                continue;
-+            }
-+
-+            if (mode == M_GENERATE) {
-+                const char *version;
-+
-+                version = gnutls_protocol_get_name(protocol);
-+                trace_qcrypto_tls_cipher_suite_info(cipher.data[0],
-+                                                    cipher.data[1],
-+                                                    version, name);
-+                s->cipher_list[s->cipher_count] = cipher;
-+            }
-+            s->cipher_count++;
-+        }
-+
-+        if (mode == M_ENUMERATE) {
-+            if (s->cipher_count == 0) {
-+                break;
-+            }
-+            s->cipher_list = g_new(IANA_TLS_CIPHER, s->cipher_count);
-+            s->cipher_count = 0;
-+        }
-+    }
-+    trace_qcrypto_tls_cipher_suite_count(s->cipher_count);
-+    gnutls_priority_deinit(pcache);
-+}
-+
-+static void qcrypto_tls_cipher_suites_complete(UserCreatable *uc, Error **errp)
-+{
-+    QCryptoTLSCreds *s = QCRYPTO_TLS_CREDS(uc);
-+
-+    if (!s->priority) {
-+        error_setg(errp, "'priority' property is not set");
-+        return;
-+    }
-+    parse_cipher_suites(QCRYPTO_TLS_CIPHER_SUITES(s), s->priority, errp);
-+}
-+
-+static void qcrypto_tls_cipher_suites_finalize(Object *obj)
-+{
-+    QCryptoTLSCipherSuites *s = QCRYPTO_TLS_CIPHER_SUITES(obj);
-+
-+    g_free(s->cipher_list);
-+}
-+
-+static void qcrypto_tls_cipher_suites_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+
-+    ucc->complete = qcrypto_tls_cipher_suites_complete;
-+}
-+
-+static const TypeInfo qcrypto_tls_cipher_suites_info = {
-+    .parent = TYPE_QCRYPTO_TLS_CREDS,
-+    .name = TYPE_QCRYPTO_TLS_CIPHER_SUITES,
-+    .instance_size = sizeof(QCryptoTLSCipherSuites),
-+    .instance_finalize = qcrypto_tls_cipher_suites_finalize,
-+    .class_size = sizeof(QCryptoTLSCredsClass),
-+    .class_init = qcrypto_tls_cipher_suites_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void qcrypto_tls_cipher_suites_register_types(void)
-+{
-+    type_register_static(&qcrypto_tls_cipher_suites_info);
-+}
-+
-+type_init(qcrypto_tls_cipher_suites_register_types);
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index c2a371b0b4..1c1b5e21ff 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -13,6 +13,7 @@ crypto-obj-y += cipher.o
- crypto-obj-$(CONFIG_AF_ALG) += afalg.o
- crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
- crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
-+crypto-obj-$(CONFIG_GNUTLS) += tls-cipher-suites.o
- crypto-obj-y += tlscreds.o
- crypto-obj-y += tlscredsanon.o
- crypto-obj-y += tlscredspsk.o
-diff --git a/crypto/trace-events b/crypto/trace-events
-index 9e594d30e8..c07a752b50 100644
---- a/crypto/trace-events
-+++ b/crypto/trace-events
-@@ -21,3 +21,8 @@ qcrypto_tls_creds_x509_load_cert_list(void *creds, const char *file) "TLS creds
- # tlssession.c
- qcrypto_tls_session_new(void *session, void *creds, const char *hostname, const char *authzid, int endpoint) "TLS session new session=%p creds=%p hostname=%s authzid=%s endpoint=%d"
- qcrypto_tls_session_check_creds(void *session, const char *status) "TLS session check creds session=%p status=%s"
-+
-+# tls-cipher-suites.c
-+qcrypto_tls_cipher_suite_priority(const char *name) "priority: %s"
-+qcrypto_tls_cipher_suite_info(uint8_t data0, uint8_t data1, const char *version, const char *name) "data:[0x%02x, 0x%02x] version:%s name:%s"
-+qcrypto_tls_cipher_suite_count(unsigned count) "count: %u"
 -- 
-2.21.3
-
+Best regards,
+Vladimir
 
