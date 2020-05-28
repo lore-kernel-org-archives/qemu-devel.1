@@ -4,80 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B407C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B02C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:54:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1422206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FE50206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:54:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRwpYQeM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1422206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tb+bfidc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FE50206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeQQ5-000139-Vn
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 17:50:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39008)
+	id 1jeQTn-0002gA-8N
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 17:54:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQMd-0004S9-Ss
- for qemu-devel@nongnu.org; Thu, 28 May 2020 17:46:59 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50699
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQSw-0001ot-AH
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 17:53:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43288
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQMc-0005oo-P0
- for qemu-devel@nongnu.org; Thu, 28 May 2020 17:46:59 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQSu-0002LR-Lz
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 17:53:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590702418;
+ s=mimecast20190719; t=1590702807;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=V0pRPNGUX2oCMzddlIiBI2W3R+cSD6MK8vxPHoVUMtw=;
- b=RRwpYQeME94hocFA/sC0WU/MT9m6HUEElevFgDu6Ho1CCA1NruYzm064H9ibuduj/QrVUF
- 5w7M+ca9V+wcooFnb24dgwKgIk1BrtiXYld+uj/vAlz1H0YWXBBEXIt/eVmRImMKkM4NY3
- T17UOFfmch3JZU1F68A/SE4Jtohgi3Q=
+ bh=GiVumsXOj6XnWRoyp7j8nZNDqWEQBH1FAMwCBk4UFKE=;
+ b=Tb+bfidc61rVN2OJQ3yBy33tNwJHTBcWWAB9uovxb5X4xmOU4E8Shj4XTCnotUTUQzPfey
+ qB9gWlcIS6QttHpr+svbQmw2Le9TPhFjLglSOpjD/nisq46CJ0tfGNeid7ff+vIOUHjQyS
+ p6gvWSvSFhWp8LI7GPSKRSuKhpgAoy4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-wkXx4XWbP_GhfeGr0WPl_g-1; Thu, 28 May 2020 17:46:54 -0400
-X-MC-Unique: wkXx4XWbP_GhfeGr0WPl_g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-234-e215EmtEMfO9UYzBHDxWlg-1; Thu, 28 May 2020 17:53:25 -0400
+X-MC-Unique: e215EmtEMfO9UYzBHDxWlg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5536835B40;
- Thu, 28 May 2020 21:46:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9E8518FF661;
+ Thu, 28 May 2020 21:53:23 +0000 (UTC)
 Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1952D7E467;
- Thu, 28 May 2020 21:46:43 +0000 (UTC)
-Subject: Re: [PATCH v7 5/8] qdev-properties: make blocksize accept size
- suffixes
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C1ED5D9CD;
+ Thu, 28 May 2020 21:53:14 +0000 (UTC)
+Subject: Re: [PATCH v7 6/8] block: make BlockConf size props 32bit and accept
+ size suffixes
 To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org
 References: <20200528213946.1636444-1-rvkagan@yandex-team.ru>
- <20200528213946.1636444-6-rvkagan@yandex-team.ru>
+ <20200528213946.1636444-7-rvkagan@yandex-team.ru>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <a4e3fa72-7ad2-8be0-d714-14505be1373b@redhat.com>
-Date: Thu, 28 May 2020 16:46:42 -0500
+Message-ID: <0439aa5e-413c-cf7e-83b7-1e942a882f5a@redhat.com>
+Date: Thu, 28 May 2020 16:53:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200528213946.1636444-6-rvkagan@yandex-team.ru>
+In-Reply-To: <20200528213946.1636444-7-rvkagan@yandex-team.ru>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:42:57
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:53:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -114,16 +114,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/28/20 4:39 PM, Roman Kagan wrote:
-> It appears convenient to be able to specify physical_block_size and
-> logical_block_size using common size suffixes.
+> Convert all size-related properties in BlockConf to 32bit.  This will
+> allow to accomodate bigger block sizes (in a followup patch).
+
+s/allow to accomodate/accommodate/
+
+> This also allows to make them all accept size suffixes, either via
+> DEFINE_PROP_BLOCKSIZE or via DEFINE_PROP_SIZE32.
 > 
-> Teach the blocksize property setter to interpret them.  Also express the
-> upper and lower limits in the respective units.
+> Also, since min_io_size is exposed to the guest by scsi and virtio-blk
+> devices as an uint16_t in units of logical blocks, introduce an
+> additional check in blkconf_blocksizes to prevent its silent truncation.
 > 
 > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
 > ---
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> +    if (conf->min_io_size / conf->logical_block_size > UINT16_MAX) {
+> +        error_setg(errp,
+> +                   "min_io_size must not exceed " stringify(UINT16_MAX)
+> +                   " logical blocks");
+
+On my libc, this results in "must not exceed (65535) logical blocks".
+
+Worse, I could envision a platform where it prints something funky like:
+
+"exceed (2 * (32768) + 1) logical", based on however complex the 
+definition of UINT16_MAX is.  You're better off printing this one with 
+%d than with stringify().
 
 -- 
 Eric Blake, Principal Software Engineer
