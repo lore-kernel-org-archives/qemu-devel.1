@@ -2,83 +2,85 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82440C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9937C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:10:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 575B32072D
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:09:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575B32072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4EAD2071A
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 16:10:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hPt5FD3Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4EAD2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeL5q-0007It-FA
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 12:09:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36862)
+	id 1jeL6r-0008CO-Sf
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 12:10:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeL2E-0004ps-9f
- for qemu-devel@nongnu.org; Thu, 28 May 2020 12:05:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:32080)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jeL2C-0002J6-2w
- for qemu-devel@nongnu.org; Thu, 28 May 2020 12:05:33 -0400
-IronPort-SDR: +XJ97uR54qhEvtUGnxR5Er0PaH//8epWyMRdr4P5+bXhkSCIFJho+PZzGxUWcaZ7Htky143Ofe
- wHiNreZSJLbQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 May 2020 09:05:23 -0700
-IronPort-SDR: KKrR/KtBbgMgbTCOyXU1WJ+83hjt3nPACg/tgNOv7OUa+XxNEes8W1uPmjflg7/88TokQyxRn/
- dWoKQGJxn7Sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,445,1583222400"; d="scan'208";a="302857683"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
- by orsmga008.jf.intel.com with ESMTP; 28 May 2020 09:05:23 -0700
-Received: from orsmsx121.amr.corp.intel.com ([169.254.10.222]) by
- ORSMSX105.amr.corp.intel.com ([169.254.2.143]) with mapi id 14.03.0439.000;
- Thu, 28 May 2020 09:05:22 -0700
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "imammedo@redhat.com" <imammedo@redhat.com>
-Subject: Re: [PATCH v2 2/3] hw/acpi-build: account for NVDIMM numa nodes in
- SRAT
-Thread-Topic: [PATCH v2 2/3] hw/acpi-build: account for NVDIMM numa nodes in
- SRAT
-Thread-Index: AQHWNLOi43Pbr9sMpUeIFidMXr7HDai9z7oAgABPWoA=
-Date: Thu, 28 May 2020 16:05:22 +0000
-Message-ID: <7bbbc2706e7b886d55aa23b5ae67200a363f7b6f.camel@intel.com>
-References: <20200528054807.21278-1-vishal.l.verma@intel.com>
- <20200528054807.21278-3-vishal.l.verma@intel.com>
- <20200528131946.3a09cd20@redhat.com>
-In-Reply-To: <20200528131946.3a09cd20@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.32.5 (3.32.5-1.fc30) 
-x-originating-ip: [10.18.116.7]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F545879F8FA9184B9518F9065365A8FC@intel.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jeL2l-0005fL-6L
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 12:06:07 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:41868)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jeL2g-0002RO-T5
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 12:06:06 -0400
+Received: by mail-oi1-x230.google.com with SMTP id 23so466398oiq.8
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 09:06:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FmQPhQdx38sSy1VSGWvWI0AsSYe4MKxKZySiJlpQwj0=;
+ b=hPt5FD3Z2jXehFijuQkilXjxAiwcpKGwSECqxvUqgW2EpuIrZ4iUzB2TJrqJQrYtA7
+ BZxRCZDpnLZoyDiVNfjxr0MW5ZAld1CkNuF2ju7jrfa3Fh7RHG2MuZak8obNoIpMZ2AW
+ jBLX/OATQPtT27V6wyOzy0lrXErWNKmGyrJk3X/q7cx71wpbqLNJh5VjyBrM22oZ5uTG
+ 7xYS0qrAaqby7GJGH4JsSiqhkBu1oRSd8+tTR+OqfZRwrvc4LijBLVczfrd8j3S9OCnb
+ ErJiqVVFX5GR4pZ6Dlz5PkgW3kFYtkL5p3SEPORFmnrOUOjCDrwPN0wngtUmUvIurhvK
+ ezgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FmQPhQdx38sSy1VSGWvWI0AsSYe4MKxKZySiJlpQwj0=;
+ b=ZtSYXm7i5jovhJ3oBTKjizsgmZ+9RAOiMWjQZsh+YdcRdji9G9qfJ4bzQ23xh1wDa7
+ vjCxGm2AJdNz+eHb30d53dxT9jGfSIBp1XTw1xswJwV4WfXrJA6y6lQl252Z06PP/mzW
+ OXmHpfpNpIHAHVczuYRPKZq+VuVw67TuzRM6sDMJ0+AWhQLalnFwq9Hb1irN1753iMDC
+ 0hzIAbOGxPAQfgdCa3bDZlEgOiOeQj8vaim4AVN/Erif07RUJuWlWelEQCDOF7zOnUfX
+ fdbk9lyzzN6209KMyPJ/s1XdLdl8kA7Djo3AQWoenk6/lqKF1j1fAdcVa9Wm38+A5MCN
+ 7IYA==
+X-Gm-Message-State: AOAM531/zEFmeGPPkDF/z5hhjTinuEsUvoYD2rkxbivyGT18GLXyq4Mc
+ ybaKs5yUPSz4CzQZG1M8k0s7Mxo06GsJAEyFKnI3wA==
+X-Google-Smtp-Source: ABdhPJyLT8dktE4Jw/Pc23dJ3JeBtTBOpRvj//6grBrLrE9bTR1cx+ZDGwvoAlOh1QON5pzGGcWkgJXbsbzZ6PB8kaM=
+X-Received: by 2002:aca:ed16:: with SMTP id l22mr2591402oih.146.1590681961062; 
+ Thu, 28 May 2020 09:06:01 -0700 (PDT)
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.43;
- envelope-from=vishal.l.verma@intel.com; helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 12:05:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200528101039.24600-1-thuth@redhat.com>
+In-Reply-To: <20200528101039.24600-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 May 2020 17:05:50 +0100
+Message-ID: <CAFEAcA9Q4rE2zDywq=4fe86hwZY82psZre7BCTUMAOHYkcEqpw@mail.gmail.com>
+Subject: Re: [PULL 0/7] Gitlab CI fixes and improvements
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::230;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x230.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,43 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gVGh1LCAyMDIwLTA1LTI4IGF0IDEzOjE5ICswMjAwLCBJZ29yIE1hbW1lZG92IHdyb3RlOg0K
-DQpbLi5dDQo+ID4gQEAgLTEzMzQsNiArMTMzNSwzMSBAQCBzdGF0aWMgdm9pZCBudmRpbW1fYnVp
-bGRfc3NkdChHQXJyYXkgKnRhYmxlX29mZnNldHMsIEdBcnJheSAqdGFibGVfZGF0YSwNCj4gPiAg
-ICAgIGZyZWVfYW1sX2FsbG9jYXRvcigpOw0KPiA+ICB9DQo+ID4gIA0KPiA+ICt2b2lkICpudmRp
-bW1fYnVpbGRfc3JhdChHQXJyYXkgKnRhYmxlX2RhdGEpDQo+ID4gK3sNCj4gPiArICAgIEFjcGlT
-cmF0TWVtb3J5QWZmaW5pdHkgKm51bWFtZW0gPSBOVUxMOw0KPiA+ICsgICAgR1NMaXN0ICpkZXZp
-Y2VfbGlzdCA9IG52ZGltbV9nZXRfZGV2aWNlX2xpc3QoKTsNCj4gPiArDQo+ID4gKyAgICBmb3Ig
-KDsgZGV2aWNlX2xpc3Q7IGRldmljZV9saXN0ID0gZGV2aWNlX2xpc3QtPm5leHQpIHsNCj4gPiAr
-ICAgICAgICBEZXZpY2VTdGF0ZSAqZGV2ID0gZGV2aWNlX2xpc3QtPmRhdGE7DQo+IEknZCB1c2Ug
-T2JqZWN0IGhlcmUgd2l0aCBPQkpFQ1QoKSBjYXN0IGFuZCBkcm9wIGNhc3RzIGJlb2x3IGluIHBy
-b3BlcnR5IGdldHRlcnMNCj4gDQpEb25lLCB0aGF0IG1ha2VzIGl0IG11Y2ggY2xlYW5lci4NCg0K
-PiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2FjcGktYnVpbGQuYyBiL2h3L2kzODYvYWNwaS1idWls
-ZC5jDQo+ID4gaW5kZXggMmUxNWY2ODQ4ZS4uMTQ2MWQ4YTcxOCAxMDA2NDQNCj4gPiAtLS0gYS9o
-dy9pMzg2L2FjcGktYnVpbGQuYw0KPiA+ICsrKyBiL2h3L2kzODYvYWNwaS1idWlsZC5jDQo+ID4g
-QEAgLTI0MjgsNiArMjQyOCwxNiBAQCBidWlsZF9zcmF0KEdBcnJheSAqdGFibGVfZGF0YSwgQklP
-U0xpbmtlciAqbGlua2VyLCBNYWNoaW5lU3RhdGUgKm1hY2hpbmUpDQo+ID4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIE1FTV9BRkZJTklUWV9FTkFCTEVEKTsNCj4gPiAgICAgICAgICB9
-DQo+ID4gICAgICB9DQo+ID4gKw0KPiA+ICsgICAgaWYgKG1hY2hpbmUtPm52ZGltbXNfc3RhdGUt
-PmlzX2VuYWJsZWQpIHsNCj4gPiArICAgICAgICB2b2lkICpyZXQ7DQo+ID4gKw0KPiA+ICsgICAg
-ICAgIHJldCA9IG52ZGltbV9idWlsZF9zcmF0KHRhYmxlX2RhdGEpOw0KPiA+ICsgICAgICAgIGlm
-IChyZXQgIT0gTlVMTCkgew0KPiA+ICsgICAgICAgICAgICBudW1hbWVtID0gcmV0Ow0KPiA+ICsg
-ICAgICAgIH0NCj4gDQo+IHdoeSBkbyB3ZSBuZWVkIHJldHVybiB2YWx1ZSBoZXJlIGFuZCBhIHRl
-c3QgY29uZGl0aW9uIGFuZCBhc3NpZ24gJ3JldCcgdG8gbnVtYW1lbT8NCg0KQWggSSB0aG91Z2h0
-IG51bWFtZW0gd2FzIHByb3BhZ2F0ZWQgdGhyb3VnaCB0aGUgZGlmZmVyZW50IHBhcnRzIG9mIHRo
-ZQ0KYnVpbGRfc3JhdCBmbG93LCBidXQgSSBtaXNyZWFkLiBZb3UncmUgcmlnaHQgaXQgaXMgbm90
-IG5lZWRlZCwgcmVtb3ZpbmcuDQoNCg==
+On Thu, 28 May 2020 at 11:10, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter,
+>
+> the following changes since commit 06539ebc76b8625587aa78d646a9d8d5fddf84f3:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/mips-hw-next-20200526' into staging (2020-05-26 20:25:06 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2020-05-28
+>
+> for you to fetch changes up to 0016afa250d251a1b3fbc90c6d618e7f00e02f14:
+>
+>   gitlab-ci: Determine the number of jobs dynamically (2020-05-28 11:01:38 +0200)
+>
+> ----------------------------------------------------------------
+> - Build with other images instead of the broken Debian containers
+> - Fix building with the latest version of Clang (at least wrt. to
+>   the gitlab-CI pipeline)
+> - Add Philippe, Alex and Wainer to the Gitlab-CI section in MAINTAINERS
+> ----------------------------------------------------------------
+
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
