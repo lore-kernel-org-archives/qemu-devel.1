@@ -4,119 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5336CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 18:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7421DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 203092074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 18:51:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49865207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 19:12:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ag/MgwjN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 203092074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ACVFIa7n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49865207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeNcQ-0002Gq-6U
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 14:51:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
+	id 1jeNwu-0004FP-CZ
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 15:12:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jeNbj-0001Ui-NV; Thu, 28 May 2020 14:50:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56933
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jeNbi-0000RK-9j; Thu, 28 May 2020 14:50:23 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04SI3GCG169537; Thu, 28 May 2020 14:50:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type; s=pp1; bh=Li95ceZ3v2ln5HhMyqtu2zKdVNbMuRJ+mBidky84Nz4=;
- b=Ag/MgwjNEE5OE5kZ7cHbKPZXx2Ef/rAMBCMCuDm8tjo7M4Lj0yICukAT28cRyRPaeT9U
- pRTmU5jF9Ch0Ix3OmkB3+DVyXNhH8dPkBZGvnWTrn+F/DBxIy4zsC18vG1t1GWpUHGah
- gf/4lF+k3V/h8VGcRqnhysV/scE5D4chDMWpmz9HgovZfioE0aiPNTpUrm7chsneua2v
- syMmqUWqBZpiVht92FkCwHuDMTw5bvW4OC4ifFPTx6ZakcpgG5Y2Nf9HvWdQ//LP0wUN
- gEur3yM/oEwgjY1mjMZEBfu8LLEXOVw1Re48+sANipgsXwkiKC859k3tU7ZNi85rMp0T 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31agujv9us-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 28 May 2020 14:50:20 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04SI3S9K170566;
- Thu, 28 May 2020 14:50:19 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31agujv9th-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 28 May 2020 14:50:19 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04SIfgbV016373;
- Thu, 28 May 2020 18:50:18 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma04ams.nl.ibm.com with ESMTP id 316uf92f6g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 28 May 2020 18:50:18 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04SIoF6763045788
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 28 May 2020 18:50:15 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0AB284C050;
- Thu, 28 May 2020 18:50:15 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 763384C040;
- Thu, 28 May 2020 18:50:13 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.21.214])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 28 May 2020 18:50:13 +0000 (GMT)
-Date: Thu, 28 May 2020 20:49:56 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200528204956.657e4a05.pasic@linux.ibm.com>
-In-Reply-To: <eb340fdb-9453-2227-53f1-c507b3698f32@linux.ibm.com>
-References: <20200514221155.32079-1-pasic@linux.ibm.com>
- <20200520121507-mutt-send-email-mst@kernel.org>
- <20200522230451.632a3787.pasic@linux.ibm.com>
- <20200528132112.2a1fdf45.cohuck@redhat.com>
- <eb340fdb-9453-2227-53f1-c507b3698f32@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeNwL-0003oe-FZ
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 15:11:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57720
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeNwJ-00081w-RG
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 15:11:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590693097;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qoHmuYITB9VyuergFeembIQ/Eu1kdKqmFCwJpoJQo6Q=;
+ b=ACVFIa7nd89/u9PVxo7A0vprAxJSDUGCNro6GgOKgpEgk7r8XL+yX5AjLkCpsx2NijNNcJ
+ hRM7HFL2IpArudjOs9rpgo5ks98PP8yMVeXIrY8BA+/Wi7kRdYWsQD8FxeR2pF9hklZQDo
+ sZMnrJKctrph7No4IIH2/B3Yx9tskng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109--9JgHaspPL6-Rs8eLNVe4Q-1; Thu, 28 May 2020 15:11:10 -0400
+X-MC-Unique: -9JgHaspPL6-Rs8eLNVe4Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EC5D1005510;
+ Thu, 28 May 2020 19:11:09 +0000 (UTC)
+Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D15DD1A91F;
+ Thu, 28 May 2020 19:11:07 +0000 (UTC)
+Subject: Re: [PATCH v7 28/32] qcow2: Add subcluster support to
+ qcow2_co_pwrite_zeroes()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1590429901.git.berto@igalia.com>
+ <e037ed54599e7bf4d76bf8cd8db1904a20ffc6dd.1590429901.git.berto@igalia.com>
+ <467e4184-2cee-a9e9-9cf0-ee6050ea4319@redhat.com>
+ <w51sgfkt81f.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0adafac6-15e8-96eb-6c3f-bb9c182fb2d1@redhat.com>
+Date: Thu, 28 May 2020 14:11:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/OOscOCvg=QWs+53BK9IOFDA"; protocol="application/pgp-signature"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-05-28_04:2020-05-28,
- 2020-05-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 phishscore=0
- spamscore=0 clxscore=1015 suspectscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 mlxscore=0 lowpriorityscore=0 cotscore=-2147483648
- malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005280122
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 14:50:20
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+In-Reply-To: <w51sgfkt81f.fsf@maestria.local.igalia.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 02:50:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,132 +99,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/OOscOCvg=QWs+53BK9IOFDA
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/28/20 10:04 AM, Alberto Garcia wrote:
+> On Wed 27 May 2020 07:58:10 PM CEST, Eric Blake wrote:
+>>> There is just one thing to take into account for a possible future
+>>> improvement: compressed clusters cannot be partially zeroized so
+>>> zero_l2_subclusters() on the head or the tail can return -ENOTSUP.
+>>> This makes the caller repeat the *complete* request and write actual
+>>> zeroes to disk. This is sub-optimal because
+>>>
+>>>      1) if the head area was compressed we would still be able to use
+>>>         the fast path for the body and possibly the tail.
+>>>
+>>>      2) if the tail area was compressed we are writing zeroes to the
+>>>         head and the body areas, which are already zeroized.
+>>
+>> Is this true?  The block layer tries hard to break zero requests up so
+>> that any non-cluster-aligned requests do not cross cluster boundaries.
+>> In practice, that means that when you have an unaligned request, the
+>> head and tail cluster will be the same cluster, and there is no body in
+>> play, so that returning -ENOTSUP is correct because there really is no
+>> other work to do and repeating the entire request (which is less than a
+>> cluster in length) is the right approach.
+> 
+> Let's use an example.
+> 
+> cluster size is 64KB, subcluster size is 2KB, and we get this request:
+> 
+>     write -z 31k 130k
+> 
+> Since pwrite_zeroes_alignment equals the cluster size (64KB), this
+> would result in 3 calls to qcow2_co_pwrite_zeroes():
+> 
+>     offset=31k  size=33k    [-ENOTSUP, writes actual zeros]
+>     offset=64k  size=64k    [zeroized using the relevant metadata bits]
+>     offset=128k size=33k    [-ENOTSUP, writes actual zeros]
+> 
+> However this patch changes the alignment:
+> 
+>      bs->bl.pwrite_zeroes_alignment = s->subcluster_size;
 
-On Thu, 28 May 2020 16:42:49 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Ah, I missed that trick.  But it is nice, and indeed...
 
-> On 5/28/20 1:21 PM, Cornelia Huck wrote:
-> >> I think we have "allow protected" already expressed via cpu models. I'm
-> >> also not sure how libvirt would react to the idea of a new machine
-> >> property for this. You did mean "allow protected" as machine property,
-> >> or?
-> >=20
-> > "Unpack facility in cpu model" means "guest may transition into pv
-> > mode", right? What does it look like when the guest actually has
-> > transitioned?
->=20
-> Well, we don't sync the features that the protected guest has back into
-> QEMU. So basically the VM doesn't really change except for ms->pv now
-> being true.
->=20
+> 
+> so we get these instead:
+> 
+>     offset=31k  size=1k     [-ENOTSUP, writes actual zeros]
+>     offset=32k  size=128k   [zeroized using the relevant metadata bits]
+>     offset=160k size=1k     [-ENOTSUP, writes actual zeros]
+> 
+> So far, so good. Reducing the alignment requirements allows us to
+> maximize the number of subclusters to zeroize.
 
-The features as observed by the guest do change, some quite drastically,
-it is just that the CPU model maintained by QEMU does not change. That
-is the changes can not be inspected.=20
+...we can now hit a request that is not cluster-aligned.
 
-Unfortunately I'm not very familiar with the details, but my guess is
-that
-a) the ultravisor does what needs to be done with regards to features
-that are obligatory or not prohibited in PV mode.
-b) either the initial CPU model determines the CPU model after the
-conversion fully, or we will need to express something more via
-the QEMU cpu model. But we will have to do a fair amount of work
-before we get migration, and I would hate to wait with this until
-then.
+> 
+> Now let's suppose we have this request:
+> 
+>     write -z 32k 128k
+> 
+> This one is aligned so it goes directly to qcow2_co_pwrite_zeroes().
+> However if the third cluster is compressed then the function will
+> return -ENOTSUP after having zeroized the first 96KB of the request,
+> forcing the caller to repeat it completely using the slow path.
+> 
+> I think the problem also exists in the current code (without my
+> patches). If you zeroize 10 clusters and the last one is compressed
+> you have to repeat the request after having zeroized 9 clusters.
 
-Important for me is the following.=20
-1) The user asks for a VM with certain
-characteristics including cpu features. E.g. AP and unpack facilities.
-2) The specified VM is sane, and gets started.
-3) The OS decides to go secure.
-4) Certain characteristics of the VM get changed as observed by the OS
-(e.g. gains the ability to do uv calls, but also loses stuff).
-5) The changes are not reflected via QEMU interfaces.
+Hmm. In the pre-patch code, qcow2_co_pwrite_zeroes() calls 
+qcow2_cluster_zeroize() which can fail with -ENOTSUP up front, but not 
+after the fact.  Once it starts the while loop over clusters, its use of 
+zero_in_l2_slice() handles compressed clusters just fine; as far as I 
+can tell, only your new subcluster handling lets it now fail with 
+-ENOTSUP after earlier clusters have been visited.
 
-Compared to this my patch introduces a very similar behavior, in a sense
-that the characteristics as observed by the guest change during the
-transition, and that in a sense, after the transition the user gets
-something different than she has asked for. The differences are that
-this change ain't enforced by the ultravisor, and can be inspected
-through the QEMU property 'iommu_platform'.
+But isn't this something we could solve recursively?  Instead of 
+returning -ENOTSUP, we could have zero_in_l2_slice() call 
+bdrv_pwrite_zeroes() on the (sub-)clusters associated with a compressed 
+cluster.
 
-We can IMHO clam that the user opted in for this weird override of
-featues with 'unpack' and with DIAG 308 subcode 10. That is what I mean
-by 'already expressed': the machine property would be redundant and
-add extra complexity. Conny do you agree?
-
->=20
->=20
-> >=20
-> >>
-> >> AFAIU "allow protected" would be required for the !PV to PV switch, and
-> >> we would have to reject paravirtualized devices with iommu_platform=3D=
-'off'
-> >> on VM construction or hotplug (iommu_platform=3D'auto/on' would be fin=
-e).
-> >>
-> >> Could you please confirm that I understood this correctly?
-> >>
-> >>
-> >>> This will come handy for other things like migrating to hosts without
-> >>> protected memory support.
-> >>>  =20
-> >>
-> >> This is already covered by cpu model AFAIK.
-> >=20
-> > I don't think we'd want to migrate between pv and non-pv anyway?
->=20
-> What exactly do you mean by that?
-> I'd expect that the VM can either be migrated in PV or non-PV mode and
-> not in a transition phase.
-
->=20
-I agree. I don't think migrating an in transition VM is practicable.
-Currently migration is inhibited. We would probably need to inhibit
-migration during transition, and make ms->pv conceptually a part of
-the migration state. Both the source and the target would need to do
-some things differently if the migration is requested while in PV
-mode.
-
-Regards,
-Halil
-
---Sig_/OOscOCvg=QWs+53BK9IOFDA
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJe0AfjAAoJEA0vhuyXGx0A4/AP/1r0NJPUVdrlh7/mhvnu/m89
-NWdANE6YhhbIatSVzrheU8Baq9N2LD6NLr1ZoWYgPLs2xo5phvkfzTQ1A+xrMQ0s
-TZyENNhrtDE7KVLtNn5gKraOqTHe5Jhqz7EfpDtIVGEt54SCJzjMU6ZaSYonhY8p
-MxB4Y1jwcqxVXcnxFwUmOhkEoF+H45QntAeooxDp9pF+pJsCvtlE+pnMJb6vuN7y
-Bey1PwzaOe3TOwNBgCyR2CBbDA6iWXEruqwpFsdwF5y0L4y/C73C3Eqx/5bwOA1P
-apmF6JlLccixtUYhRPq/aKtuhERY1usUxmvSfXFDKo+frCTwXdcZFQ9EEfdG5Ty1
-a4gswDB8Mvw8TspfFmI/IFmOzEorzWDg0XyEjy2HERmGTgesdQhmUv+iw+dnDf1F
-THZmV57VvyTLPWSntKF4VvK+ouWVtR/XtAnFI/w1ZSQ3cOSgcqtR9kXnUjNJaDh4
-ABkpIn/xV1f7HZgCWR4oZnSMMQDiW70cQM5p2ktK+Fu14g1X0lffyyRAEvhNkCAY
-WJ4vA+PFANaw/Fz9nWahpWXtVPM4vvl4RRpT3P2Xxm9k9fciFQfWLfhW7mirg2wJ
-mse4cIzzmT6R/4OFr+VW8bAK99QbF5pwCS6OZaInPwi3fDfbh2QM04rSv/V3Dt/S
-eBLJsczFQ4WnBL6V6dQ7
-=ptCD
------END PGP SIGNATURE-----
-
---Sig_/OOscOCvg=QWs+53BK9IOFDA--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
