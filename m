@@ -2,100 +2,99 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 897A7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73343C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5390F2088E
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DA0E208DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:29:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anEjzzPt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5390F2088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZmsJ2wl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DA0E208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeDfO-0000Lw-G1
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:13:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56194)
+	id 1jeDur-0006NB-Dt
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeDee-000873-Kx
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:12:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58572
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jeDeb-0001dJ-Mv
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:12:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590653559;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ju31ucyvt6u5FE7CDEX95IS6qEEv0uK9dmPtvsPxCRo=;
- b=anEjzzPtzAzdnlKgRd1zPmIrpDmEZXWyh5vr8oBA/UnczJnaXDRLDOMQ+maOYwxni9GCzm
- 3FRqX5I6ogq+J8lLQ/4LA4IZ2t5kfUl1PtqTqrGbhDVv1yNSeICeIvYnouK+JzilTFRkoE
- CBKVo0A9hBgPbfwvSz5O1jAlYGvzfbU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-ADd1_C5LPJeUHzZPB3ZWLw-1; Thu, 28 May 2020 04:12:35 -0400
-X-MC-Unique: ADd1_C5LPJeUHzZPB3ZWLw-1
-Received: by mail-wr1-f70.google.com with SMTP id a4so3085697wrp.5
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 01:12:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jeDu6-0005wi-Pq
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:28:42 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35397)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jeDu5-00030Q-Ep
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:28:42 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x14so21572491wrp.2
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 01:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=a5ZBZzeKDfBHOE7jqGqPzt4IkHZCT04+UUXSj+sLoYc=;
+ b=RZmsJ2wlQE+QtXUUsx+bKFM9RrHDg9Cc4+aGhINd0bO8aECD98WEUXex6rMWS0YvSe
+ QDxhviQcIyhFDBDq0Vojpog5tpiFR2LgW/Ss4xYj3EsSdQ99aGLSA1Qya70PIOPZjkNI
+ ezYPaM1N9JiIPOVEIXFFdD4jZSauOzoe9b6vO77tDE2nNo9+zwzWn2lbzUDV0DeUnRqm
+ gyzprF9ZpKFijsk3XV+Y/pPn1RmpFd1XUUrmfGa/HrZb1indGKqGt2SKm7GMoMzrOWGs
+ cbYcMZP+sSTFw5V8RTsK1yITKXX5V/LGKOimdUNkGm6drOhRy0lucS1etZNK0uBqKKfp
+ uXDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ju31ucyvt6u5FE7CDEX95IS6qEEv0uK9dmPtvsPxCRo=;
- b=LVMd23jeg7JXtA51IBnGPRvF24QJ7g423Z1cq3+hcc8hgX9977jWUjFtRdmiwYobWw
- dpe94wW9cSI7sYPx0BhaBsOpR7CZkhTfVRvIII0HOQ847L3sof5iWtWKsnekoPKOGMz/
- FEa8hSCVReT1h5mkWvx4BtxC8yHl9xe2uFFiOFY+Fm9fupnHpBEwRbDsX2Xfy0NqHe8V
- wHTPx1C6K/NW7/wk/2FhrVV7/GgirXLrGnb8wtzvPhBDHZ2lLZmFB2sKyS1fN1VkhLR3
- qeUnCX6xd7sC12qUx7c3rhIpm/WFXMakBWdl6aPJfVdMV1RSSmEFVIGkfSQhG1nPdcTF
- WwiQ==
-X-Gm-Message-State: AOAM532oenQwPydCLkF61E/XEWnG33HeD1WUHi3vxBQjFnHtCfUqVHop
- oZ2dKVp+1APngjckJm+fyyj3j4tRZlM4HlitduRZyKTK9IUKwGttwVR8mrpRcexCAztbKeXLo6x
- fW075YBmCMRwoL38=
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr2148550wmh.1.1590653551855;
- Thu, 28 May 2020 01:12:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw0Xu712Xjjz9lzrr3rE5OZifZ1IOIerxfXCrjsQX+lsP0cHwtSFd9aEwlo6/M00pfR5HvLhA==
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr2148511wmh.1.1590653551489;
- Thu, 28 May 2020 01:12:31 -0700 (PDT)
-Received: from localhost.localdomain (71.red-88-21-204.staticip.rima-tde.net.
- [88.21.204.71])
- by smtp.gmail.com with ESMTPSA id z6sm5064638wrh.79.2020.05.28.01.12.30
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=a5ZBZzeKDfBHOE7jqGqPzt4IkHZCT04+UUXSj+sLoYc=;
+ b=qUSpMvEHlq+zcUR0tXtRV6SP/fE2YBN8zKZHtEwhSLanzlKFUcIWdy2hGPMVNFJvuz
+ xM1SwNFGW2yaXXk2M9DMdQuHqg20V9IRzsVD62UjGqbFXBKz53Ql1pxadfJnsNBS3k2L
+ HHDkJhx6Ye8iUlwH6nSlc0Swzov1lqEakZunfCplnQjIfwA9XbqPpidDFlWThwiBugbn
+ 6aDM3wpr9VjBtCRQxvWhiONh4U9xArCEq0JHj6bnJNYtDOPqFoEp+MVnO9FAKLUfG0DD
+ axy/tdYiQLb/MDv8VoEI8XEGy9nxGynC2f3CZNGFTlkJQidtgknE5dXHQv4XZtXwYouD
+ M0lQ==
+X-Gm-Message-State: AOAM533Ee3Bq827drnkkWwhDpp84lzML/xuYNGjYMOs4EKFMhvEi1knE
+ gjbPLBNDB1fMDbtguxqW1lIgLQ==
+X-Google-Smtp-Source: ABdhPJyykIEWASqrsUi3UWKH/9tRH0XYgFaYa2LCFMh6cdTINeNZu/W6qEszVOBm2j/wslbw0RFgYQ==
+X-Received: by 2002:a5d:68c2:: with SMTP id p2mr2395060wrw.253.1590654519812; 
+ Thu, 28 May 2020 01:28:39 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j190sm5741393wmb.33.2020.05.28.01.28.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 01:12:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] fpu/softfloat: Silent 'bitwise negation of a boolean
- expression' warning
-Date: Thu, 28 May 2020 10:12:28 +0200
-Message-Id: <20200528081228.7716-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ Thu, 28 May 2020 01:28:38 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 986F91FF7E;
+ Thu, 28 May 2020 09:28:37 +0100 (BST)
+References: <159057543840.16818.14393433996899521784.stgit@pasha-ThinkPad-X280>
+ <159057545565.16818.10615781697342502198.stgit@pasha-ThinkPad-X280>
+ <87y2pd5rrd.fsf@linaro.org>
+ <34f0a0f8-d7ab-2d81-c4da-594936db6c7f@ispras.ru>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Subject: Re: [PATCH v2 03/11] tests/acceptance: add base class record/replay
+ kernel tests
+In-reply-to: <34f0a0f8-d7ab-2d81-c4da-594936db6c7f@ispras.ru>
+Date: Thu, 28 May 2020 09:28:37 +0100
+Message-ID: <871rn45uq2.fsf@linaro.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 03:11:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,156 +107,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Toni Wilen <twilen@winuae.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: wrampazz@redhat.com, qemu-devel@nongnu.org,
+ Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, pavel.dovgaluk@ispras.ru,
+ crosa@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When building with clang version 10.0.0-4ubuntu1, we get:
 
-  CC      lm32-softmmu/fpu/softfloat.o
-fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-    absZ &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            !
-fpu/softfloat.c:3423:18: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-        absZ0 &= ~ ( ( (uint64_t) ( absZ1<<1 ) == 0 ) & roundNearestEven );
-                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                 !
-fpu/softfloat.c:3483:18: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-        absZ0 &= ~(((uint64_t)(absZ1<<1) == 0) & roundNearestEven);
-                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                 !
-fpu/softfloat.c:3606:13: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-    zSig &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            !
-fpu/softfloat.c:3760:13: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-    zSig &= ~ ( ( ( roundBits ^ 0x200 ) == 0 ) & roundNearestEven );
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            !
-fpu/softfloat.c:3987:21: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-                    ~ ( ( (uint64_t) ( zSig1<<1 ) == 0 ) & roundNearestEven );
-                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    !
-fpu/softfloat.c:4003:22: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-            zSig0 &= ~ ( ( (uint64_t) ( zSig1<<1 ) == 0 ) & roundNearestEven );
-                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                     !
-fpu/softfloat.c:4273:18: error: bitwise negation of a boolean expression; did you mean logical negation? [-Werror,-Wbool-operation]
-        zSig1 &= ~ ( ( zSig2 + zSig2 == 0 ) & roundNearestEven );
-                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                 !
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-Fix by rewriting the fishy bitwise AND of two bools as an int.
+> On 27.05.2020 18:20, Alex Benn=C3=A9e wrote:
+>> Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com> writes:
+>>
+>>> This patch adds a base for testing kernel boot recording and replaying.
+>>> Each test has the phase of recording and phase of replaying.
+>>> Virtual machines just boot the kernel and do not interact with
+>>> the network.
+>>> Structure and image links for the tests are borrowed from boot_linux_co=
+nsole.py
+>>> Testing controls the message pattern at the end of the kernel
+>>> boot for both record and replay modes. In replay mode QEMU is also
+>>> intended to finish the execution automatically.
+>>>
+>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 47ef3139e6..e9a9ce4f66 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -2497,6 +2497,7 @@ F: net/filter-replay.c
+>>   F: include/sysemu/replay.h
+>>   F: docs/replay.txt
+>>   F: stubs/replay.c
+>> +F: tests/acceptance/replay_kernel.py
+>>     IOVA Tree
+>>   M: Peter Xu <peterx@redhat.com>
+>> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay=
+_kernel.py
+>> new file mode 100644
+>> index 0000000000..b8b277ad2f
+>> --- /dev/null
+>> +++ b/tests/acceptance/replay_kernel.py
+>> @@ -0,0 +1,57 @@
+>> +# Record/replay test that boots a Linux kernel
+>> +#
+>> +# Copyright (c) 2020 ISP RAS
+>> +#
+>> +# Author:
+>> +#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or
+>> +# later.  See the COPYING file in the top-level directory.
+>> +
+>> +import os
+>> +import gzip
+>>
+>> Do we actually use gzip in this test?
+>
+> Removed that, thanks.
+>
+>>
+>> +
+>> +from avocado_qemu import wait_for_console_pattern
+>> +from avocado.utils import process
+>> +from avocado.utils import archive
+>> +from boot_linux_console import LinuxKernelUtils
+>> +
+>> +class ReplayKernel(LinuxKernelUtils):
+>> +    """
+>> +    Boots a Linux kernel in record mode and checks that the console
+>> +    is operational and the kernel command line is properly passed
+>> +    from QEMU to the kernel.
+>> +    Then replays the same scenario and verifies, that QEMU correctly
+>> +    terminates.
+>>
+>> Shouldn't we be doing more to verify the replay behaved the same as the
+>> recorded session? What happens if things go wrong? Does QEMU barf out or
+>> just deviate from the previous run?
+>
+> We hardly can compare vCPU states during record and replay.
+>
+> But in the most cases it is not needed. When control flow goes in the
+> wrong direction, it affects the interrupts and exceptions.
+>
+> And interrupts and exceptions are the synchronization points in the
+> replay log. Therefore when the executions differ, QEMU replay just
+> hangs.
 
-Cc: Toni Wilen <twilen@winuae.net>
-Suggested-by: Eric Blake <eblake@redhat.com>
-Buglink: https://bugs.launchpad.net/bugs/1881004
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- fpu/softfloat.c | 33 ++++++++++++++++++++++++---------
- 1 file changed, 24 insertions(+), 9 deletions(-)
+Maybe we should fix that and exit with a more definitive error? Hangs
+are just plain ugly to debug because your first step has to be to start
+poking around with a debugger.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 6c8f2d597a..0dd57eddd7 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -3362,7 +3362,9 @@ static int32_t roundAndPackInt32(bool zSign, uint64_t absZ,
-     }
-     roundBits = absZ & 0x7F;
-     absZ = ( absZ + roundIncrement )>>7;
--    absZ &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
-+    if (((roundBits ^ 0x40) == 0) && roundNearestEven) {
-+        absZ &= ~1;
-+    }
-     z = absZ;
-     if ( zSign ) z = - z;
-     if ( ( absZ>>32 ) || ( z && ( ( z < 0 ) ^ zSign ) ) ) {
-@@ -3420,7 +3422,9 @@ static int64_t roundAndPackInt64(bool zSign, uint64_t absZ0, uint64_t absZ1,
-     if ( increment ) {
-         ++absZ0;
-         if ( absZ0 == 0 ) goto overflow;
--        absZ0 &= ~ ( ( (uint64_t) ( absZ1<<1 ) == 0 ) & roundNearestEven );
-+        if (((absZ1 << 1) == 0) && roundNearestEven) {
-+            absZ0 &= ~1;
-+        }
-     }
-     z = absZ0;
-     if ( zSign ) z = - z;
-@@ -3480,7 +3484,9 @@ static int64_t roundAndPackUint64(bool zSign, uint64_t absZ0,
-             float_raise(float_flag_invalid, status);
-             return UINT64_MAX;
-         }
--        absZ0 &= ~(((uint64_t)(absZ1<<1) == 0) & roundNearestEven);
-+        if (((absZ1 << 1) == 0) && roundNearestEven) {
-+            absZ0 &= ~1;
-+        }
-     }
- 
-     if (zSign && absZ0) {
-@@ -3603,7 +3609,9 @@ static float32 roundAndPackFloat32(bool zSign, int zExp, uint32_t zSig,
-         status->float_exception_flags |= float_flag_inexact;
-     }
-     zSig = ( zSig + roundIncrement )>>7;
--    zSig &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
-+    if (((roundBits ^ 0x40) == 0) && roundNearestEven) {
-+        zSig &= ~1;
-+    }
-     if ( zSig == 0 ) zExp = 0;
-     return packFloat32( zSign, zExp, zSig );
- 
-@@ -3757,7 +3765,9 @@ static float64 roundAndPackFloat64(bool zSign, int zExp, uint64_t zSig,
-         status->float_exception_flags |= float_flag_inexact;
-     }
-     zSig = ( zSig + roundIncrement )>>10;
--    zSig &= ~ ( ( ( roundBits ^ 0x200 ) == 0 ) & roundNearestEven );
-+    if (((roundBits ^ 0x200) == 0) && roundNearestEven) {
-+        zSig &= ~1;
-+    }
-     if ( zSig == 0 ) zExp = 0;
-     return packFloat64( zSign, zExp, zSig );
- 
-@@ -3983,8 +3993,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, bool zSign,
-             }
-             if ( increment ) {
-                 ++zSig0;
--                zSig0 &=
--                    ~ ( ( (uint64_t) ( zSig1<<1 ) == 0 ) & roundNearestEven );
-+                if (((zSig1 << 1) == 0) && roundNearestEven) {
-+                    zSig0 &= ~1;
-+                }
-                 if ( (int64_t) zSig0 < 0 ) zExp = 1;
-             }
-             return packFloatx80( zSign, zExp, zSig0 );
-@@ -4000,7 +4011,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, bool zSign,
-             zSig0 = UINT64_C(0x8000000000000000);
-         }
-         else {
--            zSig0 &= ~ ( ( (uint64_t) ( zSig1<<1 ) == 0 ) & roundNearestEven );
-+            if (((zSig1 << 1) == 0) && roundNearestEven) {
-+                zSig0 &= ~1;
-+            }
-         }
-     }
-     else {
-@@ -4270,7 +4283,9 @@ static float128 roundAndPackFloat128(bool zSign, int32_t zExp,
-     }
-     if ( increment ) {
-         add128( zSig0, zSig1, 0, 1, &zSig0, &zSig1 );
--        zSig1 &= ~ ( ( zSig2 + zSig2 == 0 ) & roundNearestEven );
-+        if ((zSig2 + zSig2 == 0) && roundNearestEven) {
-+            zSig1 &= ~1;
-+        }
-     }
-     else {
-         if ( ( zSig0 | zSig1 ) == 0 ) zExp = 0;
--- 
-2.21.3
-
+--=20
+Alex Benn=C3=A9e
 
