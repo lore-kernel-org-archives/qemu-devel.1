@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B407C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFDD5208DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1422206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 21:50:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JcAN+t/Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFDD5208DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRwpYQeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1422206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeQOp-0007Hp-UB
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 17:49:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37884)
+	id 1jeQQ5-000139-Vn
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 17:50:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQLI-0001Rs-K6
- for qemu-devel@nongnu.org; Thu, 28 May 2020 17:45:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56310
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQMd-0004S9-Ss
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 17:46:59 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50699
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQLG-0004vZ-Ut
- for qemu-devel@nongnu.org; Thu, 28 May 2020 17:45:35 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jeQMc-0005oo-P0
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 17:46:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590702333;
+ s=mimecast20190719; t=1590702418;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4kww8Kn7lt15WNtiBiHu7yq5dFmH5ZOSHRj6DUAGi/8=;
- b=JcAN+t/YNLtK60vYJCDLZe/Hxq0uLnqRsHW44rWObE5EAzZeTeQ42d7p632fuQYi965Nkj
- RKdqm8L1CgKya7XrHPaJVh6e39vKhT97r/BVkvJ+a9udxjyKWCnlPXKDrZhuHyRpIGcRLX
- XSYtkrayzJiy7AtcVQ4N/VyLVxHEyDA=
+ bh=V0pRPNGUX2oCMzddlIiBI2W3R+cSD6MK8vxPHoVUMtw=;
+ b=RRwpYQeME94hocFA/sC0WU/MT9m6HUEElevFgDu6Ho1CCA1NruYzm064H9ibuduj/QrVUF
+ 5w7M+ca9V+wcooFnb24dgwKgIk1BrtiXYld+uj/vAlz1H0YWXBBEXIt/eVmRImMKkM4NY3
+ T17UOFfmch3JZU1F68A/SE4Jtohgi3Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-eawdfFkvNqet1I0c3Ybv0Q-1; Thu, 28 May 2020 17:45:31 -0400
-X-MC-Unique: eawdfFkvNqet1I0c3Ybv0Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-93-wkXx4XWbP_GhfeGr0WPl_g-1; Thu, 28 May 2020 17:46:54 -0400
+X-MC-Unique: wkXx4XWbP_GhfeGr0WPl_g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC4E118FF662;
- Thu, 28 May 2020 21:45:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5536835B40;
+ Thu, 28 May 2020 21:46:52 +0000 (UTC)
 Received: from [10.3.112.88] (ovpn-112-88.phx2.redhat.com [10.3.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9680D60C87;
- Thu, 28 May 2020 21:45:19 +0000 (UTC)
-Subject: Re: [PATCH v7 4/8] qdev-properties: add size32 property type
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1952D7E467;
+ Thu, 28 May 2020 21:46:43 +0000 (UTC)
+Subject: Re: [PATCH v7 5/8] qdev-properties: make blocksize accept size
+ suffixes
 To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org
 References: <20200528213946.1636444-1-rvkagan@yandex-team.ru>
- <20200528213946.1636444-5-rvkagan@yandex-team.ru>
+ <20200528213946.1636444-6-rvkagan@yandex-team.ru>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <78e3587a-efea-970a-b47e-8d187464d955@redhat.com>
-Date: Thu, 28 May 2020 16:45:19 -0500
+Message-ID: <a4e3fa72-7ad2-8be0-d714-14505be1373b@redhat.com>
+Date: Thu, 28 May 2020 16:46:42 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200528213946.1636444-5-rvkagan@yandex-team.ru>
+In-Reply-To: <20200528213946.1636444-6-rvkagan@yandex-team.ru>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -113,44 +114,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/28/20 4:39 PM, Roman Kagan wrote:
-> Introduce size32 property type which handles size suffixes (k, m) just
-> like size property, but is uint32_t rather than uint64_t.
-
-Does it handle 'g' as well? (even though the set of valid 32-bit sizes 
-with a g suffix is rather small ;)
-
->  It's going to
-> be useful for properties that are byte sizes but are inherently 32bit,
-> like BlkConf.opt_io_size or .discard_granularity (they are switched to
-> this new property type in a followup commit).
+> It appears convenient to be able to specify physical_block_size and
+> logical_block_size using common size suffixes.
 > 
-> The getter for size32 is left out for a separate patch as its benefit is
-> less obvious, and it affects test output; for now the regular uint32
-> getter is used.
+> Teach the blocksize property setter to interpret them.  Also express the
+> upper and lower limits in the respective units.
 > 
 > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
 > ---
->
 
-> +static void set_size32(Object *obj, Visitor *v, const char *name, void *opaque,
-> +                       Error **errp)
-> +{
-> +    DeviceState *dev = DEVICE(obj);
-> +    Property *prop = opaque;
-> +    uint32_t *ptr = qdev_get_prop_ptr(dev, prop);
-> +    uint64_t value;
-> +    Error *local_err = NULL;
-> +
-> +    if (dev->realized) {
-> +        qdev_prop_set_after_realize(dev, name, errp);
-> +        return;
-> +    }
-> +
-> +    visit_type_size(v, name, &value, &local_err);
-
-Yes, it does.
-
-Whether or not the commit message is tweaked,
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
