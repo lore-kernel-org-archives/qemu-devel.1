@@ -2,88 +2,88 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6E9C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E992CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 300692063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:35:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B90F42063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 08:38:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CwXc0zvJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 300692063A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mo/vorCE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B90F42063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeE0a-0002GX-Ch
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:35:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58274)
+	id 1jeE3D-0004B1-0O
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 04:38:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeDzc-0001OP-4A
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:34:24 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39136)
+ id 1jeE2f-0003kj-Ev
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:37:33 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33055)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jeDza-00066r-Sd
- for qemu-devel@nongnu.org; Thu, 28 May 2020 04:34:23 -0400
-Received: by mail-wr1-x436.google.com with SMTP id t18so12902828wru.6
- for <qemu-devel@nongnu.org>; Thu, 28 May 2020 01:34:22 -0700 (PDT)
+ id 1jeE2e-00071k-5K
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 04:37:32 -0400
+Received: by mail-wm1-x341.google.com with SMTP id j198so3984937wmj.0
+ for <qemu-devel@nongnu.org>; Thu, 28 May 2020 01:37:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=CqffJZBiY/VykmUf1KGvLSl6LRGouEYjQ+HhIRS+Vh8=;
- b=CwXc0zvJVMc52YkJcxwUA17pud6XKbz0WY/x4LA4UHdkxN631HqB5AD5DUhCgeNEHQ
- W03GbSwBoXctgKS+NJs2Zqxdx5NdYPBCGkleGmDsEndxI5L3nVIBie/KN6Ib60DvmkRi
- RbxcycUZvE5hBo3orZDP2T5zQEQkdYQ5Sdm8r6iuem1+akt6dSV/IDT1swjl56lf2NGi
- +Rof6y5qGHSUR56gErFgrfSrVW5Azdp00IqJvpTWPrXv7JhbCCnwqVMl45Mi+YJJ0FWi
- lfW0qR0aQKaanIC45LM2lv5tK+gq1LxdJ1oDP6VoNyCcwEKY+Nn1pIj9sqULMe3MzhvJ
- AA+g==
+ bh=QIRJUCrOmnItilJILJITHVol5OPeBUjeImrjw2DaJTo=;
+ b=Mo/vorCEPBJLRdOmNfaYlGZtXE4EvP+w8OTcZwrUwr5KWJ6myiCdLdZy7Ry/Ta9SH4
+ mrpUUdVSCczBbXFRKWvvLMO0ITkzJr/Q5Z+BPox3DMCscfL6JqfeCfFwlIjWZgo3ghcM
+ miH8RTPENCrbkA9Sm0lsWBdxSifygxvEiHaGusOX8/sOn3i3uJGfOMh0quoY3Hg7b/lm
+ n7D3XPU9Dldh342ksGZ4jyXC5isoyb/U9QWypjKVcmS+PWN50I8yomsq/59zU3nKp9qr
+ nRNFD8U27+grtvZu8s3EElzFPBhccwjpPjC7SDdXttYRZAQZs0NBuWwAoeI6otGDbcK1
+ Ilrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=CqffJZBiY/VykmUf1KGvLSl6LRGouEYjQ+HhIRS+Vh8=;
- b=WYzVEvJeMSeegoEcSGS9FVRfZ8g/sGDjq4XFLPluN1s90tynkMQ/uIPXpKbF5bLgRB
- bAdBUJYM3wW0Rbgrpz8jvAB94n8OCao60INHAOT4wXdBeQTnT5EXisgFl8QiVFFMEt69
- BLEV/DsbG9p48Sy0PsTuCS8Y8I326prVuFKdxIL5A0RYGISOpTn+/ep0mKPGURZGROZz
- n0cIiRUd+eD7n46klWUFDSfLc371f70qht95XHLxNTsqnKCclMg8mVRzZSWGqUH0eNMf
- +HeqhUEAo3NYS9dkvmLknko7IUg0XXtMCSIDWY1sotA1j54MBszNBR39Xql3ibs54ZVq
- reAg==
-X-Gm-Message-State: AOAM530Y4+yrJEDfANTRSjgOHppYbVrNciwig3pvo3mK9R66gqrx8SBD
- OIlzGf4BlmpbM6FjX/AcNKOKhQ==
-X-Google-Smtp-Source: ABdhPJwOe5vSiMm8xnbyaoGEMA/BiyDRUpC1OsF08zeUWit6PKXusS5mFRXCL++XM3NS1NW22TojYA==
-X-Received: by 2002:a5d:4dd0:: with SMTP id f16mr2583718wru.117.1590654861414; 
- Thu, 28 May 2020 01:34:21 -0700 (PDT)
+ bh=QIRJUCrOmnItilJILJITHVol5OPeBUjeImrjw2DaJTo=;
+ b=AgbSEGLdTPk/WAFde2EWLq1ry4L0Q4aexBvF3YDqTo6PK2q1JLoc4QGInEDjH8pj9+
+ N1S5c+QcQHe80HjGhzrUKiWP/epEYYxeoJeosOzhWHOqbWB0CGqnu/oasA/yBgyjp+Qk
+ 3ibomAra2yZMEsGj+cjSOLwcNFFb9PD/gVRbzj8jr83fyFTvOq97Y2Nn0m4/ckninBQW
+ PgjHfa/tIRs5Xwtz1ccyPySuMg3byMqjSZcPK8p1Zii+XhFPoX9uvQmeJ9yCwmjGgmXZ
+ fTQv9zCX3hqlszRdkpoAbognxya7ueGMAkgFoVL+4G9+qjc70aweXjjy2SY3KdSggrEB
+ kw3Q==
+X-Gm-Message-State: AOAM5333nPLCKggWJk0wHDpvPDRjhfPZEMqQR1YeXWCPWGtv6s4JAlON
+ 4yQdFUqG8rVTMmk8Dwhpo5H4Yj8UQwE=
+X-Google-Smtp-Source: ABdhPJyAOkIPaDqNbK8Tx0o+ao1WoPRk0wGx0Q4MXWJ0vphyW2zuDyZiUAGlBmK4LaxOoOPxYTqGeQ==
+X-Received: by 2002:a1c:4009:: with SMTP id n9mr2300232wma.104.1590655049240; 
+ Thu, 28 May 2020 01:37:29 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w10sm5248502wrp.16.2020.05.28.01.34.20
+ by smtp.gmail.com with ESMTPSA id j18sm5422286wrn.59.2020.05.28.01.37.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 May 2020 01:34:20 -0700 (PDT)
+ Thu, 28 May 2020 01:37:27 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 900141FF7E;
- Thu, 28 May 2020 09:34:19 +0100 (BST)
-References: <tencent_86D9DB902C46CBAC4F3A6FD5B4CDA93B7506@qq.com>
- <8b83e11b-e593-b7db-48b6-252e23c599da@amsat.org>
- <tencent_B0E453026AE8377459F3162D9F7D5ECE6907@qq.com>
+ by zen.linaroharston (Postfix) with ESMTP id 2E8A11FF7E;
+ Thu, 28 May 2020 09:37:27 +0100 (BST)
+References: <20200525131823.715-1-thuth@redhat.com>
+ <20200525131823.715-6-thuth@redhat.com>
 User-agent: mu4e 1.5.1; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: casmac <1482995675@qq.com>
-Subject: Re: GDB get wrong debug infos on TI DSP architecture extension
-In-reply-to: <tencent_B0E453026AE8377459F3162D9F7D5ECE6907@qq.com>
-Date: Thu, 28 May 2020 09:34:19 +0100
-Message-ID: <87v9kg4fw4.fsf@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 5/7] gitlab-ci: Do not use the standard container images
+ from gitlab
+In-reply-to: <20200525131823.715-6-thuth@redhat.com>
+Date: Thu, 28 May 2020 09:37:27 +0100
+Message-ID: <87sgfk4fqw.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,148 +105,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-casmac <1482995675@qq.com> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> Hi,
-> &nbsp;&nbsp; Thank you for forwarding my question to developers and shari=
-ng the C6x implementation.
-> &nbsp;&nbsp; Perhaps I should follow up with another problem I encountere=
-d. The senerio is the&nbsp; emulator keeps running eventhough the program i=
-t emulates has already exited. And it keeps retrieving instructions which a=
-re all zero "instruction"(0x00000000).=20
+> Currently all pipelines of the gitlab CI are failing, except for the
+> "build-user" pipeline. There is an issue with the default container
+> image (likely Debian stable) where they imported something bad in one
+> of the system headers:
 >
-> &nbsp;&nbsp; It looks to me that in function cpu_exec(CPUState *cpu), the=
- following loop never terminate:
-> &nbsp;&nbsp; while (!cpu_handle_exception(cpu, &amp;ret)) {
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TranslationBlock *last_tb =3D =
-NULL;
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int tb_exit =3D 0;
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while (!cpu_handle_interrupt(c=
-pu, &amp;last_tb)) { ... }
-> &nbsp;&nbsp; Is it because cpu-&gt;exit_request remains 0 ?
+>  /usr/include/linux/swab.h: In function '__swab':
+>  /builds/huth/qemu/include/qemu/bitops.h:20:34: error: "sizeof" is not
+>   defined, evaluates to 0 [-Werror=3Dundef]
+>  #define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
 >
-> &nbsp;&nbsp; At what point should we make cpu-&gt;exit_request=3D1 ?
+> We could maybe work-around this issue or wait for the default containers
+> to get fixed, but considering that we use Ubuntu (and thus Debian-style)
+> CI in Travis already to a very large extent, we should consider to use
+> some RPM-based distros in our gitlab CI instead. Thus let's change the
+> failing pipelines to use Fedora and CentOS (and also one Ubuntu 19.10,
+> since 20.04 is broken, too) now.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-cpu->exit_request is set for asynchronus conditions (e.g. timer IRQs or
-IO events). A number of helpers will "kick" the cpu by calling
-cpu_exit().
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> &nbsp;&nbsp; Thanks again!!
+I will say Fedora/CentOS won't be immune to this failure if they update
+the kernel headers to somewhere between the breakage and the fix.
+
+> ---
+>  .gitlab-ci.yml | 37 +++++++++++++++++++++++++------------
+>  1 file changed, 25 insertions(+), 12 deletions(-)
 >
->
-> regards
-> xiaolei
->
->
->
-> ------------------&nbsp;Original&nbsp;------------------
-> From:&nbsp;"Philippe Mathieu-Daud=C3=A9"<f4bug@amsat.org&gt;;
-> Date:&nbsp;Wed, May 27, 2020 03:19 PM
-> To:&nbsp;"casmac"<1482995675@qq.com&gt;;"qemu-devel"<qemu-devel@nongnu.or=
-g&gt;;
-> Cc:&nbsp;"Taylor Simpson"<tsimpson@quicinc.com&gt;;"Alex Benn=C3=A9e"<ale=
-x.bennee@linaro.org&gt;;"Luc Michel"<luc.michel@greensocs.com&gt;;
-> Subject:&nbsp;Re: GDB get wrong debug infos on TI DSP architecture extens=
-ion
->
->
->
-> Hi Xiaolei,
->
-> Cc'ing more developers who might answer you.
->
-> On 5/27/20 8:48 AM, casmac wrote:
-> &gt; Hi all,
-> &gt; &nbsp;&nbsp; I am working on a TI DSP architecture extension for QEM=
-U.
->
-> FYI you can find the TI TMS320C6x target implemented here:
-> https://github.com/philmd/qemu/releases/tag/target-c6x-2.4
->
-> I started rebasing it to QEMU 4.2 but then got distracted.
->
-> &gt; Now, we are
-> &gt; adding GDB debugging features.
-> &gt; &nbsp;&nbsp; We have done the following, but not sure we are on the =
-right track :
-> &gt; &nbsp;&nbsp; - add a xml description file in gdb-xml, without unders=
-tanding the
-> &gt; purpose of the file, why some architectures don't provide such xml f=
-ile?
-> &gt; &nbsp;&nbsp; - add ***_cpu_gdb_read_register(), ***_cpu_gdb_write_re=
-gister();
-> &gt; &nbsp;&nbsp; - added&nbsp; dsp_cpu_get_phys_page_attrs_debug(), but =
-uncertain about
-> &gt; what to return
-> &gt; &nbsp; &nbsp;&nbsp; dsp_cpu_get_phys_page_attrs_debug(CPUState *cs, =
-vaddr addr,
-> &gt; MemTxAttrs *attrs)
-> &gt; &nbsp; &nbsp;&nbsp; {
-> &gt; &nbsp; &nbsp; &nbsp; &nbsp; return addr &amp; TARGET_PAGE_MASK;&nbsp=
-;&nbsp;
-> &gt; &nbsp; &nbsp;&nbsp; }
-> &gt; &nbsp;&nbsp;
-> &gt; &nbsp;&nbsp; We run QEMU with the these arguments
-> &gt; &nbsp;&nbsp; qemu-system-dsp ... -kernel filename.out -S -s
-> &gt; &nbsp;&nbsp;
-> &gt; &nbsp;&nbsp; It turns out that gdb reads incorrect register values, =
-and complains
-> &gt; : "warning: Target-supplied registers are not supported by the curre=
-nt
-> &gt; architecture".
-> &gt; &nbsp;&nbsp;
-> &gt; &nbsp;&nbsp; Something is missing here, or we do it in a wrong way.&=
-nbsp; Any advise
-> &gt; would be helpful to us.
-> &gt; &nbsp;&nbsp;
-> &gt; &nbsp;&nbsp; Thanks.
-> &gt; &nbsp; &nbsp;
-> &gt; xiaolei
-> &gt;=20
-> &gt; &nbsp;&nbsp; ----- ti_dsp.xml&nbsp; -----
-> &gt; &nbsp;&nbsp;
-> &gt; &nbsp;&nbsp; <?xml version=3D"1.0"?&gt;
-> &gt; <!DOCTYPE feature SYSTEM "gdb-target.dtd"&gt;
-> &gt; <feature name=3D"org.gnu.gdb.tic3x.core"&gt;
-> &gt; &nbsp;&nbsp;&nbsp; <reg name=3D"r0"&nbsp; bitsize=3D"32"&gt;</reg&gt;
-> &gt; &nbsp;<reg name=3D"r1"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"r2"&nbsp; bitsize=3D"32"&gt;</reg&gt;
-> &gt; &nbsp;<reg name=3D"r3"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"r4"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"r5"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"r6"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"r7"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar0" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar1" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar2" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar3" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar4" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar5" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar6" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ar7" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"dp"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ir0" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"ir1" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"bk"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"sp"&nbsp; bitsize=3D"32" type=3D"data_ptr"/&gt;
-> &gt; &nbsp;<reg name=3D"st"&nbsp; bitsize=3D"32"&gt;</reg&gt;
-> &gt; &nbsp;<reg name=3D"ie"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"if"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"iof" bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"rs"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"re"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"rc"&nbsp; bitsize=3D"32"/&gt;
-> &gt; &nbsp;<reg name=3D"pc"&nbsp; bitsize=3D"32" type=3D"data_ptr"/&gt;
-> &gt; &nbsp;<reg name=3D"clk"&nbsp; bitsize=3D"32"/&gt;
-> &gt; </feature&gt;
-> &gt; &nbsp;&nbsp;
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index 5208d93ff8..559ec2ab4d 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -5,9 +5,17 @@ include:
+>  .update_apt_template: &before_script_apt
+>   before_script:
+>    - apt-get update -qq
+> -  - apt-get install -y -qq libglib2.0-dev libpixman-1-dev genisoimage
+> +  - apt-get install -y -qq git gcc libglib2.0-dev libpixman-1-dev make
+> +        genisoimage
+> +
+> +.update_dnf_template: &before_script_dnf
+> + before_script:
+> +  - dnf update -y
+> +  - dnf install -y bzip2 diffutils gcc git genisoimage findutils glib2-d=
+evel
+> +        make python3 perl-podlators perl-Test-Harness pixman-devel zlib-=
+devel
+>=20=20
+>  build-system1:
+> + image: ubuntu:19.10
+>   <<: *before_script_apt
+>   script:
+>   - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-d=
+ev
+> @@ -21,11 +29,12 @@ build-system1:
+>   - make -j2 check
+>=20=20
+>  build-system2:
+> - <<: *before_script_apt
+> + image: fedora:latest
+> + <<: *before_script_dnf
+>   script:
+> - - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio=
+-dev
+> -      libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
+> -      libzstd-dev
+> + - yum install -y SDL2-devel libgcrypt-devel brlapi-devel libaio-devel
+> +       libfdt-devel lzo-devel librdmacm-devel libibverbs-devel libibumad=
+-devel
+> +       libzstd-devel
+>   - mkdir build
+>   - cd build
+>   - ../configure --enable-werror --target-list=3D"tricore-softmmu unicore=
+32-softmmu
+> @@ -35,7 +44,8 @@ build-system2:
+>   - make -j2 check
+>=20=20
+>  build-disabled:
+> - <<: *before_script_apt
+> + image: fedora:latest
+> + <<: *before_script_dnf
+>   script:
+>   - mkdir build
+>   - cd build
+> @@ -50,9 +60,10 @@ build-disabled:
+>   - make -j2 check-qtest SPEED=3Dslow
+>=20=20
+>  build-tcg-disabled:
+> - <<: *before_script_apt
+> + image: centos:8
+> + <<: *before_script_dnf
+>   script:
+> - - apt-get install -y -qq clang libgtk-3-dev libusb-dev
+> + - dnf install -y clang gtk3-devel libusbx-devel libgcrypt-devel
+>   - mkdir build
+>   - cd build
+>   - ../configure --cc=3Dclang --enable-werror --disable-tcg --audio-drv-l=
+ist=3D""
+> @@ -79,10 +90,11 @@ build-user:
+>   - make run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
+>=20=20
+>  build-clang:
+> - <<: *before_script_apt
+> + image: fedora:latest
+> + <<: *before_script_dnf
+>   script:
+> - - apt-get install -y -qq clang libsdl2-dev libattr1-dev libcap-ng-dev
+> -      xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev libr=
+bd-dev
+> + - yum install -y clang SDL2-devel libattr-devel libcap-ng-devel xfsprog=
+s-devel
+> +       libiscsi-devel libnfs-devel libseccomp-devel gnutls-devel librbd-=
+devel
+>   - mkdir build
+>   - cd build
+>   - ../configure --cc=3Dclang --cxx=3Dclang++ --enable-werror
+> @@ -92,7 +104,8 @@ build-clang:
+>   - make -j2 check
+>=20=20
+>  build-tci:
+> - <<: *before_script_apt
+> + image: centos:8
+> + <<: *before_script_dnf
+>   script:
+>   - TARGETS=3D"aarch64 alpha arm hppa m68k microblaze moxie ppc64 s390x x=
+86_64"
+>   - mkdir build
 
 
 --=20
