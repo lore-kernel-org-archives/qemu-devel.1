@@ -2,85 +2,86 @@ Return-Path: <SRS0=D+kF=7K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276B9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47C2B208B8
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:33:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D30BC208B8
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 May 2020 22:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="h8ZGZaQb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C2B208B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RHYsUqWC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30BC208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeR5C-0000HT-7P
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:33:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47024)
+	id 1jeR6Z-0002qe-Tw
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 18:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQxP-0005QI-BJ; Thu, 28 May 2020 18:24:59 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:17157)
+ id 1jeQvw-0003Mn-Gk; Thu, 28 May 2020 18:23:28 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:15473)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4104b2603=alistair.francis@wdc.com>)
- id 1jeQxM-0008Aq-DA; Thu, 28 May 2020 18:24:58 -0400
+ id 1jeQvj-00064j-FA; Thu, 28 May 2020 18:23:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1590704696; x=1622240696;
+ t=1590704595; x=1622240595;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=7XsObUTOmANBGkm0Z0f9CxYlI3PAM1BkJFcltW/HVKU=;
- b=h8ZGZaQbG1hq95dFYL6wO142/TlWkR3b4lZ+8uLybPwsyc2WpifMSJ0i
- m8H2jy9xGfKGRXmBddn5B+zNQIsn1NRr5OaqJe05DLI1oOFAIqvrnKT2K
- WCQhoMYLiLTUgy4b24tBTKaH62G/uRCDuhKi/zz2s40qkQKwEK1dMzu8H
- E6YbmohcS+ycHbJM2MIlDwXb1U1TEeEYu/VB4xTRkk+GtJ9UI7JV81nfl
- 3+CH6UqQDTD8Z5NWI6jKjMlCPta647I+gDKfeLHopnA2qeda0QMFf6dNM
- k/BjiZ3XTzlKccfpkexJs4OT3i3M4ntm9m//NTuAh2TvUcQ92MTfN6UMg w==;
-IronPort-SDR: VG64szpQys+IRZoNo7phwW3CDkC32jHlUH5ehdWh8qaZaK65l1rhb4VQA9TC+2cGh3Wd5b1t+8
- iCopQirqall+bD5TrMM/6tch17wvmB4sORwvXWZXbm6wJa+Aidnz9QJHKOfoLhApUxIMiDGsoB
- brJ8H9N5I6t/2SWyJ5SDfiesHyDWDvB7H8thfzCpWUElFnLwPbt65noVDgWMIZgedU3U6CLdFO
- gQBRV2/TjaDVXzgyf8Q1KgIx6+P7teQOrplz5tbBjBXCnMYFANfz+E46xENjin683EMRz2wEZ1
- hEA=
-X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="247810986"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ bh=Bvwri5Zp6ypKxEBHfELl3xgsE3Zz5p1AOKRot2+qvMI=;
+ b=RHYsUqWCIbVyEP6DIJDC3ozQWbWD7KQxIXKsdQIwNbRPf/pROGqNuOv1
+ 29+oRCWtPS6DpC0dio6NqGL9XOY76wEhVufC3kARrDM4v46O0EcQGLsCi
+ y81D/n5EqtOOvSpCbOSsOV0v6bDeD+i5Wnq/IinJxVXyWgOYONPEAlpC0
+ arerxKOogJ3HyU6nzfcRX95NDrtK0KfDWVfxT4qS11U6+k8hXVIWlO+X+
+ Fg6V4pewiHFdLx+pZV/UXz7c/NlSR9j4OiAAImm4o5EdJy48kmCyuhLcJ
+ VWkFD6w2HrEtkudgO4C0POvK3Q85Ew8zYlXyX+Tiom+fKHFysFO+kfPgb w==;
+IronPort-SDR: Wns6Oli53qmNWwVuqRUpUX8euEl9/OCmJ2i0gxm068qjHJsmXoVa4jQsCrWJbIY3GRFO4zb+UF
+ b/ax/eq9rjbdGiXj49XzTRiT2GQrvM8oLdzQn5VsEL1fOnSPW4fh5j+vmLKlQPMFQFgsrKbRsi
+ j0mXc+HB23SCXgCfpE37hAS9pj5QbFuTZPjdruMnn+95avrl19GbcZ/WMrQnhGxnKts+B6bak9
+ ajj4ymw65HurOvuLcHgk6LYWjIvccdNDqTRWizzWBdM6K7BSYZ1yw3FxpFTa7EU5hBodycsQeX
+ LSY=
+X-IronPort-AV: E=Sophos;i="5.73,446,1583164800"; d="scan'208";a="143076000"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:24:49 +0800
-IronPort-SDR: BbYK8ZfACSiddrOoT4XGGtVHJPP5+mTRJbvhk3O7bEIVz1XEt1bVRj/yjcCImIPhx5wqppHC1Z
- k3jX8C7eWyC54vPv1i0EQn8fMihGLFrK4=
+ by ob1.hgst.iphmx.com with ESMTP; 29 May 2020 06:23:05 +0800
+IronPort-SDR: 364b1cxoxDmxO/qimifdG/XxMNpE6QBNQd3/Esj3wz8up8TmZ7zDQiNLtCqIq+wtv+j69gxWQJ
+ ynIaOtqxn8OR5OzFFKfJIRwh4AMnHnM7M=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 May 2020 15:14:05 -0700
-IronPort-SDR: GYT4v7u7Y8438J8lipwB8JwK7F1pZR/smHqswBc+ilG236B0GNPYhShtUZIjVmnJQpCW48yV7x
- aKdJnuLHf0zw==
+ 28 May 2020 15:12:20 -0700
+IronPort-SDR: w1TmiYuA0XDny548qkIocyTfE9pgIByM/fsewdefvm+WJpjptldfjVOWVqH9ODhJ/CxV7uFG4Z
+ /uwrZwGsFD/w==
 WDCIronportException: Internal
 Received: from 6xf7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.123])
- by uls-op-cesaip02.wdc.com with ESMTP; 28 May 2020 15:24:49 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 28 May 2020 15:23:04 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v4 3/4] target/riscv: Drop support for ISA spec version 1.09.1
-Date: Thu, 28 May 2020 15:16:13 -0700
-Message-Id: <8f4f5104c0687f6c11d41f8b72f6b57cc1e9f4a5.1590704110.git.alistair.francis@wdc.com>
+Subject: [PATCH v5 08/11] hw/intc: Initial commit of lowRISC Ibex PLIC
+Date: Thu, 28 May 2020 15:14:28 -0700
+Message-Id: <b2a2f70eed173de4ae1d5a66ffff7df90822b216.1590704015.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1590704110.git.alistair.francis@wdc.com>
-References: <cover.1590704110.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1590704015.git.alistair.francis@wdc.com>
+References: <cover.1590704015.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
+Received-SPF: pass client-ip=216.71.153.141;
  envelope-from=prvs=4104b2603=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:24:44
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 18:23:00
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -107,593 +108,386 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The RISC-V ISA spec version 1.09.1 has been deprecated in QEMU since
-4.1. It's not commonly used so let's remove support for it.
+The Ibex core contains a PLIC that although similar to the RISC-V spec
+is not RISC-V spec compliant.
+
+This patch implements a Ibex PLIC in a somewhat generic way.
+
+As the current RISC-V PLIC needs tidying up, my hope is that as the Ibex
+PLIC move towards spec compliance this PLIC implementation can be
+updated until it can replace the current PLIC.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- docs/system/deprecated.rst                    |  20 +--
- target/riscv/cpu.h                            |   1 -
- target/riscv/cpu.c                            |   2 -
- target/riscv/cpu_helper.c                     |  82 ++++-------
- target/riscv/csr.c                            | 138 ++++--------------
- .../riscv/insn_trans/trans_privileged.inc.c   |  18 +--
- target/riscv/monitor.c                        |   5 -
- target/riscv/op_helper.c                      |  17 +--
- 8 files changed, 73 insertions(+), 210 deletions(-)
+ include/hw/intc/ibex_plic.h |  63 +++++++++
+ hw/intc/ibex_plic.c         | 261 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                 |   2 +
+ hw/intc/Makefile.objs       |   1 +
+ 4 files changed, 327 insertions(+)
+ create mode 100644 include/hw/intc/ibex_plic.h
+ create mode 100644 hw/intc/ibex_plic.c
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index a6664bfca9..38865daafc 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -301,16 +301,6 @@ The ``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, and
- ``acl_remove`` commands are deprecated with no replacement. Authorization
- for VNC should be performed using the pluggable QAuthZ objects.
- 
--Guest Emulator ISAs
---------------------
--
--RISC-V ISA privledge specification version 1.09.1 (since 4.1)
--'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
--
--The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
--QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
--should be used instead of the 1.09.1 version.
--
- System emulator CPUS
- --------------------
- 
-@@ -471,6 +461,16 @@ The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (removed in 5.0
- The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
- 'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
- 
-+Guest Emulator ISAs
-+-------------------
+diff --git a/include/hw/intc/ibex_plic.h b/include/hw/intc/ibex_plic.h
+new file mode 100644
+index 0000000000..ddc7909903
+--- /dev/null
++++ b/include/hw/intc/ibex_plic.h
+@@ -0,0 +1,63 @@
++/*
++ * QEMU RISC-V lowRISC Ibex PLIC
++ *
++ * Copyright (c) 2020 Western Digital
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+RISC-V ISA privledge specification version 1.09.1 (removed in 5.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
++#ifndef HW_IBEX_PLIC_H
++#define HW_IBEX_PLIC_H
 +
-+The RISC-V ISA privledge specification version 1.09.1 has been removed.
-+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
-+should be used instead of the 1.09.1 version.
++#include "hw/sysbus.h"
 +
- System emulator CPUS
- --------------------
- 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 76b98d7a33..c022539012 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -73,7 +73,6 @@ enum {
-     RISCV_FEATURE_MISA
- };
- 
--#define PRIV_VERSION_1_09_1 0x00010901
- #define PRIV_VERSION_1_10_0 0x00011000
- #define PRIV_VERSION_1_11_0 0x00011100
- 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 112f2e3a2f..eeb91f8513 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -368,8 +368,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-             priv_version = PRIV_VERSION_1_11_0;
-         } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
-             priv_version = PRIV_VERSION_1_10_0;
--        } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.9.1")) {
--            priv_version = PRIV_VERSION_1_09_1;
-         } else {
-             error_setg(errp,
-                        "Unsupported privilege spec version '%s'",
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index bc80aa87cf..62fe1ecc8f 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -364,57 +364,36 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-         mxr = get_field(env->vsstatus, MSTATUS_MXR);
-     }
- 
--    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
--        if (first_stage == true) {
--            if (use_background) {
--                base = (hwaddr)get_field(env->vsatp, SATP_PPN) << PGSHIFT;
--                vm = get_field(env->vsatp, SATP_MODE);
--            } else {
--                base = (hwaddr)get_field(env->satp, SATP_PPN) << PGSHIFT;
--                vm = get_field(env->satp, SATP_MODE);
--            }
--            widened = 0;
-+    if (first_stage == true) {
-+        if (use_background) {
-+            base = (hwaddr)get_field(env->vsatp, SATP_PPN) << PGSHIFT;
-+            vm = get_field(env->vsatp, SATP_MODE);
-         } else {
--            base = (hwaddr)get_field(env->hgatp, HGATP_PPN) << PGSHIFT;
--            vm = get_field(env->hgatp, HGATP_MODE);
--            widened = 2;
--        }
--        sum = get_field(env->mstatus, MSTATUS_SUM);
--        switch (vm) {
--        case VM_1_10_SV32:
--          levels = 2; ptidxbits = 10; ptesize = 4; break;
--        case VM_1_10_SV39:
--          levels = 3; ptidxbits = 9; ptesize = 8; break;
--        case VM_1_10_SV48:
--          levels = 4; ptidxbits = 9; ptesize = 8; break;
--        case VM_1_10_SV57:
--          levels = 5; ptidxbits = 9; ptesize = 8; break;
--        case VM_1_10_MBARE:
--            *physical = addr;
--            *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
--            return TRANSLATE_SUCCESS;
--        default:
--          g_assert_not_reached();
-+            base = (hwaddr)get_field(env->satp, SATP_PPN) << PGSHIFT;
-+            vm = get_field(env->satp, SATP_MODE);
-         }
--    } else {
-         widened = 0;
--        base = (hwaddr)(env->sptbr) << PGSHIFT;
--        sum = !get_field(env->mstatus, MSTATUS_PUM);
--        vm = get_field(env->mstatus, MSTATUS_VM);
--        switch (vm) {
--        case VM_1_09_SV32:
--          levels = 2; ptidxbits = 10; ptesize = 4; break;
--        case VM_1_09_SV39:
--          levels = 3; ptidxbits = 9; ptesize = 8; break;
--        case VM_1_09_SV48:
--          levels = 4; ptidxbits = 9; ptesize = 8; break;
--        case VM_1_09_MBARE:
--            *physical = addr;
--            *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
--            return TRANSLATE_SUCCESS;
--        default:
--          g_assert_not_reached();
--        }
-+    } else {
-+        base = (hwaddr)get_field(env->hgatp, HGATP_PPN) << PGSHIFT;
-+        vm = get_field(env->hgatp, HGATP_MODE);
-+        widened = 2;
++#define TYPE_IBEX_PLIC "ibex-plic"
++#define IBEX_PLIC(obj) \
++    OBJECT_CHECK(IbexPlicState, (obj), TYPE_IBEX_PLIC)
++
++typedef struct IbexPlicState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion mmio;
++
++    uint32_t *pending;
++    uint32_t *source;
++    uint32_t *priority;
++    uint32_t *enable;
++    uint32_t threshold;
++    uint32_t claim;
++
++    /* config */
++    uint32_t num_cpus;
++    uint32_t num_sources;
++
++    uint32_t pending_base;
++    uint32_t pending_num;
++
++    uint32_t source_base;
++    uint32_t source_num;
++
++    uint32_t priority_base;
++    uint32_t priority_num;
++
++    uint32_t enable_base;
++    uint32_t enable_num;
++
++    uint32_t threshold_base;
++
++    uint32_t claim_base;
++} IbexPlicState;
++
++#endif /* HW_IBEX_PLIC_H */
+diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
+new file mode 100644
+index 0000000000..41079518c6
+--- /dev/null
++++ b/hw/intc/ibex_plic.c
+@@ -0,0 +1,261 @@
++/*
++ * QEMU RISC-V lowRISC Ibex PLIC
++ *
++ * Copyright (c) 2020 Western Digital
++ *
++ * Documentation avaliable: https://docs.opentitan.org/hw/ip/rv_plic/doc/
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "hw/qdev-properties.h"
++#include "hw/core/cpu.h"
++#include "hw/boards.h"
++#include "hw/pci/msi.h"
++#include "target/riscv/cpu_bits.h"
++#include "target/riscv/cpu.h"
++#include "hw/intc/ibex_plic.h"
++
++static bool addr_between(uint32_t addr, uint32_t base, uint32_t num)
++{
++    uint32_t end = base + (num * 0x04);
++
++    if (addr >= base && addr < end) {
++        return true;
 +    }
-+    sum = get_field(env->mstatus, MSTATUS_SUM);
-+    switch (vm) {
-+    case VM_1_10_SV32:
-+      levels = 2; ptidxbits = 10; ptesize = 4; break;
-+    case VM_1_10_SV39:
-+      levels = 3; ptidxbits = 9; ptesize = 8; break;
-+    case VM_1_10_SV48:
-+      levels = 4; ptidxbits = 9; ptesize = 8; break;
-+    case VM_1_10_SV57:
-+      levels = 5; ptidxbits = 9; ptesize = 8; break;
-+    case VM_1_10_MBARE:
-+        *physical = addr;
-+        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-+        return TRANSLATE_SUCCESS;
-+    default:
-+      g_assert_not_reached();
-     }
- 
-     CPUState *cs = env_cpu(env);
-@@ -588,7 +567,6 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-     int page_fault_exceptions;
-     if (first_stage) {
-         page_fault_exceptions =
--            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-             get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-             !pmp_violation;
-     } else {
-@@ -941,8 +919,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-         }
- 
-         s = env->mstatus;
--        s = set_field(s, MSTATUS_SPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
--            get_field(s, MSTATUS_SIE) : get_field(s, MSTATUS_UIE << env->priv));
-+        s = set_field(s, MSTATUS_SPIE, get_field(s, MSTATUS_SIE));
-         s = set_field(s, MSTATUS_SPP, env->priv);
-         s = set_field(s, MSTATUS_SIE, 0);
-         env->mstatus = s;
-@@ -979,8 +956,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-         }
- 
-         s = env->mstatus;
--        s = set_field(s, MSTATUS_MPIE, env->priv_ver >= PRIV_VERSION_1_10_0 ?
--            get_field(s, MSTATUS_MIE) : get_field(s, MSTATUS_UIE << env->priv));
-+        s = set_field(s, MSTATUS_MPIE, get_field(s, MSTATUS_MIE));
-         s = set_field(s, MSTATUS_MPP, env->priv);
-         s = set_field(s, MSTATUS_MIE, 0);
-         env->mstatus = s;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 11d184cd16..383be0a955 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -58,31 +58,11 @@ static int ctr(CPURISCVState *env, int csrno)
- #if !defined(CONFIG_USER_ONLY)
-     CPUState *cs = env_cpu(env);
-     RISCVCPU *cpu = RISCV_CPU(cs);
--    uint32_t ctr_en = ~0u;
- 
-     if (!cpu->cfg.ext_counters) {
-         /* The Counters extensions is not enabled */
-         return -1;
-     }
--
--    /*
--     * The counters are always enabled at run time on newer priv specs, as the
--     * CSR has changed from controlling that the counters can be read to
--     * controlling that the counters increment.
--     */
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
--        return 0;
--    }
--
--    if (env->priv < PRV_M) {
--        ctr_en &= env->mcounteren;
--    }
--    if (env->priv < PRV_S) {
--        ctr_en &= env->scounteren;
--    }
--    if (!(ctr_en & (1u << (csrno & 31)))) {
--        return -1;
--    }
- #endif
-     return 0;
- }
-@@ -293,9 +273,6 @@ static const target_ulong delegable_excps =
-     (1ULL << (RISCV_EXCP_INST_GUEST_PAGE_FAULT)) |
-     (1ULL << (RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT)) |
-     (1ULL << (RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT));
--static const target_ulong sstatus_v1_9_mask = SSTATUS_SIE | SSTATUS_SPIE |
--    SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
--    SSTATUS_SUM | SSTATUS_SD;
- static const target_ulong sstatus_v1_10_mask = SSTATUS_SIE | SSTATUS_SPIE |
-     SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
-     SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
-@@ -304,20 +281,11 @@ static const target_ulong hip_writable_mask = MIP_VSSIP | MIP_VSTIP | MIP_VSEIP;
- static const target_ulong vsip_writable_mask = MIP_VSSIP;
- 
- #if defined(TARGET_RISCV32)
--static const char valid_vm_1_09[16] = {
--    [VM_1_09_MBARE] = 1,
--    [VM_1_09_SV32] = 1,
--};
- static const char valid_vm_1_10[16] = {
-     [VM_1_10_MBARE] = 1,
-     [VM_1_10_SV32] = 1
- };
- #elif defined(TARGET_RISCV64)
--static const char valid_vm_1_09[16] = {
--    [VM_1_09_MBARE] = 1,
--    [VM_1_09_SV39] = 1,
--    [VM_1_09_SV48] = 1,
--};
- static const char valid_vm_1_10[16] = {
-     [VM_1_10_MBARE] = 1,
-     [VM_1_10_SV39] = 1,
-@@ -347,8 +315,7 @@ static int read_mstatus(CPURISCVState *env, int csrno, target_ulong *val)
- 
- static int validate_vm(CPURISCVState *env, target_ulong vm)
- {
--    return (env->priv_ver >= PRIV_VERSION_1_10_0) ?
--        valid_vm_1_10[vm & 0xf] : valid_vm_1_09[vm & 0xf];
-+    return valid_vm_1_10[vm & 0xf];
- }
- 
- static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
-@@ -358,34 +325,21 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
-     int dirty;
- 
-     /* flush tlb on mstatus fields that affect VM */
--    if (env->priv_ver <= PRIV_VERSION_1_09_1) {
--        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP |
--                MSTATUS_MPRV | MSTATUS_SUM | MSTATUS_VM)) {
--            tlb_flush(env_cpu(env));
--        }
--        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
--            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
--            MSTATUS_MPP | MSTATUS_MXR |
--            (validate_vm(env, get_field(val, MSTATUS_VM)) ?
--                MSTATUS_VM : 0);
-+    if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
-+            MSTATUS_MPRV | MSTATUS_SUM)) {
-+        tlb_flush(env_cpu(env));
-     }
--    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
--        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
--                MSTATUS_MPRV | MSTATUS_SUM)) {
--            tlb_flush(env_cpu(env));
--        }
--        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
--            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
--            MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
--            MSTATUS_TW;
-+    mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
-+        MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
-+        MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
-+        MSTATUS_TW;
- #if defined(TARGET_RISCV64)
--            /*
--             * RV32: MPV and MTL are not in mstatus. The current plan is to
--             * add them to mstatush. For now, we just don't support it.
--             */
--            mask |= MSTATUS_MTL | MSTATUS_MPV;
++
++    return false;
++}
++
++static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
++{
++    int pending_num = irq / 32;
++
++    s->pending[pending_num] |= level << (irq % 32);
++}
++
++static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
++{
++    int i;
++
++    for (i = 0; i < s->pending_num; i++) {
++        uint32_t irq_num = ctz64(s->pending[i]) + (i * 32);
++
++        if (!(s->pending[i] & s->enable[i])) {
++            /* No pending and enabled IRQ */
++            continue;
++        }
++
++        if (s->priority[irq_num] > s->threshold) {
++            if (!s->claim) {
++                s->claim = irq_num;
++            }
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static void ibex_plic_update(IbexPlicState *s)
++{
++    CPUState *cpu;
++    int level, i;
++
++    for (i = 0; i < s->num_cpus; i++) {
++        cpu = qemu_get_cpu(i);
++
++        if (!cpu) {
++            continue;
++        }
++
++        level = ibex_plic_irqs_pending(s, 0);
++
++        riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
++    }
++}
++
++static void ibex_plic_reset(DeviceState *dev)
++{
++    IbexPlicState *s = IBEX_PLIC(dev);
++
++    s->threshold = 0x00000000;
++    s->claim = 0x00000000;
++}
++
++static uint64_t ibex_plic_read(void *opaque, hwaddr addr,
++                               unsigned int size)
++{
++    IbexPlicState *s = opaque;
++    int offset;
++    uint32_t ret = 0;
++
++    if (addr_between(addr, s->pending_base, s->pending_num)) {
++        offset = (addr - s->pending_base) / 4;
++        ret = s->pending[offset];
++    } else if (addr_between(addr, s->source_base, s->source_num)) {
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Interrupt source mode not supported\n", __func__);
++    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
++        offset = (addr - s->priority_base) / 4;
++        ret = s->priority[offset];
++    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
++        offset = (addr - s->enable_base) / 4;
++        ret = s->enable[offset];
++    } else if (addr_between(addr, s->threshold_base, 1)) {
++        ret = s->threshold;
++    } else if (addr_between(addr, s->claim_base, 1)) {
++        int pending_num = s->claim / 32;
++        s->pending[pending_num] &= ~(1 << (s->claim % 32));
++
++        ret = s->claim;
++    }
++
++    return ret;
++}
++
++static void ibex_plic_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned int size)
++{
++    IbexPlicState *s = opaque;
++
++    if (addr_between(addr, s->pending_base, s->pending_num)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Pending registers are read only\n", __func__);
++    } else if (addr_between(addr, s->source_base, s->source_num)) {
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Interrupt source mode not supported\n", __func__);
++    } else if (addr_between(addr, s->priority_base, s->priority_num)) {
++        uint32_t irq = ((addr - s->priority_base) >> 2) + 1;
++        s->priority[irq] = value & 7;
++    } else if (addr_between(addr, s->enable_base, s->enable_num)) {
++        uint32_t enable_reg = (addr - s->enable_base) / 4;
++
++        s->enable[enable_reg] = value;
++    } else if (addr_between(addr, s->threshold_base, 1)) {
++        s->threshold = value & 3;
++    } else if (addr_between(addr, s->claim_base, 1)) {
++        if (s->claim == value) {
++            /* Interrupt was completed */
++            s->claim = 0;
++        }
++    }
++
++    ibex_plic_update(s);
++}
++
++static const MemoryRegionOps ibex_plic_ops = {
++    .read = ibex_plic_read,
++    .write = ibex_plic_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static void ibex_plic_irq_request(void *opaque, int irq, int level)
++{
++    IbexPlicState *s = opaque;
++
++    ibex_plic_irqs_set_pending(s, irq, level > 0);
++    ibex_plic_update(s);
++}
++
++static Property ibex_plic_properties[] = {
++    DEFINE_PROP_UINT32("num-cpus", IbexPlicState, num_cpus, 1),
++    DEFINE_PROP_UINT32("num-sources", IbexPlicState, num_sources, 80),
++
++    DEFINE_PROP_UINT32("pending-base", IbexPlicState, pending_base, 0),
++    DEFINE_PROP_UINT32("pending-num", IbexPlicState, pending_num, 3),
++
++    DEFINE_PROP_UINT32("source-base", IbexPlicState, source_base, 0x0c),
++    DEFINE_PROP_UINT32("source-num", IbexPlicState, source_num, 3),
++
++    DEFINE_PROP_UINT32("priority-base", IbexPlicState, priority_base, 0x18),
++    DEFINE_PROP_UINT32("priority-num", IbexPlicState, priority_num, 80),
++
++    DEFINE_PROP_UINT32("enable-base", IbexPlicState, enable_base, 0x200),
++    DEFINE_PROP_UINT32("enable-num", IbexPlicState, enable_num, 3),
++
++    DEFINE_PROP_UINT32("threshold-base", IbexPlicState, threshold_base, 0x20c),
++
++    DEFINE_PROP_UINT32("claim-base", IbexPlicState, claim_base, 0x210),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void ibex_plic_init(Object *obj)
++{
++    IbexPlicState *s = IBEX_PLIC(obj);
++
++    memory_region_init_io(&s->mmio, obj, &ibex_plic_ops, s,
++                          TYPE_IBEX_PLIC, 0x400);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++}
++
++static void ibex_plic_realize(DeviceState *dev, Error **errp)
++{
++    IbexPlicState *s = IBEX_PLIC(dev);
++    int i;
++
++    s->pending = g_new0(uint32_t, s->pending_num);
++    s->source = g_new0(uint32_t, s->source_num);
++    s->priority = g_new0(uint32_t, s->priority_num);
++    s->enable = g_new0(uint32_t, s->enable_num);
++
++    qdev_init_gpio_in(dev, ibex_plic_irq_request, s->num_sources);
++
 +    /*
-+     * RV32: MPV and MTL are not in mstatus. The current plan is to
-+     * add them to mstatush. For now, we just don't support it.
++     * We can't allow the supervisor to control SEIP as this would allow the
++     * supervisor to clear a pending external interrupt which will result in
++     * a lost interrupt in the case a PLIC is attached. The SEIP bit must be
++     * hardware controlled when a PLIC is attached.
 +     */
-+    mask |= MSTATUS_MTL | MSTATUS_MPV;
- #endif
--    }
- 
-     mstatus = (mstatus & ~mask) | (val & mask);
- 
-@@ -534,18 +488,12 @@ static int write_mtvec(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_mcounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    if (env->priv_ver < PRIV_VERSION_1_10_0) {
--        return -1;
--    }
-     *val = env->mcounteren;
-     return 0;
- }
- 
- static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if (env->priv_ver < PRIV_VERSION_1_10_0) {
--        return -1;
--    }
-     env->mcounteren = val;
-     return 0;
- }
-@@ -553,8 +501,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
- /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1
--        && env->priv_ver < PRIV_VERSION_1_11_0) {
-+    if (env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     *val = env->mcounteren;
-@@ -564,32 +511,13 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1
--        && env->priv_ver < PRIV_VERSION_1_11_0) {
-+    if (env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     env->mcounteren = val;
-     return 0;
- }
- 
--static int read_mucounteren(CPURISCVState *env, int csrno, target_ulong *val)
--{
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
--        return -1;
--    }
--    *val = env->scounteren;
--    return 0;
--}
--
--static int write_mucounteren(CPURISCVState *env, int csrno, target_ulong val)
--{
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
--        return -1;
--    }
--    env->scounteren = val;
--    return 0;
--}
--
- /* Machine Trap Handling */
- static int read_mscratch(CPURISCVState *env, int csrno, target_ulong *val)
- {
-@@ -663,16 +591,14 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
- /* Supervisor Trap Setup */
- static int read_sstatus(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
--                         sstatus_v1_10_mask : sstatus_v1_9_mask);
-+    target_ulong mask = (sstatus_v1_10_mask);
-     *val = env->mstatus & mask;
-     return 0;
- }
- 
- static int write_sstatus(CPURISCVState *env, int csrno, target_ulong val)
- {
--    target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
--                         sstatus_v1_10_mask : sstatus_v1_9_mask);
-+    target_ulong mask = (sstatus_v1_10_mask);
-     target_ulong newval = (env->mstatus & ~mask) | (val & mask);
-     return write_mstatus(env, CSR_MSTATUS, newval);
- }
-@@ -722,18 +648,12 @@ static int write_stvec(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_scounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    if (env->priv_ver < PRIV_VERSION_1_10_0) {
--        return -1;
--    }
-     *val = env->scounteren;
-     return 0;
- }
- 
- static int write_scounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if (env->priv_ver < PRIV_VERSION_1_10_0) {
--        return -1;
--    }
-     env->scounteren = val;
-     return 0;
- }
-@@ -812,15 +732,15 @@ static int read_satp(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
-         *val = 0;
--    } else if (env->priv_ver >= PRIV_VERSION_1_10_0) {
--        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
--            return -1;
--        } else {
--            *val = env->satp;
--        }
-+        return 0;
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int smp_cpus = ms->smp.cpus;
++    for (i = 0; i < smp_cpus; i++) {
++        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(i));
++        if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
++            error_report("SEIP already claimed");
++            exit(1);
++        }
 +    }
 +
-+    if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
-+        return -1;
-     } else {
--        *val = env->sptbr;
-+        *val = env->satp;
-     }
++    msi_nonbroken = true;
++}
 +
-     return 0;
- }
++static void ibex_plic_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = ibex_plic_reset;
++    device_class_set_props(dc, ibex_plic_properties);
++    dc->realize = ibex_plic_realize;
++}
++
++static const TypeInfo ibex_plic_info = {
++    .name          = TYPE_IBEX_PLIC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IbexPlicState),
++    .instance_init = ibex_plic_init,
++    .class_init    = ibex_plic_class_init,
++};
++
++static void ibex_plic_register_types(void)
++{
++    type_register_static(&ibex_plic_info);
++}
++
++type_init(ibex_plic_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a1ce186a7e..d6b2819e44 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1246,8 +1246,10 @@ L: qemu-riscv@nongnu.org
+ S: Supported
+ F: hw/riscv/opentitan.c
+ F: hw/char/ibex_uart.c
++F: hw/intc/ibex_plic.c
+ F: include/hw/riscv/opentitan.h
+ F: include/hw/char/ibex_uart.h
++F: include/hw/intc/ibex_plic.h
  
-@@ -829,13 +749,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
-     if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
-         return 0;
-     }
--    if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val ^ env->sptbr)) {
--        tlb_flush(env_cpu(env));
--        env->sptbr = val & (((target_ulong)
--            1 << (TARGET_PHYS_ADDR_SPACE_BITS - PGSHIFT)) - 1);
--    }
--    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
--        validate_vm(env, get_field(val, SATP_MODE)) &&
-+    if (validate_vm(env, get_field(val, SATP_MODE)) &&
-         ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
-     {
-         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
-@@ -1313,8 +1227,6 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_MSTATUSH] =            { any,  read_mstatush,    write_mstatush    },
- #endif
- 
--    /* Legacy Counter Setup (priv v1.9.1) */
--    [CSR_MUCOUNTEREN] =         { any,  read_mucounteren, write_mucounteren },
-     [CSR_MSCOUNTEREN] =         { any,  read_mscounteren, write_mscounteren },
- 
-     /* Machine Trap Handling */
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
-index 76c2fad71c..5f26e0f5ea 100644
---- a/target/riscv/insn_trans/trans_privileged.inc.c
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -85,30 +85,21 @@ static bool trans_wfi(DisasContext *ctx, arg_wfi *a)
- static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
- {
- #ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver >= PRIV_VERSION_1_10_0) {
--        gen_helper_tlb_flush(cpu_env);
--        return true;
--    }
-+    gen_helper_tlb_flush(cpu_env);
-+    return true;
- #endif
-     return false;
- }
- 
- static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
- {
--#ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
--        gen_helper_tlb_flush(cpu_env);
--        return true;
--    }
--#endif
-     return false;
- }
- 
- static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
- {
- #ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
--        has_ext(ctx, RVH)) {
-+    if (has_ext(ctx, RVH)) {
-         /* Hpervisor extensions exist */
-         /*
-          * if (env->priv == PRV_M ||
-@@ -127,8 +118,7 @@ static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
- static bool trans_hfence_bvma(DisasContext *ctx, arg_sfence_vma *a)
- {
- #ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
--        has_ext(ctx, RVH)) {
-+    if (has_ext(ctx, RVH)) {
-         /* Hpervisor extensions exist */
-         /*
-          * if (env->priv == PRV_M ||
-diff --git a/target/riscv/monitor.c b/target/riscv/monitor.c
-index d725a7a36e..b569f08387 100644
---- a/target/riscv/monitor.c
-+++ b/target/riscv/monitor.c
-@@ -215,11 +215,6 @@ void hmp_info_mem(Monitor *mon, const QDict *qdict)
-         return;
-     }
- 
--    if (env->priv_ver < PRIV_VERSION_1_10_0) {
--        monitor_printf(mon, "Privileged mode < 1.10 unsupported\n");
--        return;
--    }
--
-     if (!(env->satp & SATP_MODE)) {
-         monitor_printf(mon, "No translation or protection\n");
-         return;
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index c6412f680c..b0c49efc4a 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -84,8 +84,7 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
-         riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
-     }
- 
--    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
--        get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
-+    if (get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
-@@ -119,10 +118,8 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
-     } else {
-         prev_priv = get_field(mstatus, MSTATUS_SPP);
- 
--        mstatus = set_field(mstatus,
--            env->priv_ver >= PRIV_VERSION_1_10_0 ?
--            MSTATUS_SIE : MSTATUS_UIE << prev_priv,
--            get_field(mstatus, MSTATUS_SPIE));
-+        mstatus = set_field(mstatus, MSTATUS_SIE,
-+                            get_field(mstatus, MSTATUS_SPIE));
-         mstatus = set_field(mstatus, MSTATUS_SPIE, 1);
-         mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
-         env->mstatus = mstatus;
-@@ -147,10 +144,8 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
-     target_ulong mstatus = env->mstatus;
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
-     target_ulong prev_virt = MSTATUS_MPV_ISSET(env);
--    mstatus = set_field(mstatus,
--        env->priv_ver >= PRIV_VERSION_1_10_0 ?
--        MSTATUS_MIE : MSTATUS_UIE << prev_priv,
--        get_field(mstatus, MSTATUS_MPIE));
-+    mstatus = set_field(mstatus, MSTATUS_MIE,
-+                        get_field(mstatus, MSTATUS_MPIE));
-     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
-     mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
- #ifdef TARGET_RISCV32
-@@ -177,7 +172,6 @@ void helper_wfi(CPURISCVState *env)
-     CPUState *cs = env_cpu(env);
- 
-     if ((env->priv == PRV_S &&
--        env->priv_ver >= PRIV_VERSION_1_10_0 &&
-         get_field(env->mstatus, MSTATUS_TW)) ||
-         riscv_cpu_virt_enabled(env)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-@@ -193,7 +187,6 @@ void helper_tlb_flush(CPURISCVState *env)
-     CPUState *cs = env_cpu(env);
-     if (!(env->priv >= PRV_S) ||
-         (env->priv == PRV_S &&
--         env->priv_ver >= PRIV_VERSION_1_10_0 &&
-          get_field(env->mstatus, MSTATUS_TVM))) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     } else {
+ SH4 Machines
+ ------------
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index f726d87532..a61e6728fe 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) += arm_gicv3_cpuif.o
+ obj-$(CONFIG_MIPS_CPS) += mips_gic.o
+ obj-$(CONFIG_NIOS2) += nios2_iic.o
+ obj-$(CONFIG_OMPIC) += ompic.o
++obj-$(CONFIG_IBEX) += ibex_plic.o
 -- 
 2.26.2
 
