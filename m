@@ -2,44 +2,44 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B2CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95923C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A37F8207D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A37F8207D4
+	by mail.kernel.org (Postfix) with ESMTPS id 6A8FB206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8FB206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeZ8w-0002tm-Jn
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:09:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40832)
+	id 1jeZ9t-0005bI-J3
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:10:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jeZ4o-0004Aj-Ky
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:10 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33316)
+ id 1jeZ5D-0004z6-4H
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:35 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33410)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4n-00016s-G0
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:10 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ5B-0001Ve-BA
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:34 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 53E21CD461;
- Fri, 29 May 2020 10:05:08 +0300 (MSK)
-Subject: [PATCH v3 06/11] tests/acceptance: add record/replay test for arm
+ by mail.ispras.ru (Postfix) with ESMTPSA id 35540CD461;
+ Fri, 29 May 2020 10:05:32 +0300 (MSK)
+Subject: [PATCH v3 10/11] tests/acceptance: refactor boot_linux to allow
+ code reuse
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 29 May 2020 10:05:07 +0300
-Message-ID: <159073590785.20809.17654573764167037499.stgit@pasha-ThinkPad-X280>
+Date: Fri, 29 May 2020 10:05:31 +0300
+Message-ID: <159073593167.20809.17582679291556188984.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -50,12 +50,13 @@ Received-SPF: softfail client-ip=83.149.199.45;
  envelope-from=Pavel.Dovgaluk@gmail.com; helo=mail.ispras.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:56:22
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 7
-X-Spam_score: 0.7
-X-Spam_bar: /
-X-Spam_report: (0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, NML_ADSP_CUSTOM_MED=0.9,
- SPF_SOFTFAIL=0.665, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 17
+X-Spam_score: 1.7
+X-Spam_bar: +
+X-Spam_report: (1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
+ FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, FROM_WORDY=1,
+ NML_ADSP_CUSTOM_MED=0.9, SPF_SOFTFAIL=0.665, T_FILL_THIS_FORM_SHORT=0.01,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,66 +76,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a test for record/replay of the kernel
-image boot for two different arm platforms.
+This patch moves image downloading functions to the separate class to allow
+reusing them from record/replay tests.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
  0 files changed
 
-diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-index 616d2dfc33..382f1248e0 100644
---- a/tests/acceptance/replay_kernel.py
-+++ b/tests/acceptance/replay_kernel.py
-@@ -106,3 +106,49 @@ class ReplayKernel(LinuxKernelTest):
+diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
+index 075a386300..3aa57e88b0 100644
+--- a/tests/acceptance/boot_linux.py
++++ b/tests/acceptance/boot_linux.py
+@@ -26,22 +26,8 @@ KVM_NOT_AVAILABLE = ACCEL_NOT_AVAILABLE_FMT % "KVM"
+ TCG_NOT_AVAILABLE = ACCEL_NOT_AVAILABLE_FMT % "TCG"
  
-         self.run_rr(kernel_path, kernel_command_line, console_pattern,
-             args=('-cpu', 'cortex-a53'))
+ 
+-class BootLinux(Test):
+-    """
+-    Boots a Linux system, checking for a successful initialization
+-    """
+-
+-    timeout = 900
+-    chksum = None
+-
+-    def setUp(self):
+-        super(BootLinux, self).setUp()
+-        self.vm.add_args('-smp', '2')
+-        self.vm.add_args('-m', '1024')
+-        self.prepare_boot()
+-        self.prepare_cloudinit()
+-
+-    def prepare_boot(self):
++class BootLinuxBase(Test):
++    def download_boot(self):
+         self.log.debug('Looking for and selecting a qemu-img binary to be '
+                        'used to create the bootable snapshot image')
+         # If qemu-img has been built, use it, otherwise the system wide one
+@@ -60,17 +46,17 @@ class BootLinux(Test):
+         if image_arch == 'ppc64':
+             image_arch = 'ppc64le'
+         try:
+-            self.boot = vmimage.get(
++            boot = vmimage.get(
+                 'fedora', arch=image_arch, version='31',
+                 checksum=self.chksum,
+                 algorithm='sha256',
+                 cache_dir=self.cache_dirs[0],
+                 snapshot_dir=self.workdir)
+-            self.vm.add_args('-drive', 'file=%s' % self.boot.path)
+         except:
+             self.cancel('Failed to download/prepare boot image')
++        return boot.path
+ 
+-    def prepare_cloudinit(self):
++    def download_cloudinit(self):
+         self.log.info('Preparing cloudinit image')
+         try:
+             cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
+@@ -81,9 +67,32 @@ class BootLinux(Test):
+                           # QEMU's hard coded usermode router address
+                           phone_home_host='10.0.2.2',
+                           phone_home_port=self.phone_home_port)
+-            self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
+         except Exception:
+             self.cancel('Failed to prepared cloudinit image')
++        return cloudinit_iso
 +
-+    def test_arm_virt(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:virt
-+        """
-+        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
-+                      '/linux/releases/29/Everything/armhfp/os/images/pxeboot'
-+                      '/vmlinuz')
-+        kernel_hash = 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
-+        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++class BootLinux(BootLinuxBase):
++    """
++    Boots a Linux system, checking for a successful initialization
++    """
 +
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyAMA0')
-+        console_pattern = 'VFS: Cannot open root device'
++    timeout = 900
++    chksum = None
 +
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=1)
++    def setUp(self):
++        super(BootLinux, self).setUp()
++        self.vm.add_args('-smp', '2')
++        self.vm.add_args('-m', '1024')
++        self.prepare_boot()
++        self.prepare_cloudinit()
 +
-+    def test_arm_cubieboard_initrd(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:cubieboard
-+        """
-+        deb_url = ('https://apt.armbian.com/pool/main/l/'
-+                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-+        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        kernel_path = self.extract_from_deb(deb_path,
-+                                            '/boot/vmlinuz-4.20.7-sunxi')
-+        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
-+        dtb_path = self.extract_from_deb(deb_path, dtb_path)
-+        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-+                      '2eb0a73b5d5a28df3170c546ddaaa9757e1e0848/rootfs/'
-+                      'arm/rootfs-armv5.cpio.gz')
-+        initrd_hash = '2b50f1873e113523967806f4da2afe385462ff9b'
-+        initrd_path_gz = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-+        initrd_path = os.path.join(self.workdir, 'rootfs.cpio')
-+        archive.gzip_uncompress(initrd_path_gz, initrd_path)
++    def prepare_boot(self):
++        path = self.download_boot()
++        self.vm.add_args('-drive', 'file=%s' % path)
 +
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200 '
-+                               'usbcore.nousb '
-+                               'panic=-1 noreboot')
-+        console_pattern = 'Boot successful.'
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=1,
-+            args=('-dtb', dtb_path, '-initrd', initrd_path, '-no-reboot'))
++    def prepare_cloudinit(self):
++        cloudinit_iso = self.download_cloudinit()
++        self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
+ 
+     def launch_and_wait(self):
+         self.vm.set_console()
 
 
