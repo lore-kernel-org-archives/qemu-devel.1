@@ -2,161 +2,73 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AFDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 00:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F4CC433E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 02:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 900A320776
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 00:19:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCwkteds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900A320776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0EAF214F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 02:58:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0EAF214F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeSkE-0001eA-LH
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 20:19:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48946)
+	id 1jeVEM-0001o4-Oj
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 22:58:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jeSjM-0001Cu-T1
- for qemu-devel@nongnu.org; Thu, 28 May 2020 20:18:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48106
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jeVDn-0001DP-JM
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 22:58:11 -0400
+Resent-Date: Thu, 28 May 2020 22:58:11 -0400
+Resent-Message-Id: <E1jeVDn-0001DP-JM@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jeSjL-0000Ro-AY
- for qemu-devel@nongnu.org; Thu, 28 May 2020 20:18:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590711513;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=mDiMS38TTVOokMIFPnEFyctpigA9cvKamezOfXjvzls=;
- b=GCwktedstzyL1oVZrVsHnDtccXkVjNyOwhbIUkfEq/mcKKynw7xAOzFfYV7QJZFLHdnYrx
- Ec6Ukahe1VF+hAiqZJLPLew3frNsftKJiUTYfzUfr//ck6cREH56g1DTugnzTZY3po4hjK
- JHLJxRLWZGOERnJwyavxlhduzygE1F8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-NRSXqF0VPFSXBxVMpBHmjQ-1; Thu, 28 May 2020 20:18:32 -0400
-X-MC-Unique: NRSXqF0VPFSXBxVMpBHmjQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2655800D24;
- Fri, 29 May 2020 00:18:30 +0000 (UTC)
-Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C56CA7A8B0;
- Fri, 29 May 2020 00:18:28 +0000 (UTC)
-Subject: Re: [PATCH RFC 26/32] python//machine.py: use qmp.command
-To: qemu-devel@nongnu.org
-References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-27-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <0baff903-779b-c583-8ba6-6a28a4a10a42@redhat.com>
-Date: Thu, 28 May 2020 20:18:28 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jeVDl-0004iV-IH
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 22:58:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590721078; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=W3iKSdrUXbWnX6KqL54waUm6pJ/RkUuqk+2euLksEGeFSZZLUYWjQsIV2qMg2egAyIvWX1IlgQdRK5fl6i15rInMa510uS5x/HqnMEFWoAuvL5+II0IjbZm1ccFWgR5gm7fjUs29ScoL5edZjDVppuSZnsOmIYQQuuEZYkqwrGg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590721078;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=OZTxs62wDDgucCk+u6fiDAHb+0sVhHeGFcmW3pPwNyE=; 
+ b=b/pafd5vUVF1szU0uONjkxFyVe8RhxGVkW3b1E0QDo00ZUxoi6cgQKlhotA/HBY+CN65n6eKZRrKDUjpT3noHaqXEVBZwRVI4UBSYvJ5IMm4miB+qJBaH4KNG1gp52Nr+2X72y01L1EU2IHd+Y0wavPJRjlJluL0l5NlJoUkctE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1590721075874592.5796965051674;
+ Thu, 28 May 2020 19:57:55 -0700 (PDT)
+Message-ID: <159072107463.20666.5539780381350433554@45ef0f9c86ae>
+In-Reply-To: <20200528193758.51454-1-r.bolshakov@yadro.com>
+Subject: Re: [PATCH 00/13] i386: hvf: Remove HVFX86EmulatorState
 MIME-Version: 1.0
-In-Reply-To: <20200514055403.18902-27-jsnow@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 17:42:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: r.bolshakov@yadro.com
+Date: Thu, 28 May 2020 19:57:55 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 22:58:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -169,76 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: r.bolshakov@yadro.com, qemu-devel@nongnu.org, dirty@apple.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-[...]
-
->  
-> -    def qmp(self, cmd, conv_keys=True, **args):
-> -        """
-> -        Invoke a QMP command and return the response dict
-> -        """
-> +    @classmethod
-> +    def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
->          qmp_args = dict()
->          for key, value in args.items():
-> -            if conv_keys:
-> +            if _conv_keys:
->                  qmp_args[key.replace('_', '-')] = value
->              else:
->                  qmp_args[key] = value
-> +        return qmp_args
->  
-> +    def qmp(self, cmd: str,
-> +            conv_keys: bool = True,
-> +            **args: Any) -> QMPMessage:
-
-This creates an interesting problem with iotests 297:
-
-
--Success: no issues found in 1 source file
-+iotests.py:563: error: Argument 2 to "qmp" of "QEMUMachine" has
-incompatible type "**Dict[str, str]"; expected "bool"
-+Found 1 error in 1 file (checked 1 source file)
-
-
-def hmp(self, command_line: str, use_log: bool = False) -> QMPResponse:
-    cmd = 'human-monitor-command'
-    kwargs = {'command-line': command_line}
-    if use_log:
-        return self.qmp_log(cmd, **kwargs)
-    else:
-        return self.qmp(cmd, **kwargs)
-
-It seems like mypy is unable to understand that we are passing keyword
-arguments, and instead believes we're passing something to the conv_keys
-parameter.
-
-(Is this a bug...?)
-
-Even amending the function signature to indicate that conv_keys should
-only ever appear as a keyword argument doesn't seem to help.
-
-I'll have to think about a nice way to fix this; removing conv_keys out
-of the argument namespace seems like the best approach.
-
-qmp(cmd, foo=bar, hello=world)
-qmp(cmd, **conv_keys(foo=bar, hello=world))
-
-...but now this function looks really annoying to call.
-
-Uh, I'll play around with this, but let me know if you have any cool ideas.
-
---js
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyODE5Mzc1OC41MTQ1
+NC0xLXIuYm9sc2hha292QHlhZHJvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MjgxOTM3NTguNTE0NTQtMS1yLmJvbHNo
+YWtvdkB5YWRyby5jb20KU3ViamVjdDogW1BBVENIIDAwLzEzXSBpMzg2OiBodmY6IFJlbW92ZSBI
+VkZYODZFbXVsYXRvclN0YXRlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
+YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmFiZmQ3NSBpMzg2
+OiBodmY6IERyb3AgSFZGWDg2RW11bGF0b3JTdGF0ZQo1NzU1N2JlIGkzODY6IGh2ZjogTW92ZSBt
+bWlvX2J1ZiBpbnRvIENQVVg4NlN0YXRlCjUzYjkzNTQgaTM4NjogaHZmOiBNb3ZlIGxhenlfZmxh
+Z3MgaW50byBDUFVYODZTdGF0ZQpiYTZjODIxIGkzODY6IGh2ZjogRHJvcCByZWdzIGluIEhWRlg4
+NkVtdWxhdG9yU3RhdGUKNzBiMjgzOSBpMzg2OiBodmY6IERyb3AgY29weSBvZiBSRkxBR1MgZGVm
+aW5lcwphZWY3Mjc4IGkzODY6IGh2ZjogRHJvcCByZmxhZ3MgZnJvbSBIVkZYODZFbXVsYXRvclN0
+YXRlCjNhYTU3YWEgaTM4NjogaHZmOiBEcm9wIGZldGNoX3JpcCBmcm9tIEhWRlg4NkVtdWxhdG9y
+U3RhdGUKNDRhOTRlZCBpMzg2OiBodmY6IFVzZSBJUCBmcm9tIENQVVg4NlN0YXRlCmVmNmZlNzkg
+aTM4NjogaHZmOiBVc2UgaW5zX2xlbiB0byBhZHZhbmNlIElQCmVjODhiMTIgaTM4NjogaHZmOiBE
+cm9wIHVudXNlZCB2YXJpYWJsZQpkZThkOTk5IGkzODY6IGh2ZjogQ2xlYW4gc3RyYXkgaW5jbHVk
+ZXMgaW4gc3lzZW11CmFkMDYxYmMgaTM4NjogaHZmOiBEcm9wIHVzZWxlc3MgZGVjbGFyYXRpb25z
+IGluIHN5c2VtdQowZGE2ZmJhIGkzODY6IGh2ZjogTW92ZSBIVkZTdGF0ZSBkZWZpbml0aW9uIGlu
+dG8gaHZmCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEzIENoZWNraW5nIGNvbW1pdCAwZGE2ZmJh
+ZmRhNWYgKGkzODY6IGh2ZjogTW92ZSBIVkZTdGF0ZSBkZWZpbml0aW9uIGludG8gaHZmKQoyLzEz
+IENoZWNraW5nIGNvbW1pdCBhZDA2MWJjN2YwMjUgKGkzODY6IGh2ZjogRHJvcCB1c2VsZXNzIGRl
+Y2xhcmF0aW9ucyBpbiBzeXNlbXUpCjMvMTMgQ2hlY2tpbmcgY29tbWl0IGRlOGQ5OTk3ZTkxMSAo
+aTM4NjogaHZmOiBDbGVhbiBzdHJheSBpbmNsdWRlcyBpbiBzeXNlbXUpCjQvMTMgQ2hlY2tpbmcg
+Y29tbWl0IGVjODhiMTJjNGFlNyAoaTM4NjogaHZmOiBEcm9wIHVudXNlZCB2YXJpYWJsZSkKNS8x
+MyBDaGVja2luZyBjb21taXQgZWY2ZmU3OTY5NzhlIChpMzg2OiBodmY6IFVzZSBpbnNfbGVuIHRv
+IGFkdmFuY2UgSVApCjYvMTMgQ2hlY2tpbmcgY29tbWl0IDQ0YTk0ZWQyMWQwNiAoaTM4NjogaHZm
+OiBVc2UgSVAgZnJvbSBDUFVYODZTdGF0ZSkKRVJST1I6IHVubmVjZXNzYXJ5IHdoaXRlc3BhY2Ug
+YmVmb3JlIGEgcXVvdGVkIG5ld2xpbmUKIzQ0NDogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9l
+bXUuYzoxNDcwOgorICAgICAgICBwcmludGYoIlVuaW1wbGVtZW50ZWQgaGFuZGxlciAoJWxseCkg
+Zm9yICVkICgleCAleCkgXG4iLCBlbnYtPmVpcCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgNDAzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjcvMTMgQ2hlY2tpbmcgY29tbWl0IDNhYTU3YWFiOTI3MSAoaTM4NjogaHZmOiBEcm9wIGZl
+dGNoX3JpcCBmcm9tIEhWRlg4NkVtdWxhdG9yU3RhdGUpCjgvMTMgQ2hlY2tpbmcgY29tbWl0IGFl
+ZjcyNzg1ZGE2OCAoaTM4NjogaHZmOiBEcm9wIHJmbGFncyBmcm9tIEhWRlg4NkVtdWxhdG9yU3Rh
+dGUpCjkvMTMgQ2hlY2tpbmcgY29tbWl0IDcwYjI4MzlkOGQyZSAoaTM4NjogaHZmOiBEcm9wIGNv
+cHkgb2YgUkZMQUdTIGRlZmluZXMpCjEwLzEzIENoZWNraW5nIGNvbW1pdCBiYTZjODIxZjhhN2Ug
+KGkzODY6IGh2ZjogRHJvcCByZWdzIGluIEhWRlg4NkVtdWxhdG9yU3RhdGUpCjExLzEzIENoZWNr
+aW5nIGNvbW1pdCA1M2I5MzU0MjQ0NDQgKGkzODY6IGh2ZjogTW92ZSBsYXp5X2ZsYWdzIGludG8g
+Q1BVWDg2U3RhdGUpCjEyLzEzIENoZWNraW5nIGNvbW1pdCA1NzU1N2JlMmQxM2MgKGkzODY6IGh2
+ZjogTW92ZSBtbWlvX2J1ZiBpbnRvIENQVVg4NlN0YXRlKQoxMy8xMyBDaGVja2luZyBjb21taXQg
+YmFiZmQ3NTc4NzI0IChpMzg2OiBodmY6IERyb3AgSFZGWDg2RW11bGF0b3JTdGF0ZSkKPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MjgxOTM3
+NTguNTE0NTQtMS1yLmJvbHNoYWtvdkB5YWRyby5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
