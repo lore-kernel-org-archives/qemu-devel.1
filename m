@@ -2,107 +2,85 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 111A6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 10:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8571C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 10:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D04E12074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 10:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A010D2074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 10:30:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVjQFthF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04E12074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xaoTNXld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A010D2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jecBy-0008VU-0p
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 06:24:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56744)
+	id 1jecH2-0004P7-Qy
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 06:30:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jecBN-0007li-3J
- for qemu-devel@nongnu.org; Fri, 29 May 2020 06:24:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32758
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jecBL-0000Iy-Pq
- for qemu-devel@nongnu.org; Fri, 29 May 2020 06:24:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590747846;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pxDBHAtntdYo3/I5jF5RO1+05QKmLkITNesr/lf56qc=;
- b=JVjQFthF7L976DwuWQQo10+LD36qNmoYtUC7pWtdS/qOXBQgOoTdc8A/ZIrcLjJl1Ps2hs
- 3ezu/2bpTIM8hEIz5fkWfuXOA+B7zpUeJqsZy5jiQok1gwFyVuKlwsmCuMx1+tjj0vQdwN
- YRTnc84PZSKolxjxxX4M2v337UIGHJ4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120--pUeCN0APCCcXUi86aYoyQ-1; Fri, 29 May 2020 06:24:03 -0400
-X-MC-Unique: -pUeCN0APCCcXUi86aYoyQ-1
-Received: by mail-wm1-f70.google.com with SMTP id y202so470638wmd.0
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 03:24:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jecGJ-0003a8-PT
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 06:29:15 -0400
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:37576)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jecGI-000264-Et
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 06:29:15 -0400
+Received: by mail-oi1-x232.google.com with SMTP id m67so2145542oif.4
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 03:29:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=OwQhexAqH28RpYFwFIoOCRJDk+PQALWmWutKQyXstaM=;
+ b=xaoTNXldeeu22OPNodXo23pnWLR4aa4GWe7uOnsovO2xN4AniOJXOFRMJ94zqxp29l
+ pqugCZRhvy+q60Jkuea/M0r2/WhGYXYp6nwFPOZR8YqfeIt9PQH73Z3af7VLda6CZDSW
+ gIT2ByrvePzNJb7qEOT7FE1j0ZucZ2aW0BRM9cwUJC6o6aLH+D52LY3IX/hzqQVhwdnO
+ UOzUeT7NcAQeOPSqh9xg41S1djhWIANcewcXdY8hzWrfPR4H//D3iCpJfRQsSufnfIAk
+ 2GMx4P92ik9KTnIG5i1QDF+JtH2k8VSqXo9qnwufnQUnRXRkEOlBBvrKdN9uiEUM2pZW
+ 0Idw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pxDBHAtntdYo3/I5jF5RO1+05QKmLkITNesr/lf56qc=;
- b=VeKho+1OWFQwQnZNY2Cy0hShbiNiOA/0vMytp+MmaBTuMoLg2fAtgerpbjKqgjkkeB
- Hkkbw31zMWE6KYCa07BI9VnODDT4S+EqLINzCpfh+YXzCDNBWYY9yKio+tKmqrwf7LH5
- nuqcAKR18hR8dKhtGHkyRgC3000e/KVe+CKX5ZGUmyThyUkfd+54NxnglS+IkBRlhVjv
- KOxnHD9i48VDsgnLlwxgLm3ajVR0wTNnO0VRmMaxODkR+Ka1gddF/0ak4Lqlhn7r0U6C
- tRGD5tB47/NWnClMm3U+eqMM8xE2WTk4ClS+snYRf1YRSYK0yYqhvsNVV85VPAEQxnTM
- 1c3A==
-X-Gm-Message-State: AOAM5317r0NbeTJlM0SF/8uTIov2oS1bsHveLQ/yER65ZrKXdAPn4sON
- HRKtwaZVoOYRJnO+AmYQC5Jc4/nsPGhgWoXrh4U+Nj/Zqm1ibPhFjh2B4xES7PKIozvO+wDUaxt
- EQ5WeFa+vsGavIN0=
-X-Received: by 2002:a1c:df57:: with SMTP id w84mr8387059wmg.52.1590747842081; 
- Fri, 29 May 2020 03:24:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTJlbT0P7UibD2L2+OQYbTMuMmZmH8apUHkw6a/gvcox+qHPjE6vge9qVAIxlOiHSEMqBYiQ==
-X-Received: by 2002:a1c:df57:: with SMTP id w84mr8387030wmg.52.1590747841776; 
- Fri, 29 May 2020 03:24:01 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b096:1b7:7695:e4f7?
- ([2001:b07:6468:f312:b096:1b7:7695:e4f7])
- by smtp.gmail.com with ESMTPSA id e6sm3010301wrx.80.2020.05.29.03.24.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 29 May 2020 03:24:00 -0700 (PDT)
-Subject: Re: [Qemu-devel PATCH] target/i386: define a new MSR based feature
- word - FEAT_PERF_CAPABILITIES
-To: Like Xu <like.xu@linux.intel.com>
-References: <20200529074347.124619-1-like.xu@linux.intel.com>
- <20200529074347.124619-5-like.xu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1aa68600-e48d-fa83-b2e2-b070a486afd4@redhat.com>
-Date: Fri, 29 May 2020 12:23:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OwQhexAqH28RpYFwFIoOCRJDk+PQALWmWutKQyXstaM=;
+ b=g+pdC58H0KWNzLuXoVmGz/COQ9YxVdBakT3eCNfRzapT1THYc41dJSS5xwyazjT409
+ 3YmSDbGKbCRWwaL1kei6w6QLEwCzBKg3c/XyxixyvEfkQ5AZBF0IluhwcuCCrG4oaEDm
+ q9p9wPGdnXOpF1MqqZKDpELfcGGBru0LtCmCNdMtmbhm0AWqlEzqOz8hJYW9zw8m4wAx
+ GhxnIBklmAlcbsd0NtYuZbB4IEa2Fi4vhz4cRCTdMV2OYam3cJOUGugN+Z09BqmfxRCG
+ kEzUEyH9qGJLh8JIzKmmVzA23ACPOjUUCnQdvBNkFMI2EJjFMDB9ilRG+csgZe8dD4XB
+ uLIA==
+X-Gm-Message-State: AOAM533btIkQIRjEnGhS/FWvJ/WDsCkk+nMq7niqdzCBYnYoEWdJ/d6e
+ +AaIuB3yuHw7L60Jqaesz2vZ2lkm5yOU8UEZN3XKjg==
+X-Google-Smtp-Source: ABdhPJwkGEBrp/rkvuwy/xdE/zsbjKanyd/3+EjneFaoYSiDAU77wtgUSdtibZQmpupx93oz0updi+RF53vc0LOX5Hs=
+X-Received: by 2002:a54:469a:: with SMTP id k26mr5179512oic.163.1590748152733; 
+ Fri, 29 May 2020 03:29:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200529074347.124619-5-like.xu@linux.intel.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:43:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200528123609.27362-1-kraxel@redhat.com>
+In-Reply-To: <20200528123609.27362-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 May 2020 11:29:02 +0100
+Message-ID: <CAFEAcA98OyyyC6gs34e3U03=dXz8GkDn5qf38UaO_XBB679V+g@mail.gmail.com>
+Subject: Re: [PULL 00/21] Vga 20200528 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::232;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x232.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,39 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wanpeng Li <wanpengli@tencent.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>, qemu-devel@nongnu.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Jim Mattson <jmattson@google.com>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/05/20 09:43, Like Xu wrote:
-> +        if (!cpu->enable_pmu) {
-> +            *ecx &= ~CPUID_EXT_PDCM;
-> +        }
->          break;
->      case 2:
->          /* cache info: needed for Pentium Pro compatibility */
-> @@ -6505,6 +6528,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->          }
->      }
->  
-> +    if (kvm_enabled() && cpu->enable_pmu &&
-> +        (kvm_arch_get_supported_cpuid(kvm_state, 1, 0, R_ECX) &
-> +         CPUID_EXT_PDCM)) {
-> +        env->features[FEAT_1_ECX] |= CPUID_EXT_PDCM;
-> +    }
-> +
+On Thu, 28 May 2020 at 13:36, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 06539ebc76b8625587aa78d646a9d8d5fddf84f3:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/mips-hw-next-20200526' into staging (2020-05-26 20:25:06 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20200528-pull-request
+>
+> for you to fetch changes up to fa0013a1bc5f6011a1017e0e655740403e5555d9:
+>
+>   sm501: Remove obsolete changelog and todo comment (2020-05-28 11:38:57 +0200)
+>
+> ----------------------------------------------------------------
+> hw/dispaly/sm501: bugfixes, add sanity checks.
+> hw/display: use tracepoints, misc cleanups.
+>
 
-I'm dropping this hunk two hunks because it's going to break live
-migration with e.g. "-cpu IvyBridge,pmu=on".  We will have to add PDCM
-by default only to future CPU models, but "-cpu host,pmu=on" will pick
-it up automatically.
 
-Paolo
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+Could somebody send a followup patch to fix the indentation
+error checkpatch notices, please?
+
+5/21 Checking commit 97f369f2479d (hw/display/cirrus_vga: Use
+qemu_log_mask(ERROR) instead of debug printf)
+ERROR: suspect code indent for conditional statements (16, 12)
+#34: FILE: hw/display/cirrus_vga.c:1038:
+                if (s->cirrus_blt_pixelwidth > 2) {
++            qemu_log_mask(LOG_GUEST_ERROR,
+
+-- PMM
 
