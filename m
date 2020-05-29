@@ -2,87 +2,88 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5FBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:23:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66479C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD1CC207F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:23:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FCA72077D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6pE4ysC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD1CC207F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HyrC0IA6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCA72077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jehmp-0003DE-2x
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 12:23:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57612)
+	id 1jei2q-0000sp-Dt
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 12:39:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jehmA-0002ee-23
- for qemu-devel@nongnu.org; Fri, 29 May 2020 12:22:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22161
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jehm7-0005P5-Iw
- for qemu-devel@nongnu.org; Fri, 29 May 2020 12:22:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590769345;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6LiA7IcTgcwXaLS54JAhevAXGEaouaGh4rapnm2otjE=;
- b=a6pE4ysCfLixFskzodb1e/BOsBeTe60Sucz5+c5+0UNPAloBFAT0DFlbXndOddXDkUctJr
- zBaUkhAoKZhyQpo6guBaJGqCZsaVlgjv3Lw4qO1KT109fk1kC+pD/jiS+x/Nqnta0M6Ad8
- GHqw4EZSr6pDzOzLTGNIfCYe8xfLfIg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-IhMZgKo8P2CG_A5usDDPnA-1; Fri, 29 May 2020 12:22:22 -0400
-X-MC-Unique: IhMZgKo8P2CG_A5usDDPnA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0F3D1902EA0;
- Fri, 29 May 2020 16:22:20 +0000 (UTC)
-Received: from ptitpuce (ovpn-113-93.ams2.redhat.com [10.36.113.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EB555D9EF;
- Fri, 29 May 2020 16:22:03 +0000 (UTC)
-References: <20200526185132.1652355-1-eblake@redhat.com>
-User-agent: mu4e 1.3.9; emacs 26.2
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] or1k: Fix compilation hiccup
-In-reply-to: <20200526185132.1652355-1-eblake@redhat.com>
-Date: Fri, 29 May 2020 18:21:54 +0200
-Message-ID: <m1d06msod9.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jehzt-0006ej-GG
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 12:36:41 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:39731)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jehzs-0004l2-PM
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 12:36:41 -0400
+Received: by mail-ot1-x333.google.com with SMTP id g5so1885244otg.6
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 09:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=zXn7AXifg48JVqsK9vmLot62NN8E79cUAHW8G7tpJww=;
+ b=HyrC0IA6nn1hI4HTbT7QugqwR/28LKc2Oy3eU1lM2KTLvq09G+60fVX49jH6D0V5PE
+ +xqc1GD07svWmUwRVK5FmGR7EeYw5lvs5WchmhZLRJ8RbLgyZ5O/CA/qyLSmSRyMoYtV
+ mxige4UJMHFX3ascDV5fVPwszVpViGOzd+KR6vrBoBzc1hi1GG9ALA+VPdsh7jLbqkGJ
+ Xrz6xsKyHsj8E+kABOxK4RIA4nMiUpDW5x/Gc9huMDMhC4ko2IQSgNNynHAywiXPTcqH
+ hRmGsVtBncbXv5RaMvpuCVfuuLzYR0snrW3TjYQz9Iob0kJh8Ex0GKOvOvdHwx+iu3wa
+ dtJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zXn7AXifg48JVqsK9vmLot62NN8E79cUAHW8G7tpJww=;
+ b=dlXRd2lifoKCJdFtG5jmbxlZ72jZOOGmRQJgC87wmUGvN5klqj+EfCMHL9hv3+Kjq+
+ 6pjg1t0tMQzT0RSBWyJFFKJfRLYHk9DXc2ikdiAQ2rrcTIRDOh16I7r5WOz0bDNxMUrL
+ OLcwPJE9AuHcsfoc5rcb+3/4T9W/+97d+xESd3pyWUOwTABeEv+G7t5u4YuIx+TEghpG
+ 2HZwxpt8r55MiIPSBcplrPIIS6wclDuw4BL9+n2pOqMpVlMGcfbQyGzd6frMQQe9bFsT
+ iZRMEh17XoFW00k3qRudzVqxxaqoACp0CuqHeB9lcwv6aqWSbYvQuvrCAhC/nGBcK+iM
+ l2aQ==
+X-Gm-Message-State: AOAM531JGnw1N/zdEBMyiPlqNsH9WxjyNTf8dR44QL+438zoX3PNvrNj
+ dtYjPpzFwExMek6gaSMdmDS1tFN1QJxtS+IcCygsqA==
+X-Google-Smtp-Source: ABdhPJzCXE6d89Lv/EblkPHDF/Q7fNSN5waE7yYG2fRYjPBk+w8vatqex7gK9Kh824fmgKGM2Smu5gwfUY4M4n0z/0k=
+X-Received: by 2002:a9d:3623:: with SMTP id w32mr6676198otb.91.1590770194679; 
+ Fri, 29 May 2020 09:36:34 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200528123609.27362-1-kraxel@redhat.com>
+ <CAFEAcA98OyyyC6gs34e3U03=dXz8GkDn5qf38UaO_XBB679V+g@mail.gmail.com>
+ <bf43132b-71c2-d411-7cf3-e9a00066ccdc@amsat.org>
+In-Reply-To: <bf43132b-71c2-d411-7cf3-e9a00066ccdc@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 May 2020 17:36:23 +0100
+Message-ID: <CAFEAcA_Su+2O6nm0hRfj1BqwQzSsLva+ft_f=1O47-o6U8NxBA@mail.gmail.com>
+Subject: Re: [PULL 00/21] Vga 20200528 patches
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:43:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,58 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Stafford Horne <shorne@gmail.com>,
- Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020-05-26 at 20:51 CEST, Eric Blake wrote...
-> On my Fedora 32 machine, gcc 10.1.1 at -O2 (the default for a bare
-> './configure') has a false-positive complaint:
+On Fri, 29 May 2020 at 17:15, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> On 5/29/20 12:29 PM, Peter Maydell wrote:
+> > Could somebody send a followup patch to fix the indentation
+> > error checkpatch notices, please?
 >
->   CC      or1k-softmmu/hw/openrisc/openrisc_sim.o
-> /home/eblake/qemu/hw/openrisc/openrisc_sim.c: In function =E2=80=98openri=
-sc_sim_init=E2=80=99:
-> /home/eblake/qemu/hw/openrisc/openrisc_sim.c:87:42: error: =E2=80=98cpu_i=
-rqs[0]=E2=80=99 may be used uninitialized in this function [-Werror=3Dmaybe=
--uninitialized]
->    87 |         sysbus_connect_irq(s, i, cpu_irqs[i][irq_pin]);
->       |                                  ~~~~~~~~^~~
+> If this is part of your scripts, this is a nice feature :)
+
+No, I just noticed the patchew email.
+
+> >
+> > 5/21 Checking commit 97f369f2479d (hw/display/cirrus_vga: Use
+> > qemu_log_mask(ERROR) instead of debug printf)
+> > ERROR: suspect code indent for conditional statements (16, 12)
+> > #34: FILE: hw/display/cirrus_vga.c:1038:
+> >                 if (s->cirrus_blt_pixelwidth > 2) {
+> > +            qemu_log_mask(LOG_GUEST_ERROR,
 >
-> Initializing both pointers of cpu_irqs[] to NULL is sufficient to shut
-> up the compiler, even though they are definitely assigned in
-> openrisc_sim_init() prior to the inlined call to
-> openrisc_sim_ompic_init() containing the line in question.
+> I explained on the patches:
 >
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  hw/openrisc/openrisc_sim.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index d08ce6181199..95011a8015b4 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -129,7 +129,7 @@ static void openrisc_sim_init(MachineState *machine)
->      const char *kernel_filename =3D machine->kernel_filename;
->      OpenRISCCPU *cpu =3D NULL;
->      MemoryRegion *ram;
-> -    qemu_irq *cpu_irqs[2];
-> +    qemu_irq *cpu_irqs[2] =3D {};
+>   False positive.
 
-Why is the value [2] correct here? The loop that initializes loops over
-machine->smp.cpus. Is it always less than 2 on this machine?
+The code is
+            if (s->cirrus_blt_mode & CIRRUS_BLTMODE_TRANSPARENTCOMP) {
+                if (s->cirrus_blt_pixelwidth > 2) {
+            qemu_log_mask(LOG_GUEST_ERROR,
+                          "cirrus: src transparent without colorexpand "
+                          "must be 8bpp or 16bpp\n");
+                    goto bitblt_ignore;
+                }
 
+checkpatch seems correct; the qemu_log_mask line is misindented,
+and looking at the commit this is a misindent introduced in
+commit 2b55f4d3504a9f34 "hw/display/cirrus_vga: Use
+qemu_log_mask(ERROR) instead of debug printf". The old
+fprintf() line was using indent of tab+tab+4 spaces, but
+the new qemu_log_mask line is indented by 12 spaces, not 20.
+(Tabs are always 8 spaces equivalent.)
 
->      qemu_irq serial_irq;
->      int n;
->      unsigned int smp_cpus =3D machine->smp.cpus;
+Some days I wonder whether we should just do a bulk detabify
+of the QEMU sources.
 
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
-
+thanks
+-- PMM
 
