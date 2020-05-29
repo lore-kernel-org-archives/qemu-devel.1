@@ -2,79 +2,85 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE1CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D5EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA3CA20721
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 041DB20721
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:27:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VF7LL2Fu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3CA20721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BjIq0D9R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041DB20721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jef18-00071g-T1
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:25:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42686)
+	id 1jef2Z-000197-35
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:27:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jeeyz-00042y-IN
- for qemu-devel@nongnu.org; Fri, 29 May 2020 09:23:33 -0400
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:45867)
+ id 1jeezM-0004pe-KP
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:23:56 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:33623)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jeeyx-0003TD-Sb
- for qemu-devel@nongnu.org; Fri, 29 May 2020 09:23:33 -0400
-Received: by mail-pl1-x634.google.com with SMTP id y11so1149886plt.12
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 06:23:31 -0700 (PDT)
+ id 1jeezK-0003gJ-EO
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:23:56 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id z15so3151333pjb.0
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 06:23:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=iW7IdIzsC9AFT7A/HgICb/ikiPzXalvsYjSvDjiUN+g=;
- b=VF7LL2Fu+vrqD6kGEFNiPgyrztTNHkQ+jCM9MrIJ+qhpaVUZJMQjXS0r/UqSqF3Mpi
- wufwEz/8zoO/QP22/Y8qMI0+l3HDlVwaq5BornSob7kOsgXc5pIFZUn5AKhswCUhAXLh
- Wvrs0gHIH1ZwVlBiGvnxaldhZn+h1K6nFRikGLXwVtcBJ8b6l662tjBQ9PDUOMHzItc7
- KUzTJoMb2wLagDyxwFm2Tv6RD+matAUG52/Sl3ABTTM4SKRIHiTHUmAdmqbAWAy0wl/U
- 34roJzTwmGGSTgTu/SLHbUPps4JHQY05fo5gCm6zIkpXB3JYwO1vNGkVTx6kiYfGt2mn
- 9xQQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=fk2ImFtCAweaJwaiXMj1+yvDhd6ngpBz4DJyDjLrY1c=;
+ b=BjIq0D9RgGi8EXyaqDoJIONuHQ6AxKwqgf43fedHDN6Xyo/LEb6N2LCCCxb/BO65Lk
+ rwM4MqO6xzpoS56VLlGpHH1ZG6MSkSTKelpVkBK6CHCW8lzrWizt6jxCTLAOeiJio/QN
+ YVV48DTDqCuB7Ig/MowElLNDf8nscLNkqmZK6EraxWUvym16eph1iUZW/TZF69boVHv9
+ QudByrm2pWn1RX1pVjNOjGxIBfC3bE6Jfn11Bajc+RaSIuhalQ+y2KHacQrjtNta2lzZ
+ jDnHx3iBlv5oBndM4V2tSRl/P4zT8pf0R9dgCPn7MH7Wme6q5QPVjJFiFJDMZ8T1qvoo
+ rTUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=iW7IdIzsC9AFT7A/HgICb/ikiPzXalvsYjSvDjiUN+g=;
- b=ue2YQkWvz6ynqtgOgJkjNi61wOM9AbnKBlyh/d7n4npGEY52VzSt+PR35tpedND89O
- DbVqCzFr4VK+GCeB4jzvyhY2Sley79RoAyvDEjK7ui9gqFf+m5b3r6snnXKPvHiBckfa
- 0bBxyjtgnOGwz7N+hR6eIrd/+76pmcdVi5nNkjQyN6Xd+7m6QUCuQmoAAvlxffYw3TWA
- uXupmtm0ZG8uKioXuxS7f06niRpGRw70C3khMJcnp//q9+E+bOHj6pEm2h1NBrFzdyK1
- VC630aV3LPrjRdjEtRyxUNn75kXtp+L8/x5DZKT5RklYUOLu/HM/mJE6/Do4JJQQzswH
- e5Lg==
-X-Gm-Message-State: AOAM531aB/H62yDyURHyAVwnYtObKrl8LnXlz2FwMIaUYmwEcRtdnF4G
- a4G7OnscQctA+pnB3T5Ea2lPGdnEMCsWHg==
-X-Google-Smtp-Source: ABdhPJwo4xE3TvP97jbm78UJCvE8EMuxYTCPmgFic1Ddy1nkaIL5wiocuryyc+87pyUREK+kpjoEMw==
-X-Received: by 2002:a17:90b:4d10:: with SMTP id
- mw16mr9331139pjb.143.1590758609648; 
- Fri, 29 May 2020 06:23:29 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fk2ImFtCAweaJwaiXMj1+yvDhd6ngpBz4DJyDjLrY1c=;
+ b=COwlz5wIJJzpWJ43+4cuLMXhfadv0uciM0SeaJNlWgFXLYWrotaXWYIKlKKvqVgdVG
+ a4thr6PoONQHtfn6oeLO4MFcYW7BjKVtr0zH6lkZ1K4/IZSXQjW3Kl/7308luOhoTP2V
+ 1ZFAeKa5HyKMwihYLP0CGJxdC36ND4csU2lPNTRpNAD2/tkdRJ4Vo5fr+MywH+gwvQ1w
+ ei9yCQhExoderXui9HPmQ+xz6Cix0l4Qi0dWQdfvBkHSYkiMVUFrIjlili3l+b/YhV4N
+ ge8etxLuRKVLJThxDJvv9ZigwVKjfwuFvW0ljtXVoCR2i5WuGxXF+SUcf4MsjItOjbYN
+ YN8w==
+X-Gm-Message-State: AOAM5332F+YKoaje91zYlRXNjm+f/+/P0XpjV5qAsyU8+pbxAnA6OGp3
+ Y0D0CsPJ7TcXXoiUq+BFh4R1hNNUhRqhCw==
+X-Google-Smtp-Source: ABdhPJz3R7jFx/v73A+O/bvMi4ySM8JjZ92D3ilGyqAiICkT7nBaOuG5ishy0RrpXE3jsEyX6baKVw==
+X-Received: by 2002:a17:90a:930b:: with SMTP id
+ p11mr1809274pjo.230.1590758632669; 
+ Fri, 29 May 2020 06:23:52 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:75ac:d268:da04:dde4])
- by smtp.gmail.com with ESMTPSA id e13sm1998686pfd.10.2020.05.29.06.23.27
+ by smtp.gmail.com with ESMTPSA id e13sm1998686pfd.10.2020.05.29.06.23.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 29 May 2020 06:23:28 -0700 (PDT)
+ Fri, 29 May 2020 06:23:52 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 01/12] configure: add --enable-tsan flag + fiber
- annotations for coroutine-ucontext
-Date: Fri, 29 May 2020 09:23:31 -0400
-Message-Id: <20200529132341.755-1-robert.foley@linaro.org>
+Subject: [PATCH v1 09/12] tests/docker: Added docker build support for TSan.
+Date: Fri, 29 May 2020 09:23:39 -0400
+Message-Id: <20200529132341.755-9-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2607:f8b0:4864:20::634;
- envelope-from=robert.foley@linaro.org; helo=mail-pl1-x634.google.com
+In-Reply-To: <20200529132341.755-1-robert.foley@linaro.org>
+References: <20200529132341.755-1-robert.foley@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=robert.foley@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,329 +102,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, robert.foley@linaro.org, cota@braap.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Lingfeng Yang <lfy@google.com>,
+Cc: Fam Zheng <fam@euphon.net>, robert.foley@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
  peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lingfeng Yang <lfy@google.com>
+Added a new docker for ubuntu 20.04.
+This docker has support for Thread Sanitizer
+including one patch we need in one of the header files.
+https://github.com/llvm/llvm-project/commit/a72dc86cd
 
-We tried running QEMU under tsan in 2016, but tsan's lack of support for
-longjmp-based fibers was a blocker:
-  https://groups.google.com/forum/#!topic/thread-sanitizer/se0YuzfWazw
+This command will build with tsan enabled:
+make docker-test-build-ubuntu2004 V=1 TSAN=1
 
-Fortunately, thread sanitizer gained fiber support in early 2019:
-  https://reviews.llvm.org/D54889
+Also added the TSAN suppresion file to disable certain
+cases of TSAN warnings.
 
-This patch brings tsan support upstream by importing the patch that annotated
-QEMU's coroutines as tsan fibers in Android's QEMU fork:
-  https://android-review.googlesource.com/c/platform/external/qemu/+/844675
-
-Tested with '--enable-tsan --cc=clang-9 --cxx=clang++-9 --disable-werror'
-configure flags.
-
-Signed-off-by: Lingfeng Yang <lfy@google.com>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-[cota: minor modifications + configure changes]
+Cc: Fam Zheng <fam@euphon.net>
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
-[RF: Error out in configure if tsan not available, fix checkpatch warnings]
 ---
- configure                 | 41 +++++++++++++++++
- util/coroutine-ucontext.c | 97 +++++++++++++++++++++++++++++++++++----
- 2 files changed, 129 insertions(+), 9 deletions(-)
+ tests/docker/Makefile.include              |  2 +
+ tests/docker/common.rc                     | 19 +++++++
+ tests/docker/dockerfiles/ubuntu2004.docker | 65 ++++++++++++++++++++++
+ tests/tsan/blacklist.tsan                  | 10 ++++
+ tests/tsan/suppressions.tsan               | 14 +++++
+ 5 files changed, 110 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/ubuntu2004.docker
+ create mode 100644 tests/tsan/blacklist.tsan
+ create mode 100644 tests/tsan/suppressions.tsan
 
-diff --git a/configure b/configure
-index b969dee675..c18efae65e 100755
---- a/configure
-+++ b/configure
-@@ -395,6 +395,7 @@ gprof="no"
- debug_tcg="no"
- debug="no"
- sanitizers="no"
-+tsan="no"
- fortify_source=""
- strip_opt="yes"
- tcg_interpreter="no"
-@@ -1150,6 +1151,10 @@ for opt do
-   ;;
-   --disable-sanitizers) sanitizers="no"
-   ;;
-+  --enable-tsan) tsan="yes"
-+  ;;
-+  --disable-tsan) tsan="no"
-+  ;;
-   --enable-sparse) sparse="yes"
-   ;;
-   --disable-sparse) sparse="no"
-@@ -1750,6 +1755,7 @@ Advanced options (experts only):
-   --with-pkgversion=VERS   use specified string as sub-version of the package
-   --enable-debug           enable common debug build options
-   --enable-sanitizers      enable default sanitizers
-+  --enable-tsan            enable thread sanitizer
-   --disable-strip          disable stripping binaries
-   --disable-werror         disable compilation abort on warning
-   --disable-stack-protector disable compiler-provided stack protection
-@@ -6192,6 +6198,27 @@ if test "$fuzzing" = "yes" ; then
-   fi
- fi
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 43a8678688..e029e54b42 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -202,6 +202,7 @@ endif
+ 	@echo '                         (default is 1)'
+ 	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+ 	@echo '                         before running the command.'
++	@echo '    TSAN=1               Enable use of tsan during the build/test.'
+ 	@echo '    NETWORK=1            Enable virtual network interface with default backend.'
+ 	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
+ 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+@@ -239,6 +240,7 @@ docker-run: docker-qemu-src
+ 			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
+ 			-e V=$V -e J=$J -e DEBUG=$(DEBUG)		\
+ 			-e SHOW_ENV=$(SHOW_ENV) 			\
++	                $(if $(TSAN),,-e TSAN=$(TSAN))		        \
+ 			$(if $(NOUSER),,				\
+ 				-e CCACHE_DIR=/var/tmp/ccache 		\
+ 				-v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z \
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 02cd67a8c5..5df93c6326 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -27,6 +27,25 @@ requires()
  
-+# Thread sanitizer is, for now, much noisier than the other sanitizers;
-+# keep it separate until that is not the case.
-+have_tsan=no
-+have_tsan_iface_fiber=no
-+if test "$tsan" = "yes" ; then
-+  write_c_skeleton
-+  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=thread" "" ; then
-+      have_tsan=yes
-+  fi
-+  cat > $TMPC << EOF
-+#include <sanitizer/tsan_interface.h>
-+int main(void) {
-+  __tsan_create_fiber(0);
-+  return 0;
-+}
-+EOF
-+  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=thread" "" ; then
-+      have_tsan_iface_fiber=yes
-+  fi
-+fi
-+
- ##########################################
- # check for libpmem
- 
-@@ -6293,6 +6320,16 @@ if test "$have_asan" = "yes"; then
-            "Without code annotation, the report may be inferior."
-   fi
- fi
-+if test "$have_tsan" = "yes" ; then
-+  if test "$have_tsan_iface_fiber" = "yes" ; then
-+    QEMU_CFLAGS="-fsanitize=thread $QEMU_CFLAGS"
-+    QEMU_LDFLAGS="-fsanitize=thread $QEMU_LDFLAGS"
-+  else
-+    error_exit "Cannot enable TSAN due to missing fiber annotation interface."
-+  fi
-+elif test "$tsan" = "yes" ; then
-+  error_exit "Cannot enable TSAN due to missing sanitize thread interface."
-+fi
- if test "$have_ubsan" = "yes"; then
-   QEMU_CFLAGS="-fsanitize=undefined $QEMU_CFLAGS"
-   QEMU_LDFLAGS="-fsanitize=undefined $QEMU_LDFLAGS"
-@@ -7382,6 +7419,10 @@ if test "$have_asan_iface_fiber" = "yes" ; then
-     echo "CONFIG_ASAN_IFACE_FIBER=y" >> $config_host_mak
- fi
- 
-+if test "$have_tsan" = "yes" && test "$have_tsan_iface_fiber" = "yes" ; then
-+    echo "CONFIG_TSAN=y" >> $config_host_mak
-+fi
-+
- if test "$has_environ" = "yes" ; then
-   echo "CONFIG_HAS_ENVIRON=y" >> $config_host_mak
- fi
-diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
-index bd593e61bc..a3dc78e67a 100644
---- a/util/coroutine-ucontext.c
-+++ b/util/coroutine-ucontext.c
-@@ -37,18 +37,33 @@
- #endif
- #endif
- 
-+#ifdef CONFIG_TSAN
-+#include <sanitizer/tsan_interface.h>
-+#endif
-+
- typedef struct {
-     Coroutine base;
-     void *stack;
-     size_t stack_size;
-     sigjmp_buf env;
- 
-+    void *tsan_co_fiber;
-+    void *tsan_caller_fiber;
-+
- #ifdef CONFIG_VALGRIND_H
-     unsigned int valgrind_stack_id;
- #endif
- 
- } CoroutineUContext;
- 
-+#define UC_DEBUG 0
-+#if UC_DEBUG && defined(CONFIG_TSAN)
-+#define UC_TRACE(fmt, ...) fprintf(stderr, "%s:%d:%p " fmt "\n", \
-+    __func__, __LINE__, __tsan_get_current_fiber(), ##__VA_ARGS__);
-+#else
-+#define UC_TRACE(fmt, ...)
-+#endif
-+
- /**
-  * Per-thread coroutine bookkeeping
-  */
-@@ -65,7 +80,20 @@ union cc_arg {
-     int i[2];
- };
- 
--static void finish_switch_fiber(void *fake_stack_save)
-+/* QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it. */
-+static inline __attribute__((always_inline))
-+void on_new_fiber(CoroutineUContext *co)
-+{
-+#ifdef CONFIG_TSAN
-+    co->tsan_co_fiber = __tsan_create_fiber(0); /* flags: sync on switch */
-+    co->tsan_caller_fiber = __tsan_get_current_fiber();
-+    UC_TRACE("Create new TSAN co fiber. co: %p co fiber: %p caller fiber: %p ",
-+             co, co->tsan_co_fiber, co->tsan_caller_fiber);
-+#endif
-+}
-+
-+static inline __attribute__((always_inline))
-+void finish_switch_fiber(void *fake_stack_save)
+ configure_qemu()
  {
- #ifdef CONFIG_ASAN
-     const void *bottom_old;
-@@ -78,18 +106,40 @@ static void finish_switch_fiber(void *fake_stack_save)
-         leader.stack_size = size_old;
-     }
- #endif
-+#ifdef CONFIG_TSAN
-+    if (fake_stack_save) {
-+        __tsan_release(fake_stack_save);
-+        __tsan_switch_to_fiber(fake_stack_save, 0);  /* 0=synchronize */
-+    }
-+#endif
- }
- 
--static void start_switch_fiber(void **fake_stack_save,
--                               const void *bottom, size_t size)
-+static inline __attribute__((always_inline)) void start_switch_fiber(
-+    CoroutineAction action, void **fake_stack_save,
-+    const void *bottom, size_t size, void *new_fiber)
- {
- #ifdef CONFIG_ASAN
--    __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
-+    if (action == COROUTINE_TERMINATE) {
-+        __sanitizer_start_switch_fiber(
-+            action == COROUTINE_TERMINATE ? NULL : fake_stack_save,
-+            bottom, size);
-+    }
-+#endif
-+#ifdef CONFIG_TSAN
-+    void *curr_fiber =
-+        __tsan_get_current_fiber();
-+    __tsan_acquire(curr_fiber);
++    if test -z "$TSAN"; then
++        requires clang tsan
++        echo "Including TSan Support"
++        tsan_log_dir="/tmp/qemu-test/build/tsan"
++        mkdir -p $tsan_log_dir > /dev/null || true
++        EXTRA_CONFIGURE_OPTS="${EXTRA_CONFIGURE_OPTS} --enable-tsan \
++                             --cc=clang-10 --cxx=clang++-10 \
++                             --disable-werror --extra-cflags=-O0"
++        # detect deadlocks is false currently simply because
++        # TSan crashes immediately with deadlock detecter enabled.
++        # We have maxed out the history size to get the best chance of finding
++        # warnings during testing.
++        # Note, to get tsan to fail on warning, use exitcode=66 below.
++        tsan_opts="suppressions=/tmp/qemu-test/src/tests/tsan/suppressions.tsan\
++                   detect_deadlocks=false history_size=7\
++                   halt_on_error=0 exitcode=0 verbose=5\
++                   log_path=$tsan_log_dir/tsan_warnings.txt"
++        export TSAN_OPTIONS="$tsan_opts"
++    fi
+     config_opts="--enable-werror \
+                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+                  --prefix=$INSTALL_DIR \
+diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
+new file mode 100644
+index 0000000000..6050ce7e8a
+--- /dev/null
++++ b/tests/docker/dockerfiles/ubuntu2004.docker
+@@ -0,0 +1,65 @@
++FROM ubuntu:20.04
++ENV PACKAGES flex bison \
++    ccache \
++    clang-10\
++    gcc \
++    gettext \
++    git \
++    glusterfs-common \
++    libaio-dev \
++    libattr1-dev \
++    libbrlapi-dev \
++    libbz2-dev \
++    libcacard-dev \
++    libcap-ng-dev \
++    libcurl4-gnutls-dev \
++    libdrm-dev \
++    libepoxy-dev \
++    libfdt-dev \
++    libgbm-dev \
++    libgtk-3-dev \
++    libibverbs-dev \
++    libiscsi-dev \
++    libjemalloc-dev \
++    libjpeg-turbo8-dev \
++    liblzo2-dev \
++    libncurses5-dev \
++    libncursesw5-dev \
++    libnfs-dev \
++    libnss3-dev \
++    libnuma-dev \
++    libpixman-1-dev \
++    librados-dev \
++    librbd-dev \
++    librdmacm-dev \
++    libsasl2-dev \
++    libsdl2-dev \
++    libseccomp-dev \
++    libsnappy-dev \
++    libspice-protocol-dev \
++    libspice-server-dev \
++    libssh-dev \
++    libusb-1.0-0-dev \
++    libusbredirhost-dev \
++    libvdeplug-dev \
++    libvte-2.91-dev \
++    libxen-dev \
++    libzstd-dev \
++    make \
++    python3-yaml \
++    python3-sphinx \
++    sparse \
++    texinfo \
++    xfslibs-dev\
++    vim
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
++RUN dpkg -l $PACKAGES | sort > /packages.txt
++ENV FEATURES clang tsan pyyaml sdl2
 +
-+    UC_TRACE("Current fiber: %p.", curr_fiber);
-+    *fake_stack_save = curr_fiber;
-+    UC_TRACE("Switch to fiber %p", new_fiber);
-+    __tsan_switch_to_fiber(new_fiber, 0);  /* 0=synchronize */
- #endif
- }
- 
- static void coroutine_trampoline(int i0, int i1)
- {
-+    UC_TRACE("Start trampoline");
-     union cc_arg arg;
-     CoroutineUContext *self;
-     Coroutine *co;
-@@ -104,21 +154,34 @@ static void coroutine_trampoline(int i0, int i1)
- 
-     /* Initialize longjmp environment and switch back the caller */
-     if (!sigsetjmp(self->env, 0)) {
--        start_switch_fiber(&fake_stack_save,
--                           leader.stack, leader.stack_size);
-+        UC_TRACE("Current fiber: %p. Set co %p to env 0x%lx",
-+                 __tsan_get_current_fiber(), self, (unsigned long)self->env);
-+        start_switch_fiber(
-+            COROUTINE_YIELD,
-+            &fake_stack_save,
-+            leader.stack,
-+            leader.stack_size,
-+            self->tsan_caller_fiber);
-+        UC_TRACE("Jump to co %p caller fiber %p env 0x%lx",
-+                 co, self->tsan_caller_fiber, *(unsigned long *)co->entry_arg);
-         siglongjmp(*(sigjmp_buf *)co->entry_arg, 1);
-     }
- 
-+    UC_TRACE("After first siglongjmp");
++# https://bugs.launchpad.net/qemu/+bug/1838763
++ENV QEMU_CONFIGURE_OPTS --disable-libssh
 +
-     finish_switch_fiber(fake_stack_save);
- 
-     while (true) {
-         co->entry(co->entry_arg);
-+        UC_TRACE("switch from co %p to caller co %p fiber %p\n",
-+                 co, co->caller, self->tsan_caller_fiber);
-         qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
-     }
- }
- 
- Coroutine *qemu_coroutine_new(void)
- {
-+    UC_TRACE("Start new coroutine");
-     CoroutineUContext *co;
-     ucontext_t old_uc, uc;
-     sigjmp_buf old_env;
-@@ -154,12 +217,16 @@ Coroutine *qemu_coroutine_new(void)
- 
-     arg.p = co;
- 
-+    on_new_fiber(co);
-     makecontext(&uc, (void (*)(void))coroutine_trampoline,
-                 2, arg.i[0], arg.i[1]);
- 
-     /* swapcontext() in, siglongjmp() back out */
-     if (!sigsetjmp(old_env, 0)) {
--        start_switch_fiber(&fake_stack_save, co->stack, co->stack_size);
-+        start_switch_fiber(
-+            COROUTINE_YIELD,
-+            &fake_stack_save,
-+            co->stack, co->stack_size, co->tsan_co_fiber);
-         swapcontext(&old_uc, &uc);
-     }
- 
-@@ -185,6 +252,7 @@ static inline void valgrind_stack_deregister(CoroutineUContext *co)
- 
- void qemu_coroutine_delete(Coroutine *co_)
- {
-+    UC_TRACE("Nuking co %p from orbit", co_);
-     CoroutineUContext *co = DO_UPCAST(CoroutineUContext, base, co_);
- 
- #ifdef CONFIG_VALGRIND_H
-@@ -209,6 +277,10 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine *to_,
- {
-     CoroutineUContext *from = DO_UPCAST(CoroutineUContext, base, from_);
-     CoroutineUContext *to = DO_UPCAST(CoroutineUContext, base, to_);
-+    UC_TRACE("from to: %p %p uc: %p %p. fibers: %p %p caller fibers: %p %p\n",
-+            from_, to_, from, to,
-+            from->tsan_co_fiber, to->tsan_co_fiber,
-+            from->tsan_caller_fiber, to->tsan_caller_fiber);
-     int ret;
-     void *fake_stack_save = NULL;
- 
-@@ -216,8 +288,8 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine *to_,
- 
-     ret = sigsetjmp(from->env, 0);
-     if (ret == 0) {
--        start_switch_fiber(action == COROUTINE_TERMINATE ?
--                           NULL : &fake_stack_save, to->stack, to->stack_size);
-+        start_switch_fiber(action, &fake_stack_save,
-+                           to->stack, to->stack_size, to->tsan_co_fiber);
-         siglongjmp(to->env, action);
-     }
- 
-@@ -231,6 +303,13 @@ Coroutine *qemu_coroutine_self(void)
-     if (!current) {
-         current = &leader.base;
-     }
-+#ifdef CONFIG_TSAN
-+    if (!leader.tsan_co_fiber) {
-+        leader.tsan_co_fiber = __tsan_get_current_fiber();
-+        UC_TRACE("For co %p set leader co fiber to %p",
-+                 current, leader.tsan_co_fiber);
-+    }
-+#endif
-     return current;
- }
- 
++# Apply patch https://reviews.llvm.org/D75820
++# This is required for TSan in clang-10 to compile with QEMU.
++RUN sed -i 's/^const/static const/g' /usr/lib/llvm-10/lib/clang/10.0.0/include/sanitizer/tsan_interface.h
+diff --git a/tests/tsan/blacklist.tsan b/tests/tsan/blacklist.tsan
+new file mode 100644
+index 0000000000..75e444f5dc
+--- /dev/null
++++ b/tests/tsan/blacklist.tsan
+@@ -0,0 +1,10 @@
++# This is an example blacklist.
++# To enable use of the blacklist add this to configure:
++# "--extra-cflags=-fsanitize-blacklist=<src path>/tests/tsan/blacklist.tsan"
++# The eventual goal would be to fix these warnings.
++
++# TSan is not happy about setting/getting of dirty bits,
++# for example, cpu_physical_memory_set_dirty_range,
++# and cpu_physical_memory_get_dirty.
++src:bitops.c
++src:bitmap.c
+diff --git a/tests/tsan/suppressions.tsan b/tests/tsan/suppressions.tsan
+new file mode 100644
+index 0000000000..73414b9ebd
+--- /dev/null
++++ b/tests/tsan/suppressions.tsan
+@@ -0,0 +1,14 @@
++# This is the set of runtime suppressions of TSan warnings.
++# The goal would be to have here only items we do not
++# plan to fix, and to explain why for each item.
++
++# TSan reports a double lock on RECURSIVE mutexes.
++# Since the recursive lock is intentional, we choose to ignore it.
++mutex:aio_context_acquire
++mutex:pthread_mutex_lock
++
++# TSan reports a race betwen pthread_mutex_init() and
++# pthread_mutex_lock().  Since this is outside of QEMU,
++# we choose to ignore it.
++race:pthread_mutex_init
++race:pthread_mutex_lock
 -- 
 2.17.1
 
