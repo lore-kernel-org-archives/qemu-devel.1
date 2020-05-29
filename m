@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0737EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89C8C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:49:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8543207BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A740C207BC
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:49:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6SHMrof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8543207BC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxwtvzkM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A740C207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jefNe-0008WN-RI
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49172)
+	id 1jefO6-000170-Qg
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:49:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKM-0002gi-JK
- for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48099
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKI-0002XL-GG
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52378
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKI-00071t-SI
- for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:37 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKH-0006zM-BI
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590759933;
+ s=mimecast20190719; t=1590759932;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/6ax/It/7EESBC6GF5vLuFiNjx3YeT+aubQf6cvRDpg=;
- b=N6SHMrof0nGhO4K0R/fChigcjIX+Ye2rAEY5DNSTSQAeyxTcGcL4R8CJVmJM81TKZkGzwP
- nypVe4ZHHtVWI06l6dxMdXGgTWz2Xkx8gnw7kKSouTFTAUx57ASpnftG2aQuLAuKuyFF5u
- YUW3uB5PJBYaT+rnlEzWRmR02H4QbcU=
+ bh=WYs/0T9UPs/fSVf/TkUVU/5UOwEBrsaLwY4545j0MJQ=;
+ b=dxwtvzkM2mN6YTrw4Bm9X4KBZf1D2ouZTAcf+Of3iQ2+m2vY59dF712CKTnVEIfuiBQsJo
+ 9CYfpFCz7gjCU1Bz0i/ScW1fOsHt2Pzrb1r9H57362cD9X/V3+DrJwoTVa4fpOwAoADPW0
+ 7UD0IWIUJfWDChiglNanWQDBhbTfid0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-TMjE1F_ENH6FCIDD1rPjcw-1; Fri, 29 May 2020 09:45:32 -0400
-X-MC-Unique: TMjE1F_ENH6FCIDD1rPjcw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-205-IkoV1-IoOdiAgaOE3K4Jcw-1; Fri, 29 May 2020 09:45:30 -0400
+X-MC-Unique: IkoV1-IoOdiAgaOE3K4Jcw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A862D107ACF4
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ED5A460
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B47E2B6F8
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D677D5C1C8
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 426AD1135222; Fri, 29 May 2020 15:45:24 +0200 (CEST)
+ id 187C711358D0; Fri, 29 May 2020 15:45:24 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 30/58] qdev: qdev_create(), qdev_try_create() are now unused,
- drop
-Date: Fri, 29 May 2020 15:44:55 +0200
-Message-Id: <20200529134523.8477-31-armbru@redhat.com>
+Subject: [PATCH v2 18/58] isa: New isa_new(), isa_realize_and_unref() etc.
+Date: Fri, 29 May 2020 15:44:43 +0200
+Message-Id: <20200529134523.8477-19-armbru@redhat.com>
 In-Reply-To: <20200529134523.8477-1-armbru@redhat.com>
 References: <20200529134523.8477-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:43:13
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:34:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,111 +99,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I'm converting from qdev_create()/qdev_init_nofail() to
+qdev_new()/qdev_realize_and_unref(); recent commit "qdev: New
+qdev_new(), qdev_realize(), etc." explains why.
+
+ISA devices use qdev_create() through isa_create() and
+isa_try_create().
+
+Provide isa_new(), isa_try_new(), and isa_realize_and_unref() for
+converting ISA devices.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/hw/qdev-core.h |  2 --
- hw/core/qdev.c         | 48 ------------------------------------------
- hw/core/sysbus.c       |  1 -
- migration/migration.c  |  2 +-
- 4 files changed, 1 insertion(+), 52 deletions(-)
+ include/hw/isa/isa.h |  3 +++
+ hw/isa/isa-bus.c     | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index be6f7c4736..ef6137b6a8 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -320,8 +320,6 @@ compat_props_add(GPtrArray *arr,
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 02c2350274..3b6215fafe 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -105,6 +105,9 @@ MemoryRegion *isa_address_space(ISADevice *dev);
+ MemoryRegion *isa_address_space_io(ISADevice *dev);
+ ISADevice *isa_create(ISABus *bus, const char *name);
+ ISADevice *isa_try_create(ISABus *bus, const char *name);
++ISADevice *isa_new(const char *name);
++ISADevice *isa_try_new(const char *name);
++bool isa_realize_and_unref(ISADevice *dev, ISABus *bus, Error **errp);
+ ISADevice *isa_create_simple(ISABus *bus, const char *name);
  
- /*** Board API.  This should go away once we have a machine config file.  ***/
- 
--DeviceState *qdev_create(BusState *bus, const char *name);
--DeviceState *qdev_try_create(BusState *bus, const char *name);
- DeviceState *qdev_new(const char *name);
- DeviceState *qdev_try_new(const char *name);
- void qdev_init_nofail(DeviceState *dev);
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 4768244f31..a1fdebb3aa 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -128,54 +128,6 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-     }
+ ISADevice *isa_vga_init(ISABus *bus);
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 1c9d7e19ab..e6412d39b4 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -176,6 +176,16 @@ ISADevice *isa_try_create(ISABus *bus, const char *name)
+     return ISA_DEVICE(dev);
  }
  
--/* Create a new device.  This only initializes the device state
--   structure and allows properties to be set.  The device still needs
--   to be realized.  See qdev-core.h.  */
--DeviceState *qdev_create(BusState *bus, const char *name)
--{
--    DeviceState *dev;
--
--    dev = qdev_try_create(bus, name);
--    if (!dev) {
--        if (bus) {
--            error_report("Unknown device '%s' for bus '%s'", name,
--                         object_get_typename(OBJECT(bus)));
--        } else {
--            error_report("Unknown device '%s' for default sysbus", name);
--        }
--        abort();
--    }
--
--    return dev;
--}
--
--DeviceState *qdev_try_create(BusState *bus, const char *type)
--{
--    DeviceState *dev;
--
--    if (object_class_by_name(type) == NULL) {
--        return NULL;
--    }
--    dev = DEVICE(object_new(type));
--    if (!dev) {
--        return NULL;
--    }
--
--    if (!bus) {
--        /* Assert that the device really is a SysBusDevice before
--         * we put it onto the sysbus. Non-sysbus devices which aren't
--         * being put onto a bus should be created with object_new(TYPE_FOO),
--         * not qdev_create(NULL, TYPE_FOO).
--         */
--        g_assert(object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE));
--        bus = sysbus_get_default();
--    }
--
--    qdev_set_parent_bus(dev, bus);
--    object_unref(OBJECT(dev));
--    return dev;
--}
--
- /*
-  * Create a device on the heap.
-  * A type @name must exist.
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index b5db0d179f..7ff1b5f2de 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -325,7 +325,6 @@ static const TypeInfo sysbus_device_type_info = {
-     .class_init = sysbus_device_class_init,
- };
++ISADevice *isa_new(const char *name)
++{
++    return ISA_DEVICE(qdev_new(name));
++}
++
++ISADevice *isa_try_new(const char *name)
++{
++    return ISA_DEVICE(qdev_try_new(name));
++}
++
+ ISADevice *isa_create_simple(ISABus *bus, const char *name)
+ {
+     ISADevice *dev;
+@@ -185,6 +195,11 @@ ISADevice *isa_create_simple(ISABus *bus, const char *name)
+     return dev;
+ }
  
--/* This is a nasty hack to allow passing a NULL bus to qdev_create.  */
- static BusState *main_system_bus;
- 
- static void main_system_bus_create(void)
-diff --git a/migration/migration.c b/migration/migration.c
-index 0bb042a0f7..66c04caa18 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3774,7 +3774,7 @@ static const TypeInfo migration_type = {
-     .name = TYPE_MIGRATION,
-     /*
-      * NOTE: TYPE_MIGRATION is not really a device, as the object is
--     * not created using qdev_create(), it is not attached to the qdev
-+     * not created using qdev_new(), it is not attached to the qdev
-      * device tree, and it is never realized.
-      *
-      * TODO: Make this TYPE_OBJECT once QOM provides something like
++bool isa_realize_and_unref(ISADevice *dev, ISABus *bus, Error **errp)
++{
++    return qdev_realize_and_unref(&dev->parent_obj, &bus->parent_obj, errp);
++}
++
+ ISADevice *isa_vga_init(ISABus *bus)
+ {
+     switch (vga_interface_type) {
 -- 
 2.21.3
 
