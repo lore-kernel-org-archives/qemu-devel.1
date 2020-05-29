@@ -2,73 +2,85 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F4CC433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 02:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB5DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 03:08:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0EAF214F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 02:58:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0EAF214F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 61BEE207D3
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 03:08:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KkTYF3SU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BEE207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeVEM-0001o4-Oj
-	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 22:58:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53760)
+	id 1jeVNn-0001Sl-I9
+	for qemu-devel@archiver.kernel.org; Thu, 28 May 2020 23:08:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jeVDn-0001DP-JM
- for qemu-devel@nongnu.org; Thu, 28 May 2020 22:58:11 -0400
-Resent-Date: Thu, 28 May 2020 22:58:11 -0400
-Resent-Message-Id: <E1jeVDn-0001DP-JM@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jeVN3-0000Rb-10
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 23:07:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43415
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jeVDl-0004iV-IH
- for qemu-devel@nongnu.org; Thu, 28 May 2020 22:58:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1590721078; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=W3iKSdrUXbWnX6KqL54waUm6pJ/RkUuqk+2euLksEGeFSZZLUYWjQsIV2qMg2egAyIvWX1IlgQdRK5fl6i15rInMa510uS5x/HqnMEFWoAuvL5+II0IjbZm1ccFWgR5gm7fjUs29ScoL5edZjDVppuSZnsOmIYQQuuEZYkqwrGg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1590721078;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=OZTxs62wDDgucCk+u6fiDAHb+0sVhHeGFcmW3pPwNyE=; 
- b=b/pafd5vUVF1szU0uONjkxFyVe8RhxGVkW3b1E0QDo00ZUxoi6cgQKlhotA/HBY+CN65n6eKZRrKDUjpT3noHaqXEVBZwRVI4UBSYvJ5IMm4miB+qJBaH4KNG1gp52Nr+2X72y01L1EU2IHd+Y0wavPJRjlJluL0l5NlJoUkctE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1590721075874592.5796965051674;
- Thu, 28 May 2020 19:57:55 -0700 (PDT)
-Message-ID: <159072107463.20666.5539780381350433554@45ef0f9c86ae>
-In-Reply-To: <20200528193758.51454-1-r.bolshakov@yadro.com>
-Subject: Re: [PATCH 00/13] i386: hvf: Remove HVFX86EmulatorState
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jeVN1-0000M8-HQ
+ for qemu-devel@nongnu.org; Thu, 28 May 2020 23:07:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590721661;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=GQGxQRL+XdgwQl0ERL0r9Elrw53V2oDRBNxdGiipILU=;
+ b=KkTYF3SUd7oO/xKS65nk6pktboGZgDR0ykLPoJmraiu48dt8AqU9xdRCy/INE4KzsLOLo9
+ ATIwLQCyfsdKEzIIqJl1ASw9RFx+XrUOTQUfLUIpxJt3Fe0fWHYtDrjYkRkIol9iVEPdLe
+ bJMjVCuw8RJteIUSAdWXrTYpg079yDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-NMm0_092PGeTMg6p91bFwA-1; Thu, 28 May 2020 23:07:39 -0400
+X-MC-Unique: NMm0_092PGeTMg6p91bFwA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B2B018A0721
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 03:07:38 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
+ (ovpn-13-231.pek2.redhat.com [10.72.13.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A377719D71;
+ Fri, 29 May 2020 03:07:30 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH] virtio-pci: fix queue_enable write
+Date: Fri, 29 May 2020 11:07:28 +0800
+Message-Id: <20200529030728.7687-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: r.bolshakov@yadro.com
-Date: Thu, 28 May 2020 19:57:55 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 22:58:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:07:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,63 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: r.bolshakov@yadro.com, qemu-devel@nongnu.org, dirty@apple.com
+Cc: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyODE5Mzc1OC41MTQ1
-NC0xLXIuYm9sc2hha292QHlhZHJvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MjgxOTM3NTguNTE0NTQtMS1yLmJvbHNo
-YWtvdkB5YWRyby5jb20KU3ViamVjdDogW1BBVENIIDAwLzEzXSBpMzg2OiBodmY6IFJlbW92ZSBI
-VkZYODZFbXVsYXRvclN0YXRlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmFiZmQ3NSBpMzg2
-OiBodmY6IERyb3AgSFZGWDg2RW11bGF0b3JTdGF0ZQo1NzU1N2JlIGkzODY6IGh2ZjogTW92ZSBt
-bWlvX2J1ZiBpbnRvIENQVVg4NlN0YXRlCjUzYjkzNTQgaTM4NjogaHZmOiBNb3ZlIGxhenlfZmxh
-Z3MgaW50byBDUFVYODZTdGF0ZQpiYTZjODIxIGkzODY6IGh2ZjogRHJvcCByZWdzIGluIEhWRlg4
-NkVtdWxhdG9yU3RhdGUKNzBiMjgzOSBpMzg2OiBodmY6IERyb3AgY29weSBvZiBSRkxBR1MgZGVm
-aW5lcwphZWY3Mjc4IGkzODY6IGh2ZjogRHJvcCByZmxhZ3MgZnJvbSBIVkZYODZFbXVsYXRvclN0
-YXRlCjNhYTU3YWEgaTM4NjogaHZmOiBEcm9wIGZldGNoX3JpcCBmcm9tIEhWRlg4NkVtdWxhdG9y
-U3RhdGUKNDRhOTRlZCBpMzg2OiBodmY6IFVzZSBJUCBmcm9tIENQVVg4NlN0YXRlCmVmNmZlNzkg
-aTM4NjogaHZmOiBVc2UgaW5zX2xlbiB0byBhZHZhbmNlIElQCmVjODhiMTIgaTM4NjogaHZmOiBE
-cm9wIHVudXNlZCB2YXJpYWJsZQpkZThkOTk5IGkzODY6IGh2ZjogQ2xlYW4gc3RyYXkgaW5jbHVk
-ZXMgaW4gc3lzZW11CmFkMDYxYmMgaTM4NjogaHZmOiBEcm9wIHVzZWxlc3MgZGVjbGFyYXRpb25z
-IGluIHN5c2VtdQowZGE2ZmJhIGkzODY6IGh2ZjogTW92ZSBIVkZTdGF0ZSBkZWZpbml0aW9uIGlu
-dG8gaHZmCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEzIENoZWNraW5nIGNvbW1pdCAwZGE2ZmJh
-ZmRhNWYgKGkzODY6IGh2ZjogTW92ZSBIVkZTdGF0ZSBkZWZpbml0aW9uIGludG8gaHZmKQoyLzEz
-IENoZWNraW5nIGNvbW1pdCBhZDA2MWJjN2YwMjUgKGkzODY6IGh2ZjogRHJvcCB1c2VsZXNzIGRl
-Y2xhcmF0aW9ucyBpbiBzeXNlbXUpCjMvMTMgQ2hlY2tpbmcgY29tbWl0IGRlOGQ5OTk3ZTkxMSAo
-aTM4NjogaHZmOiBDbGVhbiBzdHJheSBpbmNsdWRlcyBpbiBzeXNlbXUpCjQvMTMgQ2hlY2tpbmcg
-Y29tbWl0IGVjODhiMTJjNGFlNyAoaTM4NjogaHZmOiBEcm9wIHVudXNlZCB2YXJpYWJsZSkKNS8x
-MyBDaGVja2luZyBjb21taXQgZWY2ZmU3OTY5NzhlIChpMzg2OiBodmY6IFVzZSBpbnNfbGVuIHRv
-IGFkdmFuY2UgSVApCjYvMTMgQ2hlY2tpbmcgY29tbWl0IDQ0YTk0ZWQyMWQwNiAoaTM4NjogaHZm
-OiBVc2UgSVAgZnJvbSBDUFVYODZTdGF0ZSkKRVJST1I6IHVubmVjZXNzYXJ5IHdoaXRlc3BhY2Ug
-YmVmb3JlIGEgcXVvdGVkIG5ld2xpbmUKIzQ0NDogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9l
-bXUuYzoxNDcwOgorICAgICAgICBwcmludGYoIlVuaW1wbGVtZW50ZWQgaGFuZGxlciAoJWxseCkg
-Zm9yICVkICgleCAleCkgXG4iLCBlbnYtPmVpcCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgNDAzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjcvMTMgQ2hlY2tpbmcgY29tbWl0IDNhYTU3YWFiOTI3MSAoaTM4NjogaHZmOiBEcm9wIGZl
-dGNoX3JpcCBmcm9tIEhWRlg4NkVtdWxhdG9yU3RhdGUpCjgvMTMgQ2hlY2tpbmcgY29tbWl0IGFl
-ZjcyNzg1ZGE2OCAoaTM4NjogaHZmOiBEcm9wIHJmbGFncyBmcm9tIEhWRlg4NkVtdWxhdG9yU3Rh
-dGUpCjkvMTMgQ2hlY2tpbmcgY29tbWl0IDcwYjI4MzlkOGQyZSAoaTM4NjogaHZmOiBEcm9wIGNv
-cHkgb2YgUkZMQUdTIGRlZmluZXMpCjEwLzEzIENoZWNraW5nIGNvbW1pdCBiYTZjODIxZjhhN2Ug
-KGkzODY6IGh2ZjogRHJvcCByZWdzIGluIEhWRlg4NkVtdWxhdG9yU3RhdGUpCjExLzEzIENoZWNr
-aW5nIGNvbW1pdCA1M2I5MzU0MjQ0NDQgKGkzODY6IGh2ZjogTW92ZSBsYXp5X2ZsYWdzIGludG8g
-Q1BVWDg2U3RhdGUpCjEyLzEzIENoZWNraW5nIGNvbW1pdCA1NzU1N2JlMmQxM2MgKGkzODY6IGh2
-ZjogTW92ZSBtbWlvX2J1ZiBpbnRvIENQVVg4NlN0YXRlKQoxMy8xMyBDaGVja2luZyBjb21taXQg
-YmFiZmQ3NTc4NzI0IChpMzg2OiBodmY6IERyb3AgSFZGWDg2RW11bGF0b3JTdGF0ZSkKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MjgxOTM3
-NTguNTE0NTQtMS1yLmJvbHNoYWtvdkB5YWRyby5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+Spec said: The driver uses this to selectively prevent the device from
+executing requests from this virtqueue. 1 - enabled; 0 - disabled.
+
+Though write 0 to queue_enable is forbidden by the sepc, we should not
+assume that the value is 1.
+
+Fix this by ignoring the write value other than 1.
+
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/virtio/virtio-pci.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index d028c17c24..b3558eeaee 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1273,16 +1273,18 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
+         virtio_queue_set_vector(vdev, vdev->queue_sel, val);
+         break;
+     case VIRTIO_PCI_COMMON_Q_ENABLE:
+-        virtio_queue_set_num(vdev, vdev->queue_sel,
+-                             proxy->vqs[vdev->queue_sel].num);
+-        virtio_queue_set_rings(vdev, vdev->queue_sel,
++        if (val == 1) {
++            virtio_queue_set_num(vdev, vdev->queue_sel,
++                                 proxy->vqs[vdev->queue_sel].num);
++            virtio_queue_set_rings(vdev, vdev->queue_sel,
+                        ((uint64_t)proxy->vqs[vdev->queue_sel].desc[1]) << 32 |
+                        proxy->vqs[vdev->queue_sel].desc[0],
+                        ((uint64_t)proxy->vqs[vdev->queue_sel].avail[1]) << 32 |
+                        proxy->vqs[vdev->queue_sel].avail[0],
+                        ((uint64_t)proxy->vqs[vdev->queue_sel].used[1]) << 32 |
+                        proxy->vqs[vdev->queue_sel].used[0]);
+-        proxy->vqs[vdev->queue_sel].enabled = 1;
++            proxy->vqs[vdev->queue_sel].enabled = 1;
++        }
+         break;
+     case VIRTIO_PCI_COMMON_Q_DESCLO:
+         proxy->vqs[vdev->queue_sel].desc[0] = val;
+-- 
+2.20.1
+
 
