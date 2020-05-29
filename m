@@ -2,85 +2,72 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D96C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46A1C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44E592072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:55:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44E592072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F6A72072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:07:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="mIr3iP7S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6A72072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jehLY-0000LW-DG
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 11:55:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52322)
+	id 1jehY5-0005G0-NG
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 12:07:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jehKS-00068h-NB
- for qemu-devel@nongnu.org; Fri, 29 May 2020 11:53:52 -0400
-Received: from mga06.intel.com ([134.134.136.31]:44249)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jehKQ-0004PH-QV
- for qemu-devel@nongnu.org; Fri, 29 May 2020 11:53:52 -0400
-IronPort-SDR: YQQKLKOO9HAw3IgHkg7Gnz5Bpyq8cHYmtDNwHhISkaubmpciIWkYYteJ3afNp04f2HCs4TxJ5O
- JLmPC7sR+CAA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 May 2020 08:53:38 -0700
-IronPort-SDR: 2LJzmXHoxG3l3dt/Xjw9fYZRV1akjKmqCZ5JCidjlXjHVzdL9loI3YC2zgbv+/d7I40+b7pgbl
- cAe4oqT7s6nw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,449,1583222400"; d="scan'208";a="303162420"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
- by orsmga008.jf.intel.com with ESMTP; 29 May 2020 08:53:38 -0700
-Received: from orsmsx113.amr.corp.intel.com (10.22.240.9) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 29 May 2020 08:53:38 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.250]) by
- ORSMSX113.amr.corp.intel.com ([169.254.9.126]) with mapi id 14.03.0439.000;
- Fri, 29 May 2020 08:53:38 -0700
-From: "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To: "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>
-Subject: Re: [PATCH v3 1/2] PCI: vmd: Filter resource type bits from shadow
- register
-Thread-Topic: [PATCH v3 1/2] PCI: vmd: Filter resource type bits from shadow
- register
-Thread-Index: AQHWNJ6/KA9BUx6s/UuCJV3Lsz6Rn6i/VTmAgABYZAA=
-Date: Fri, 29 May 2020 15:53:37 +0000
-Message-ID: <163e8cb37ece0c8daa6d6e5fd7fcae47ba4fa437.camel@intel.com>
-References: <20200528030240.16024-1-jonathan.derrick@intel.com>
- <20200528030240.16024-3-jonathan.derrick@intel.com>
- <20200529103315.GC12270@e121166-lin.cambridge.arm.com>
-In-Reply-To: <20200529103315.GC12270@e121166-lin.cambridge.arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.212.4.51]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9320F8450203F74885A01C2338E0390F@intel.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jehWx-0004b4-7L; Fri, 29 May 2020 12:06:47 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:50919)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jehWv-0008TW-2f; Fri, 29 May 2020 12:06:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=WvvQCIvwekoS/kY4NSTaXzv4TT6EdBEo6/pD/7vfBD8=; 
+ b=mIr3iP7SR66K1U9KJth9CrgFQfZV4npLVjjC1Q05vy6NS3V6WqoEksktdXzWJeI1x0t5uxuxJ8KlvSHWWowlhqv+ebDVu0aMKR7ktTJVKETf+yffdgobUWv79dclVkd+cuhbYtgRf7ZKMQbGsKcmxbTvJcVwaU0U0rmm9pa8ajDe5k9PIejgc+GeVa3toRnEUxSyKzRBBoGDGchFn9kQumNhO22MoZz3Vxpi2cZw6S1yMIgu9M4VatjBV2likf/aSxGrts6AeTvFDKjumlgrMvlVqg0K9FcY+/cygONvcD21cJhnzPNoS3qYpEb7aSH+3GZW6Y34nUBrDO7AKEMPZA==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jehWq-0006l6-BM; Fri, 29 May 2020 18:06:40 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jehWq-0004kk-2L; Fri, 29 May 2020 18:06:40 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v7 28/32] qcow2: Add subcluster support to
+ qcow2_co_pwrite_zeroes()
+In-Reply-To: <0adafac6-15e8-96eb-6c3f-bb9c182fb2d1@redhat.com>
+References: <cover.1590429901.git.berto@igalia.com>
+ <e037ed54599e7bf4d76bf8cd8db1904a20ffc6dd.1590429901.git.berto@igalia.com>
+ <467e4184-2cee-a9e9-9cf0-ee6050ea4319@redhat.com>
+ <w51sgfkt81f.fsf@maestria.local.igalia.com>
+ <0adafac6-15e8-96eb-6c3f-bb9c182fb2d1@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 29 May 2020 18:06:40 +0200
+Message-ID: <w51sgfivi7j.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.31;
- envelope-from=jonathan.derrick@intel.com; helo=mga06.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 11:53:39
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 11:07:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,58 +80,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "andrzej.jakowski@linux.intel.com" <andrzej.jakowski@linux.intel.com>,
- "helgaas@kernel.org" <helgaas@kernel.org>, "hch@lst.de" <hch@lst.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gRnJpLCAyMDIwLTA1LTI5IGF0IDExOjMzICswMTAwLCBMb3JlbnpvIFBpZXJhbGlzaSB3cm90
-ZToNCj4gT24gV2VkLCBNYXkgMjcsIDIwMjAgYXQgMTE6MDI6MzlQTSAtMDQwMCwgSm9uIERlcnJp
-Y2sgd3JvdGU6DQo+ID4gVmVyc2lvbnMgb2YgVk1EIHdpdGggdGhlIEhvc3QgUGh5c2ljYWwgQWRk
-cmVzcyBzaGFkb3cgcmVnaXN0ZXIgdXNlIHRoaXMNCj4gPiByZWdpc3RlciB0byBjYWxjdWxhdGUg
-dGhlIGJ1cyBhZGRyZXNzIG9mZnNldCBuZWVkZWQgdG8gZG8gZ3Vlc3QNCj4gPiBwYXNzdGhyb3Vn
-aCBvZiB0aGUgZG9tYWluLiBUaGlzIHJlZ2lzdGVyIHNoYWRvd3MgdGhlIEhvc3QgUGh5c2ljYWwN
-Cj4gPiBBZGRyZXNzIHJlZ2lzdGVycyBpbmNsdWRpbmcgdGhlIHJlc291cmNlIHR5cGUgYml0cy4g
-QWZ0ZXIgY2FsY3VsYXRpbmcNCj4gPiB0aGUgb2Zmc2V0LCB0aGUgZXh0cmEgcmVzb3VyY2UgdHlw
-ZSBiaXRzIGxlYWQgdG8gdGhlIFZNRCByZXNvdXJjZXMgYmVpbmcNCj4gPiBvdmVyLXByb3Zpc2lv
-bmVkIGF0IHRoZSBmcm9udCBhbmQgdW5kZXItcHJvdmlzaW9uZWQgYXQgdGhlIGJhY2suDQo+ID4g
-DQo+ID4gRXhhbXBsZToNCj4gPiBwY2kgMTAwMDA6ODA6MDIuMDogcmVnIDB4MTA6IFttZW0gMHhm
-ODAxZmZmYy0weGY4MDNmZmZiIDY0Yml0XQ0KPiA+IA0KPiA+IEV4cGVjdGVkOg0KPiA+IHBjaSAx
-MDAwMDo4MDowMi4wOiByZWcgMHgxMDogW21lbSAweGY4MDIwMDAwLTB4ZjgwM2ZmZmYgNjRiaXRd
-DQo+ID4gDQo+ID4gSWYgb3RoZXIgZGV2aWNlcyBhcmUgbWFwcGVkIGluIHRoZSBvdmVyLXByb3Zp
-c2lvbmVkIGZyb250LCBpdCBjb3VsZCBsZWFkDQo+ID4gdG8gcmVzb3VyY2UgY29uZmxpY3QgaXNz
-dWVzIHdpdGggVk1EIG9yIHRob3NlIGRldmljZXMuDQo+ID4gDQo+ID4gRml4ZXM6IGExYTMwMTcw
-MTM4YzkgKCJQQ0k6IHZtZDogRml4IHNoYWRvdyBvZmZzZXRzIHRvIHJlZmxlY3Qgc3BlYyBjaGFu
-Z2VzIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBKb24gRGVycmljayA8am9uYXRoYW4uZGVycmlja0Bp
-bnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvcGNpL2NvbnRyb2xsZXIvdm1kLmMgfCA2
-ICsrKystLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9u
-cygtKQ0KPiANCj4gSGkgSm9uLA0KPiANCj4gaXQgbG9va3MgbGlrZSBJIGNhbiB0YWtlIHRoaXMg
-cGF0Y2ggZm9yIHY1Ljggd2hlcmVhcyBwYXRjaCAyIGRlcGVuZHMNCj4gb24gdGhlIFFFTVUgY2hh
-bmdlcyBhY2NlcHRhbmNlIGFuZCBzaG91bGQgcHJvYmFibHkgd2FpdC4NCj4gDQo+IFBsZWFzZSBs
-ZXQgbWUga25vdyB5b3VyIHRob3VnaHRzIGFzYXAgYW5kIEkgd2lsbCB0cnkgdG8gYXQgbGVhc3QN
-Cj4gc3F1ZWV6ZSB0aGlzIHBhdGNoIGluLg0KPiANCj4gTG9yZW56bw0KDQpIaSBMb3JlbnpvLA0K
-DQpUaGlzIGlzIGZpbmUuIFBsZWFzZSB0YWtlIFBhdGNoIDEuDQpQYXRjaCAyIGlzIGhhcm1sZXNz
-IHdpdGhvdXQgdGhlIFFFTVUgY2hhbmdlcywgYnV0IG1heSBhbHdheXMgbmVlZCBhDQpkaWZmZXJl
-bnQgYXBwcm9hY2guDQoNCkJlc3QsDQpqb24NCg0KDQo+IA0KPiA+IGRpZmYgLS1naXQgYS9kcml2
-ZXJzL3BjaS9jb250cm9sbGVyL3ZtZC5jIGIvZHJpdmVycy9wY2kvY29udHJvbGxlci92bWQuYw0K
-PiA+IGluZGV4IGRhYzkxZDYuLmUzODZkNGUgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9wY2kv
-Y29udHJvbGxlci92bWQuYw0KPiA+ICsrKyBiL2RyaXZlcnMvcGNpL2NvbnRyb2xsZXIvdm1kLmMN
-Cj4gPiBAQCAtNDQ1LDkgKzQ0NSwxMSBAQCBzdGF0aWMgaW50IHZtZF9lbmFibGVfZG9tYWluKHN0
-cnVjdCB2bWRfZGV2ICp2bWQsIHVuc2lnbmVkIGxvbmcgZmVhdHVyZXMpDQo+ID4gIAkJCWlmICgh
-bWVtYmFyMikNCj4gPiAgCQkJCXJldHVybiAtRU5PTUVNOw0KPiA+ICAJCQlvZmZzZXRbMF0gPSB2
-bWQtPmRldi0+cmVzb3VyY2VbVk1EX01FTUJBUjFdLnN0YXJ0IC0NCj4gPiAtCQkJCQlyZWFkcSht
-ZW1iYXIyICsgTUIyX1NIQURPV19PRkZTRVQpOw0KPiA+ICsJCQkJCShyZWFkcShtZW1iYXIyICsg
-TUIyX1NIQURPV19PRkZTRVQpICYNCj4gPiArCQkJCQkgUENJX0JBU0VfQUREUkVTU19NRU1fTUFT
-Syk7DQo+ID4gIAkJCW9mZnNldFsxXSA9IHZtZC0+ZGV2LT5yZXNvdXJjZVtWTURfTUVNQkFSMl0u
-c3RhcnQgLQ0KPiA+IC0JCQkJCXJlYWRxKG1lbWJhcjIgKyBNQjJfU0hBRE9XX09GRlNFVCArIDgp
-Ow0KPiA+ICsJCQkJCShyZWFkcShtZW1iYXIyICsgTUIyX1NIQURPV19PRkZTRVQgKyA4KSAmDQo+
-ID4gKwkJCQkJIFBDSV9CQVNFX0FERFJFU1NfTUVNX01BU0spOw0KPiA+ICAJCQlwY2lfaW91bm1h
-cCh2bWQtPmRldiwgbWVtYmFyMik7DQo+ID4gIAkJfQ0KPiA+ICAJfQ0KPiA+IC0tIA0KPiA+IDEu
-OC4zLjENCj4gPiANCg==
+On Thu 28 May 2020 09:11:07 PM CEST, Eric Blake wrote:
+>> I think the problem also exists in the current code (without my
+>> patches). If you zeroize 10 clusters and the last one is compressed
+>> you have to repeat the request after having zeroized 9 clusters.
+>
+> Hmm. In the pre-patch code, qcow2_co_pwrite_zeroes() calls
+> qcow2_cluster_zeroize() which can fail with -ENOTSUP up front, but not
+> after the fact.  Once it starts the while loop over clusters, its use
+> of zero_in_l2_slice() handles compressed clusters just fine;
+
+You're right, complete compressed clusters can always be handled, the
+problem is just when there's subclusters.
+
+> But isn't this something we could solve recursively?  Instead of
+> returning -ENOTSUP, we could have zero_in_l2_slice() call
+> bdrv_pwrite_zeroes() on the (sub-)clusters associated with a
+> compressed cluster.
+
+I suppose we could, as long as BDRV_REQ_NO_FALLBACK is not used.
+
+Berto
 
