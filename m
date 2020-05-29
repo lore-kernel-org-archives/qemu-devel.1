@@ -2,68 +2,79 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C15C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0461C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80C56207BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:20:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C56207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2EAD207BC
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:21:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2EAD207BC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jenMr-0005f1-Mt
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 18:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59840)
+	id 1jenNw-0006ag-Rr
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 18:21:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1jenLn-0004xn-Kz; Fri, 29 May 2020 18:19:40 -0400
-Received: from mga17.intel.com ([192.55.52.151]:38610)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1jenLk-0004GB-KW; Fri, 29 May 2020 18:19:38 -0400
-IronPort-SDR: PNgEdyY2gAeNVs6qnbsHe3ImsnjY7Mcg7BsAAXyxc8C7UuHe01kONWwU2UG7IFZ1wpqaurcTP5
- X2X//WYQ3hkg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 May 2020 15:19:26 -0700
-IronPort-SDR: 8fsBnJ8/eVoxsb0uNjg6+LtIBoIDkvbbx2dRkZ02g8tdonPt1pulU3aJFOiVwrMeUtOnyIWz/P
- cbGQOEhN0mfQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,450,1583222400"; d="scan'208";a="469643380"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.152])
- by fmsmga006.fm.intel.com with ESMTP; 29 May 2020 15:19:26 -0700
-Date: Fri, 29 May 2020 15:19:26 -0700
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200529221926.GA3168@linux.intel.com>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <nbd@lists.ewheeler.net>)
+ id 1jemFW-0004sF-1O
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 17:09:06 -0400
+Received: from mx.ewheeler.net ([173.205.220.69]:36935 helo=mail.ewheeler.net)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <nbd@lists.ewheeler.net>) id 1jemFU-0007Tq-Lg
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 17:09:05 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.ewheeler.net (Postfix) with ESMTP id E9CB5A0415;
+ Fri, 29 May 2020 21:08:56 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mail.ewheeler.net ([127.0.0.1])
+ by localhost (mail.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+ with LMTP id dzMYA0b7eKmB; Fri, 29 May 2020 21:08:35 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+ (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mail.ewheeler.net (Postfix) with ESMTPSA id 85FA5A0633;
+ Fri, 29 May 2020 21:08:30 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ewheeler.net 85FA5A0633
+Date: Fri, 29 May 2020 21:08:29 +0000 (UTC)
+From: Eric Wheeler <nbd@lists.ewheeler.net>
+X-X-Sender: lists@mail.ewheeler.net
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Subject: Re: [Libguestfs] Provide NBD via Browser over Websockets
+In-Reply-To: <20200529141315.GU3888@redhat.com>
+Message-ID: <alpine.LRH.2.11.2005292107180.10871@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1810131833150.18520@mx.ewheeler.net>
+ <CAMRbyytcufK8-XdFu7LU+UwO_FRoGJO2FhhBHtH9etf3A2htwQ@mail.gmail.com>
+ <alpine.LRH.2.11.2005280014150.13970@mail.ewheeler.net>
+ <20200528090443.GN7304@redhat.com>
+ <alpine.LRH.2.11.2005282147410.13970@mail.ewheeler.net>
+ <20200529093744.GS3888@redhat.com>
+ <13571029-5bf4-2dfa-6879-0ad2642afb3f@redhat.com>
+ <20200529135042.GJ2755532@redhat.com>
+ <ff2e7dd1-c8b2-b46c-3c3b-ed88d9ad9689@redhat.com>
+ <20200529141315.GU3888@redhat.com>
+User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200521034304.340040-1-david@gibson.dropbear.id.au>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=192.55.52.151;
- envelope-from=sean.j.christopherson@intel.com; helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 18:19:26
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: MULTIPART/MIXED;
+ BOUNDARY="1514185278-310523577-1590786510=:10871"
+Received-SPF: none client-ip=173.205.220.69;
+ envelope-from=nbd@lists.ewheeler.net; helo=mail.ewheeler.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 17:09:02
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 29 May 2020 18:20:08 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,55 +86,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- dgilbert@redhat.com, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
+Cc: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, nbd@other.debian.org,
+ Nir Soffer <nsoffer@redhat.com>, libguestfs <libguestfs@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 01:42:46PM +1000, David Gibson wrote:
-> A number of hardware platforms are implementing mechanisms whereby the
-> hypervisor does not have unfettered access to guest memory, in order
-> to mitigate the security impact of a compromised hypervisor.
-> 
-> AMD's SEV implements this with in-cpu memory encryption, and Intel has
-> its own memory encryption mechanism.  POWER has an upcoming mechanism
-> to accomplish this in a different way, using a new memory protection
-> level plus a small trusted ultravisor.  s390 also has a protected
-> execution environment.
-> 
-> The current code (committed or draft) for these features has each
-> platform's version configured entirely differently.  That doesn't seem
-> ideal for users, or particularly for management layers.
-> 
-> AMD SEV introduces a notionally generic machine option
-> "machine-encryption", but it doesn't actually cover any cases other
-> than SEV.
-> 
-> This series is a proposal to at least partially unify configuration
-> for these mechanisms, by renaming and generalizing AMD's
-> "memory-encryption" property.  It is replaced by a
-> "guest-memory-protection" property pointing to a platform specific
-> object which configures and manages the specific details.
-> 
-> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
-> can be extended to cover the Intel and s390 mechanisms as well,
-> though.
-> 
-> Note: I'm using the term "guest memory protection" throughout to refer
-> to mechanisms like this.  I don't particular like the term, it's both
-> long and not really precise.  If someone can think of a succinct way
-> of saying "a means of protecting guest memory from a possibly
-> compromised hypervisor", I'd be grateful for the suggestion.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Many of the features are also going far beyond just protecting memory, so
-even the "memory" part feels wrong.  Maybe something like protected-guest
-or secure-guest?
+--1514185278-310523577-1590786510=:10871
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
+Content-Transfer-Encoding: 8BIT
 
-A little imprecision isn't necessarily a bad thing, e.g. memory-encryption
-is quite precise, but also wrong once it encompasses anything beyond plain
-old encryption.
+On Fri, 29 May 2020, Richard W.M. Jones wrote:
+> On Fri, May 29, 2020 at 08:58:06AM -0500, Eric Blake wrote:
+> > On 5/29/20 8:50 AM, Daniel P. Berrangé wrote:
+> > 
+> > >>>(2) You need to persuade qemu's NBD client to read from a WebSocket.
+> > >>>I didn't really know anything about WebSockets until today but it
+> > >>>seems as if they are a full-duplex protocol layered on top of HTTP [a].
+> > >>>Is there a WebSocket proxy that turns WS into plain TCP (a bit like
+> > >>>stunnel)?  Google suggests [b].
+> > >>>
+> > >>>[a] https://en.wikipedia.org/wiki/WebSocket#Protocol_handshake
+> > >>>[b] https://github.com/novnc/websockify
+> > >>
+> > >>qemu already knows how to connect as a client to websockets; Dan Berrange
+> > >>knows more about that setup.  I suspect it would not be too difficult to
+> > >>teach the qemu NBD client code to use a WebSocket instead of a Unix or TCP
+> > >>socket as its data source.
+> > >
+> > >Actually the inverse. The QIOChannelWebsocket impl is only the server
+> > >side of the problem, as used by QEMU's VNC server. We've never implemented
+> > >the client side. There is nothing especially stopping us doing that - just
+> > >needs someone motivated with time to work on it.
+> > 
+> > In the meantime, you may still be able to set up something like:
+> > 
+> > local machine:
+> > iso -> NBD server -> Unix socket -> websockify -> WebSocket
+> 
+> I guess the idea is to have a zero-install solution for the browser.
+> As I said in the email earlier this is very common for IPMI-type
+> remote access to blade servers and in my experience is implemented
+> using a Java applet and a proprietary protocol terminated at the BMC
+> (which then emulates a virtual CDROM to the server).  There are some
+> HP blade servers on Red Hat's internal Beaker instance where you can
+> play with this.  For qemu we wouldn't need to invent a new protocol
+> when NBD is available and already implemented (albeit not yet on top
+> of WebSockets).
+> 
+> The NBD server must run inside the browser and therefore be either
+> written from scratch in Javascript, or an existing server
+> cross-compiled to WASM (if that is possible - I don't really know).
+
+Interesting idea about WASM.  I'll see if I can build one of the simple 
+nbd servers that are around.  Not sure how to link it to the JS file IO, 
+however.
+
+--
+Eric Wheeler
+
+
+> > remote machine:
+> > WebSocket -> websockify -> Unix socket -> qemu NBD client
+> > 
+> > Adding websocket client support into qemu would reduce the length of
+> > the chain slightly (for less data copying) by getting rid of a
+> > websockify proxy middleman, but would not necessarily improve
+> > performance (it's hard to say where the latency bottlenecks will be
+> > in the chain).
+> 
+> Rich.
+> 
+> -- 
+> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+> Read my programming and virtualization blog: http://rwmj.wordpress.com
+> libguestfs lets you edit virtual machines.  Supports shell scripting,
+> bindings from many languages.  http://libguestfs.org
+> 
+> 
+--1514185278-310523577-1590786510=:10871--
 
