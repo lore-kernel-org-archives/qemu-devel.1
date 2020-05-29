@@ -2,87 +2,91 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80ACDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 129F8C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D6FA206E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:30:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cuRj3yk6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6FA206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D808F20776
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 15:43:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D808F20776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jegxU-0004EK-BM
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 11:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47292)
+	id 1jehAQ-0002QA-3t
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 11:43:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jegwc-0003iY-Uf
- for qemu-devel@nongnu.org; Fri, 29 May 2020 11:29:16 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46514
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jegwa-00019A-Jx
- for qemu-devel@nongnu.org; Fri, 29 May 2020 11:29:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590766150;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bIZ9p/xe7PjgB5Wp57zxSUR4OMgKTUH6eLZx+xpIFAY=;
- b=cuRj3yk68QXhWqp8cNj6sVhxQunb8rggbR4vkXrKITkEt5SL7Ow0Ti07oRsmO7gaMHRdLS
- 5sGOKZunCutoSiH8rLXKrZZXCGe8pNx4eAdJRL0elrfHFGkjcGGJDuR2xe9rgiLvZAeKy4
- JkrAqSg4rmoK0Um7yIoIV7PEpeC7kyU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-LVZNjbOTPJ2UwgcyzqS59Q-1; Fri, 29 May 2020 11:29:07 -0400
-X-MC-Unique: LVZNjbOTPJ2UwgcyzqS59Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0A56EC1AF;
- Fri, 29 May 2020 15:29:05 +0000 (UTC)
-Received: from localhost (ovpn-114-38.ams2.redhat.com [10.36.114.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64F245C1B5;
- Fri, 29 May 2020 15:28:56 +0000 (UTC)
-Date: Fri, 29 May 2020 16:28:55 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 5/5] virtio: enable VIRTIO_F_RING_PACKED for all devices
-Message-ID: <20200529152855.GE367530@stefanha-x1.localdomain>
-References: <20200522171726.648279-1-stefanha@redhat.com>
- <20200522171726.648279-6-stefanha@redhat.com>
- <8e3a0ac5-9294-ca7e-071e-3074c43204c3@redhat.com>
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jeh9g-0001z4-Qk
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 11:42:45 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40562)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jeh9e-0008RN-HH
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 11:42:44 -0400
+IronPort-SDR: XZXsfDUMqo4m2pGEZ7YJJm/c7MQStDs2RpIdUHGq54F/FwarTmzT+PYy9DB7GuVicxkFAA+Xqs
+ Ncwc3EbYYl1g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 May 2020 08:42:30 -0700
+IronPort-SDR: ZNL82atgL3VQ6wiAY+rTm3wbgTqMFj1TWfknCrRkJ4sbunLGzF5uBJy+8tRRXiG3QE41lIXu6h
+ MI210x5fsi4Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,449,1583222400"; d="scan'208";a="256115520"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by fmsmga007.fm.intel.com with ESMTP; 29 May 2020 08:42:30 -0700
+Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 29 May 2020 08:42:30 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX604.ccr.corp.intel.com (10.109.6.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 29 May 2020 23:42:28 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Fri, 29 May 2020 23:42:28 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Bug 1881231 <1881231@bugs.launchpad.net>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [Bug 1881231] Re: colo: Can not recover colo after svm failover
+ twice
+Thread-Topic: [Bug 1881231] Re: colo: Can not recover colo after svm failover
+ twice
+Thread-Index: AQHWNZ+McC8c46bGk0ydNIjDPx0bA6i/M5yA
+Date: Fri, 29 May 2020 15:42:28 +0000
+Message-ID: <7e259d3f57f94d909f78039ed4c4c460@intel.com>
+References: <159072520391.13844.465385675639953986.malonedeb@soybean.canonical.com>
+ <159074563281.5613.7928812716162105847.malone@wampee.canonical.com>
+In-Reply-To: <159074563281.5613.7928812716162105847.malone@wampee.canonical.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <8e3a0ac5-9294-ca7e-071e-3074c43204c3@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5xSkJheCpeK0RUEJ"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:27:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=192.55.52.93; envelope-from=chen.zhang@intel.com;
+ helo=mga11.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 11:42:30
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,110 +99,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- cohuck@redhat.com, qemu-devel@nongnu.org,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Fam Zheng <fam@euphon.net>, Max Reitz <mreitz@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "ye.zou@zstack.io" <ye.zou@zstack.io>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---5xSkJheCpeK0RUEJ
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 29, 2020 at 03:15:59PM +0800, Jason Wang wrote:
->=20
-> On 2020/5/23 =E4=B8=8A=E5=8D=881:17, Stefan Hajnoczi wrote:
-> > The packed virtqueue layout was introduced in VIRTIO 1.1. It is a singl=
-e
-> > ring instead of a split avail/used ring design. There are CPU cache
-> > advantages to this layout and it is also suited better to hardware
-> > implementation.
-> >=20
-> > The vhost-net backend has already supported packed virtqueues for some
-> > time. Performance benchmarks show that virtio-blk performance on NVMe
-> > drives is also improved.
-> >=20
-> > Go ahead and enable this feature for all VIRTIO devices. Keep it
-> > disabled for QEMU 5.0 and earlier machine types.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >   include/hw/virtio/virtio.h |  2 +-
-> >   hw/core/machine.c          | 18 +++++++++++++++++-
-> >   2 files changed, 18 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> > index b69d517496..fd5b4a2044 100644
-> > --- a/include/hw/virtio/virtio.h
-> > +++ b/include/hw/virtio/virtio.h
-> > @@ -292,7 +292,7 @@ typedef struct VirtIORNGConf VirtIORNGConf;
-> >       DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
-> >                         VIRTIO_F_IOMMU_PLATFORM, false), \
-> >       DEFINE_PROP_BIT64("packed", _state, _field, \
-> > -                      VIRTIO_F_RING_PACKED, false)
-> > +                      VIRTIO_F_RING_PACKED, true)
-> >   hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
-> >   bool virtio_queue_enabled(VirtIODevice *vdev, int n);
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index bb3a7b18b1..3598c3c825 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -28,7 +28,23 @@
-> >   #include "hw/mem/nvdimm.h"
-> >   #include "migration/vmstate.h"
-> > -GlobalProperty hw_compat_5_0[] =3D {};
-> > +GlobalProperty hw_compat_5_0[] =3D {
-> > +    { "vhost-user-blk", "packed", "off" },
-> > +    { "vhost-user-fs-device", "packed", "off" },
-> > +    { "vhost-vsock-device", "packed", "off" },
-> > +    { "virtio-9p-device", "packed", "off" },
-> > +    { "virtio-balloon-device", "packed", "off" },
-> > +    { "virtio-blk-device", "packed", "off" },
-> > +    { "virtio-crypto-device", "packed", "off" },
-> > +    { "virtio-gpu-device", "packed", "off" },
-> > +    { "virtio-input-device", "packed", "off" },
-> > +    { "virtio-iommu-device", "packed", "off" },
-> > +    { "virtio-net-device", "packed", "off" },
-> > +    { "virtio-pmem", "packed", "off" },
-> > +    { "virtio-rng-device", "packed", "off" },
-> > +    { "virtio-scsi-common", "packed", "off" },
-> > +    { "virtio-serial-device", "packed", "off" },
->=20
->=20
-> Missing "vhost-user-gpu" here?
-
-Thanks, you're right.
-
-I'll see if virtio-gpu-base works. If not it will be necessary to add
-all the derived classes. The same is true for virtio-scsi-common, I'd
-better check it works correctly!
-
-Stefan
-
---5xSkJheCpeK0RUEJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7RKjcACgkQnKSrs4Gr
-c8h/pwf+MXyj4Sc0yGVl7xAD5sYbeJZHWM9O0TSJd7JasvaFYvXvN6Ia8qjpb4BB
-46ARIqaDVtHe0WxVTq2IKI5r6I9RnAxRICx8I9vuIMhib6txVmMplnw1cu49s3fS
-xS/QlmlYsCZYy3xnH64j4hbs2uNytensCXqnAIXQBRFlFht1r+1jnn2SOA9GDnMD
-FPWiteViNv1DgMn3ISKOhqeAOoJYPnAvzKajL54CF8Qx5BUB5QO5ezsbMpnM1b1a
-6iABiQ4fbdC+7lUAiUTxzPTdouezmZPWV61RMaChrV4pD5Yf2tEA2xiRCGw6rUjj
-qq7bZG8nDUBqd5LvGBH7nZ/ZEQxNfw==
-=G1dd
------END PGP SIGNATURE-----
-
---5xSkJheCpeK0RUEJ--
-
+SGkgWWUsDQoNClRoYW5rIHlvdSBmb3IgeW91ciB0ZXN0IGFuZCByZXBvcnQsIEkgd2lsbCB0cnkg
+dG8gZml4IHRoaXMgaXNzdWUuDQoNClRoYW5rcw0KWmhhbmcgQ2hlbg0KDQo+IC0tLS0tT3JpZ2lu
+YWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWwtDQo+IGJvdW5j
+ZXMrY2hlbi56aGFuZz1pbnRlbC5jb21Abm9uZ251Lm9yZz4gT24gQmVoYWxmIE9mIHllLnpvdQ0K
+PiBTZW50OiBGcmlkYXksIE1heSAyOSwgMjAyMCA1OjQ3IFBNDQo+IFRvOiBxZW11LWRldmVsQG5v
+bmdudS5vcmcNCj4gU3ViamVjdDogW0J1ZyAxODgxMjMxXSBSZTogY29sbzogQ2FuIG5vdCByZWNv
+dmVyIGNvbG8gYWZ0ZXIgc3ZtIGZhaWxvdmVyIHR3aWNlDQo+IA0KPiBJbiBzdGVwIDMgSSB1c2Vk
+IGZvbGxvd2luZyBjb21tYW5kczoNCj4gb24gcHJpbWFyeSB2bSBjb25zb2xlOg0KPiB7ImV4ZWN1
+dGUiOiAiZHJpdmUtbWlycm9yIiwgImFyZ3VtZW50cyI6eyAiZGV2aWNlIjogImNvbG8tZGlzazAi
+LCAiam9iLWlkIjoNCj4gInJlc3luYyIsICJ0YXJnZXQiOiAibmJkOi8vMTY5LjI1NC42Ni4xMDo5
+OTk5L3BhcmVudDAiLCAibW9kZSI6DQo+ICJleGlzdGluZyIsImZvcm1hdCI6InJhdyIsInN5bmMi
+OiJmdWxsIn0gfQ0KPiANCj4gLy8gdGlsbCB0aGUgam9iIHJlYWR5DQo+IHsgImV4ZWN1dGUiOiAi
+cXVlcnktYmxvY2stam9icyIgfQ0KPiANCj4geyJleGVjdXRlIjogInN0b3AifQ0KPiB7ImV4ZWN1
+dGUiOiAiYmxvY2stam9iLWNhbmNlbCIsICJhcmd1bWVudHMiOnsgImRldmljZSI6ICJyZXN5bmMi
+fSB9DQo+IA0KPiB7J2V4ZWN1dGUnOiAnaHVtYW4tbW9uaXRvci1jb21tYW5kJywgJ2FyZ3VtZW50
+cyc6IHsnY29tbWFuZC1saW5lJzoNCj4gJ2RyaXZlX2FkZCAtbiBidWRkeQ0KPiBkcml2ZXI9cmVw
+bGljYXRpb24sbW9kZT1wcmltYXJ5LGZpbGUuZHJpdmVyPW5iZCxmaWxlLmhvc3Q9MTY5LjI1NC42
+Ni4xMCxmaWxlLg0KPiBwb3J0PTk5OTksZmlsZS5leHBvcnQ9cGFyZW50MCxub2RlLW5hbWU9cmVw
+bGljYXRpb24wJ319DQo+IHsnZXhlY3V0ZSc6ICd4LWJsb2NrZGV2LWNoYW5nZScsICdhcmd1bWVu
+dHMnOnsncGFyZW50JzogJ2NvbG8tZGlzazAnLCAnbm9kZSc6DQo+ICdyZXBsaWNhdGlvbjAnIH0g
+fQ0KPiB7J2V4ZWN1dGUnOiAnbWlncmF0ZS1zZXQtY2FwYWJpbGl0aWVzJywgJ2FyZ3VtZW50cyc6
+IHsnY2FwYWJpbGl0aWVzJzogWyB7J2NhcGFiaWxpdHknOg0KPiAneC1jb2xvJywgJ3N0YXRlJzog
+dHJ1ZSB9IF0gfSB9DQo+IHsnZXhlY3V0ZSc6ICdtaWdyYXRlJywgJ2FyZ3VtZW50cyc6IHsndXJp
+JzogJ3RjcDoxNjkuMjU0LjY2LjEwOjk5OTgnIH0gfQ0KPiB7ICJleGVjdXRlIjogIm1pZ3JhdGUt
+c2V0LXBhcmFtZXRlcnMiICwgImFyZ3VtZW50cyI6eyAieC1jaGVja3BvaW50LWRlbGF5IjoNCj4g
+MTAwMDAgfSB9DQo+IA0KPiAtLQ0KPiBZb3UgcmVjZWl2ZWQgdGhpcyBidWcgbm90aWZpY2F0aW9u
+IGJlY2F1c2UgeW91IGFyZSBhIG1lbWJlciBvZiBxZW11LQ0KPiBkZXZlbC1tbCwgd2hpY2ggaXMg
+c3Vic2NyaWJlZCB0byBRRU1VLg0KPiBodHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC9idWdzLzE4
+ODEyMzENCj4gDQo+IFRpdGxlOg0KPiAgIGNvbG86IENhbiBub3QgIHJlY292ZXIgY29sbyBhZnRl
+ciBzdm0gZmFpbG92ZXIgdHdpY2UNCj4gDQo+IFN0YXR1cyBpbiBRRU1VOg0KPiAgIE5ldw0KPiAN
+Cj4gQnVnIGRlc2NyaXB0aW9uOg0KPiAgIEhpIEV4cGVydCwNCj4gICB4LWJsb2NrZGV2LWNoYW5n
+ZSBtZXQgc29tZSBlcnJvciwgZHVyaW5nIHRlc3RpbmcgY29sbw0KPiANCj4gICBIb3N0IG9zOg0K
+PiAgIENlbnRPUyBMaW51eCByZWxlYXNlIDcuNi4xODEwIChDb3JlKQ0KPiANCj4gICBSZXByb2R1
+Y2Ugc3RlcHM6DQo+ICAgMS4gY3JlYXRlIGNvbG8gdm0gZm9sbG93aW5nDQo+IGh0dHBzOi8vZ2l0
+aHViLmNvbS9xZW11L3FlbXUvYmxvYi9tYXN0ZXIvZG9jcy9DT0xPLUZULnR4dA0KPiAgIDIuIGtp
+bGwgc2Vjb25kYXJ5IHZtIGFuZCByZW1vdmUgdGhlIG5iZCBjaGlsZCBmcm9tIHRoZSBxdW9ydW0g
+dG8gd2FpdCBmb3INCj4gcmVjb3Zlcg0KPiAgICAgdHlwZSB0aG9zZSBjb21tYW5kcyBvbiBwcmlt
+YXJ5IHZtIGNvbnNvbGU6DQo+ICAgICB7ICdleGVjdXRlJzogJ3gtYmxvY2tkZXYtY2hhbmdlJywg
+J2FyZ3VtZW50cyc6IHsncGFyZW50JzogJ2NvbG8tZGlzazAnLCAnY2hpbGQnOg0KPiAnY2hpbGRy
+ZW4uMSd9fQ0KPiAgICAgeyAnZXhlY3V0ZSc6ICdodW1hbi1tb25pdG9yLWNvbW1hbmQnLCdhcmd1
+bWVudHMnOiB7J2NvbW1hbmQtbGluZSc6DQo+ICdkcml2ZV9kZWwgcmVwbGljYXRpb24wJ319DQo+
+ICAgICB7ICdleGVjdXRlJzogJ3gtY29sby1sb3N0LWhlYXJ0YmVhdCd9DQo+ICAgMy4gcmVjb3Zl
+ciBjb2xvDQo+ICAgNC4ga2lsbCBzZWNvbmRhcnkgdm0gYWdhaW4gYWZ0ZXIgcmVjb3ZlciBjb2xv
+IGFuZCB0eXBlIHNhbWUgY29tbWFuZHMgYXMNCj4gc3RlcCAyOg0KPiAgICAgeyAnZXhlY3V0ZSc6
+ICd4LWJsb2NrZGV2LWNoYW5nZScsICdhcmd1bWVudHMnOiB7J3BhcmVudCc6ICdjb2xvLWRpc2sw
+JywgJ2NoaWxkJzoNCj4gJ2NoaWxkcmVuLjEnfX0NCj4gICAgIHsgJ2V4ZWN1dGUnOiAnaHVtYW4t
+bW9uaXRvci1jb21tYW5kJywnYXJndW1lbnRzJzogeydjb21tYW5kLWxpbmUnOg0KPiAnZHJpdmVf
+ZGVsIHJlcGxpY2F0aW9uMCd9fQ0KPiAgICAgeyAnZXhlY3V0ZSc6ICd4LWNvbG8tbG9zdC1oZWFy
+dGJlYXQnfQ0KPiAgICAgYnV0IHRoZSBmaXJzdCBjb21tYW5kIGdvdCBlcnJvcg0KPiAgICAgeyAn
+ZXhlY3V0ZSc6ICd4LWJsb2NrZGV2LWNoYW5nZScsICdhcmd1bWVudHMnOiB7J3BhcmVudCc6ICdj
+b2xvLWRpc2swJywgJ2NoaWxkJzoNCj4gJ2NoaWxkcmVuLjEnfX0NCj4gICB7ImVycm9yIjogeyJj
+bGFzcyI6ICJHZW5lcmljRXJyb3IiLCAiZGVzYyI6ICJOb2RlICdjb2xvLWRpc2swJyBkb2VzIG5v
+dCBoYXZlDQo+IGNoaWxkICdjaGlsZHJlbi4xJyJ9fQ0KPiANCj4gICBhY2NvcmRpbmcgdG8gaHR0
+cHM6Ly93d3cucWVtdS5vcmcvZG9jcy9tYXN0ZXIvcWVtdS1xbXAtcmVmLmh0bWwNCj4gICBDb21t
+YW5kOiB4LWJsb2NrZGV2LWNoYW5nZQ0KPiAgIER5bmFtaWNhbGx5IHJlY29uZmlndXJlIHRoZSBi
+bG9jayBkcml2ZXIgc3RhdGUgZ3JhcGguIEl0IGNhbiBiZSB1c2VkIHRvIGFkZCwNCj4gcmVtb3Zl
+LCBpbnNlcnQgb3IgcmVwbGFjZSBhIGdyYXBoIG5vZGUuIEN1cnJlbnRseSBvbmx5IHRoZSBRdW9y
+dW0gZHJpdmVyDQo+IGltcGxlbWVudHMgdGhpcyBmZWF0dXJlIHRvIGFkZCBvciByZW1vdmUgaXRz
+IGNoaWxkLiBUaGlzIGlzIHVzZWZ1bCB0byBmaXggYQ0KPiBicm9rZW4gcXVvcnVtIGNoaWxkLg0K
+PiANCj4gICBJdCBzZWVtcyB4LWJsb2NrZGV2LWNoYW5nZSBub3Qgd29ya2VkIGFzIGV4cGVjdGVk
+Lg0KPiANCj4gICBUaGFua3MuDQo+IA0KPiBUbyBtYW5hZ2Ugbm90aWZpY2F0aW9ucyBhYm91dCB0
+aGlzIGJ1ZyBnbyB0bzoNCj4gaHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvcWVtdS8rYnVnLzE4
+ODEyMzEvK3N1YnNjcmlwdGlvbnMNCg0K
 
