@@ -2,109 +2,70 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AC6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F55C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:45:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58CBF207BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:24:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58CBF207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90CC920721
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 22:45:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90CC920721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jenQB-00082D-JK
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 18:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60234)
+	id 1jenlA-0001vT-Lx
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 18:45:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jenPS-0007HU-CB
- for qemu-devel@nongnu.org; Fri, 29 May 2020 18:23:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15638
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jenPQ-00067T-PQ
- for qemu-devel@nongnu.org; Fri, 29 May 2020 18:23:25 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04TM2aIr079175
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 18:23:22 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31as1e7qjk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 18:23:21 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04TMMjwJ132669
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 18:23:21 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31as1e7qje-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 29 May 2020 18:23:21 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04TML2KI010174;
- Fri, 29 May 2020 22:23:20 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma02dal.us.ibm.com with ESMTP id 316ufbtd1u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 29 May 2020 22:23:20 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04TMNIA212649166
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 29 May 2020 22:23:18 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6E9AA6E050;
- Fri, 29 May 2020 22:23:19 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 01B316E04E;
- Fri, 29 May 2020 22:23:18 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 29 May 2020 22:23:18 +0000 (GMT)
-Subject: Re: [PATCH] acpi: tpm: Do not build TCPA table for TPM 2
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- mst@redhat.com
-References: <20200529192840.3921141-1-stefanb@linux.vnet.ibm.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <5df0df78-817d-d80e-648b-c4f733972ff2@linux.ibm.com>
-Date: Fri, 29 May 2020 18:23:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jenkI-0000wh-P9; Fri, 29 May 2020 18:44:58 -0400
+Resent-Date: Fri, 29 May 2020 18:44:58 -0400
+Resent-Message-Id: <E1jenkI-0000wh-P9@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21386)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jenkH-0004Un-1V; Fri, 29 May 2020 18:44:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1590792276; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=TUpsQtRehWFdwQ1/A0Tj431xOgmPqwUqeg6+iHYSTSLmMuuRqJpiRJbwkVs9PcFlsZB9vqpSGMDaqSF76nLZ9GpQB719ww/JBDLIJ2dP2VU7enIoP0HIkbKstvsED28SutcgS/SeZm5Ni59ACxC3grn7mohC64LO5yAeHB6FCC8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1590792276;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=q0j8SNUo0gdCPkVPxxoqv6Qyu3MELEoP6bxiZ63u4bo=; 
+ b=h7rn75a7Xm8c0Z2xgiExitf1+yGom7DH0uHsE6A9iw6kMo73+D0yDkP2C9nuo6YhujSCFabHo3Du0e1jbx9aaTaSacbVjZlwMmUekzFD3iws1xheiYLLw5D9B6hhfczHD0oeIT/0Ax2gidXL8RalRojvS2wJy1j0uEsc9YJVli8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1590792273562238.71106462006833;
+ Fri, 29 May 2020 15:44:33 -0700 (PDT)
+Message-ID: <159079227228.27167.7665611920685671617@45ef0f9c86ae>
+In-Reply-To: <20200529180025.169097-1-jcd@tribudubois.net>
+Subject: Re: [PATCH] hw/net/imx_fec.c: Convert debug fprintf() to trace event
 MIME-Version: 1.0
-In-Reply-To: <20200529192840.3921141-1-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-05-29_10:2020-05-28,
- 2020-05-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0
- cotscore=-2147483648 phishscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 adultscore=0
- mlxscore=0 clxscore=1015 mlxlogscore=941 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005290155
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 15:28:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jcd@tribudubois.net
+Date: Fri, 29 May 2020 15:44:33 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 18:44:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,22 +79,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eric.auger@redhat.com, marcandre.lureau@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, peter.chubb@nicta.com.au,
+ qemu-devel@nongnu.org, jcd@tribudubois.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/29/20 3:28 PM, Stefan Berger wrote:
-> From: Stefan Berger <stefanb@linux.ibm.com>
->
-> Do not build a TCPA table for TPM 2 anymore but create the log area when
-> building the TPM2 table. The TCPA table is only needed for TPM 1.2.
-
-Specs are here: 
-https://trustedcomputinggroup.org/wp-content/uploads/TCG_ACPIGeneralSpecification_v1.20_r8.pdf
-
-TCPA is a TPM 1.2 table and TPM2 tables is sufficient for TPM 2.0.
-
-
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUyOTE4MDAyNS4xNjkw
+OTctMS1qY2RAdHJpYnVkdWJvaXMubmV0LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUyOTE4MDAyNS4xNjkwOTctMS1qY2RAdHJp
+YnVkdWJvaXMubmV0ClN1YmplY3Q6IFtQQVRDSF0gaHcvbmV0L2lteF9mZWMuYzogQ29udmVydCBk
+ZWJ1ZyBmcHJpbnRmKCkgdG8gdHJhY2UgZXZlbnQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
+fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
+cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDUyOTE4MDAyNS4x
+NjkwOTctMS1qY2RAdHJpYnVkdWJvaXMubmV0IC0+IHBhdGNoZXcvMjAyMDA1MjkxODAwMjUuMTY5
+MDk3LTEtamNkQHRyaWJ1ZHVib2lzLm5ldApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjdjYmQ0ZGMgaHcvbmV0L2lteF9mZWMuYzogQ29udmVydCBkZWJ1ZyBmcHJpbnRmKCkgdG8gdHJh
+Y2UgZXZlbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
+bmV2ZXIgdXNlIHRhYnMKIzI2ODogRklMRTogaHcvbmV0L2lteF9mZWMuYzoxMDkxOgorXkl0cmFj
+ZV9pbXhfZmVjX3JlY2VpdmVfbGVuKGFkZHIsIGJkLmxlbmd0aCk7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjc4OiBGSUxFOiBody9uZXQvaW14X2ZlYy5jOjEx
+MTA6CiteSSAgICB0cmFjZV9pbXhfZmVjX3JlY2VpdmVfbGFzdChiZC5mbGFncyk7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjk3OiBGSUxFOiBody9uZXQvaW14
+X2ZlYy5jOjExOTA6CiteSXRyYWNlX2lteF9lbmV0X3JlY2VpdmVfbGVuKGFkZHIsIGJkLmxlbmd0
+aCk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzA3OiBGSUxF
+OiBody9uZXQvaW14X2ZlYy5jOjEyMjc6CiteSSAgICB0cmFjZV9pbXhfZW5ldF9yZWNlaXZlX2xh
+c3QoYmQuZmxhZ3MpOyQKCkVSUk9SOiBIZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGgg
+JzB4JwojMzI2OiBGSUxFOiBody9uZXQvdHJhY2UtZXZlbnRzOjQxNzoKK2lteF9mZWNfcmVhZF9i
+ZCh1aW50NjRfdCBhZGRyLCBpbnQgZmxhZ3MsIGludCBsZW4sIGludCBkYXRhKSAidHhfYmQgJWx4
+IGZsYWdzICUwNHggbGVuICVkIGRhdGEgJTA4eCIKCkVSUk9SOiBIZXggbnVtYmVycyBtdXN0IGJl
+IHByZWZpeGVkIHdpdGggJzB4JwojMzI3OiBGSUxFOiBody9uZXQvdHJhY2UtZXZlbnRzOjQxODoK
+K2lteF9lbmV0X3JlYWRfYmQodWludDY0X3QgYWRkciwgaW50IGZsYWdzLCBpbnQgbGVuLCBpbnQg
+ZGF0YSwgaW50IG9wdGlvbnMsIGludCBzdGF0dXMpICJ0eF9iZCAlbHggZmxhZ3MgJTA0eCBsZW4g
+JWQgZGF0YSAlMDh4IG9wdGlvbiAlMDR4IHN0YXR1cyAlMDR4IgoKRVJST1I6IEhleCBudW1iZXJz
+IG11c3QgYmUgcHJlZml4ZWQgd2l0aCAnMHgnCiMzMzQ6IEZJTEU6IGh3L25ldC90cmFjZS1ldmVu
+dHM6NDI1OgoraW14X2ZlY19yZWNlaXZlX2xhc3QoaW50IGxhc3QpICJyeCBmcmFtZSBmbGFncyAl
+MDR4IgoKRVJST1I6IEhleCBudW1iZXJzIG11c3QgYmUgcHJlZml4ZWQgd2l0aCAnMHgnCiMzMzc6
+IEZJTEU6IGh3L25ldC90cmFjZS1ldmVudHM6NDI4OgoraW14X2VuZXRfcmVjZWl2ZV9sYXN0KGlu
+dCBsYXN0KSAicnggZnJhbWUgZmxhZ3MgJTA0eCIKCnRvdGFsOiA4IGVycm9ycywgMCB3YXJuaW5n
+cywgMjk3IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA3Y2JkNGRjYWRlNWEgKGh3L25ldC9pbXhfZmVj
+LmM6IENvbnZlcnQgZGVidWcgZnByaW50ZigpIHRvIHRyYWNlIGV2ZW50KSBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDIwMDUyOTE4MDAyNS4xNjkwOTctMS1qY2RAdHJpYnVkdWJvaXMubmV0L3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
