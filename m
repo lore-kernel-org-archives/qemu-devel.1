@@ -2,93 +2,56 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AE6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 17:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E85C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 18:01:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 078652073B
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 17:59:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Bi3iZMPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078652073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id B430A207BC
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 18:01:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B430A207BC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jejHX-0000ki-87
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 13:58:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49354)
+	id 1jejJy-0002y4-UX
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 14:01:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jejGq-00086Q-Pt
- for qemu-devel@nongnu.org; Fri, 29 May 2020 13:58:17 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:5400)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jejIt-0001yT-Cd; Fri, 29 May 2020 14:00:23 -0400
+Received: from relay12.mail.gandi.net ([217.70.178.232]:37455)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jejGo-00046k-Mk
- for qemu-devel@nongnu.org; Fri, 29 May 2020 13:58:15 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ed14d280001>; Fri, 29 May 2020 10:58:00 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Fri, 29 May 2020 10:58:12 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Fri, 29 May 2020 10:58:12 -0700
-Received: from [10.40.100.117] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 29 May
- 2020 17:57:57 +0000
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-To: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert"
- <dgilbert@redhat.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home> <20200525065925.GA698@joy-OptiPlex-7040>
- <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
- <20200526141939.2632f100@x1.home> <20200527062358.GD19560@joy-OptiPlex-7040>
- <20200527084822.GC3001@work-vm> <20200528165906.7d03f689@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <b6d78fd3-d2d7-91c9-5f5d-a76ebe5a7a5e@nvidia.com>
-Date: Fri, 29 May 2020 23:27:53 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jejIr-0004pk-Mb; Fri, 29 May 2020 14:00:23 -0400
+Received: from localhost.localdomain (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay12.mail.gandi.net (Postfix) with ESMTPSA id DBF0E200008;
+ Fri, 29 May 2020 18:00:14 +0000 (UTC)
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+To: qemu-arm@nongnu.org
+Subject: [PATCH] hw/misc/imx6ul_ccm.c: Implement non writable bits in CCM
+ registers
+Date: Fri, 29 May 2020 20:00:05 +0200
+Message-Id: <20200529180005.169036-1-jcd@tribudubois.net>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200528165906.7d03f689@x1.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1590775080; bh=9rTtu3kf9bEqSZ338TiGiLKhOLfMIwfqgDH96m+5MN0=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=Bi3iZMPRJkmpjpq4uCCp3csVA1rvg7ZAooXAbf73Z5wpp6GqG5UlV+dgG5faUiSJK
- /yJWHLGfqUOR7J0AB+ts4MWUeVF2yyzyB5c5eNsswzJ/9aBbgif4+VdnQlymTNaQli
- SToQlEnwJHQ9t5iGeOm5l9m3BRx2Yskol1AOY57tt7H7iXnVtk1MXGtk2aSnr3rSCg
- lgCxbsxLxyPPDr4A4xchIphUrNM0jelpn536XpUgSs+r84gS79kC3WcRKLsLlRfZrl
- VhwQexmuvf8rKvmy1F5NQM2xjVp+fLAtezFTrlMGGMjKVm6ZgpJC7XhLy9IlxIQxQR
- IR6TwBLCqeyqA==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 13:58:12
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=217.70.178.232; envelope-from=jcd@tribudubois.net;
+ helo=relay12.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 13:07:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,43 +64,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
- zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- Yan Zhao <yan.y.zhao@intel.com>, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: peter.maydell@linaro.org, peter.chubb@nicta.com.au, qemu-devel@nongnu.org,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Some bits of the CCM registers are non writable.
 
+This was left undone in the initial commit (all bits of registers were
+writable).
 
-On 5/29/2020 4:29 AM, Alex Williamson wrote:
-> On Wed, 27 May 2020 09:48:22 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->> * Yan Zhao (yan.y.zhao@intel.com) wrote:
->>> BTW, for viommu, the downtime data is as below. under the same network
->>> condition and guest memory size, and no running dirty data/memory produced
->>> by device.
->>> (1) viommu off
->>> single-round dirty query: downtime ~100ms
->>
->> Fine.
->>
->>> (2) viommu on
->>> single-round dirty query: downtime 58s
->>
->> Youch.
-> 
-> Double Youch!  But we believe this is because we're getting the dirty
-> bitmap one IOMMU leaf page at a time, right?  We've enable the kernel
-> to get a dirty bitmap across multiple mappings, but QEMU isn't yet
-> taking advantage of it.  Do I have this correct?  Thanks,
-> 
+This patch add the required code to protect non writable bits.
 
-That's correct.
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+---
+ hw/misc/imx6ul_ccm.c | 81 +++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 68 insertions(+), 13 deletions(-)
 
-Thanks,
-Kirti
+diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+index a2fc1d0364a..ede845fde8e 100644
+--- a/hw/misc/imx6ul_ccm.c
++++ b/hw/misc/imx6ul_ccm.c
+@@ -19,6 +19,62 @@
+ 
+ #include "trace.h"
+ 
++static const uint32_t ccm_mask[CCM_MAX] = {
++    [CCM_CCR] = 0xf01fef80,
++    [CCM_CCDR] = 0xfffeffff,
++    [CCM_CSR] = 0xffffffff,
++    [CCM_CCSR] = 0xfffffef2,
++    [CCM_CACRR] = 0xfffffff8,
++    [CCM_CBCDR] = 0xc1f8e000,
++    [CCM_CBCMR] = 0xfc03cfff,
++    [CCM_CSCMR1] = 0x80700000,
++    [CCM_CSCMR2] = 0xe01ff003,
++    [CCM_CSCDR1] = 0xfe00c780,
++    [CCM_CS1CDR] = 0xfe00fe00,
++    [CCM_CS2CDR] = 0xf8007000,
++    [CCM_CDCDR] = 0xf00fffff,
++    [CCM_CHSCCDR] = 0xfffc01ff,
++    [CCM_CSCDR2] = 0xfe0001ff,
++    [CCM_CSCDR3] = 0xffffc1ff,
++    [CCM_CDHIPR] = 0xffffffff,
++    [CCM_CTOR] = 0x00000000,
++    [CCM_CLPCR] = 0xf39ff01c,
++    [CCM_CISR] = 0xfb85ffbe,
++    [CCM_CIMR] = 0xfb85ffbf,
++    [CCM_CCOSR] = 0xfe00fe00,
++    [CCM_CGPR] = 0xfffc3fea,
++    [CCM_CCGR0] = 0x00000000,
++    [CCM_CCGR1] = 0x00000000,
++    [CCM_CCGR2] = 0x00000000,
++    [CCM_CCGR3] = 0x00000000,
++    [CCM_CCGR4] = 0x00000000,
++    [CCM_CCGR5] = 0x00000000,
++    [CCM_CCGR6] = 0x00000000,
++    [CCM_CMEOR] = 0xafffff1f,
++};
++
++static const uint32_t analog_mask[CCM_ANALOG_MAX] = {
++    [CCM_ANALOG_PLL_ARM] = 0xfff60f80,
++    [CCM_ANALOG_PLL_USB1] = 0xfffe0fbc,
++    [CCM_ANALOG_PLL_USB2] = 0xfffe0fbc,
++    [CCM_ANALOG_PLL_SYS] = 0xfffa0ffe,
++    [CCM_ANALOG_PLL_SYS_SS] = 0x00000000,
++    [CCM_ANALOG_PLL_SYS_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_SYS_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_AUDIO] = 0xffe20f80,
++    [CCM_ANALOG_PLL_AUDIO_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_AUDIO_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_VIDEO] = 0xffe20f80,
++    [CCM_ANALOG_PLL_VIDEO_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_VIDEO_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_ENET] = 0xffc20ff0,
++    [CCM_ANALOG_PFD_480] = 0x40404040,
++    [CCM_ANALOG_PFD_528] = 0x40404040,
++    [PMU_MISC0] = 0x01fe8306,
++    [PMU_MISC1] = 0x07fcede0,
++    [PMU_MISC2] = 0x005f5f5f,
++};
++
+ static const char *imx6ul_ccm_reg_name(uint32_t reg)
+ {
+     static char unknown[20];
+@@ -596,11 +652,8 @@ static void imx6ul_ccm_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     trace_ccm_write_reg(imx6ul_ccm_reg_name(index), (uint32_t)value);
+ 
+-    /*
+-     * We will do a better implementation later. In particular some bits
+-     * cannot be written to.
+-     */
+-    s->ccm[index] = (uint32_t)value;
++    s->ccm[index] = (s->ccm[index] & ccm_mask[index]) |
++                           ((uint32_t)value & ~ccm_mask[index]);
+ }
+ 
+ static uint64_t imx6ul_analog_read(void *opaque, hwaddr offset, unsigned size)
+@@ -737,7 +790,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, setting bits passed in the value.
+          */
+-        s->analog[index - 1] |= value;
++        s->analog[index - 1] = s->analog[index - 1] |
++                               (value & ~analog_mask[index - 1]);
+         break;
+     case CCM_ANALOG_PLL_ARM_CLR:
+     case CCM_ANALOG_PLL_USB1_CLR:
+@@ -762,7 +816,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, unsetting bits passed in the value.
+          */
+-        s->analog[index - 2] &= ~value;
++        s->analog[index - 2] = s->analog[index - 2] &
++                               ~(value & ~analog_mask[index - 2]);
+         break;
+     case CCM_ANALOG_PLL_ARM_TOG:
+     case CCM_ANALOG_PLL_USB1_TOG:
+@@ -787,14 +842,14 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, toggling bits passed in the value.
+          */
+-        s->analog[index - 3] ^= value;
++        s->analog[index - 3] = (s->analog[index - 3] &
++                                analog_mask[index - 3]) |
++                               ((value ^ s->analog[index - 3]) &
++                                ~analog_mask[index - 3]);
+         break;
+     default:
+-        /*
+-         * We will do a better implementation later. In particular some bits
+-         * cannot be written to.
+-         */
+-        s->analog[index] = value;
++        s->analog[index] = (s->analog[index] & analog_mask[index]) |
++                           (value & ~analog_mask[index]);
+         break;
+     }
+ }
+-- 
+2.25.1
+
 
