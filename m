@@ -2,92 +2,85 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99924C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 073C8C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6203D208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4C302068D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:50:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d8NarI4a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6203D208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHWgApFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4C302068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jelwu-0006k3-K0
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 16:49:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46550)
+	id 1jelxM-0007RN-Vd
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 16:50:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jelqh-0005uF-CL
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:43:27 -0400
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:44519)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jelwD-0006Ah-H6; Fri, 29 May 2020 16:49:09 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:39337)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jelqg-0000rq-Cu
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:43:27 -0400
-Received: by mail-pl1-x631.google.com with SMTP id bh7so1696374plb.11
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=I57f4z5ddl8Jgj2XC06LWOjtbgtg/rXwxyMqaFaoBAM=;
- b=d8NarI4a5bR1b0jOmT4mpBXTixvltA5AycOdlCe0wkJGSJ1L1nvwx8iYL8ts3Ii55B
- CMBxeMX6Y1TNUSsRk0O1niUCjEpwxqUFZY2/rswBF1I86yaHxnmr+b+z/VLEoN6YAp/q
- 5hyS2uBQAYQqAmLNIndz12LbB5zGrCSNSI0ZoJ0MvzW+pff+vw+Ocq4DwGgSSdMSBUxS
- JngFdR1D1M+tUFzXRI9qNMFCUJyaY6CoTiFj1ctcxspc8NqHz44mnKQGjYbmVSqkSEKM
- Wrbeq3Hn0EZlQCQgGVbNqg1Wx/qI93IVEDjC/AQNnuRclXfbpAS7MCsE2MFsGn70Q2yd
- wu4A==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jelwC-0005mI-5J; Fri, 29 May 2020 16:49:09 -0400
+Received: by mail-io1-xd41.google.com with SMTP id c8so788266iob.6;
+ Fri, 29 May 2020 13:49:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lfYJwYbsf3viRq0jEi9p4en5sgc/dXFv1cABxe72Y4g=;
+ b=JHWgApFQkhmQYyEayQNbTMfv279Hd4HPuMm+4riC6elGKmxwNAaMIRI1PmEs57DyKj
+ Xqi81eklcZ6QWW6epFnV1zYd/ZFsGhFeaFERC89Plh4Q9t1Y8wAhke+jBfMkCYaAGumH
+ XRJffhebNBBo0OC01AMMqZeGAGC9UgIP5tYyGqVs0TgTXhkwuZvS+Glg6kIzoCrls9wS
+ bY3TugfIG2TPGwGm/kVromoTwn1U6OCyZNVMVzttpo40bOpm5RyEC9WWqymV919FDqcw
+ adUCLvimikG+akLYqtV8Qhw6LkhUTSAu1O50voeWt2heEpBCBFNrACEWXt/M21blcBOT
+ S3dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=I57f4z5ddl8Jgj2XC06LWOjtbgtg/rXwxyMqaFaoBAM=;
- b=hUJtKQCB5gIMU91VsaeWHT/KPKpRinT6I8YPZoo4YwHlVA2W6JM/J2XTEPuDs1E3UM
- NtQBWC5N0SYk+IsNVUEvDC7qo7B45Y0Lr4n1WhfTE/yXqUSHhq9P8qE61OVITHI2BQjs
- PN+j+JsNOFTbFaEllh0j3xJgrfmT+48lS+Id0+nndO4RiZCWukP9mnTrUxGcIv9/pAJy
- taZ9wKJH+KpV5dBpoet20d6m07ajDpZdhut19q5mLqYE2aK5HiMYqnMeAoaKr9dcS+pT
- p3bHjNuqQpGJYo/sIiw4KgjKwXsDt6XB7PwMBf6nb5pLyIEhfwqlvZI2MDhYbtdWSqA5
- I/6g==
-X-Gm-Message-State: AOAM533AwTKL2Q6Ul/pFY531Z6enAY7ljTIc670n8XWzzprAh0HZDPkL
- RLCvXEZ8I/OnnvL9q2lQUYq7Gx3O+qbB/A==
-X-Google-Smtp-Source: ABdhPJy3ztoWAT52XGQOtZx1307bL8ruciP2QMQhornJXdnywh/MD3i87K1GfphPB8MbVivqPVOc9Q==
-X-Received: by 2002:a17:90a:a884:: with SMTP id
- h4mr11578316pjq.82.1590785004522; 
- Fri, 29 May 2020 13:43:24 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:75ac:d268:da04:dde4])
- by smtp.gmail.com with ESMTPSA id t12sm282839pjf.3.2020.05.29.13.43.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 29 May 2020 13:43:23 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 06/12] tests/vm: allow wait_ssh() to specify command
-Date: Fri, 29 May 2020 16:34:52 -0400
-Message-Id: <20200529203458.1038-7-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200529203458.1038-1-robert.foley@linaro.org>
-References: <20200529203458.1038-1-robert.foley@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lfYJwYbsf3viRq0jEi9p4en5sgc/dXFv1cABxe72Y4g=;
+ b=JuaOdOx46AvGR3MxAYP+04sXy+sdrJyJuaCgtT1YA1LLpDnJcuxV670KQa04CJMwre
+ KzDg4m4WG8P2Q4NZgdGFdOdECcZMLAlJbtiwcwR0bCfNgExkSU+wnfJcBane1GQjgrMw
+ f9d96Bpyb07WJd8GjdNlidPqdEH5gvHlsLFEnlJEbUaXTrviZFLQ+ZzSSxgfh14suhqI
+ xeXIsrCCMOlibKr3QLJq8VanDqvxrSTiskCpyLBXFF/FCpPeNsCRj8Ggh3yp/mcb2s8X
+ XrtaAVx5kGYSYGbJ5LQCYNibqeZa/G6ZZDEi5XJXm49Rx3jnPmAWXMBBfoQa55MGlFaP
+ K1ng==
+X-Gm-Message-State: AOAM530uyJv0GMSC5+5hjj9yAHp32/KEk7lsO6rVrE1bBgGUpKVx832b
+ TfT8cPBAFFA885dVBxYXoZ4S2GJwbGA48+nxXv4=
+X-Google-Smtp-Source: ABdhPJxA/O8VOQj6PvtK9fw3e1ssHI4WUV3LYuHb7eB7X/sn2OdgVRcUgW2Axg/AobVkoHKFmw2cEUp0hRjrKV7TppA=
+X-Received: by 2002:a5e:dd45:: with SMTP id u5mr7142530iop.118.1590785346588; 
+ Fri, 29 May 2020 13:49:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::631;
- envelope-from=robert.foley@linaro.org; helo=mail-pl1-x631.google.com
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ <20200521094413.10425-44-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200521094413.10425-44-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 29 May 2020 13:40:01 -0700
+Message-ID: <CAKmqyKP04ZQ-EwURWVQDoe2on_NqNkW-OoqNOBk136+WG1L5+w@mail.gmail.com>
+Subject: Re: [PATCH v8 43/62] target/riscv: vector floating-point/integer
+ type-convert instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -102,58 +95,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, philmd@redhat.com, alex.bennee@linaro.org,
- robert.foley@linaro.org, peter.puhov@linaro.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows for waiting for completion of arbitrary commands.
+On Thu, May 21, 2020 at 4:11 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/vm/basevm.py | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 75a7ac2bd3..1aab9e3a24 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -411,24 +411,24 @@ class BaseVM(object):
-     def print_step(self, text):
-         sys.stderr.write("### %s ...\n" % text)
- 
--    def wait_ssh(self, wait_root=False, seconds=300):
-+    def wait_ssh(self, wait_root=False, seconds=300, cmd="exit 0"):
-         # Allow more time for VM to boot under TCG.
-         if not kvm_available(self.arch):
-             seconds *= self.tcg_ssh_timeout_multiplier
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
--        guest_up = False
-+        cmd_success = False
-         while datetime.datetime.now() < endtime:
--            if wait_root and self.ssh_root("exit 0") == 0:
--                guest_up = True
-+            if wait_root and self.ssh_root(cmd) == 0:
-+                cmd_success = True
-                 break
--            elif self.ssh("exit 0") == 0:
--                guest_up = True
-+            elif self.ssh(cmd) == 0:
-+                cmd_success = True
-                 break
-             seconds = (endtime - datetime.datetime.now()).total_seconds()
-             logging.debug("%ds before timeout", seconds)
-             time.sleep(1)
--        if not guest_up:
-+        if not cmd_success:
-             raise Exception("Timeout while waiting for guest ssh")
- 
-     def shutdown(self):
--- 
-2.17.1
+Alistair
 
+> ---
+>  target/riscv/helper.h                   | 13 ++++++++++
+>  target/riscv/insn32.decode              |  4 +++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  6 +++++
+>  target/riscv/vector_helper.c            | 33 +++++++++++++++++++++++++
+>  4 files changed, 56 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index 21054cc957..05f8fb5ffc 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -998,3 +998,16 @@ DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
+> +
+> +DEF_HELPER_5(vfcvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_xu_f_v_d, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_x_f_v_d, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_xu_v_d, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfcvt_f_x_v_d, void, ptr, ptr, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 14cb4e2e66..53562c6663 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -515,6 +515,10 @@ vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
+>  vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
+>  vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
+> +vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
+> +vfcvt_x_f_v     100010 . ..... 00001 001 ..... 1010111 @r2_vm
+> +vfcvt_f_xu_v    100010 . ..... 00010 001 ..... 1010111 @r2_vm
+> +vfcvt_f_x_v     100010 . ..... 00011 001 ..... 1010111 @r2_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index dfa2177331..6db460177d 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -2215,3 +2215,9 @@ static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
+>      }
+>      return false;
+>  }
+> +
+> +/* Single-Width Floating-Point/Integer Type-Convert Instructions */
+> +GEN_OPFV_TRANS(vfcvt_xu_f_v, opfv_check)
+> +GEN_OPFV_TRANS(vfcvt_x_f_v, opfv_check)
+> +GEN_OPFV_TRANS(vfcvt_f_xu_v, opfv_check)
+> +GEN_OPFV_TRANS(vfcvt_f_x_v, opfv_check)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 018293570d..34b21c8deb 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -4217,3 +4217,36 @@ void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2, \
+>  GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
+>  GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
+>  GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
+> +
+> +/* Single-Width Floating-Point/Integer Type-Convert Instructions */
+> +/* vfcvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
+> +RVVCALL(OPFVV1, vfcvt_xu_f_v_h, OP_UU_H, H2, H2, float16_to_uint16)
+> +RVVCALL(OPFVV1, vfcvt_xu_f_v_w, OP_UU_W, H4, H4, float32_to_uint32)
+> +RVVCALL(OPFVV1, vfcvt_xu_f_v_d, OP_UU_D, H8, H8, float64_to_uint64)
+> +GEN_VEXT_V_ENV(vfcvt_xu_f_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfcvt_xu_f_v_w, 4, 4, clearl)
+> +GEN_VEXT_V_ENV(vfcvt_xu_f_v_d, 8, 8, clearq)
+> +
+> +/* vfcvt.x.f.v vd, vs2, vm # Convert float to signed integer. */
+> +RVVCALL(OPFVV1, vfcvt_x_f_v_h, OP_UU_H, H2, H2, float16_to_int16)
+> +RVVCALL(OPFVV1, vfcvt_x_f_v_w, OP_UU_W, H4, H4, float32_to_int32)
+> +RVVCALL(OPFVV1, vfcvt_x_f_v_d, OP_UU_D, H8, H8, float64_to_int64)
+> +GEN_VEXT_V_ENV(vfcvt_x_f_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfcvt_x_f_v_w, 4, 4, clearl)
+> +GEN_VEXT_V_ENV(vfcvt_x_f_v_d, 8, 8, clearq)
+> +
+> +/* vfcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to float. */
+> +RVVCALL(OPFVV1, vfcvt_f_xu_v_h, OP_UU_H, H2, H2, uint16_to_float16)
+> +RVVCALL(OPFVV1, vfcvt_f_xu_v_w, OP_UU_W, H4, H4, uint32_to_float32)
+> +RVVCALL(OPFVV1, vfcvt_f_xu_v_d, OP_UU_D, H8, H8, uint64_to_float64)
+> +GEN_VEXT_V_ENV(vfcvt_f_xu_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfcvt_f_xu_v_w, 4, 4, clearl)
+> +GEN_VEXT_V_ENV(vfcvt_f_xu_v_d, 8, 8, clearq)
+> +
+> +/* vfcvt.f.x.v vd, vs2, vm # Convert integer to float. */
+> +RVVCALL(OPFVV1, vfcvt_f_x_v_h, OP_UU_H, H2, H2, int16_to_float16)
+> +RVVCALL(OPFVV1, vfcvt_f_x_v_w, OP_UU_W, H4, H4, int32_to_float32)
+> +RVVCALL(OPFVV1, vfcvt_f_x_v_d, OP_UU_D, H8, H8, int64_to_float64)
+> +GEN_VEXT_V_ENV(vfcvt_f_x_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfcvt_f_x_v_w, 4, 4, clearl)
+> +GEN_VEXT_V_ENV(vfcvt_f_x_v_d, 8, 8, clearq)
+> --
+> 2.23.0
+>
+>
 
