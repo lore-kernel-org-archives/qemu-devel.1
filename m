@@ -5,70 +5,70 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6DDC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A64C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72DC12075A
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:58:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BBA62075A
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 16:59:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="POwnswFM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72DC12075A
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="MoSS9AFH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBA62075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeiKu-0006Lu-H6
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 12:58:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37344)
+	id 1jeiLx-0007R1-Mc
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 12:59:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jeiKB-0005nq-HR
- for qemu-devel@nongnu.org; Fri, 29 May 2020 12:57:39 -0400
-Received: from mail-dm6nam10on2122.outbound.protection.outlook.com
- ([40.107.93.122]:57726 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jeiKi-0006N3-G4
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 12:58:12 -0400
+Received: from mail-dm6nam12on2098.outbound.protection.outlook.com
+ ([40.107.243.98]:17697 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jeiK9-0003Ul-IV
- for qemu-devel@nongnu.org; Fri, 29 May 2020 12:57:38 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jeiKh-0003lv-Nd
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 12:58:12 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f6wCVNY4AuhRCfCQiO3nwEM0C7RaMWm4Cu4SKHlI/yuMCu8E//9Umv0dnVqrfzJgQSZZFU7KFhkWGKoiz7w/r19O8htwUmFPffKtfHYOePdr8W2v7r8JqOmjRGHBx3y9mTnCkNMEdiLg8uDpMrlGVy4Kk9WDmV0Mck6INimCzM4UFvQsiDn93TVSAlvOnigkCGWAm0SlwwVFjFCahjboVSPdNGGzhhSlAGwOUNYNkJgjKS5YndWqQZnOKljiTDQpZHlpElsikYEULYC4/l8ZCwpnmHq0AsT7REbh16EFRqHxWQgYJIX96DHPJIppEdmfeFYGXzor7fGuKZ+hhEHDQA==
+ b=PHD2e9oB9Alk6NO1AmvyFd7X/dcbRU8IuqBL1+yadReOu+ywbDHhJZ/pM7n52YgkrqbFHyTymRQgyyKOnXVbLyszgNSxlmK9tCojox6fRxT1+7u4+lW7ZRTCNTJW263nuUcmgyAxedsILwPE0v4heW+0seEVfh1ujViFpF+PjIfIDL89S0WIInExAVREx0h3+5HxJaKA6qKMwJpx5iuJNWAKNtWvi2IyitQWqe/4+uaUwFE4DMGQVau+mTyaYXU0ehpj6dt1uAecD7iB2THwPtWzXqNzMF0aAkLENPpdXwRhMdCEOa51g5bWgc9CIBQluG5g22U9rs2LZBLIs9KpYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8R693xrsfPjKMVeJfA9kIDi9VkchLPMpwuhXyduMZDI=;
- b=ersJAdNOGS9065IGaG+/sdNyZw9EB4bsB6H5vsoH9EUK1yLTBh9ayxs0Ps+dfMYHQ3QPqhf8rdcHLUypCB3eU/FOi4PDQJGLZAuuV4dUGkpVKkvUtOxqDgPqsSNcQUrLt01OO60yVaicPreX9rXrOisQ7tR+mfX9kI2727s3+XZ5eFEzXVnbB9EC4bNAfCw91f+/r2gSWp9d2lWPxWc70UDSZO3R+ziR0yKtUeo3pbBXqaz6c8oomuSaZY6tBW5xopFeue/F4doALCtuhCfYMj9AoQif+blA/KZCSovzdzK2ZMQy4KIZ46GqVgp0Pgp3UHL+BKqdc0TW+z0oZdPg/g==
+ bh=VF43pmbK7Aodes9LVekcIcCYpaa+Gq3Lxpdu8DvOzm4=;
+ b=bf6/508CyzlVq53tdywK6Z2E9DE6J68u6jfw+I2V9wPgKXFrDL3IL9ubtrcg06STgCONqozRcC16RF+2+peMsUUwSLdHc3NBC1eMEvDuBim1+fGeYCP24+GQLrxBvrcTgtap1nxUYWW6NeQgKyGoedJJgxjzhhjB3nkTFik/isWGFn7kaAZW31gDhpmgVPGeZzmogOxd7K0uD03ocW1isyyzRtpCCO0uLUSa65sBpO1qXtaVjnSk34NTmtuC6Bll+ItFPZthohcTx9OM4RbUSpXjfzuSoFX7jbT/OYAuzQXGGn5mSFnsd1dfb4RXiLoI48/y9Rtn+uybAx5XpVNgRA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8R693xrsfPjKMVeJfA9kIDi9VkchLPMpwuhXyduMZDI=;
- b=POwnswFMTILgSD0JqMfBcEy37O+b4E7qEASzV3tbQzv2DT3FBFvGblYUsVTG0VGpL9tlnj/WCBMBBJKkK5zvwKvCXcSVPJkGNLPC3EOST5aFqkr/aNddW3kXb8g49TL7UzXiPno2emF80etRdPxwAoE5WwlWbF8h1QuDOY8O5pM=
+ bh=VF43pmbK7Aodes9LVekcIcCYpaa+Gq3Lxpdu8DvOzm4=;
+ b=MoSS9AFHajWdNnxAeLcvf5u+s3z/GiXL8fEpBE1pIjUTzTckXBMC6OWtvYvkRzxOmjBflnJFV5eE/6npaOBM8SUQezjulBYLuQhGzTlbSWbfGV3WKWzTo+7TOxXQWzhudFxdSeDnt4ocCr9ayebJDjurxW4vFNBglgMHLuCnOoY=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB3917.namprd03.prod.outlook.com (2603:10b6:805:72::24)
+ by SN6PR03MB3504.namprd03.prod.outlook.com (2603:10b6:805:4e::28)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.18; Fri, 29 May
- 2020 16:57:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Fri, 29 May
+ 2020 16:57:36 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::640a:1123:37c1:42db]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::640a:1123:37c1:42db%3]) with mapi id 15.20.3045.018; Fri, 29 May 2020
- 16:57:34 +0000
+ 16:57:36 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] fuzz: skip QTest serialization
-Date: Fri, 29 May 2020 12:57:18 -0400
-Message-Id: <20200529165719.19262-2-alxndr@bu.edu>
+Subject: [PATCH 2/2] fuzz: Add support for logging QTest commands
+Date: Fri, 29 May 2020 12:57:19 -0400
+Message-Id: <20200529165719.19262-3-alxndr@bu.edu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529165719.19262-1-alxndr@bu.edu>
 References: <20200529165719.19262-1-alxndr@bu.edu>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: BL0PR02CA0077.namprd02.prod.outlook.com
  (2603:10b6:208:51::18) To SN6PR03MB3871.namprd03.prod.outlook.com
  (2603:10b6:805:6d::32)
@@ -77,36 +77,36 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from mozz.bu.edu (128.197.127.33) by
  BL0PR02CA0077.namprd02.prod.outlook.com (2603:10b6:208:51::18) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3045.17 via Frontend Transport; Fri, 29 May 2020 16:57:33 +0000
+ 15.20.3045.17 via Frontend Transport; Fri, 29 May 2020 16:57:34 +0000
 X-Mailer: git-send-email 2.26.2
 X-Originating-IP: [128.197.127.33]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c05445b2-83ce-45e4-0a6e-08d803f16229
-X-MS-TrafficTypeDiagnostic: SN6PR03MB3917:
+X-MS-Office365-Filtering-Correlation-Id: a54be189-ad8e-4694-a33b-08d803f162d0
+X-MS-TrafficTypeDiagnostic: SN6PR03MB3504:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB3917BD1FECBFBD8EFCBAC532BA8F0@SN6PR03MB3917.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2399;
+X-Microsoft-Antispam-PRVS: <SN6PR03MB35040750269A19A6ADCD56F8BA8F0@SN6PR03MB3504.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:747;
 X-Forefront-PRVS: 04180B6720
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: H0pP917SNYnGSMMQTvnlGHyCKlSrf3Z9aMHByDYMP7V7RbfZq5HEldiTsqYmOgItf4I1YVLdUxt4J97Fku+MJO+fGB67EkveJys7VGC1y3l24SmEtCtvdhFH1i8rNKLo2KJakzcJkmEStYtbjEJ6/4DJR+WlpGpXGzad6EnLjuo/x6JQlLxWvBRymC40s+UDXWQgVCTRPkx+Ltj4+vOKfyWcZaI7ZPZKzbIqgwHp4bHUJm9ia7b2lMYiKO6XUxCv44YIxcOIX0BACZUxJQdx8aV/9yOc9BW8AwaQwmEa8ZJqKFqkQsmXEodfId8H2D1I7IdmQI95n4TP6UEipUujPA==
+X-Microsoft-Antispam-Message-Info: KHtwfqW5k227XdZKzM9yhVvh2Koyzlh0CReauNY4AFynRKnPlN+5pFh3Zw0XKTxdxAM71fF+B4yX1sOlePbO2xUQX+GLk0/rJAjb/1MyTIDbmI//4IkFuXXdlD33HeSIQ1cv5kWjovXicN8u0QGlA6pQSejQTFdPm93FRiEMpovTOORzhll1cgWvivPYU1sSqri+VgYJAkBnilJg30w+/0N5L0rsdxexo3C+3rE0p0AUVNTyHBMzqbEPcblwWQmPd7eBI4LTxJqjTZP+qhI1yifmJVSsoDnyw7E1ExdwM9PLVc/o75BDy9fnJhx902E0VcQESSDVNCXiFRR2UmFuTg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39860400002)(136003)(346002)(376002)(366004)(396003)(8936002)(186003)(83380400001)(2616005)(956004)(6666004)(6486002)(1076003)(36756003)(30864003)(26005)(16526019)(786003)(316002)(54906003)(478600001)(4326008)(66476007)(5660300002)(66946007)(7696005)(52116002)(86362001)(66556008)(8676002)(6916009)(2906002)(75432002);
+ SFS:(4636009)(136003)(376002)(346002)(39860400002)(396003)(366004)(478600001)(5660300002)(6486002)(26005)(4326008)(6666004)(36756003)(75432002)(54906003)(2906002)(86362001)(16526019)(786003)(316002)(8676002)(8936002)(66556008)(66946007)(1076003)(2616005)(66476007)(83380400001)(956004)(52116002)(6916009)(186003)(7696005);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: vHo7xlBNBK5TpTgd1lqfAtXKvaoY+OdRrQJhGflOc1U+oibcko+BTzErfgBhLELngdeDF7Ek4jiVrE9d+T18bFTMzqc72svyU1MTnC0+qW36sjINbpKNIyt2QIQDxTirHmpw1fsX3RuMPR6CkX9fntQR7q8U3AWl5PhlieVCdoK867OdR9wcPa+HkmhaTyTpeZiPNqcpdaoJy6UwIk47k+KI6ctl4hPwimSFBKsWChK3NhWPpR/PXFFKxtZy6RMrTcmdLyWPRlEY6DaHlhCz4fvQlN4ZUUEiCAhUMEV1zzCCOfk+3LKz3qnObmVZ84dg+YCOJaeUot7Wz9qkNEJiwhfhyFsvSQ67d+MoU7BaFeITrORR8YeFdwLnS9Qx4vhyL6Sw7cXqTrdD+BV1J/MLeTDdM2ILuGeHxGGP7a1VKYJt8rhCXYVnyyId/G40KgxwWFaz8QSCBHkOZwBG3oG3a9u847VEaO78pbyAxApQ0KmFMriOjrHBWzR3NR6JFPo6
+X-MS-Exchange-AntiSpam-MessageData: gPzLLitiW4FN0i23E/t210WoPq3iDaNfJTwo2oOksuxaU0EkDSGGYOjxTQfNrNo95bceLjJI4eKHt7c5A3Hn5fXTuz14GKM7VVB+fKO4HA84nnu8PmOGk7yMs7M2/jmLRU0UOEy+Viyp+d44fmASVWKTNO7zYT5BqWdE5zNHs4xE6wrwrdiobh0sO6I+x8R45zWwqh05yfUSy14y12ButW24Fbwmyor6ast2jidQeDLfcWA58z5JRqWadwH4QVL+BY17lkJ28S2V5+dIt9MHGGs9KT0pkj0WWHUXxr6Cwg2DEiklahw16H68gPO3ZENjPEbRWDGLQfJXhMw5NvDj7/wwAbYY0xaLPqpnIVkXfcl9dT7HNnSIoPpxZ837B/pIVnUZhRS3FndBW0T71kJvm6g8b+bX371zHXq6ghQWYmpGnDxSonC2tnlFtMTcgtCj2XcdtwbmPRA4/oPXDojwl6pXJqngcPbi9NJ4gM0Oia0=
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: c05445b2-83ce-45e4-0a6e-08d803f16229
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2020 16:57:34.3532 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a54be189-ad8e-4694-a33b-08d803f162d0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2020 16:57:36.3790 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ig3NCfgAIPED0m8KomC0g8D5RHi2Z7BHEzy5yQ7RjmDpDWKD4Wb9lRlVvsp1SwX2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3917
-Received-SPF: pass client-ip=40.107.93.122; envelope-from=alxndr@bu.edu;
- helo=NAM10-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 12:57:35
+X-MS-Exchange-CrossTenant-UserPrincipalName: BG9BkFotNUNwmPn9watJGb/JY29gy5m4AND+cwcway3A1GHfIY/CvJCdYRVblEac
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3504
+Received-SPF: pass client-ip=40.107.243.98; envelope-from=alxndr@bu.edu;
+ helo=NAM12-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 12:58:10
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -135,367 +135,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The QTest server usually parses ASCII commands from clients. Since we
-fuzz within the QEMU process, skip the QTest serialization and server
-for most QTest commands. Leave the option to use the ASCII protocol, to
-generate readable traces for crash reproducers.
-
-Inspired-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- tests/qtest/fuzz/Makefile.include |  21 +++
- tests/qtest/fuzz/fuzz.c           |  13 +-
- tests/qtest/fuzz/fuzz.h           |   3 +
- tests/qtest/fuzz/qtest_wrappers.c | 252 ++++++++++++++++++++++++++++++
- 4 files changed, 288 insertions(+), 1 deletion(-)
- create mode 100644 tests/qtest/fuzz/qtest_wrappers.c
+ tests/qtest/fuzz/fuzz.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.include
-index e455bebc9d..0184f59406 100644
---- a/tests/qtest/fuzz/Makefile.include
-+++ b/tests/qtest/fuzz/Makefile.include
-@@ -5,6 +5,7 @@ fuzz-obj-y += $(libqos-obj-y)
- fuzz-obj-y += tests/qtest/fuzz/fuzz.o # Fuzzer skeleton
- fuzz-obj-y += tests/qtest/fuzz/fork_fuzz.o
- fuzz-obj-y += tests/qtest/fuzz/qos_fuzz.o
-+fuzz-obj-y += tests/qtest/fuzz/qtest_wrappers.o
- 
- # Targets
- fuzz-obj-y += tests/qtest/fuzz/i440fx_fuzz.o
-@@ -17,3 +18,23 @@ FUZZ_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
- # Linker Script to force coverage-counters into known regions which we can mark
- # shared
- FUZZ_LDFLAGS += -Xlinker -T$(SRC_PATH)/tests/qtest/fuzz/fork_fuzz.ld
-+
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_inb
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_inw
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_inl
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_outb
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_outw
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_outl
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_readb
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_readw
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_readl
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_readq
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeb
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_writew
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_writel
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeq
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_memread
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufread
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_memwrite
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufwrite
-+FUZZ_LDFLAGS += -Wl,-wrap,qtest_memset
 diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 33365c3782..ea630ddb9b 100644
+index ea630ddb9b..2c9e2ee7b7 100644
 --- a/tests/qtest/fuzz/fuzz.c
 +++ b/tests/qtest/fuzz/fuzz.c
-@@ -91,7 +91,10 @@ static void usage(char *path)
-         printf(" * %s  : %s\n", tmp->target->name,
-                 tmp->target->description);
-     }
--    printf("Alternatively, add -target-FUZZ_TARGET to the executable name\n");
-+    printf("Alternatively, add -target-FUZZ_TARGET to the executable name\n\n"
-+           "Set the environment variable FUZZ_SERIALIZE_QTEST=1 to serialize\n"
-+           "QTest commands into an ASCII protocol. Useful for building crash\n"
-+           "reproducers, but slows down execution.\n");
+@@ -94,7 +94,9 @@ static void usage(char *path)
+     printf("Alternatively, add -target-FUZZ_TARGET to the executable name\n\n"
+            "Set the environment variable FUZZ_SERIALIZE_QTEST=1 to serialize\n"
+            "QTest commands into an ASCII protocol. Useful for building crash\n"
+-           "reproducers, but slows down execution.\n");
++           "reproducers, but slows down execution.\n\n"
++           "Set the environment variable QTEST_LOG=1 to log all qtest commands"
++           "\n");
      exit(0);
  }
  
-@@ -138,6 +141,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+@@ -198,6 +200,11 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+     /* Run QEMU's softmmu main with the fuzz-target dependent arguments */
+     const char *init_cmdline = fuzz_target->get_init_cmdline(fuzz_target);
  
-     char *target_name;
-     char *dir;
-+    bool serialize = false;
- 
-     /* Initialize qgraph and modules */
-     qos_graph_init();
-@@ -172,6 +176,13 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-         usage(**argv);
-     }
- 
-+    /* Should we always serialize qtest commands? */
-+    if (getenv("FUZZ_SERIALIZE_QTEST")) {
-+        serialize = true;
-+    }
++    init_cmdline = g_strdup_printf("%s -qtest /dev/null -qtest-log %s",
++                                   init_cmdline,
++                                   getenv("QTEST_LOG") ? "/dev/fd/2"
++                                                       : "/dev/null");
 +
-+    fuzz_qtest_set_serialize(serialize);
-+
-     /* Identify the fuzz target */
-     fuzz_target = fuzz_get_target(target_name);
-     if (!fuzz_target) {
-diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
-index 03901d414e..72d5710f6c 100644
---- a/tests/qtest/fuzz/fuzz.h
-+++ b/tests/qtest/fuzz/fuzz.h
-@@ -82,6 +82,9 @@ typedef struct FuzzTarget {
- void flush_events(QTestState *);
- void reboot(QTestState *);
- 
-+/* Use the QTest ASCII protocol or call address_space API directly?*/
-+void fuzz_qtest_set_serialize(bool option);
-+
- /*
-  * makes a copy of *target and adds it to the target-list.
-  * i.e. fine to set up target on the caller's stack
-diff --git a/tests/qtest/fuzz/qtest_wrappers.c b/tests/qtest/fuzz/qtest_wrappers.c
-new file mode 100644
-index 0000000000..713c830cdb
---- /dev/null
-+++ b/tests/qtest/fuzz/qtest_wrappers.c
-@@ -0,0 +1,252 @@
-+/*
-+ * qtest function wrappers
-+ *
-+ * Copyright Red Hat Inc., 2019
-+ *
-+ * Authors:
-+ *  Alexander Bulekov   <alxndr@bu.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/ioport.h"
-+
-+#include "fuzz.h"
-+
-+static bool serialize = true;
-+
-+#define WRAP(RET_TYPE, NAME_AND_ARGS)\
-+    RET_TYPE __wrap_##NAME_AND_ARGS;\
-+    RET_TYPE __real_##NAME_AND_ARGS;
-+
-+WRAP(uint8_t  , qtest_inb(QTestState *s, uint16_t addr))
-+WRAP(uint16_t , qtest_inw(QTestState *s, uint16_t addr))
-+WRAP(uint32_t , qtest_inl(QTestState *s, uint16_t addr))
-+WRAP(void     , qtest_outb(QTestState *s, uint16_t addr, uint8_t value))
-+WRAP(void     , qtest_outw(QTestState *s, uint16_t addr, uint16_t value))
-+WRAP(void     , qtest_outl(QTestState *s, uint16_t addr, uint32_t value))
-+WRAP(uint8_t  , qtest_readb(QTestState *s, uint64_t addr))
-+WRAP(uint16_t , qtest_readw(QTestState *s, uint64_t addr))
-+WRAP(uint32_t , qtest_readl(QTestState *s, uint64_t addr))
-+WRAP(uint64_t , qtest_readq(QTestState *s, uint64_t addr))
-+WRAP(void     , qtest_writeb(QTestState *s, uint64_t addr, uint8_t value))
-+WRAP(void     , qtest_writew(QTestState *s, uint64_t addr, uint16_t value))
-+WRAP(void     , qtest_writel(QTestState *s, uint64_t addr, uint32_t value))
-+WRAP(void     , qtest_writeq(QTestState *s, uint64_t addr, uint64_t value))
-+WRAP(void     , qtest_memread(QTestState *s, uint64_t addr,
-+                              void *data, size_t size))
-+WRAP(void     , qtest_bufread(QTestState *s, uint64_t addr, void *data,
-+                              size_t size))
-+WRAP(void     , qtest_memwrite(QTestState *s, uint64_t addr, const void *data,
-+                               size_t size))
-+WRAP(void,      qtest_bufwrite(QTestState *s, uint64_t addr,
-+                               const void *data, size_t size))
-+WRAP(void,      qtest_memset(QTestState *s, uint64_t addr,
-+                             uint8_t patt, size_t size))
-+
-+
-+uint8_t __wrap_qtest_inb(QTestState *s, uint16_t addr)
-+{
-+    if (!serialize) {
-+        return cpu_inb(addr);
-+    } else {
-+        return __real_qtest_inb(s, addr);
-+    }
-+}
-+
-+uint16_t __wrap_qtest_inw(QTestState *s, uint16_t addr)
-+{
-+    if (!serialize) {
-+        return cpu_inw(addr);
-+    } else {
-+        return __real_qtest_inw(s, addr);
-+    }
-+}
-+
-+uint32_t __wrap_qtest_inl(QTestState *s, uint16_t addr)
-+{
-+    if (!serialize) {
-+        return cpu_inl(addr);
-+    } else {
-+        return __real_qtest_inl(s, addr);
-+    }
-+}
-+
-+void __wrap_qtest_outb(QTestState *s, uint16_t addr, uint8_t value)
-+{
-+    if (!serialize) {
-+        cpu_outb(addr, value);
-+    } else {
-+        __real_qtest_outb(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_outw(QTestState *s, uint16_t addr, uint16_t value)
-+{
-+    if (!serialize) {
-+        cpu_outw(addr, value);
-+    } else {
-+        __real_qtest_outw(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_outl(QTestState *s, uint16_t addr, uint32_t value)
-+{
-+    if (!serialize) {
-+        cpu_outl(addr, value);
-+    } else {
-+        __real_qtest_outl(s, addr, value);
-+    }
-+}
-+
-+uint8_t __wrap_qtest_readb(QTestState *s, uint64_t addr)
-+{
-+    uint8_t value;
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 1);
-+        return value;
-+    } else {
-+        return __real_qtest_readb(s, addr);
-+    }
-+}
-+
-+uint16_t __wrap_qtest_readw(QTestState *s, uint64_t addr)
-+{
-+    uint16_t value;
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 2);
-+        return value;
-+    } else {
-+        return __real_qtest_readw(s, addr);
-+    }
-+}
-+
-+uint32_t __wrap_qtest_readl(QTestState *s, uint64_t addr)
-+{
-+    uint32_t value;
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 4);
-+        return value;
-+    } else {
-+        return __real_qtest_readl(s, addr);
-+    }
-+}
-+
-+uint64_t __wrap_qtest_readq(QTestState *s, uint64_t addr)
-+{
-+    uint64_t value;
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 8);
-+        return value;
-+    } else {
-+        return __real_qtest_readq(s, addr);
-+    }
-+}
-+
-+void __wrap_qtest_writeb(QTestState *s, uint64_t addr, uint8_t value)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 1);
-+    } else {
-+        __real_qtest_writeb(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_writew(QTestState *s, uint64_t addr, uint16_t value)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 2);
-+    } else {
-+        __real_qtest_writew(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_writel(QTestState *s, uint64_t addr, uint32_t value)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 4);
-+    } else {
-+        __real_qtest_writel(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_writeq(QTestState *s, uint64_t addr, uint64_t value)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            &value, 8);
-+    } else {
-+        __real_qtest_writeq(s, addr, value);
-+    }
-+}
-+
-+void __wrap_qtest_memread(QTestState *s, uint64_t addr, void *data, size_t size)
-+{
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED, data,
-+                           size);
-+    } else {
-+        __real_qtest_memread(s, addr, data, size);
-+    }
-+}
-+
-+void __wrap_qtest_bufread(QTestState *s, uint64_t addr, void *data, size_t size)
-+{
-+    if (!serialize) {
-+        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED, data,
-+                           size);
-+    } else {
-+        __real_qtest_bufread(s, addr, data, size);
-+    }
-+}
-+
-+void __wrap_qtest_memwrite(QTestState *s, uint64_t addr, const void *data,
-+                           size_t size)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            data, size);
-+    } else {
-+        __real_qtest_memwrite(s, addr, data, size);
-+    }
-+}
-+
-+void __wrap_qtest_bufwrite(QTestState *s, uint64_t addr,
-+                    const void *data, size_t size)
-+{
-+    if (!serialize) {
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            data, size);
-+    } else {
-+        __real_qtest_bufwrite(s, addr, data, size);
-+    }
-+}
-+void __wrap_qtest_memset(QTestState *s, uint64_t addr,
-+                         uint8_t patt, size_t size)
-+{
-+    void *data;
-+    if (!serialize) {
-+        data = malloc(size);
-+        memset(data, patt, size);
-+        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                            data, size);
-+    } else {
-+        __real_qtest_memset(s, addr, patt, size);
-+    }
-+}
-+
-+void fuzz_qtest_set_serialize(bool option)
-+{
-+    serialize = option;
-+}
+     /* Split the runcmd into an argv and argc */
+     wordexp_t result;
+     wordexp(init_cmdline, &result, 0);
 -- 
 2.26.2
 
