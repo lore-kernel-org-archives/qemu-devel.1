@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95923C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B577C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A8FB206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8FB206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 4F4CD206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:10:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4CD206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeZ9t-0005bI-J3
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:10:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40946)
+	id 1jeZA1-0005yx-FY
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jeZ5D-0004z6-4H
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:35 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33410)
+ id 1jeZ4u-0004NL-QX
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:16 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33344)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ5B-0001Ve-BA
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:34 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4t-0001Fa-U1
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:16 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 35540CD461;
- Fri, 29 May 2020 10:05:32 +0300 (MSK)
-Subject: [PATCH v3 10/11] tests/acceptance: refactor boot_linux to allow
- code reuse
+ by mail.ispras.ru (Postfix) with ESMTPSA id D264CCD461;
+ Fri, 29 May 2020 10:05:14 +0300 (MSK)
+Subject: [PATCH v3 07/11] tests/acceptance: add record/replay test for ppc64
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 29 May 2020 10:05:31 +0300
-Message-ID: <159073593167.20809.17582679291556188984.stgit@pasha-ThinkPad-X280>
+Date: Fri, 29 May 2020 10:05:13 +0300
+Message-ID: <159073591363.20809.15658672985367330140.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -50,13 +49,12 @@ Received-SPF: softfail client-ip=83.149.199.45;
  envelope-from=Pavel.Dovgaluk@gmail.com; helo=mail.ispras.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:56:22
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 17
-X-Spam_score: 1.7
-X-Spam_bar: +
-X-Spam_report: (1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, FROM_WORDY=1,
- NML_ADSP_CUSTOM_MED=0.9, SPF_SOFTFAIL=0.665, T_FILL_THIS_FORM_SHORT=0.01,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 7
+X-Spam_score: 0.7
+X-Spam_bar: /
+X-Spam_report: (0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
+ FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, NML_ADSP_CUSTOM_MED=0.9,
+ SPF_SOFTFAIL=0.665, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,96 +74,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch moves image downloading functions to the separate class to allow
-reusing them from record/replay tests.
+This patch adds a test for record/replay of the kernel
+image boot for ppc64 platform.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
  0 files changed
 
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
-index 075a386300..3aa57e88b0 100644
---- a/tests/acceptance/boot_linux.py
-+++ b/tests/acceptance/boot_linux.py
-@@ -26,22 +26,8 @@ KVM_NOT_AVAILABLE = ACCEL_NOT_AVAILABLE_FMT % "KVM"
- TCG_NOT_AVAILABLE = ACCEL_NOT_AVAILABLE_FMT % "TCG"
- 
- 
--class BootLinux(Test):
--    """
--    Boots a Linux system, checking for a successful initialization
--    """
--
--    timeout = 900
--    chksum = None
--
--    def setUp(self):
--        super(BootLinux, self).setUp()
--        self.vm.add_args('-smp', '2')
--        self.vm.add_args('-m', '1024')
--        self.prepare_boot()
--        self.prepare_cloudinit()
--
--    def prepare_boot(self):
-+class BootLinuxBase(Test):
-+    def download_boot(self):
-         self.log.debug('Looking for and selecting a qemu-img binary to be '
-                        'used to create the bootable snapshot image')
-         # If qemu-img has been built, use it, otherwise the system wide one
-@@ -60,17 +46,17 @@ class BootLinux(Test):
-         if image_arch == 'ppc64':
-             image_arch = 'ppc64le'
-         try:
--            self.boot = vmimage.get(
-+            boot = vmimage.get(
-                 'fedora', arch=image_arch, version='31',
-                 checksum=self.chksum,
-                 algorithm='sha256',
-                 cache_dir=self.cache_dirs[0],
-                 snapshot_dir=self.workdir)
--            self.vm.add_args('-drive', 'file=%s' % self.boot.path)
-         except:
-             self.cancel('Failed to download/prepare boot image')
-+        return boot.path
- 
--    def prepare_cloudinit(self):
-+    def download_cloudinit(self):
-         self.log.info('Preparing cloudinit image')
-         try:
-             cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
-@@ -81,9 +67,32 @@ class BootLinux(Test):
-                           # QEMU's hard coded usermode router address
-                           phone_home_host='10.0.2.2',
-                           phone_home_port=self.phone_home_port)
--            self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
-         except Exception:
-             self.cancel('Failed to prepared cloudinit image')
-+        return cloudinit_iso
+diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
+index 382f1248e0..738367849f 100644
+--- a/tests/acceptance/replay_kernel.py
++++ b/tests/acceptance/replay_kernel.py
+@@ -152,3 +152,19 @@ class ReplayKernel(LinuxKernelTest):
+         console_pattern = 'Boot successful.'
+         self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=1,
+             args=('-dtb', dtb_path, '-initrd', initrd_path, '-no-reboot'))
 +
-+class BootLinux(BootLinuxBase):
-+    """
-+    Boots a Linux system, checking for a successful initialization
-+    """
++    def test_ppc64_pseries(self):
++        """
++        :avocado: tags=arch:ppc64
++        :avocado: tags=machine:pseries
++        """
++        kernel_url = ('https://archives.fedoraproject.org/pub/archive'
++                      '/fedora-secondary/releases/29/Everything/ppc64le/os'
++                      '/ppc/ppc64/vmlinuz')
++        kernel_hash = '3fe04abfc852b66653b8c3c897a59a689270bc77'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
 +
-+    timeout = 900
-+    chksum = None
-+
-+    def setUp(self):
-+        super(BootLinux, self).setUp()
-+        self.vm.add_args('-smp', '2')
-+        self.vm.add_args('-m', '1024')
-+        self.prepare_boot()
-+        self.prepare_cloudinit()
-+
-+    def prepare_boot(self):
-+        path = self.download_boot()
-+        self.vm.add_args('-drive', 'file=%s' % path)
-+
-+    def prepare_cloudinit(self):
-+        cloudinit_iso = self.download_cloudinit()
-+        self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
- 
-     def launch_and_wait(self):
-         self.vm.set_console()
++        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'console=hvc0'
++        # icount is not good enough for PPC64 for complete boot yet
++        console_pattern = 'Kernel command line: %s' % kernel_command_line
++        self.run_rr(kernel_path, kernel_command_line, console_pattern)
 
 
