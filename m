@@ -2,104 +2,86 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 090B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 21:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1FEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 21:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC46D20897
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 21:00:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC46D20897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 657A120776
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 21:02:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1e1+A/Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657A120776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jem6r-0005x0-0c
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 17:00:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47676)
+	id 1jem8e-00072W-Jw
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 17:02:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jelyw-0001LU-E3
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:51:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25286
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jelyv-0002Mu-Ge
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:51:58 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04TKY0IB175690
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:56 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31as1hvprn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:56 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04TKk7qV019053
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:56 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31as1hvprh-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 29 May 2020 16:51:56 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04TKp2TJ022361;
- Fri, 29 May 2020 20:51:55 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma02dal.us.ibm.com with ESMTP id 316ufbscwd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 29 May 2020 20:51:55 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04TKpsgV55509422
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 29 May 2020 20:51:54 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EA0026A054;
- Fri, 29 May 2020 20:51:53 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0DA446A047;
- Fri, 29 May 2020 20:51:53 +0000 (GMT)
-Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.226.57])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 29 May 2020 20:51:52 +0000 (GMT)
-From: Daniele Buono <dbuono@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] check-block: enable iotests with SafeStack
-Date: Fri, 29 May 2020 16:51:22 -0400
-Message-Id: <20200529205122.714-5-dbuono@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200529205122.714-1-dbuono@linux.vnet.ibm.com>
-References: <20200529205122.714-1-dbuono@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jem7M-0006Q0-Bm; Fri, 29 May 2020 17:00:40 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40947)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jem7K-0003tL-Bx; Fri, 29 May 2020 17:00:39 -0400
+Received: by mail-il1-x141.google.com with SMTP id t8so3321900ilm.7;
+ Fri, 29 May 2020 14:00:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=t+0flSDyEuMMZRsW92vPS2V1F9iTfeF3IfBDWwhl5Io=;
+ b=B1e1+A/Q6UJDCLeMutNNIvg1izLD/43v5TUHT+U64+5xOEIIc9VQrMGuQqakke9dW8
+ JZEPGTEB3hMS0N33ZUWcOyveNqQgunByoX9jTHQptUFTFgpzwDePxB1BfXTKwtc2ZgAS
+ C+4kUo9iI31xs4DXW4Kt2yPsgxYCzsPMTBx1QQxBPbbymFJneNx3fud4gYSMKdLBBrtl
+ gJD0sNz8PDoH7lXL5cGSzOfb5yn7s9c6CLxRNxL5ANWY59+a/vnRt6ALyrGJEC06f9aI
+ S/yJNWazezwHhKb8C0gdkoDRCKUHpsdAJxstIMQW0A6sSN0cGOFkC6cbKFg1dROaEOnW
+ aTig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=t+0flSDyEuMMZRsW92vPS2V1F9iTfeF3IfBDWwhl5Io=;
+ b=uSqqUmtPnyv8li0ntJnhpW7A1ASQo/cUeclq63UlV7TDlGpyWSeeVcr0PBjsTkmvUA
+ nBXpiQVx1Nv2iAvIxvNvrsyxd6YsA3Uv5Ei9HapN+6hh1lh8+r8steXFl2nToc/pAWVW
+ aENiZk962sZL6Fy+oZmj4Qxt4sLb13sQ00/mr8yINbHyFScKLHTeOFxieWYSI4+vIpST
+ WDnBuYUN9S4f3wlm533HWWxk9UNIj+4FbAqzxXjBJRfA2H392tzu8UTVErIqBhX4vLUq
+ YhWcOapMI4NHn4VTKnEZolvVZJ1IG3fup0YzXUQfrvxEs0W5njP5TeAEBbzMM6KfC6Aj
+ pudQ==
+X-Gm-Message-State: AOAM531IZPq+9GXxv+u7YgWcaPM1nVZ//bqlvys8SNSa/AycX/7a8Zaz
+ 0WiBmDcvyfExltFrp9i8X0qczhAjNZ8BpJDsAQA=
+X-Google-Smtp-Source: ABdhPJxepGeedOFRr0FVR9Cv80ipvJCdIVXUS7vBQd7zttmPxP6HXcsu1XqyzW/bs4+SzK0GFh2EZGUI/yZ4dYB5qN8=
+X-Received: by 2002:a92:bb45:: with SMTP id w66mr9620401ili.131.1590786036108; 
+ Fri, 29 May 2020 14:00:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-05-29_10:2020-05-28,
- 2020-05-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=1
- spamscore=0 adultscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- malwarescore=0 cotscore=-2147483648 mlxlogscore=937 mlxscore=0
- phishscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005290148
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 15:28:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ <20200521094413.10425-46-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200521094413.10425-46-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 29 May 2020 13:51:27 -0700
+Message-ID: <CAKmqyKNPSUwya=Gb4mszAhiRDp=HMoPs43WSv3CADSGEw1h1zg@mail.gmail.com>
+Subject: Re: [PATCH v8 45/62] target/riscv: narrowing floating-point/integer
+ type-convert instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,59 +95,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- dbuono@linux.vnet.ibm.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SafeStack is a stack protection technique implemented in llvm. It is
-enabled with a -fsanitize flag.
-iotests are currently disabled when any -fsanitize option is used,
-because such options tend to produce additional warnings and false
-positives.
+On Thu, May 21, 2020 at 4:15 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-While common -fsanitize options are used to verify the code and not
-added in production, SafeStack's main use is in production environments
-to protect against stack smashing.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Since SafeStack does not print any warning or false positive, enable
-iotests when SafeStack is the only -fsanitize option used.
-This is likely going to be a production binary and we want to make sure
-it works correctly.
+Alistair
 
-Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
----
- tests/check-block.sh | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/tests/check-block.sh b/tests/check-block.sh
-index ad320c21ba..8e29c868e5 100755
---- a/tests/check-block.sh
-+++ b/tests/check-block.sh
-@@ -21,7 +21,17 @@ if grep -q "CONFIG_GPROF=y" config-host.mak 2>/dev/null ; then
-     exit 0
- fi
- 
--if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null ; then
-+# Disable tests with any sanitizer except for SafeStack
-+CFLAGS=$( grep "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null )
-+SANITIZE_FLAGS=""
-+#Remove all occurrencies of -fsanitize=safe-stack
-+for i in ${CFLAGS}; do
-+        if [ "${i}" != "-fsanitize=safe-stack" ]; then
-+                SANITIZE_FLAGS="${SANITIZE_FLAGS} ${i}"
-+        fi
-+done
-+if echo ${SANITIZE_FLAGS} | grep -q "\-fsanitize" 2>/dev/null; then
-+    # Have a sanitize flag that is not allowed, stop
-     echo "Sanitizers are enabled ==> Not running the qemu-iotests."
-     exit 0
- fi
--- 
-2.26.2
-
+> ---
+>  target/riscv/helper.h                   | 11 ++++++
+>  target/riscv/insn32.decode              |  5 +++
+>  target/riscv/insn_trans/trans_rvv.inc.c | 47 +++++++++++++++++++++++++
+>  target/riscv/vector_helper.c            | 39 ++++++++++++++++++++
+>  4 files changed, 102 insertions(+)
+>
+> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+> index e59dcc5a7c..82c5d1129e 100644
+> --- a/target/riscv/helper.h
+> +++ b/target/riscv/helper.h
+> @@ -1022,3 +1022,14 @@ DEF_HELPER_5(vfwcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_5(vfwcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_5(vfwcvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_5(vfwcvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+> +
+> +DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index e0efc63ec2..57ac4de1c2 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -524,6 +524,11 @@ vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
+>  vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
+>  vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
+>  vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
+> +vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
+> +vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
+> +vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
+> +vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
+> +vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index 44505027c1..e63b88a4cc 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -2268,3 +2268,50 @@ GEN_OPFV_WIDEN_TRANS(vfwcvt_x_f_v)
+>  GEN_OPFV_WIDEN_TRANS(vfwcvt_f_xu_v)
+>  GEN_OPFV_WIDEN_TRANS(vfwcvt_f_x_v)
+>  GEN_OPFV_WIDEN_TRANS(vfwcvt_f_f_v)
+> +
+> +/* Narrowing Floating-Point/Integer Type-Convert Instructions */
+> +
+> +/*
+> + * If the current SEW does not correspond to a supported IEEE floating-point
+> + * type, an illegal instruction exception is raised
+> + */
+> +static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
+> +{
+> +    return (vext_check_isa_ill(s) &&
+> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
+> +            vext_check_reg(s, a->rd, false) &&
+> +            vext_check_reg(s, a->rs2, true) &&
+> +            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
+> +                                     2 << s->lmul) &&
+> +            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
+> +}
+> +
+> +#define GEN_OPFV_NARROW_TRANS(NAME)                                \
+> +static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+> +{                                                                  \
+> +    if (opfv_narrow_check(s, a)) {                                 \
+> +        uint32_t data = 0;                                         \
+> +        static gen_helper_gvec_3_ptr * const fns[2] = {            \
+> +            gen_helper_##NAME##_h,                                 \
+> +            gen_helper_##NAME##_w,                                 \
+> +        };                                                         \
+> +        TCGLabel *over = gen_new_label();                          \
+> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
+> +                                                                   \
+> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
+> +        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
+> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
+> +        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
+> +                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
+> +                           s->vlen / 8, data, fns[s->sew - 1]);    \
+> +        gen_set_label(over);                                       \
+> +        return true;                                               \
+> +    }                                                              \
+> +    return false;                                                  \
+> +}
+> +
+> +GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
+> +GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
+> +GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
+> +GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
+> +GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index ea6a5853f3..8e525720d1 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -4292,3 +4292,42 @@ RVVCALL(OPFVV1, vfwcvt_f_f_v_h, WOP_UU_H, H4, H2, vfwcvtffv16)
+>  RVVCALL(OPFVV1, vfwcvt_f_f_v_w, WOP_UU_W, H8, H4, float32_to_float64)
+>  GEN_VEXT_V_ENV(vfwcvt_f_f_v_h, 2, 4, clearl)
+>  GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
+> +
+> +/* Narrowing Floating-Point/Integer Type-Convert Instructions */
+> +/* (TD, T2, TX2) */
+> +#define NOP_UU_H uint16_t, uint32_t, uint32_t
+> +#define NOP_UU_W uint32_t, uint64_t, uint64_t
+> +/* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
+> +RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
+> +RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
+> +GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4, clearl)
+> +
+> +/* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
+> +RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
+> +RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
+> +GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4, clearl)
+> +
+> +/* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
+> +RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
+> +RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
+> +GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4, clearl)
+> +
+> +/* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
+> +RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
+> +RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
+> +GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4, clearl)
+> +
+> +/* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
+> +static uint16_t vfncvtffv16(uint32_t a, float_status *s)
+> +{
+> +    return float32_to_float16(a, true, s);
+> +}
+> +
+> +RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
+> +RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
+> +GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
+> +GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
+> --
+> 2.23.0
+>
+>
 
