@@ -2,95 +2,80 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F96C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 06:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A48C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 06:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77AF520721
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 06:37:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQ6/xkHm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AF520721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D1D22072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 06:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1D22072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeYdk-0005EF-Go
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 02:37:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34048)
+	id 1jeYi3-0008HD-BM
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 02:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jeYce-00042H-8L
- for qemu-devel@nongnu.org; Fri, 29 May 2020 02:36:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42780
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jeYcc-0007RU-Rx
- for qemu-devel@nongnu.org; Fri, 29 May 2020 02:36:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590734161;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RxPSWTdJuvfPvSoAEprWkIPM+gF1S/GudfHLBFG6hp8=;
- b=eQ6/xkHmQBcPD/03VqVQu39q4NaErcQjGDX5pKPIA3oZKPasPAXKYge7ZX9GcyRUKrcvED
- MU7Dpi2iS6cYhbML+FkpuUmLv8nrr0pkZaXXzhIvu4b0D0Vmo5iM1p6ftrRKKR+GtBpV1m
- FBmrRLeQpz40Zjhl+WSmsb9RZTB3qcU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-2HT8p8WiNAWm2_s5_G-UpA-1; Fri, 29 May 2020 02:35:57 -0400
-X-MC-Unique: 2HT8p8WiNAWm2_s5_G-UpA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 302BF464;
- Fri, 29 May 2020 06:35:56 +0000 (UTC)
-Received: from [10.72.13.231] (ovpn-13-231.pek2.redhat.com [10.72.13.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B81195D9D5;
- Fri, 29 May 2020 06:35:50 +0000 (UTC)
-Subject: Re: [RFC PATCH] hw/net/e1000e: Do not abort() on invalid PSRCTL
- register value
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200525122330.3691-1-f4bug@amsat.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2623aab1-355a-a5dc-3fc1-e22f795b98a0@redhat.com>
-Date: Fri, 29 May 2020 14:35:48 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jeYhR-0007qw-5W
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 02:41:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43068)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jeYhP-0005fP-VO
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 02:41:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jeYhN-0002Wk-NN
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 06:40:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9AFA32E810F
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 06:40:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200525122330.3691-1-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:43:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 29 May 2020 06:31:58 -0000
+From: Heiko Sieger <1856335@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Heiko Sieger (h-sieger)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <159073391849.14053.10020759641505248848.malone@soybean.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="275d46a24253e557e4403d52832837e4bfa425b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f24eb01747ec42b284a45381e49bc3c00d90fded
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 02:40:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,125 +84,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Thanks for clarifying, Jan.
 
-On 2020/5/25 下午8:23, Philippe Mathieu-Daudé wrote:
-> libFuzzer found using 'qemu-system-i386 -M q35':
->
-> qemu: hardware error: e1000e: PSRCTL.BSIZE0 cannot be zero
-> CPU #0:
-> EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000663
-> ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-> EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =0000 00000000 0000ffff 00009300
-> CS =f000 ffff0000 0000ffff 00009b00
-> SS =0000 00000000 0000ffff 00009300
-> DS =0000 00000000 0000ffff 00009300
-> FS =0000 00000000 0000ffff 00009300
-> GS =0000 00000000 0000ffff 00009300
-> LDT=0000 00000000 0000ffff 00008200
-> TR =0000 00000000 0000ffff 00008b00
-> GDT=     00000000 0000ffff
-> IDT=     00000000 0000ffff
-> CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
-> DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
-> DR6=ffff0ff0 DR7=00000400
-> EFER=0000000000000000
-> FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-> FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-> FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-> FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-> FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-> XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-> XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
-> XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-> XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-> ==1988== ERROR: libFuzzer: deadly signal
->      #6 0x7fae4d3ea894 in __GI_abort (/lib64/libc.so.6+0x22894)
->      #7 0x563f4cc59a1d in hw_error (qemu-fuzz-i386+0xe8ca1d)
->      #8 0x563f4d7c93f2 in e1000e_set_psrctl (qemu-fuzz-i386+0x19fc3f2)
->      #9 0x563f4d7b798f in e1000e_core_write (qemu-fuzz-i386+0x19ea98f)
->      #10 0x563f4d7afc46 in e1000e_mmio_write (qemu-fuzz-i386+0x19e2c46)
->      #11 0x563f4cc9a0a7 in memory_region_write_accessor (qemu-fuzz-i386+0xecd0a7)
->      #12 0x563f4cc99c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
->      #13 0x563f4cc987b4 in memory_region_dispatch_write (qemu-fuzz-i386+0xecb7b4)
->
-> It simply sent the following 2 I/O command to the e1000e
-> PCI BAR #2 I/O region:
->
->    writew 0x0100 0x0c00 # RCTL =   E1000_RCTL_DTYP_MASK
->    writeb 0x2170 0x00   # PSRCTL = 0
->
-> 2813 static void
-> 2814 e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-> 2815 {
-> 2816     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
-> 2817
-> 2818         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
-> 2819             hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-> 2820         }
->
-> Instead of calling hw_error() which abort the process (it is
-> meant for CPU fatal error condition, not for device logging),
-> log the invalid request with qemu_log_mask(LOG_GUEST_ERROR)
-> and return ignoring the request.
->
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> RFC because there might be something clever than returning...
-> Probably worth a Cc:qemu-stable@ tag
+In the meantime I tried a number of so-called solutions published on
+Reddit and other places, none of which seems to work.
 
+So if I understand it correctly, there is currently no solution to the
+incorrect l3 cache layout for Zen architecture CPUs. At best a
+workaround for Linux guests.
 
-I can't think of a better solution here. And the code looks safe if we 
-accept zero value.
+I hope somebody is looking into that.
 
-So I applied this patch.
+-- =
 
-Thanks
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856335
 
+Title:
+  Cache Layout wrong on many Zen Arch CPUs
 
-> ---
->   hw/net/e1000e_core.c | 10 +++++++---
->   1 file changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index d5676871fa..bcd186cac5 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -34,9 +34,9 @@
->   */
->   
->   #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->   #include "net/net.h"
->   #include "net/tap.h"
-> -#include "hw/hw.h"
->   #include "hw/pci/msi.h"
->   #include "hw/pci/msix.h"
->   #include "sysemu/runstate.h"
-> @@ -2816,11 +2816,15 @@ e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
->       if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
->   
->           if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
-> -            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "e1000e: PSRCTL.BSIZE0 cannot be zero");
-> +            return;
->           }
->   
->           if ((val & E1000_PSRCTL_BSIZE1_MASK) == 0) {
-> -            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "e1000e: PSRCTL.BSIZE1 cannot be zero");
-> +            return;
->           }
->       }
->   
+Status in QEMU:
+  New
 
+Bug description:
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
+
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+
+  In windows, coreinfo reports correctly:
+
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+
+  in windows, coreinfo reports incorrectly:
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
