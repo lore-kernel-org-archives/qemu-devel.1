@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9385EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DABC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:07:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66B94207D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:07:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66B94207D4
+	by mail.kernel.org (Postfix) with ESMTPS id EEF08207D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:07:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF08207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeZ73-00080a-Ih
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40754)
+	id 1jeZ76-00086i-3I
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:07:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jeZ4X-0003YV-Ct
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:53 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33260)
+ id 1jeZ4i-0003wB-Hd
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:04 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33308)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4W-0000uk-Aq
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:53 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4h-00011z-KS
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:05:04 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 483FCCD460;
- Fri, 29 May 2020 10:04:51 +0300 (MSK)
-Subject: [PATCH v3 03/11] tests/acceptance: add base class record/replay
- kernel tests
+ by mail.ispras.ru (Postfix) with ESMTPSA id 8E6A6CD461;
+ Fri, 29 May 2020 10:05:02 +0300 (MSK)
+Subject: [PATCH v3 05/11] tests/acceptance: add record/replay test for aarch64
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 29 May 2020 10:04:51 +0300
-Message-ID: <159073589099.20809.14078431743098373301.stgit@pasha-ThinkPad-X280>
+Date: Fri, 29 May 2020 10:05:02 +0300
+Message-ID: <159073590231.20809.9842179251741585482.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,118 +74,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a base for testing kernel boot recording and replaying.
-Each test has the phase of recording and phase of replaying.
-Virtual machines just boot the kernel and do not interact with
-the network.
-Structure and image links for the tests are borrowed from boot_linux_console.py
-Testing controls the message pattern at the end of the kernel
-boot for both record and replay modes. In replay mode QEMU is also
-intended to finish the execution automatically.
+This patch adds a test for record/replay of the kernel
+image boot for aarch64 platform.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
 --
 
-v2:
- - changed default value of args to None (suggested by Willian Rampazzo)
- - inherited common functions from boot_linux_console (suggested by Willian Rampazzo)
-
 v3:
- - added logging (suggested by Philippe Mathieu-Daudé)
+ - added cpu tag for the test (suggested by Philippe Mathieu-Daudé)
 ---
  0 files changed
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 47ef3139e6..e9a9ce4f66 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2497,6 +2497,7 @@ F: net/filter-replay.c
- F: include/sysemu/replay.h
- F: docs/replay.txt
- F: stubs/replay.c
-+F: tests/acceptance/replay_kernel.py
- 
- IOVA Tree
- M: Peter Xu <peterx@redhat.com>
 diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-new file mode 100644
-index 0000000000..77678760be
---- /dev/null
+index 5b32126e27..616d2dfc33 100644
+--- a/tests/acceptance/replay_kernel.py
 +++ b/tests/acceptance/replay_kernel.py
-@@ -0,0 +1,73 @@
-+# Record/replay test that boots a Linux kernel
-+#
-+# Copyright (c) 2020 ISP RAS
-+#
-+# Author:
-+#  Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
+@@ -87,3 +87,22 @@ class ReplayKernel(LinuxKernelTest):
+         console_pattern = 'VFS: Cannot open root device'
+ 
+         self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=5)
 +
-+import os
-+import logging
-+import time
++    def test_aarch64_virt(self):
++        """
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:virt
++        :avocado: tags=cpu:cortex-a53
++        """
++        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
++                      '/linux/releases/29/Everything/aarch64/os/images/pxeboot'
++                      '/vmlinuz')
++        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
 +
-+from avocado_qemu import wait_for_console_pattern
-+from avocado.utils import process
-+from avocado.utils import archive
-+from boot_linux_console import LinuxKernelTest
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyAMA0')
++        console_pattern = 'VFS: Cannot open root device'
 +
-+class ReplayKernel(LinuxKernelTest):
-+    """
-+    Boots a Linux kernel in record mode and checks that the console
-+    is operational and the kernel command line is properly passed
-+    from QEMU to the kernel.
-+    Then replays the same scenario and verifies, that QEMU correctly
-+    terminates.
-+    """
-+
-+    timeout = 90
-+    KERNEL_COMMON_COMMAND_LINE = 'printk.time=1 panic=-1 '
-+
-+    def run_vm(self, kernel_path, kernel_command_line, console_pattern,
-+               record, shift, args, replay_path):
-+        logger = logging.getLogger('replay')
-+        start_time = time.time()
-+        vm = self.get_vm()
-+        vm.set_console()
-+        if record:
-+            logger.info('recording the execution...')
-+            mode = 'record'
-+        else:
-+            logger.info('replaying the execution...')
-+            mode = 'replay'
-+        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s' %
-+                    (shift, mode, replay_path),
-+                    '-kernel', kernel_path,
-+                    '-append', kernel_command_line,
-+                    '-net', 'none',
-+                    '-no-reboot')
-+        if args:
-+            vm.add_args(*args)
-+        vm.launch()
-+        self.wait_for_console_pattern(console_pattern, vm)
-+        if record:
-+            vm.shutdown()
-+            logger.info('finished the recording with log size %s bytes'
-+                % os.path.getsize(replay_path))
-+        else:
-+            vm.wait()
-+            logger.info('successfully fihished the replay')
-+        elapsed = time.time() - start_time
-+        logger.info('elapsed time %.2f sec' % elapsed)
-+        return elapsed
-+
-+    def run_rr(self, kernel_path, kernel_command_line, console_pattern,
-+        shift=7, args=None):
-+        replay_path = os.path.join(self.workdir, 'replay.bin')
-+        t1 = self.run_vm(kernel_path, kernel_command_line, console_pattern,
-+                    True, shift, args, replay_path)
-+        t2 = self.run_vm(kernel_path, kernel_command_line, console_pattern,
-+                    False, shift, args, replay_path)
-+        logger = logging.getLogger('replay')
-+        logger.info('replay overhead {:.2%}'.format(t2 / t1 - 1))
++        self.run_rr(kernel_path, kernel_command_line, console_pattern,
++            args=('-cpu', 'cortex-a53'))
 
 
