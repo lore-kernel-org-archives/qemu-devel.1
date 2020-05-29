@@ -2,46 +2,43 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA61C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13382C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73234207D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73234207D4
+	by mail.kernel.org (Postfix) with ESMTPS id DC9CA207D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC9CA207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeZ5L-0004ln-Jd
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:05:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40736)
+	id 1jeZ5T-0005BE-Ut
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:05:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jeZ4R-0003M7-IN
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:47 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33242)
+ id 1jeZ4I-0003Ab-1u
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:38 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33198)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4Q-0000qx-OC
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:47 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4G-0000is-Vv
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:37 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 3A68ECD461;
- Fri, 29 May 2020 10:04:45 +0300 (MSK)
-Subject: [PATCH v3 02/11] tests/acceptance: refactor boot_linux_console test
- to allow code reuse
+ by mail.ispras.ru (Postfix) with ESMTPSA id EDD6BCD461;
+ Fri, 29 May 2020 10:04:33 +0300 (MSK)
+Subject: [PATCH v3 00/11] Record/replay acceptance tests
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 29 May 2020 10:04:44 +0300
-Message-ID: <159073588490.20809.13942096070255577558.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
-References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
+Date: Fri, 29 May 2020 10:04:33 +0300
+Message-ID: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -55,7 +52,7 @@ X-Spam_score: 0.7
 X-Spam_bar: /
 X-Spam_report: (0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
  FORGED_GMAIL_RCVD=1, FREEMAIL_FROM=0.001, NML_ADSP_CUSTOM_MED=0.9,
- SPF_SOFTFAIL=0.665, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,55 +72,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch splits code in BootLinuxConsole class into two different
-classes to allow reusing it by record/replay tests.
+The following series adds record/replay tests to the acceptance group.
+Test pass successfully with the latest submitted record/replay fixes:
+ - replay: notify the main loop when there are no instructions
+ - replay: synchronize on every virtual timer callback
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+The provided tests perform kernel boot and disk image boot scenarios.
+For all of them recording and replaying phases are executed.
+Tests were borrowed from existing boot_linux*.py tests. But some
+of the platforms and images were excluded, because icount for them
+still has some issues.
+
+Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
+
+v3 changes:
+ - Added record/replay logging (suggested by Philippe Mathieu-Daudé)
+ - Changed the console pattern to get longer kernel execution (suggested by Alex Bennée)
+ - Coding style fixes
+ - Other minor changes
+v2 changes:
+ - Some test structure refactoring (suggested by Willian Rampazzo)
+
 ---
+
+Pavel Dovgaluk (11):
+      tests/acceptance: allow console interaction with specific VMs
+      tests/acceptance: refactor boot_linux_console test to allow code reuse
+      tests/acceptance: add base class record/replay kernel tests
+      tests/acceptance: add kernel record/replay test for x86_64
+      tests/acceptance: add record/replay test for aarch64
+      tests/acceptance: add record/replay test for arm
+      tests/acceptance: add record/replay test for ppc64
+      tests/acceptance: add record/replay test for m68k
+      tests/acceptance: record/replay tests with advcal images
+      tests/acceptance: refactor boot_linux to allow code reuse
+      tests/acceptance: Linux boot test for record/replay
+
+
  0 files changed
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index c6b06a1a13..12725d4529 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -28,19 +28,13 @@ try:
- except CmdNotFoundError:
-     P7ZIP_AVAILABLE = False
- 
--class BootLinuxConsole(Test):
--    """
--    Boots a Linux kernel and checks that the console is operational and the
--    kernel command line is properly passed from QEMU to the kernel
--    """
--
--    timeout = 90
--
-+class LinuxKernelTest(Test):
-     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
- 
--    def wait_for_console_pattern(self, success_message):
-+    def wait_for_console_pattern(self, success_message, vm=None):
-         wait_for_console_pattern(self, success_message,
--                                 failure_message='Kernel panic - not syncing')
-+                                 failure_message='Kernel panic - not syncing',
-+                                 vm=vm)
- 
-     def extract_from_deb(self, deb, path):
-         """
-@@ -79,6 +73,13 @@ class BootLinuxConsole(Test):
-         os.chdir(cwd)
-         return os.path.normpath(os.path.join(self.workdir, path))
- 
-+class BootLinuxConsole(LinuxKernelTest):
-+    """
-+    Boots a Linux kernel and checks that the console is operational and the
-+    kernel command line is properly passed from QEMU to the kernel
-+    """
-+    timeout = 90
-+
-     def test_x86_64_pc(self):
-         """
-         :avocado: tags=arch:x86_64
-
+--
+Pavel Dovgalyuk
 
