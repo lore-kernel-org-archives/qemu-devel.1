@@ -1,121 +1,94 @@
 Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37114C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4402F20C09
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F357A20721
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:23:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="R5P8i+ST"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4402F20C09
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qk39QB5S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F357A20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeexC-0000lK-8r
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:21:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35502)
+	id 1jeez7-0003yG-6s
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:23:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hakangurbuz.hg@hotmail.com>)
- id 1jeeZa-0001Wq-ET
- for qemu-devel@nongnu.org; Fri, 29 May 2020 08:57:18 -0400
-Received: from mail-db8eur05olkn2058.outbound.protection.outlook.com
- ([40.92.89.58]:52065 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hakangurbuz.hg@hotmail.com>)
- id 1jeeZZ-0007n6-00
- for qemu-devel@nongnu.org; Fri, 29 May 2020 08:57:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lFWrIuULV6PnNjH5wDd3xOwaRWneWxqDhV4z3VttTbRcRO6BHHeftvi0JuL0anvAohc/oNld8ECd99Oc1JB1ovdgZAiCAoJANIjX8+ZNJYLmXuzS/qZ9lnnSje4v4Z/b3Yjyt3yfjU/DSmFSbLYJfQDAM8bEz3VjUZbdfm26JjMl8KXx046Q7o5lyl/r+FLKauwrBPhxD5jDPg15A9YWBYUM/9fJh4q8tNMYS6F09lNUrikUmmuiwG0nBvNphq381LHcprw+0ZMIkXrdx99urwKCJme+7PNlR1nDvckGc+C93Q6fGzFGl8ErQKwZ2MYhD2SSlYutXeocFI991k0gTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vioOKn4YM8PuoygmAUyRiKj2p8KemXhB6/1/Lsdw6LI=;
- b=j9VOZHBnki522gX7emVEBv/Ujv49kaWP9b6g1Y+RGsDNnL8XeB1P1q7mZvcPMeBiOLmM3wrke7UFf1FCubFHvKlZLbgv7vPkXkP3glI91+RY5wfH8vYHI48iaOwcRosYru3223tYUErH2AgetGUZsRt3D1mCV8S1vuCMxLacee63Fuv0ps8lNu1v9RoU7vjOPhkpYED1MhV+Pv8EcvSZ9V5WFKxe19BU3XXr5JEGr7NWkvdCaLwwtN6Py+WITDKYWxmmoxqrD3go8WGPfr/ubgJbYP9Ou4K1JkHqv1JQNZTa8EqT1JZw+7Uy6uC0zNhfxmaChxMVBfwYz2XVeqGExA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vioOKn4YM8PuoygmAUyRiKj2p8KemXhB6/1/Lsdw6LI=;
- b=R5P8i+STKVN69WKg1ch2bFqrNcffr4P1Y3EoT7Ndc7hYxVuIPjaUAgMOhmD8L1t1i6TT4qLuLFk6VgF9jEYg7srdTAh31R8yGOSLL1qID8vSG6xi3Aw8Sr8ijycJk9pRsleXgmVMG6nIhf5DlRxrHrLNoRWEyFgPI3S3dKRZK/qcEntWv64zoiz6U6pgYr7JXX9+smZJ8n6VLVIptPINMXwnE41JNfq1lJ7nrFHMM1ToYpZ1xS8xpCbjIhL2bwf513R0BQnWImq9JDHhh2tEdErUCGbmbUx3memZer6tQ0DdIiqWT/CAdIitl4+rUf+Lz0JHY0ik4Lg+gQD+1EGL1A==
-Received: from AM6EUR05FT024.eop-eur05.prod.protection.outlook.com
- (2a01:111:e400:fc11::42) by
- AM6EUR05HT026.eop-eur05.prod.protection.outlook.com (2a01:111:e400:fc11::291)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17; Fri, 29 May
- 2020 12:42:12 +0000
-Received: from AM0PR06MB4514.eurprd06.prod.outlook.com
- (2a01:111:e400:fc11::41) by AM6EUR05FT024.mail.protection.outlook.com
- (2a01:111:e400:fc11::90) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17 via Frontend
- Transport; Fri, 29 May 2020 12:42:12 +0000
-Received: from AM0PR06MB4514.eurprd06.prod.outlook.com
- ([fe80::98ea:ee00:4973:d472]) by AM0PR06MB4514.eurprd06.prod.outlook.com
- ([fe80::98ea:ee00:4973:d472%6]) with mapi id 15.20.3045.018; Fri, 29 May 2020
- 12:42:11 +0000
-From: =?iso-8859-9?Q?Hakan_G=DCRB=DCZ?= <hakangurbuz.hg@hotmail.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: Qemu Help
-Thread-Topic: Qemu Help
-Thread-Index: AQHWNbY7zGGTz2lcakuufE+tV0lq5A==
-Date: Fri, 29 May 2020 12:42:11 +0000
-Message-ID: <AM0PR06MB4514F5FD24459E9E2740A0078E8F0@AM0PR06MB4514.eurprd06.prod.outlook.com>
-Accept-Language: tr-TR, en-US
-Content-Language: tr-TR
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-incomingtopheadermarker: OriginalChecksum:39DA2334B7BDE9F8A00BAA320A9A17CCB1B11959AB2CC9A695DB6ABBEF8B24B3;
- UpperCasedChecksum:D78EC92B90ABAF83D2E8859FC9C03194BE7C6BDCFEA4D0679951098C85B82555;
- SizeAsReceived:6663; Count:42
-x-tmn: [NgNfsaWj2x+9ErsUgV2GjPBW5Y1z6hlG]
-x-ms-publictraffictype: Email
-x-incomingheadercount: 42
-x-eopattributedmessage: 0
-x-ms-office365-filtering-correlation-id: 1a762e33-b5ae-4de7-e2d7-08d803cdb55a
-x-ms-traffictypediagnostic: AM6EUR05HT026:
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1EXg7+XDCy8wu4oFzAJ81r9g0pMGVwqzKNOPBBAieCHKiihm+P6ezchWkhvdX9GQ14oiQvlBarqZE9gm7EWUKXGbxz/H9EDzlNHP7yjWd81ASizTKo+6NmiKAFOmdKZ5ftwiwpziwabwMsyOlarW0BrHRi9k/91u864VGwrhask28OmobhjCd6qA/3aDPWUcGudd0Zsv+CVo46viE1mnYQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:0; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR06MB4514.eurprd06.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:; SFS:; DIR:OUT; SFP:1901; 
-x-ms-exchange-antispam-messagedata: Ju0Ga4pYnTdjS+JKqXeOuqMhtag/Bqa4eq2zzjUbHIUp2IrF5d76WszN611uToTDR8U0E6+AQZKEMsBh1vBNrKqOfvnmY0PNe3BD8QkNpjwruZ8cW37qWIHyTmRXc42YqgKxTpGZBA0FkDuClpyb5A==
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_AM0PR06MB4514F5FD24459E9E2740A0078E8F0AM0PR06MB4514eurp_"
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jeeyK-00035i-3y
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:22:52 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36687)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jeeyI-00038d-EH
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:22:51 -0400
+Received: by mail-pl1-x644.google.com with SMTP id bg4so1163654plb.3
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 06:22:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WUZT8MmOayZGLSCYKoc1qodVCAWn7YuXqviDoocPmbE=;
+ b=qk39QB5SZxtjxxmxaGGuXThdjRLQm7aj/9L6/Ud2yo5TeIbBv5WvoTpe3iUYulhF6E
+ jWYvp+8iMY9x3HzTGQ7vRMxVjWocnMFkiEFcoLI+zMUaCW9wSOIuiRsgjA8SNFJ5u1gp
+ KQ5xRfeE5899EeiZGYHQEzf24dou4ulRS6LtbweQqgWfjuZB8F8uz4JeXc685j0B8WeH
+ a5vAaQywnuisX9l5+W81ItDo7zFtj599A/O6+l62qqhVUUrS+DgIs9Xrom813z2CqJre
+ bEc7OmfRZIsARUGba7l4uut7kN9CkZ58l0ARPjtIxNACBkFcCb6hpkVTCyvD290HC9Wh
+ Pw6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WUZT8MmOayZGLSCYKoc1qodVCAWn7YuXqviDoocPmbE=;
+ b=q0iBiMqvizvrzPkZHD7vOALFbujbOfi0QJT//PvSPZa0S9czvo1Rj9JvYbPobbQVEH
+ LQL2hF3hcqn17vOrF2nUFM8e2guhLHPILxnNtNHH7c7WO6fHBns865VMdywv93Lfewcu
+ DuR1SnR+KL0B8VR1jKyA6pOY/GaBj0uSEcGwwJzlsV3ETn+aZPeUayWYg3LuN9C4QbIn
+ IPLRPGA3CtO9jF/6OVfwgbKss3xMk08W3yMdsBZ52I8aKTLoEFIInTFDdAojihEbSz9+
+ ri8SopDMvJ1I1F9AFzBSsJ3OchXUaQGhh2AkqRDB7EuIgbRvnloYPCbpqgjarVNGOvj5
+ T2mA==
+X-Gm-Message-State: AOAM5304tFSTLEUSTDz+CTdlR24SwEtcJO1D2J4GxQdhg5Bh7pz4oO3Z
+ jalE2pAk8UB/IXPkU38q4jQASpS8OXBphA==
+X-Google-Smtp-Source: ABdhPJyJ7TkjVJDOpzaIIvB5NzcjSokPjC0kWgwfKZiupHzOV4d20gI738QYmEF3Mgep4p18eJ7lPA==
+X-Received: by 2002:a17:90a:d191:: with SMTP id
+ fu17mr9696225pjb.228.1590758567768; 
+ Fri, 29 May 2020 06:22:47 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:75ac:d268:da04:dde4])
+ by smtp.gmail.com with ESMTPSA id e16sm6946374pgg.8.2020.05.29.06.22.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 29 May 2020 06:22:46 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 00/12] Add Thread Sanitizer support to QEMU
+Date: Fri, 29 May 2020 09:21:43 -0400
+Message-Id: <20200529132143.702-1-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-X-OriginatorOrg: hotmail.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a762e33-b5ae-4de7-e2d7-08d803cdb55a
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2020 12:42:11.7857 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Internet
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6EUR05HT026
-Received-SPF: pass client-ip=40.92.89.58;
- envelope-from=hakangurbuz.hg@hotmail.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 08:57:15
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=robert.foley@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 29 May 2020 09:20:11 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,40 +100,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_AM0PR06MB4514F5FD24459E9E2740A0078E8F0AM0PR06MB4514eurp_
-Content-Type: text/plain; charset="iso-8859-9"
-Content-Transfer-Encoding: quoted-printable
+Changes in v1:
+- Refocused the patch more on enabling TSan and less on removing warnings.
+- Because of this we removed several patches from the series that
+  were fixing and/or suppressing warnings.
+- Removed from the series some patches that had overlap with the
+  per-cpu-lock patch.  We will let the per-cpu-lock patch fix those warnings.
+- Removed built-in support for blacklist.   
+  The idea here being that all warnings should eventually be fixed and
+  this blacklist is for test/debug.
+- Enhanced the documentation on TSan support in testing.rst.
+- Improved the comments in tsan.h.
+- Changed configure to error out if --enable-tsan provided but
+  TSan not available.
 
-Is it possible to run the .elf file produced from non-Linux operating syste=
-m kernel in Qemu?
-I could not find a solution anywhere, please I am waiting for your help. Th=
-e information you provide is very valuable for me.
+This patch series continues the work done by Emilio Cota and others to add
+Thread Sanitizer (TSan) support to QEMU.
 
---_000_AM0PR06MB4514F5FD24459E9E2740A0078E8F0AM0PR06MB4514eurp_
-Content-Type: text/html; charset="iso-8859-9"
-Content-Transfer-Encoding: quoted-printable
+The starting point for this work was Emilio's branch here:
+https://github.com/cota/qemu/commits/tsan
+specifically this commit: 0be125fc0afd47218b34d2019abdd19b644f3199
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-9">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt;=
- color: rgb(0, 0, 0);">
-<span>Is it possible to run the .elf file produced from non-Linux operating=
- system kernel in Qemu?<br>
-</span><span>I could not find a solution anywhere, please I am waiting for =
-your help. The information you provide is very valuable for me.</span><br>
-</div>
-</body>
-</html>
+The main purpose of this patch is to enable TSan support so that 
+QEMU developers can start using the tool.  
+We found this tool useful and even ran it on our recent changes in
+the cpu-locks series, which fixes many warnings.
+Clearly there is work to do here to clean up all the warnings. :)
+We have also made an effort to introduce enough of the TSan suppression
+mechanisms, so that others can continue this work.
 
---_000_AM0PR06MB4514F5FD24459E9E2740A0078E8F0AM0PR06MB4514eurp_--
+This series adds support for:
+- configure option for --enable-tsan.
+- testing.rst has the full details on how to use TSan with or without docker,
+  including all the suppression mechanisms.
+- We added an Ubuntu 20.04 docker that supports TSan builds.
+- We added an example blacklist file for files or functions TSan should ignore 
+  at compile time.  This can now be specified manually.
+- Added a suppression file for TSan to suppress certain warnings at run time.
+- Added tsan.h with annotations which also can be used to suppress warnings.
+
+Issues:
+- When running docker-test-quick under TSan there are several tests which hang
+  - The unit tests which seem to hang under TSan:
+    test-char, test-qdev-global-props, and test-qga.  
+  - If we comment out those tests, check-unit finishes, albeit with 
+    a couple of warnings. :)
+
+Emilio G. Cota (7):
+  cpu: convert queued work to a QSIMPLEQ
+  thread: add qemu_spin_destroy
+  cputlb: destroy CPUTLB with tlb_destroy
+  qht: call qemu_spin_destroy for head buckets
+  tcg: call qemu_spin_destroy for tb->jmp_lock
+  translate-all: call qemu_spin_destroy for PageDesc
+  thread: add tsan annotations to QemuSpin
+
+Lingfeng Yang (1):
+  configure: add --enable-tsan flag + fiber annotations for
+    coroutine-ucontext
+
+Robert Foley (4):
+  tests/docker: Added docker build support for TSan.
+  include/qemu: Added tsan.h for annotations.
+  util: Added tsan annotate for thread name.
+  docs: Added details on TSan to testing.rst
+
+ accel/tcg/cputlb.c                         |  15 +++
+ accel/tcg/translate-all.c                  |  19 +++-
+ configure                                  |  41 ++++++++
+ cpus-common.c                              |  25 ++---
+ cpus.c                                     |  14 ++-
+ docs/devel/testing.rst                     | 113 +++++++++++++++++++++
+ exec.c                                     |   1 +
+ hw/core/cpu.c                              |   1 +
+ include/exec/exec-all.h                    |   8 ++
+ include/hw/core/cpu.h                      |   6 +-
+ include/qemu/thread.h                      |  38 ++++++-
+ include/qemu/tsan.h                        |  71 +++++++++++++
+ include/tcg/tcg.h                          |   3 +-
+ tcg/tcg.c                                  |  19 +++-
+ tests/docker/Makefile.include              |   2 +
+ tests/docker/common.rc                     |  19 ++++
+ tests/docker/dockerfiles/ubuntu2004.docker |  65 ++++++++++++
+ tests/tsan/blacklist.tsan                  |  10 ++
+ tests/tsan/suppressions.tsan               |  14 +++
+ util/coroutine-ucontext.c                  |  97 ++++++++++++++++--
+ util/qemu-thread-posix.c                   |   2 +
+ util/qht.c                                 |   1 +
+ 22 files changed, 547 insertions(+), 37 deletions(-)
+ create mode 100644 include/qemu/tsan.h
+ create mode 100644 tests/docker/dockerfiles/ubuntu2004.docker
+ create mode 100644 tests/tsan/blacklist.tsan
+ create mode 100644 tests/tsan/suppressions.tsan
+
+-- 
+2.17.1
+
 
