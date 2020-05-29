@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4E6C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA61C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F4E7207D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4E7207D4
+	by mail.kernel.org (Postfix) with ESMTPS id 73234207D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 07:05:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73234207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jeZ5G-0004Yt-Kd
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:05:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40724)
+	id 1jeZ5L-0004ln-Jd
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 03:05:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Pavel.Dovgaluk@gmail.com>)
- id 1jeZ4M-0003En-Bv
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:42 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33216)
+ id 1jeZ4R-0003M7-IN
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:47 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33242)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4L-0000mB-GV
- for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:42 -0400
+ (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jeZ4Q-0000qx-OC
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 03:04:47 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 9872DCD461;
- Fri, 29 May 2020 10:04:39 +0300 (MSK)
-Subject: [PATCH v3 01/11] tests/acceptance: allow console interaction with
- specific VMs
+ by mail.ispras.ru (Postfix) with ESMTPSA id 3A68ECD461;
+ Fri, 29 May 2020 10:04:45 +0300 (MSK)
+Subject: [PATCH v3 02/11] tests/acceptance: refactor boot_linux_console test
+ to allow code reuse
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 29 May 2020 10:04:39 +0300
-Message-ID: <159073587933.20809.5122618715976660635.stgit@pasha-ThinkPad-X280>
+Date: Fri, 29 May 2020 10:04:44 +0300
+Message-ID: <159073588490.20809.13942096070255577558.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,58 +75,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Console interaction in avocado scripts was possible only with single
-default VM.
-This patch modifies the function parameters to allow passing a specific
-VM as a parameter to interact with it.
+This patch splits code in BootLinuxConsole class into two different
+classes to allow reusing it by record/replay tests.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
  0 files changed
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index 59e7b4f763..77d1c1d9ff 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -69,13 +69,15 @@ def pick_default_qemu_bin(arch=None):
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index c6b06a1a13..12725d4529 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -28,19 +28,13 @@ try:
+ except CmdNotFoundError:
+     P7ZIP_AVAILABLE = False
  
+-class BootLinuxConsole(Test):
+-    """
+-    Boots a Linux kernel and checks that the console is operational and the
+-    kernel command line is properly passed from QEMU to the kernel
+-    """
+-
+-    timeout = 90
+-
++class LinuxKernelTest(Test):
+     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
  
- def _console_interaction(test, success_message, failure_message,
--                         send_string, keep_sending=False):
-+                         send_string, keep_sending=False, vm=None):
-     assert not keep_sending or send_string
--    console = test.vm.console_socket.makefile()
-+    if vm is None:
-+        vm = test.vm
-+    console = vm.console_socket.makefile()
-     console_logger = logging.getLogger('console')
-     while True:
-         if send_string:
--            test.vm.console_socket.sendall(send_string.encode())
-+            vm.console_socket.sendall(send_string.encode())
-             if not keep_sending:
-                 send_string = None # send only once
-         msg = console.readline().strip()
-@@ -115,7 +117,8 @@ def interrupt_interactive_console_until_pattern(test, success_message,
-     _console_interaction(test, success_message, failure_message,
-                          interrupt_string, True)
+-    def wait_for_console_pattern(self, success_message):
++    def wait_for_console_pattern(self, success_message, vm=None):
+         wait_for_console_pattern(self, success_message,
+-                                 failure_message='Kernel panic - not syncing')
++                                 failure_message='Kernel panic - not syncing',
++                                 vm=vm)
  
--def wait_for_console_pattern(test, success_message, failure_message=None):
-+def wait_for_console_pattern(test, success_message, failure_message=None,
-+                             vm=None):
-     """
-     Waits for messages to appear on the console, while logging the content
+     def extract_from_deb(self, deb, path):
+         """
+@@ -79,6 +73,13 @@ class BootLinuxConsole(Test):
+         os.chdir(cwd)
+         return os.path.normpath(os.path.join(self.workdir, path))
  
-@@ -125,7 +128,7 @@ def wait_for_console_pattern(test, success_message, failure_message=None):
-     :param success_message: if this message appears, test succeeds
-     :param failure_message: if this message appears, test fails
-     """
--    _console_interaction(test, success_message, failure_message, None)
-+    _console_interaction(test, success_message, failure_message, None, vm=vm)
- 
- def exec_command_and_wait_for_pattern(test, command,
-                                       success_message, failure_message=None):
++class BootLinuxConsole(LinuxKernelTest):
++    """
++    Boots a Linux kernel and checks that the console is operational and the
++    kernel command line is properly passed from QEMU to the kernel
++    """
++    timeout = 90
++
+     def test_x86_64_pc(self):
+         """
+         :avocado: tags=arch:x86_64
 
 
