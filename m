@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F028C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DBEC433DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:46:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAB31207BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14F5B2145D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 13:46:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrtqqcK2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB31207BC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aY3VfQXJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14F5B2145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jefLY-0004dd-VH
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49042)
+	id 1jefLZ-0004ey-5d
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 09:46:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKF-0002SH-L1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKF-0002S5-G8
  for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29694
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22164
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKE-0006w3-UG
- for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:31 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jefKD-0006tt-T0
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 09:45:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590759930;
+ s=mimecast20190719; t=1590759928;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IUgy8UQUvLdKrp9kE6giOUSUOdmUDgCVVf6kfLQkLE0=;
- b=RrtqqcK2tW4MA5W8YqRvw0WgYO/rcX7KaE5Yp09dJBS2Y3dlW79gwOHCfTgNwOKht8cD06
- 9eF+DMBaWnj+XVkuDO3cynxFRkjkULWohtgRp8mL64gEB8NdyRqQxb2t0E+7nOcynhCd8d
- u9S1+NULEartgBik+Mt9MypLmFzrQis=
+ bh=n3CvRTDgJHeJsgz0lxAaoSjYDbfIWFPs+jlp96ZxrCk=;
+ b=aY3VfQXJCzcs6XP6fH1R38OMAfaUaBYqklxLKlZUiwGes8ic8SpWXdqPhxQ9If5v/N/4zA
+ mltDYMFNelxAKvCG56txNPIzwIrXfcdtXT2gdrcrCil8//Ck4CQ+4XNtqnACNxfMKV+Pqz
+ 4Q8r/nLyZMmNhITCmYQ1xapno4FfO7w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-zpP3gSVHM--y_pdpVxa4Wg-1; Fri, 29 May 2020 09:45:27 -0400
-X-MC-Unique: zpP3gSVHM--y_pdpVxa4Wg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-114-zPDbqeBHOmqrlDqWiCregg-1; Fri, 29 May 2020 09:45:26 -0400
+X-MC-Unique: zPDbqeBHOmqrlDqWiCregg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03CAD107ACF2
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BD99835B42
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-32.ams2.redhat.com
  [10.36.112.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB51119C79
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 601135C1B0
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:45:25 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DF0BD113639D; Fri, 29 May 2020 15:45:23 +0200 (CEST)
+ id D234211386A0; Fri, 29 May 2020 15:45:23 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/58] qdev: Put qdev_new() to use with Coccinelle
-Date: Fri, 29 May 2020 15:44:30 +0200
-Message-Id: <20200529134523.8477-6-armbru@redhat.com>
+Subject: [PATCH v2 01/58] qdev: Rename qbus_realize() to qbus_init()
+Date: Fri, 29 May 2020 15:44:26 +0200
+Message-Id: <20200529134523.8477-2-armbru@redhat.com>
 In-Reply-To: <20200529134523.8477-1-armbru@redhat.com>
 References: <20200529134523.8477-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:34:27
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/28 23:43:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,60 +99,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's start simple and put qdev_new() to use.  Coccinelle script:
-
-    @ depends on !(file in "hw/core/qdev.c")@
-    expression type_name;
-    @@
-    -    DEVICE(object_new(type_name))
-    +    qdev_new(type_name)
+qbus_realize() does not actually realize.  Rename it to qbus_init().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/block/nand.c  | 2 +-
- hw/misc/auxbus.c | 2 +-
- qdev-monitor.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/core/bus.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/block/nand.c b/hw/block/nand.c
-index bba89688ba..cdf3429ce6 100644
---- a/hw/block/nand.c
-+++ b/hw/block/nand.c
-@@ -644,7 +644,7 @@ DeviceState *nand_init(BlockBackend *blk, int manf_id, int chip_id)
-     if (nand_flash_ids[chip_id].size == 0) {
-         hw_error("%s: Unsupported NAND chip ID.\n", __func__);
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 50924793ac..33a4443217 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -95,7 +95,7 @@ static void bus_reset_child_foreach(Object *obj, ResettableChildCallback cb,
      }
--    dev = DEVICE(object_new(TYPE_NAND));
-+    dev = qdev_new(TYPE_NAND);
-     qdev_prop_set_uint8(dev, "manufacturer_id", manf_id);
-     qdev_prop_set_uint8(dev, "chip_id", chip_id);
-     if (blk) {
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index 5e4794f0ac..7fb020086f 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -273,7 +273,7 @@ DeviceState *aux_create_slave(AUXBus *bus, const char *type)
+ }
+ 
+-static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
++static void qbus_init(BusState *bus, DeviceState *parent, const char *name)
  {
-     DeviceState *dev;
+     const char *typename = object_get_typename(OBJECT(bus));
+     BusClass *bc;
+@@ -151,7 +151,7 @@ void qbus_create_inplace(void *bus, size_t size, const char *typename,
+                          DeviceState *parent, const char *name)
+ {
+     object_initialize(bus, size, typename);
+-    qbus_realize(bus, parent, name);
++    qbus_init(bus, parent, name);
+ }
  
--    dev = DEVICE(object_new(type));
-+    dev = qdev_new(type);
-     assert(dev);
-     qdev_set_parent_bus(dev, &bus->qbus);
-     return dev;
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index a4735d3bb1..20cfa7615b 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -652,7 +652,7 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-     }
+ BusState *qbus_create(const char *typename, DeviceState *parent, const char *name)
+@@ -159,7 +159,7 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
+     BusState *bus;
  
-     /* create device */
--    dev = DEVICE(object_new(driver));
-+    dev = qdev_new(driver);
+     bus = BUS(object_new(typename));
+-    qbus_realize(bus, parent, name);
++    qbus_init(bus, parent, name);
  
-     /* Check whether the hotplug is allowed by the machine */
-     if (qdev_hotplug && !qdev_hotplug_allowed(dev, &err)) {
+     return bus;
+ }
 -- 
 2.21.3
 
