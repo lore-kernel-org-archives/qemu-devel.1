@@ -2,94 +2,105 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760C9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F81C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B607208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:53:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NH27CoFM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B607208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B878B208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 20:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B878B208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jem0G-0003Sx-Al
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 16:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46602)
+	id 1jem1i-0006Co-Sx
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 16:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jelqs-0006Fo-At
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:43:38 -0400
-Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:33767)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jelqq-00010A-OG
- for qemu-devel@nongnu.org; Fri, 29 May 2020 16:43:37 -0400
-Received: by mail-pl1-x632.google.com with SMTP id t7so1711656plr.0
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 13:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=7quFEHdL4P9uUXPGzV68+zgA7HBXKH+ccwUEceiVJ9c=;
- b=NH27CoFMFxXc3kNC3w5pvyh31DijQsT/ML5F/6a39RgiYuOzckpukL4LPl5GbZ3d6v
- 77Gy+euUgN4NHAp5Ze4/Mr4Yhs31a1jOVoh/nhdp12WUeEEJGmEKrkAEDrjlsDmVWv6d
- 7KQt05pEINux3ELxddCpv8710iKF6/3KyUlApdDXN2c8FcxJ4HTicrAZWY4gOLsNLCkH
- NnzU6cOoKb5Rdx/n3faYrT/WouFtDv7QqMKzrPB2FmmukhvvPyr4FOKsrDDAZ6PrsRzu
- yoFx49KYXnnSEbqTwyG45EBhArtCpwRSEMlCGzA59DNX9K2EP6QLOVawmkqjP0WaOZwY
- Pxsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7quFEHdL4P9uUXPGzV68+zgA7HBXKH+ccwUEceiVJ9c=;
- b=ZuQEW8gkte8dkjk7CagxRHlrhoofFsn1pS8+/fDnvSWJ7AxZWkrEmX40O//ky3CMMj
- fNE4yobiXN6cVY0WLTAvNrJDngL5Y+Hd9P+QqwXQZDObQxBzvFekThv5uwAQCZQSuNb1
- iWkfbB4FEimg2ZcgqXhH1pSVltTMY0vLvSQfwBiG0QPUvm/oJyfQ7jCqFJ0AveQ8pe4y
- vcmLd/6gN8u5Gn6VTS5i5ok9F/gP8a5oG0AnItjSWJdhg2diKLvkK6kqkeVybT/E65Ig
- 1oJqu10A0h+87mf1RjMy3RpQ5xLPlMXnpbViv2qGXtgYrBqhwjEaxkHej/U0pjq4CCT0
- Vj2A==
-X-Gm-Message-State: AOAM531c8R4Oyl1zSowDEXkIqeHzpCzAt/isi1pdcqqt4DM+C2pQ9BH0
- AbJmhRuhqHoBueEUaYbWkRq54BOY493k4Q==
-X-Google-Smtp-Source: ABdhPJyq4OPiubah9K3jEyAHVA9ckGX3vGm5z0MA0A+uwJfcD0iVOOFjHFvs5pYUtj+1naT9LF9WOA==
-X-Received: by 2002:a17:902:bf46:: with SMTP id u6mr1837494pls.1.1590785014897; 
- Fri, 29 May 2020 13:43:34 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:75ac:d268:da04:dde4])
- by smtp.gmail.com with ESMTPSA id t12sm282839pjf.3.2020.05.29.13.43.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 29 May 2020 13:43:34 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jelyn-00019x-3d
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 16:51:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28728
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jelym-0001vo-4o
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 16:51:48 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04TKViAG000927
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:47 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31as1e5uct-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:46 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04TKWufw004510
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 16:51:46 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31as1e5uch-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 29 May 2020 16:51:46 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04TKp2JP022322;
+ Fri, 29 May 2020 20:51:46 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma02dal.us.ibm.com with ESMTP id 316ufbscv6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 29 May 2020 20:51:45 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04TKphpc28967358
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 29 May 2020 20:51:43 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B5AD36A04D;
+ Fri, 29 May 2020 20:51:44 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D3E666A047;
+ Fri, 29 May 2020 20:51:43 +0000 (GMT)
+Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.226.57])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 29 May 2020 20:51:43 +0000 (GMT)
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 11/12] python/qemu: Add ConsoleSocket for optional use in
- QEMUMachine
-Date: Fri, 29 May 2020 16:34:57 -0400
-Message-Id: <20200529203458.1038-12-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200529203458.1038-1-robert.foley@linaro.org>
-References: <20200529203458.1038-1-robert.foley@linaro.org>
+Subject: [PATCH v2 1/4] coroutine: support SafeStack in ucontext backend
+Date: Fri, 29 May 2020 16:51:19 -0400
+Message-Id: <20200529205122.714-2-dbuono@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200529205122.714-1-dbuono@linux.vnet.ibm.com>
+References: <20200529205122.714-1-dbuono@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::632;
- envelope-from=robert.foley@linaro.org; helo=mail-pl1-x632.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-05-29_10:2020-05-28,
+ 2020-05-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0
+ cotscore=-2147483648 phishscore=0 impostorscore=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=3 adultscore=0
+ mlxscore=0 clxscore=1015 mlxlogscore=999 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005290148
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 15:28:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,226 +113,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, alex.bennee@linaro.org,
- Cleber Rosa <crosa@redhat.com>, peter.puhov@linaro.org, philmd@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ dbuono@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We add the ConsoleSocket object, which has a socket interface
-and which will consume all arriving characters on the
-socket, placing them into an in memory buffer.
-This will also provide those chars via recv() as
-would a regular socket.
-ConsoleSocket also has the option of dumping
-the console bytes to a log file.
+LLVM's SafeStack instrumentation does not yet support programs that make
+use of the APIs in ucontext.h
+With the current implementation of coroutine-ucontext, the resulting
+binary is incorrect, with different coroutines sharing the same unsafe
+stack and producing undefined behavior at runtime.
+This fix allocates an additional unsafe stack area for each coroutine,
+and sets the new unsafe stack pointer before calling swapcontext() in
+qemu_coroutine_new.
+This is the only place where the pointer needs to be manually updated,
+since sigsetjmp/siglongjmp are already instrumented by LLVM to properly
+support SafeStack.
+The additional stack is then freed in qemu_coroutine_delete.
 
-We also give QEMUMachine the option of using ConsoleSocket
-to drain and to use for logging console to a file.
-By default QEMUMachine does not use ConsoleSocket.
-
-This is added in preparation for use by basevm.py in a later commit.
-This is a workaround we found was needed for basevm.py since
-there is a known issue where QEMU will hang waiting
-for console characters to be consumed.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
 ---
- python/qemu/console_socket.py | 118 ++++++++++++++++++++++++++++++++++
- python/qemu/machine.py        |  23 +++++--
- 2 files changed, 137 insertions(+), 4 deletions(-)
- create mode 100644 python/qemu/console_socket.py
+ include/qemu/coroutine_int.h |  5 +++++
+ util/coroutine-ucontext.c    | 26 ++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-new file mode 100644
-index 0000000000..2fe1c20d64
---- /dev/null
-+++ b/python/qemu/console_socket.py
-@@ -0,0 +1,118 @@
-+#!/usr/bin/env python3
-+#
-+# This python module implements a ConsoleSocket object which is
-+# designed always drain the socket itself, and place
-+# the bytes into a in memory buffer for later processing.
-+#
-+# Optionally a file path can be passed in and we will also
-+# dump the characters to this file for debug.
-+#
-+# Copyright 2020 Linaro
-+#
-+# Authors:
-+#  Robert Foley <robert.foley@linaro.org>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
-+import asyncore
-+import socket
-+import threading
-+import io
-+import os
-+import sys
-+from collections import deque
-+import time
-+import traceback
-+
-+class ConsoleSocket(asyncore.dispatcher):
-+
-+    def __init__(self, address, file=None):
-+        self._recv_timeout_sec = 300
-+        self._buffer = deque()
-+        self._asyncore_thread = None
-+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-+        self._sock.connect(address)
-+        self._logfile = None
-+        if file:
-+            self._logfile = open(file, "w")
-+        asyncore.dispatcher.__init__(self, sock=self._sock)
-+        self._thread_start()
-+        self._open = True
-+
-+    def _thread_start(self):
-+        """Kick off a thread to wait on the asyncore.loop"""
-+        if self._asyncore_thread is not None:
-+            return
-+        self._asyncore_thread = threading.Thread(target=asyncore.loop,
-+                                                 kwargs={'timeout':1})
-+        self._asyncore_thread.daemon = True
-+        self._asyncore_thread.start()
-+
-+    def handle_close(self):
-+        """redirect close to base class"""
-+        # Call the base class close, but not self.close() since
-+        # handle_close() occurs in the context of the thread which
-+        # self.close() attempts to join.
-+        asyncore.dispatcher.close(self)
-+
-+    def close(self):
-+        """Close the base object and wait for the thread to terminate"""
-+        if self._open:
-+            self._open = False
-+            asyncore.dispatcher.close(self)
-+            if self._asyncore_thread is not None:
-+                thread, self._asyncore_thread = self._asyncore_thread, None
-+                thread.join()
-+            if self._logfile:
-+                self._logfile.close()
-+                self._logfile = None
-+
-+    def handle_read(self):
-+        """process arriving characters into in memory _buffer"""
-+        try:
-+            data = asyncore.dispatcher.recv(self, 1)
-+            # latin1 is needed since there are some chars
-+            # we are receiving that cannot be encoded to utf-8
-+            # such as 0xe2, 0x80, 0xA6.
-+            string = data.decode("latin1")
-+        except:
-+            print("Exception seen.")
-+            traceback.print_exc()
-+            return
-+        if self._logfile:
-+            self._logfile.write("{}".format(string))
-+            self._logfile.flush()
-+        for c in string:
-+            self._buffer.append(c)
-+
-+    def recv(self, n=1):
-+        """Return chars from in memory buffer"""
-+        start_time = time.time()
-+        while len(self._buffer) < n:
-+            time.sleep(0.1)
-+            elapsed_sec = time.time() - start_time
-+            if elapsed_sec > self._recv_timeout_sec:
-+                raise socket.timeout
-+        chars = ''.join([self._buffer.popleft() for i in range(n)])
-+        # We choose to use latin1 to remain consistent with
-+        # handle_read() and give back the same data as the user would
-+        # receive if they were reading directly from the
-+        # socket w/o our intervention.
-+        return chars.encode("latin1")
-+
-+    def set_blocking(self):
-+        """Maintain compatibility with socket API"""
-+        pass
-+
-+    def settimeout(self, seconds):
-+        """Set current timeout on recv"""
-+        self._recv_timeout_sec = seconds
-+
-+class ByteBuffer(deque):
-+    """Simple in memory buffer with read/write interface"""
-+    def write(self, bytes):
-+        for i in bytes:
-+            self.append(i)
-+    def read(self, n):
-+        return ''.join([self.popleft() for i in range(n)])
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index b9a98e2c86..ee9c337f55 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -24,6 +24,7 @@ import subprocess
- import shutil
- import socket
- import tempfile
-+from qemu.console_socket import ConsoleSocket
+diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
+index bd6b0468e1..1da148552f 100644
+--- a/include/qemu/coroutine_int.h
++++ b/include/qemu/coroutine_int.h
+@@ -28,6 +28,11 @@
+ #include "qemu/queue.h"
+ #include "qemu/coroutine.h"
  
- from . import qmp
++#ifdef CONFIG_SAFESTACK
++/* Pointer to the unsafe stack, defined by the compiler */
++extern __thread void *__safestack_unsafe_stack_ptr;
++#endif
++
+ #define COROUTINE_STACK_SIZE (1 << 20)
  
-@@ -71,7 +72,8 @@ class QEMUMachine(object):
+ typedef enum {
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index bd593e61bc..9108eb1294 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -41,6 +41,11 @@ typedef struct {
+     Coroutine base;
+     void *stack;
+     size_t stack_size;
++#ifdef CONFIG_SAFESTACK
++    /* Need an unsafe stack for each coroutine */
++    void *unsafe_stack;
++    size_t unsafe_stack_size;
++#endif
+     sigjmp_buf env;
  
-     def __init__(self, binary, args=None, wrapper=None, name=None,
-                  test_dir="/var/tmp", monitor_address=None,
--                 socket_scm_helper=None, sock_dir=None):
-+                 socket_scm_helper=None, sock_dir=None,
-+                 drain_console=False, console_log=None):
-         '''
-         Initialize a QEMUMachine
+ #ifdef CONFIG_VALGRIND_H
+@@ -140,6 +145,10 @@ Coroutine *qemu_coroutine_new(void)
+     co = g_malloc0(sizeof(*co));
+     co->stack_size = COROUTINE_STACK_SIZE;
+     co->stack = qemu_alloc_stack(&co->stack_size);
++#ifdef CONFIG_SAFESTACK
++    co->unsafe_stack_size = COROUTINE_STACK_SIZE;
++    co->unsafe_stack = qemu_alloc_stack(&co->unsafe_stack_size);
++#endif
+     co->base.entry_arg = &old_env; /* stash away our jmp_buf */
  
-@@ -82,6 +84,9 @@ class QEMUMachine(object):
-         @param test_dir: where to create socket and log file
-         @param monitor_address: address for QMP monitor
-         @param socket_scm_helper: helper program, required for send_fd_scm()
-+        @param sock_dir: where to create socket (overrides test_dir for sock)
-+        @param console_log: (optional) path to console log file
-+        @param drain_console: (optional) True to drain console socket to buffer
-         @note: Qemu process is not started until launch() is used.
-         '''
-         if args is None:
-@@ -118,6 +123,12 @@ class QEMUMachine(object):
-         self._console_address = None
-         self._console_socket = None
-         self._remove_files = []
-+        self._console_log_path = console_log
-+        if self._console_log_path:
-+            # In order to log the console, buffering needs to be enabled.
-+            self._drain_console = True
-+        else:
-+            self._drain_console = drain_console
+     uc.uc_link = &old_uc;
+@@ -160,6 +169,20 @@ Coroutine *qemu_coroutine_new(void)
+     /* swapcontext() in, siglongjmp() back out */
+     if (!sigsetjmp(old_env, 0)) {
+         start_switch_fiber(&fake_stack_save, co->stack, co->stack_size);
++#ifdef CONFIG_SAFESTACK
++        /*
++         * Before we swap the context, set the new unsafe stack
++         * The unsafe stack grows just like the normal stack, so start from
++         * the last usable location of the memory area.
++         * NOTE: we don't have to re-set the usp afterwards because we are
++         * coming back to this context through a siglongjmp.
++         * The compiler already wrapped the corresponding sigsetjmp call with
++         * code that saves the usp on the (safe) stack before the call, and
++         * restores it right after (which is where we return with siglongjmp).
++         */
++        void *usp = co->unsafe_stack + co->unsafe_stack_size;
++        __safestack_unsafe_stack_ptr = usp;
++#endif
+         swapcontext(&old_uc, &uc);
+     }
  
-         # just in case logging wasn't configured by the main script:
-         logging.basicConfig()
-@@ -568,7 +579,11 @@ class QEMUMachine(object):
-         Returns a socket connected to the console
-         """
-         if self._console_socket is None:
--            self._console_socket = socket.socket(socket.AF_UNIX,
--                                                 socket.SOCK_STREAM)
--            self._console_socket.connect(self._console_address)
-+            if self._drain_console:
-+                self._console_socket = ConsoleSocket(self._console_address,
-+                                                    file=self._console_log_path)
-+            else:
-+                self._console_socket = socket.socket(socket.AF_UNIX,
-+                                                     socket.SOCK_STREAM)
-+                self._console_socket.connect(self._console_address)
-         return self._console_socket
+@@ -192,6 +215,9 @@ void qemu_coroutine_delete(Coroutine *co_)
+ #endif
+ 
+     qemu_free_stack(co->stack, co->stack_size);
++#ifdef CONFIG_SAFESTACK
++    qemu_free_stack(co->unsafe_stack, co->unsafe_stack_size);
++#endif
+     g_free(co);
+ }
+ 
 -- 
-2.17.1
+2.26.2
 
 
