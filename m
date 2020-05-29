@@ -2,90 +2,83 @@ Return-Path: <SRS0=UjLb=7L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B191FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 11:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61947C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 11:29:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77F25207D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 11:19:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 293522074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 May 2020 11:29:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hlwk1OaQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F25207D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mkVlHAR/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 293522074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jed3H-0000OH-G6
-	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 07:19:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41918)
+	id 1jedCr-0006ut-7v
+	for qemu-devel@archiver.kernel.org; Fri, 29 May 2020 07:29:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jed2O-0007zj-82
- for qemu-devel@nongnu.org; Fri, 29 May 2020 07:18:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52271
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jed2M-00067C-P1
- for qemu-devel@nongnu.org; Fri, 29 May 2020 07:18:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590751133;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jYiSMjIofNB15qWzwWiArouHiwdmYBQj6661003ktIs=;
- b=Hlwk1OaQymPUNIXUxlp+DqDA+u+/wFlc4dTThZAx3etu6WKFXzadeaYXYND9v6/k3IdlMc
- FKuVm35F9AC5UJa4Y1cK8mZ9agbFXt+R1kaxfE8UUczBc9r4ZNOpLvG7F7VL2YKDnj1t6H
- hcjccA1xGgLhDIHCTUkJxI6VHLec6+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-IE5wJrDZPi2d1tCHbEXS2g-1; Fri, 29 May 2020 07:18:48 -0400
-X-MC-Unique: IE5wJrDZPi2d1tCHbEXS2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88877461
- for <qemu-devel@nongnu.org>; Fri, 29 May 2020 11:18:47 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 41DD36298C;
- Fri, 29 May 2020 11:18:43 +0000 (UTC)
-Date: Fri, 29 May 2020 12:18:40 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH v7 4/5] crypto: Add tls-cipher-suites object
-Message-ID: <20200529111840.GE2755532@redhat.com>
-References: <20200528173141.17495-1-philmd@redhat.com>
- <20200528173141.17495-5-philmd@redhat.com>
- <81c61004-cccc-2ece-91a7-de96012a8ebf@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <81c61004-cccc-2ece-91a7-de96012a8ebf@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/29 01:34:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jedC1-0005kI-OY
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 07:28:53 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39068)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jedBz-0002vq-PD
+ for qemu-devel@nongnu.org; Fri, 29 May 2020 07:28:53 -0400
+Received: by mail-wm1-x342.google.com with SMTP id k26so3040363wmi.4
+ for <qemu-devel@nongnu.org>; Fri, 29 May 2020 04:28:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=wKZ/XG+QT1qtovyr0q0rEdp/rI8bv2otMbHbRlqHsoY=;
+ b=mkVlHAR/W7MuyANeOmDncItez0ATFdX67xIGtWfurGN7edQgrFjFgR09qFnuYJh23E
+ uo2Lyg7h+Ba0/MF9oJa+0DE2OiK1yMeZCvxCWTsVr+Ydsc2wUWrTZiGrTgmNwhW6qPcS
+ ZonLbKoDeFXRVYmIH84Wn6/qKuq0TKCBCLCjkkKkNBqHGe0qYAcNCy+yshzLNjrnSR3t
+ zff+tj5yCvnPDFsK2oib3Lz9mGgx2OoTrav0WCXH7sXQlSLTP91UAcafNyo7lNBclrIH
+ ISLqgCiwhIPSwwBj9qxjvUmk/9O4ZIR2q2S9Z/pT9vE+xbpxnqt5MFfytY22JWAr216l
+ MAdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=wKZ/XG+QT1qtovyr0q0rEdp/rI8bv2otMbHbRlqHsoY=;
+ b=P9tch3cR2pVzhbfngZWA0iiiHC6Y4AE19fHRBL+5vJCOpi5ch1u4Ur71vbkxaqBrPA
+ ZxlNACk5UHmOTO/YH+3ATRtEW0qr5dh3p/FgwMkrk10zQOVseiTfkpt/x6KAUuP8p+j4
+ HMSTZBQNZczJEnaaz/cJOk7S78qqy4r5z9xUpzfZ5xVx+vjCY0v3RXqxqlzXHyRCK1HL
+ VtcB0wJB8qARhKz0P3GWiNI63TY6U840Rhz8FlJTryGG4SZwu4/AeDhGic7x+oZ2UC2t
+ wKdtXIrkp67rpsAwuPhRos4Zpg9fT/B3qPpl1mTFwXJo/3hzvufHnbVavyaGdkvBAyBr
+ Zxxw==
+X-Gm-Message-State: AOAM532kvomgvg+MBFeLWb0Yldccu6Cd2+87s94LH8G1mBMRlky3VlET
+ elaKgh1hkw8WCLZS128PtzYzH8LjhutprQ==
+X-Google-Smtp-Source: ABdhPJzQZ4uGbfqSQUBovRMfvP/hGloVqHliKut1DrE1HXdanUmTHhCCzsrvWpzoF6VDPB7uxgqAGg==
+X-Received: by 2002:a1c:e389:: with SMTP id a131mr8436784wmh.46.1590751729031; 
+ Fri, 29 May 2020 04:28:49 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-151-121-39.range86-151.btcentralplus.com. [86.151.121.39])
+ by smtp.gmail.com with ESMTPSA id h188sm6449053wmh.2.2020.05.29.04.28.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 29 May 2020 04:28:48 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Fri, 29 May 2020 12:27:55 +0100
+Message-Id: <20200529112757.32235-1-beata.michalska@linaro.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=beata.michalska@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,86 +92,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, Christoffer.Dall@arm.com,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 01:09:22PM +0200, Laszlo Ersek wrote:
-> On 05/28/20 19:31, Philippe Mathieu-Daudé wrote:
-> (2) We need an actual commit message for this patch. How about the
-> following -- I have liberally stolen and edited comments that Daniel
-> made earlier in the Red Hat Bugzilla:
-> 
-> ---v--- ---v--- ---v--- ---v---
-> On the host OS, various aspects of TLS operation are configurable. In
-> particular it is possible for the sysadmin to control the TLS
-> cipher/protocol algorithms that applications are permitted to use.
-> 
-> * Any given crypto library has a built-in default priority list defined by
->   the distro maintainer of the libary package (or by upstream).
-> 
-> * The "crypto-policies" RPM (or equivalent host OS package) provides a
->   config file such as "/etc/crypto-policies/config", where the sysadmin
->   can set a high level (library-independent) policy.
-> 
->   The "update-crypto-policies --set" command (or equivalent) is used to
->   translate the global policy to individual library representations,
->   producing files such as "/etc/crypto-policies/back-ends/*.config". The
->   generated files, if present, are loaded by the various crypto libraries
->   to override their own built-in defaults.
-> 
->   For example, the GNUTLS library may read
->   "/etc/crypto-policies/back-ends/gnutls.config".
-> 
-> * A management application (or the QEMU user) may overide the system-wide
->   crypto-policies config via their own config, if they need to diverge
->   from the former.
-> 
-> Thus the priority order is "QEMU user config" > "crypto-policies system
-> config" > "library built-in config".
-> 
-> Introduce the "tls-cipher-suites" object for exposing the ordered list of
-> permitted TLS cipher suites from the host side to the firmware, via
-> fw_cfg. The list is represented as an array of IANA_TLS_CIPHER objects.
-> The firmware uses the IANA_TLS_CIPHER array for configuring guest-side
-> TLS, for example in UEFI HTTPS Boot.
-> 
-> The priority at which the host-side policy is retrieved is given by the
-> "priority" property of the new object type. For example,
-> "priority=@SYSTEM" may be used to refer to
-> "/etc/crypto-policies/back-ends/gnutls.config" (given that QEMU uses
-> GNUTLS).
-> ---^--- ---^--- ---^--- ---^---
-> 
-> (3) I think I have now at least formed an idea about where we should
-> document -fw_cfg / "gen_id" in the *manual*.
-> 
-> The various -object types are already documented extensively; namely in
-> section "Generic object creation". Thus, I think we should document
-> "tls-cipher-suites" there -- near the already existent "-object tls-*"
-> ones.
-> 
-> I suggest including a manual update to that effect. I think we can mostly
-> copy the suggested commit message into the manual as well.
-> 
-> And then, we can include the new "-fw_cfg" command line option (with
-> "gen_id") *right there*. Consequently, we won't need to modify the
-> existent "-fw_cfg" documentation bits (about "file" and "string") under
-> section "Debug/Expert options".
-> 
-> Dan: please comment!
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-I don't really have anything else to say. More docs == better
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-Regards,
-Daniel
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
+
+This patchset relies on KVM to insert the external data abort into the guest.
+
+
+Thanks for all the input on the previous version!
+----------------------
+
+v5:
+ - Drop syncing vcpu regs in favour of calling kvm_put_vcpu_events directly
+ - Fix decoding DFSC for LPAE case
+ - Add/clarify comments
+ - Switch to reporting error case failure when enabling the cap
+
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
+
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
+
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
+
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle misconfigured dabt injection
+
+ target/arm/cpu.h     |  3 ++
+ target/arm/kvm.c     | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/kvm32.c   | 35 ++++++++++++++++++++
+ target/arm/kvm64.c   | 49 ++++++++++++++++++++++++++++
+ target/arm/kvm_arm.h | 21 ++++++++++++
+ 5 files changed, 199 insertions(+), 1 deletion(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.7.4
 
 
