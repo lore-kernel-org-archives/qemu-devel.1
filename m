@@ -2,93 +2,90 @@ Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A592C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C23C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F33D20723
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA0C220723
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:26:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGXkqv91"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F33D20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bBkyVsbA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA0C220723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jf5AG-0002T7-Ck
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:20:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55392)
+	id 1jf5FD-0004hW-Th
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:26:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jf54l-0006dF-HW
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:15:16 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35462)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jf54j-0003A6-DH
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:15:15 -0400
-Received: by mail-pl1-x641.google.com with SMTP id q16so2506722plr.2
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 10:15:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qjwsKX79whYtQLp9fXWrna2gSvhnwxYbf0JasgWFeW8=;
- b=jGXkqv91Lzw1o4ggMJ81CV5PNkSxS6SCmjWV5H3wNQgJGspuSaf8g6T+TGBAayQMOT
- jIVfiguaZb6akK7FojX5f3ynP4S/Gj9635RiKQFbckK526OVaL37z/z/59QGhKAFInmh
- ZyRJpZUY4mMpfGCO5n8dg/uboSZmN2OjD3sadlP1N42cCwvEjGnkPan+wcUF4r4P8rHj
- lJwPV4ul7/cYjWV9xGe+jTW0SzlA5eobOHZ2mycPAUC7wgTgyfAxbfookd8YFBuoSYyg
- SsfY33xpF5ETkbetHlPOHuptJibjrGBlmmyNjHKZdQmNPO7+7Ed7KQcmERrQZ3SvM7Hp
- rziQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qjwsKX79whYtQLp9fXWrna2gSvhnwxYbf0JasgWFeW8=;
- b=KZHHAfFeLuw8kk1HdBEh44EGH0UmU0UhTIr1p5OzmYygakCkchmuik+EVAK3t3s8jP
- pmhkNwy01azOBabBpmu0b3H9eBlOpWUEoah2fKT32NP/onlpjsojPYSLBFmz1blyYGZW
- FjUr3KSGkSZ6/LnzK+M+NRRWY41l8lOz4ZCBIKsGqKlGNRwWwAJ1hTAdPmIG5ndPdJKT
- uakaAd5ELCGSuQdjuhxvwkziT0yDQRDvYxmUkEVK5BOO87p498OzQ9h3yz2mHU2n74KD
- E6VmCQonjauaHGDfTFYmkuPFC1PN5LU/F27PFPVa9fBNcI0tKnNv8iSuXypp/YImwPKO
- kBvw==
-X-Gm-Message-State: AOAM531lXnwiOfHZhqigct2tGF3+o146F+f0bGyI8D6avVGsYStxzkWQ
- J2TKVz4JlMrsWFAT4Hgf3RFmEgQNQb+c7A==
-X-Google-Smtp-Source: ABdhPJxyskoOJNSwFB3TomcGPwbJTfZmn5opFupa/ywdj5tIkYKTzpT+2XACP+hqCYEVtDja1NSPwQ==
-X-Received: by 2002:a17:902:9a02:: with SMTP id
- v2mr13374112plp.37.1590858911518; 
- Sat, 30 May 2020 10:15:11 -0700 (PDT)
-Received: from localhost.localdomain
- (tunnel570486-pt.tunnel.tserv25.sin1.ipv6.he.net. [2001:470:35:3d5::2])
- by smtp.googlemail.com with ESMTPSA id 191sm1229731pfy.161.2020.05.30.10.15.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 30 May 2020 10:15:11 -0700 (PDT)
-From: Coiby Xu <coiby.xu@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 3/4] vhost-user block device backend server
-Date: Sun, 31 May 2020 01:14:40 +0800
-Message-Id: <20200530171441.660814-4-coiby.xu@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200530171441.660814-1-coiby.xu@gmail.com>
-References: <20200530171441.660814-1-coiby.xu@gmail.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jf5Ed-0004D4-MR
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:25:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49302
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jf5Ec-0007Qw-BM
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:25:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590859524;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=+Lp8UyUfZGWp/JtelO0zUKQdScBiLCqoPkGHMnQON1w=;
+ b=bBkyVsbA2DxBOCqJKHULGWw52tQE+r8bWnyxCKGkhMoiUQ1u4AlBgiS0AhcUQv0fBDf8Sn
+ PZh5f43UgNdnS4AU4lOgI4coUYACAUw5YqBfdDa2l7O/wpjtco4bTL7djXCRIGP9YiwgwW
+ IKpJbzutSXfdsGjm9DzQUhTaTi5n9Qg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-Xrphb0gzMq6LZOVn9AP8MA-1; Sat, 30 May 2020 13:25:22 -0400
+X-MC-Unique: Xrphb0gzMq6LZOVn9AP8MA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE755460;
+ Sat, 30 May 2020 17:25:20 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-47.ams2.redhat.com [10.36.112.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B88F65D9C5;
+ Sat, 30 May 2020 17:25:14 +0000 (UTC)
+Subject: Re: [PATCH] tests/acceptance: Add boot tests for sh4 QEMU advent
+ calendar image
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <20200515164337.4899-1-thuth@redhat.com>
+ <CAHiYmc72cA9Va_JCbzq+E0M3wUuxedH2=BdE-YqAqWF8DBD_kA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <658ce012-150d-40ee-0689-0262971e20b4@redhat.com>
+Date: Sat, 30 May 2020 19:25:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <CAHiYmc72cA9Va_JCbzq+E0M3wUuxedH2=BdE-YqAqWF8DBD_kA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=coiby.xu@gmail.com; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 12:00:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,818 +98,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
- stefanha@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By making use of libvhost-user, block device drive can be shared to
-the connected vhost-user client. Only one client can connect to the
-server one time.
+On 30/05/2020 10.54, Aleksandar Markovic wrote:
+> 18:44 Pet, 15.05.2020. Thomas Huth <thuth@redhat.com
+> <mailto:thuth@redhat.com>> је написао/ла:
+>>
+>> Now that we can select the second serial console in the acceptance tests
+>> (see commit 746f244d9720 "Allow to use other serial consoles than
+> default"),
+>> we can also test the sh4 image from the QEMU advent calendar 2018.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>>
+>> ---
+>>  I've split my original patch that also added yet another mips64 test...
+>>  I hope it's easier to review/ack/merge this way this only addresses
+> sh4 here.
+>>
+> 
+> It makes sense to me, Thomas. If I were you, I would do the same.
+> 
+> But, sorry, do you intend to send mips64 counterpart in future, or it is
+> already sent, but I somehow missed it?
 
-Since vhost-user-server needs a block drive to be created first, delay
-the creation of this object.
+ Hi Aleksandar,
 
-Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
----
- block/Makefile.objs                  |   1 +
- block/export/vhost-user-blk-server.c | 715 +++++++++++++++++++++++++++
- block/export/vhost-user-blk-server.h |  34 ++
- softmmu/vl.c                         |   4 +
- 4 files changed, 754 insertions(+)
- create mode 100644 block/export/vhost-user-blk-server.c
- create mode 100644 block/export/vhost-user-blk-server.h
+I was planning to send a separate patch, but then I noticed that there
+are already quite a lot of tests for the various flavors of the
+mips-malta machine in tests/acceptance/boot_linux_console.py ... so I
+currently doubt that the malta advent calendar image will add much value
+here?
 
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 3635b6b4c1..0eb7eff470 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -24,6 +24,7 @@ block-obj-y += throttle-groups.o
- block-obj-$(CONFIG_LINUX) += nvme.o
- 
- block-obj-y += nbd.o
-+block-obj-$(CONFIG_LINUX) += export/vhost-user-blk-server.o ../contrib/libvhost-user/libvhost-user.o
- block-obj-$(CONFIG_SHEEPDOG) += sheepdog.o
- block-obj-$(CONFIG_LIBISCSI) += iscsi.o
- block-obj-$(if $(CONFIG_LIBISCSI),y,n) += iscsi-opts.o
-diff --git a/block/export/vhost-user-blk-server.c b/block/export/vhost-user-blk-server.c
-new file mode 100644
-index 0000000000..630aeb4ac4
---- /dev/null
-+++ b/block/export/vhost-user-blk-server.c
-@@ -0,0 +1,715 @@
-+/*
-+ * Sharing QEMU block devices via vhost-user protocal
-+ *
-+ * Author: Coiby Xu <coiby.xu@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "block/block.h"
-+#include "vhost-user-blk-server.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "sysemu/block-backend.h"
-+
-+enum {
-+    VHOST_USER_BLK_MAX_QUEUES = 1,
-+};
-+struct virtio_blk_inhdr {
-+    unsigned char status;
-+};
-+
-+static QTAILQ_HEAD(, VuBlockDev) vu_block_devs =
-+                                 QTAILQ_HEAD_INITIALIZER(vu_block_devs);
-+
-+
-+typedef struct VuBlockReq {
-+    VuVirtqElement *elem;
-+    int64_t sector_num;
-+    size_t size;
-+    struct virtio_blk_inhdr *in;
-+    struct virtio_blk_outhdr out;
-+    VuServer *server;
-+    struct VuVirtq *vq;
-+} VuBlockReq;
-+
-+
-+static void vu_block_req_complete(VuBlockReq *req)
-+{
-+    VuDev *vu_dev = &req->server->vu_dev;
-+
-+    /* IO size with 1 extra status byte */
-+    vu_queue_push(vu_dev, req->vq, req->elem, req->size + 1);
-+    vu_queue_notify(vu_dev, req->vq);
-+
-+    if (req->elem) {
-+        free(req->elem);
-+    }
-+
-+    g_free(req);
-+}
-+
-+static VuBlockDev *get_vu_block_device_by_server(VuServer *server)
-+{
-+    return container_of(server, VuBlockDev, vu_server);
-+}
-+
-+static int coroutine_fn
-+vu_block_discard_write_zeroes(VuBlockReq *req, struct iovec *iov,
-+                              uint32_t iovcnt, uint32_t type)
-+{
-+    struct virtio_blk_discard_write_zeroes desc;
-+    ssize_t size = iov_to_buf(iov, iovcnt, 0, &desc, sizeof(desc));
-+    if (unlikely(size != sizeof(desc))) {
-+        error_report("Invalid size %ld, expect %ld", size, sizeof(desc));
-+        return -EINVAL;
-+    }
-+
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(req->server);
-+    uint64_t range[2] = { le64toh(desc.sector) << 9,
-+                          le32toh(desc.num_sectors) << 9 };
-+    if (type == VIRTIO_BLK_T_DISCARD) {
-+        if (blk_co_pdiscard(vdev_blk->backend, range[0], range[1]) == 0) {
-+            return 0;
-+        }
-+    } else if (type == VIRTIO_BLK_T_WRITE_ZEROES) {
-+        if (blk_co_pwrite_zeroes(vdev_blk->backend,
-+                                 range[0], range[1], 0) == 0) {
-+            return 0;
-+        }
-+    }
-+
-+    return -EINVAL;
-+}
-+
-+
-+static void coroutine_fn vu_block_flush(VuBlockReq *req)
-+{
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(req->server);
-+    BlockBackend *backend = vdev_blk->backend;
-+    blk_co_flush(backend);
-+}
-+
-+
-+struct req_data {
-+    VuServer *server;
-+    VuVirtq *vq;
-+    VuVirtqElement *elem;
-+};
-+
-+static void coroutine_fn vu_block_virtio_process_req(void *opaque)
-+{
-+    struct req_data *data = opaque;
-+    VuServer *server = data->server;
-+    VuVirtq *vq = data->vq;
-+    VuVirtqElement *elem = data->elem;
-+    uint32_t type;
-+    VuBlockReq *req;
-+
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(server);
-+    BlockBackend *backend = vdev_blk->backend;
-+
-+    struct iovec *in_iov = elem->in_sg;
-+    struct iovec *out_iov = elem->out_sg;
-+    unsigned in_num = elem->in_num;
-+    unsigned out_num = elem->out_num;
-+    /* refer to hw/block/virtio_blk.c */
-+    if (elem->out_num < 1 || elem->in_num < 1) {
-+        error_report("virtio-blk request missing headers");
-+        free(elem);
-+        return;
-+    }
-+
-+    req = g_new0(VuBlockReq, 1);
-+    req->server = server;
-+    req->vq = vq;
-+    req->elem = elem;
-+
-+    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
-+                            sizeof(req->out)) != sizeof(req->out))) {
-+        error_report("virtio-blk request outhdr too short");
-+        goto err;
-+    }
-+
-+    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
-+
-+    if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
-+        error_report("virtio-blk request inhdr too short");
-+        goto err;
-+    }
-+
-+    /* We always touch the last byte, so just see how big in_iov is.  */
-+    req->in = (void *)in_iov[in_num - 1].iov_base
-+              + in_iov[in_num - 1].iov_len
-+              - sizeof(struct virtio_blk_inhdr);
-+    iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
-+
-+
-+    type = le32toh(req->out.type);
-+    switch (type & ~VIRTIO_BLK_T_BARRIER) {
-+    case VIRTIO_BLK_T_IN:
-+    case VIRTIO_BLK_T_OUT: {
-+        ssize_t ret = 0;
-+        bool is_write = type & VIRTIO_BLK_T_OUT;
-+        req->sector_num = le64toh(req->out.sector);
-+
-+        int64_t offset = req->sector_num * vdev_blk->blk_size;
-+        QEMUIOVector *qiov = g_new0(QEMUIOVector, 1);
-+        if (is_write) {
-+            qemu_iovec_init_external(qiov, out_iov, out_num);
-+            ret = blk_co_pwritev(backend, offset, qiov->size,
-+                                 qiov, 0);
-+        } else {
-+            qemu_iovec_init_external(qiov, in_iov, in_num);
-+            ret = blk_co_preadv(backend, offset, qiov->size,
-+                                qiov, 0);
-+        }
-+        if (ret >= 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        break;
-+    }
-+    case VIRTIO_BLK_T_FLUSH:
-+        vu_block_flush(req);
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        break;
-+    case VIRTIO_BLK_T_GET_ID: {
-+        size_t size = MIN(iov_size(&elem->in_sg[0], in_num),
-+                          VIRTIO_BLK_ID_BYTES);
-+        snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk_server");
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        req->size = elem->in_sg[0].iov_len;
-+        break;
-+    }
-+    case VIRTIO_BLK_T_DISCARD:
-+    case VIRTIO_BLK_T_WRITE_ZEROES: {
-+        int rc;
-+        rc = vu_block_discard_write_zeroes(req, &elem->out_sg[1],
-+                                           out_num, type);
-+        if (rc == 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        break;
-+    }
-+    default:
-+        req->in->status = VIRTIO_BLK_S_UNSUPP;
-+        break;
-+    }
-+
-+    vu_block_req_complete(req);
-+    return;
-+
-+err:
-+    free(elem);
-+    g_free(req);
-+    return;
-+}
-+
-+
-+
-+static void vu_block_process_vq(VuDev *vu_dev, int idx)
-+{
-+    VuServer *server;
-+    VuVirtq *vq;
-+
-+    server = container_of(vu_dev, VuServer, vu_dev);
-+    assert(server);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    assert(vq);
-+    VuVirtqElement *elem;
-+    while (1) {
-+        elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) +
-+                                    sizeof(VuBlockReq));
-+        if (elem) {
-+            struct req_data req_data = {
-+                .server = server,
-+                .vq = vq,
-+                .elem = elem
-+            };
-+            Coroutine *co = qemu_coroutine_create(vu_block_virtio_process_req,
-+                                                  &req_data);
-+            aio_co_enter(server->ioc->ctx, co);
-+        } else {
-+            break;
-+        }
-+    }
-+}
-+
-+static void vu_block_queue_set_started(VuDev *vu_dev, int idx, bool started)
-+{
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    vu_set_queue_handler(vu_dev, vq, started ? vu_block_process_vq : NULL);
-+}
-+
-+static uint64_t vu_block_get_features(VuDev *dev)
-+{
-+    uint64_t features;
-+    VuServer *server = container_of(dev, VuServer, vu_dev);
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(server);
-+    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+               1ull << VIRTIO_BLK_F_SEG_MAX |
-+               1ull << VIRTIO_BLK_F_TOPOLOGY |
-+               1ull << VIRTIO_BLK_F_BLK_SIZE |
-+               1ull << VIRTIO_BLK_F_FLUSH |
-+               1ull << VIRTIO_BLK_F_DISCARD |
-+               1ull << VIRTIO_BLK_F_WRITE_ZEROES |
-+               1ull << VIRTIO_BLK_F_CONFIG_WCE |
-+               1ull << VIRTIO_F_VERSION_1 |
-+               1ull << VIRTIO_RING_F_INDIRECT_DESC |
-+               1ull << VIRTIO_RING_F_EVENT_IDX |
-+               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-+
-+    if (!vdev_blk->writable) {
-+        features |= 1ull << VIRTIO_BLK_F_RO;
-+    }
-+
-+    return features;
-+}
-+
-+static uint64_t vu_block_get_protocol_features(VuDev *dev)
-+{
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
-+           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
-+}
-+
-+static int
-+vu_block_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
-+{
-+    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(server);
-+    memcpy(config, &vdev_blk->blkcfg, len);
-+
-+    return 0;
-+}
-+
-+static int
-+vu_block_set_config(VuDev *vu_dev, const uint8_t *data,
-+                    uint32_t offset, uint32_t size, uint32_t flags)
-+{
-+    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
-+    VuBlockDev *vdev_blk = get_vu_block_device_by_server(server);
-+    uint8_t wce;
-+
-+    /* don't support live migration */
-+    if (flags != VHOST_SET_CONFIG_TYPE_MASTER) {
-+        return -EINVAL;
-+    }
-+
-+
-+    if (offset != offsetof(struct virtio_blk_config, wce) ||
-+        size != 1) {
-+        return -EINVAL;
-+    }
-+
-+    wce = *data;
-+    if (wce == vdev_blk->blkcfg.wce) {
-+        /* Do nothing as same with old configuration */
-+        return 0;
-+    }
-+
-+    vdev_blk->blkcfg.wce = wce;
-+    blk_set_enable_write_cache(vdev_blk->backend, wce);
-+    return 0;
-+}
-+
-+
-+/*
-+ * When the client disconnects, it sends a VHOST_USER_NONE request
-+ * and vu_process_message will simple call exit which cause the VM
-+ * to exit abruptly.
-+ * To avoid this issue,  process VHOST_USER_NONE request ahead
-+ * of vu_process_message.
-+ *
-+ */
-+static int vu_block_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
-+{
-+    if (vmsg->request == VHOST_USER_NONE) {
-+        dev->panic(dev, "disconnect");
-+        return true;
-+    }
-+    return false;
-+}
-+
-+
-+static const VuDevIface vu_block_iface = {
-+    .get_features          = vu_block_get_features,
-+    .queue_set_started     = vu_block_queue_set_started,
-+    .get_protocol_features = vu_block_get_protocol_features,
-+    .get_config            = vu_block_get_config,
-+    .set_config            = vu_block_set_config,
-+    .process_msg           = vu_block_process_msg,
-+};
-+
-+static void blk_aio_attached(AioContext *ctx, void *opaque)
-+{
-+    VuBlockDev *vub_dev = opaque;
-+    aio_context_acquire(ctx);
-+    vhost_user_server_set_aio_context(ctx, &vub_dev->vu_server);
-+    aio_context_release(ctx);
-+}
-+
-+static void blk_aio_detach(void *opaque)
-+{
-+    VuBlockDev *vub_dev = opaque;
-+    AioContext *ctx = vub_dev->vu_server.ctx;
-+    aio_context_acquire(ctx);
-+    vhost_user_server_set_aio_context(NULL, &vub_dev->vu_server);
-+    aio_context_release(ctx);
-+}
-+
-+static void vu_block_free(VuBlockDev *vu_block_dev)
-+{
-+    if (!vu_block_dev) {
-+        return;
-+    }
-+
-+    if (vu_block_dev->backend) {
-+        blk_remove_aio_context_notifier(vu_block_dev->backend, blk_aio_attached,
-+                                        blk_aio_detach, vu_block_dev);
-+    }
-+
-+    blk_unref(vu_block_dev->backend);
-+
-+    if (vu_block_dev->next.tqe_circ.tql_prev) {
-+        /*
-+         * remove vu_block_device from the list
-+         *
-+         * if vu_block_dev->next.tqe_circ.tql_prev = null,
-+         * vu_block_dev hasn't been inserted into the queue and
-+         * vu_block_free is called by obj->instance_finalize.
-+         */
-+        QTAILQ_REMOVE(&vu_block_devs, vu_block_dev, next);
-+    }
-+}
-+
-+static void
-+vu_block_initialize_config(BlockDriverState *bs,
-+                           struct virtio_blk_config *config, uint32_t blk_size)
-+{
-+    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
-+    config->blk_size = blk_size;
-+    config->size_max = 0;
-+    config->seg_max = 128 - 2;
-+    config->min_io_size = 1;
-+    config->opt_io_size = 1;
-+    config->num_queues = VHOST_USER_BLK_MAX_QUEUES;
-+    config->max_discard_sectors = 32768;
-+    config->max_discard_seg = 1;
-+    config->discard_sector_alignment = config->blk_size >> 9;
-+    config->max_write_zeroes_sectors = 32768;
-+    config->max_write_zeroes_seg = 1;
-+}
-+
-+
-+static VuBlockDev *vu_block_init(VuBlockDev *vu_block_device, Error **errp)
-+{
-+
-+    BlockBackend *blk;
-+    Error *local_error = NULL;
-+    const char *node_name = vu_block_device->node_name;
-+    bool writable = vu_block_device->writable;
-+    /*
-+     * Don't allow resize while the vhost user server is running,
-+     * otherwise we don't care what happens with the node.
-+     */
-+    uint64_t perm = BLK_PERM_CONSISTENT_READ;
-+    int ret;
-+
-+    AioContext *ctx;
-+
-+    BlockDriverState *bs = bdrv_lookup_bs(node_name, node_name, &local_error);
-+
-+    if (!bs) {
-+        error_propagate(errp, local_error);
-+        return NULL;
-+    }
-+
-+    if (bdrv_is_read_only(bs)) {
-+        writable = false;
-+    }
-+
-+    if (writable) {
-+        perm |= BLK_PERM_WRITE;
-+    }
-+
-+    ctx = bdrv_get_aio_context(bs);
-+    aio_context_acquire(ctx);
-+    bdrv_invalidate_cache(bs, NULL);
-+    aio_context_release(ctx);
-+
-+    blk = blk_new(bdrv_get_aio_context(bs), perm,
-+                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
-+    ret = blk_insert_bs(blk, bs, errp);
-+
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    blk_set_enable_write_cache(blk, false);
-+
-+    blk_set_allow_aio_context_change(blk, true);
-+
-+    vu_block_device->blkcfg.wce = 0;
-+    vu_block_device->backend = blk;
-+    if (!vu_block_device->blk_size) {
-+        vu_block_device->blk_size = BDRV_SECTOR_SIZE;
-+    }
-+    vu_block_device->blkcfg.blk_size = vu_block_device->blk_size;
-+    blk_set_guest_block_size(blk, vu_block_device->blk_size);
-+    vu_block_initialize_config(bs, &vu_block_device->blkcfg,
-+                                   vu_block_device->blk_size);
-+    return vu_block_device;
-+
-+fail:
-+    blk_unref(blk);
-+    return NULL;
-+}
-+
-+static void vhost_user_blk_server_free(VuBlockDev *vu_block_device)
-+{
-+    if (!vu_block_device) {
-+        return;
-+    }
-+    vhost_user_server_stop(&vu_block_device->vu_server);
-+    vu_block_free(vu_block_device);
-+
-+}
-+
-+/*
-+ * A exported drive can serve multiple multiple clients simutateously,
-+ * thus no need to export the same drive twice.
-+ *
-+ */
-+static VuBlockDev *vu_block_dev_find(const char *node_name)
-+{
-+    VuBlockDev *vu_block_device;
-+    QTAILQ_FOREACH(vu_block_device, &vu_block_devs, next) {
-+        if (strcmp(node_name, vu_block_device->node_name) == 0) {
-+            return vu_block_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+
-+static VuBlockDev
-+*vu_block_dev_find_by_unix_socket(const char *unix_socket)
-+{
-+    VuBlockDev *vu_block_device;
-+    QTAILQ_FOREACH(vu_block_device, &vu_block_devs, next) {
-+        if (strcmp(unix_socket, vu_block_device->addr->u.q_unix.path) == 0) {
-+            return vu_block_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+
-+static void vhost_user_blk_server_start(VuBlockDev *vu_block_device,
-+                                        Error **errp)
-+{
-+
-+    const char *name = vu_block_device->node_name;
-+    SocketAddress *addr = vu_block_device->addr;
-+    char *unix_socket = vu_block_device->addr->u.q_unix.path;
-+
-+    if (vu_block_dev_find(name)) {
-+        error_setg(errp, "Vhost-user-blk server with node-name '%s' "
-+                   "has already been started",
-+                   name);
-+        return;
-+    }
-+
-+    if (vu_block_dev_find_by_unix_socket(unix_socket)) {
-+        error_setg(errp, "Vhost-user-blk server with with socket_path '%s' "
-+                   "has already been started", unix_socket);
-+        return;
-+    }
-+
-+    if (!vu_block_init(vu_block_device, errp)) {
-+        return;
-+    }
-+
-+
-+    AioContext *ctx = bdrv_get_aio_context(blk_bs(vu_block_device->backend));
-+
-+    if (!vhost_user_server_start(VHOST_USER_BLK_MAX_QUEUES, addr, ctx,
-+                                 &vu_block_device->vu_server,
-+                                 NULL, &vu_block_iface,
-+                                 errp)) {
-+        goto error;
-+    }
-+
-+    QTAILQ_INSERT_TAIL(&vu_block_devs, vu_block_device, next);
-+    blk_add_aio_context_notifier(vu_block_device->backend, blk_aio_attached,
-+                                 blk_aio_detach, vu_block_device);
-+    return;
-+
-+ error:
-+    vu_block_free(vu_block_device);
-+}
-+
-+static void vu_set_node_name(Object *obj, const char *value, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+
-+    if (vus->node_name) {
-+        error_setg(errp, "evdev property already set");
-+        return;
-+    }
-+
-+    vus->node_name = g_strdup(value);
-+}
-+
-+static char *vu_get_node_name(Object *obj, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+    return g_strdup(vus->node_name);
-+}
-+
-+
-+static void vu_set_unix_socket(Object *obj, const char *value,
-+                               Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+
-+    if (vus->addr) {
-+        error_setg(errp, "unix_socket property already set");
-+        return;
-+    }
-+
-+    SocketAddress *addr = g_new0(SocketAddress, 1);
-+    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
-+    addr->u.q_unix.path = g_strdup(value);
-+    vus->addr = addr;
-+}
-+
-+static char *vu_get_unix_socket(Object *obj, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+    return g_strdup(vus->addr->u.q_unix.path);
-+}
-+
-+static bool vu_get_block_writable(Object *obj, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+    return vus->writable;
-+}
-+
-+static void vu_set_block_writable(Object *obj, bool value, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+
-+    vus->writable = value;
-+}
-+
-+static void vu_get_blk_size(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+    uint32_t value = vus->blk_size;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void vu_set_blk_size(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    VuBlockDev *vus = VHOST_USER_BLK_SERVER(obj);
-+
-+    Error *local_err = NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (value != BDRV_SECTOR_SIZE && value != 4096) {
-+        error_setg(&local_err,
-+                   "Property '%s.%s' can only take value 512 or 4096",
-+                   object_get_typename(obj), name);
-+        goto out;
-+    }
-+
-+    vus->blk_size = value;
-+
-+out:
-+    error_propagate(errp, local_err);
-+    vus->blk_size = value;
-+}
-+
-+
-+static void vhost_user_blk_server_instance_finalize(Object *obj)
-+{
-+    VuBlockDev *vub = VHOST_USER_BLK_SERVER(obj);
-+
-+    vhost_user_blk_server_free(vub);
-+}
-+
-+static void vhost_user_blk_server_complete(UserCreatable *obj, Error **errp)
-+{
-+    Error *local_error = NULL;
-+    VuBlockDev *vub = VHOST_USER_BLK_SERVER(obj);
-+
-+    vhost_user_blk_server_start(vub, &local_error);
-+
-+    if (local_error) {
-+        error_propagate(errp, local_error);
-+        return;
-+    }
-+}
-+
-+static void vhost_user_blk_server_class_init(ObjectClass *klass,
-+                                             void *class_data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(klass);
-+    ucc->complete = vhost_user_blk_server_complete;
-+
-+    object_class_property_add_bool(klass, "writable",
-+                                   vu_get_block_writable,
-+                                   vu_set_block_writable);
-+
-+    object_class_property_add_str(klass, "node-name",
-+                                  vu_get_node_name,
-+                                  vu_set_node_name);
-+
-+    object_class_property_add_str(klass, "unix-socket",
-+                                  vu_get_unix_socket,
-+                                  vu_set_unix_socket);
-+
-+    object_class_property_add(klass, "blk-size", "uint32",
-+                              vu_get_blk_size, vu_set_blk_size,
-+                              NULL, NULL);
-+}
-+
-+static const TypeInfo vhost_user_blk_server_info = {
-+    .name = TYPE_VHOST_USER_BLK_SERVER,
-+    .parent = TYPE_OBJECT,
-+    .instance_size = sizeof(VuBlockDev),
-+    .instance_finalize = vhost_user_blk_server_instance_finalize,
-+    .class_init = vhost_user_blk_server_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        {TYPE_USER_CREATABLE},
-+        {}
-+    },
-+};
-+
-+static void vhost_user_blk_server_register_types(void)
-+{
-+    type_register_static(&vhost_user_blk_server_info);
-+}
-+
-+type_init(vhost_user_blk_server_register_types)
-diff --git a/block/export/vhost-user-blk-server.h b/block/export/vhost-user-blk-server.h
-new file mode 100644
-index 0000000000..6a393ed49d
---- /dev/null
-+++ b/block/export/vhost-user-blk-server.h
-@@ -0,0 +1,34 @@
-+/*
-+ * Sharing QEMU block devices via vhost-user protocal
-+ *
-+ * Author: Coiby Xu <coiby.xu@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef VHOST_USER_BLK_SERVER_H
-+#define VHOST_USER_BLK_SERVER_H
-+#include "util/vhost-user-server.h"
-+
-+typedef struct VuBlockDev VuBlockDev;
-+#define TYPE_VHOST_USER_BLK_SERVER "vhost-user-blk-server"
-+#define VHOST_USER_BLK_SERVER(obj) \
-+   OBJECT_CHECK(VuBlockDev, obj, TYPE_VHOST_USER_BLK_SERVER)
-+
-+/* vhost user block device */
-+struct VuBlockDev {
-+    Object parent_obj;
-+    char *node_name;
-+    SocketAddress *addr;
-+    AioContext *ctx;
-+    VuServer vu_server;
-+    uint32_t blk_size;
-+    BlockBackend *backend;
-+    QIOChannelSocket *sioc;
-+    QTAILQ_ENTRY(VuBlockDev) next;
-+    struct virtio_blk_config blkcfg;
-+    bool writable;
-+};
-+
-+#endif /* VHOST_USER_BLK_SERVER_H */
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index ae5451bc23..e4549871e1 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2520,6 +2520,10 @@ static bool object_create_initial(const char *type, QemuOpts *opts)
-     }
- #endif
- 
-+    /* Reason: vhost-user-blk-server property "node-name" */
-+    if (g_str_equal(type, "vhost-user-blk-server")) {
-+        return false;
-+    }
-     /*
-      * Reason: filter-* property "netdev" etc.
-      */
--- 
-2.26.2
+ Thomas
 
 
