@@ -2,95 +2,64 @@ Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAC2C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 09:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DE1C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 10:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 447EB208E4
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 09:28:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2FAE5bs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447EB208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3391A208E4
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 10:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3391A208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jexn0-0001CG-I1
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 05:28:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49634)
+	id 1jeyJq-0005hR-ET
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 06:02:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1jexm2-0000U1-KJ
- for qemu-devel@nongnu.org; Sat, 30 May 2020 05:27:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46191
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1jexm0-0000Sr-6S
- for qemu-devel@nongnu.org; Sat, 30 May 2020 05:27:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590830842;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QNCBlcfXesRsi7EHYn/qiLEFZSVhVTbggu1BTv3xExs=;
- b=b2FAE5bsmCQfP6gCz0OWSG2qHMPcZ3jzyxEJsMOXWFig1iw7fJ0KbityaiRXoPWJUDPFYY
- u9ix3/DQ0M7PGnh4mE9mejEjHhMq8UWsYBCwh8WyyrZL7c4jTokFDDw5TdMQNMDsLeJZlJ
- 9vgHpC/rPvW+PO0dCYfbtUMNA0wLuBg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-divcMtUfP3iseg-lNCdiTw-1; Sat, 30 May 2020 05:27:20 -0400
-X-MC-Unique: divcMtUfP3iseg-lNCdiTw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECEA7107ACCA;
- Sat, 30 May 2020 09:27:18 +0000 (UTC)
-Received: from localhost (ovpn-112-79.ams2.redhat.com [10.36.112.79])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 064A978366;
- Sat, 30 May 2020 09:27:15 +0000 (UTC)
-Date: Sat, 30 May 2020 10:27:15 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Eric Wheeler <nbd@lists.ewheeler.net>
-Subject: Re: [Libguestfs] Provide NBD via Browser over Websockets
-Message-ID: <20200530092715.GX3888@redhat.com>
-References: <CAMRbyytcufK8-XdFu7LU+UwO_FRoGJO2FhhBHtH9etf3A2htwQ@mail.gmail.com>
- <alpine.LRH.2.11.2005280014150.13970@mail.ewheeler.net>
- <20200528090443.GN7304@redhat.com>
- <alpine.LRH.2.11.2005282147410.13970@mail.ewheeler.net>
- <20200529093744.GS3888@redhat.com>
- <13571029-5bf4-2dfa-6879-0ad2642afb3f@redhat.com>
- <20200529135042.GJ2755532@redhat.com>
- <ff2e7dd1-c8b2-b46c-3c3b-ed88d9ad9689@redhat.com>
- <20200529141315.GU3888@redhat.com>
- <alpine.LRH.2.11.2005292107180.10871@mail.ewheeler.net>
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jeyIl-0004tG-8h; Sat, 30 May 2020 06:01:15 -0400
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:36975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jeyIf-0005MZ-IB; Sat, 30 May 2020 06:01:14 -0400
+X-Originating-IP: 82.252.130.88
+Received: from [192.168.1.155] (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 7D17660006;
+ Sat, 30 May 2020 10:01:03 +0000 (UTC)
+Subject: Re: [PATCH] hw/net/imx_fec.c: Convert debug fprintf() to trace event
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org
+References: <20200529180025.169097-1-jcd@tribudubois.net>
+ <b262186a-4566-8757-2129-7654013a3b07@redhat.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <d70309d9-447f-0da5-b22a-e002352470b9@tribudubois.net>
+Date: Sat, 30 May 2020 12:01:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.11.2005292107180.10871@mail.ewheeler.net>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <b262186a-4566-8757-2129-7654013a3b07@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=rjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 05:27:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.195; envelope-from=jcd@tribudubois.net;
+ helo=relay3-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 06:01:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,77 +72,366 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, nbd@other.debian.org,
- Nir Soffer <nsoffer@redhat.com>, libguestfs <libguestfs@redhat.com>
+Cc: peter.maydell@linaro.org, peter.chubb@nicta.com.au, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 09:08:29PM +0000, Eric Wheeler wrote:
-> On Fri, 29 May 2020, Richard W.M. Jones wrote:
-> > On Fri, May 29, 2020 at 08:58:06AM -0500, Eric Blake wrote:
-> > > On 5/29/20 8:50 AM, Daniel P. BerrangÃ© wrote:
-> > > 
-> > > >>>(2) You need to persuade qemu's NBD client to read from a WebSocket.
-> > > >>>I didn't really know anything about WebSockets until today but it
-> > > >>>seems as if they are a full-duplex protocol layered on top of HTTP [a].
-> > > >>>Is there a WebSocket proxy that turns WS into plain TCP (a bit like
-> > > >>>stunnel)?  Google suggests [b].
-> > > >>>
-> > > >>>[a] https://en.wikipedia.org/wiki/WebSocket#Protocol_handshake
-> > > >>>[b] https://github.com/novnc/websockify
-> > > >>
-> > > >>qemu already knows how to connect as a client to websockets; Dan Berrange
-> > > >>knows more about that setup.  I suspect it would not be too difficult to
-> > > >>teach the qemu NBD client code to use a WebSocket instead of a Unix or TCP
-> > > >>socket as its data source.
-> > > >
-> > > >Actually the inverse. The QIOChannelWebsocket impl is only the server
-> > > >side of the problem, as used by QEMU's VNC server. We've never implemented
-> > > >the client side. There is nothing especially stopping us doing that - just
-> > > >needs someone motivated with time to work on it.
-> > > 
-> > > In the meantime, you may still be able to set up something like:
-> > > 
-> > > local machine:
-> > > iso -> NBD server -> Unix socket -> websockify -> WebSocket
-> > 
-> > I guess the idea is to have a zero-install solution for the browser.
-> > As I said in the email earlier this is very common for IPMI-type
-> > remote access to blade servers and in my experience is implemented
-> > using a Java applet and a proprietary protocol terminated at the BMC
-> > (which then emulates a virtual CDROM to the server).  There are some
-> > HP blade servers on Red Hat's internal Beaker instance where you can
-> > play with this.  For qemu we wouldn't need to invent a new protocol
-> > when NBD is available and already implemented (albeit not yet on top
-> > of WebSockets).
-> > 
-> > The NBD server must run inside the browser and therefore be either
-> > written from scratch in Javascript, or an existing server
-> > cross-compiled to WASM (if that is possible - I don't really know).
-> 
-> Interesting idea about WASM.  I'll see if I can build one of the simple 
-> nbd servers that are around.  Not sure how to link it to the JS file IO, 
-> however.
-
-After reading a bit about compiling to WebSockets it sounds like you
-can cross-compile a C program, but there's no library support at all.
-IOW to port an existing server you'd have to implement enough of POSIX
-to make it work.  nbdkit has a liberal license deliberately to make it
-possible to chop it up and incorporate it into completely forked
-codebases (nbdkit is a plot to make NBD more popular).
-
-But since NBD is pretty simple, a fresh Javascript server might be
-easier, especially if you stick to only implementing reads.
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+Le 30/05/2020 à 09:49, Philippe Mathieu-Daudé a écrit :
+> Hi Jean-Christophe,
+>
+> On 5/29/20 8:00 PM, Jean-Christophe Dubois wrote:
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> ---
+>>   hw/net/imx_fec.c    | 101 ++++++++++++++++++--------------------------
+>>   hw/net/trace-events |  18 ++++++++
+>>   2 files changed, 58 insertions(+), 61 deletions(-)
+>>
+>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+>> index 7adcc9df654..823dac0603b 100644
+>> --- a/hw/net/imx_fec.c
+>> +++ b/hw/net/imx_fec.c
+>> @@ -31,34 +31,11 @@
+>>   #include "qemu/module.h"
+>>   #include "net/checksum.h"
+>>   #include "net/eth.h"
+>> +#include "trace.h"
+>>   
+>>   /* For crc32 */
+>>   #include <zlib.h>
+>>   
+>> -#ifndef DEBUG_IMX_FEC
+>> -#define DEBUG_IMX_FEC 0
+>> -#endif
+>> -
+>> -#define FEC_PRINTF(fmt, args...) \
+>> -    do { \
+>> -        if (DEBUG_IMX_FEC) { \
+>> -            fprintf(stderr, "[%s]%s: " fmt , TYPE_IMX_FEC, \
+>> -                                             __func__, ##args); \
+>> -        } \
+>> -    } while (0)
+>> -
+>> -#ifndef DEBUG_IMX_PHY
+>> -#define DEBUG_IMX_PHY 0
+>> -#endif
+>> -
+>> -#define PHY_PRINTF(fmt, args...) \
+>> -    do { \
+>> -        if (DEBUG_IMX_PHY) { \
+>> -            fprintf(stderr, "[%s.phy]%s: " fmt , TYPE_IMX_FEC, \
+>> -                                                 __func__, ##args); \
+>> -        } \
+>> -    } while (0)
+>> -
+>>   #define IMX_MAX_DESC    1024
+>>   
+>>   static const char *imx_default_reg_name(IMXFECState *s, uint32_t index)
+>> @@ -262,43 +239,45 @@ static void imx_eth_update(IMXFECState *s);
+>>    * For now we don't handle any GPIO/interrupt line, so the OS will
+>>    * have to poll for the PHY status.
+>>    */
+>> -static void phy_update_irq(IMXFECState *s)
+>> +static void imx_phy_update_irq(IMXFECState *s)
+>>   {
+>>       imx_eth_update(s);
+>>   }
+>>   
+>> -static void phy_update_link(IMXFECState *s)
+>> +static void imx_phy_update_link(IMXFECState *s)
+>>   {
+>>       /* Autonegotiation status mirrors link status.  */
+>>       if (qemu_get_queue(s->nic)->link_down) {
+>> -        PHY_PRINTF("link is down\n");
+>> +        trace_imx_phy_update_link("down");
+>>           s->phy_status &= ~0x0024;
+>>           s->phy_int |= PHY_INT_DOWN;
+>>       } else {
+>> -        PHY_PRINTF("link is up\n");
+>> +        trace_imx_phy_update_link("up");
+>>           s->phy_status |= 0x0024;
+>>           s->phy_int |= PHY_INT_ENERGYON;
+>>           s->phy_int |= PHY_INT_AUTONEG_COMPLETE;
+>>       }
+>> -    phy_update_irq(s);
+>> +    imx_phy_update_irq(s);
+>>   }
+>>   
+>>   static void imx_eth_set_link(NetClientState *nc)
+>>   {
+>> -    phy_update_link(IMX_FEC(qemu_get_nic_opaque(nc)));
+>> +    imx_phy_update_link(IMX_FEC(qemu_get_nic_opaque(nc)));
+>>   }
+>>   
+>> -static void phy_reset(IMXFECState *s)
+>> +static void imx_phy_reset(IMXFECState *s)
+>>   {
+>> +    trace_imx_phy_reset();
+>> +
+>>       s->phy_status = 0x7809;
+>>       s->phy_control = 0x3000;
+>>       s->phy_advertise = 0x01e1;
+>>       s->phy_int_mask = 0;
+>>       s->phy_int = 0;
+>> -    phy_update_link(s);
+>> +    imx_phy_update_link(s);
+>>   }
+>>   
+>> -static uint32_t do_phy_read(IMXFECState *s, int reg)
+>> +static uint32_t imx_phy_read(IMXFECState *s, int reg)
+>>   {
+>>       uint32_t val;
+>>   
+>> @@ -332,7 +311,7 @@ static uint32_t do_phy_read(IMXFECState *s, int reg)
+>>       case 29:    /* Interrupt source.  */
+>>           val = s->phy_int;
+>>           s->phy_int = 0;
+>> -        phy_update_irq(s);
+>> +        imx_phy_update_irq(s);
+>>           break;
+>>       case 30:    /* Interrupt mask */
+>>           val = s->phy_int_mask;
+>> @@ -352,14 +331,14 @@ static uint32_t do_phy_read(IMXFECState *s, int reg)
+>>           break;
+>>       }
+>>   
+>> -    PHY_PRINTF("read 0x%04x @ %d\n", val, reg);
+>> +    trace_imx_phy_read(val, reg);
+>>   
+>>       return val;
+>>   }
+>>   
+>> -static void do_phy_write(IMXFECState *s, int reg, uint32_t val)
+>> +static void imx_phy_write(IMXFECState *s, int reg, uint32_t val)
+>>   {
+>> -    PHY_PRINTF("write 0x%04x @ %d\n", val, reg);
+>> +    trace_imx_phy_write(val, reg);
+>>   
+>>       if (reg > 31) {
+>>           /* we only advertise one phy */
+>> @@ -369,7 +348,7 @@ static void do_phy_write(IMXFECState *s, int reg, uint32_t val)
+>>       switch (reg) {
+>>       case 0:     /* Basic Control */
+>>           if (val & 0x8000) {
+>> -            phy_reset(s);
+>> +            imx_phy_reset(s);
+>>           } else {
+>>               s->phy_control = val & 0x7980;
+>>               /* Complete autonegotiation immediately.  */
+>> @@ -383,7 +362,7 @@ static void do_phy_write(IMXFECState *s, int reg, uint32_t val)
+>>           break;
+>>       case 30:    /* Interrupt mask */
+>>           s->phy_int_mask = val & 0xff;
+>> -        phy_update_irq(s);
+>> +        imx_phy_update_irq(s);
+>>           break;
+>>       case 17:
+>>       case 18:
+>> @@ -402,6 +381,8 @@ static void do_phy_write(IMXFECState *s, int reg, uint32_t val)
+>>   static void imx_fec_read_bd(IMXFECBufDesc *bd, dma_addr_t addr)
+>>   {
+>>       dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd));
+>> +
+>> +    trace_imx_fec_read_bd(addr, bd->flags, bd->length, bd->data);
+>>   }
+>>   
+>>   static void imx_fec_write_bd(IMXFECBufDesc *bd, dma_addr_t addr)
+>> @@ -412,6 +393,9 @@ static void imx_fec_write_bd(IMXFECBufDesc *bd, dma_addr_t addr)
+>>   static void imx_enet_read_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+>>   {
+>>       dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd));
+>> +
+>> +    trace_imx_enet_read_bd(addr, bd->flags, bd->length, bd->data,
+>> +                   bd->option, bd->status);
+>>   }
+>>   
+>>   static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+>> @@ -471,11 +455,9 @@ static void imx_fec_do_tx(IMXFECState *s)
+>>           int len;
+>>   
+>>           imx_fec_read_bd(&bd, addr);
+>> -        FEC_PRINTF("tx_bd %x flags %04x len %d data %08x\n",
+>> -                   addr, bd.flags, bd.length, bd.data);
+>>           if ((bd.flags & ENET_BD_R) == 0) {
+>>               /* Run out of descriptors to transmit.  */
+>> -            FEC_PRINTF("tx_bd ran out of descriptors to transmit\n");
+>> +            trace_imx_fec_do_tx();
+> Here this is not the normal flow but an error, please use a more
+> descriptive event name, maybe trace_imx_fec_tx_bd_busy()?
+OK, will do.
+>>               break;
+>>           }
+>>           len = bd.length;
+>> @@ -552,9 +534,6 @@ static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
+>>           int len;
+>>   
+>>           imx_enet_read_bd(&bd, addr);
+>> -        FEC_PRINTF("tx_bd %x flags %04x len %d data %08x option %04x "
+>> -                   "status %04x\n", addr, bd.flags, bd.length, bd.data,
+>> -                   bd.option, bd.status);
+>>           if ((bd.flags & ENET_BD_R) == 0) {
+>>               /* Run out of descriptors to transmit.  */
+> Maybe use it here again?
+OK, will do.
+>>               break;
+>> @@ -633,7 +612,7 @@ static void imx_eth_enable_rx(IMXFECState *s, bool flush)
+>>       s->regs[ENET_RDAR] = (bd.flags & ENET_BD_E) ? ENET_RDAR_RDAR : 0;
+>>   
+>>       if (!s->regs[ENET_RDAR]) {
+>> -        FEC_PRINTF("RX buffer full\n");
+>> +        trace_imx_eth_enable_rx();
+> Another error, rename trace_imx_eth_rx_bd_full()?
+>
+>>       } else if (flush) {
+>>           qemu_flush_queued_packets(qemu_get_queue(s->nic));
+>>       }
+>> @@ -676,7 +655,7 @@ static void imx_eth_reset(DeviceState *d)
+>>       memset(s->tx_descriptor, 0, sizeof(s->tx_descriptor));
+>>   
+>>       /* We also reset the PHY */
+>> -    phy_reset(s);
+>> +    imx_phy_reset(s);
+>>   }
+>>   
+>>   static uint32_t imx_default_read(IMXFECState *s, uint32_t index)
+>> @@ -774,8 +753,7 @@ static uint64_t imx_eth_read(void *opaque, hwaddr offset, unsigned size)
+>>           break;
+>>       }
+>>   
+>> -    FEC_PRINTF("reg[%s] => 0x%" PRIx32 "\n", imx_eth_reg_name(s, index),
+>> -                                              value);
+>> +    trace_imx_eth_read(imx_eth_reg_name(s, index), value);
+>>   
+>>       return value;
+>>   }
+>> @@ -884,8 +862,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+>>       const bool single_tx_ring = !imx_eth_is_multi_tx_ring(s);
+>>       uint32_t index = offset >> 2;
+>>   
+>> -    FEC_PRINTF("reg[%s] <= 0x%" PRIx32 "\n", imx_eth_reg_name(s, index),
+>> -                (uint32_t)value);
+>> +    trace_imx_eth_write(imx_eth_reg_name(s, index), (uint32_t)value);
+> Why not use a u64 value directly, avoiding the cast?
+Well, the registers are really 32 bits.
+>>   
+>>       switch (index) {
+>>       case ENET_EIR:
+>> @@ -940,12 +917,12 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+>>           if (extract32(value, 29, 1)) {
+>>               /* This is a read operation */
+>>               s->regs[ENET_MMFR] = deposit32(s->regs[ENET_MMFR], 0, 16,
+>> -                                           do_phy_read(s,
+>> +                                           imx_phy_read(s,
+>>                                                          extract32(value,
+>>                                                                    18, 10)));
+>>           } else {
+>>               /* This a write operation */
+>> -            do_phy_write(s, extract32(value, 18, 10), extract32(value, 0, 16));
+>> +            imx_phy_write(s, extract32(value, 18, 10), extract32(value, 0, 16));
+>>           }
+>>           /* raise the interrupt as the PHY operation is done */
+>>           s->regs[ENET_EIR] |= ENET_INT_MII;
+>> @@ -1053,8 +1030,6 @@ static bool imx_eth_can_receive(NetClientState *nc)
+>>   {
+>>       IMXFECState *s = IMX_FEC(qemu_get_nic_opaque(nc));
+>>   
+>> -    FEC_PRINTF("\n");
+>> -
+>>       return !!s->regs[ENET_RDAR];
+>>   }
+>>   
+>> @@ -1071,7 +1046,7 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+>>       unsigned int buf_len;
+>>       size_t size = len;
+>>   
+>> -    FEC_PRINTF("len %d\n", (int)size);
+>> +    trace_imx_fec_receive(size);
+>>   
+>>       if (!s->regs[ENET_RDAR]) {
+>>           qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Unexpected packet\n",
+>> @@ -1113,7 +1088,7 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+>>           bd.length = buf_len;
+>>           size -= buf_len;
+>>   
+>> -        FEC_PRINTF("rx_bd 0x%x length %d\n", addr, bd.length);
+>> +	trace_imx_fec_receive_len(addr, bd.length);
+>>   
+>>           /* The last 4 bytes are the CRC.  */
+>>           if (size < 4) {
+>> @@ -1131,7 +1106,9 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+>>           if (size == 0) {
+>>               /* Last buffer in frame.  */
+>>               bd.flags |= flags | ENET_BD_L;
+>> -            FEC_PRINTF("rx frame flags %04x\n", bd.flags);
+>> +
+>> +	    trace_imx_fec_receive_last(bd.flags);
+>> +
+>>               s->regs[ENET_EIR] |= ENET_INT_RXF;
+>>           } else {
+>>               s->regs[ENET_EIR] |= ENET_INT_RXB;
+>> @@ -1164,7 +1141,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>       size_t size = len;
+>>       bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+>>   
+>> -    FEC_PRINTF("len %d\n", (int)size);
+>> +    trace_imx_enet_receive(size);
+>>   
+>>       if (!s->regs[ENET_RDAR]) {
+>>           qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Unexpected packet\n",
+>> @@ -1210,7 +1187,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>           bd.length = buf_len;
+>>           size -= buf_len;
+>>   
+>> -        FEC_PRINTF("rx_bd 0x%x length %d\n", addr, bd.length);
+>> +	trace_imx_enet_receive_len(addr, bd.length);
+>>   
+>>           /* The last 4 bytes are the CRC.  */
+>>           if (size < 4) {
+>> @@ -1246,7 +1223,9 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>           if (size == 0) {
+>>               /* Last buffer in frame.  */
+>>               bd.flags |= flags | ENET_BD_L;
+>> -            FEC_PRINTF("rx frame flags %04x\n", bd.flags);
+>> +
+>> +	    trace_imx_enet_receive_last(bd.flags);
+>> +
+>>               /* Indicate that we've updated the last buffer descriptor. */
+>>               bd.last_buffer = ENET_BD_BDU;
+>>               if (bd.option & ENET_BD_RX_INT) {
+>> diff --git a/hw/net/trace-events b/hw/net/trace-events
+>> index e18f883cfd4..0bc74d98fec 100644
+>> --- a/hw/net/trace-events
+>> +++ b/hw/net/trace-events
+>> @@ -408,3 +408,21 @@ i82596_receive_packet(size_t sz) "len=%zu"
+>>   i82596_new_mac(const char *id_with_mac) "New MAC for: %s"
+>>   i82596_set_multicast(uint16_t count) "Added %d multicast entries"
+>>   i82596_channel_attention(void *s) "%p: Received CHANNEL ATTENTION"
+>> +
+>> +# imx_fec.c
+>> +imx_phy_read(uint32_t val, int reg) "0x%04x <= reg[%d]"
+>> +imx_phy_write(uint32_t val, int reg) "0x%04x => reg[%d]"
+>> +imx_phy_update_link(const char *s) "%s"
+>> +imx_phy_reset(void) ""
+>> +imx_fec_read_bd(uint64_t addr, int flags, int len, int data) "tx_bd %lx flags %04x len %d data %08x"
+> Please use '0x' prefix for hexadecimal formats (in various places).
+OK, will do.
+>> +imx_enet_read_bd(uint64_t addr, int flags, int len, int data, int options, int status) "tx_bd %lx flags %04x len %d data %08x option %04x status %04x"
+>> +imx_fec_do_tx(void) "tx_bd ran out of descriptors to transmit"
+>> +imx_eth_enable_rx(void) "RX buffer is full"
+>> +imx_eth_read(const char *reg, uint32_t value) "reg[%s] => 0x%08x"
+>> +imx_eth_write(const char *reg, uint32_t value) "reg[%s] <= 0x%08x"
+> Can we have the reg addr and its name traced? Maybe "reg[%d:%s] ..."
+> Feel free to disagree.
+>
+> Good cleanup otherwise, thanks!
+OK, will do.
+>> +imx_fec_receive(size_t size) "len %ld"
+>> +imx_fec_receive_len(uint64_t addr, int len) "rx_bd 0x%lx length %d"
+>> +imx_fec_receive_last(int last) "rx frame flags %04x"
+>> +imx_enet_receive(size_t size) "len %ld"
+>> +imx_enet_receive_len(uint64_t addr, int len) "rx_bd 0x%lx length %d"
+>> +imx_enet_receive_last(int last) "rx frame flags %04x"
+>>
+>
 
 
