@@ -2,80 +2,93 @@ Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FF3C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:16:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFD792077D
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:06:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFD792077D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8313120721
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:16:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGXVy3uj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8313120721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jf4wP-0002cc-0Q
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53602)
+	id 1jf55w-0007UK-MA
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:16:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jf4vV-0001pa-19
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:05:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39530)
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jf54b-0006Wq-B9
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:15:05 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:46954)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jf4vT-0007vw-Mw
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:05:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jf4vR-0002sy-MN
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 17:05:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A7FD62E8106
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 17:05:37 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 30 May 2020 16:56:25 -0000
-From: John Snow <1878255@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jf54Y-00035u-Pd
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:15:05 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id p21so1428521pgm.13
+ for <qemu-devel@nongnu.org>; Sat, 30 May 2020 10:15:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=FvO26/xgMag/yX++zMrFrB9DA7FvQUcqwhSlYfN6mb4=;
+ b=eGXVy3ujf273KK2E+tgttR5jFMydVfmNZgQwb2TSz5pCVkGzr4hWyDXDWFo5WQSr6I
+ xI2FTDJFAEaHHRXK5sKFrJiwZA3uw0AQEQZBhVi6Jg5FkqB0p25CuodyTKAAQeheggJ6
+ JL975vVMUveZeBTUeliAWhqovuG+Wo05mrtMnbsv7HNsMElHWh6Jd/zDJCpgMYkdAUZ6
+ XpjOw4aZM1l2CdqgxSTXy5lEZ0xwExp8GSjqolIs+e1c9hoDnFcHfkU28tIKGpFIL0TN
+ kR4E3/uiDw8HyfA3R/jeWJUVhBjqcIYIJFPBgPNk74fFN8L9UzmQUu0XuK5ZRcCKL34S
+ neUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=FvO26/xgMag/yX++zMrFrB9DA7FvQUcqwhSlYfN6mb4=;
+ b=FGYis9y1FlVcRJHaRDNmkvyInwALp+K1OeKLRVfL4L9kgw1K2KbM94McphrXCk70dH
+ 0wH50+jP006SXN0LRJPQrpLvI2Um22AhQ902JhVAheF8OJUwmkbQQCJKkEUaTbBiWnTZ
+ Ef56+8Bzf55lJQrxOJQzDRef1BZ9eiHh5cgk/HgUgu+s+fptt931FInRmvIqhsxOXc57
+ Qb+SxV78syiGRAC98FIhuQOwDFE+V3PcoMk5dcbjJDpvxfbwz9dBY817ez9/OoV/HuDV
+ A/huQK36WT4J1x6KL12pCRcUZwDjc5Kb2V69eqhQIvlNFKmcKR/9o49cwnGtgC83L0O7
+ yIRg==
+X-Gm-Message-State: AOAM5315HW4BjNH/kKqUIfrL3qzgoOZ+0tp528JjRFPfrNnGmBEZi2zR
+ EkJdShMLqzwT5H3BtNkBoouNSkwNZaoQxA==
+X-Google-Smtp-Source: ABdhPJxOexIOxV+kI05iLL+rMq701HB6+JqU0LhSMkgfcv9LFvsGmSnaXmNyoi9geyURCL7dq6AN8g==
+X-Received: by 2002:a63:78b:: with SMTP id 133mr13717271pgh.161.1590858899810; 
+ Sat, 30 May 2020 10:14:59 -0700 (PDT)
+Received: from localhost.localdomain
+ (tunnel570486-pt.tunnel.tserv25.sin1.ipv6.he.net. [2001:470:35:3d5::2])
+ by smtp.googlemail.com with ESMTPSA id 191sm1229731pfy.161.2020.05.30.10.14.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 30 May 2020 10:14:59 -0700 (PDT)
+From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr jnsnow philmd stefanha
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <158930780033.13046.17639068194138488918.malonedeb@wampee.canonical.com>
-Message-Id: <159085778589.4852.15502062063735758507.malone@wampee.canonical.com>
-Subject: [Bug 1878255] Re: Assertion failure in bdrv_aio_cancel, through ide
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 29923122d08387fcd35a553de7fa68b1e7926d46
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 13:05:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PATCH v6 0/4] vhost-user block device backend implementation
+Date: Sun, 31 May 2020 01:14:37 +0800
+Message-Id: <20200530171441.660814-1-coiby.xu@gmail.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pg1-x52c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,99 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878255 <1878255@bugs.launchpad.net>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Forgot to mention:
+v6
+ - add missing license header and include guard
+ - vhost-user server only serve one client one time
+ - a bug fix in custom vu_message_read
+ - using qemu-storage-daemon to start vhost-user-blk-server
+ - a bug fix to pass docker-test-clang@ubuntu
 
-4. the last write to PxSCTL is what actually causes the reset by
-clearing the DET bit that was armed.
+Coiby Xu (4):
+  Allow vu_message_read to be replaced
+  generic vhost user server
+  vhost-user block device backend server
+  new qTest case to test the vhost-user-blk-server
 
-In response to Philippe: Yes, if you had a malicious kernel or root
-access to the guest, you could emit a sequence of PIO and memory write
-operations to trip this. Even the reproducer CLI omits -accel qtest, so
-at a minimum a malicious firmware image that's guaranteed not to be
-interrupted could trigger the race condition.
+ block/Makefile.objs                        |   1 +
+ block/export/vhost-user-blk-server.c       | 715 ++++++++++++++++++++
+ block/export/vhost-user-blk-server.h       |  34 +
+ contrib/libvhost-user/libvhost-user-glib.c |   2 +-
+ contrib/libvhost-user/libvhost-user.c      |  11 +-
+ contrib/libvhost-user/libvhost-user.h      |  21 +
+ softmmu/vl.c                               |   4 +
+ tests/Makefile.include                     |   3 +-
+ tests/qtest/Makefile.include               |   2 +
+ tests/qtest/libqos/vhost-user-blk.c        | 126 ++++
+ tests/qtest/libqos/vhost-user-blk.h        |  44 ++
+ tests/qtest/libqtest.c                     |  44 +-
+ tests/qtest/libqtest.h                     |  38 ++
+ tests/qtest/vhost-user-blk-test.c          | 741 +++++++++++++++++++++
+ tests/vhost-user-bridge.c                  |   2 +
+ tools/virtiofsd/fuse_virtio.c              |   4 +-
+ util/Makefile.objs                         |   1 +
+ util/vhost-user-server.c                   | 404 +++++++++++
+ util/vhost-user-server.h                   |  59 ++
+ 19 files changed, 2216 insertions(+), 40 deletions(-)
+ create mode 100644 block/export/vhost-user-blk-server.c
+ create mode 100644 block/export/vhost-user-blk-server.h
+ create mode 100644 tests/qtest/libqos/vhost-user-blk.c
+ create mode 100644 tests/qtest/libqos/vhost-user-blk.h
+ create mode 100644 tests/qtest/vhost-user-blk-test.c
+ create mode 100644 util/vhost-user-server.c
+ create mode 100644 util/vhost-user-server.h
 
--- =
+--
+2.26.2
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878255
-
-Title:
-  Assertion failure in bdrv_aio_cancel, through ide
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an assertion failure in bdr=
-v_aio_cancel, through ide:
-
-  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
-  #2  0x0000555556a8d396 in bdrv_aio_cancel (acb=3D0x607000061290) at /home=
-/alxndr/Development/qemu/block/io.c:2746
-  #3  0x0000555556a58525 in blk_aio_cancel (acb=3D0x2) at /home/alxndr/Deve=
-lopment/qemu/block/block-backend.c:1540
-  #4  0x0000555556552f5b in ide_reset (s=3D<optimized out>) at /home/alxndr=
-/Development/qemu/hw/ide/core.c:1318
-  #5  0x0000555556552aeb in ide_bus_reset (bus=3D0x62d000017398) at /home/a=
-lxndr/Development/qemu/hw/ide/core.c:2422
-  #6  0x0000555556579ba5 in ahci_reset_port (s=3D<optimized out>, port=3D<o=
-ptimized out>) at /home/alxndr/Development/qemu/hw/ide/ahci.c:650
-  #7  0x000055555657bd8d in ahci_port_write (s=3D0x61e000014d70, port=3D0x2=
-, offset=3D<optimized out>, val=3D0x10) at /home/alxndr/Development/qemu/hw=
-/ide/ahci.c:360
-  #8  0x000055555657bd8d in ahci_mem_write (opaque=3D<optimized out>, addr=
-=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /home=
-/alxndr/Development/qemu/hw/ide/ahci.c:513
-  #9  0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
->, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:483
-  #10 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x61e000014da0, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #11 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, data=3D0x10, op=3D<optimized out>, attrs=3D...=
-) at /home/alxndr/Development/qemu/memory.c:1476
-  #12 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, =
-addr=3D0xe106c22c, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0=
-x7fffffffb8d0, l=3D<optimized out>, mr=3D0x61e000014da0) at /home/alxndr/De=
-velopment/qemu/exec.c:3137
-  #13 0x0000555555f0fb98 in flatview_write (fv=3D0x60600003b180, addr=3D<op=
-timized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at=
- /home/alxndr/Development/qemu/exec.c:3177
-
-  I can reproduce it in qemu 5.0 using:
-
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtes=
-t stdio -monitor none -serial none -M pc-q35-5.0  -nographic
-  outl 0xcf8 0x8000fa24
-  outl 0xcfc 0xe106c000
-  outl 0xcf8 0x8000fa04
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fb20
-  write 0x0 0x3 0x2780e7
-  write 0xe106c22c 0xd 0x1130c218021130c218021130c2
-  write 0xe106c218 0x15 0x110010110010110010110010110010110010110010
-  EOF
-
-  I also attached the commands to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -qtest stdio -monitor none -serial none -M pc-q35-5.0
-  -nographic < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878255/+subscriptions
 
