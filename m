@@ -2,129 +2,99 @@ Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B473EC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CED0C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72BDB20723
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:00:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8E9520723
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:03:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWaMOctW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BDB20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUUJSwat"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E9520723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jewQ5-0002Gz-Ln
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 04:00:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38438)
+	id 1jewSs-0005Cr-6x
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 04:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jewPO-0001cF-8s
- for qemu-devel@nongnu.org; Sat, 30 May 2020 03:59:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54849
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jewPM-0008H5-UU
- for qemu-devel@nongnu.org; Sat, 30 May 2020 03:59:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590825596;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uB/o9fqNrCLaZeek7URsSglCRgQFsRi2htD+jSgn7Zo=;
- b=dWaMOctWLaPvTjV2QUn7MDvBqSSgLdjBRVHriYwKwo2DN/3ypKgsRDL71bWzdi3Pzu4e8r
- B+KpK1+/nG2VHOlm4Or9jRygFjvGW+zjCEzv4377Rgtc46EEAgvyXnTtEOCYimLqtsw2/0
- b9ad5ZQ0Q1O7KmSLhKLcpr7xKtM+Iv8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-sZYxl2KoMKS1Ps9DYeVjBQ-1; Sat, 30 May 2020 03:59:54 -0400
-X-MC-Unique: sZYxl2KoMKS1Ps9DYeVjBQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 18so1698401wmu.1
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 00:59:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jewSG-0004GP-H7
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 04:02:56 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52192)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jewSD-0001Ar-Up
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 04:02:54 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u13so6019674wml.1
+ for <qemu-devel@nongnu.org>; Sat, 30 May 2020 01:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=RId/V9E10XfD9eu91CAoNJ+No5yJB8NKzqB1bY2T1yY=;
+ b=LUUJSwattsHebyPaEdGZk5SMOpRu6QSrInpeYcT8SN9SJHvgbrBIcrm5BVEMXRlCfZ
+ rSubC6gsHTGnaOJcUnQgB/7zJd1aenhVasCEjs/rbOlsgfSmSBy7wsXt9WBgpzC2cY4+
+ U+bDd163xGcVw5DDj4BL5hLtIdSzoWa5VE/jucNKgQEHPG3N3bqlyC+bRmAqrxZb8m05
+ CeBCqY2CI3L4qsklz57xs/pZtby2WJci38gg5xVjh1bQex66N2KBLp2oKI/pltYH8BU7
+ zOeB/KqmTwcj31zZTtzuh0CbtqyMjVlA3SuwOlh5COj0ghlD3oTpokTlByYVjqgklNTj
+ ZXJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=uB/o9fqNrCLaZeek7URsSglCRgQFsRi2htD+jSgn7Zo=;
- b=H4pNX/hrR9DlxaBMQ5RM8HwZONxoJn9K5mxoJoK9/iRKm1KGWPu5AQM29KB00vO6Ly
- jjnx7j6qQRXA3Q1Rn3bEf25Ar2kf4PQhUso31abc2RfI3VaEXXpNhy8jTQwC80aFb79C
- 9pivk/WO+NVOY9zH2zHvwjjOk0arAjuFdarPWGwEQHLRxukvAqrn7wFfCiX/7+fymDNe
- 2zExn7C0SHKqSIfs5tsXrFfquFBwIS7NrDJaBafEil/jugT8obXQLqxzP52+1KMK3ZrX
- lpYlI+s2QFXtmgQ8MAoxuJ3ujZRnxtAB70IrxgqpGEz8TyZf21HXA3r8FIUk5BidNi9d
- 7fIw==
-X-Gm-Message-State: AOAM533+0GCGtA1AB1Ypwc5xB7Htb3PsmKEnPY3uRyJJOLlGSWBaTuTf
- pysP7r1iwh8rScdTgOpomHKOCPyJU+RI6T+QsU7IbQo6UF8pmFzwBTZTqcRhcWZrPbiLgHxHrcJ
- D09Zcq9U4/bo09x0=
-X-Received: by 2002:adf:ce02:: with SMTP id p2mr13347257wrn.152.1590825592931; 
- Sat, 30 May 2020 00:59:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwtm4e7qMnljltirIwJmmkVjac4e2uRrvhCoTwlxQ/o4XTeMuBiaVXx3VuE36gTqS6DF25Pg==
-X-Received: by 2002:adf:ce02:: with SMTP id p2mr13347240wrn.152.1590825592664; 
- Sat, 30 May 2020 00:59:52 -0700 (PDT)
+ bh=RId/V9E10XfD9eu91CAoNJ+No5yJB8NKzqB1bY2T1yY=;
+ b=XDytysG9/N6HpLBiEtZGYD0emGCsyAa2Nm7CQn/+pz17KP7j2QNpTWBssk5ru0RZx7
+ KIE5cXMhahyJA6q8K4otXIz8n4YmI24gBqwfZC7KIXaFzJpX58gkd6WKKj0+6A5hRx9T
+ kjxUyW80bw4PJIgeIs7UFSVFYmREPardnyVBgqoKnir/PKLfZoheJ+VqBhVTXcJmdn+L
+ Xh0ESuVu56D9hdnMOT/zrasaxVLy44G3tBkYq8Q75wFkuruyDWjSLWtjDBjOC0ZRxmRZ
+ 7PPXG1v9K80bOW95St3qWLeExZuqZb02aWbugVxLRnxHkgPGw1kcI4HPfNrJfr3PCGkm
+ XkNA==
+X-Gm-Message-State: AOAM532xfvJnP6AdhScCH1m7hK2m65iXcfEJZhC6gxdPDxHj67bnteuB
+ 43rZ3lPDP7pXNxfHuq9f6Fs=
+X-Google-Smtp-Source: ABdhPJwyR0OODyG9Uyg74i7AJoODr2bVJIgBAQCPLh2tDRJFcSa8pBvO2iVWzfi28efHFcrZuPN0zA==
+X-Received: by 2002:a05:600c:2147:: with SMTP id
+ v7mr12222250wml.101.1590825772113; 
+ Sat, 30 May 2020 01:02:52 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id m129sm2620627wmf.2.2020.05.30.00.59.51
+ by smtp.gmail.com with ESMTPSA id z206sm2872848wmg.30.2020.05.30.01.02.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 30 May 2020 00:59:52 -0700 (PDT)
-Subject: Re: [PATCH v2 54/58] qdev: Make qdev_realize() support bus-less
- devices
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200529134523.8477-1-armbru@redhat.com>
- <20200529134523.8477-55-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1ef7e53a-c2b0-5c4f-8317-04c5129b4073@redhat.com>
-Date: Sat, 30 May 2020 09:59:51 +0200
+ Sat, 30 May 2020 01:02:51 -0700 (PDT)
+Subject: Re: [PATCH] tests/acceptance: Add boot tests for sh4 QEMU advent
+ calendar image
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200515164337.4899-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cf291a37-2467-4297-42af-17194889a9d6@amsat.org>
+Date: Sat, 30 May 2020 10:02:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200529134523.8477-55-armbru@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200515164337.4899-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 01:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,58 +107,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/29/20 3:45 PM, Markus Armbruster wrote:
-> So far, qdev_realize() supports only devices that plug into a bus:
-> argument @bus cannot be null.  Extend it to support bus-less devices,
-> too.
+On 5/15/20 6:43 PM, Thomas Huth wrote:
+> Now that we can select the second serial console in the acceptance tests
+> (see commit 746f244d9720 "Allow to use other serial consoles than default"),
+> we can also test the sh4 image from the QEMU advent calendar 2018.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  hw/core/qdev.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  I've split my original patch that also added yet another mips64 test...
+>  I hope it's easier to review/ack/merge this way this only addresses sh4 here.
 > 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 78a06db76e..50336168f2 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -408,7 +408,7 @@ void qdev_init_nofail(DeviceState *dev)
->  /*
->   * Realize @dev.
->   * @dev must not be plugged into a bus.
-> - * Plug @dev into @bus.  This takes a reference to @dev.
-> + * If @bus, plug @dev into @bus.  This takes a reference to @dev.
->   * If @dev has no QOM parent, make one up, taking another reference.
->   * On success, return true.
->   * On failure, store an error through @errp and return false.
-> @@ -418,9 +418,12 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
->      Error *err = NULL;
+>  .travis.yml                            |  2 +-
+>  tests/acceptance/boot_linux_console.py | 13 +++++++++++--
+>  2 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index fe708792ca..84b7f83ac4 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -291,7 +291,7 @@ jobs:
+>      - name: "GCC check-acceptance"
+>        dist: bionic
+>        env:
+> -        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+> +        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sh4-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+>          - TEST_CMD="make check-acceptance"
+>          - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-acceptance"
+>        after_script:
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index c6b06a1a13..0653c8c1bf 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -826,12 +826,12 @@ class BootLinuxConsole(Test):
+>          console_pattern = 'No filesystem could mount root'
+>          self.wait_for_console_pattern(console_pattern)
 >  
->      assert(!dev->realized && !dev->parent_bus);
-> -    assert(bus);
-
-This simpler form is easier to review IMHO:
-
-       if (!bus) {
-            assert(!DEVICE_GET_CLASS(dev)->bus_type);
-       }
-
-Whichever you prefer (the simpler the better):
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> -    def do_test_advcal_2018(self, day, tar_hash, kernel_name):
+> +    def do_test_advcal_2018(self, day, tar_hash, kernel_name, console=0):
+>          tar_url = ('https://www.qemu-advent-calendar.org'
+>                     '/2018/download/day' + day + '.tar.xz')
+>          file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
+>          archive.extract(file_path, self.workdir)
+> -        self.vm.set_console()
+> +        self.vm.set_console(console_index=console)
+>          self.vm.add_args('-kernel',
+>                           self.workdir + '/day' + day + '/' + kernel_name)
+>          self.vm.launch()
+> @@ -905,6 +905,15 @@ class BootLinuxConsole(Test):
+>          self.vm.add_args('-M', 'graphics=off')
+>          self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
 >  
-> -    qdev_set_parent_bus(dev, bus);
-> +    if (bus) {
-> +        qdev_set_parent_bus(dev, bus);
-> +    } else {
-> +        assert(!DEVICE_GET_CLASS(dev)->bus_type);
-> +    }
->  
->      object_property_set_bool(OBJECT(dev), true, "realized", &err);
->      if (err) {
+> +    def test_sh4_r2d(self):
+> +        """
+> +        :avocado: tags=arch:sh4
+> +        :avocado: tags=machine:r2d
+> +        """
+> +        tar_hash = 'fe06a4fd8ccbf2e27928d64472939d47829d4c7e'
+> +        self.vm.add_args('-append', 'console=ttySC1')
+> +        self.do_test_advcal_2018('09', tar_hash, 'zImage', console=1)
+> +
+>      def test_sparc_ss20(self):
+>          """
+>          :avocado: tags=arch:sparc
 > 
 
 
