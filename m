@@ -1,87 +1,122 @@
 Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2BDC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C8FC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:18:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2342720723
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:04:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF4782070E
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 08:18:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFOh0oUq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2342720723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mqlgJM2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF4782070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jewTk-000693-Az
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 04:04:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38884)
+	id 1jewhJ-0004lV-Rt
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 04:18:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jewSO-0004U4-PO
- for qemu-devel@nongnu.org; Sat, 30 May 2020 04:03:04 -0400
-Received: from mail-ed1-x52c.google.com ([2a00:1450:4864:20::52c]:37498)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jewSO-0001Ca-0v
- for qemu-devel@nongnu.org; Sat, 30 May 2020 04:03:04 -0400
-Received: by mail-ed1-x52c.google.com with SMTP id k8so3494992edq.4
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 01:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k8k8OBg8bqGEosRL+L+9I7oHaBOyEwB78osFf0AxB/M=;
- b=mFOh0oUqmcCl/UOA59EoIA3dd0YbnlaikAscZCtHEEbR+zIUZ/9l48EYMwRQreCaLY
- wOuUVPI2kRq5peKMG+YCvhytM8JR2X6NkW7iX80lIypfPPHGvoQHWeRfJ3kQeDGjD++e
- YJD6RWDYjxE2drhfsLfUwE7xbR4E4ueOqKiePRD7LLIrfycGo1YKs2tCJoDrmxjywgLY
- 97tsyX+1SL/azHi90nXp4xI8sfDVYNgmIkVCNIt6z6/CEa/tsm5iGiyxf1WtH7jUJZzi
- fyfKVON5Lky2rq8ht3pAGwH/EqcqnE6x0qdJGFfEKkcCj24DjTaJQNwJIDrSRnbbjUt8
- 7MMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k8k8OBg8bqGEosRL+L+9I7oHaBOyEwB78osFf0AxB/M=;
- b=YqgY5evSvkn3djSK0UPo3dZcchpjfrfeOD1CGUzxF7D1pQYNIuPu8nw+HRerHhsmU9
- SArxKltIb/VhBQtThQCKTZuGr73zd78k98CXzD3wz/zAOMkBK/uUfLavKN8FJLKwBJGR
- hS5GktLGsZN6jBEof+Um6XlM+iB++v1X5s4dEcJn9gFjtcaMtBadD0VaIwVHFbtmYLkJ
- 0wwq4fuf96oB8HlAT8A0xwVn8aiUa9RangNe23EETRT4gCNfq+UHdbH16TEAScUDw0qx
- UqoBOjEvMJge4FFRDlrMmV2O/dA76TodxT2TQXwkjYwLv+xuhHDstIX8kQPa566ddeKo
- vVSw==
-X-Gm-Message-State: AOAM5309B+BsBNrPF3iCAVddxX9bcvUPw5taF4KjYk5jFhugkI/k6GO8
- Ffe18Pw9gy29Wwgz3tpz3wZTQu5H7+w7eCMVfAnPEw==
-X-Google-Smtp-Source: ABdhPJwGkcRpvHxw+nuABA14HAq9QIx1NHm70iDZLLS5CGV7JZiXkAjBHDbFFmjBD1z2EsaoE7/eE5IglYwek48L95g=
-X-Received: by 2002:a05:6402:549:: with SMTP id
- i9mr5257665edx.159.1590825781849; 
- Sat, 30 May 2020 01:03:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jewgb-0003lW-GG; Sat, 30 May 2020 04:17:45 -0400
+Received: from mail-eopbgr10132.outbound.protection.outlook.com
+ ([40.107.1.132]:29001 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jewgY-0008Sm-On; Sat, 30 May 2020 04:17:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DDuv82R4UBFow2UWh+Pw5acSNgaXKWOk9er2k2y3+gydCoTTJkZRpFuH9hZVdCumlvglhgWJ+T1cDc80FbAJquZoJFwi4AefE9hnBHFVrPcYa+kEruemGNruFVYfRs8YwI2T9xlQRHSqt9pxZpg05+ASBmS8dZbhRPTBbazTtqCvwPSiN8WAFYfPvEqLSrR1wgx4uZSDBdj+HiVQuXO+1Z/WYP8A27ic5wL6a23HwIMB/kuBThbSx/gRlwgsMANmlLKUw5TLN/L0OnuVd+KfRKeItVkvkyy8GKUiBKyccl2w48FpqPrk8KjESV8Rz/bf10kifx4/L9/bRsywHO8KbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orIXvvjRyhmMGZbyc13KHCZytvYwH8/p/9yILsDVd0I=;
+ b=UtnXY0AOhXZS6owoW+zy0xCLkseNhbtVwba6cUeaCDlnKytZZHCnSb6FlZl3rJyoGKtLX0JVOkhZuWEX1Ge3kqzRd0z0cJGmuco0muS8qIUHrRpCSZV+nPPMrTr625uChKXLwV4fI9EJ37xrmT8hrl5yt1XIc9mSKWdkwwlqjQDUgkKvQlw8BFft6N0wrx8Pr8wkBf3wAfH79kuA/10AfIhmEKiF6DCwWyOGvaUvS3szrpehDy1xJwgJc40yRCAtxCyPMOv78w23mxCDQ8AZkVEaNZBynSmN0e2TfPQkzG5QcYw5D4zgbmuzKrt+XhEIS+9f4hTLZa6f/5ZqXB27fg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orIXvvjRyhmMGZbyc13KHCZytvYwH8/p/9yILsDVd0I=;
+ b=mqlgJM2NqK5hpApLzNT87eNX4mAu47YeySsCkrOdC9NR2g2uchCNvOw7gSB24L7hD8kMXMM8kBOG+/H+VtoFN/xYqQzOnSMEaUOW3GdnafwZF05LcB5A8aaXfbDX+jbXT6mjnD1InA7nnK371GgMZtcSKwf+yeKsQLfZv2SF4pw=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5381.eurprd08.prod.outlook.com (2603:10a6:20b:105::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.19; Sat, 30 May
+ 2020 08:17:37 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3045.022; Sat, 30 May 2020
+ 08:17:37 +0000
+Subject: Re: [PATCH] qemu-img: Fix doc typo for 'bitmap' subcommand
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200529144527.1943527-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9abea376-32e0-c483-f965-ddab9aa9cc50@virtuozzo.com>
+Date: Sat, 30 May 2020 11:17:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200529144527.1943527-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR05CA0092.eurprd05.prod.outlook.com
+ (2603:10a6:208:136::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <CAFEAcA_Lr8ySUK_PUNVB+RRQhFhEQL2wFeJtdYAxZhhT1xEFNw@mail.gmail.com>
- <CAFEAcA_qiz6fa7sGJmqcHEwX9CirqXVrbVP6XaLcxfskrb6wYg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_qiz6fa7sGJmqcHEwX9CirqXVrbVP6XaLcxfskrb6wYg@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 30 May 2020 10:02:44 +0200
-Message-ID: <CAL1e-=jThKOGtG=tJT4ponkkZRTig1ZFAwJyH0vwrqxrr4Yaew@mail.gmail.com>
-Subject: Re: 5.1 proposed schedule
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000a0707405a6d8fd46"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52c;
- envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ed1-x52c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.134) by
+ AM0PR05CA0092.eurprd05.prod.outlook.com (2603:10a6:208:136::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17 via Frontend
+ Transport; Sat, 30 May 2020 08:17:36 +0000
+X-Originating-IP: [185.215.60.134]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3b4219fa-a8d9-480e-9c0a-08d80471e9a4
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5381988FB4D49F076CDF3217C18C0@AM7PR08MB5381.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-Forefront-PRVS: 041963B986
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xoS1G6u84xmvOcqUdb0B6bW1047WMf3y+oejKqHUURjvnrnEb6gkOaWlV8qQjKEB7zabVzJ0yXDwbCODV/xcOqrU2iN8jeAlfA/dCLYQnqGNS3XvZqmK34kWr7rreo3iaV9Zy/eHGaQPNW30cylPc1tyXgxnnI0draldRJ1FYxsiuekpYDguhaFdtdgo2qYByy9mKRJ3pvNR/zQEQpYDNnOxxEUJAV7r1NOeqdR5e+7YmehC1Fw3hkaIW4U22dzOTkPcs5b3AXWDmZ7RM9fvHWl0ZyHwxbRi/dp2rbIwZ7e2qwjN4/BGFub5L+F0eJiJzMUmfLNgHlFaL7IkbKzlLi/ORfE051I2UpN8IP69/ezmwY+lnOWHNG1tuNfTbVHk
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(346002)(136003)(39840400004)(366004)(396003)(5660300002)(478600001)(36756003)(8676002)(2616005)(16526019)(66946007)(66476007)(956004)(31686004)(2906002)(26005)(16576012)(558084003)(4326008)(186003)(52116002)(316002)(8936002)(86362001)(31696002)(66556008)(6486002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: EfB2YFLQW9CnG0jo8zLIbzh1aNeLCSkcmeM+F2wImFOUDdwS/cAuxNnaToylJcJ4S/Z9zqPUjump4fbXX3bA1MaoO+iQLlQ05D7SrWaPl62NlefxFDLMw9iXBZfQAnwm0+MAQfHp0fpNTcpsVS1JP2O5E3L3yP1rv5VZBUMONHQHBFdqECzABKaR5IC2G6zGvDVjxaAMd+sVdYgaAxCQmbvhrTdVullKB7DdMy0/5z4AD23Y8JGFFiR2TY+ug66CG3fhtG9Pf9Fzt/kCD5N2Bkl6KUUPWx2PSx9LvOl6sGOECfgv5X9bFhGjw0KpE8R5eiMtwfS1n1nbHU6igX2jS9LAtQwudT7SwhIyL3S3VptjRY0DPt9OEd5cwnuDAbCB7xIn9RKTBl4So5Ea0KC+NJ8SutoTf8T6vH+KOWfPDCGxYswmRaOlNQL33BcpevIYFosJl5E4Yv+gFTrdtRFTxLqjiDTFS2gIwlFkbzgInkpB1yWMtjzP03k38KD6N00L
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b4219fa-a8d9-480e-9c0a-08d80471e9a4
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2020 08:17:37.2407 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bap6hr+LXFOaQmyHMwiF4V5ZNHtYMxw73WDaNoCtc7EV+jupr3u5fv5uygehTzrn0v8KKSTorQYOs0RtnCgmuKTOytgGrnNkCpkTizHnZEo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
+Received-SPF: pass client-ip=40.107.1.132;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 04:17:37
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,91 +130,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a0707405a6d8fd46
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+29.05.2020 17:45, Eric Blake wrote:
+> Prefer a consistent naming for the --merge argument.
+> 
+> Fixes: 3b51ab4bf
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-16:36 Pet, 29.05.2020. Peter Maydell <peter.maydell@linaro.org> =D1=98=D0=
-=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Tue, 26 May 2020 at 11:07, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-> >
-> > Here's a draft schedule for 5.1:
-> >
-> > 2019-07-06: softfreeze
->
-> this should have read 2020-07-07 (Tuesday)...
->
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-I really like "Tuesdays" concept. It worked very well for me as a
-submaintainer. I don't know its origin, but it works, bringing some degree
-of order and predictability, and at the same seemingly not imposing larger
-than necessary burden, and the end-of-week rush.
 
-Just from my gut feeling, "Mondays" or "Fridays" wouldn't work that well.
-
-Aleksandar
-
-> > 2019-07-14: hardfreeze, rc0
-> > 2019-07-21: rc1
-> > 2019-07-28: rc2
-> > 2019-08-04: rc3
-> > 2019-08-11: release, or rc4 if we need it
-> > 2019-08-18: release if we needed an rc4
->
-> ...and these are all obviously supposed to be 2020,
-> though the month/day numbers are otherwise correct.
->
-> thanks
-> -- PMM
->
-
---000000000000a0707405a6d8fd46
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">16:36 Pet, 29.05.2020. Peter Maydell &lt;<a href=3D"mailto:p=
-eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =D1=98=D0=B5 =D0=
-=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; On Tue, 26 May 2020 at 11:07, Peter Maydell &lt;<a href=3D"mailto:pete=
-r.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br>
-&gt; &gt;<br>
-&gt; &gt; Here&#39;s a draft schedule for 5.1:<br>
-&gt; &gt;<br>
-&gt; &gt; 2019-07-06: softfreeze<br>
-&gt;<br>
-&gt; this should have read 2020-07-07 (Tuesday)...<br>
-&gt;</p>
-<p dir=3D"ltr">I really like &quot;Tuesdays&quot; concept. It worked very w=
-ell for me as a submaintainer. I don&#39;t know its origin, but it works, b=
-ringing some degree of order and predictability, and at the same seemingly =
-not imposing larger than necessary burden, and the end-of-week rush.</p>
-<p dir=3D"ltr">Just from my gut feeling, &quot;Mondays&quot; or &quot;Frida=
-ys&quot; wouldn&#39;t work that well.</p>
-<p dir=3D"ltr">Aleksandar</p>
-<p dir=3D"ltr">&gt; &gt; 2019-07-14: hardfreeze, rc0<br>
-&gt; &gt; 2019-07-21: rc1<br>
-&gt; &gt; 2019-07-28: rc2<br>
-&gt; &gt; 2019-08-04: rc3<br>
-&gt; &gt; 2019-08-11: release, or rc4 if we need it<br>
-&gt; &gt; 2019-08-18: release if we needed an rc4<br>
-&gt;<br>
-&gt; ...and these are all obviously supposed to be 2020,<br>
-&gt; though the month/day numbers are otherwise correct.<br>
-&gt;<br>
-&gt; thanks<br>
-&gt; -- PMM<br>
-&gt;<br>
-</p>
-
---000000000000a0707405a6d8fd46--
+-- 
+Best regards,
+Vladimir
 
