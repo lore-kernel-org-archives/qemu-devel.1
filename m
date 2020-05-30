@@ -2,80 +2,93 @@ Return-Path: <SRS0=1N+K=7M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C654AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF05CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9760620723
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:27:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9760620723
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A1B7F206A1
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 May 2020 17:42:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGIZhSR1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1B7F206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jf5GQ-0005sJ-SB
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:27:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57438)
+	id 1jf5VC-0002SM-Sd
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 13:42:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jf5FQ-00052n-Ln
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:26:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41986)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jf5FP-0007jZ-Be
- for qemu-devel@nongnu.org; Sat, 30 May 2020 13:26:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jf5FM-0004TB-Rl
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 17:26:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A69C12E813C
- for <qemu-devel@nongnu.org>; Sat, 30 May 2020 17:26:09 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jf5UK-0001sr-7S
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:41:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29126
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jf5UI-0007D2-CI
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 13:41:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590860497;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=C8+O4jKfZw2x6/nZ3z91acMOF/azKglpza49Rye/lx0=;
+ b=jGIZhSR1G1gBSbZQzJVh3hYek9Xd5LCEuNR+SvTN11GU12XtnsozykfzL9S6rokml9GTvZ
+ piU8bFEL6s+/XPSfjXtieCPZIZx8KS3Pc68fJkJcC+N8Nq28qktByU4svfneDEe/11EPrF
+ 28DVa99q+BE/thv7rvx12iOzZhIYTUg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-lF9vksptM72L1wPVfZYQ8A-1; Sat, 30 May 2020 13:41:34 -0400
+X-MC-Unique: lF9vksptM72L1wPVfZYQ8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D293880B700;
+ Sat, 30 May 2020 17:41:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-47.ams2.redhat.com [10.36.112.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0ADF710013C1;
+ Sat, 30 May 2020 17:41:28 +0000 (UTC)
+Subject: Re: [PATCH] hw/display/cirrus_vga: Fix code mis-indentation
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200529165436.23573-1-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <17c858f1-dbd0-42b9-f2fa-22954133891a@redhat.com>
+Date: Sat, 30 May 2020 19:41:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 30 May 2020 17:17:02 -0000
-From: Alexander Bulekov <1878255@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr jnsnow philmd stefanha
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-References: <158930780033.13046.17639068194138488918.malonedeb@wampee.canonical.com>
-Message-Id: <159085902266.5613.15979501922699402941.malone@wampee.canonical.com>
-Subject: [Bug 1878255] Re: Assertion failure in bdrv_aio_cancel, through ide
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: aa1e5569f1b57dec4837934c48f2bf7879dcdef6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 13:05:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200529165436.23573-1-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 12:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,96 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878255 <1878255@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Not all of those register writes are actually important for the bug,
-so I simplified them to the fewest writes and fewest bits.
+On 29/05/2020 18.54, Philippe Mathieu-Daudé wrote:
+> While replacing fprintf() by qemu_log_mask() in commit
+> 2b55f4d3504, we incorrectly used a 'tab = 4 spaces'
+> alignment, leading to misindented new code. Fix now.
+> 
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/display/cirrus_vga.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index 92c197cdde..212d6f5e61 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -1032,9 +1032,9 @@ static void cirrus_bitblt_start(CirrusVGAState * s)
+>          } else {
+>  	    if (s->cirrus_blt_mode & CIRRUS_BLTMODE_TRANSPARENTCOMP) {
+>  		if (s->cirrus_blt_pixelwidth > 2) {
+> -            qemu_log_mask(LOG_GUEST_ERROR,
+> -                          "cirrus: src transparent without colorexpand "
+> -                          "must be 8bpp or 16bpp\n");
+> +                    qemu_log_mask(LOG_GUEST_ERROR,
+> +                                  "cirrus: src transparent without colorexpand "
+> +                                  "must be 8bpp or 16bpp\n");
+>  		    goto bitblt_ignore;
+>  		}
+>  		if (s->cirrus_blt_mode & CIRRUS_BLTMODE_BACKWARDS) {
+> 
 
-Thanks for bringing this up. I tried to trim long write commands from
-both "sides", but there can still be useless data in the middle. I'll
-work on something that can split them up so only the relevant data
-remains in the future.
+I think it would be better to fix the TABs in the whole surounding area,
+too. Or maybe even in the whole file. Otherwise this problem will happen
+soon again...
 
--- =
+ Thomas
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878255
-
-Title:
-  Assertion failure in bdrv_aio_cancel, through ide
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an assertion failure in bdr=
-v_aio_cancel, through ide:
-
-  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
-  #2  0x0000555556a8d396 in bdrv_aio_cancel (acb=3D0x607000061290) at /home=
-/alxndr/Development/qemu/block/io.c:2746
-  #3  0x0000555556a58525 in blk_aio_cancel (acb=3D0x2) at /home/alxndr/Deve=
-lopment/qemu/block/block-backend.c:1540
-  #4  0x0000555556552f5b in ide_reset (s=3D<optimized out>) at /home/alxndr=
-/Development/qemu/hw/ide/core.c:1318
-  #5  0x0000555556552aeb in ide_bus_reset (bus=3D0x62d000017398) at /home/a=
-lxndr/Development/qemu/hw/ide/core.c:2422
-  #6  0x0000555556579ba5 in ahci_reset_port (s=3D<optimized out>, port=3D<o=
-ptimized out>) at /home/alxndr/Development/qemu/hw/ide/ahci.c:650
-  #7  0x000055555657bd8d in ahci_port_write (s=3D0x61e000014d70, port=3D0x2=
-, offset=3D<optimized out>, val=3D0x10) at /home/alxndr/Development/qemu/hw=
-/ide/ahci.c:360
-  #8  0x000055555657bd8d in ahci_mem_write (opaque=3D<optimized out>, addr=
-=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /home=
-/alxndr/Development/qemu/hw/ide/ahci.c:513
-  #9  0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
->, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:483
-  #10 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x61e000014da0, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #11 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, data=3D0x10, op=3D<optimized out>, attrs=3D...=
-) at /home/alxndr/Development/qemu/memory.c:1476
-  #12 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, =
-addr=3D0xe106c22c, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0=
-x7fffffffb8d0, l=3D<optimized out>, mr=3D0x61e000014da0) at /home/alxndr/De=
-velopment/qemu/exec.c:3137
-  #13 0x0000555555f0fb98 in flatview_write (fv=3D0x60600003b180, addr=3D<op=
-timized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at=
- /home/alxndr/Development/qemu/exec.c:3177
-
-  I can reproduce it in qemu 5.0 using:
-
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtes=
-t stdio -monitor none -serial none -M pc-q35-5.0  -nographic
-  outl 0xcf8 0x8000fa24
-  outl 0xcfc 0xe106c000
-  outl 0xcf8 0x8000fa04
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fb20
-  write 0x0 0x3 0x2780e7
-  write 0xe106c22c 0xd 0x1130c218021130c218021130c2
-  write 0xe106c218 0x15 0x110010110010110010110010110010110010110010
-  EOF
-
-  I also attached the commands to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -qtest stdio -monitor none -serial none -M pc-q35-5.0
-  -nographic < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878255/+subscriptions
 
