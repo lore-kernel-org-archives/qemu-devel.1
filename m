@@ -2,127 +2,101 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA13C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 15:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D1CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 15:27:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A711B20671
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 15:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 844D6206DA
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 15:27:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dlWJQdwg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A711B20671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aNizsghi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 844D6206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfPbh-0000re-Qm
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 11:10:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46980)
+	id 1jfPsL-0005Lc-NB
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 11:27:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfPau-0000DB-NJ
- for qemu-devel@nongnu.org; Sun, 31 May 2020 11:09:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45909
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfPas-0003HO-7H
- for qemu-devel@nongnu.org; Sun, 31 May 2020 11:09:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590937785;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=2qKs0xPbBqPQwYY9jfgEEMbNuK/sXQhVPogH2Vn+iFQ=;
- b=dlWJQdwgxhuzfvXzm3bR1Ueb40TbBQjtA8YcH1F6GKrcuLk2HGFKgtIH9p+8HCZd0KMVB7
- ans+saf453i0prFbtt7bP2/gBv6sKV69QpY4BljagPfXPju4AWytUsgYALENAUsBbP2itg
- 4DshDqOj0vCc0RXSzkqL6FPkWJnFEOo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-TM1K7WCkO1W8NYzGUm00qA-1; Sun, 31 May 2020 11:09:42 -0400
-X-MC-Unique: TM1K7WCkO1W8NYzGUm00qA-1
-Received: by mail-wm1-f71.google.com with SMTP id q7so2130343wmj.9
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 08:09:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfPrd-0004v0-Q3
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 11:27:05 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36049)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfPrc-0007As-RT
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 11:27:05 -0400
+Received: by mail-wm1-x342.google.com with SMTP id d128so8957606wmc.1
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 08:27:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6N8JzG1MDH3h5xdlCs0KibX8zzucwbmcmfX6XO9nuuI=;
+ b=aNizsghiQpfYnDlLo7uRrna6TO7SVsY+X5cFCNS7WB/HT5I4D1BE1PFTgt2vvqYdwY
+ 8yy6BctkTyzRxNZoFNaawbk6Lp+yPX6rpg1t7xkI+KvaMz+Rf2E0ZTtEc9TwTWFKAHeP
+ OsiYz+4fF+pNGhhb6CR9U0OrCVTKuXuA/4WE3U9SejnXgkIh7MPW8H/p6bOwRCU89sG8
+ t3a9YEtu+jbUVLVdb7j6Fs3D3v3KKO/joHea6LieH5o6LtXLp7AyWqfDDftQzex0T/09
+ ocMu0KZkx1FKwsOqnsxZt9XKVsYyv131PW78G4WNh8CiCDsT27FLSamJobhxA8eQ0lQW
+ bgWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=2qKs0xPbBqPQwYY9jfgEEMbNuK/sXQhVPogH2Vn+iFQ=;
- b=dbIcXakECYbeqGmpjUh35EXhNJnGxQp2JhvpSWvCaHNgJvUvv/zVYeKko6eCAtqsN6
- ZpClVmN04kecjgHqIrc89iP25K7QIx/MapFmKE5UA0EjopzRU8LIkw167XN/a+zqYV+9
- egDNTtYnzvk2YV9q/XEqpZW2KPgEG5nZPlboDENu5WVEk/gDLIvvlsHZWFl/GiBcHW/5
- Cwjx+9kwAilZmOsaVUC1Uly5UUqiY656UIu4xmlVeuQ+9SO4qT3WrRGjt4rNVTKkAKGq
- I5BNXws+Ou2jM/rOKRWVwpOhfPtJvgMl429WIrAimmFW+eFzSy8F1gfuw0GFrba7ARui
- hfRw==
-X-Gm-Message-State: AOAM531Ka3C+kMQuTteddHcyklGiWsv7bO9+M5RGCnxdEmC81SlMNilj
- 1cKtNPz+AaSzcJ2Fi3vjdFF58g3Dw0j0FzG+q4cjVmiQUyV1u2fwglp40trkPu4pPzRxxFKy8B+
- 0/rDed/Q6D40WvJ4=
-X-Received: by 2002:a1c:e0c3:: with SMTP id x186mr17248550wmg.17.1590937781533; 
- Sun, 31 May 2020 08:09:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4f4ehMPmhq8yxF3liqjsXCQR8J/gXF8LjQdPdnbh0SiDCfuI0bEwyKEv4LryhPAuxQAIvlQ==
-X-Received: by 2002:a1c:e0c3:: with SMTP id x186mr17248530wmg.17.1590937781307; 
- Sun, 31 May 2020 08:09:41 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6N8JzG1MDH3h5xdlCs0KibX8zzucwbmcmfX6XO9nuuI=;
+ b=FmH9YdflPOCuJw88OeIIuW+s7yv4BQKxQixpvjf6F7Y8Jg/fHAiiUo7t9UR+lnlh5h
+ Qzl+dH9GxEgj3XH6/PM6r4ZJU603/ZHFRuSM2UYT9zyu6kCf6z7KhIoAa93CboPjpPCv
+ L6U8BYqy1cn1M13KUSjKOZrIwozeSg3gQlYzNf2w2j8OoU9FsaBX/tldFr2wXuaMHguS
+ Vl3ASTmf+C5/wSgseCe4dRMKX+iM5iUU95Mi46qw2CfxXu+K1jhbPBdxAAOSQRCXgNb6
+ Satt0W/XuDicgkiNUuaEu65p983eiq8nmcjBYgf0IYjvw3/rxjEpCkM8iG1TVxSpxV+C
+ Ngag==
+X-Gm-Message-State: AOAM533imfZvT3EJ+Lx+idNbN08cmexZ0i0zZZcN1d7a8uCJBQI7Hdd5
+ qVlyeUzacPfKRm4JIQJom3E=
+X-Google-Smtp-Source: ABdhPJxHmTM3/kFcTZSvlPo+jVnEPnrlzccYQJ2yBrW4NAf8NYe3PBVoaHmBpvzuMVStJErNNX5reQ==
+X-Received: by 2002:a1c:4c12:: with SMTP id z18mr5343291wmf.155.1590938823225; 
+ Sun, 31 May 2020 08:27:03 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id d5sm18033414wrb.14.2020.05.31.08.09.39
+ by smtp.gmail.com with ESMTPSA id w17sm15545615wra.71.2020.05.31.08.27.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 31 May 2020 08:09:40 -0700 (PDT)
-Subject: Re: [PATCH v3 00/11] Record/replay acceptance tests
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <540831cc-c5b0-cf10-6889-bab499729a53@redhat.com>
-Date: Sun, 31 May 2020 17:09:39 +0200
+ Sun, 31 May 2020 08:27:02 -0700 (PDT)
+Subject: Re: [PATCH-for-5.0] gdbstub: Use correct address space with
+ Qqemu.PhyMemMode packet
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200330153016.2959-1-f4bug@amsat.org>
+ <CAFEAcA8i1W7ss2hQjaFbVHXzqhV81M8U4Fkaj_Te5JK8JO8+mg@mail.gmail.com>
+ <f1fd3384-8653-c2e2-7248-457ae873cc27@redhat.com>
+ <CAFEAcA_BJf3k-O4j73kNaPtSHfhqmgtm9LH=nAmNj46kMjbkCA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d5ce42bc-a236-512f-dbbe-7327527419e0@amsat.org>
+Date: Sun, 31 May 2020 17:27:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <159073587336.20809.5404476664125786279.stgit@pasha-ThinkPad-X280>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA_BJf3k-O4j73kNaPtSHfhqmgtm9LH=nAmNj46kMjbkCA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 11:09:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,55 +109,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wrampazz@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru,
- crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org,
- ehabkost@redhat.com
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Jon Doron <arilou@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/29/20 9:04 AM, Pavel Dovgalyuk wrote:
-> The following series adds record/replay tests to the acceptance group.
-> Test pass successfully with the latest submitted record/replay fixes:
->  - replay: notify the main loop when there are no instructions
->  - replay: synchronize on every virtual timer callback
+On 3/30/20 6:41 PM, Peter Maydell wrote:
+> On Mon, 30 Mar 2020 at 17:21, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> On 3/30/20 6:08 PM, Peter Maydell wrote:
+>>> On Mon, 30 Mar 2020 at 16:30, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>>
+>>>> Since commit 3f940dc98, we added support for vAttach packet
+>>>> to select a particular thread/cpu/core. However when using
+>>>> the GDB physical memory mode, it is not clear which CPU
+>>>> address space is used.
+>>>> Since the CPU address space is stored in CPUState::as, use
+>>>> address_space_rw() instead of cpu_physical_memory_rw().
+>>>>
+>>>> Fixes: ab4752ec8d9
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>>   gdbstub.c | 7 ++-----
+>>>>   1 file changed, 2 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/gdbstub.c b/gdbstub.c
+>>>> index 013fb1ac0f..3baaef50e3 100644
+>>>> --- a/gdbstub.c
+>>>> +++ b/gdbstub.c
+>>>> @@ -69,11 +69,8 @@ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+>>>>
+>>>>   #ifndef CONFIG_USER_ONLY
+>>>>       if (phy_memory_mode) {
+>>>> -        if (is_write) {
+>>>> -            cpu_physical_memory_write(addr, buf, len);
+>>>> -        } else {
+>>>> -            cpu_physical_memory_read(addr, buf, len);
+>>>> -        }
+>>>> +        address_space_rw(cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+>>>> +                         buf, len, is_write);
+>>>>           return 0;
+>>>
+>>> There's an argument here for using
+>>>     int asidx = cpu_asidx_from_attrs(cpu, MEMTXATTRS_UNSPECIFIED);
+>>>     AddressSpace *as = cpu_get_address_space(cpu, asidx);
+>>>
+>>> though it will effectively boil down to the same thing in the end
+>>> as there's no way for the gdbstub to specify whether it wanted
+>>> eg the Arm secure or non-secure physical address space.
+>>
+>> https://static.docs.arm.com/ihi0074/a/debug_interface_v6_0_architecture_specification_IHI0074A.pdf
+>>
+>> * Configuration of hypervisor noninvasive debug.
+>>
+>> This field can have one of the following values:
+>>
+>> - 0b00
+>> Separate controls for hypervisor noninvasive debug are not implemented,
+>> or no hypervisor is implemented. For ARMv7 PEs that implement the
+>> Virtualization Extensions, and for ARMv8 PEs that implement EL2, if
+>> separate controls for hypervisor debug visibility are not implemented,
+>> the hypervisor debug visibility is indicated by the relevant Non-secure
+>> debug visibility fields NSNID and NSID.
+>>
+>> OK so for ARM "noninvasive debug is not implemented" and we would use
+>> the core secure address space?
 > 
-> The provided tests perform kernel boot and disk image boot scenarios.
-> For all of them recording and replaying phases are executed.
-> Tests were borrowed from existing boot_linux*.py tests. But some
-> of the platforms and images were excluded, because icount for them
-> still has some issues.
+> I'm not very familiar with the debug interface (we don't model
+> it in QEMU), but I think that is the wrong end of it. These
+> are bits in AUTHSTATUS, which is a read-only register provided
+> by the CPU to the debugger. It basically says "am I, the CPU,
+> going to permit you, the debugger, to debug code running
+> in secure mode, or in EL2". (The CPU gets to decide this:
+> for security some h/w will not want any random with access
+> to the jtag debug port to be able to just read out code from
+> the secure world, for instance.)
 > 
-> Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
+> What the debugger gets to control is bits in the CSW register
+> in the "MEM-AP"; it can use these to specify the size of
+> a memory access it wants to make to the guest, and also
+> the 'type', which is IMPDEF but typically lets the debugger
+> say "code access vs data access", "privileged vs usermode"
+> and "secure vs non-secure".
 > 
-> v3 changes:
->  - Added record/replay logging (suggested by Philippe Mathieu-Daudé)
->  - Changed the console pattern to get longer kernel execution (suggested by Alex Bennée)
->  - Coding style fixes
->  - Other minor changes
-> v2 changes:
->  - Some test structure refactoring (suggested by Willian Rampazzo)
+> The equivalent in the QEMU world is that the debugger can
+> specify the memory transaction attributes. The question is
+> whether the gdb protocol provides any equivalent of that:
+> if it doesn't then gdbstub.c has to make up an attribute and
+> use that.
 > 
-> ---
+>> Instead of MEMTXATTRS_UNSPECIFIED I should use a crafted MemTxAttrs with
+>> .secure = 1, .unspecified = 1?
 > 
-> Pavel Dovgaluk (11):
->       tests/acceptance: allow console interaction with specific VMs
->       tests/acceptance: refactor boot_linux_console test to allow code reuse
->       tests/acceptance: add base class record/replay kernel tests
->       tests/acceptance: add kernel record/replay test for x86_64
->       tests/acceptance: add record/replay test for aarch64
->       tests/acceptance: add record/replay test for arm
->       tests/acceptance: add record/replay test for ppc64
->       tests/acceptance: add record/replay test for m68k
->       tests/acceptance: record/replay tests with advcal images
->       tests/acceptance: refactor boot_linux to allow code reuse
->       tests/acceptance: Linux boot test for record/replay
+> You shouldn't set 'unspecified = 1', because that indicates
+> "this is MEMTXATTRS_UNSPECIFIED". The default set of
+> unspecified-attributes are probably good enough,
+> though, so you can just use MEMTXATTRS_UNSPECIFIED.
+> 
+>> The idea of this command is to use the
+>> CPU AS but not the MMU/MPU, maybe it doesn't make sense...
+> 
+> The trouble is that the command isn't precise enough.
+> "read/write to physical memory" is fine if the CPU has
+> exactly one physical address space, but it's ambiguous if the CPU
+> has more than one physical address space. Either we need the
+> user to be able to tell us which one they wanted somehow
+> (which for QEMU more or less means that they should tell
+> us what tx attributes they wanted), or we need to make an
+> arbitrary decision.
+> 
+> PS: do we have any documentation of this new command ?
+> ab4752ec8d9 has the implementation but no documentation...
 
-Thanks, patches 1/2/10 applied to my python-next tree:
-https://gitlab.com/philmd/qemu/commits/python-next
+Jon, do you have documentation on the Qqemu.PhyMemMode packet?
 
-- tests/acceptance: allow console interaction with specific VMs
-- tests/acceptance: refactor boot_linux_console test to allow code reuse
-- tests/acceptance: refactor boot_linux to allow code reuse
-
+> 
+> thanks
+> -- PMM
+> 
 
