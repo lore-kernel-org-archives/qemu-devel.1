@@ -2,83 +2,82 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAE1C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB4CC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 785F620707
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20BE320707
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:59:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7a8Nnpt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785F620707
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hkCOvePv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20BE320707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfMXC-0005tJ-NL
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:53:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58236)
+	id 1jfMcZ-0007K7-CO
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:59:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMWQ-0005SJ-MB
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:52:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48654
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMbX-0006pW-Cf
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:58:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37738
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMWP-0008Js-7g
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:52:58 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMbW-0001CZ-DF
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:58:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590925975;
+ s=mimecast20190719; t=1590926293;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YqJQzxlqkkuz7YybaBOHPT6RnbknrzI7aM5pUExwIbA=;
- b=U7a8NnptIrIjreQ0gqkagz4MYkW01zXZjRHIN79ZU1sVHt3MtWZ8dszNYYXNJqHctohK8Q
- vwc6J3A7xvUxAn10LmIHm/JoAx60DQHCzPvWI6a2OEJ86y+UVoujK3y9+pxpqkocmbiftP
- HM7kSWSx98DK49ae3U8YpltyL/sPyWQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-BjwpmRL3NHq6TQb7WJV-bA-1; Sun, 31 May 2020 07:52:50 -0400
-X-MC-Unique: BjwpmRL3NHq6TQb7WJV-bA-1
-Received: by mail-wm1-f71.google.com with SMTP id b65so1864076wmb.5
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 04:52:50 -0700 (PDT)
+ bh=MmmO/ihpoSKfaVfh7mlN4r/JI6hiqVN5nG0g2Ehw4So=;
+ b=hkCOvePvHlnO3mcjsde2HK+9y8W7ikAqRVTsZydq8o40d9fbcsiGCKsAwKfhN/8i7Ne4z8
+ XwSuwo8nDaGRJ4PDWfvbTMl2WZQZh5VE+bF5GzDgb64AfOvSE4e1c+/fP1CSCcRqSpsyyb
+ qHmVEfmJTYOzkQZIH2NRXXWIJvJeelQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-aWcvlMlmN1azfCD9xFtsmA-1; Sun, 31 May 2020 07:58:11 -0400
+X-MC-Unique: aWcvlMlmN1azfCD9xFtsmA-1
+Received: by mail-wm1-f72.google.com with SMTP id 18so2109491wmu.1
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 04:58:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=YqJQzxlqkkuz7YybaBOHPT6RnbknrzI7aM5pUExwIbA=;
- b=PXx13QzPArJ17vW2ANtmoMYbZQ7nVJTiNI3pawlyZGYrHFGjeJhLhzrfwyY2BhA3kP
- ofhZ1iWRFw8gNKqrHOxUxLIFJ5BEPyAvqWlgSAu8vuJiVpYnSI0ucG1c7kIRtlikwSQU
- ScgED5EoD03dMZdoInFIK86J+AkwFJYX23lrib5G9OgH/ie3Qm/PnPwtXgWQwoBMdzeW
- GLVoXpVIodyO0bmNhD1KrFz/L7TVP/tUgRFM61sjuedTlgDMxEYHjwKyN6DftGiXi9T3
- GLuePpMUWdSwetBcW16MqP69SwUl8UvRpW4bm46zFuFX2WGdVjms6mER9kRcJxDmvOX1
- rbUA==
-X-Gm-Message-State: AOAM531QHLw7lAIYm3nTARGO9mndpUYbjL8F27mXcpJZKbyMiAtfUzHY
- LTLD4cM1b9c71VFDkJzxI7hyxUtOiiyNEOHDuNktzVsEzAXsDyGN488PpJDQh9XTkV+3FEuGAfZ
- bUxNqcwUW+9G3xz4=
-X-Received: by 2002:a05:600c:22c1:: with SMTP id
- 1mr17844666wmg.50.1590925969365; 
- Sun, 31 May 2020 04:52:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzypkmAhdBi+MXl3YO1KMoQoxLFVbq+3hay2jKgnIYs5g52hBrIYUXWtmuCAE06oH//jCrqwg==
-X-Received: by 2002:a05:600c:22c1:: with SMTP id
- 1mr17844658wmg.50.1590925969149; 
- Sun, 31 May 2020 04:52:49 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MmmO/ihpoSKfaVfh7mlN4r/JI6hiqVN5nG0g2Ehw4So=;
+ b=CKxyVX6WXSnrfqbwOqQRONuLZ0CFRjqYYhRuoi3NPwFaHhq0IiGdfOAIjA2+Xvbtde
+ m2X38tFwYGV4hWD9OL7hZzpQS1YRbLQRLcIWSFA2AXgzhrri+4yrIszPiPr2hg8lWT3V
+ 7s6fNefaOJOGQTaCpb/ZXY26SnTqm9fLk/4hTCcm1+1Q54hvmcZyXXM1JowBCh2E3NRk
+ i5UOHl/sSJX2+VDa45KE725RS2tDUZvxD391wFpkBrXASXNkle+TiA6m0VuzORLkTCzJ
+ xfB1o3v3BRJLNN14M/u0d+R6acyCNJwCNeWka+FR/OAUA7sTY9TdWJ5mX3eX6unO21OU
+ kc4w==
+X-Gm-Message-State: AOAM532KAw6FZ+ztjGpGYr51/uwdHWYxlTvMYVlwkK+DqdbdOr8QKFRX
+ llNrKSezXP3b5cT6dTmcJ2SqEf2XJNzgohCG3FaMRgm6JqAI0E4h8pbDnjzGbnlSAqmVIzD1Lme
+ X/UCBF2bWp0WLEGE=
+X-Received: by 2002:a5d:4404:: with SMTP id z4mr16707839wrq.189.1590926290495; 
+ Sun, 31 May 2020 04:58:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxST56XRYh5WWj7Ino56Z0fj2MUr21C7vuYYqKb96L9T0bd+xUwmvmLBfyB2qLNxQcbEIBUGg==
+X-Received: by 2002:a5d:4404:: with SMTP id z4mr16707822wrq.189.1590926290292; 
+ Sun, 31 May 2020 04:58:10 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id b132sm7991155wmh.3.2020.05.31.04.52.47
+ by smtp.gmail.com with ESMTPSA id d13sm7540438wmb.39.2020.05.31.04.58.09
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 31 May 2020 04:52:48 -0700 (PDT)
-Subject: Re: [PATCH v8 00/12] tests/vm: Add support for aarch64 VMs
-To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
-References: <20200529203458.1038-1-robert.foley@linaro.org>
+ Sun, 31 May 2020 04:58:09 -0700 (PDT)
+Subject: Re: [PATCH] tests/acceptance/migration.py: Wait for both sides
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, alex.bennee@linaro.org, ovoshcha@redhat.com
+References: <20200528112404.121972-1-dgilbert@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,27 +102,27 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2d2b834c-ea10-befe-ebc1-92c95ef882ae@redhat.com>
-Date: Sun, 31 May 2020 13:52:47 +0200
+Message-ID: <9ad38809-ab7b-4d41-ccb7-7fad35060aeb@redhat.com>
+Date: Sun, 31 May 2020 13:58:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200529203458.1038-1-robert.foley@linaro.org>
+In-Reply-To: <20200528112404.121972-1-dgilbert@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 05:59:21
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 05:57:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,47 +136,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/29/20 10:34 PM, Robert Foley wrote:
-> This is version 8 of the patch series to
-> add support for aarch64 VMs in the vm-build infrastructure.
->  - Ubuntu 18.04 aarch64 VM
->  - CentOS 8 aarch64 VM
+On 5/28/20 1:24 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> v7: https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05286.html
+> When the source finishes migration the destination will still be
+> receiving the data sent by the source, so it might not have quite
+> finished yet, so won't quite have reached 'completed'.
+> This lead to occasional asserts in the next few checks.
 > 
-> Changes in v8:
-> - Added Ubuntu common module in tests/vm.
-> - Changed ubuntu.i386 and ubuntu.aarch64 to use new common module.
-> - Split out ConsoleSocket addition (python/qemu) to separate patch
->   from changes to use it in tests/vm.
-> - Adjustments in configure when checking for aarch64 efi images.
-> - Remove use of QEMU_LOCAL in basevm.py.  We will use the
->   presence of the --build-path argument instead.
+> After the source has finished, check the destination as well.
+> (We can't just switch to checking the destination, because it doesn't
+> give a status until it has started receiving the migration).
 > 
-> Robert Foley (12):
->   tests/vm: pass args through to BaseVM's __init__
->   tests/vm: Add configuration to basevm.py
->   tests/vm: Added configuration file support
->   tests/vm: Pass --debug through for vm-boot-ssh.
->   tests/vm: Add ability to select QEMU from current build.
->   tests/vm: allow wait_ssh() to specify command
->   tests/vm: Add common Ubuntu python module
->   tests/vm: Added a new script for ubuntu.aarch64.
->   tests/vm: Added a new script for centos.aarch64.
->   tests/vm: change scripts to use self._config
->   python/qemu: Add ConsoleSocket for optional use in QEMUMachine
->   tests/vm: Add workaround to consume console
+> Reported-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Tested-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/acceptance/migration.py | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+> index 0365289cda..792639cb69 100644
+> --- a/tests/acceptance/migration.py
+> +++ b/tests/acceptance/migration.py
+> @@ -35,6 +35,10 @@ class Migration(Test):
+>                        timeout=self.timeout,
+>                        step=0.1,
+>                        args=(src_vm,))
+> +        wait.wait_for(self.migration_finished,
+> +                      timeout=self.timeout,
+> +                      step=0.1,
+> +                      args=(dst_vm,))
+>          self.assertEqual(src_vm.command('query-migrate')['status'], 'completed')
+>          self.assertEqual(dst_vm.command('query-migrate')['status'], 'completed')
+>          self.assertEqual(dst_vm.command('query-status')['status'], 'running')
+> 
 
-Thanks, patches 4/5/6 applied to my python-next tree:
+Thanks, applied to my python-next tree:
 https://gitlab.com/philmd/qemu/commits/python-next
-
-- tests/vm: Pass --debug through for vm-boot-ssh.
-- tests/vm: Add ability to select QEMU from current build.
-- tests/vm: allow wait_ssh() to specify command
 
 
