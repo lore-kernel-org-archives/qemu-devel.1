@@ -2,114 +2,128 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0817C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F78C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 789B7206F1
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:25:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 789B7206F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
+	by mail.kernel.org (Postfix) with ESMTPS id 45EB4206F1
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:26:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvM7oomc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45EB4206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfM5Q-0007WL-P6
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:25:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55592)
+	id 1jfM72-0000JS-K4
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <glaubitz@zedat.fu-berlin.de>)
- id 1jfM4D-0006jW-Jq
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:23:50 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:55997)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <glaubitz@zedat.fu-berlin.de>)
- id 1jfM49-0001Cz-SR
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:23:48 -0400
-Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
- by outpost.zedat.fu-berlin.de (Exim 4.93) with esmtps (TLS1.2)
- tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
- (envelope-from <glaubitz@zedat.fu-berlin.de>)
- id 1jfM43-00372l-Me; Sun, 31 May 2020 13:23:39 +0200
-Received: from x4d0db28b.dyn.telefonica.de ([77.13.178.139] helo=[192.168.1.7])
- by inpost2.zedat.fu-berlin.de (Exim 4.93) with esmtpsa (TLS1.2)
- tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
- (envelope-from <glaubitz@physik.fu-berlin.de>)
- id 1jfM43-003pMS-G0; Sun, 31 May 2020 13:23:39 +0200
-Subject: Re: [PATCH] target/m68k: implement fmove.l #<data>,FPCR
-To: Laurent Vivier <laurent@vivier.eu>
-References: <20200531110231.620711-1-laurent@vivier.eu>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Autocrypt: addr=glaubitz@physik.fu-berlin.de; keydata=
- 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
- scOkTAZQGVpD/8AaLH4v1w==
-Message-ID: <96042cba-c58b-576e-b34e-e30a817234e3@physik.fu-berlin.de>
-Date: Sun, 31 May 2020 13:23:38 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfM5u-0008Em-Ij
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:25:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44146
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfM5s-0001Z0-Nj
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:25:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590924331;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=E7gb5BF9gmtl+bW+ok1h4ScDlaN3Ac+HP8rBtNhSC1A=;
+ b=fvM7oomcPc+O47w9ZI8yvIEPgRlHXUSmRMZW120ZFahlIDL9EzAXDdfyOrKyz8T8uk6uiu
+ jkJp8Y+h00apH7bpCLbiq9HyFhKbnBhXheRHFvT8V49jzV+6+6F4awy0tP+GCNyx1pCr8r
+ YZ6T/Cbjwu1ErRUvewJ7bGxLW/atrSI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-MVh5W6UINYy3tu-CeADxgw-1; Sun, 31 May 2020 07:25:29 -0400
+X-MC-Unique: MVh5W6UINYy3tu-CeADxgw-1
+Received: by mail-wm1-f71.google.com with SMTP id u15so2095933wmm.5
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 04:25:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=E7gb5BF9gmtl+bW+ok1h4ScDlaN3Ac+HP8rBtNhSC1A=;
+ b=NQuA/CPslkg03+4JeyzNJIgzKCgyKqggG1PEqt5QApOxDBHE9v5ZdUTj6pxIqmf22Z
+ DlGpE9Rdx8GOT3PNPErWMomL68GCjaNEJMnKZHcmkYVri/SKg6xh8+1Nanb+y4JjRsOS
+ sCh5A4cdKcHkYzV+u48NsZ6BiBFiXDZr9a5rhcPvi3jNm2O+b8u4Grrmsxc8/DNL5X/H
+ LJfjYhUzmTVcqoBgGi4sKJW3fqpVYrTarw6PJB0tS3t9LZ6WNRiqEbL80PEVcuUbybMZ
+ C46okIvb9rs3/iyuLH6kvdbNLEAKHdXqy9R6ufYNoHiCPnenXZN9P59arJJRJ9gcrXPF
+ OvlA==
+X-Gm-Message-State: AOAM531VrAxlYERWUsiDXSfz9ik1lPTvqJVRAxKydc/sk/QfF8tSCcgR
+ yXhuYTg7ZsBqGL768CIzPWsExnBySaLSt3nTq51LTH4fCn7DM9FjCRh5uvIeFX7SrH9MINqIET5
+ M5uVjvT21psGD+DM=
+X-Received: by 2002:a1c:44c3:: with SMTP id r186mr16721510wma.67.1590924328625; 
+ Sun, 31 May 2020 04:25:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKa3G8UVZV9rAOGezTmV8gyksfWU1YHPKiuTw5ZDvR39q5ogqlrxhHksgE/K8BiAsRRgbKKQ==
+X-Received: by 2002:a1c:44c3:: with SMTP id r186mr16721499wma.67.1590924328424; 
+ Sun, 31 May 2020 04:25:28 -0700 (PDT)
+Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.43])
+ by smtp.gmail.com with ESMTPSA id b18sm16421134wrn.88.2020.05.31.04.25.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 31 May 2020 04:25:27 -0700 (PDT)
+Subject: Re: [PATCH v8 06/12] tests/vm: allow wait_ssh() to specify command
+To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+References: <20200529203458.1038-1-robert.foley@linaro.org>
+ <20200529203458.1038-7-robert.foley@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <50496fcd-06a5-ade6-268e-d421a72d4b1e@redhat.com>
+Date: Sun, 31 May 2020 13:25:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200531110231.620711-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200529203458.1038-7-robert.foley@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Original-Sender: glaubitz@physik.fu-berlin.de
-X-Originating-IP: 77.13.178.139
-Received-SPF: pass client-ip=130.133.4.66;
- envelope-from=glaubitz@zedat.fu-berlin.de; helo=outpost1.zedat.fu-berlin.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 07:23:40
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 05:57:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,48 +136,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laurent!
-
-On 5/31/20 1:02 PM, Laurent Vivier wrote:
-> The immediate value mode was ignored and instruction execution
-> ends to an invalid access mode.
+On 5/29/20 10:34 PM, Robert Foley wrote:
+> This allows for waiting for completion of arbitrary commands.
 > 
-> This was found running 'R' that set FPSR to 0 at startup with
-> a 'fmove.l #0,FPSR' in qemu-system-m68k emulation and triggers a
-> kernel crash:
-> (...)
-> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  target/m68k/translate.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-Thanks for the fix.
+>  tests/vm/basevm.py | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 75a7ac2bd3..1aab9e3a24 100644
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -411,24 +411,24 @@ class BaseVM(object):
+>      def print_step(self, text):
+>          sys.stderr.write("### %s ...\n" % text)
+>  
+> -    def wait_ssh(self, wait_root=False, seconds=300):
+> +    def wait_ssh(self, wait_root=False, seconds=300, cmd="exit 0"):
+>          # Allow more time for VM to boot under TCG.
+>          if not kvm_available(self.arch):
+>              seconds *= self.tcg_ssh_timeout_multiplier
+>          starttime = datetime.datetime.now()
+>          endtime = starttime + datetime.timedelta(seconds=seconds)
+> -        guest_up = False
+> +        cmd_success = False
+>          while datetime.datetime.now() < endtime:
+> -            if wait_root and self.ssh_root("exit 0") == 0:
+> -                guest_up = True
+> +            if wait_root and self.ssh_root(cmd) == 0:
+> +                cmd_success = True
+>                  break
+> -            elif self.ssh("exit 0") == 0:
+> -                guest_up = True
+> +            elif self.ssh(cmd) == 0:
+> +                cmd_success = True
+>                  break
+>              seconds = (endtime - datetime.datetime.now()).total_seconds()
+>              logging.debug("%ds before timeout", seconds)
+>              time.sleep(1)
+> -        if not guest_up:
+> +        if not cmd_success:
+>              raise Exception("Timeout while waiting for guest ssh")
+>  
+>      def shutdown(self):
+> 
 
-I applied the patch, but I'm getting a lock-up now as you previously reported
-in the other discussion on the Linux/m68k mailing list:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-root@pacman:~# R
-[   68.420000] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [R:650]
-[   68.420000] Modules linked in: sg evdev mac_hid ip_tables x_tables sha1_generic hmac ipv6 nf_defrag_ipv6 autofs4 ext4 crc16 mbcache jbd2 crc32c_generic sd_mod t10_pi crc_t10dif sr_mod cdrom crct10dif_generic crct10dif_common mac_esp macsonic esp_scsi
-[   68.420000] Format 00  Vector: 0064  PC: 0002df9c  Status: 2008    Not tainted
-[   68.420000] ORIG_D0: ffffffff  D0: 00000000  A2: c02e239a  A1: ffa10000
-[   68.420000] A0: 3c9adf29  D5: 0000000d  D4: 8002ce30
-[   68.420000] D3: 8002b418  D2: 8002b4b4  D1: 00000000
-
-Is this related or a different bug?
-
-I have not seen these lockups on real hardware.
-
-Adrian
-
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
 
