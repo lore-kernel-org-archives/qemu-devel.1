@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F21C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30075C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83D062074A
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED4FA2074A
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhf4PI9v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D062074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rfa+YdU7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED4FA2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfRCc-0004XS-M0
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:52:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
+	id 1jfRD8-0005g4-68
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0m-0003fU-1C
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46318
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR03-000285-NA
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:51 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45039)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0h-00074l-MF
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:35 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR01-0006n1-LA
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590943230;
+ s=mimecast20190719; t=1590943189;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=s8Rk2ct1SwmXVJV/wHXYbsX6rV3XnYQXBZW0Chu6BIg=;
- b=fhf4PI9vs31LS+Iorxow1wFT3sP1epGkjO9aNJLC/M80DKYrIFjn/+9HdF9s4TAEH5WGtq
- 9w67YAWh3r9qKmQNBay4nCzaev6+qPmmkH4Wz2fFHdtTgyABd1drMQeUljGAh5jZphjYyL
- fuHmNQ+bEVlfS6yyuw7Ee/0IRYurVLU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-rwSre_RkM3u_yhMWRe1QpQ-1; Sun, 31 May 2020 12:40:27 -0400
-X-MC-Unique: rwSre_RkM3u_yhMWRe1QpQ-1
-Received: by mail-wr1-f71.google.com with SMTP id c14so3604197wrm.15
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:40:27 -0700 (PDT)
+ bh=T0yaQrYBR9fbxjrwWSMaG0y1Z8dADDvU+WXrcZtsKyw=;
+ b=Rfa+YdU7VgKsc6jqlmQyTVsi0IgDH1M3+PfRO+gNcBq5DY6EQ2do5O4cpjq6ux/HJpq61n
+ gi4zSm0PAa+5S4Aj7tLsQWsiOq7NBZd/YKy0QWSFY+cTkPzrzx+1z2Kw3jxzuvUs45s49z
+ ityc5Ne/f79MI/YqHU+sBW7nhXWetkk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-LdHOXZacPJW4xnd6EeiDZw-1; Sun, 31 May 2020 12:39:47 -0400
+X-MC-Unique: LdHOXZacPJW4xnd6EeiDZw-1
+Received: by mail-wm1-f71.google.com with SMTP id p24so1919297wmc.1
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:39:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=s8Rk2ct1SwmXVJV/wHXYbsX6rV3XnYQXBZW0Chu6BIg=;
- b=FAXGJek6jaDPCo0056xRg9/SufTADAbQJdcto7y+/pd1Taam6+A/JvR+TEl+nA+qQn
- TUCyfmO/WlLBHt7Q05l39Off7Y2gYIsda871n8+Z1qlsGc79obMfC3XKUvGcTBwie+eY
- xqrKtGvtpGKxGYzStKN7HjzwwBHdUVubzIAEPTPddMOmKzC+x3qEO+ZaqUAZinYfG8OA
- 3XpJEmJVv82EF2uXlm0MrD1OAOaKmuuNY1DKtRjUVRhKf35d+2xUDRcKZYKZcIlpKkUW
- 1SbawOF7nMHoGltahuCoV3L3SI+MKZCibnZfquAwQxEQzzpdzdG/mC9eLSQ1QmoUXgr0
- r7NA==
-X-Gm-Message-State: AOAM531B2GVo/bsNITlEjnH9nhKDqjMDj3MqtXfiPPpqul6M84uyO4Fr
- ctocKF7I3rhTND3+F2klr1Nz16BIkJI1zKyjvxAnkToTuoIy5YELzUB9MdGQhwo/AQhmt8Dl8dD
- nRpiEtBLXf+9KzMY=
-X-Received: by 2002:adf:fb0f:: with SMTP id c15mr19211122wrr.410.1590943226362; 
- Sun, 31 May 2020 09:40:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJze0FR0rffg96Z21CHxAOunsqXM7ThaI5OCZlRFyIOIHJ0snfCaqtZZHfecy2V9OYUxse0UKA==
-X-Received: by 2002:adf:fb0f:: with SMTP id c15mr19211104wrr.410.1590943226147; 
- Sun, 31 May 2020 09:40:26 -0700 (PDT)
+ bh=T0yaQrYBR9fbxjrwWSMaG0y1Z8dADDvU+WXrcZtsKyw=;
+ b=KWEC3wCsaPmsNBGCGq7ogBNDETZs/VbLXmI/Be2XU1YvGsBRBKIR453ohW/5UGOn/8
+ WnrIJNkRC0hOaxY23FwNeKDc8xQMhBJDLC6VmIM45R6iOdxrRxstrnMm7KOrRWVfZr4y
+ uakcAk0Yfux67wyfC51QTbRVuawQr5BeZ2S+joZFZFiN0ck7cDo0QxdAEnj00KClAQxM
+ ND3FpYZcewSNR4mcobSrdXvf6ZcM7c1ZcONoPve6D6IrcpPEF3QVotDa6aFDyepJhDSD
+ hGhTinnnloEWUb2HUZPUCUXM8674Wh7ZRP1YqmKlBnXcLxYllp0/PiUZ+PDui6vjYb4W
+ Snqg==
+X-Gm-Message-State: AOAM533Ff9WU2qKkf0NmxttpdKCZPSyB+Jkk0hhaoG2xjxZF/vE0lzS2
+ o5y0HZVtUCv+1GBWQXbcqn+zhAsgCWndNNQ+Y/m7QYLNNwHxf0CXxlmawE5Y6CHjOvelBdCCu7G
+ vQz2Apr7HeeLP4go=
+X-Received: by 2002:adf:e692:: with SMTP id r18mr17215587wrm.192.1590943186010; 
+ Sun, 31 May 2020 09:39:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwyzme/eJkzFKriVfDnwFDZTFh5KmHq5g1d6NkwyrSeOmFMs12wVIIfxqx+l/LdP8rud9JxpA==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr17215570wrm.192.1590943185775; 
+ Sun, 31 May 2020 09:39:45 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id y25sm9023876wmi.2.2020.05.31.09.40.24
+ by smtp.gmail.com with ESMTPSA id h15sm17067658wrt.73.2020.05.31.09.39.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 09:40:25 -0700 (PDT)
+ Sun, 31 May 2020 09:39:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/25] tests/vm: Add ability to select QEMU from current build
-Date: Sun, 31 May 2020 18:38:40 +0200
-Message-Id: <20200531163846.25363-20-philmd@redhat.com>
+Subject: [PULL 11/25] python/qemu: delint; add flake8 config
+Date: Sun, 31 May 2020 18:38:32 +0200
+Message-Id: <20200531163846.25363-12-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
 References: <20200531163846.25363-1-philmd@redhat.com>
@@ -87,9 +86,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 11:09:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:39:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -111,147 +110,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Robert Foley <robert.foley@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, Peter Puhov <peter.puhov@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+From: John Snow <jsnow@redhat.com>
 
-Added a new special variable QEMU_LOCAL=1, which
-will indicate to take the QEMU binary from the current
-build.
+Mostly, ignore the "no bare except" rule, because flake8 is not
+contextual and cannot determine if we re-raise. Pylint can, though, so
+always prefer pylint for that.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200529203458.1038-6-robert.foley@linaro.org>
+Message-Id: <20200528222129.23826-5-jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/vm/Makefile.include |  4 ++++
- tests/vm/basevm.py        | 28 +++++++++++++++++++++++-----
- 2 files changed, 27 insertions(+), 5 deletions(-)
+ python/qemu/.flake8    |  2 ++
+ python/qemu/accel.py   |  9 ++++++---
+ python/qemu/machine.py | 13 +++++++++----
+ python/qemu/qmp.py     |  4 ++--
+ 4 files changed, 19 insertions(+), 9 deletions(-)
+ create mode 100644 python/qemu/.flake8
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 80f7f6bdee..a253aba457 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -41,6 +41,7 @@ endif
- 	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
- 	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
- 	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
-+	@echo "    QEMU_LOCAL=1                 - Use QEMU binary local to this build."
- 	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
- 	@echo "    QEMU_IMG=/path/to/qemu-img	 - Change path to qemu-img tool"
+diff --git a/python/qemu/.flake8 b/python/qemu/.flake8
+new file mode 100644
+index 0000000000..45d8146f3f
+--- /dev/null
++++ b/python/qemu/.flake8
+@@ -0,0 +1,2 @@
++[flake8]
++extend-ignore = E722  # Pylint handles this, but smarter.
+\ No newline at end of file
+diff --git a/python/qemu/accel.py b/python/qemu/accel.py
+index 36ae85791e..7fabe62920 100644
+--- a/python/qemu/accel.py
++++ b/python/qemu/accel.py
+@@ -23,11 +23,12 @@
+ # Mapping host architecture to any additional architectures it can
+ # support which often includes its 32 bit cousin.
+ ADDITIONAL_ARCHES = {
+-    "x86_64" : "i386",
+-    "aarch64" : "armhf",
+-    "ppc64le" : "ppc64",
++    "x86_64": "i386",
++    "aarch64": "armhf",
++    "ppc64le": "ppc64",
+ }
  
-@@ -57,6 +58,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
- 		$(PYTHON) $< \
- 		$(if $(V)$(DEBUG), --debug) \
- 		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
-+		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		--image "$@" \
- 		--force \
- 		--build-image $@, \
-@@ -71,6 +73,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
- 		$(if $(DEBUG), --interactive) \
- 		$(if $(J),--jobs $(J)) \
- 		$(if $(V),--verbose) \
-+		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		--image "$<" \
- 		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
- 		--snapshot \
-@@ -92,6 +95,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
- 		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
- 		$(if $(J),--jobs $(J)) \
- 		$(if $(V)$(DEBUG), --debug) \
-+		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		--image "$<" \
- 		--interactive \
- 		false, \
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index a2d4054d72..5a3ce42281 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -61,9 +61,11 @@ class BaseVM(object):
-     # 4 is arbitrary, but greater than 2,
-     # since we found we need to wait more than twice as long.
-     tcg_ssh_timeout_multiplier = 4
--    def __init__(self, debug=False, vcpus=None, genisoimage=None):
-+    def __init__(self, debug=False, vcpus=None, genisoimage=None,
-+                 build_path=None):
-         self._guest = None
-         self._genisoimage = genisoimage
-+        self._build_path = build_path
-         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
-                                                          suffix=".tmp",
-                                                          dir="."))
-@@ -184,15 +186,15 @@ def boot(self, img, extra_args=[]):
-             "-device", "virtio-blk,drive=drive0,bootindex=0"]
-         args += self._data_args + extra_args
-         logging.debug("QEMU args: %s", " ".join(args))
--        qemu_bin = os.environ.get("QEMU", "qemu-system-" + self.arch)
--        guest = QEMUMachine(binary=qemu_bin, args=args)
-+        qemu_path = get_qemu_path(self.arch, self._build_path)
-+        guest = QEMUMachine(binary=qemu_path, args=args)
-         guest.set_machine('pc')
-         guest.set_console()
-         try:
-             guest.launch()
-         except:
-             logging.error("Failed to launch QEMU, command line:")
--            logging.error(" ".join([qemu_bin] + args))
-+            logging.error(" ".join([qemu_path] + args))
-             logging.error("Log:")
-             logging.error(guest.get_log())
-             logging.error("QEMU version >= 2.10 is required")
-@@ -391,6 +393,19 @@ def gen_cloud_init_iso(self):
- 
-         return os.path.join(cidir, "cloud-init.iso")
- 
-+def get_qemu_path(arch, build_path=None):
-+    """Fetch the path to the qemu binary."""
-+    # If QEMU environment variable set, it takes precedence
-+    if "QEMU" in os.environ:
-+        qemu_path = os.environ["QEMU"]
-+    elif build_path:
-+        qemu_path = os.path.join(build_path, arch + "-softmmu")
-+        qemu_path = os.path.join(qemu_path, "qemu-system-" + arch)
-+    else:
-+        # Default is to use system path for qemu.
-+        qemu_path = "qemu-system-" + arch
-+    return qemu_path
 +
- def parse_args(vmcls):
+ def list_accel(qemu_bin):
+     """
+     List accelerators enabled in the QEMU binary.
+@@ -47,6 +48,7 @@ def list_accel(qemu_bin):
+     # Skip the first line which is the header.
+     return [acc.strip() for acc in out.splitlines()[1:]]
  
-     def get_default_jobs():
-@@ -421,6 +436,9 @@ def get_default_jobs():
-                       help="build QEMU from source in guest")
-     parser.add_option("--build-target",
-                       help="QEMU build target", default="check")
-+    parser.add_option("--build-path", default=None,
-+                      help="Path of build directory, "\
-+                           "for using build tree QEMU binary. ")
-     parser.add_option("--interactive", "-I", action="store_true",
-                       help="Interactively run command")
-     parser.add_option("--snapshot", "-s", action="store_true",
-@@ -439,7 +457,7 @@ def main(vmcls):
-         logging.basicConfig(level=(logging.DEBUG if args.debug
-                                    else logging.WARN))
-         vm = vmcls(debug=args.debug, vcpus=args.jobs,
--                   genisoimage=args.genisoimage)
-+                   genisoimage=args.genisoimage, build_path=args.build_path)
-         if args.build_image:
-             if os.path.exists(args.image) and not args.force:
-                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
++
+ def kvm_available(target_arch=None, qemu_bin=None):
+     """
+     Check if KVM is available using the following heuristic:
+@@ -69,6 +71,7 @@ def kvm_available(target_arch=None, qemu_bin=None):
+         return False
+     return True
+ 
++
+ def tcg_available(qemu_bin):
+     """
+     Check if TCG is available.
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index 8e4ecd1837..187790ce9e 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -29,6 +29,7 @@
+ 
+ LOG = logging.getLogger(__name__)
+ 
++
+ class QEMUMachineError(Exception):
+     """
+     Exception called when an error in QEMUMachine happens.
+@@ -62,7 +63,8 @@ class QEMUMachine:
+     """
+     A QEMU VM
+ 
+-    Use this object as a context manager to ensure the QEMU process terminates::
++    Use this object as a context manager to ensure
++    the QEMU process terminates::
+ 
+         with VM(binary) as vm:
+             ...
+@@ -185,8 +187,10 @@ def send_fd_scm(self, fd=None, file_path=None):
+             fd_param.append(str(fd))
+ 
+         devnull = open(os.path.devnull, 'rb')
+-        proc = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
+-                                stderr=subprocess.STDOUT, close_fds=False)
++        proc = subprocess.Popen(
++            fd_param, stdin=devnull, stdout=subprocess.PIPE,
++            stderr=subprocess.STDOUT, close_fds=False
++        )
+         output = proc.communicate()[0]
+         if output:
+             LOG.debug(output)
+@@ -485,7 +489,8 @@ def event_wait(self, name, timeout=60.0, match=None):
+ 
+     def events_wait(self, events, timeout=60.0):
+         """
+-        events_wait waits for and returns a named event from QMP with a timeout.
++        events_wait waits for and returns a named event
++        from QMP with a timeout.
+ 
+         events: a sequence of (name, match_criteria) tuples.
+                 The match criteria are optional and may be None.
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index d6c9b2f4b1..6ae7693965 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -168,8 +168,8 @@ def accept(self, timeout=15.0):
+ 
+         @param timeout: timeout in seconds (nonnegative float number, or
+                         None). The value passed will set the behavior of the
+-                        underneath QMP socket as described in [1]. Default value
+-                        is set to 15.0.
++                        underneath QMP socket as described in [1].
++                        Default value is set to 15.0.
+         @return QMP greeting dict
+         @raise OSError on socket connection errors
+         @raise QMPConnectError if the greeting is not received
 -- 
 2.21.3
 
