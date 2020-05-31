@@ -2,50 +2,51 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA4CC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43360C433E1
 	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BF8920707
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:25:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF8920707
+	by mail.kernel.org (Postfix) with ESMTPS id 17E2020723
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:25:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E2020723
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfQmN-0005d4-1I
+	id 1jfQmN-0005fo-9K
 	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:25:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53672)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1jfQlL-0004DE-59
+ id 1jfQlL-0004DM-Jb
  for qemu-devel@nongnu.org; Sun, 31 May 2020 12:24:39 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:48254)
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:48260)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1jfQlJ-0004Jy-Uy
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:24:38 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jfQlJ-0004KS-Uh
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:24:39 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id C62DFECD35;
- Mon,  1 Jun 2020 01:24:32 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 0A2EDECD3D;
+ Mon,  1 Jun 2020 01:24:35 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id EFBC91C05D2;
- Mon,  1 Jun 2020 01:24:31 +0900 (JST)
+ by sakura.ysato.name (Postfix) with ESMTPSA id B56F71C0DB3;
+ Mon,  1 Jun 2020 01:24:34 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 00/10] Add RX hardware emulation
-Date: Mon,  1 Jun 2020 01:24:17 +0900
-Message-Id: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+Subject: [PATCH 09/10] hw/sh4: Convert to renesas_timer.c
+Date: Mon,  1 Jun 2020 01:24:26 +0900
+Message-Id: <20200531162427.57410-10-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+References: <20200531162427.57410-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: softfail client-ip=202.224.55.15;
  envelope-from=ysato@users.sourceforge.jp; helo=mail03.asahi-net.or.jp
@@ -73,79 +74,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello.
+Using unified TMU/CMT module.
 
-This series add to hardware emulation module for RX target.
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ include/hw/sh4/sh.h    | 10 ---------
+ hw/sh4/sh7750.c        | 47 +++++++++++++++++++++++++++++++++---------
+ hw/sh4/Kconfig         |  2 +-
+ hw/timer/Makefile.objs |  1 -
+ 4 files changed, 38 insertions(+), 22 deletions(-)
 
-Details below.
-Interrupt controller, 8bit timer, 16bit comapare match timer and
-SCI is RX62N integrated peripheral.
-rx-virt - RX62N MCU and external RAM. It like gdb simulator.
-
-The compare match timer has a CPU interface similar to the SH4 timer.
-sh_timer will be deprecated and integrated into this module.
-SCI is also implemented in sh_serial, but the functionality is omitted.
-I implemented the complete one as renesas_sci.
-
-git repository here.
-git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/hw-rx-20200601
-
-Yoshinori Sato (10):
-  hw/intc: RX62N interrupt controller (ICUa)
-  hw/timer: Renesas 8bit timer module.
-  hw/timer: Renesas TMU/CMT module.
-  hw/char: Renesas SCI module.
-  hw/rx: RX MCU and target
-  Add rx-softmmu
-  hw/sh4: Convert renesas_sci.
-  hw/char: remove sh_serial.c
-  hw/sh4: Convert to renesas_timer.c
-  hw/timer: remove sh_timer.c
-
- default-configs/rx-softmmu.mak    |   1 +
- include/hw/char/renesas_sci.h     |  77 +++
- include/hw/intc/rx_icu.h          |  56 +++
- include/hw/rx/rx.h                |   7 +
- include/hw/rx/rx62n.h             |  91 ++++
- include/hw/sh4/sh.h               |  21 -
- include/hw/timer/renesas_8timer.h |  61 +++
- include/hw/timer/renesas_timer.h  |  59 +++
- hw/char/renesas_sci.c             | 786 ++++++++++++++++++++++++++++++
- hw/char/sh_serial.c               | 431 ----------------
- hw/intc/rx_icu.c                  | 379 ++++++++++++++
- hw/rx/rx-virt.c                   | 143 ++++++
- hw/rx/rx62n.c                     | 240 +++++++++
- hw/sh4/sh7750.c                   |  78 ++-
- hw/timer/renesas_8timer.c         | 466 ++++++++++++++++++
- hw/timer/renesas_timer.c          | 421 ++++++++++++++++
- hw/timer/sh_timer.c               | 341 -------------
- hw/Kconfig                        |   1 +
- hw/char/Kconfig                   |   3 +
- hw/char/Makefile.objs             |   3 +-
- hw/intc/Makefile.objs             |   1 +
- hw/rx/Kconfig                     |  13 +
- hw/rx/Makefile.objs               |   2 +
- hw/sh4/Kconfig                    |   3 +-
- hw/timer/Kconfig                  |   6 +
- hw/timer/Makefile.objs            |   4 +-
- 26 files changed, 2891 insertions(+), 803 deletions(-)
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 include/hw/intc/rx_icu.h
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
- create mode 100644 include/hw/timer/renesas_8timer.h
- create mode 100644 include/hw/timer/renesas_timer.h
- create mode 100644 hw/char/renesas_sci.c
- delete mode 100644 hw/char/sh_serial.c
- create mode 100644 hw/intc/rx_icu.c
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 hw/timer/renesas_8timer.c
- create mode 100644 hw/timer/renesas_timer.c
- delete mode 100644 hw/timer/sh_timer.c
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
-
+diff --git a/include/hw/sh4/sh.h b/include/hw/sh4/sh.h
+index e184b4b300..248cc052e1 100644
+--- a/include/hw/sh4/sh.h
++++ b/include/hw/sh4/sh.h
+@@ -28,16 +28,6 @@ typedef struct {
+ 
+ int sh7750_register_io_device(struct SH7750State *s,
+ 			      sh7750_io_device * device);
+-/* sh_timer.c */
+-#define TMU012_FEAT_TOCR   (1 << 0)
+-#define TMU012_FEAT_3CHAN  (1 << 1)
+-#define TMU012_FEAT_EXTCLK (1 << 2)
+-void tmu012_init(struct MemoryRegion *sysmem, hwaddr base,
+-                 int feat, uint32_t freq,
+-		 qemu_irq ch0_irq, qemu_irq ch1_irq,
+-		 qemu_irq ch2_irq0, qemu_irq ch2_irq1);
+-
+-
+ /* sh7750.c */
+ qemu_irq sh7750_irl(struct SH7750State *s);
+ 
+diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
+index 150d3029f7..733c4009e1 100644
+--- a/hw/sh4/sh7750.c
++++ b/hw/sh4/sh7750.c
+@@ -32,6 +32,7 @@
+ #include "sh7750_regnames.h"
+ #include "hw/sh4/sh_intc.h"
+ #include "hw/char/renesas_sci.h"
++#include "hw/timer/renesas_timer.h"
+ #include "hw/qdev-properties.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+@@ -756,13 +757,13 @@ static const MemoryRegionOps sh7750_mmct_ops = {
+ };
+ 
+ static void sh_serial_init(SH7750State *s, MemoryRegion *sysmem,
+-                    hwaddr base, int feat,
+-                    uint32_t freq, Chardev *chr,
+-                    qemu_irq eri_source,
+-                    qemu_irq rxi_source,
+-                    qemu_irq txi_source,
+-                    qemu_irq tei_source,
+-                    qemu_irq bri_source)
++                           hwaddr base, int feat,
++                           uint32_t freq, Chardev *chr,
++                           qemu_irq eri_source,
++                           qemu_irq rxi_source,
++                           qemu_irq txi_source,
++                           qemu_irq tei_source,
++                           qemu_irq bri_source)
+ {
+     DeviceState *dev;
+     SysBusDevice *sci;
+@@ -789,6 +790,31 @@ static void sh_serial_init(SH7750State *s, MemoryRegion *sysmem,
+     }
+ }
+ 
++static void tmu012_init(SH7750State *s, MemoryRegion *sysmem, hwaddr base,
++                        int feat, uint32_t freq,
++                        qemu_irq ch0_irq, qemu_irq ch1_irq,
++                        qemu_irq ch2_irq0, qemu_irq ch2_irq1)
++{
++    DeviceState *dev;
++    SysBusDevice *tmu;
++
++    dev = qdev_create(NULL, TYPE_RENESAS_TIMER);
++
++    tmu = SYS_BUS_DEVICE(dev);
++
++    qdev_prop_set_uint64(dev, "input-freq", freq);
++    qdev_prop_set_int32(dev, "feature", feat);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(tmu, 0, base);
++    sysbus_mmio_map(tmu, 1, P4ADDR(base));
++    sysbus_mmio_map(tmu, 2, A7ADDR(base));
++    sysbus_connect_irq(tmu, 0, ch0_irq);
++    sysbus_connect_irq(tmu, 1, ch1_irq);
++    if (ch2_irq0) {
++        sysbus_connect_irq(tmu, 2, ch2_irq0);
++    }
++}
++
+ SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem)
+ {
+     SH7750State *s;
+@@ -853,8 +879,8 @@ SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem)
+                    NULL,
+                    s->intc.irqs[SCIF_BRI]);
+ 
+-    tmu012_init(sysmem, 0x1fd80000,
+-		TMU012_FEAT_TOCR | TMU012_FEAT_3CHAN | TMU012_FEAT_EXTCLK,
++    tmu012_init(s, sysmem, 0x1fd80000,
++                RTIMER_FEAT_TMU_LOW,
+ 		s->periph_freq,
+ 		s->intc.irqs[TMU0],
+ 		s->intc.irqs[TMU1],
+@@ -877,7 +903,8 @@ SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem)
+         sh_intc_register_sources(&s->intc,
+ 				 _INTC_ARRAY(vectors_tmu34),
+ 				 NULL, 0);
+-        tmu012_init(sysmem, 0x1e100000, 0, s->periph_freq,
++        tmu012_init(s, sysmem, 0x1e100000,
++                    RTIMER_FEAT_TMU_HIGH, s->periph_freq,
+ 		    s->intc.irqs[TMU3],
+ 		    s->intc.irqs[TMU4],
+ 		    NULL, NULL);
+diff --git a/hw/sh4/Kconfig b/hw/sh4/Kconfig
+index 38509b7e65..ac21830bb5 100644
+--- a/hw/sh4/Kconfig
++++ b/hw/sh4/Kconfig
+@@ -21,5 +21,5 @@ config SH7750
+ 
+ config SH4
+     bool
+-    select PTIMER
++    select RENESAS_TIMER
+     select RENESAS_SCI
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 289b6b03ab..f3918836e4 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -22,7 +22,6 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
+ common-obj-$(CONFIG_OMAP) += omap_gptimer.o
+ common-obj-$(CONFIG_OMAP) += omap_synctimer.o
+ common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
+-common-obj-$(CONFIG_SH4) += sh_timer.o
+ common-obj-$(CONFIG_DIGIC) += digic-timer.o
+ common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
+ 
 -- 
 2.20.1
 
