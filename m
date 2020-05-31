@@ -2,102 +2,98 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7210DC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FCF5C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C172074A
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:56:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9DDA2074A
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:56:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DL30hmNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C172074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtTIbCsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9DDA2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfRFz-00026J-Ez
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:56:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55482)
+	id 1jfRGP-00030G-7e
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:56:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0x-0003rK-AS
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42147
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0v-0007Ak-97
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590943244;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KEU6cF8wx9dT9DR4quAwHsy5LYVVtSbv+hQRMIt0K90=;
- b=DL30hmNnw+DbtkdxO6YB852G4ah6lBOdXFixbJOGeV+dU4lh0JU5gVPKnLPossdoqqxFFF
- 5z3poLvfMgqYDWMc16XDYCMpZzX/nsZXpkpL7z7A9v+A7V2CkxEZY6vqY9Vo9RXhRsP217
- EVsRB01qU77PeWbwYh85AN2I9k48Kjg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-a-x1-tnYOCOSz5yLSATC-Q-1; Sun, 31 May 2020 12:40:43 -0400
-X-MC-Unique: a-x1-tnYOCOSz5yLSATC-Q-1
-Received: by mail-wr1-f69.google.com with SMTP id j16so3579728wre.22
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:40:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfR5q-0003cW-UM
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:45:50 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41334)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfR5q-0001Lk-3S
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:45:50 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j10so9065981wrw.8
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=rcRt5hRKYsOCngwFksCi7aIsGDFquSF0YGSBXyIu96E=;
+ b=XtTIbCsEugHvb4M5iVBxMjvBH5J6lD2lJOhs0nyDpgqOQ/ISz5vFEWbKoM+ALdxWV2
+ x7DCGUYIujlA4vUHcpiTz+3e4rJbjzt03BMXLNJjdTmjbC3J/73HPw5Q6/EeaeorTraf
+ TGLOke4ZHMQ9t0S0ANhmGi9Gw7bPrQV6XgAkDNcP+jOIxZhLh6m58ReiPmHWQnOMkx/9
+ +kcfu9jrDq0nbJVvIxEDdx4uRLRmmo5zeWEFGMBslVPHPyH6ukm1NRoUy4Ifo0InR1tv
+ hR6PnYcr+uXrlKoJugJmKK2RXJQznTm4Hl1uAK1OfueA6zel8DyAFPl7GaDBNw7wy9qo
+ 47Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KEU6cF8wx9dT9DR4quAwHsy5LYVVtSbv+hQRMIt0K90=;
- b=V7RJhqmFmszGEcoFUFlyQ7XaxM09gnFGok99AqQaSbsfZ3kp6IDObbN7TAVCxiKsMO
- vKagEp3EtsEjX2juRJSnTUtGzB1sSTiH1Yb2DnnkmhTKtkTRYndQ/oNWZu5r7sex1Gbf
- e/KIyHdNGH8cpFnb2d/liKb3AhBikgJSSsfKrK8g7W81xeeXohq9XhnqmXHVW1ZcutgB
- 1GmjBOQRwjYaZcf8nPr5pG3n/CG8VHv6wGu9C4Ru8sCDUtscgoI7BGUTCUwac90j2AIF
- iXcoOxe+ZjExkeUG1MTi+KtA0gGf+zyhyXtgEfxRf1P4JFBmfjDMQ+DE9mrWuCeUcFcF
- 304Q==
-X-Gm-Message-State: AOAM531Q4wzMRcVNzMo0g/XFqZQZXEKbuHGl3MzdRoh0rmc5gmwZ0x7Q
- 2eztNF++yR+q/xcsZ/Sy19qkIvZzzSP/eDCxG1/GaewGgqk9jiKEVYzJGSmlLEszYtZbIPwnLFX
- JIpi5QxYM4WIgqfo=
-X-Received: by 2002:adf:8041:: with SMTP id 59mr17259541wrk.278.1590943241715; 
- Sun, 31 May 2020 09:40:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzImNvZeAhhQ1GMFMgecKFJ9XA4/OBogYQBVHGi7VCZ3PzFb8gTmqybziOivHHumywOwku1CA==
-X-Received: by 2002:adf:8041:: with SMTP id 59mr17259527wrk.278.1590943241554; 
- Sun, 31 May 2020 09:40:41 -0700 (PDT)
-Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rcRt5hRKYsOCngwFksCi7aIsGDFquSF0YGSBXyIu96E=;
+ b=mMKtnDXhbMsvZSS/xQ7uqj/3ZCJXaaeRrYSKByXaYFUqTHLrr2DkqgNz8ywLb9mNJK
+ UE7QHIjpOSH6/xuHjHRnX2EwOTlEEfB7xC9ugNwAIzFGmoH2f3LwHuqid7ATMz41IX3V
+ TB5TyUmRvEW65EfKuiCHi+Rpfpcl9zP4GXS3KEjzMD6o8I4tdz7dwitPT8tU0Y1076op
+ DAz0M6VENObOjMl6tWGzBaYHs2VPmasZ5LqVjl2oUQFASCwvJYuofQPO39K0IAXsoUiP
+ mN+UvtWhbRmNieggNUVhaXNmqaD/9LoRiImYrrvHo+S5qdvtyTqPD1OR+tStXVgjP8Pf
+ N51Q==
+X-Gm-Message-State: AOAM532LDyZViP6m84h5//92WKd4MuQXt57DKONb8T7odrMLOB1aC5W4
+ OM4on2gL+oDOCN5eyTvpH6AorkSI
+X-Google-Smtp-Source: ABdhPJypbDyrB4limgqD157g8NGrz9XvGMgcXFYdiC2UQkRKPj65XffaiXF8V8s5o6veTfbL5JvBbw==
+X-Received: by 2002:a05:6000:12c8:: with SMTP id
+ l8mr18641744wrx.148.1590943548190; 
+ Sun, 31 May 2020 09:45:48 -0700 (PDT)
+Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id z25sm8585383wmf.10.2020.05.31.09.40.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 09:40:41 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 22/25] tests/acceptance/migration.py: Wait for both sides
-Date: Sun, 31 May 2020 18:38:43 +0200
-Message-Id: <20200531163846.25363-23-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
-References: <20200531163846.25363-1-philmd@redhat.com>
+ by smtp.gmail.com with ESMTPSA id m24sm8788098wmi.14.2020.05.31.09.45.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 31 May 2020 09:45:47 -0700 (PDT)
+Subject: Re: [PATCH 00/10] Add RX hardware emulation
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d7fc8b59-5a22-8383-b939-1cc73f8c2e66@amsat.org>
+Date: Sun, 31 May 2020 18:45:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:38:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,56 +106,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 5/31/20 6:24 PM, Yoshinori Sato wrote:
+> Hello.
+> 
+> This series add to hardware emulation module for RX target.
+> 
+> Details below.
+> Interrupt controller, 8bit timer, 16bit comapare match timer and
+> SCI is RX62N integrated peripheral.
+> rx-virt - RX62N MCU and external RAM. It like gdb simulator.
+> 
+> The compare match timer has a CPU interface similar to the SH4 timer.
+> sh_timer will be deprecated and integrated into this module.
+> SCI is also implemented in sh_serial, but the functionality is omitted.
+> I implemented the complete one as renesas_sci.
+> 
+> git repository here.
+> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/hw-rx-20200601
 
-When the source finishes migration the destination will still be
-receiving the data sent by the source, so it might not have quite
-finished yet, so won't quite have reached 'completed'.
-This lead to occasional asserts in the next few checks.
+Sigh. It is a bit unfortunate and demotivating that we can not
+coordinate this. I was going to send a pre-merge for this today.
 
-After the source has finished, check the destination as well.
-(We can't just switch to checking the destination, because it doesn't
-give a status until it has started receiving the migration).
+What is positive is you unified some SH4/RX peripherals.
 
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200528112404.121972-1-dgilbert@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- tests/acceptance/migration.py | 4 ++++
- 1 file changed, 4 insertions(+)
+I'll try to merge both series. If it takes too long, I might send my
+current queue for you to review, then go back to this one you just sent.
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
-index 0365289cda..792639cb69 100644
---- a/tests/acceptance/migration.py
-+++ b/tests/acceptance/migration.py
-@@ -35,6 +35,10 @@ def assert_migration(self, src_vm, dst_vm):
-                       timeout=self.timeout,
-                       step=0.1,
-                       args=(src_vm,))
-+        wait.wait_for(self.migration_finished,
-+                      timeout=self.timeout,
-+                      step=0.1,
-+                      args=(dst_vm,))
-         self.assertEqual(src_vm.command('query-migrate')['status'], 'completed')
-         self.assertEqual(dst_vm.command('query-migrate')['status'], 'completed')
-         self.assertEqual(dst_vm.command('query-status')['status'], 'running')
--- 
-2.21.3
+Regards,
 
+Phil.
 
