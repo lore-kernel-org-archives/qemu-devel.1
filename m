@@ -2,80 +2,76 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B74C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAA3C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:44:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D436206A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:42:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBC7E206A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f15L8bkQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D436206A1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WskSRgSo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBC7E206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfTr0-0000ic-BI
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 15:42:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46424)
+	id 1jfTsb-0001r1-2S
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 15:44:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jfTqF-00008y-0V
- for qemu-devel@nongnu.org; Sun, 31 May 2020 15:41:55 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43041)
+ id 1jfTrk-0001Dz-TJ
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 15:43:28 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34184)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jfTqA-0004uq-Gk
- for qemu-devel@nongnu.org; Sun, 31 May 2020 15:41:51 -0400
-Received: by mail-oi1-x243.google.com with SMTP id i22so7237759oik.10
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 12:41:49 -0700 (PDT)
+ id 1jfTrj-0005Xu-Rq
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 15:43:28 -0400
+Received: by mail-ot1-x343.google.com with SMTP id b18so6295741oti.1
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 12:43:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=zZkAfHXymnO3BXYgTxxC7cdbgIt0XWHaxePpN/N3NYw=;
- b=f15L8bkQjtQ3FzGw6fFCB3pGeOsMFHUJ5xQU5NoYAFBXlqemt98hl8YY672OTPUH5u
- xgLTRA4lydyKBEZol1G/E4B5lr/Zt0vFFPCJpZWfqLqpv+h0oSb/SHBW3cCC7pwvFW0C
- bRFOr5/kwmPdGH81r/iCz5Yb/foX+Zd6iqpZHvHe5+2gqQAj4A8wWqamEaiRoP/JvTLO
- 6vUOTN1ISfxXYblYCD4sK91y4jzzeIKXKl+9uNN1reA6V8MvdcsHFtizaybmnqtFWqU5
- I7EkC42p5hyVnsfkTMxDi/f44GP+Fyos2RM6kqfURndJRlQdJ1pW0KuTsvsLH+0vlMlo
- FY2g==
+ :cc; bh=x+y3DLpMJNh4pXLmnD12TABCn5pXlI+Hr6tlZBko3sU=;
+ b=WskSRgSoQT/z+On2pSMAE5RnK+Kf2p1q4hSJXPaWBZPWNgrNmkqR13LyIQUbcIgBKU
+ lQfZiwylfY9cucgbKI3MkYoP3CKSmtlJyfh2zr5RV+0txwtEoqV4eXiji3BAAZyBxXuq
+ 6/Isw7GqXbwHqDBk71IPgI0nA02npfQF3t38wSIGXKIRYi9BpRoDAV4qLoQrjZYZ3Rcl
+ XQAf12+ooyVMBnV9GzXn2DPRP+eF0ZfSonbzlAnIHDXwR74P/HSlUwtxWjw5/CykQVA5
+ E4MLymxW6G1fFHZLZbNsAcRDUEa7ZQ4mAQjB1w2PVukN6QNaK2Hia6/mdPZnUUcI2maw
+ RpSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=zZkAfHXymnO3BXYgTxxC7cdbgIt0XWHaxePpN/N3NYw=;
- b=GofMFVgwxljNadBKfokwe1kvHRdoDKOIeznCphZTDTMDwEBjkeuySFiPjUluxNQduU
- g+mgHu6azSRJD8X/O0RLuUSdPyeOK8sGd1aSmnIOVWZrF9EraHoACPVu/yMo4JQQryju
- 6oiPIaqdr1+p226P8x1aQriwyFFPjxUOA3VUIGXb2M7OO2GdpARSPTo8bQ5vQ/IWwpN1
- V61CO+y62d9fHehFk+STwv6EpL6uMh/UgqLqGAaF1V1MLzx/eeF04N4YinIXkVdKphY0
- jEk75nFC8g8mwvhzc5sZMCEVG3Q+nv8ZxGUxh5rPt4LLR4gxaJZ+C2JFyZS/AV5U8U6T
- gFsw==
-X-Gm-Message-State: AOAM533uPWVEbxMMlRVQY7DjK7QQ5u/aVdmSZuTAU9TDkLKFRX30lmWO
- at76c/5wuZAYg/zpaBMrKFIW1PH47zhRGxNXbEuxYQ==
-X-Google-Smtp-Source: ABdhPJwx/Fp22ckvm8yonutVfHujugI28A8908acZg8+fqReC23eXHSgFnsiuuoQdRFG5xBHa+Lbx5PC2hNUSqGTiIg=
-X-Received: by 2002:aca:5451:: with SMTP id i78mr7126844oib.48.1590954109071; 
- Sun, 31 May 2020 12:41:49 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=x+y3DLpMJNh4pXLmnD12TABCn5pXlI+Hr6tlZBko3sU=;
+ b=flghBx/SWGLSyCUv7SB97Dkup1o+A3h+48PaZDpcAJHXTVZZbzN7aSjzAqEvbQn52T
+ eSLPk4JOA06YrZL0xrYaUJhRHVk2ZwCMGbZVtV36MExGm5HvNHAmG4HArbN1+36gsKgQ
+ nJAfKMgUR8PQSQRHw4foaVwEAvukzeR9Lt6yN/ElMENOmfeUt5F4dLSRlDvp/KU9t5s8
+ GOglofUw49RIHJyIiZDTjViO5EX2PeQGU3rZw2ce6MQLHQ0RI9liNheW8wJtGjfXHCKS
+ 9NArKhL73GTpI/45Qpf11xCF2Q5oY2BuWKsLycdCqdOg2iSpVId1Te8ToOiFVfMz5Bc4
+ w0kQ==
+X-Gm-Message-State: AOAM5306TsakfWBOa1nsmblWh1zpvWEmvqizq7XkIAKrtOLYWUJIuFsa
+ CpvnqSxGthTipdweJMKef76NR84zkU/LPdjFsS+B3Q==
+X-Google-Smtp-Source: ABdhPJyCFBh75DW3ozvS0vwCt8J8R8QlRo7lOwNxWcnUP7FagVy8oeAcS8SdZ6mtpBV/981D1H/ik6m4Wiepc4zMC8c=
+X-Received: by 2002:a9d:b82:: with SMTP id 2mr13436625oth.221.1590954206459;
+ Sun, 31 May 2020 12:43:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200531175425.10329-1-f4bug@amsat.org>
- <20200531175425.10329-5-f4bug@amsat.org>
-In-Reply-To: <20200531175425.10329-5-f4bug@amsat.org>
+References: <20200528181849.1823820-1-eblake@redhat.com>
+In-Reply-To: <20200528181849.1823820-1-eblake@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 31 May 2020 20:41:38 +0100
-Message-ID: <CAFEAcA9bDjiQnr7bw8QiixGtFmFszN6RuN3D-jNEL8mNmk987Q@mail.gmail.com>
-Subject: Re: [PATCH 4/6] exec/cpu-common: Do not restrict CPU to 32-bit memory
- access maximum
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sun, 31 May 2020 20:43:15 +0100
+Message-ID: <CAFEAcA-PwUiy5Fxu2YzXprzVC4U8c2bGSDfds=3iKU62yJ3d0A@mail.gmail.com>
+Subject: Re: [PULL v3 00/11] bitmaps patches for 2020-05-26
+To: Eric Blake <eblake@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,83 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 31 May 2020 at 18:54, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
+On Thu, 28 May 2020 at 19:19, Eric Blake <eblake@redhat.com> wrote:
 >
-> Most CPUs can do 64-bit operations. Update the CPUReadMemoryFunc
-> and CPUWriteMemoryFunc prototypes.
+> The following changes since commit a20ab81d22300cca80325c284f21eefee99aa740:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  include/exec/cpu-common.h |  4 ++--
->  hw/usb/hcd-musb.c         | 12 ++++++------
->  2 files changed, 8 insertions(+), 8 deletions(-)
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-05-28' into staging (2020-05-28 16:18:06 +0100)
 >
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index b47e5630e7..5ac766e3b6 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -43,8 +43,8 @@ extern ram_addr_t ram_size;
+> are available in the Git repository at:
 >
->  /* memory API */
+>   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-05-26-v3
 >
-> -typedef void CPUWriteMemoryFunc(void *opaque, hwaddr addr, uint32_t valu=
-e);
-> -typedef uint32_t CPUReadMemoryFunc(void *opaque, hwaddr addr);
-> +typedef void CPUWriteMemoryFunc(void *opaque, hwaddr addr, uint64_t valu=
-e);
-> +typedef uint64_t CPUReadMemoryFunc(void *opaque, hwaddr addr);
+> for you to fetch changes up to cf2d1203dcfc2bf964453d83a2302231ce77f2dc:
+>
+>   iotests: Add test 291 to for qemu-img bitmap coverage (2020-05-28 13:16:30 -0500)
+>
+> v3: port sed expression to BSD sed
+> v2: fix iotest 190 to not be as sensitive to different sparseness of
+> qcow2 file on various filesystems, such as FreeBSD (sending only the
+> changed patch)
+>
+> ----------------------------------------------------------------
+> bitmaps patches for 2020-05-26
+>
+> - fix non-blockdev migration of bitmaps when mirror job is in use
+> - add bitmap sizing to 'qemu-img measure'
+> - add 'qemu-img convert --bitmaps'
+>
 
-I don't think the type of these functions has anything to do with the
-CPU's capabilities, does it? The typedefs are a legacy remnant from before
-the conversion to MemoryRegions:
- * before MemoryRegions, devices provided separate functions for
-   byte/word/long reads and writes (64-bit writes were simply
-   impossible with the ancient APIs, which required a 3-element
-   function pointer array for read and the same for write)
- * the initial MemoryRegion conversion introduced the new-style
-   "one read/write fn for all widths" APIs, but also supported
-   old-style six-function devices, for ease of conversion, using
-   MemoryRegionOps::old_mmio.
- * in commit 62a0db942dec6ebfe we were finally able to drop the
-   old_mmio (having changed over the last devices using old-style).
-   (I see I forgot to delete the now-unused MemoryRegionMmio typedef.)
 
-The only remaining user of these typedefs is hw/usb/hcd-musb.c,
-which is still not converted to QOM/qdev. It uses them to allow
-its one user (hw/usb/tusb6010.c) to perform reads/writes on the
-underlying musb registers.
+Applied, thanks.
 
-There's no point in changing these typedefs to pass or return
-a 64-bit data type, because their sole use is in the musb_read[]
-and musb_write[] arrays, which only allow for 1, 2 or 4 byte
-accesses, depending on which array element you use.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-Possible cleanups here:
-Easy:
- * delete the unused MmeoryRegionMmio
- * move these typedefs into include/hw/usb.h and rename them
-   to MUSBReadFunc and MUSBWriteFunc, since that's all they're
-   used for now
-Tricky:
- * convert the hw/usb/hcd-musb.c code to QOM/qdev, which would
-   include refactoring the current musb_read/musb_write so that
-   instead of the tusb6010.c code calling function entries in these
-   arrays the hcd-musb.c code exposed a MemoryRegion; the tusb6010
-   code would access it via memory_region_dispatch_read/write
-
-thanks
 -- PMM
 
