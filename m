@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3965EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:44:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38D04204EA
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06BFB204EA
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVSryTZW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D04204EA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecRtJ9+d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06BFB204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfRzB-0002Jx-96
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 13:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34138)
+	id 1jfS08-0003xr-8Q
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 13:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfRuo-0004Ai-7j; Sun, 31 May 2020 13:38:30 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41694)
+ id 1jfRup-0004CV-BP; Sun, 31 May 2020 13:38:33 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33223)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfRun-0004Fh-Ez; Sun, 31 May 2020 13:38:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j10so9152077wrw.8;
- Sun, 31 May 2020 10:38:24 -0700 (PDT)
+ id 1jfRuo-0004G7-Ir; Sun, 31 May 2020 13:38:30 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j198so10509957wmj.0;
+ Sun, 31 May 2020 10:38:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Dv8k9OvX0sGDM6SnC2SEv28YQ5tgOTM9QioS6R+rf/M=;
- b=BVSryTZWMKqgtf1QMR74iA2a1/KO4Uy3SphIAK8LPJsyPkwckWfXDNibM+axg726DZ
- SOxrLOGVIxjQO1zqPrMp0H1sgXw3bFO+/tNCygs7RSfe47FZ6fzyl8luYeaYKphOjkVi
- OCMSIO+jJyhY8KvoRpSZImqE+0XAVhWggJCSkSwrg20N9ndbq6O399AVmjDCPvyP/Tb5
- dlQa2RKuW+AN6SwcOGxhziuKVbffRnR2ra0pRvolwWtCNXZiQU5hjwUjw+a/RC3Dn5mu
- mqyABHZCPs1C01fLaMueU7HT+U+bbJ4chOlXdK8XgTkduVhjcj2+7mnalCo1xT6WZsXh
- tIIA==
+ bh=nx6i+AHtHhOPOYC0ludmYEcyPCtH+R6fArfoXhgX/80=;
+ b=ecRtJ9+dMcz6HFcCrjMA79m2NLL9pLTe3YlR6u/5U8B/pDwEZnHkpthloUcJD9mdeX
+ z4NzrruZHIQ5BDed7AH8zcr/JzgBoZ1wQmFBvCf0zqPlH2VDi3PlRQEl/z3dTDw8CP0R
+ VEh2hNdQFoGTa0ucGgNoDbeocX77DmNTTR7f1AuNpakZHtfsid+pCIBY0so133aao2cN
+ b+i37OA+ThO+bxJeMeXuuwDMmwuLCLkIY+kfFnePWYnEWyGruAmEtPG2VehLleFSgTQF
+ GNo4UF310Aboap3C76RpTvPD64wZq/2auDdcnjb13FWLdoOod69RR73rZOQlRY4ZML6K
+ vZmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Dv8k9OvX0sGDM6SnC2SEv28YQ5tgOTM9QioS6R+rf/M=;
- b=q7KspmcktTqGB9y6FH3akrV5pgLecMeR8lvGT+Q9e4KkOXZ8eIckVNYGg9ZkX6RIga
- VPS/6j+aZxS+ND+dRGeK1Cb6LTnDahA2ksDebHZh7pQLsRkS9i9WZPNrGO3jJuIs5HQh
- MlevVwF9U/R7/0WTTjIDtPqKklufkpXurbRZhySD40u0w0yS3dZk6v3+oFwJ0OMreuAr
- fnQ5BVOJr7FFQmb6n/9juW6eeIpb0G/T6DvVSKOR9nMD6zdnV2X7NUVB5QRJVEtGQ58G
- GrDDwLS22l9ycPwsUIBzeIXbK23gEpn0IOlbnkDFsaFDIxxXbvt6kdn3AXH4nb/FX7yx
- KstQ==
-X-Gm-Message-State: AOAM5318y4TwgjA2EefJ+xgJyOrxlIISFUietgCh/rwclK+DpNHAjODX
- N/EGNAtcDQra8zH2QsWtf16BBJBU
-X-Google-Smtp-Source: ABdhPJwiBhhdiSv5xipwUBmxFfUuE7Js6srJ5I4x//n2LAjphXaXilwy/UiUFaG7+ZnnplrFb1ATaw==
-X-Received: by 2002:adf:f7ce:: with SMTP id a14mr17874609wrq.362.1590946703877; 
- Sun, 31 May 2020 10:38:23 -0700 (PDT)
+ bh=nx6i+AHtHhOPOYC0ludmYEcyPCtH+R6fArfoXhgX/80=;
+ b=XSMgWox6hoVu9S4yXtAk5SJre4jJzi/4ERPAu2rmLHnbIwnvvb7xZSslaNLGdBQNIo
+ HtgkObwZ0kSOajHg1HRbCDaR2o3+oUTJp+ZgdIFYX4VEFH9Ae+3J1vfF1k9FFYOullux
+ 1gNR2p8vHE1ERaUPkf9Ji6Eoa9KmJt97woF4hyZKPzpMFSUmzEfTHP5SOtmMx9Ujqnii
+ yCtSqkjqaq8vVLBAM9g6ZRju3QEzNxN3fOifYzThmX532vPDgwGek8N8YBA1nzIajrgQ
+ P3ZQhRfoIKKbQGjd/AQJq1nTQet/K0LFxUjta7Htz/ftgVQIsSYQXuv+ZMzSAN5TMI9Q
+ sn1w==
+X-Gm-Message-State: AOAM532n3Vra+8Shyun1KHsiHCcwFJ7vYgGzL2rDeZ9ks7PQw3v3obUw
+ mD5pBP9sIs3ogASRzr06URZmyYX4
+X-Google-Smtp-Source: ABdhPJwrR3vwdIenjSppjEGj76X18jhrVpnPd8ljKzuiMJUGDNuZXGPyuZJVIrkrS466Afme7Vb7pg==
+X-Received: by 2002:a1c:39c1:: with SMTP id g184mr17816585wma.9.1590946708068; 
+ Sun, 31 May 2020 10:38:28 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id l19sm7973121wmj.14.2020.05.31.10.38.22
+ by smtp.gmail.com with ESMTPSA id l19sm7973121wmj.14.2020.05.31.10.38.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 10:38:23 -0700 (PDT)
+ Sun, 31 May 2020 10:38:27 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/8] hw/pci/pci_bridge: Use the IEC binary prefix definitions
-Date: Sun, 31 May 2020 19:38:10 +0200
-Message-Id: <20200531173814.8734-5-f4bug@amsat.org>
+Subject: [PATCH 7/8] hw/i386/xen/xen-hvm: Use the IEC binary prefix definitions
+Date: Sun, 31 May 2020 19:38:13 +0200
+Message-Id: <20200531173814.8734-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200531173814.8734-1-f4bug@amsat.org>
 References: <20200531173814.8734-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -121,30 +121,30 @@ IEC binary prefixes ease code review: the unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci/pci_bridge.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/xen/xen-hvm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 3ba3203f72..3789c17edc 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -423,14 +423,14 @@ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
-     }
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 82ece6b9e7..679d74e6a3 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -9,6 +9,7 @@
+  */
  
-     if (res_reserve.mem_non_pref != (uint64_t)-1 &&
--        res_reserve.mem_non_pref >= (1ULL << 32)) {
-+        res_reserve.mem_non_pref >= 4 * GiB) {
-         error_setg(errp,
-                    "PCI resource reserve cap: mem-reserve must be less than 4G");
-         return -EINVAL;
-     }
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
  
-     if (res_reserve.mem_pref_32 != (uint64_t)-1 &&
--        res_reserve.mem_pref_32 >= (1ULL << 32)) {
-+        res_reserve.mem_pref_32 >= 4 * GiB) {
-         error_setg(errp,
-                    "PCI resource reserve cap: pref32-reserve  must be less than 4G");
-         return -EINVAL;
+ #include "cpu.h"
+ #include "hw/pci/pci.h"
+@@ -230,7 +231,7 @@ static void xen_ram_init(PCMachineState *pcms,
+          * Xen does not allocate the memory continuously, it keeps a
+          * hole of the size computed above or passed in.
+          */
+-        block_len = (1ULL << 32) + x86ms->above_4g_mem_size;
++        block_len = 4 * GiB + x86ms->above_4g_mem_size;
+     }
+     memory_region_init_ram(&ram_memory, NULL, "xen.ram", block_len,
+                            &error_fatal);
 -- 
 2.21.3
 
