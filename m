@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA0FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4297AC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC11E207BB
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01BB82074A
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CB4lIwa6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC11E207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJMOogfa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01BB82074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfR9X-0000Y9-3R
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
+	id 1jfRAv-0002Az-7B
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0b-0003QD-MU
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25150
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzq-0001aF-EE
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:38 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57330
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfR0a-000721-Np
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:40:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzp-0006ki-Lu
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590943224;
+ s=mimecast20190719; t=1590943175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q4vVNWwGJ6X+mCxN22qm0JQKHOJ0PdAaDdcsNO2TkXQ=;
- b=CB4lIwa6Lnb5guiHSGOGs/5a3xowk44fIHL5Om/bfa816EEdzecYOxj3+2AOFGupnjPoTc
- 743hOlVri7Rsz5pCumrAMgjwJku3KcypR32X/MUOkMiwB7cvnxfgAUZWz2VYjGZCtP1MQA
- 7dZALHmB0zIwAoBKui70G4hw8uqcd5o=
+ bh=rjbH7teVMtjBh+T5ufCfzeY9CyBEBHGmfbosO+YUVTM=;
+ b=LJMOogfas/QwkWNesSoisfhrcvCctKiljwog5gh0Z8LiVo/IGG6ygEcRIQc10oEMcLnqgA
+ jg2wes8RT9fiehXoyQWqr7UmCv0aYX8P2jp9tlR0YsZQTcdeiGSOHaPtvOqorpUPo9FY1o
+ VjXvf52bUwqPZEJzYo5B71POwLb4u1Y=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-1b8HRgV4Nv6hHSwjLPJ7NQ-1; Sun, 31 May 2020 12:40:22 -0400
-X-MC-Unique: 1b8HRgV4Nv6hHSwjLPJ7NQ-1
-Received: by mail-wr1-f70.google.com with SMTP id o1so3590482wrm.17
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:40:22 -0700 (PDT)
+ us-mta-169-xVuduibAOY2n20UrIfFcMg-1; Sun, 31 May 2020 12:39:32 -0400
+X-MC-Unique: xVuduibAOY2n20UrIfFcMg-1
+Received: by mail-wr1-f70.google.com with SMTP id c14so3591278wrw.11
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:39:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Q4vVNWwGJ6X+mCxN22qm0JQKHOJ0PdAaDdcsNO2TkXQ=;
- b=blqPPuFQgRPRq6xoAr4FKpci7b38mwK9VnrIjW78AJVA+cuRoX2yD9gvOUS10/beDU
- 0Zg3ijZW4BJ9SISTCXhlNulJr+8H+6oXWGDC5nv6rFI47b8BWqkJsYfR8aNrxFi1dlP5
- 6KrtkNWaWGiDoFyQ2skiLcioopqI93Ohb10pa222GVJxYIwltK5TOStGt5A3KVQhhWBk
- dMmh0KEUaKQZmU/GGrhi1CyKhofMQMqkTFpBcPPjKiFAAmAs26o1dayDeW4IMzCcMnti
- 4zonuZ8mxYre/K2gu3H4jCPRcYVaIiLLse7FS8jxWfnbHHmi5CYhA1gle6EUDGl/l66S
- I5og==
-X-Gm-Message-State: AOAM532W2M5rUS+ylQl6TRJ7bVk271xU783CGiH6MNcY1MiExWh7HAS0
- 06UL202S3QMr7V/U7B0/e2yw6ZM6zMFNhJ9MxTZWxDLRgX4Js0XiZLeARV+rFWs2hKIJc7VtRED
- aHhRsJWR9jO0dCm0=
-X-Received: by 2002:adf:eec2:: with SMTP id a2mr17399488wrp.136.1590943221349; 
- Sun, 31 May 2020 09:40:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTbjh1kanaHu4mvEz5G2IetIDATr+AlkqOK/pFPgvXTE/QruP8PTveawBN85Yr0c5UV+YrRQ==
-X-Received: by 2002:adf:eec2:: with SMTP id a2mr17399473wrp.136.1590943221141; 
- Sun, 31 May 2020 09:40:21 -0700 (PDT)
+ bh=rjbH7teVMtjBh+T5ufCfzeY9CyBEBHGmfbosO+YUVTM=;
+ b=PrC2Pfqx6/NexE/RcWPWPhstlxsr5voM0bxWai9F9rggC4AqSwHgKx/v+GoOSX+1MH
+ kOPFlgdyq0iT/o+jufl6TKl3rXxMeJOHnmz8NqXrOlBdsM1C568oqZMX4OsUFwSAq2Nm
+ CXwtWypQnZu/dOZw7Ox+SIWEvLuNkuWg+MObrf1yFPSvNiWcGA2m/rZAH9pxFbyiONsd
+ AzXxAX4N7txFfOEom7BN6/1TJh0rkhQfbUALltiTSrg0RJFTFqabeRz+79XDXa/IZFUQ
+ CDpbUBI6QHkg3x15ce04GdOqLQ22wQ1ZE6NkjnTXRj3caiACs/MI1ORYzjLqjgvjzTkm
+ FnUw==
+X-Gm-Message-State: AOAM5321jWf7whiltzmZgBwMjQYPlSLiVL/qvto0WpgJuE2mb4SYOnu4
+ F7R0A4rXVBcYDmU2iKahbQ4uWoOI1ZjStog/YJQmuDyqBHVZoyUOfIXTobV5MZLMK1Pg1KcFcvo
+ QVWqql3ZqJKIV5XE=
+X-Received: by 2002:a5d:5112:: with SMTP id s18mr17632632wrt.160.1590943170818; 
+ Sun, 31 May 2020 09:39:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxviLkgXrjUX2NcNJC5mie2lsvP1IrSShLdDDtm64dQg0NFzJSb44/ioBt+ym943Nm0qZ2SIA==
+X-Received: by 2002:a5d:5112:: with SMTP id s18mr17632616wrt.160.1590943170658; 
+ Sun, 31 May 2020 09:39:30 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id a1sm10072069wmd.28.2020.05.31.09.40.19
+ by smtp.gmail.com with ESMTPSA id k26sm9409518wmi.27.2020.05.31.09.39.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 09:40:20 -0700 (PDT)
+ Sun, 31 May 2020 09:39:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/25] tests/vm: Pass --debug through for vm-boot-ssh
-Date: Sun, 31 May 2020 18:38:39 +0200
-Message-Id: <20200531163846.25363-19-philmd@redhat.com>
+Subject: [PULL 08/25] python/qemu/machine: add kill() method
+Date: Sun, 31 May 2020 18:38:29 +0200
+Message-Id: <20200531163846.25363-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
 References: <20200531163846.25363-1-philmd@redhat.com>
@@ -87,16 +87,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:38:54
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:39:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,45 +111,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Robert Foley <robert.foley@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, Peter Puhov <peter.puhov@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This helps debug issues that occur during the boot sequence.
+Add method to hard-kill vm, without any quit commands.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200529203458.1038-5-robert.foley@linaro.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-Id: <20200217150246.29180-19-vsementsov@virtuozzo.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/vm/Makefile.include | 1 +
- 1 file changed, 1 insertion(+)
+ python/qemu/machine.py | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 74ab522c55..80f7f6bdee 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -91,6 +91,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
- 	$(call quiet-command, \
- 		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
- 		$(if $(J),--jobs $(J)) \
-+		$(if $(V)$(DEBUG), --debug) \
- 		--image "$<" \
- 		--interactive \
- 		false, \
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index b9a98e2c86..d2f531f1b4 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -342,7 +342,7 @@ def wait(self):
+         self._load_io_log()
+         self._post_shutdown()
+ 
+-    def shutdown(self, has_quit=False):
++    def shutdown(self, has_quit=False, hard=False):
+         """
+         Terminate the VM and clean up
+         """
+@@ -354,7 +354,9 @@ def shutdown(self, has_quit=False):
+             self._console_socket = None
+ 
+         if self.is_running():
+-            if self._qmp:
++            if hard:
++                self._popen.kill()
++            elif self._qmp:
+                 try:
+                     if not has_quit:
+                         self._qmp.cmd('quit')
+@@ -368,7 +370,8 @@ def shutdown(self, has_quit=False):
+         self._post_shutdown()
+ 
+         exitcode = self.exitcode()
+-        if exitcode is not None and exitcode < 0:
++        if exitcode is not None and exitcode < 0 and \
++                not (exitcode == -9 and hard):
+             msg = 'qemu received signal %i: %s'
+             if self._qemu_full_args:
+                 command = ' '.join(self._qemu_full_args)
+@@ -378,6 +381,9 @@ def shutdown(self, has_quit=False):
+ 
+         self._launched = False
+ 
++    def kill(self):
++        self.shutdown(hard=True)
++
+     def set_qmp_monitor(self, enabled=True):
+         """
+         Set the QMP monitor.
 -- 
 2.21.3
 
