@@ -2,97 +2,101 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A848C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB75FC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A4582074B
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B55EF2074B
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYGVmiRa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4582074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RCQMDnUd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55EF2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfR0O-0002Kt-JZ
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:40:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55134)
+	id 1jfR0S-0002VB-SG
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:40:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzD-0000lO-BB
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:38:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23526
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzG-0000ng-Cr
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27819
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzB-0006dr-7e
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:38:58 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzF-0006eU-JH
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590943134;
+ s=mimecast20190719; t=1590943141;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
- b=BYGVmiRaOznuTKgWAzaUi/N+rvV/HJj9JneDb++DVfHDn/XJYR7PDQNRq3UjJ+VfpmxqOl
- MhwU6WhVmSBx6p/8E0BCsjO7WDvnqpKyS+mMTDPfeIAcvW34IfQSuphirbOXaG7XIBvdFw
- ugmjBx9JhizzM8/on7WHvXkMtChf2Hk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-gV0PkRh0NxWINclhf0aDRA-1; Sun, 31 May 2020 12:38:51 -0400
-X-MC-Unique: gV0PkRh0NxWINclhf0aDRA-1
-Received: by mail-wr1-f69.google.com with SMTP id p10so3618867wrn.19
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:38:51 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ly/BNyoFscwcUlEdMi1CDGrrxngHJB98Yaq6NCa8Sss=;
+ b=RCQMDnUdyBjsa1xhJ27PLnBho2J+oTh3+9/ISOo7cLxTmcrmMYeJcyXFZL5DoQPfUDeIJh
+ ikAHqYgN2DSW/VinzTlsgJC6TJ/V8ESJyKsMWRwXhq4Zx4oFucT05vbbTWoPWjsmBadBdA
+ ZGMCqIDzpQWXjP2ONQXJUICLKldoJpY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-NFJOCalZNWOMDdvzVfd3Hg-1; Sun, 31 May 2020 12:38:57 -0400
+X-MC-Unique: NFJOCalZNWOMDdvzVfd3Hg-1
+Received: by mail-wr1-f70.google.com with SMTP id a4so3614456wrp.5
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:38:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
- b=DNKbqp3wUyMgTjxwIhnBa1pZGMjitfshEYDjaZ5izV+GGrOC4TWnXuvL76KasQh9k3
- OqaaOd4tzBPQkBCaPGAZ3XQzQJR9z5n5TmdJRXIBXpT+zyBQXWUFN4Eb26Z3xm4FY2CP
- w20jWBwVYa7zh0KtkYbPSN423uNvEhjjKu1bxe/fp66pHEPeN7UV323z+QNohJYmQD1K
- kvmcbjCehfu4hUGNq9A2vazhOylQnDjwisnP/MKIgRwvitOtLgjR+XlcNG4VvWaJBJ51
- odJH5/CR5/pTZ+v7hBnyz42ImTYSOjs+SUf/E/d25M+4StqeUAiw+qMsSKWCAeQU/Dq1
- jo6g==
-X-Gm-Message-State: AOAM531Xeu3L0lFzHEcbpp87elaeZhIqEHhRFTsdjrKv3LQEYrZ0bJ7a
- bSfsg73BLGqxq9hscLae6UfTLC66pW0Hu2sVx8NLVxIMPfNWzhQdiFG7mS8jYhj8Sn1KWg/8qGY
- pRNSwrbixNHcT3Ss=
-X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019038wmc.145.1590943129756; 
- Sun, 31 May 2020 09:38:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyD/VAdm6bALQItTxdHOkN9cmdqlhgWpmq4GftYVKQFfyiuufz0LwlGo+Qn5wNF96G2siY3sg==
-X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019016wmc.145.1590943129519; 
- Sun, 31 May 2020 09:38:49 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Ly/BNyoFscwcUlEdMi1CDGrrxngHJB98Yaq6NCa8Sss=;
+ b=ZSnUyaK8QgJ0oLRQAK6B8rXpWzINkSdMIsVfucfWvFTmUgk57lJ7r7/h76CbNlwlBj
+ pivvjaLJcEnVo9CsTkzOX5syEub9EuM4Gpm/CWIw0GjiChGZqKJhnMmfi8kS4CN9QHOT
+ 3xvqGIVn8qM4jDFhy9K/r7TdfSjPs2fFgCzhuZpgZAHraefIsmppncjAKAwPYaEL+rI3
+ zvpSFkvaU+0OvOJ0PzMzUD7pY4Y0F5RDFmq7Dmk+VtEk0ZdUzHZ1MJZN9jOfcuxXvpR7
+ gdsDF/OFHbffJJrV0y2fy0dd59ZQ3BuyF0FVUkrQEJlqR+vo0hoz0enbTSnrmADJE2/C
+ OJ9w==
+X-Gm-Message-State: AOAM531OHG+WSNf5+stLPndhF7l4inuhhj8CqaipTb1WhJM2VHXo9UR9
+ LO4m04R26HOCkQU+at2NBenml6tsG4I6CHNLYQTDsJ/ZejkGS+BjGgB2iim8STpwrnZDUWhYKWH
+ KJR+CAyAfYHcGbTY=
+X-Received: by 2002:a5d:4e03:: with SMTP id p3mr18519117wrt.350.1590943135211; 
+ Sun, 31 May 2020 09:38:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxe7sJn4ZGtJgKpS26KNwTyhpDQC9oFjhczDjqsHEXGXaRKqr+VepBPJMpNihdteRynA8wNuA==
+X-Received: by 2002:a5d:4e03:: with SMTP id p3mr18519096wrt.350.1590943134994; 
+ Sun, 31 May 2020 09:38:54 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id 5sm8192953wmd.19.2020.05.31.09.38.48
+ by smtp.gmail.com with ESMTPSA id v7sm8920008wme.46.2020.05.31.09.38.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 09:38:48 -0700 (PDT)
+ Sun, 31 May 2020 09:38:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/25] python-next patches for 2020-05-31
-Date: Sun, 31 May 2020 18:38:21 +0200
-Message-Id: <20200531163846.25363-1-philmd@redhat.com>
+Subject: [PULL 01/25] scripts/qemugdb: Remove shebang header
+Date: Sun, 31 May 2020 18:38:22 +0200
+Message-Id: <20200531163846.25363-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
+References: <20200531163846.25363-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 11:09:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:38:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,121 +113,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit c86274bc2e34295764fb44c2aef3cf29623f9b4b:
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-tcg-plugins=
--270520-1' into staging (2020-05-29 17:41:45 +0100)
+These scripts are loaded as plugin by GDB (and they don't
+have any __main__ entry point). Remove the shebang header.
 
-are available in the Git repository at:
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200512103238.7078-2-philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ scripts/qemugdb/__init__.py  | 3 +--
+ scripts/qemugdb/aio.py       | 3 +--
+ scripts/qemugdb/coroutine.py | 3 +--
+ scripts/qemugdb/mtree.py     | 4 +---
+ scripts/qemugdb/tcg.py       | 1 -
+ scripts/qemugdb/timers.py    | 1 -
+ 6 files changed, 4 insertions(+), 11 deletions(-)
 
-  https://gitlab.com/philmd/qemu.git tags/python-next-20200531
-
-for you to fetch changes up to 1c80c87c8c2489e4318c93c844aa29bc1d014146:
-
-  tests/acceptance: refactor boot_linux to allow code reuse (2020-05-31 18:25=
-:31 +0200)
-
-----------------------------------------------------------------
-Python queue:
-
-* migration acceptance test fix
-* introduce pylintrc & flake8 config
-* various cleanups (Python3, style)
-* vm-test can set QEMU_LOCAL=3D1 to use locally built binaries
-* refactored BootLinuxBase & LinuxKernelTest acceptance classes
-
-https://gitlab.com/philmd/qemu/pipelines/151323210
-https://travis-ci.org/github/philmd/qemu/builds/693157969
-
-----------------------------------------------------------------
-
-Dr. David Alan Gilbert (1):
-  tests/acceptance/migration.py: Wait for both sides
-
-John Snow (11):
-  scripts/qmp: Fix shebang and imports
-  python: remove more instances of sys.version_info
-  python/qemu/machine: remove logging configuration
-  python/qemu: delint and add pylintrc
-  python/qemu: delint; add flake8 config
-  python/qemu: remove Python2 style super() calls
-  python/qemu: fix socket.makefile() typing
-  python/qemu: Adjust traceback typing
-  python/qemu/qmp: use True/False for non/blocking modes
-  python/qemu/qmp: assert sockfile is not None
-  python/qemu/qtest: Check before accessing _qtest
-
-Pavel Dovgaluk (3):
-  tests/acceptance: allow console interaction with specific VMs
-  tests/acceptance: refactor boot_linux_console test to allow code reuse
-  tests/acceptance: refactor boot_linux to allow code reuse
-
-Philippe Mathieu-Daud=C3=A9 (6):
-  scripts/qemugdb: Remove shebang header
-  scripts/qemu-gdb: Use Python 3 interpreter
-  scripts/qmp: Use Python 3 interpreter
-  scripts/kvm/vmxcap: Use Python 3 interpreter and add pseudo-main()
-  scripts/modules/module_block: Use Python 3 interpreter & add
-    pseudo-main
-  tests/migration/guestperf: Use Python 3 interpreter
-
-Robert Foley (3):
-  tests/vm: Pass --debug through for vm-boot-ssh
-  tests/vm: Add ability to select QEMU from current build
-  tests/vm: allow wait_ssh() to specify command
-
-Vladimir Sementsov-Ogievskiy (1):
-  python/qemu/machine: add kill() method
-
- python/qemu/.flake8                       |  2 +
- python/qemu/accel.py                      |  9 ++-
- python/qemu/machine.py                    | 44 +++++++-----
- python/qemu/pylintrc                      | 58 ++++++++++++++++
- python/qemu/qmp.py                        | 29 +++++---
- python/qemu/qtest.py                      | 83 +++++++++++++++--------
- scripts/analyze-migration.py              |  5 --
- scripts/decodetree.py                     | 25 +++----
- scripts/kvm/vmxcap                        |  7 +-
- scripts/modules/module_block.py           | 29 ++++----
- scripts/qemu-gdb.py                       |  4 +-
- scripts/qemugdb/__init__.py               |  3 +-
- scripts/qemugdb/aio.py                    |  3 +-
- scripts/qemugdb/coroutine.py              |  3 +-
- scripts/qemugdb/mtree.py                  |  4 +-
- scripts/qemugdb/tcg.py                    |  1 -
- scripts/qemugdb/timers.py                 |  1 -
- scripts/qmp/qmp                           |  4 +-
- scripts/qmp/qmp-shell                     |  3 -
- scripts/qmp/qom-fuse                      |  4 +-
- scripts/qmp/qom-get                       |  6 +-
- scripts/qmp/qom-list                      |  6 +-
- scripts/qmp/qom-set                       |  6 +-
- scripts/qmp/qom-tree                      |  6 +-
- tests/acceptance/avocado_qemu/__init__.py | 13 ++--
- tests/acceptance/boot_linux.py            | 49 +++++++------
- tests/acceptance/boot_linux_console.py    | 21 +++---
- tests/acceptance/migration.py             |  4 ++
- tests/docker/docker.py                    |  5 +-
- tests/migration/guestperf-batch.py        |  2 +-
- tests/migration/guestperf-plot.py         |  2 +-
- tests/migration/guestperf.py              |  2 +-
- tests/qemu-iotests/nbd-fault-injector.py  |  5 +-
- tests/vm/Makefile.include                 |  5 ++
- tests/vm/basevm.py                        | 42 ++++++++----
- 35 files changed, 317 insertions(+), 178 deletions(-)
- create mode 100644 python/qemu/.flake8
- create mode 100644 python/qemu/pylintrc
-
---=20
+diff --git a/scripts/qemugdb/__init__.py b/scripts/qemugdb/__init__.py
+index 969f552b26..da8ff612e5 100644
+--- a/scripts/qemugdb/__init__.py
++++ b/scripts/qemugdb/__init__.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright (c) 2015 Linaro Ltd
+diff --git a/scripts/qemugdb/aio.py b/scripts/qemugdb/aio.py
+index 2ba00c4444..d7c1ba0c28 100644
+--- a/scripts/qemugdb/aio.py
++++ b/scripts/qemugdb/aio.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support: aio/iohandler debug
+ #
+ # Copyright (c) 2015 Red Hat, Inc.
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index 41e079d0e2..db61389022 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
+index 3030a60d3f..8fe42c3c12 100644
+--- a/scripts/qemugdb/mtree.py
++++ b/scripts/qemugdb/mtree.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+@@ -84,4 +83,3 @@ def print_item(self, ptr, offset = gdb.Value(0), level = 0):
+         while not isnull(subregion):
+             self.print_item(subregion, addr, level)
+             subregion = subregion['subregions_link']['tqe_next']
+-
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
+index 18880fc9a7..16c03c06a9 100644
+--- a/scripts/qemugdb/tcg.py
++++ b/scripts/qemugdb/tcg.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ #
+ # GDB debugging support, TCG status
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+index f0e132d27a..46537b27cf 100644
+--- a/scripts/qemugdb/timers.py
++++ b/scripts/qemugdb/timers.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ # GDB debugging support
+ #
+-- 
 2.21.3
 
 
