@@ -2,93 +2,89 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30EEEC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AF7C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBDAC2074B
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28737204EA
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 17:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPgx3uRg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDAC2074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eaZGRhHJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28737204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfS2P-0006s6-7w
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 13:46:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34170)
+	id 1jfSBT-0004zm-BL
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 13:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfRus-0004F3-6L; Sun, 31 May 2020 13:38:34 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51069)
+ id 1jfSAJ-0003c1-4d; Sun, 31 May 2020 13:54:31 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfRuq-0004Gq-0D; Sun, 31 May 2020 13:38:33 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v19so8627245wmj.0;
- Sun, 31 May 2020 10:38:30 -0700 (PDT)
+ id 1jfSAI-0007ak-E5; Sun, 31 May 2020 13:54:30 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t18so9214844wru.6;
+ Sun, 31 May 2020 10:54:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=jnJt4nNSB0E2pLIKum3vjItQrLzo5DO2iXhJKs1nBc8=;
- b=kPgx3uRgc7TXjjpq1UvXYDhszlo8l3sRGueug/C8vRhLjgvZQ5Mieac9b318WBFJ2/
- aeYe32r9/P1YQ0T5IBGEZZ7DL+Wy3+63lPgyyyIx0+YmMwTp5IOUGd2IT1wgrMl/x1tR
- KJz6LeuNQroYjMDQHIcgiF8BdxJylz7XpfRhndCHWb8t1o//QCW5SH5/lCsvTvNfTjTe
- II8tGrhBafOYy7pR3oJLWiTvPSFZijdqdapNq7SavzV2LWsL6fiHgv7zZkvxDTXFVwkn
- nhmlNB2/Qmcnalw8/VjytMqmdx2T42K5JNc3hbG2/fcaGN2tjOK+OXLUHm3TmUzbuQVt
- aGQQ==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=AEl6bT4q19zBH2BgMy7bXNnUtsc1bYKdZAFCBjIlSaw=;
+ b=eaZGRhHJxQAtSw26xWGvnUufmlMGk2NZArPNF0URkkrmVRXtwPKucour5svqDI+aa2
+ uyC0m4lm+G0P6RA6AWRT5/D7Uky94PrT21bsKhi01lJccbI91TIVfy/MKpyecyxrzPqd
+ sWBlWcOlXd/LDU63L2mek/GMBAnSkiKwoQcGWZRMFxw993qOTA0eh3i5fxlFro1J4OtC
+ fW2rgIhF3L7BZbxCzM1A4vR/SNtio9ioUCcF4wW4hHdeyBDtVz4XYCQ3B0y4wLI3+OTv
+ vIppeGS8lhD6hcfqD6EZF5VIJmrkZ107g5IWtNUAWpMsKEYcKlwb+nxWFTZHVhR9HJ0G
+ tEbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=jnJt4nNSB0E2pLIKum3vjItQrLzo5DO2iXhJKs1nBc8=;
- b=TYNByybJ1CAG82yeJhlodW38/5zSPHyFCRkn3DcHpb7WB875ZMHwk15IK2OAqv3Giq
- 4cm2Z9pU17TeG7wi+nn2BSybywhHTJJHxfE3S/h+xtqwki1myemnWufjgPvRrfueVzJm
- 6sMC8tVE7/lumjStdzuLPM/F9OTc2qjSHI8mPiuatXvktSICtPfIus/sX4NQmd0A+SYY
- X9gPMNDU5PUuze9MO6e4Z9XR1C91nDvE75FZm86wNWK28yevXrA1/2HHDrPjg35cVhVG
- wmaFr4rUncs/iSxLQnxFzXWiXehtol1JDz6+V22++1Hf3L7GBTtWa1ljwhRdVbiy4Fj2
- X5sQ==
-X-Gm-Message-State: AOAM5304AZPmvxaNhREyiGYY1y+44Cg7yNop0jcCeF+tP5CqN0wKXci5
- Pqay4cdoSLkeKk9Jmkw0VCNrJdhb
-X-Google-Smtp-Source: ABdhPJzC9j6ttjFbMxV1i2cC0ijncxDDP5cwavA0spex0KcuX2eB8xIhSwUxzBVMqmUzJNtm/2Oq4w==
-X-Received: by 2002:a7b:cc82:: with SMTP id p2mr17828736wma.101.1590946709508; 
- Sun, 31 May 2020 10:38:29 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=AEl6bT4q19zBH2BgMy7bXNnUtsc1bYKdZAFCBjIlSaw=;
+ b=fLNl3v0c7QUAST4zE9uQblMCkPzqJdxFWd0pjQofeOvtp0GlO0Mb6nSLICn7edtqzA
+ FUw7bS69jLr8NHYU56MK2DQEVF/oX6A0ZchjgZmUGQPL1KtdtvASssieLnsgtnoMoiTI
+ rWTWEJ2gFV4acmhlPMfTmDCuMzOVzSGTikaJWe5dfxwiB6bxbzhEv0G1h3UqbZqL6SNc
+ 5k3QUUPMGmHUhqjQdM0UAXxDvxHhazoMf59/7qQOqfm0C0AJQI+Bh/LYb+YKuj+Z0yN8
+ VDIq33uFVyVnc0yAxadbbBNXoMYwnHyrheHcUTz4ThnoaNP5dSyVCNnHUG/ciggOjsKN
+ NA2g==
+X-Gm-Message-State: AOAM532rVMquyJMSReYJIh61VVwTi8nBUBVWfhi/uLMJrGzJlYcJTvOO
+ xT/u+EQLsDJhF8bVVltaOpZLhVvr
+X-Google-Smtp-Source: ABdhPJwch/GkIKUiPnNFA25+KBIqsDPqRO07CbQNWi4W8Cb11C4KZeSL4sBlKl9CM0qYH8NaoSpAjg==
+X-Received: by 2002:adf:fac2:: with SMTP id a2mr18199433wrs.304.1590947667965; 
+ Sun, 31 May 2020 10:54:27 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id l19sm7973121wmj.14.2020.05.31.10.38.28
+ by smtp.gmail.com with ESMTPSA id z7sm17862531wrt.6.2020.05.31.10.54.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 10:38:28 -0700 (PDT)
+ Sun, 31 May 2020 10:54:27 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 8/8] target/i386/cpu: Use the IEC binary prefix definitions
-Date: Sun, 31 May 2020 19:38:14 +0200
-Message-Id: <20200531173814.8734-9-f4bug@amsat.org>
+Subject: [PATCH 0/6] exec/memory: Rework some address and access size limits
+Date: Sun, 31 May 2020 19:54:19 +0200
+Message-Id: <20200531175425.10329-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200531173814.8734-1-f4bug@amsat.org>
-References: <20200531173814.8734-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
  FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,41 +98,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
- Andrew Jeffery <andrew@aj.id.au>, Helge Deller <deller@gmx.de>,
- "Michael S. Tsirkin" <mst@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-trivial@nongnu.org, qemu-arm@nongnu.org,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-IEC binary prefixes ease code review: the unit is explicit.
+These patches are extracted from a bigger series which
+- remove generic ISA space, restricting it to the hw
+  that really has it (mostly PCI-ISA bridges)
+- allow QTest/GDB to use any address space
+- make I/O address space target-specific (only X86 and
+  AVR have a CPU connected to it)
+- better handle Harvard architectures
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Various patches only make sense if the AVR arch is merged,
+so instead of waiting and keeping rebasing/testing, let's
+share what is generic and might be worthwhile.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3733d9a279..33ce4861fb 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6159,7 +6159,7 @@ static void x86_cpu_machine_done(Notifier *n, void *unused)
-     if (smram) {
-         cpu->smram = g_new(MemoryRegion, 1);
-         memory_region_init_alias(cpu->smram, OBJECT(cpu), "smram",
--                                 smram, 0, 1ull << 32);
-+                                 smram, 0, 4 * GiB);
-         memory_region_set_enabled(cpu->smram, true);
-         memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->smram, 1);
-     }
+Currently the QMP/QTest commands only use the 1st CPU
+address space, which has already been reported to limit
+fuzzing/fault_injection/gdbstub.
+
+I'll probably follow with the PCI-ISA bridge part, but
+let's first see the feedback for this batch.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (6):
+  target/s390x/mmu_helper: Use address_space_rw() in place
+  hw/dma/rc4030: Use DMA address space to do DMA accesses
+  hw/sd/allwinner-sdhost: Do DMA accesses via DMA address space
+  exec/cpu-common: Do not restrict CPU to 32-bit memory access maximum
+  exec: Restrict 32-bit CPUs to 32-bit address space
+  memory: Use CPU register size as default access_size_max
+
+ include/exec/cpu-common.h        |  4 ++--
+ include/hw/sd/allwinner-sdhost.h |  4 ++++
+ exec.c                           | 10 ++++++++-
+ hw/dma/rc4030.c                  |  3 ++-
+ hw/sd/allwinner-sdhost.c         | 36 ++++++++++++++++++++++++++------
+ hw/usb/hcd-musb.c                | 12 +++++------
+ memory.c                         |  2 +-
+ target/s390x/mmu_helper.c        |  6 ++++--
+ 8 files changed, 58 insertions(+), 19 deletions(-)
+
 -- 
 2.21.3
 
