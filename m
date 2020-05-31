@@ -2,84 +2,84 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C347C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F209C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:03:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C55442074A
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6849D2074A
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:03:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="McKW4i6K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55442074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FK7/No2j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6849D2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfKmI-0003NB-1F
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 06:01:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47308)
+	id 1jfKoi-0005Oy-Lk
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 06:03:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfKkV-0001wB-Er
- for qemu-devel@nongnu.org; Sun, 31 May 2020 05:59:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49963
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfKmS-0003of-Vh
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 06:01:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58093
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfKkU-0000Bs-8M
- for qemu-devel@nongnu.org; Sun, 31 May 2020 05:59:23 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfKmR-0000Zt-QZ
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 06:01:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590919161;
+ s=mimecast20190719; t=1590919283;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LrxPG95m3Xqq9X3tJE2sAe55g0sqIpPvf4IWjsma3tk=;
- b=McKW4i6KVpbNoVw2E8FK0W4AOyJ12qLOtqPI5e9wi65YpJ4OzfVEAYcfNYBk+Ri/PUjP3v
- EvV3+yqSQYZ1M83s8rLRVQriofaTiGZMJphx0BTbvDZx+r6LAiXI99DwQRqqHUHJeNBT82
- kihhPFW6uJ+6cSaVT5Xm9TNES7XSfEY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-_bMjEE5jMlGF92cpWdm-rA-1; Sun, 31 May 2020 05:59:18 -0400
-X-MC-Unique: _bMjEE5jMlGF92cpWdm-rA-1
-Received: by mail-wr1-f69.google.com with SMTP id w16so3277044wru.18
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 02:59:17 -0700 (PDT)
+ bh=l7i3moTl4kJYrcoz+Vqv878sVRgn+sddB+o7wm1cC+A=;
+ b=FK7/No2japBK0qd4WZK7nUuqA789fVWBNvPuwREgr9UOh4/A1WTNSGmwNrdi8ErPao58Jl
+ zt01YPmQOknmZRJQiFDhhjRwNHN7frC7v0URCv0ZIO0TrZYBwiBuQrikXiSK6P3Rn/zvcG
+ pj645HmZu/d20RFe9/6fbgJompSdsKg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-iMEjiP3_OHqv01NJ5Vy6bQ-1; Sun, 31 May 2020 06:01:20 -0400
+X-MC-Unique: iMEjiP3_OHqv01NJ5Vy6bQ-1
+Received: by mail-wm1-f69.google.com with SMTP id j128so1845686wmj.6
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 03:01:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=LrxPG95m3Xqq9X3tJE2sAe55g0sqIpPvf4IWjsma3tk=;
- b=JEKj9LmcZxKPGzrIBGyYtBXc4EsUUz8m+BEGYK9ykzejPABCOFSdryftSh/D15bGWV
- 82gW3fEpgkb6KwO8wcPlZ9Gjk9eaNpOnQ0oHEC9ERQB2Ajh21RaPkwfU3rsCSlqBVANa
- BzIGMN7akqbgO10CnwHR+PvOkg6ayP9qvHYi2dZ1Ol9OdCQxDqtnWGoxk4l3mOFb4CTi
- v0Kuv9J4dNso0JalgIshbo85Tc3hjrjBQPWN/VzZqpUCzV41r16wF9Wqit/SCZW2XTkh
- XqdWxNWOLOu6OCtahR5TzhZc5P6XyOYVOMlvvnd4dwoozH6URi3ADxCn8DFgHGY3WKjI
- UvGw==
-X-Gm-Message-State: AOAM530vEaegca0SlKWVBdOxXZ+mSdNkA2x0FdTAnCD048fKs2iU4JuX
- bGj4PnbyJywQ4hNZjubBml22dgGTRKYPWI4s8cJ3F7sRYbhdJNpmGg5vOfvH04ooNpjqMAzmylh
- GlKV1zkTmWXUeiNs=
-X-Received: by 2002:a05:600c:23cd:: with SMTP id
- p13mr17794782wmb.163.1590919156682; 
- Sun, 31 May 2020 02:59:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwtKAM98OciEFPbo4cqvQ2G6C17Gp6RqAcP6GsNTHy73BfvpX3F8iSwS2bNMv0SqHPPi2C/gg==
-X-Received: by 2002:a05:600c:23cd:: with SMTP id
- p13mr17794765wmb.163.1590919156455; 
- Sun, 31 May 2020 02:59:16 -0700 (PDT)
+ bh=l7i3moTl4kJYrcoz+Vqv878sVRgn+sddB+o7wm1cC+A=;
+ b=Xh6ZwRVVPw0f/eMgPOK7Gk1HL2ZB9hUDYfcRc103wDkpIEGYkBOTsrO9d+uPTq3il0
+ /ZfcAhevUfcotVjb+n4sJoRL0D7sui/Ljt8/k55kp92h5mSlGQOriJ9nS/I56pgWySA6
+ O6aXzdhWCtrMdJ3mjIDOB9ImGWM2qm8f1c6ku97hxe/JgPFVXHW8YMdh+pkqlqE1FPOY
+ UF8eZUnHXn8hhpFfHNW1ZsTE7WBs0UtirsM+9olkL2xnQFQgH8Un6KFBbYo9GT1HWn0U
+ Rpzee2aBn3BnqzRnnPMn942hZQ/3J9HkqmTpdUGmNEIpgSJqdIJVft9hRtdNbWTY4qr0
+ iPkw==
+X-Gm-Message-State: AOAM530a73F21XVL6KWeTSsCHoJ4a4O0xPYgpHjOM+OLiC37MOb/Zaj5
+ nx2SHn3I0jJxxGPank0vs4A+kaSje5ZDB+HxlCVtEqvpV2tpmKigpTdhDXDvoUkg6d+Cv2ktWkC
+ okcuDDg9F/2Kxukg=
+X-Received: by 2002:a05:6000:1202:: with SMTP id
+ e2mr16233656wrx.231.1590919279222; 
+ Sun, 31 May 2020 03:01:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz67xSE7LcHHcunmu+C8ZbtavCrPLo5DJtf2AcrxkpkdYW5WouaOeKaQCQwxkqBiJ2HZBykIQ==
+X-Received: by 2002:a05:6000:1202:: with SMTP id
+ e2mr16233639wrx.231.1590919278974; 
+ Sun, 31 May 2020 03:01:18 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id e5sm16792913wrw.19.2020.05.31.02.59.15
+ by smtp.gmail.com with ESMTPSA id d4sm16097075wre.22.2020.05.31.03.01.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 31 May 2020 02:59:15 -0700 (PDT)
-Subject: Re: [PATCH RFC 12/32] python/qemu/lib: fix socket.makefile() typing
+ Sun, 31 May 2020 03:01:18 -0700 (PDT)
+Subject: Re: [PATCH RFC 13/32] python/qemu/lib: Adjust traceback typing
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-13-jsnow@redhat.com>
+ <20200514055403.18902-14-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,20 +104,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2647a1bf-4504-dbe5-417b-1e0c894eec5a@redhat.com>
-Date: Sun, 31 May 2020 11:59:14 +0200
+Message-ID: <d6c78b4c-f3c3-3395-9fb6-0657fc6a2152@redhat.com>
+Date: Sun, 31 May 2020 12:01:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514055403.18902-13-jsnow@redhat.com>
+In-Reply-To: <20200514055403.18902-14-jsnow@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 05:59:21
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 05:58:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -149,123 +149,23 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/14/20 7:53 AM, John Snow wrote:
-> Note:
+> mypy considers it incorrect to use `bool` to statically return false,
+> because it will assume that it could conceivably return True, and gives
+> different analysis in that case. Use a None return to achieve the same
+> effect, but make mypy happy.
 > 
-> A bug in typeshed (https://github.com/python/typeshed/issues/3977)
-> misinterprets the type of makefile(). Work around this by explicitly
-> stating that we are opening a text-mode file.
+> Note: Pylint considers function signatures as code that might trip the
+> duplicate-code checker. I'd rather not disable this as it does not
+> trigger often in practice, so I'm disabling it as a one-off and filed a
+> change request; see https://github.com/PyCQA/pylint/issues/3619
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/lib/qmp.py   | 10 +++++++---
->  python/qemu/lib/qtest.py | 12 ++++++++----
->  2 files changed, 15 insertions(+), 7 deletions(-)
-> 
-> diff --git a/python/qemu/lib/qmp.py b/python/qemu/lib/qmp.py
-> index 6ae7693965..73d49050ed 100644
-> --- a/python/qemu/lib/qmp.py
-> +++ b/python/qemu/lib/qmp.py
-> @@ -11,6 +11,10 @@
->  import errno
->  import socket
->  import logging
-> +from typing import (
-> +    Optional,
-> +    TextIO,
-> +)
->  
->  
->  class QMPError(Exception):
-> @@ -61,7 +65,7 @@ def __init__(self, address, server=False, nickname=None):
->          self.__events = []
->          self.__address = address
->          self.__sock = self.__get_sock()
-> -        self.__sockfile = None
-> +        self.__sockfile: Optional[TextIO] = None
->          self._nickname = nickname
->          if self._nickname:
->              self.logger = logging.getLogger('QMP').getChild(self._nickname)
-> @@ -157,7 +161,7 @@ def connect(self, negotiate=True):
->          @raise QMPCapabilitiesError if fails to negotiate capabilities
->          """
->          self.__sock.connect(self.__address)
-> -        self.__sockfile = self.__sock.makefile()
-> +        self.__sockfile = self.__sock.makefile(mode='r')
->          if negotiate:
->              return self.__negotiate_capabilities()
->          return None
-> @@ -180,7 +184,7 @@ def accept(self, timeout=15.0):
->          """
->          self.__sock.settimeout(timeout)
->          self.__sock, _ = self.__sock.accept()
-> -        self.__sockfile = self.__sock.makefile()
-> +        self.__sockfile = self.__sock.makefile(mode='r')
->          return self.__negotiate_capabilities()
->  
->      def cmd_obj(self, qmp_cmd):
-> diff --git a/python/qemu/lib/qtest.py b/python/qemu/lib/qtest.py
-> index 7943487c2b..4c88590eb0 100644
-> --- a/python/qemu/lib/qtest.py
-> +++ b/python/qemu/lib/qtest.py
-> @@ -19,6 +19,7 @@
->  
->  import socket
->  import os
-> +from typing import Optional, TextIO
->  
->  from .machine import QEMUMachine
->  
-> @@ -40,7 +41,7 @@ class QEMUQtestProtocol:
->      def __init__(self, address, server=False):
->          self._address = address
->          self._sock = self._get_sock()
-> -        self._sockfile = None
-> +        self._sockfile: Optional[TextIO] = None
->          if server:
->              self._sock.bind(self._address)
->              self._sock.listen(1)
-> @@ -59,7 +60,7 @@ def connect(self):
->          @raise socket.error on socket connection errors
->          """
->          self._sock.connect(self._address)
-> -        self._sockfile = self._sock.makefile()
-> +        self._sockfile = self._sock.makefile(mode='r')
->  
->      def accept(self):
->          """
-> @@ -68,7 +69,7 @@ def accept(self):
->          @raise socket.error on socket connection errors
->          """
->          self._sock, _ = self._sock.accept()
-> -        self._sockfile = self._sock.makefile()
-> +        self._sockfile = self._sock.makefile(mode='r')
->  
->      def cmd(self, qtest_cmd):
->          """
-> @@ -76,6 +77,7 @@ def cmd(self, qtest_cmd):
->  
->          @param qtest_cmd: qtest command text to be sent
->          """
-> +        assert self._sockfile is not None
->          self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
->          resp = self._sockfile.readline()
->          return resp
-> @@ -83,7 +85,9 @@ def cmd(self, qtest_cmd):
->      def close(self):
->          """Close this socket."""
->          self._sock.close()
-> -        self._sockfile.close()
-> +        if self._sockfile:
-> +            self._sockfile.close()
-> +            self._sockfile = None
->  
->      def settimeout(self, timeout):
->          """Set a timeout, in seconds."""
-> 
+>  python/qemu/lib/machine.py |  8 ++++++--
+>  python/qemu/lib/qmp.py     | 10 ++++++++--
+>  2 files changed, 14 insertions(+), 4 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-And applied to my python-next tree:
+Thanks, applied to my python-next tree:
 https://gitlab.com/philmd/qemu/commits/python-next
 
 
