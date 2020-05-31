@@ -2,80 +2,101 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7954C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2FFC20657
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:16:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2FFC20657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 82CD5206DA
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 19:32:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKn9oCI/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CD5206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfTRt-0001r6-VS
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 15:16:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44674)
+	id 1jfThO-000685-QG
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 15:32:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfTQp-0000x8-HV
- for qemu-devel@nongnu.org; Sun, 31 May 2020 15:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59636)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfTga-00059l-Oj; Sun, 31 May 2020 15:31:57 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36214)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfTQo-00009C-7J
- for qemu-devel@nongnu.org; Sun, 31 May 2020 15:15:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jfTQl-000586-Ng
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 19:15:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AF49B2E8033
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 19:15:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 31 May 2020 19:08:15 -0000
-From: Ethin Probst <1881506@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jfTgZ-0003L3-Q5; Sun, 31 May 2020 15:31:56 -0400
+Received: by mail-wr1-x444.google.com with SMTP id q11so9414069wrp.3;
+ Sun, 31 May 2020 12:31:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=kcAk4jMkgQDcQ57Ja0V3NalzXX4EhBVZJ2gA37gPLk4=;
+ b=XKn9oCI/5rlAtuH+ePBpAJoccKkrgUJ7DKmdgLCc1MA1pEuiBPwg9V2MpM322eBMDy
+ l4ntCPmbsvjopfw5CahzfNUYczF0Vk3c1mjNTXx3tqC+2IqZv1EGbUJ/BF7q0WpJDmnm
+ A8fU/bqIHO4dBaQLKcYa/4Mc96Lkp9iZe4toe1mMgvvNxPc7dW4k6yHi6aVcFeRUbfAV
+ v/u/uSzCDViimauPMEND0qXNmq0gXlc5K5YbSzb/gxkaaOVhptazMLuJC5cXMBNGt/hT
+ IBMWtZfOXp91W2sFPHoA4Aj+Uwl64pzCeogGqc+69uWkTY1w2tF+U/5ZlOl7eWQwJ0YN
+ cSHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kcAk4jMkgQDcQ57Ja0V3NalzXX4EhBVZJ2gA37gPLk4=;
+ b=LWxgGENSiDs7rFEGEFzYn6m0FvxtL8S4VbuwrNya9ZmGOB0WmjSfsiNIvRoN0oIy7a
+ i79qEQHYAp/RLoGEcUBphQXQZNWk6T5N8BH+5iYAaOgJSJZSRLIP+NTWyAW6VZ+30QAg
+ oaJlooJ+OxrBwkGsmVcIwKjU2iHx3oR0oJot5rypuDjelpMy4LXAOwEtBvn7TIoTBnbY
+ iMUMA2FUEmdZgKy0cfOnCiGNL9FU5Mo3mv8X6BmcUR8Z4Ars7Zy1N4WmsnW0f5+oWoxh
+ r25f9ilE6UDe7ZeoRziUo2OZQWfE1MRsQ4DgPYTmdQgF6WA3p68vmkWHHQ97zHbSazB3
+ 1czw==
+X-Gm-Message-State: AOAM530blMfZiYrroWB27crDrFbm+PmkxpfzQCKkWFzE+2wTQEEajZ31
+ +/2uYfBaLoc9RG+mQxk4D7s=
+X-Google-Smtp-Source: ABdhPJw7eXcKZQ0vlLc4y314v/1EAGViwbNaYnFUiFxBzCTV8+hBmR3Pojl9+6Ddy9kdDF9II0QMAA==
+X-Received: by 2002:a5d:610f:: with SMTP id v15mr18483412wrt.52.1590953513674; 
+ Sun, 31 May 2020 12:31:53 -0700 (PDT)
+Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.43])
+ by smtp.gmail.com with ESMTPSA id b18sm17680602wrn.88.2020.05.31.12.31.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 31 May 2020 12:31:53 -0700 (PDT)
+Subject: Re: [PATCH 3/6] hw/sd/allwinner-sdhost: Do DMA accesses via DMA
+ address space
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: harlydavidsen
-X-Launchpad-Bug-Reporter: Ethin Probst (harlydavidsen)
-X-Launchpad-Bug-Modifier: Ethin Probst (harlydavidsen)
-Message-Id: <159095209581.29684.17955799234221982572.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1881506] [NEW] TCG doesn't support a lot of features that should
- be supported
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b8bee8ec780bed5d4a58cc0af581802e00e7234c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 14:59:30
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+References: <20200531175425.10329-1-f4bug@amsat.org>
+ <20200531175425.10329-4-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a0a5e642-c5f6-158f-5dcd-14c95b782e39@amsat.org>
+Date: Sun, 31 May 2020 21:31:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200531175425.10329-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,64 +105,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1881506 <1881506@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 5/31/20 7:54 PM, Philippe Mathieu-Daudé wrote:
+> The DMA operations should not use the CPU address space, but
+> the DMA address space. Add support for a DMA address space,
+> and replace the cpu_physical_memory API calls by equivalent
+> dma_memory_read/write calls.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/sd/allwinner-sdhost.h |  4 ++++
+>  hw/sd/allwinner-sdhost.c         | 36 ++++++++++++++++++++++++++------
+>  2 files changed, 34 insertions(+), 6 deletions(-)
+> 
+[...]> @@ -742,6 +747,17 @@ static void allwinner_sdhost_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+>  }
+>  
+> +static void allwinner_sdhost_realize(DeviceState *dev, Error **errp)
+> +{
+> +    AwSdHostState *s = AW_SDHOST(dev);
+> +
+> +    if (!s->dma_mr) {
+> +        error_setg(errp, "\"dma\" property must be provided.");
 
-This is quite odd, and I'm not sure about how to get around it. I'm writing=
- an OS in Rust and require APIC support. When I boot my kernel with qemu-sy=
-stem-x86_64, however, it dumps out a [lot] of warnings; it claims that TCG =
-doesn't support FMA, X2APIC, AVX, F16C, AVX2, RDSEED, SHA-NI, FXSR-OPT, mis=
-alignsse, 3dnowprefetch, osvw, topoext, perfctr-core, clzero, xsaveerptr, i=
-bpb, nrip-save, xsavec, and xsaves, but prints these warnings over 80 times=
- before finally doing what I told it to do. Running QEMU 5.0.0 (unknown com=
-mit hash), as follows:
-qemu-system-x86_64 -drive format=3Draw,file=3Dtarget\x86_64-kernel-none\deb=
-ug\bootimage-kernel.bin -serial stdio -no-reboot -hdb disk.img -s -m 4G -us=
-b -rtc base=3Dutc,clock=3Dhost -cpu EPYC-v3,+acpi,+apic,+rdrand,+rdseed,+ss=
-e,+sse2,+sse4.1,+sse4.2,+sse4a,+ssse3,+syscall,+x2apic -smp cpus=3D8 -sound=
-hw all
-I would run using HAXM, but my kernel requires RDRAND, and QEMU does not, t=
-o my knowledge, automatically support RDRAND (and I don't know how to enabl=
-e it).
+Oops I forgot to include the part that sets this property in the A10/H3
+SoCs.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1881506
-
-Title:
-  TCG doesn't support a lot of features that should be supported
-
-Status in QEMU:
-  New
-
-Bug description:
-  This is quite odd, and I'm not sure about how to get around it. I'm writi=
-ng an OS in Rust and require APIC support. When I boot my kernel with qemu-=
-system-x86_64, however, it dumps out a [lot] of warnings; it claims that TC=
-G doesn't support FMA, X2APIC, AVX, F16C, AVX2, RDSEED, SHA-NI, FXSR-OPT, m=
-isalignsse, 3dnowprefetch, osvw, topoext, perfctr-core, clzero, xsaveerptr,=
- ibpb, nrip-save, xsavec, and xsaves, but prints these warnings over 80 tim=
-es before finally doing what I told it to do. Running QEMU 5.0.0 (unknown c=
-ommit hash), as follows:
-  qemu-system-x86_64 -drive format=3Draw,file=3Dtarget\x86_64-kernel-none\d=
-ebug\bootimage-kernel.bin -serial stdio -no-reboot -hdb disk.img -s -m 4G -=
-usb -rtc base=3Dutc,clock=3Dhost -cpu EPYC-v3,+acpi,+apic,+rdrand,+rdseed,+=
-sse,+sse2,+sse4.1,+sse4.2,+sse4a,+ssse3,+syscall,+x2apic -smp cpus=3D8 -sou=
-ndhw all
-  I would run using HAXM, but my kernel requires RDRAND, and QEMU does not,=
- to my knowledge, automatically support RDRAND (and I don't know how to ena=
-ble it).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1881506/+subscriptions
+> +        return;
+> +    }
+> +    address_space_init(&s->dma_as, s->dma_mr, "sdhost-dma");
+> +}
+> +
+>  static void allwinner_sdhost_reset(DeviceState *dev)
+>  {
+>      AwSdHostState *s = AW_SDHOST(dev);
+> @@ -787,6 +803,12 @@ static void allwinner_sdhost_reset(DeviceState *dev)
+>      s->status_crc = REG_SD_CRC_STA_RST;
+>  }
+>  
+> +static Property allwinner_sdhost_properties[] = {
+> +    DEFINE_PROP_LINK("dma", AwSdHostState,
+> +                     dma_mr, TYPE_MEMORY_REGION, MemoryRegion *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void allwinner_sdhost_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      SDBusClass *sbc = SD_BUS_CLASS(klass);
+> @@ -798,7 +820,9 @@ static void allwinner_sdhost_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> +    device_class_set_props(dc, allwinner_sdhost_properties);
+>      dc->reset = allwinner_sdhost_reset;
+> +    dc->realize = allwinner_sdhost_realize;
+>      dc->vmsd = &vmstate_allwinner_sdhost;
+>  }
+>  
+> 
 
