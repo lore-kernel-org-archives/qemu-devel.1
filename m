@@ -2,95 +2,69 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB70C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87404C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:03:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 193F120707
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 10:55:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mtnr1XvX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193F120707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 59E2320671
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:03:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E2320671
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfLcT-0008OR-CQ
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 06:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52500)
+	id 1jfLkQ-0001ey-G0
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:03:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jfLbf-0007uc-7Q
- for qemu-devel@nongnu.org; Sun, 31 May 2020 06:54:19 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41032)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jfLbd-0004Z8-VP
- for qemu-devel@nongnu.org; Sun, 31 May 2020 06:54:18 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j10so8525672wrw.8
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 03:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=fArpJ2tNrQAkmFgtJ9gv8DT7HSEXD98VTJXEmu6N9Q0=;
- b=mtnr1XvX6sK/zU9zGZb8WLFs7yMtF1hfioxVjuU8/ioa+o4VcRnG9068+X82NMgFgm
- aoi/xxdg96v0QXNWTJZMy5ONi7ImGodmXep7EuSL+/HCEReStTb1kCxQfcmUEXkRNOEe
- W6bnF4vWdJBent58M947tKgOjGAAd8vpxle4rBH0cil3EN7uc34VtlTww7xEKY3uAMNF
- MkHAv9MnF2J28Q8H7lG8x1TAwVXbTECdTsrGb07Yk/i+WGj/rTwE2+J17LiKUdL2Atv8
- 0FIMYsq35lV0sLZ9oldSN47NJqvO6hjb9z4FJ5Jn+YJ981PocwHEU8gRDARi6aVYhBTb
- IeXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fArpJ2tNrQAkmFgtJ9gv8DT7HSEXD98VTJXEmu6N9Q0=;
- b=Yc3A8GxAXVQP7Zqd/s7UkqpZUNaWmzaxDQNemv3NbF5UZHW6E+ceO6c09YXABGwtx1
- mSbgozq9m2LOpLRoZ+vtV2L/WaV1+EGdpbUNqEwZ3n4OcxzccMaE/5nxxTmSf8f2YbSJ
- McHAcTZsImyyexs+V7k+KJDj7TwBpLvNR4Y6K6Luf3QgIVEDjsg9V0+FnKv+qwDZedAP
- vvt6rODCqKvf2bzmiZmZBlEqHPBYjr/4njzlxB9ULacex2YG44jx09pmj5MPDaWF8t1q
- thn6CCT1YZgKUJaqNfLFZz8HkqGCgbzqk8T8j/XJ1dOxjcL9lsaEa5xpaDWgqWH8PGUy
- HmfQ==
-X-Gm-Message-State: AOAM532tNcR5EhVAEFTauD/J/R0i9+RBHgZh7W93th594aKOdrzzlZdo
- JG5zxuGeY9CekOFKJWfCYcIsqw==
-X-Google-Smtp-Source: ABdhPJzhfpj9YRr0EtjZnPBWTDy8vg3Lhn58WJ4T5Cn0nrXFdlsVBx7l0ZCZ0gT/L4Xo/p5NBDAQ7A==
-X-Received: by 2002:adf:f389:: with SMTP id m9mr16052616wro.195.1590922456109; 
- Sun, 31 May 2020 03:54:16 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c25sm6975861wmb.44.2020.05.31.03.54.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 03:54:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 47A7E1FF7E;
- Sun, 31 May 2020 11:54:14 +0100 (BST)
-References: <20200529203458.1038-1-robert.foley@linaro.org>
- <20200529203458.1038-9-robert.foley@linaro.org>
- <6f29b51c-b8d6-772c-eb24-b4c88c6c2d62@redhat.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v8 08/12] tests/vm: Added a new script for ubuntu.aarch64.
-In-reply-to: <6f29b51c-b8d6-772c-eb24-b4c88c6c2d62@redhat.com>
-Date: Sun, 31 May 2020 11:54:14 +0100
-Message-ID: <878sh8v0h5.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jfLjl-0001An-DD
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:02:41 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:59031)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jfLjk-0006Oj-9M
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:02:41 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MFL4B-1jlibL3fmD-00Fjz1; Sun, 31 May 2020 13:02:35 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target/m68k: implement fmove.l #<data>,FPCR
+Date: Sun, 31 May 2020 13:02:31 +0200
+Message-Id: <20200531110231.620711-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:gRXlPp3ur9V9PClMfEz5Kcot4hH4+G1Frpu/j6M5h4iEo7sZPPC
+ 4u5pwEgsK/0imq8xinGXfhR1ET4OHqvOxmB01i4EOb7fXfindYSYXnBVzQZaIGT4IAfLP7U
+ OZz7I05svbNJsLu8RMUUO0IfY1Sl+bHT1lT77wyqSqWH7Zg0IikIqyVvypTDYddlhaH8DM8
+ pXDbmP3L8SSNXEiS5d4sg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7VIazFhr6/o=:6wy0/jbWo6ISJoPF8+A4wS
+ PJIo0BqNNizhrYdri/7V+gY1X9evt8gvdBPuQJx93DjqP+wwQMez0A/FqRIF743HY1A2Dv0UZ
+ 46rUYq/ds8+UJRy6bxDS9Z4OTvtIBa4Tz94kmwNK9sjoEEJd9yLePgDWXNWi/x66m3k81z9sn
+ ToMZ3PCG9q/XZhL8uY0KG3MCUPMezthMu7xAmexXcNYbwDyRHl7Uzyw0be3YKaCAHVZf8FFrI
+ iEF/pr5YuZjC9Ojv5642jZPXXlWZMyuW02MP8hQVrU4Yb/YQxG29SUj2WNQ1NqKMXYBASQyD8
+ N2deWU64tF0wCliZcRWWobUyM65fXU7UC+gpab6tY9iN3JVUiUZukd9pTQS9cGg+Fw3oZwP7F
+ s4x41a4XS/mUMiYLX8LLirFQsLXMbT2yUYcQFVwT3ByM0zS13Vqjv1ZkOlRmt39H8wfw4nnPN
+ angb8GC3XZnDwWZv2NAoaccfY7l6G+2YlM68L+oxGiFE8WMQANcSSwA8LBuk3pJMKVE43GY4D
+ /q96yPf/sd948boDo5rLFKIxFVRZPIgTqlwLjNN3Er2YEY+Oi39j3w6oJYqy+K+9WAIQiUWr6
+ k2IZMoe9lzhw0m6TuYSBcZIqhzBl1aNOxVZrnP77c0fvgkV6dL+nKxbT8wpurKEFUNCxQT/2O
+ 6F0LE/Et+w/jboiwS4r784aC97NFgtrj+e215eDr8npCqfVBUMCzAhESRHNh4qxEc4Z+BBNdA
+ PCELz9wneTrBkUNg62E0CLm4/oKiQedw7CXapKFEANCm7wbUdKjkRNWJBxeJ47pfguh8vdMNW
+ yXDaQ6OcDMyk4mRP9RMCp+UjI9VLsgckHFGBfEyZUckhF1iyUvI3W2wYa6w20rdZ1OKbCPf
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 07:02:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,98 +78,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.puhov@linaro.org,
- Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The immediate value mode was ignored and instruction execution
+ends to an invalid access mode.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+This was found running 'R' that set FPSR to 0 at startup with
+a 'fmove.l #0,FPSR' in qemu-system-m68k emulation and triggers a
+kernel crash:
 
-> Hi Robert,
->
-> On 5/29/20 10:34 PM, Robert Foley wrote:
-<snip>
->> diff --git a/configure b/configure
->> index d82de47fdd..8a286e75a5 100755
->> --- a/configure
->> +++ b/configure
->> @@ -411,6 +411,7 @@ prefix=3D"/usr/local"
->>  mandir=3D"\${prefix}/share/man"
->>  datadir=3D"\${prefix}/share"
->>  firmwarepath=3D"\${prefix}/share/qemu-firmware"
->> +efi_aarch64=3D""
->>  qemu_docdir=3D"\${prefix}/share/doc/qemu"
->>  bindir=3D"\${prefix}/bin"
->>  libdir=3D"\${prefix}/lib"
->> @@ -1099,6 +1100,8 @@ for opt do
->>    ;;
->>    --firmwarepath=3D*) firmwarepath=3D"$optarg"
->>    ;;
->> +  --efi-aarch64=3D*) efi_aarch64=3D"$optarg"
->> +  ;;
->>    --host=3D*|--build=3D*|\
->>    --disable-dependency-tracking|\
->>    --sbindir=3D*|--sharedstatedir=3D*|\
->> @@ -1753,6 +1756,7 @@ Advanced options (experts only):
->>    --sysconfdir=3DPATH        install config in PATH$confsuffix
->>    --localstatedir=3DPATH     install local state in PATH (set at runtim=
-e on win32)
->>    --firmwarepath=3DPATH      search PATH for firmware files
->> +  --efi-aarch64=3DPATH       PATH of efi file to use for aarch64 VMs.
->>    --with-confsuffix=3DSUFFIX suffix for QEMU data inside datadir/libdir=
-/sysconfdir [$confsuffix]
->>    --with-pkgversion=3DVERS   use specified string as sub-version of the=
- package
->>    --enable-debug           enable common debug build options
->> @@ -3548,6 +3552,20 @@ EOF
->>    fi
->>  fi
->>=20=20
->> +############################################
->> +# efi-aarch64 probe
->> +# Check for efi files needed by aarch64 VMs.
->> +# By default we will use the efi included with QEMU.
->> +# Allow user to override the path for efi also.
->> +if ! test -f "$efi_aarch64"; then
->> +    if test -f $source_path/pc-bios/edk2-aaarch64-code.fd.bz2; then
->> +        # valid after build
->> +        efi_aarch64=3D$PWD/pc-bios/edk2-aarch64-code.fd
->> +    else
->> +        efi_aarch64=3D""
->> +    fi
->> +fi
->> +
-<snip>
->>=20=20
->>  IMAGES_DIR :=3D $(HOME)/.cache/qemu-vm/images
->> @@ -23,6 +26,11 @@ vm-help vm-test:
->>  ifneq ($(GENISOIMAGE),)
->>  	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, wi=
-th Docker"
->>  	@echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 V=
-M"
->> +ifneq ($(EFI_AARCH64),)
->> +	@echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu aarch6=
-4 VM"
->> +else
->> +	@echo "  (install qemu-efi-aarch64 to build centos/ubuntu aarch64 imag=
-es.)"
->
-> I'm not sure your test is working well, I have qemu-efi-aarch64
-> installed and it not automatically discovered.
->
-> # apt install qemu-efi-aarch64
-> qemu-efi-aarch64 is already the newest version
-> (0~20191122.bd85bf54-2ubuntu3).
->
-> Hint: I'm using out-of-tree builds.
+[   56.640000] *** ADDRESS ERROR ***   FORMAT=2
+[   56.640000] Current process id is 728
+[   56.640000] BAD KERNEL TRAP: 00000000
+[   56.640000] Modules linked in: sg evdev mac_hid ip_tables x_tables sha1_generic hmac ipv6 nf_defrag_ipv6 autofs4 ext4 crc16 mbcache jbd2 crc32c_generic sd_mod t10_pi crc_t10dif crct10dif_generic crct10dif_common sr_mod cdrom mac_esp macsonic esp_scsi
+[   56.640000] PC: [<00016a2c>] X_UNSUPP+0x2c/0x3c
+[   56.640000] SR: 2004  SP: 3eb5e68c  a2: c02e239a
+[   56.640000] d0: 00000040    d1: 00000002    d2: 8002adec    d3: 8002ad50
+[   56.640000] d4: 8002c768    d5: 0000000d    a0: ffffffc2    a1: ffffffc1
+[   56.640000] Process R (pid: 728, task=a3dfda5d)
+[   56.640000] Frame format=2 instr addr=00000000
+[   56.650000] Stack from 3a4d9f30:
+[   56.650000]         41000000 00000002 00000002 ffffffc2 ffffffc1 1fff0000 80000000 00000000
+[   56.650000]         3fbf0000 80000000 00000000 00000000 20000000 00000000 7fff0000 ffffffff
+[   56.650000]         ffffffff 00000000 00050008 00000000 8000067c c02c2000 efffee20 000002d8
+[   56.650000]         00002a28 3a4d9f98 00000002 00000014 fffffffe 8002c768 00000002 00000041
+[   56.650000]         00000002 c041fc58 c0743758 ffffffff 00000000 0008c075 00002b24 00000012
+[   56.650000]         000007d0 00000024 00000002 c05bef04 c05bef04 0000005e 00000077 c28aca70
+[   56.650000] Call Trace: [<00050008>] copy_overflow+0x10/0x28
+[   56.650000]  [<00002a28>] buserr+0x20/0x28
+[   56.650000]  [<0008c075>] bpf_check+0x57f/0x1cfa
+[   56.650000]  [<00002b24>] syscall+0x8/0xc
+[   56.650000]  [<0000c019>] dn_sched_init+0x75/0x88
+[   56.650000] Code: 1017 0200 00f0 0c00 0040 66ff 0000 05ac <f23c> 8800 0000 0000 f23c 9000 0000 0000 222e ff84 082e 0005 ff1c 6600 000a 0281
+[   56.650000] Disabling lock debugging due to kernel taint
+...
 
-I think efi_aarch64=3D"" needs to be the default path, which can then be
-overridden by the command line or finally fall back to the built in
-image.
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/translate.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
---=20
-Alex Benn=C3=A9e
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 0f80888203d3..c093f6c683e8 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -4936,6 +4936,20 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
+             gen_store_fcr(s, AREG(insn, 0), mask);
+         }
+         return;
++    case 7: /* Immediate */
++        if (REG(insn, 0) == 4) {
++            if (is_write ||
++                (mask != M68K_FPIAR && mask != M68K_FPSR &&
++                 mask != M68K_FPCR)) {
++                gen_exception(s, s->base.pc_next, EXCP_ILLEGAL);
++                return;
++            }
++            tmp = tcg_const_i32(read_im32(env, s));
++            gen_store_fcr(s, tmp, mask);
++            tcg_temp_free(tmp);
++            return;
++        }
++        break;
+     default:
+         break;
+     }
+-- 
+2.26.2
+
 
