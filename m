@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F31C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5622C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54BB22074A
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F1AC2074A
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:42:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWgHRcTa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54BB22074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HrBc+Rfn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F1AC2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfR12-0003RY-Df
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:40:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55268)
+	id 1jfR2R-0006AV-Os
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:42:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzs-0001da-09
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39484
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzJ-0000vb-Ie
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27371
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzr-0006kx-6m
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:39 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzI-0006et-PP
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:39:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590943178;
+ s=mimecast20190719; t=1590943144;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gbfmbJetD8UXBRyHPiWp2CZGSyL0yCJiZ8wSWR7Ajrc=;
- b=WWgHRcTauvbPDjd2H4idUM9PvClm6ie1dsT5v3I5FbRT4WEPQWca3sYHkVYW++tGPocT9l
- E+FUUUvima4ckm66DTEuIWQ2JK/3ySHoKQn3avhK2oLPGo2HcthAi/CFpteAa3wTMaAdQz
- F0jmMdK3h0rBIMSyCF8S44RAjyGRhO0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-Ioi2TqhyMkKHRozy2hLV8A-1; Sun, 31 May 2020 12:39:36 -0400
-X-MC-Unique: Ioi2TqhyMkKHRozy2hLV8A-1
-Received: by mail-wr1-f71.google.com with SMTP id n6so3624099wrv.6
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:39:36 -0700 (PDT)
+ bh=C/VDoQzlI3PMEip7rZs9mnHodIncfMhzQDNkbQhv2i8=;
+ b=HrBc+RfnUyN+2cMol2wvSFsEXguNkdPTYEHArcXcZafDlVconFtGN/yO/wWhV7J0o8mnTY
+ Yl9gbB+bnskmX2liS8+K6x6Yi/MQkDfYJj3ASB0pixL7mDaQMcsmfnXxePVLp/aqKkwxVe
+ 0n3JT04X0Iw3K6EwDr4Z1j88gQcExI0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-v20ZcIOeOsCxvQ5ZU-IkHA-1; Sun, 31 May 2020 12:39:01 -0400
+X-MC-Unique: v20ZcIOeOsCxvQ5ZU-IkHA-1
+Received: by mail-wm1-f71.google.com with SMTP id u11so1912763wmc.7
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:39:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gbfmbJetD8UXBRyHPiWp2CZGSyL0yCJiZ8wSWR7Ajrc=;
- b=MH9ADqAlJrx+HP+9xa2oBiffr0bPEXnz/MUl8xHeN/ID0CW93r5aOSVhz4oyLTiWyn
- jhHdD+dEwhEKQIrRfZHSsXzvVfAB4joD8I9DGXqfSyZMGD4SxPfo7aKzpVF+FPVgq2ie
- Vxcy9KynconmOaMWjiUclLNliwAaLPI8QrgqH/vlgQERKgEbvs15RnuuS9nwOpffTGwV
- V97PxNo9Xn5SOgVWtdcUr+ZsKPkQ3R2GR99Zgakh/8LL3ZKOCidvoEF7UQiYtYGA8ixt
- Z3PiTjYg8oZ9E2Z3tKSLHVDFoAcEtnXCIYXBAyHtWpdEc4z4wyTT8vwQHPmZmR+i+zeM
- R97A==
-X-Gm-Message-State: AOAM530gAh9oySby+eQ23B6vpJd15HoKpia7rsmRyL4eaEpLBsMnuwbP
- Ck0EiXWeMXwgvuu4pVHvNfSv7bZo95CYM7+2/WzkLp4yjLi/HZ06ayPMd6I1HFxHQbW4hAu3AaA
- 3F6sm0QbYOCcI65A=
-X-Received: by 2002:a5d:6905:: with SMTP id t5mr17760709wru.113.1590943175696; 
- Sun, 31 May 2020 09:39:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyR0WKTSgw9DfCBwsj7WS7gvkIpsMb9ekd4IwqI/sxgbznb+YzTnTNNzeC4sMj2PMSV+Th05w==
-X-Received: by 2002:a5d:6905:: with SMTP id t5mr17760696wru.113.1590943175563; 
- Sun, 31 May 2020 09:39:35 -0700 (PDT)
+ bh=C/VDoQzlI3PMEip7rZs9mnHodIncfMhzQDNkbQhv2i8=;
+ b=K/JWNvgFwAoZqRQICT9kZ13cLE/SVoOUxe4QmLfXDOEgolIaZ/VG9EdDPjiFR09qvw
+ fjmli14XaIC2EyGRCI6nMzbovaMAyDeDBsoFxMaNmuc573IPU55Ntk9ZqJeMHtGTsC53
+ CENUJnF/pE9SIA/xPGHhTip+g2vcDVn9B4EuIWBcF613SN0sJiwgv4BDpR73YTbfyMTw
+ FNCq8Wvl8vzSorzpKKaTdVQ+leFu9P1pCGFEnKIS6Sqeeg3lc3JPUiF+hqbnF+228Tzj
+ C0jo4oPGFNbKTUPIXR5/8/7hYsb7L7t0VQ8bPqU3v7RDmlXwCIhjVEJMfIglOSSZLctt
+ 3oHQ==
+X-Gm-Message-State: AOAM530AUNSE4jM1E0cICeY0FiZxakPGyTNXIwxjmalYufEFQUr9ELk1
+ TtW+Irw3i7rLZhvOLGWoSGDoy0/w6yHtkHxiuaHG/GOyDYJrF0mc3s3tprjt8Bpzk4UCJFc34pX
+ 3soUiVglZe8l+Ovk=
+X-Received: by 2002:a1c:29c4:: with SMTP id p187mr17760836wmp.73.1590943140357; 
+ Sun, 31 May 2020 09:39:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwIEiALGuV93Ro6dhnxfm0LVwVkfTLG/HYDNsHae0Cpu2iwY0tKkx4JmUw+UJ4NEDJTtGPkpg==
+X-Received: by 2002:a1c:29c4:: with SMTP id p187mr17760818wmp.73.1590943140155; 
+ Sun, 31 May 2020 09:39:00 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id s7sm17688910wrr.60.2020.05.31.09.39.34
+ by smtp.gmail.com with ESMTPSA id d2sm17217183wrs.95.2020.05.31.09.38.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 09:39:35 -0700 (PDT)
+ Sun, 31 May 2020 09:38:59 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/25] python/qemu/machine: remove logging configuration
-Date: Sun, 31 May 2020 18:38:30 +0200
-Message-Id: <20200531163846.25363-10-philmd@redhat.com>
+Subject: [PULL 02/25] scripts/qemu-gdb: Use Python 3 interpreter
+Date: Sun, 31 May 2020 18:38:23 +0200
+Message-Id: <20200531163846.25363-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
 References: <20200531163846.25363-1-philmd@redhat.com>
@@ -87,16 +87,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:38:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 11:09:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,6 +113,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
@@ -123,34 +124,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Python 3.5 and above do not print a warning when logging is not
-configured. As a library, it's best practice to leave logging
-configuration to the client executable.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200514055403.18902-22-jsnow@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200512103238.7078-3-philmd@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- python/qemu/machine.py | 3 ---
- 1 file changed, 3 deletions(-)
+ scripts/qemu-gdb.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index d2f531f1b4..41554de533 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -119,9 +119,6 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         self._console_socket = None
-         self._remove_files = []
- 
--        # just in case logging wasn't configured by the main script:
--        logging.basicConfig()
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index f2a305c42e..e0bfa7b5a4 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -1,5 +1,5 @@
+-#!/usr/bin/python
 -
-     def __enter__(self):
-         return self
- 
++#!/usr/bin/env python3
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
 -- 
 2.21.3
 
