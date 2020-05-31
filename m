@@ -2,82 +2,83 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAE1C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:53:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFA3E206F1
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:28:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 785F620707
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 11:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGDOH//H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFA3E206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7a8Nnpt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785F620707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfM8p-0001VK-LD
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:28:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56084)
+	id 1jfMXC-0005tJ-NL
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 07:53:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfM7s-000148-Fx
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:27:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20296
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMWQ-0005SJ-MB
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:52:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48654
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfM7q-0001pm-Tp
- for qemu-devel@nongnu.org; Sun, 31 May 2020 07:27:36 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfMWP-0008Js-7g
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 07:52:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590924453;
+ s=mimecast20190719; t=1590925975;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+rhvB2BO8YWp/irXNbbOhgmq5q6FB59Dl2dRnBb8q34=;
- b=WGDOH//H8vDAqMrwBxkMc5R84TSdA0i9hhah0hQoaeIlSWofs+ISKqImWKRvC8rKxSniY9
- YZLiXlXy0Tm8f4MfDqHicXXZI8HUITMlnNZRw7OofNlnsnYgSMMht6iS/8RqF2sII+PTpD
- BEHBS0XqRBGjNmx6FT1tPpxfIBFXuxI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-d347J8qqM1WL7TuN3ds5Hw-1; Sun, 31 May 2020 07:27:31 -0400
-X-MC-Unique: d347J8qqM1WL7TuN3ds5Hw-1
-Received: by mail-wr1-f69.google.com with SMTP id w16so3349655wru.18
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 04:27:31 -0700 (PDT)
+ bh=YqJQzxlqkkuz7YybaBOHPT6RnbknrzI7aM5pUExwIbA=;
+ b=U7a8NnptIrIjreQ0gqkagz4MYkW01zXZjRHIN79ZU1sVHt3MtWZ8dszNYYXNJqHctohK8Q
+ vwc6J3A7xvUxAn10LmIHm/JoAx60DQHCzPvWI6a2OEJ86y+UVoujK3y9+pxpqkocmbiftP
+ HM7kSWSx98DK49ae3U8YpltyL/sPyWQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-452-BjwpmRL3NHq6TQb7WJV-bA-1; Sun, 31 May 2020 07:52:50 -0400
+X-MC-Unique: BjwpmRL3NHq6TQb7WJV-bA-1
+Received: by mail-wm1-f71.google.com with SMTP id b65so1864076wmb.5
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 04:52:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=+rhvB2BO8YWp/irXNbbOhgmq5q6FB59Dl2dRnBb8q34=;
- b=YGMWOEVN9ds1By0ZBSE27yV+LCBQ8azlYgPVcIRBBAbueAeM4ugWR4bNnCTWh+ZltN
- QNfrLMT8pSL4txbP0kKpNXKR8NWSi3MQ2wXmsIjRwuSlTbuK96iz1PEsGOFZ81Mm7DpX
- e75pU4eyoTHEwhpGqfUg8RSo0wt9QQWuALWgynBf+2wSU620IkExq2RgXJ1+5ijpWrPJ
- X6LoecALPMfi18YILK9hkjI2sIKJlRIG/U4HFg/sWCEVxJjv44BfZirlMyrYEtrOA8/L
- gXZJE232YrP34/yMAWlTmsyZRNt/vO1E/qfqGCEdK1DVJeyRYuwqpplwps9gbx/Haif5
- WCiA==
-X-Gm-Message-State: AOAM531A5VcEXI5VJJGe7wvRZWEmGHLSFL3C3hmpAqzvzTFdA0WWDsUj
- zMJQgBTIllI/h4oltiDS3a05y3TLSM/46UTIGqzyNkzG5YoUrelbn+O22BYjdsvgs8hhHrVz4fZ
- JUh3ZiG4j2yWze7I=
-X-Received: by 2002:adf:dec5:: with SMTP id i5mr14078556wrn.16.1590924450198; 
- Sun, 31 May 2020 04:27:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxpZJ29jrqcNnaufY8CaPfx06LQDqfZ9Ua8Uptm1K9676CAkPrIVEPuXFN5IpeiTTpJmvVK2A==
-X-Received: by 2002:adf:dec5:: with SMTP id i5mr14078542wrn.16.1590924449973; 
- Sun, 31 May 2020 04:27:29 -0700 (PDT)
+ bh=YqJQzxlqkkuz7YybaBOHPT6RnbknrzI7aM5pUExwIbA=;
+ b=PXx13QzPArJ17vW2ANtmoMYbZQ7nVJTiNI3pawlyZGYrHFGjeJhLhzrfwyY2BhA3kP
+ ofhZ1iWRFw8gNKqrHOxUxLIFJ5BEPyAvqWlgSAu8vuJiVpYnSI0ucG1c7kIRtlikwSQU
+ ScgED5EoD03dMZdoInFIK86J+AkwFJYX23lrib5G9OgH/ie3Qm/PnPwtXgWQwoBMdzeW
+ GLVoXpVIodyO0bmNhD1KrFz/L7TVP/tUgRFM61sjuedTlgDMxEYHjwKyN6DftGiXi9T3
+ GLuePpMUWdSwetBcW16MqP69SwUl8UvRpW4bm46zFuFX2WGdVjms6mER9kRcJxDmvOX1
+ rbUA==
+X-Gm-Message-State: AOAM531QHLw7lAIYm3nTARGO9mndpUYbjL8F27mXcpJZKbyMiAtfUzHY
+ LTLD4cM1b9c71VFDkJzxI7hyxUtOiiyNEOHDuNktzVsEzAXsDyGN488PpJDQh9XTkV+3FEuGAfZ
+ bUxNqcwUW+9G3xz4=
+X-Received: by 2002:a05:600c:22c1:: with SMTP id
+ 1mr17844666wmg.50.1590925969365; 
+ Sun, 31 May 2020 04:52:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzypkmAhdBi+MXl3YO1KMoQoxLFVbq+3hay2jKgnIYs5g52hBrIYUXWtmuCAE06oH//jCrqwg==
+X-Received: by 2002:a05:600c:22c1:: with SMTP id
+ 1mr17844658wmg.50.1590925969149; 
+ Sun, 31 May 2020 04:52:49 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id 40sm17545481wrc.15.2020.05.31.04.27.29
+ by smtp.gmail.com with ESMTPSA id b132sm7991155wmh.3.2020.05.31.04.52.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 31 May 2020 04:27:29 -0700 (PDT)
-Subject: Re: [PATCH v8 12/12] tests/vm: Add workaround to consume console
+ Sun, 31 May 2020 04:52:48 -0700 (PDT)
+Subject: Re: [PATCH v8 00/12] tests/vm: Add support for aarch64 VMs
 To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
 References: <20200529203458.1038-1-robert.foley@linaro.org>
- <20200529203458.1038-13-robert.foley@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <235ec2d4-f8ee-5192-9da5-4e29b2599525@redhat.com>
-Date: Sun, 31 May 2020 13:27:28 +0200
+Message-ID: <2d2b834c-ea10-befe-ebc1-92c95ef882ae@redhat.com>
+Date: Sun, 31 May 2020 13:52:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200529203458.1038-13-robert.foley@linaro.org>
+In-Reply-To: <20200529203458.1038-1-robert.foley@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -136,128 +137,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.puhov@linaro.org, alex.bennee@linaro.org
+Cc: peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/29/20 10:34 PM, Robert Foley wrote:
-> This adds support to basevm.py so that we always
-> drain the console chars.  This makes use of
-> support added in an earlier commit that allows
-> QEMUMachine to use the ConsoleSocket.
+> This is version 8 of the patch series to
+> add support for aarch64 VMs in the vm-build infrastructure.
+>  - Ubuntu 18.04 aarch64 VM
+>  - CentOS 8 aarch64 VM
 > 
-> This is a workaround we found was needed since
-> there is a known issue where QEMU will hang waiting
-> for console characters to be consumed.
+> v7: https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05286.html
 > 
-> We also added the option of logging the console to a file.
-> LOG_CONSOLE=1 will now log the output to a file.
+> Changes in v8:
+> - Added Ubuntu common module in tests/vm.
+> - Changed ubuntu.i386 and ubuntu.aarch64 to use new common module.
+> - Split out ConsoleSocket addition (python/qemu) to separate patch
+>   from changes to use it in tests/vm.
+> - Adjustments in configure when checking for aarch64 efi images.
+> - Remove use of QEMU_LOCAL in basevm.py.  We will use the
+>   presence of the --build-path argument instead.
 > 
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-> Acked-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/vm/Makefile.include |  4 ++++
->  tests/vm/basevm.py        | 17 +++++++++++++++--
->  2 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 8cccfaf95d..ad35c6e7a1 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -49,6 +49,7 @@ endif
->  	@echo '    EXTRA_CONFIGURE_OPTS="..."'
->  	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
->  	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
-> +	@echo "    LOG_CONSOLE=1        	 - Log console to file in: ~/.cache/qemu-vm "
->  	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
->  	@echo "    QEMU_LOCAL=1                 - Use QEMU binary local to this build."
->  	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
-> @@ -75,6 +76,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
->  		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
->  		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
->  		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-> +		$(if $(LOG_CONSOLE),--log-console) \
->  		--image "$@" \
->  		--force \
->  		--build-image $@, \
-> @@ -91,6 +93,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
->  		$(if $(V),--verbose) \
->  		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
->  		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-> +		$(if $(LOG_CONSOLE),--log-console) \
->  		--image "$<" \
->  		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
->  		--snapshot \
-> @@ -114,6 +117,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
->  		$(if $(V)$(DEBUG), --debug) \
->  		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
->  		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-> +		$(if $(LOG_CONSOLE),--log-console) \
->  		--image "$<" \
->  		--interactive \
->  		false, \
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index b9d828423b..64dbe64326 100644
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -117,6 +117,11 @@ class BaseVM(object):
->               "w").write(self._config['ssh_pub_key'])
->  
->          self.debug = args.debug
-> +        self._console_log_path = None
-> +        if args.log_console:
-> +                self._console_log_path = \
-> +                         os.path.join(os.path.expanduser("~/.cache/qemu-vm"),
-> +                                      "{}.install.log".format(self.name))
->          self._stderr = sys.stderr
->          self._devnull = open(os.devnull, "w")
->          if self.debug:
-> @@ -271,7 +276,9 @@ class BaseVM(object):
->          args += self._data_args + extra_args + self._config['extra_args']
->          logging.debug("QEMU args: %s", " ".join(args))
->          qemu_path = get_qemu_path(self.arch, self._build_path)
-> -        guest = QEMUMachine(binary=qemu_path, args=args)
-> +        guest = QEMUMachine(binary=qemu_path, args=args,
-> +                            console_log=self._console_log_path,
-> +                            drain_console=True)
+> Robert Foley (12):
+>   tests/vm: pass args through to BaseVM's __init__
+>   tests/vm: Add configuration to basevm.py
+>   tests/vm: Added configuration file support
+>   tests/vm: Pass --debug through for vm-boot-ssh.
+>   tests/vm: Add ability to select QEMU from current build.
+>   tests/vm: allow wait_ssh() to specify command
+>   tests/vm: Add common Ubuntu python module
+>   tests/vm: Added a new script for ubuntu.aarch64.
+>   tests/vm: Added a new script for centos.aarch64.
+>   tests/vm: change scripts to use self._config
+>   python/qemu: Add ConsoleSocket for optional use in QEMUMachine
+>   tests/vm: Add workaround to consume console
 
-Are you sure you need to set drain_console here? Isn't it implied by
-self._console_log_path?
+Thanks, patches 4/5/6 applied to my python-next tree:
+https://gitlab.com/philmd/qemu/commits/python-next
 
->          guest.set_machine(self._config['machine'])
->          guest.set_console()
->          try:
-> @@ -285,6 +292,8 @@ class BaseVM(object):
->              raise
->          atexit.register(self.shutdown)
->          self._guest = guest
-> +        # Init console so we can start consuming the chars.
-> +        self.console_init()
->          usernet_info = guest.qmp("human-monitor-command",
->                                   command_line="info usernet")
->          self.ssh_port = None
-> @@ -296,7 +305,9 @@ class BaseVM(object):
->              raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
->                              usernet_info)
->  
-> -    def console_init(self, timeout = 120):
-> +    def console_init(self, timeout = None):
-> +        if timeout == None:
-> +            timeout = self.socket_timeout
->          vm = self._guest
->          vm.console_socket.settimeout(timeout)
->          self.console_raw_path = os.path.join(vm._temp_dir,
-> @@ -578,6 +589,8 @@ def parse_args(vmcls):
->      parser.add_option("--efi-aarch64",
->                        default="/usr/share/qemu-efi-aarch64/QEMU_EFI.fd",
->                        help="Path to efi image for aarch64 VMs.")
-> +    parser.add_option("--log-console", action="store_true",
-> +                      help="Log console to file.")
->      parser.disable_interspersed_args()
->      return parser.parse_args()
->  
-> 
+- tests/vm: Pass --debug through for vm-boot-ssh.
+- tests/vm: Add ability to select QEMU from current build.
+- tests/vm: allow wait_ssh() to specify command
 
 
