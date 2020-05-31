@@ -2,90 +2,82 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12031C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 00:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AB0C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 01:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C787E2074B
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 00:56:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kuGfLXIk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C787E2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 809B720723
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 01:16:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809B720723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfCH0-0008De-1g
-	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 20:56:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60554)
+	id 1jfCaY-00053N-Ll
+	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 21:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jfCGO-0007jC-Q9; Sat, 30 May 2020 20:55:44 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:44661)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jfCZj-0004CT-65
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 21:15:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46028)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jfCGN-0007fR-Ka; Sat, 30 May 2020 20:55:44 -0400
-Received: by mail-il1-x142.google.com with SMTP id j3so6073288ilk.11;
- Sat, 30 May 2020 17:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iSoq54k6CMj8oEAMo6ge/wDcrJxGGTq1iTDY0QwBp3c=;
- b=kuGfLXIkWCdCxSOce5xDxEHTgjOBbz2S24HTq9Zkh5rW1ab/ohfYmEbzuUNN6+PuMI
- q/dcm6x9UtbGJnSCM0Dot9kDBncHnPzZ7kRNy3ubo4V3D8DRMK+YutBstjJhgJ1lyp2f
- 8HV20rHqSPTO3cIQkvjC1xemRgajNJSQoUAHn9so8/fpbTKwmwgcESTwFfaYGZ+3qs6f
- 9xMyzX4geYRyEelwt49TPZis1bh0u2onLYIcM02c9pCX91SlXtLJItVX8XF8Wf4dbRoG
- TUKHBbak0KmdJ1ZizgiJjpme9foQ5iisbHOf2ylbWhR/djbD9opPK7AycIZH2MDOMI8Q
- oqyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iSoq54k6CMj8oEAMo6ge/wDcrJxGGTq1iTDY0QwBp3c=;
- b=c6h5z+1I3cW2N4pC4qtkjRE61/rzP9vv5tzsIIM8dj9cHMpgFIGimD0u9vb8DDdl/1
- XbWMZhkBAF8BlRZqoysezwGI3qb14bQ11kf5S3O+HmdmxeQaMS9YQI863D0CkMGaQVpU
- UHMlcEVvJcIbh7OJBHjBoBlZDzqqfBaSgtcBhim9SjCvaAeJhfscD05B/QSrcxaPwa7p
- mxpnjg2//UOckjlH4HA1I89XT6Ai6ajO5gPGbVLXlsdcHxGgzSoWm2DyPyQZH0m081r1
- BB3d/OQZ74CrxTLgroi30by/3b53TuV1Yg2aJCnJC/yK0NO7z488/4RV6xkP5t/LlIA6
- ThgQ==
-X-Gm-Message-State: AOAM531lOqTHOpcFRtHOYjOfZIXaf8wnmUfCuRFobTYGOFQ/cTBb//f8
- wI5+RUBEMzgflo06f9xRJxrSOoG9rcDCVmCnnic=
-X-Google-Smtp-Source: ABdhPJzmNo5NPDH+AgpBzJnWfKMF9UejeQxwZl3jfyUNAeiHUCrSFt3cv4A6NHE4zbUZIu7zbhW72uT24glMEjfzH8E=
-X-Received: by 2002:a05:6e02:972:: with SMTP id
- q18mr580022ilt.60.1590886541466; 
- Sat, 30 May 2020 17:55:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jfCZh-0002sv-Eu
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 21:15:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jfCZe-0001Fa-RV
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 01:15:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CB0F22E8105
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 01:15:38 +0000 (UTC)
 MIME-Version: 1.0
-References: <cover.1590396396.git.dimastep@yandex-team.ru>
- <69b73b94dcd066065595266c852810e0863a0895.1590396396.git.dimastep@yandex-team.ru>
-In-Reply-To: <69b73b94dcd066065595266c852810e0863a0895.1590396396.git.dimastep@yandex-team.ru>
-From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Sat, 30 May 2020 20:55:30 -0400
-Message-ID: <CAFubqFvOU-ZFnhmCUNGH9gyuwa4us0UNPvZ6QTggDLwUr7y=RA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] vhost-user-blk: delay vhost_user_blk_disconnect
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 31 May 2020 01:09:38 -0000
+From: Ahmed Karaman <1881450@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: m68k
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahmedkrmn
+X-Launchpad-Bug-Reporter: Ahmed Karaman (ahmedkrmn)
+X-Launchpad-Bug-Modifier: Ahmed Karaman (ahmedkrmn)
+References: <159088695339.29529.1797786788240960646.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159088737830.13484.13927426866206544442.malone@gac.canonical.com>
+Subject: [Bug 1881450] Re: Emulation of a math function fails for m68k Linux
+ user mode
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="275d46a24253e557e4403d52832837e4bfa425b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d7f1d137a2bd0233009942985b05cdfbc8b61b16
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 21:15:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,102 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
- yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1881450 <1881450@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 28, 2020 at 5:13 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
->
-> A socket write during vhost-user communication may trigger a disconnect
-> event, calling vhost_user_blk_disconnect() and clearing all the
-> vhost_dev structures holding data that vhost-user functions expect to
-> remain valid to roll back initialization correctly. Delay the cleanup to
-> keep vhost_dev structure valid.
-> There are two possible states to handle:
-> 1. RUN_STATE_PRELAUNCH: skip bh oneshot call and perform disconnect in
-> the caller routine.
-> 2. RUN_STATE_RUNNING: delay by using bh
->
-> BH changes are based on the similar changes for the vhost-user-net
-> device:
->   commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
->   "vhost-user: delay vhost_user_stop"
->
-> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+** Attachment added: "math-example.c"
+   https://bugs.launchpad.net/qemu/+bug/1881450/+attachment/5378914/+files/=
+math-example.c
 
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+-- =
 
-Li Feng - would you also like to sign off here?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1881450
 
-> ---
->  hw/block/vhost-user-blk.c | 38 +++++++++++++++++++++++++++++++++++++-
->  1 file changed, 37 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 9d8c0b3..76838e7 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -349,6 +349,19 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
->      vhost_dev_cleanup(&s->dev);
->  }
->
-> +static void vhost_user_blk_event(void *opaque, QEMUChrEvent event);
-> +
-> +static void vhost_user_blk_chr_closed_bh(void *opaque)
-> +{
-> +    DeviceState *dev = opaque;
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> +    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> +
-> +    vhost_user_blk_disconnect(dev);
-> +    qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_event,
-> +            NULL, opaque, NULL, true);
-> +}
-> +
->  static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
->  {
->      DeviceState *dev = opaque;
-> @@ -363,7 +376,30 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
->          }
->          break;
->      case CHR_EVENT_CLOSED:
-> -        vhost_user_blk_disconnect(dev);
-> +        /*
-> +         * A close event may happen during a read/write, but vhost
-> +         * code assumes the vhost_dev remains setup, so delay the
-> +         * stop & clear. There are two possible paths to hit this
-> +         * disconnect event:
-> +         * 1. When VM is in the RUN_STATE_PRELAUNCH state. The
-> +         * vhost_user_blk_device_realize() is a caller.
-> +         * 2. In tha main loop phase after VM start.
-> +         *
-> +         * For p2 the disconnect event will be delayed. We can't
-> +         * do the same for p1, because we are not running the loop
-> +         * at this moment. So just skip this step and perform
-> +         * disconnect in the caller function.
-> +         *
-> +         * TODO: maybe it is a good idea to make the same fix
-> +         * for other vhost-user devices.
-> +         */
-> +        if (runstate_is_running()) {
-> +            AioContext *ctx = qemu_get_current_aio_context();
-> +
-> +            qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL, NULL,
-> +                    NULL, NULL, false);
-> +            aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
-> +        }
->          break;
->      case CHR_EVENT_BREAK:
->      case CHR_EVENT_MUX_IN:
-> --
-> 2.7.4
->
->
+Title:
+  Emulation of a math function fails for m68k Linux user mode
+
+Status in QEMU:
+  New
+
+Bug description:
+  Please check the attached math-example.c file.
+  When running the m68k executable under QEMU, it results in an =
+
+  "Illegal instruction" error.
+  Other targets don't produce this error.
+
+  Steps to reproduce the bug:
+
+  1. Download the math-example.c attached file.
+  2. Compile it by running:
+  =C2=A0=C2=A0=C2=A0m68k-linux-gnu-gcc -O2 -static math-example.c -o math-e=
+xample-m68k -lm
+  3. Run the executable with QEMU:
+  =C2=A0=C2=A0=C2=A0/build/qemu-5.0.0/build-gcc/m68k-linux-user/qemu-m68k m=
+ath-example-m68k
+
+  The output of execution is:
+  =C2=A0=C2=A0=C2=A0Profiling function expm1f():
+  =C2=A0=C2=A0=C2=A0qemu: uncaught target signal 4 (Illegal instruction) - =
+core dumped
+  =C2=A0=C2=A0=C2=A0Illegal instruction (core dumped)
+
+  Output when running on other targets:
+  =C2=A0=C2=A0=C2=A0Profiling function expm1f():
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Elapsed time: 47 ms
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Control result: 71804.953125
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1881450/+subscriptions
 
