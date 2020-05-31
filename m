@@ -2,46 +2,46 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AB0C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DA3C433E0
 	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 01:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 809B720723
+	by mail.kernel.org (Postfix) with ESMTPS id 800C82070E
 	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 01:16:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809B720723
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800C82070E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfCaY-00053N-Ll
+	id 1jfCaY-00054E-Lh
 	for qemu-devel@archiver.kernel.org; Sat, 30 May 2020 21:16:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33762)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfCZj-0004CT-65
- for qemu-devel@nongnu.org; Sat, 30 May 2020 21:15:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46028)
+ id 1jfCZi-0004CL-LJ
+ for qemu-devel@nongnu.org; Sat, 30 May 2020 21:15:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46014)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfCZh-0002sv-Eu
+ id 1jfCZh-0002st-Eq
  for qemu-devel@nongnu.org; Sat, 30 May 2020 21:15:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jfCZe-0001Fa-RV
+ id 1jfCZe-0001GM-6G
  for <qemu-devel@nongnu.org>; Sun, 31 May 2020 01:15:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CB0F22E8105
+ by loganberry.canonical.com (Postfix) with ESMTP id 256242E80E7
  for <qemu-devel@nongnu.org>; Sun, 31 May 2020 01:15:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 31 May 2020 01:09:38 -0000
+Date: Sun, 31 May 2020 01:02:33 -0000
 From: Ahmed Karaman <1881450@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,9 +53,8 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ahmedkrmn
 X-Launchpad-Bug-Reporter: Ahmed Karaman (ahmedkrmn)
 X-Launchpad-Bug-Modifier: Ahmed Karaman (ahmedkrmn)
-References: <159088695339.29529.1797786788240960646.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159088737830.13484.13927426866206544442.malone@gac.canonical.com>
-Subject: [Bug 1881450] Re: Emulation of a math function fails for m68k Linux
+Message-Id: <159088695339.29529.1797786788240960646.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1881450] [NEW] Emulation of a math function fails for m68k Linux
  user mode
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="275d46a24253e557e4403d52832837e4bfa425b6";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d7f1d137a2bd0233009942985b05cdfbc8b61b16
+X-Launchpad-Hash: ebc321fed3cf06d217ece6d6d21fbea6b63757d7
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/30 21:15:38
@@ -91,8 +90,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "math-example.c"
-   https://bugs.launchpad.net/qemu/+bug/1881450/+attachment/5378914/+files/=
+Public bug reported:
+
+Please check the attached math-example.c file.
+When running the m68k executable under QEMU, it results in an =
+
+"Illegal instruction" error.
+Other targets don't produce this error.
+
+Steps to reproduce the bug:
+
+1. Download the math-example.c attached file.
+2. Compile it by running:
+=C2=A0=C2=A0=C2=A0m68k-linux-gnu-gcc -O2 -static math-example.c -o math-exa=
+mple-m68k -lm
+3. Run the executable with QEMU:
+=C2=A0=C2=A0=C2=A0/build/qemu-5.0.0/build-gcc/m68k-linux-user/qemu-m68k mat=
+h-example-m68k
+
+The output of execution is:
+=C2=A0=C2=A0=C2=A0Profiling function expm1f():
+=C2=A0=C2=A0=C2=A0qemu: uncaught target signal 4 (Illegal instruction) - co=
+re dumped
+=C2=A0=C2=A0=C2=A0Illegal instruction (core dumped)
+
+Output when running on other targets:
+=C2=A0=C2=A0=C2=A0Profiling function expm1f():
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Elapsed time: 47 ms
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Control result: 71804.953125
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: m68k
+
+** Attachment added: "Emulating the expm1f() function."
+   https://bugs.launchpad.net/bugs/1881450/+attachment/5378913/+files/math-=
+example.c
+
+** Description changed:
+
+  Please check the attached math-example.c file.
+- When running the m68k executable under QEMU, it results in an "Illegal in=
+struction" error.
++ When running the m68k executable under QEMU, it results in an =
+
++ "Illegal instruction" error.
+  Other targets don't produce this error.
+  =
+
+  Steps to reproduce the bug:
+  =
+
+  1. Download the math-example.c attached file.
+  2. Compile it by running:
+-         m68k-linux-gnu-gcc -O2 -static math-example.c -o math-example-m68=
+k -lm
++ =C2=A0=C2=A0=C2=A0m68k-linux-gnu-gcc -O2 -static math-example.c -o math-e=
+xample-m68k -lm
+  3. Run the executable with QEMU:
+-         /build/qemu-5.0.0/build-gcc/m68k-linux-user/qemu-m68k math-exampl=
+e-m68k =
+
++ =C2=A0=C2=A0=C2=A0/build/qemu-5.0.0/build-gcc/m68k-linux-user/qemu-m68k m=
+ath-example-m68k
+  =
+
+  The output of execution is:
+-         Profiling function expm1f():
+-         qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+-         Illegal instruction (core dumped)
++ =C2=A0=C2=A0=C2=A0Profiling function expm1f():
++ =C2=A0=C2=A0=C2=A0qemu: uncaught target signal 4 (Illegal instruction) - =
+core dumped
++ =C2=A0=C2=A0=C2=A0Illegal instruction (core dumped)
+  =
+
+- Expected output:
+-         Profiling function expm1f():
+-           Elapsed time: 47 ms
+-           Control result: 71804.953125
++ Output when running on other targets:
++ =C2=A0=C2=A0=C2=A0Profiling function expm1f():
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Elapsed time: 47 ms
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Control result: 71804.953125
+
+** Attachment removed: "math-example.c"
+   https://bugs.launchpad.net/qemu/+bug/1881450/+attachment/5378913/+files/=
 math-example.c
 
 -- =
