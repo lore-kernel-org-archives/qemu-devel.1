@@ -2,62 +2,98 @@ Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 338B2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A848C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC64820723
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC64820723
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 6A4582074B
+	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 16:40:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYGVmiRa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4582074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfQt3-00070M-7P
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:32:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53690)
+	id 1jfR0O-0002Kt-JZ
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 12:40:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1jfQlN-0004FS-4N
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:24:41 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:58729)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1jfQlK-0004K3-0B
- for qemu-devel@nongnu.org; Sun, 31 May 2020 12:24:40 -0400
-Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
- [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id B7334EB8B4;
- Mon,  1 Jun 2020 01:24:33 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id 30F381C05D2;
- Mon,  1 Jun 2020 01:24:33 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzD-0000lO-BB
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:38:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23526
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jfQzB-0006dr-7e
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 12:38:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590943134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
+ b=BYGVmiRaOznuTKgWAzaUi/N+rvV/HJj9JneDb++DVfHDn/XJYR7PDQNRq3UjJ+VfpmxqOl
+ MhwU6WhVmSBx6p/8E0BCsjO7WDvnqpKyS+mMTDPfeIAcvW34IfQSuphirbOXaG7XIBvdFw
+ ugmjBx9JhizzM8/on7WHvXkMtChf2Hk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-gV0PkRh0NxWINclhf0aDRA-1; Sun, 31 May 2020 12:38:51 -0400
+X-MC-Unique: gV0PkRh0NxWINclhf0aDRA-1
+Received: by mail-wr1-f69.google.com with SMTP id p10so3618867wrn.19
+ for <qemu-devel@nongnu.org>; Sun, 31 May 2020 09:38:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
+ b=DNKbqp3wUyMgTjxwIhnBa1pZGMjitfshEYDjaZ5izV+GGrOC4TWnXuvL76KasQh9k3
+ OqaaOd4tzBPQkBCaPGAZ3XQzQJR9z5n5TmdJRXIBXpT+zyBQXWUFN4Eb26Z3xm4FY2CP
+ w20jWBwVYa7zh0KtkYbPSN423uNvEhjjKu1bxe/fp66pHEPeN7UV323z+QNohJYmQD1K
+ kvmcbjCehfu4hUGNq9A2vazhOylQnDjwisnP/MKIgRwvitOtLgjR+XlcNG4VvWaJBJ51
+ odJH5/CR5/pTZ+v7hBnyz42ImTYSOjs+SUf/E/d25M+4StqeUAiw+qMsSKWCAeQU/Dq1
+ jo6g==
+X-Gm-Message-State: AOAM531Xeu3L0lFzHEcbpp87elaeZhIqEHhRFTsdjrKv3LQEYrZ0bJ7a
+ bSfsg73BLGqxq9hscLae6UfTLC66pW0Hu2sVx8NLVxIMPfNWzhQdiFG7mS8jYhj8Sn1KWg/8qGY
+ pRNSwrbixNHcT3Ss=
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019038wmc.145.1590943129756; 
+ Sun, 31 May 2020 09:38:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyD/VAdm6bALQItTxdHOkN9cmdqlhgWpmq4GftYVKQFfyiuufz0LwlGo+Qn5wNF96G2siY3sg==
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019016wmc.145.1590943129519; 
+ Sun, 31 May 2020 09:38:49 -0700 (PDT)
+Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.43])
+ by smtp.gmail.com with ESMTPSA id 5sm8192953wmd.19.2020.05.31.09.38.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 31 May 2020 09:38:48 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/10] hw/char: Renesas SCI module.
-Date: Mon,  1 Jun 2020 01:24:21 +0900
-Message-Id: <20200531162427.57410-5-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200531162427.57410-1-ysato@users.sourceforge.jp>
-References: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+Subject: [PULL 00/25] python-next patches for 2020-05-31
+Date: Sun, 31 May 2020 18:38:21 +0200
+Message-Id: <20200531163846.25363-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: softfail client-ip=202.224.55.14;
- envelope-from=ysato@users.sourceforge.jp; helo=mail02.asahi-net.or.jp
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 12:24:33
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- SPF_SOFTFAIL=0.665, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 11:09:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,937 +106,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This module supported SCI / SCIa / SCIF.
+The following changes since commit c86274bc2e34295764fb44c2aef3cf29623f9b4b:
 
-Hardware manual.
-SCI / SCIF
-https://www.renesas.com/us/en/doc/products/mpumcu/001/r01uh0457ej0401_sh7751.pdf
-SCIa
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-tcg-plugins=
+-270520-1' into staging (2020-05-29 17:41:45 +0100)
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- include/hw/char/renesas_sci.h |  77 ++++
- hw/char/renesas_sci.c         | 786 ++++++++++++++++++++++++++++++++++
- hw/char/Kconfig               |   3 +
- hw/char/Makefile.objs         |   3 +-
- 4 files changed, 868 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 hw/char/renesas_sci.c
+are available in the Git repository at:
 
-diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
-new file mode 100644
-index 0000000000..9152faff6c
---- /dev/null
-+++ b/include/hw/char/renesas_sci.h
-@@ -0,0 +1,77 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Copyright (c) 2020 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#include "chardev/char-fe.h"
-+#include "qemu/timer.h"
-+#include "qemu/fifo8.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_SCI "renesas-sci"
-+#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
-+
-+enum {
-+    ERI = 0,
-+    RXI = 1,
-+    TXI = 2,
-+    TEI = 3,
-+    BRI = 3,
-+    SCI_NR_IRQ = 4,
-+};
-+
-+enum {
-+    SCI_FEAT_SCI = 0x00,
-+    SCI_FEAT_SCIA = 0x01,
-+    SCI_FEAT_SCIF = 0x10,
-+};
-+
-+enum {
-+    RXTOUT,
-+    RXNEXT,
-+    TXEMPTY,
-+    TXEND,
-+    NR_SCI_EVENT,
-+};
-+
-+typedef struct RSCIState {
-+    SysBusDevice parent_obj;
-+    MemoryRegion memory;
-+    MemoryRegion memory_p4;
-+    MemoryRegion memory_a7;
-+
-+    /* SCI register */
-+    uint8_t smr;
-+    uint8_t brr;
-+    uint8_t scr;
-+    uint8_t tdr;
-+    uint16_t Xsr;
-+    uint8_t scmr;
-+    uint8_t semr;
-+    uint16_t fcr;
-+    uint16_t sptr;
-+    uint16_t lsr;
-+
-+    /* internal use */
-+    uint16_t read_Xsr;
-+    uint16_t read_lsr;
-+    int64_t etu;
-+    int64_t trtime;
-+    int64_t tx_start_time;
-+    int tdcnt;
-+    int regsize;
-+    struct {
-+        int64_t time;
-+        int64_t (*handler)(struct RSCIState *sci);
-+    } event[NR_SCI_EVENT];
-+    QEMUTimer *event_timer;
-+    CharBackend chr;
-+    uint64_t input_freq;
-+    int feature;
-+    qemu_irq irq[SCI_NR_IRQ];
-+    Fifo8 rxfifo;
-+} RSCIState;
-diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
-new file mode 100644
-index 0000000000..6b23055a40
---- /dev/null
-+++ b/hw/char/renesas_sci.c
-@@ -0,0 +1,786 @@
-+/*
-+ * Renesas Serial Communication Interface (SCI / SCIa / SCIF)
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ * And SH7751 Group, SH7751R Group User's Manual: Hardware
-+ * (Rev.4.01 R01UH0457EJ0401)
-+ *
-+ * Copyright (c) 2020 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/char/renesas_sci.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+
-+/* SCI register map */
-+REG8(SMR, 0)
-+  FIELD(SMR, CKS,  0, 2)
-+  FIELD(SMR, MP,   2, 1)
-+  FIELD(SMR, STOP, 3, 1)
-+  FIELD(SMR, PM,   4, 1)
-+  FIELD(SMR, PE,   5, 1)
-+  FIELD(SMR, CHR,  6, 1)
-+  FIELD(SMR, CM,   7, 1)
-+REG16(BRR, 2)
-+REG16(SCR, 4)
-+  FIELD(SCR, CKE, 0, 2)
-+  FIELD(SCR, TEIE, 2, 1)
-+  FIELD(SCR, MPIE, 3, 1)
-+  FIELD(SCR, REIE, 3, 1)
-+  FIELD(SCR, RE,   4, 1)
-+  FIELD(SCR, TE,   5, 1)
-+  FIELD(SCR, RIE,  6, 1)
-+  FIELD(SCR, TIE,  7, 1)
-+REG16(TDR, 6)
-+REG16(SSR, 8)
-+  FIELD(SSR, MPBT, 0, 1)
-+  FIELD(SSR, MPB,  1, 1)
-+  FIELD(SSR, TEND, 2, 1)
-+  FIELD(SSR, ERR, 3, 3)
-+    FIELD(SSR, PER,  3, 1)
-+    FIELD(SSR, FER,  4, 1)
-+    FIELD(SSR, ORER, 5, 1)
-+  FIELD(SSR, RDRF, 6, 1)
-+  FIELD(SSR, TDRE, 7, 1)
-+REG16(FSR, 8)
-+  FIELD(FSR, DR, 0, 1)
-+  FIELD(FSR, RDF, 1, 1)
-+  FIELD(FSR, RDF_DR, 0, 2)
-+  FIELD(FSR, PER, 2, 1)
-+  FIELD(FSR, FER, 3, 1)
-+  FIELD(FSR, BRK, 4, 1)
-+  FIELD(FSR, TDFE, 5, 1)
-+  FIELD(FSR, TEND, 6, 1)
-+  FIELD(FSR, ER, 7, 1)
-+  FIELD(FSR, FERn, 8, 4)
-+  FIELD(FSR, PERn, 12, 4)
-+REG16(RDR, 10)
-+REG16(SCMR, 12)
-+  FIELD(SCMR, SMIF, 0, 1)
-+  FIELD(SCMR, SINV, 2, 1)
-+  FIELD(SCMR, SDIR, 3, 1)
-+  FIELD(SCMR, BCP2, 7, 1)
-+REG16(FCR, 12)
-+  FIELD(FCR, LOOP, 0, 1)
-+  FIELD(FCR, RFRST, 1, 1)
-+  FIELD(FCR, TFRST, 2, 1)
-+  FIELD(FCR, MCE, 3, 1)
-+  FIELD(FCR, TTRG, 4, 2)
-+  FIELD(FCR, RTRG, 6, 2)
-+  FIELD(FCR, RSTRG, 8, 3)
-+REG16(SEMR, 14)
-+  FIELD(SEMR, ACS0, 0, 1)
-+  FIELD(SEMR, ABCS, 4, 1)
-+REG16(FDR, 14)
-+  FIELD(FDR, Rn, 0, 4)
-+  FIELD(FDR, Tn, 8, 4)
-+REG16(SPTR, 16)
-+  FIELD(SPTR, SPB2DT, 0, 1)
-+  FIELD(SPTR, SPB2IO, 1, 1)
-+  FIELD(SPTR, SCKDT, 2, 1)
-+  FIELD(SPTR, SCKIO, 3, 1)
-+  FIELD(SPTR, CTSDT, 4, 1)
-+  FIELD(SPTR, CTSIO, 5, 1)
-+  FIELD(SPTR, RTSDT, 6, 1)
-+  FIELD(SPTR, RTSIO, 7, 1)
-+  FIELD(SPTR, EIO, 7, 1)
-+REG16(LSR, 18)
-+  FIELD(LSR, ORER, 0, 1)
-+
-+#define SCIF_FIFO_DEPTH 16
-+#define IS_SCI(sci) (sci->feature < SCI_FEAT_SCIF)
-+#define IS_SCIA(sci) (IS_SCI(sci) && sci->feature >= SCI_FEAT_SCIA)
-+#define IS_SCIF(sci) (!IS_SCI(sci))
-+
-+static const int sci_rtrg[] = {1, 4, 8, 14};
-+
-+static void update_event_time(RSCIState *sci, int evt, int64_t t)
-+{
-+    if (t > 0) {
-+        t +=  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        sci->event[evt].time = t;
-+        if (timer_expire_time_ns(sci->event_timer) > t) {
-+            timer_mod(sci->event_timer, t);
-+        }
-+    } else {
-+        sci->event[evt].time = 0;
-+    }
-+}
-+
-+static int sci_is_rxi(RSCIState *sci)
-+{
-+    int eio;
-+    int enable;
-+    enable = FIELD_EX16(sci->scr, SCR, RIE);
-+    if (IS_SCI(sci)) {
-+        eio = (sci->feature != SCI_FEAT_SCI) ||
-+            (FIELD_EX16(sci->sptr, SPTR, EIO) == 0);
-+        return FIELD_EX16(sci->Xsr, SSR, RDRF) && enable && eio;
-+    } else {
-+        return (FIELD_EX16(sci->Xsr, FSR, RDF_DR) != 0) && enable;
-+    }
-+}
-+
-+static int sci_is_txi(RSCIState *sci)
-+{
-+    int enable = FIELD_EX16(sci->scr, SCR, TIE);
-+    if (IS_SCI(sci)) {
-+        return enable && FIELD_EX16(sci->Xsr, SSR, TDRE);
-+    } else {
-+        return enable && FIELD_EX16(sci->Xsr, FSR, TDFE);
-+    }
-+}
-+
-+static void sci_irq(RSCIState *sci, int req)
-+{
-+    int br;
-+    int irq;
-+    int rie;
-+
-+    switch (req) {
-+    case ERI:
-+        rie = FIELD_EX16(sci->scr, SCR, RIE);
-+        if (IS_SCI(sci)) {
-+            irq = rie && (FIELD_EX16(sci->Xsr, SSR, ERR) != 0);
-+        } else {
-+            irq = (rie || FIELD_EX16(sci->scr, SCR, REIE)) &&
-+                FIELD_EX16(sci->Xsr, FSR, ER);
-+        }
-+        qemu_set_irq(sci->irq[ERI], irq);
-+        break;
-+    case RXI:
-+        if (IS_SCIA(sci)) {
-+            if (sci_is_rxi(sci)) {
-+                qemu_irq_pulse(sci->irq[RXI]);
-+            }
-+        } else {
-+            qemu_set_irq(sci->irq[RXI], sci_is_rxi(sci));
-+        }
-+        break;
-+    case TXI:
-+        if (IS_SCIA(sci)) {
-+            if (sci_is_txi(sci)) {
-+                qemu_irq_pulse(sci->irq[TXI]);
-+            }
-+        } else {
-+            qemu_set_irq(sci->irq[TXI], sci_is_txi(sci));
-+        }
-+        break;
-+    case BRI: /* TEI */
-+        if (IS_SCI(sci)) {
-+            qemu_set_irq(sci->irq[TEI],
-+                         FIELD_EX16(sci->Xsr, SSR, TEND) &&
-+                         FIELD_EX16(sci->scr, SCR, TEIE));
-+        } else {
-+            rie = FIELD_EX16(sci->scr, SCR, RIE);
-+            br = (rie || FIELD_EX16(sci->scr, SCR, REIE)) &&
-+                FIELD_EX16(sci->Xsr, FSR, BRK);
-+            qemu_set_irq(sci->irq[BRI], br);
-+        }
-+        break;
-+    }
-+}
-+
-+static int can_receive(void *opaque)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    int fifo_free = 0;
-+    if (FIELD_EX16(sci->scr, SCR, RE)) {
-+        /* Receiver enabled */
-+        fifo_free = fifo8_num_free(&sci->rxfifo);
-+        if (IS_SCIF(sci) && fifo_free == 0) {
-+            /* FIFO overrun */
-+            sci->lsr = FIELD_DP16(sci->lsr, LSR, ORER, 1);
-+            sci_irq(sci, ERI);
-+        }
-+    }
-+    return fifo_free;
-+}
-+
-+static void sci_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    int rtrg;
-+
-+    fifo8_push_all(&sci->rxfifo, buf, size);
-+    if (sci->event[RXNEXT].time == 0) {
-+        if (IS_SCI(sci)) {
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 1);
-+            update_event_time(sci, RXNEXT, sci->trtime);
-+        } else {
-+            rtrg = sci_rtrg[FIELD_EX16(sci->fcr, FCR, RTRG)];
-+            if (fifo8_num_used(&sci->rxfifo) >= rtrg) {
-+                sci->Xsr = FIELD_DP16(sci->Xsr, FSR, RDF, 1);
-+            } else {
-+                update_event_time(sci, RXTOUT, 15 * sci->etu);
-+            }
-+        }
-+        sci_irq(sci, RXI);
-+    }
-+}
-+
-+static void sci_send_byte(RSCIState *sci)
-+{
-+    if (IS_SCI(sci)) {
-+        if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+            qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
-+        }
-+        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 0);
-+        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 1);
-+    }
-+}
-+
-+static int transmit_byte(RSCIState *sci)
-+{
-+    int64_t elapsed;
-+    int byte = 0;
-+    if (sci->tx_start_time > 0) {
-+        elapsed = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sci->tx_start_time;
-+        byte = elapsed / sci->trtime;
-+        if (byte > sci->tdcnt) {
-+            byte = sci->tdcnt;
-+        }
-+    }
-+    return byte;
-+}
-+
-+static int64_t sci_rx_timeout(RSCIState *sci)
-+{
-+    if (IS_SCIF(sci)) {
-+        sci->Xsr = FIELD_DP16(sci->Xsr, FSR, DR, 1);
-+        sci_irq(sci, RXI);
-+    }
-+    return 0;
-+}
-+
-+static int64_t sci_rx_next(RSCIState *sci)
-+{
-+    int64_t next_event = 0;
-+    if (IS_SCI(sci) && !fifo8_is_empty(&sci->rxfifo)) {
-+        if (FIELD_EX16(sci->Xsr, SSR, RDRF)) {
-+            /* Receiver overrun */
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, ORER, 1);
-+            sci_irq(sci, ERI);
-+        } else {
-+            /* Trigger next event */
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 1);
-+            sci_irq(sci, RXI);
-+            next_event = sci->trtime;
-+        }
-+    }
-+    return next_event;
-+}
-+
-+static int64_t sci_tx_empty(RSCIState *sci)
-+{
-+    int64_t ret = 0;
-+    if (IS_SCI(sci)) {
-+        if (!FIELD_EX16(sci->Xsr, SSR, TDRE)) {
-+            sci_send_byte(sci);
-+            ret = sci->trtime;
-+            sci_irq(sci, TXI);
-+        } else {
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 1);
-+            sci_irq(sci, TEI);
-+        }
-+    } else {
-+        sci->tdcnt -= transmit_byte(sci);
-+        sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 1);
-+        sci_irq(sci, TXI);
-+    }
-+    return ret;
-+}
-+
-+static int64_t sci_tx_end(RSCIState *sci)
-+{
-+    if (IS_SCIF(sci)) {
-+        sci->tdcnt = 0;
-+        sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 1);
-+        sci_irq(sci, TEI);
-+    }
-+    return 0;
-+}
-+
-+static void sci_timer_event(void *opaque)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    int64_t now, next, t;
-+    int i;
-+
-+    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    next = INT64_MAX;
-+    for (i = 0; i < NR_SCI_EVENT; i++) {
-+        if (sci->event[i].time > 0 && sci->event[i].time <= now) {
-+            t = sci->event[i].handler(sci);
-+            sci->event[i].time = (t > 0) ? now + t : 0;
-+        }
-+        if (sci->event[i].time > 0) {
-+            next = MIN(next, sci->event[i].time);
-+        }
-+    }
-+    if (next < INT64_MAX) {
-+        timer_mod(sci->event_timer, next);
-+    } else {
-+        timer_del(sci->event_timer);
-+    }
-+}
-+
-+static void update_trtime(RSCIState *sci)
-+{
-+    int divrate;
-+    if (IS_SCIA(sci)) {
-+        divrate = 16 * (2 - FIELD_EX8(sci->semr, SEMR, ABCS));
-+    } else {
-+        divrate = 32;
-+    }
-+
-+    /* x bit transmit time (divrate * brr) / base freq */
-+    sci->etu = divrate * 1 << (2 * FIELD_EX16(sci->smr, SMR, CKS));
-+    sci->etu *= sci->brr + 1;
-+    sci->etu *= NANOSECONDS_PER_SECOND;
-+    sci->etu /= sci->input_freq;
-+
-+    /* char per bits */
-+    sci->trtime = 8 - FIELD_EX16(sci->smr, SMR, CHR);
-+    sci->trtime += FIELD_EX16(sci->smr, SMR, PE);
-+    sci->trtime += FIELD_EX16(sci->smr, SMR, STOP) + 1 + 1;
-+    sci->trtime *= sci->etu;
-+}
-+
-+#define IS_TR_ENABLED(scr) \
-+    (FIELD_EX16(scr, SCR, TE) || FIELD_EX16(scr, SCR, RE))
-+
-+#define SCI_IS_NOT_SUPPORTED(sci, name)                                 \
-+    if (sci->feature == SCI_FEAT_SCI) {                                 \
-+        qemu_log_mask(LOG_GUEST_ERROR,                                  \
-+                      "reneas_sci: " #name " is not supported.\n");     \
-+    }
-+
-+static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    int txtrg;
-+    int rxtrg;
-+    uint8_t txd;
-+    uint16_t ssr_mask;
-+    bool tx_start = false;
-+
-+    if (IS_SCI(sci)) {
-+        txtrg = 1;
-+    } else {
-+        txtrg = 1 << (3 - FIELD_EX16(sci->fcr, FCR, TTRG));
-+    }
-+    switch (sci->regsize) {
-+    case 8:
-+        addr <<= 1; break;
-+    case 32:
-+        addr >>= 1; break;
-+    }
-+    switch (addr) {
-+    case A_SMR:
-+        if (IS_SCIA(sci) && IS_TR_ENABLED(sci->scr)) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "reneas_sci: SMR write protected.\n");
-+            break;
-+        }
-+        sci->smr = val;
-+        update_trtime(sci);
-+        break;
-+    case A_BRR:
-+        if (IS_SCIA(sci) && IS_TR_ENABLED(sci->scr)) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "reneas_sci: BRR write protected.\n");
-+            break;
-+        }
-+        sci->brr = val;
-+        update_trtime(sci);
-+        break;
-+    case A_SCR:
-+        sci->scr = val;
-+        if (FIELD_EX16(sci->scr, SCR, TE)) {
-+            /* Transmitter enable */
-+            if (IS_SCI(sci)) {
-+                sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 1);
-+                sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 1);
-+            } else {
-+                sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 1);
-+                sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 1);
-+                sci->tx_start_time = 0;
-+            }
-+            sci_irq(sci, TXI);
-+            sci_irq(sci, TEI);
-+        } else {
-+            /* Transmitter disable  */
-+            update_event_time(sci, TXEND, 0);
-+            update_event_time(sci, TXEMPTY, 0);
-+        }
-+        break;
-+    case A_TDR:
-+        if (IS_SCI(sci)) {
-+            sci->tdr = val;
-+            if (IS_SCIA(sci)) {
-+                if (FIELD_EX16(sci->Xsr, SSR, TEND)) {
-+                    update_event_time(sci, TXEMPTY, sci->trtime);
-+                    sci_send_byte(sci);
-+                } else {
-+                    sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 0);
-+                }
-+                sci_irq(sci, TXI);
-+                sci_irq(sci, TEI);
-+            }
-+        } else {
-+            if (sci->tx_start_time > 0) {
-+                sci->tdcnt -= transmit_byte(sci);
-+            } else {
-+                sci->tx_start_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+            }
-+            if (sci->tdcnt >= SCIF_FIFO_DEPTH) {
-+                break;
-+            }
-+            txd = val;
-+            if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+                qemu_chr_fe_write_all(&sci->chr, &txd, 1);
-+            }
-+            if (FIELD_EX16(sci->fcr, FCR, LOOP) && can_receive(sci) > 0) {
-+                /* Loopback mode */
-+                sci_receive(sci, &txd, 1);
-+            }
-+            sci->tdcnt++;
-+            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 0);
-+            update_event_time(sci, TXEND, sci->tdcnt);
-+            if (sci->tdcnt > txtrg) {
-+                sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 0);
-+                update_event_time(sci, TXEMPTY, sci->tdcnt - txtrg + 1);
-+                sci_irq(sci, TXI);
-+            }
-+        }
-+        break;
-+    case A_FSR: /* A_SSR */
-+        if (IS_SCI(sci)) {
-+            /* Mask for read only bits */
-+            ssr_mask = IS_SCIA(sci) ? 0xc7 : 0x07;
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, MPBT,
-+                                 FIELD_EX16(val, SSR, MPBT));
-+            sci->Xsr &= (val | ssr_mask);
-+            /* Clear ERI */
-+            sci_irq(sci, ERI);
-+            if (sci->feature == SCI_FEAT_SCI) {
-+                tx_start = FIELD_EX16(sci->read_Xsr, SSR, TDRE) &&
-+                    !FIELD_EX16(sci->Xsr, SSR, TDRE) &&
-+                    (FIELD_EX16(sci->Xsr, SSR, ERR) == 0);
-+                if (tx_start) {
-+                    sci_send_byte(sci);
-+                    update_event_time(sci, TXEMPTY, sci->trtime);
-+                    sci_irq(sci, TXI);
-+                }
-+            }
-+        } else {
-+            rxtrg = sci_rtrg[FIELD_EX16(sci->fcr, FCR, RTRG)];
-+            ssr_mask = ~(sci->read_Xsr & 0xf3);
-+            sci->tdcnt -= transmit_byte(sci);
-+            if (sci->tdcnt < txtrg) {
-+                ssr_mask = FIELD_DP16(ssr_mask, FSR, TDFE, 1);
-+            }
-+            if (fifo8_num_used(&sci->rxfifo) >= rxtrg) {
-+                ssr_mask = FIELD_DP16(ssr_mask, FSR, RDF, 1);
-+            }
-+            sci->Xsr &= (val | ssr_mask);
-+            sci_irq(sci, ERI);
-+            sci_irq(sci, RXI);
-+            sci_irq(sci, TXI);
-+        }
-+        break;
-+    case A_RDR:
-+        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
-+        break;
-+    case A_FCR: /* A_SCMR / A_SPTR */
-+        if (IS_SCI(sci)) {
-+            if (sci->feature == SCI_FEAT_SCI) {
-+                sci->sptr = val;
-+            } else {
-+                sci->scmr = val;
-+            }
-+        } else {
-+            sci->fcr = val;
-+            if (FIELD_EX16(sci->fcr, FCR, RFRST)) {
-+                fifo8_reset(&sci->rxfifo);
-+                update_event_time(sci, RXTOUT, 0);
-+                update_event_time(sci, RXNEXT, 0);
-+            }
-+            if (FIELD_EX16(sci->fcr, FCR, TFRST)) {
-+                sci->tdcnt = 0;
-+            }
-+        }
-+        break;
-+    case A_FDR: /* A_SEMR */
-+        if (IS_SCI(sci)) {
-+            SCI_IS_NOT_SUPPORTED(sci, SEMR);
-+            sci->semr = val;
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: FDR is read only.\n");
-+        }
-+        break;
-+    case A_SPTR:
-+        if (IS_SCI(sci)) {
-+            goto error;
-+        } else {
-+            sci->sptr = val;
-+        }
-+        break;
-+    case A_LSR:
-+        if (IS_SCI(sci)) {
-+            goto error;
-+        } else {
-+            if (FIELD_EX16(sci->read_lsr, LSR, ORER) != 1) {
-+                val = FIELD_DP16(val, LSR, ORER, 1);
-+            }
-+            sci->lsr &= val;
-+            sci_irq(sci, ERI);
-+        }
-+        break;
-+    default:
-+    error:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+    }
-+}
-+
-+static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    uint64_t ret;
-+
-+    switch (sci->regsize) {
-+    case 8:
-+        addr <<= 1; break;
-+    case 32:
-+        addr >>= 1; break;
-+    }
-+
-+    switch (addr) {
-+    case A_SMR:
-+        return sci->smr;
-+    case A_BRR:
-+        return sci->brr;
-+    case A_SCR:
-+        return sci->scr;
-+    case A_TDR:
-+        if (IS_SCI(sci)) {
-+            return sci->tdr;
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: TDR is write only.\n");
-+            return UINT64_MAX;
-+        }
-+    case A_FSR: /* A_SSR */
-+        sci->read_Xsr = sci->Xsr;
-+        return sci->Xsr;
-+    case A_RDR:
-+        ret = fifo8_pop(&sci->rxfifo);
-+        if (IS_SCIA(sci)) {
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 0);
-+        }
-+        return ret;
-+    case A_FCR: /* A_SCMR / A_SPTR */
-+        if (IS_SCI(sci)) {
-+            if (IS_SCIA(sci)) {
-+                return sci->scmr;
-+            } else {
-+                return sci->sptr;
-+            }
-+        } else {
-+            return sci->fcr & 0x7ff;
-+        }
-+    case A_FDR: /* A_SEMR */
-+        if (IS_SCI(sci)) {
-+            SCI_IS_NOT_SUPPORTED(sci, SEMR);
-+            return sci->semr;
-+        } else {
-+            ret = 0;
-+            ret = FIELD_DP16(ret, FDR, Rn, fifo8_num_used(&sci->rxfifo));
-+            ret = FIELD_DP16(ret, FDR, Tn, sci->tdcnt - transmit_byte(sci));
-+            return ret;
-+        }
-+    case A_SPTR:
-+        if (IS_SCI(sci)) {
-+            goto error;
-+        } else {
-+            return sci->sptr;
-+        }
-+    case A_LSR:
-+        if (IS_SCI(sci)) {
-+            goto error;
-+        } else {
-+            sci->read_lsr = sci->lsr;
-+            return sci->lsr;
-+        }
-+    default:
-+    error:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented.\n", addr);
-+    }
-+    return UINT64_MAX;
-+}
-+
-+static const MemoryRegionOps sci_ops = {
-+    .write = sci_write,
-+    .read  = sci_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static void sci_register_init(RSCIState *sci)
-+{
-+    int i;
-+    sci->smr = sci->scr = 0x00;
-+    sci->brr = 0xff;
-+    if (IS_SCI(sci)) {
-+        sci->tdr = 0xff;
-+        sci->Xsr = 0x84;
-+        sci->scmr = 0x00;
-+        sci->semr = 0x00;
-+        sci->sptr = 0x00;
-+    } else {
-+        sci->Xsr = 0x0060;
-+        sci->fcr = 0x0000;
-+        sci->sptr = 0x0000;
-+        sci->lsr = 0x0000;
-+    }
-+    update_trtime(sci);
-+    for (i = 0; i < NR_SCI_EVENT; i++) {
-+        sci->event[i].time = 0;
-+    }
-+}
-+
-+static void sci_event(void *opaque, QEMUChrEvent event)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    if (event == CHR_EVENT_BREAK) {
-+        if (IS_SCI(sci)) {
-+            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, FER, 1);
-+        } else {
-+            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, BRK, 1);
-+        }
-+        sci_irq(sci, ERI);
-+    }
-+}
-+
-+static void rsci_realize(DeviceState *dev, Error **errp)
-+{
-+    SysBusDevice *d = SYS_BUS_DEVICE(dev);
-+    RSCIState *sci = RSCI(dev);
-+    int i;
-+    int size;
-+
-+    if (sci->input_freq == 0) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_sci: input-freq property must be set.");
-+        return;
-+    }
-+    if (sci->regsize != 8 && sci->regsize != 16 && sci->regsize != 32) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_sci: Invalid regsize.");
-+        return;
-+    }
-+
-+    size = IS_SCI(sci) ? 16 : 20;
-+    switch (sci->regsize) {
-+    case 8:
-+        size >>= 1;
-+        break;
-+    case 32:
-+        size <<= 1;
-+        break;
-+    }
-+    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
-+                          sci, "renesas-sci", size);
-+    sysbus_init_mmio(d, &sci->memory);
-+    memory_region_init_alias(&sci->memory_p4, NULL, "renesas-sci-p4",
-+                             &sci->memory, 0, size);
-+    sysbus_init_mmio(d, &sci->memory_p4);
-+    memory_region_init_alias(&sci->memory_a7, NULL, "renesas-sci-a7",
-+                             &sci->memory, 0, size);
-+    sysbus_init_mmio(d, &sci->memory_a7);
-+
-+    for (i = 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_init_irq(d, &sci->irq[i]);
-+    }
-+    sci->event_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sci_timer_event, sci);
-+
-+    qemu_chr_fe_set_handlers(&sci->chr, can_receive, sci_receive,
-+                             sci_event, NULL, sci, NULL, true);
-+    fifo8_create(&sci->rxfifo, SCIF_FIFO_DEPTH);
-+    sci_register_init(sci);
-+}
-+
-+static const VMStateDescription vmstate_rsci = {
-+    .name = "renesas-sci",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rsci_properties[] = {
-+    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
-+    DEFINE_PROP_INT32("register-size", RSCIState, regsize, 8),
-+    DEFINE_PROP_INT32("feature", RSCIState, feature, 0),
-+    DEFINE_PROP_CHR("chardev", RSCIState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rsci_init(Object *obj)
-+{
-+    RSCIState *sci = RSCI(obj);
-+    sci->event[RXTOUT].handler = sci_rx_timeout;
-+    sci->event[RXNEXT].handler = sci_rx_next;
-+    sci->event[TXEMPTY].handler = sci_tx_empty;
-+    sci->event[TXEND].handler = sci_tx_end;
-+}
-+static void rsci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = rsci_realize;
-+    dc->vmsd = &vmstate_rsci;
-+    device_class_set_props(dc, rsci_properties);
-+}
-+
-+static const TypeInfo rsci_info = {
-+    .name       = TYPE_RENESAS_SCI,
-+    .parent     = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RSCIState),
-+    .instance_init = rsci_init,
-+    .class_init = rsci_class_init,
-+};
-+
-+static void rsci_register_types(void)
-+{
-+    type_register_static(&rsci_info);
-+}
-+
-+type_init(rsci_register_types)
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 40e7a8b8bb..874627520c 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -46,3 +46,6 @@ config SCLPCONSOLE
- 
- config TERMINAL3270
-     bool
-+
-+config RENESAS_SCI
-+    bool
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 9e9a6c1aff..b07ce63c6f 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -16,7 +16,6 @@ common-obj-$(CONFIG_CADENCE) += cadence_uart.o
- common-obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
- common-obj-$(CONFIG_COLDFIRE) += mcf_uart.o
- common-obj-$(CONFIG_OMAP) += omap_uart.o
--common-obj-$(CONFIG_SH4) += sh_serial.o
- common-obj-$(CONFIG_DIGIC) += digic-uart.o
- common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
- common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
-@@ -31,6 +30,8 @@ common-obj-$(CONFIG_LM32) += lm32_uart.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
- 
-+common-obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
-+
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
- obj-$(CONFIG_PSERIES) += spapr_vty.o
- obj-$(CONFIG_TERMINAL3270) += terminal3270.o
--- 
-2.20.1
+  https://gitlab.com/philmd/qemu.git tags/python-next-20200531
+
+for you to fetch changes up to 1c80c87c8c2489e4318c93c844aa29bc1d014146:
+
+  tests/acceptance: refactor boot_linux to allow code reuse (2020-05-31 18:25=
+:31 +0200)
+
+----------------------------------------------------------------
+Python queue:
+
+* migration acceptance test fix
+* introduce pylintrc & flake8 config
+* various cleanups (Python3, style)
+* vm-test can set QEMU_LOCAL=3D1 to use locally built binaries
+* refactored BootLinuxBase & LinuxKernelTest acceptance classes
+
+https://gitlab.com/philmd/qemu/pipelines/151323210
+https://travis-ci.org/github/philmd/qemu/builds/693157969
+
+----------------------------------------------------------------
+
+Dr. David Alan Gilbert (1):
+  tests/acceptance/migration.py: Wait for both sides
+
+John Snow (11):
+  scripts/qmp: Fix shebang and imports
+  python: remove more instances of sys.version_info
+  python/qemu/machine: remove logging configuration
+  python/qemu: delint and add pylintrc
+  python/qemu: delint; add flake8 config
+  python/qemu: remove Python2 style super() calls
+  python/qemu: fix socket.makefile() typing
+  python/qemu: Adjust traceback typing
+  python/qemu/qmp: use True/False for non/blocking modes
+  python/qemu/qmp: assert sockfile is not None
+  python/qemu/qtest: Check before accessing _qtest
+
+Pavel Dovgaluk (3):
+  tests/acceptance: allow console interaction with specific VMs
+  tests/acceptance: refactor boot_linux_console test to allow code reuse
+  tests/acceptance: refactor boot_linux to allow code reuse
+
+Philippe Mathieu-Daud=C3=A9 (6):
+  scripts/qemugdb: Remove shebang header
+  scripts/qemu-gdb: Use Python 3 interpreter
+  scripts/qmp: Use Python 3 interpreter
+  scripts/kvm/vmxcap: Use Python 3 interpreter and add pseudo-main()
+  scripts/modules/module_block: Use Python 3 interpreter & add
+    pseudo-main
+  tests/migration/guestperf: Use Python 3 interpreter
+
+Robert Foley (3):
+  tests/vm: Pass --debug through for vm-boot-ssh
+  tests/vm: Add ability to select QEMU from current build
+  tests/vm: allow wait_ssh() to specify command
+
+Vladimir Sementsov-Ogievskiy (1):
+  python/qemu/machine: add kill() method
+
+ python/qemu/.flake8                       |  2 +
+ python/qemu/accel.py                      |  9 ++-
+ python/qemu/machine.py                    | 44 +++++++-----
+ python/qemu/pylintrc                      | 58 ++++++++++++++++
+ python/qemu/qmp.py                        | 29 +++++---
+ python/qemu/qtest.py                      | 83 +++++++++++++++--------
+ scripts/analyze-migration.py              |  5 --
+ scripts/decodetree.py                     | 25 +++----
+ scripts/kvm/vmxcap                        |  7 +-
+ scripts/modules/module_block.py           | 29 ++++----
+ scripts/qemu-gdb.py                       |  4 +-
+ scripts/qemugdb/__init__.py               |  3 +-
+ scripts/qemugdb/aio.py                    |  3 +-
+ scripts/qemugdb/coroutine.py              |  3 +-
+ scripts/qemugdb/mtree.py                  |  4 +-
+ scripts/qemugdb/tcg.py                    |  1 -
+ scripts/qemugdb/timers.py                 |  1 -
+ scripts/qmp/qmp                           |  4 +-
+ scripts/qmp/qmp-shell                     |  3 -
+ scripts/qmp/qom-fuse                      |  4 +-
+ scripts/qmp/qom-get                       |  6 +-
+ scripts/qmp/qom-list                      |  6 +-
+ scripts/qmp/qom-set                       |  6 +-
+ scripts/qmp/qom-tree                      |  6 +-
+ tests/acceptance/avocado_qemu/__init__.py | 13 ++--
+ tests/acceptance/boot_linux.py            | 49 +++++++------
+ tests/acceptance/boot_linux_console.py    | 21 +++---
+ tests/acceptance/migration.py             |  4 ++
+ tests/docker/docker.py                    |  5 +-
+ tests/migration/guestperf-batch.py        |  2 +-
+ tests/migration/guestperf-plot.py         |  2 +-
+ tests/migration/guestperf.py              |  2 +-
+ tests/qemu-iotests/nbd-fault-injector.py  |  5 +-
+ tests/vm/Makefile.include                 |  5 ++
+ tests/vm/basevm.py                        | 42 ++++++++----
+ 35 files changed, 317 insertions(+), 178 deletions(-)
+ create mode 100644 python/qemu/.flake8
+ create mode 100644 python/qemu/pylintrc
+
+--=20
+2.21.3
 
 
