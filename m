@@ -2,79 +2,86 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6270C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A79AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:47:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90BD520734
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D929D206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:47:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aurel32.net header.i=@aurel32.net header.b="ao7CVuaA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90BD520734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aurel32.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d3kNeUBu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D929D206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfsFX-0001NY-L4
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 17:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57956)
+	id 1jfsHe-0002mY-3Z
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 17:47:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aurelien@aurel32.net>)
- id 1jfsBk-00087y-CE
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:41:46 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:53376)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aurelien@aurel32.net>)
- id 1jfsBh-0006ug-Ok
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:41:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
- ; s=202004.hall;
- h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
- MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:Reply-To:
- Subject:Content-ID:Content-Description:X-Debbugs-Cc;
- bh=2LyS3B+VQTKQ3rQoPTvv6ZN4OTQOytRK6vf1g+EzG3o=; b=ao7CVuaAjfkOp6PRqVdGwkFt3B
- Ai7uJ2a/fNI0ZBLgMISLWcg88NfoIT74vDlJWcUjh2Q76Pux9FTEpZspmZWYtXzUIhJMob+a5k54s
- a/ytqDcM0JW6z7c03raUK3MaorlrOeuxbnqgBF15VW8AWyd8aZ2QRmTpR1mz1aaxpht1KkYBOUz7L
- NXn/TehtLnfJiS+72OokTMduslUMnZYlrg7PEfBXjY9oe9drXI6qn0qrxuMVKZswrUzn59Y36rdrL
- RXRGgqbOnGP1JDkNM37qI17WuGqbxYcKNY+1WfqDgp+U4hKPwd1ZfQLnywABIZCHiUAFYRrFakV8I
- su37hhqA==;
-Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
- by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.92) (envelope-from <aurelien@aurel32.net>)
- id 1jfsBR-0002Ia-LF; Mon, 01 Jun 2020 23:41:25 +0200
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.93)
- (envelope-from <aurelien@aurel32.net>)
- id 1jfsBR-0084sD-13; Mon, 01 Jun 2020 23:41:25 +0200
-Date: Mon, 1 Jun 2020 23:41:25 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-To: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] MAINTAINERS: Volunteer for maintaining the Renesas
- hardware
-Message-ID: <20200601214125.GA1924990@aurel32.net>
-References: <20200601092057.10555-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jfsGg-00024a-FJ
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:46:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24187
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jfsGf-0001yR-Oi
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:46:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591048008;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k70J/xEql3whODOe8BWaChMUyeukc5me9BfrfA/Wy/k=;
+ b=d3kNeUBuoWYuT071ttRU9lkXpvoulAE/xPssgwQQg+VfET9mam2KVFeoIu+Hg/08y+SoS/
+ 7CeacNDpVTLBf6iKZWgcb+WGdKo0Gkk/9HWcYFT++i6vIG/PNfRwEOMOOeVW2LtLNAF58O
+ KTms61P2rGChgVXPbu3juDOJ80Z6RaU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-w-QVl25BMludBNobngXBkQ-1; Mon, 01 Jun 2020 17:46:41 -0400
+X-MC-Unique: w-QVl25BMludBNobngXBkQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99E82809881;
+ Mon,  1 Jun 2020 21:46:39 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DA675C1D6;
+ Mon,  1 Jun 2020 21:46:38 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metadata
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0df8d1a7-6f72-48a2-0433-cdf1c5e97492@redhat.com>
+Date: Mon, 1 Jun 2020 16:46:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200601092057.10555-1-f4bug@amsat.org>
-User-Agent: Mutt/1.13.2 (2019-12-18)
-Received-SPF: none client-ip=2001:bc8:30d7:100::1;
- envelope-from=aurelien@aurel32.net; helo=hall.aurel32.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+In-Reply-To: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 17:46:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,75 +95,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-06-01 11:20, Philippe Mathieu-Daud=E9 wrote:
-> I don't have much clue about the Renesas hardware, but at least
-> I know now the source files a little bit, so I volunteer to pick
-> up patches and send pull-requests for them during my scarce
-> hobbyist time, until someone else with more knowledge steps up
-> to do this job instead.
->=20
-> Suggested-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  MAINTAINERS | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0944d9c731..cbba3ac757 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -298,9 +298,7 @@ SH4 TCG CPUs
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  S: Odd Fixes
->  F: target/sh4/
-> -F: hw/sh4/
->  F: disas/sh4.c
-> -F: include/hw/sh4/
-> =20
->  SPARC TCG CPUs
->  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> @@ -1238,6 +1236,18 @@ F: pc-bios/canyonlands.dt[sb]
->  F: pc-bios/u-boot-sam460ex-20100605.bin
->  F: roms/u-boot-sam460ex
-> =20
-> +Renesas Hardware
-> +----------------
-> +SH4 Hardware
-> +M: Aurelien Jarno <aurelien@aurel32.net>
-> +M: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On 6/1/20 8:48 AM, Andrey Shinkevich wrote:
+> Add dirty bitmap information to QCOW2 metadata dump in qcow2.py script.
+> 
+> v3:
+>    01: JSON format output possibility added.
 
-That's fine for me, and just to be clear I don't mind being demoted to a
-reviewer or even removed from there. I do not really have time to work
-on that.
+Also, you split it into a series.  Thanks; this makes it easier to 
+review each step :)
 
-> +S: Odd Fixes
-> +F: hw/sh4/
-> +F: hw/char/sh_serial.c
-> +F: hw/intc/sh_intc.c
-> +F: hw/timer/sh_timer.c
-> +F: include/hw/sh4/
-> +
->  SH4 Machines
->  ------------
->  R2D
-> @@ -1246,6 +1256,7 @@ S: Maintained
->  F: hw/sh4/r2d.c
->  F: hw/intc/sh_intc.c
->  F: hw/timer/sh_timer.c
-> +F: include/hw/sh4/sh_intc.h
-> =20
->  Shix
->  M: Magnus Damm <magnus.damm@gmail.com>
+> 
+> v2:
+>    01: Refactoring of the Python code in the script qcow2.py.
+>        New methods were added. The bitmap dictionary was instantiated.
+>        The all of bitmaps information is read completely before
+>        printing the dictionary.
+>    02: The outputs of the tests 031, 036 and 061 were modified.
+> 
+> Andrey Shinkevich (6):
+>    iotests: Add extension names to qcow2.py dump
+>    iotests: move check for printable data to QcowHeaderExtension class
+>    iotests: dump bitmap extension data with qcow2.py
+>    iotests: Dump bitmap directory info with qcow2.py
+>    iotests: Dump bitmap table entries serialized in QCOW2 image
+>    iotests: Dump QCOW2 image metadata in JSON format with qcow2.py
+> 
+>   tests/qemu-iotests/031.out  |  22 +--
+>   tests/qemu-iotests/036.out  |   4 +-
+>   tests/qemu-iotests/061.out  |  18 +--
+>   tests/qemu-iotests/qcow2.py | 338 ++++++++++++++++++++++++++++++++++++++++++--
+>   4 files changed, 346 insertions(+), 36 deletions(-)
+> 
 
-Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
 
