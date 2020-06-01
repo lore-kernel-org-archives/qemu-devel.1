@@ -2,84 +2,79 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C134CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F02C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8745320679
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:49:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD30D20679
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HA7Os5ut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8745320679
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="garHZD5K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD30D20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfjsK-0004jU-Nk
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:49:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54332)
+	id 1jfjt8-0005FG-44
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jfjmr-00066A-DB
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:43:29 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:35946)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfjpF-0001qj-1D
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:45:58 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44582)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jfjmq-000553-Cw
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:43:29 -0400
-Received: by mail-wm1-x336.google.com with SMTP id d128so11247181wmc.1
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 05:43:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfjpE-0005iy-5C
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:45:56 -0400
+Received: by mail-ej1-x643.google.com with SMTP id gl26so9045823ejb.11
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 05:45:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=nBjzGdklMexKb/6JWGFmjUnmUd5clhjwawZNup6d0kc=;
- b=HA7Os5utpMJ6K5ebFO3TxMCYc4cK79e9DMTw9txAPs5N0hEL8GpUzTZPCGQBFCbfft
- SGUvqnUgT+5tevMoUIdsMIrrOsiYAZwj5gWeDzP303GC0QO8pTJyghUE/XEe7ibJ9D3n
- Hkt1W3RSmluVknf8SEvgZoNvsywYxmgisSKrJqeyUNKS4SxhgZCir8KJWR7XUz7jbN+M
- cE2bSW8R/1img46ueaupMI3IvSuvDDfzFUSXsQ8UZgwUiu806i2A/XPHotTNQPqWhT6w
- I0rZah2n6v49dt/uOcAoFodmqueikB0HXYLY/UShnB1ES7vexRdPOblMRnL6PpJ56QQ1
- aD9A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jr0xc/2sWUN4QoEyVCv5X8k5gtIoLCiFRIzV6bdie10=;
+ b=garHZD5KN3c3SEP1BMXgJr65flVJ8hFgMWza3RBBdVFG+08N/QYHOg29KKz45APoZF
+ 17MHiur2Nk0OgfDIvqpZiTdM00wUJx3gBvVMx5WHMM/tdvW6L1nUPG0el/igN5fXTTXc
+ kmxRJrvw6YHSmDOl3FNGnJIqW+Ys2pcR6GVi/cY37critP3Gaj2HZhCKXd6NY2rftJE0
+ Cd0l/ws1zdx8aPo72IvzyZJp2cb4zvhSapcS4QIQYOADoOeQZvtnI1CE/jkZPy0txBDe
+ hjWS921gF2x+laqfGMnCdkjOQ0bFIvNGETAHnO7o7BIcmJwk2lwi1eleeNqgC3Ob9rUg
+ YueA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=nBjzGdklMexKb/6JWGFmjUnmUd5clhjwawZNup6d0kc=;
- b=eEi/FkepCS8eLspDljqZGgM+lqtGYdr7YNAnidFwvYcYAWFr9eXR5m+AE1pG6whqHV
- oybS18iChtDiQWpRZSxx2P2PGQHGVNIC726b1k5ywh4JDyuJmNNSd9NXnSWlpcwyOid3
- Tp644wGnxIpfEQw+QWwVSuKESXmul2cbe4Z3tz3sqjpDGI1K/B6cxn7c/+l3hXuBDUBj
- rSwGOGBSst4UyiOLe/Sey+JakLWnxNuDd2mhlym6OVmt6BWa/juFBp19dc92Abd2Ed+y
- o9X2NcPEftCyfNP79F90OKOj0dyQ+/CFgeJHZlhSpQVeiQdiVGbn/0fJpysED7Wq021q
- EmmQ==
-X-Gm-Message-State: AOAM531bUVLIXwXmE8/Ul3QnUPZ9TtHJuVAaKNn+GXGwoyNOMaDuJDnt
- /4VaZVHMtxeZ2dDJ9ibLGVWOXCzOylY=
-X-Google-Smtp-Source: ABdhPJw19BJJITyC6pSG9g2LKsP4MEWbB/E06UB4GqgeSIloPA3RqcAagpZ+IpExvcf6sNII9Gsp/w==
-X-Received: by 2002:a1c:a3c1:: with SMTP id m184mr23025164wme.91.1591015406783; 
- Mon, 01 Jun 2020 05:43:26 -0700 (PDT)
-Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id n23sm10948474wmc.0.2020.06.01.05.43.26
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jun 2020 05:43:26 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/6] tests/Makefile: Fix description of "make check"
-Date: Mon,  1 Jun 2020 14:43:20 +0200
-Message-Id: <1591015405-19651-2-git-send-email-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jr0xc/2sWUN4QoEyVCv5X8k5gtIoLCiFRIzV6bdie10=;
+ b=GfBAfmm/JqU+h8eaYWxXHp8tZOCiYoT/Vu61K/tFQl8MTrbZo4LxNEev44OZjfInGQ
+ sFdhBVH16/jCyGw/apD28PG0ApYACQm6S8VWEQzjqmfmjyYBHp+ScAzHhbQ1QvD6l2U8
+ yVIyGQPUcTALT2DFRR2WWcMZRHOBcTnJou4xTagP7teqG4eXmD0oOwe3tJtOCX9P4VkP
+ bq+aWliJ8sNUJ7N7WERi/p0DQcUlc5wfzRYDedPlDVsyjk4V/TjetEJwMXhfeCv8+r6+
+ lhwJJm+aQsZEXihhhj1TpR9fWRaD73upJSvqzM6FUFbbfVDw6BppSArDVq/J2nJEL4Fv
+ 9eMA==
+X-Gm-Message-State: AOAM533q4tsQO3PhzfIvrugZ9P9pVdbw0HNHOFmxpF9uMrWEUoqzdyEj
+ RewZ6jxhH/tXU/1iujNgFsGnVzGDm63hpoIcd/M=
+X-Google-Smtp-Source: ABdhPJwlUnmpSEGgsE7UwohtGV+aHLpQvfCYXpmMKXxh6PNYErt2ujS/PzkgnC9ofn4iNKtgc0LzYUoZuGQ8yCdSWz0=
+X-Received: by 2002:a17:906:e47:: with SMTP id
+ q7mr5868992eji.279.1591015554700; 
+ Mon, 01 Jun 2020 05:45:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x336.google.com
+References: <1591013898-23391-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <CAFEAcA-Z6bcXW3nAqnv+CCTqy1JhZjdqJcdwHApFuUejutH+BA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-Z6bcXW3nAqnv+CCTqy1JhZjdqJcdwHApFuUejutH+BA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jun 2020 14:45:43 +0200
+Message-ID: <CAL1e-=gLnVJgCWVGBWQZdezBwAGDEpEUHf6MuaVOTvTJFiLHVw@mail.gmail.com>
+Subject: Re: [PULL 0/6] MIPS queue for June 1st, 2020
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,41 +96,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, aleksandar.qemu.devel@gmail.com
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Huacai Chen <zltjiangshi@gmail.com>
+On Mon, Jun 1, 2020 at 2:21 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 1 Jun 2020 at 13:18, Aleksandar Markovic
+> <aleksandar.qemu.devel@gmail.com> wrote:
+> >
+> > The following changes since commit 4ec2a1f53e8aaa22924614b64dde97321126943e:
+> >
+> >   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-05-30' into staging (2020-05-31 20:43:45 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   https://github.com/AMarkovic/qemu
+> >
+> > for you to fetch changes up to a08d60bc6c2b6469368fff3d38dd5ddd16dd36be:
+> >
+> >   hw/mips: fuloong2e: Set preferred page size to 16KB (2020-06-01 13:28:21 +0200)
+>
+> Hi; something seems to have gone wrong with your pullreq: it is
+> missing the tag name after the git repository URL...
+>
 
-The description of "make check" is out-of-date, so fix it by adding
-block and softfloat.
+True. Wrong "git request-pull" command. My bad, truly sorry. Just sent
+v2, since there was no problem with patches by themselves. Hopefully
+it will work.
 
-Reviewed-by: Claudio Fontana <cfontana@suse.de>
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <1588674291-6486-1-git-send-email-chenhc@lemote.com>
----
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have recently problems of various kinds related to remote work, and
+changing email address(es) (again). I really hope this v2 will be good
+for you.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a00ccc9..6e3d637 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -4,7 +4,7 @@
- check-help:
- 	@echo "Regression testing targets:"
- 	@echo
--	@echo " $(MAKE) check                Run unit, qapi-schema, qtest and decodetree"
-+	@echo " $(MAKE) check                Run block, qapi-schema, unit, softfloat, qtest and decodetree tests"
- 	@echo
- 	@echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given target"
- 	@echo " $(MAKE) check-qtest          Run qtest tests"
--- 
-2.7.4
+Thanks,
+Aleksandar
 
+> thanks
+> -- PMM
+>
 
