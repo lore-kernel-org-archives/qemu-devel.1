@@ -4,88 +4,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B2CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 23:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D358DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 23:38:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407692073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 23:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D6842073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 23:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rz09eZ1j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407692073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GFWJNcIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6842073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jftzK-0001wt-Ci
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 19:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45448)
+	id 1jfu0l-0003Oy-PR
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 19:38:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jfty6-0000cl-6T
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 19:35:46 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41291)
+ id 1jftyO-0000ut-DS
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 19:36:04 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37970)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jfty5-0004nr-9o
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 19:35:45 -0400
-Received: by mail-pl1-x643.google.com with SMTP id y17so556357plb.8
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 16:35:44 -0700 (PDT)
+ id 1jftyM-0004vb-RM
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 19:36:03 -0400
+Received: by mail-pf1-x442.google.com with SMTP id x207so2278728pfc.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 16:36:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=X4I89W39vWdVNoghag0DFn1ebCW1eil3jLJKcfTKZ5M=;
- b=Rz09eZ1jDr2GqUZY/02LI/v+G4Mymsh044uItJIu+SnTWqBOlAr+pJ1tg3MAcjFFs1
- Wl6k+fmHMq6vXzx2AY0IPGk7NZeU4+E1Sdxl6Mw5AoL9jND4oWQZEQZD+r57AvzHYH/N
- NuhvsCmxF/i2/oBgKNFahnAkMkXFOc81T1dqP9gwS5GJh/0SPKNFan23YgZ6NQ73MEYJ
- qtizNevWe96Vk8MzhSZxh7Hzp13L2QEO5pK/Ckpe0BVTVtsiYNZzxunfsbyOeIti92AR
- Gv4QktnI7lS9pbKOOeJaYUI0JaAylDORYJBmQBzWNsCRniPV5I/JXtMFJ7Pws0xd4Q6l
- nS0Q==
+ bh=hGrlH3PqgBr3ZkLXs0ICSwS5m6e98ZxaoB6gTALk4to=;
+ b=GFWJNcIJwd07F0D6M4IVLW6PM8NwXWcTh05r+2LsqCuNKmw3KcaiHOLhKJcdunMpKy
+ k8C7roaMyHD4kAFgeLh1abx6yLpKVPoLQr+e1sZVtY3Aw9W8WkhIiKz6w76YB+JqcH4P
+ MxkAomMSNK8vmd+4Jxt+xrrsCTPQEsE8onWo67228m4xttiom20ukivbUAHX8Q8JUeWg
+ 0S/zSvXhSxLPN+S8RUH60vBO3/IgfMPExKMPz0QsEnIpgApVtllcayn9Qb0l9VfAtI6h
+ +YQXQOC2rlmxeKBLJRIZWtdy0au/+c1OsjwAQZ0kpGZpn/9flGgboP2H4IxvkCRz+1fm
+ FVJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=X4I89W39vWdVNoghag0DFn1ebCW1eil3jLJKcfTKZ5M=;
- b=oI+Y5vNFPDnLZHLaA0cvgVpz3DeDMLEAXdgZDCAEw9YiqCbsXBkmyFGRWfRQDUgnzG
- rIc2FvzZ2nCyEiVAcHCflM/IYTcvUOO5D3l5Iok2Kl42roJtV+Cg3w68WzqbZiBtbGwZ
- UqbcJM2U7DIK/3CaYZOMTWa5ySqGQRrFZ/iBpPnSwHmSoJwvdxR+td9qh9TjTuwKwcMf
- wH/VvNeXdKws6Df0yutfrbZ6tkQ/SDbRpTMuaST633Dxoqp5qiYNjyaWnTqh2R50//D9
- G/Z0F48+kAwATYeByo/jFGEF1VU47hdcxJAFShIRHqPlOX1txFx3XotrXDsXihChvrVN
- 1EfA==
-X-Gm-Message-State: AOAM531aX7HYTUuf+kl1/fV7IXrDqPU1xrHQyxD/Np1J0pjk+gnpWwSv
- wW6bWsm/WHvCz3s2Gnn2H4f7tg==
-X-Google-Smtp-Source: ABdhPJxfVrNnYPK0N8OZPuZkt0Nk1A1urRieu/jIbg1ZT2QBbNMgMrB6P433MN9FZD6oMK1YrM174A==
-X-Received: by 2002:a17:902:7896:: with SMTP id
- q22mr23251618pll.216.1591054543738; 
- Mon, 01 Jun 2020 16:35:43 -0700 (PDT)
+ bh=hGrlH3PqgBr3ZkLXs0ICSwS5m6e98ZxaoB6gTALk4to=;
+ b=FDKIIUUmWmyfmoc8WV/J6ZFqK+XlX6MU5+oXOT+W+q/MOJYay84Iuwk2+wcsVhYPBn
+ n1Sx/wgax24dIZAscqJocVviZfnzLTCKmUVBJ1xbp7KQjEnCYr96REx5aXwPeT5cnOpC
+ bh7zHGkvPPf64QS3ixfF9Py7v2L9f2u2v/vWEpvSgksWoPEpasmt2hMqBQb+j+FMVDMu
+ vcz28O1FLWKuQwH6CNSD39VYTMjdJI02x45W7y8WDWKf5tO3LAhz0sDUVm36b3v48KT+
+ qY/1C28KCyFrBEvJmwLow7+Bh5/PQxC6xjUCycgMQeH13ATRLiN25+ZMES78ugxT5t7r
+ lEqA==
+X-Gm-Message-State: AOAM532A/GY42Y3D+Jd2Q1EspjUKs88cBtB5CIZbjGb+6Jh40jBMKuDI
+ V+i9FCckpLQZBvFjFBORQ9QKJg==
+X-Google-Smtp-Source: ABdhPJzQLtQYfpPCKrXikLqS/8usRLci/JPY1d5rfCIMc2sTmw/wqAqfi33AqaxVZO9QQc4TtjWvNw==
+X-Received: by 2002:a62:ee07:: with SMTP id e7mr22044574pfi.42.1591054561486; 
+ Mon, 01 Jun 2020 16:36:01 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id z1sm441635pfr.88.2020.06.01.16.35.42
+ by smtp.gmail.com with ESMTPSA id m14sm445894pgn.83.2020.06.01.16.36.00
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 01 Jun 2020 16:35:43 -0700 (PDT)
-Subject: Re: [PATCH v2 2/8] hw/pci-host/prep: Correct RAVEN bus bridge memory
+ Mon, 01 Jun 2020 16:36:00 -0700 (PDT)
+Subject: Re: [PATCH v2 3/8] hw/pci/pci_bridge: Correct pci_bridge_io memory
  region size
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200601142930.29408-1-f4bug@amsat.org>
- <20200601142930.29408-3-f4bug@amsat.org>
+ <20200601142930.29408-4-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <92a1fda6-0ee9-e7f2-7248-b79c01c7b2e3@linaro.org>
-Date: Mon, 1 Jun 2020 16:35:40 -0700
+Message-ID: <35f77178-dc79-3b4a-7562-9bc37fad9d9b@linaro.org>
+Date: Mon, 1 Jun 2020 16:35:58 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200601142930.29408-3-f4bug@amsat.org>
+In-Reply-To: <20200601142930.29408-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -126,27 +125,32 @@ On 6/1/20 7:29 AM, Philippe Mathieu-Daudé wrote:
 > memory_region_set_size() handle the 16 Exabytes limit by
 > special-casing the UINT64_MAX value. This is not a problem
 > for the 32-bit maximum, 4 GiB.
-> By using the UINT32_MAX value, the bm-raven MemoryRegion
+> By using the UINT32_MAX value, the pci_bridge_io MemoryRegion
 > ends up missing 1 byte:
 > 
->   $ qemu-system-ppc -M prep -S -monitor stdio -usb
->   memory-region: bm-raven
->     0000000000000000-00000000fffffffe (prio 0, i/o): bm-raven
->       0000000000000000-000000003effffff (prio 0, i/o): alias bm-pci-memory @pci-memory 0000000000000000-000000003effffff
->       0000000080000000-00000000ffffffff (prio 0, i/o): alias bm-system @system 0000000000000000-000000007fffffff
+>   (qemu) info mtree
+>   memory-region: pci_bridge_io
+>     0000000000000000-00000000fffffffe (prio 0, i/o): pci_bridge_io
+>       0000000000000060-0000000000000060 (prio 0, i/o): i8042-data
+>       0000000000000064-0000000000000064 (prio 0, i/o): i8042-cmd
+>       00000000000001ce-00000000000001d1 (prio 0, i/o): vbe
+>       0000000000000378-000000000000037f (prio 0, i/o): parallel
+>       00000000000003b4-00000000000003b5 (prio 0, i/o): vga
+>       ...
 > 
 > Fix by using the correct value. We now have:
 > 
->   memory-region: bm-raven
->     0000000000000000-00000000ffffffff (prio 0, i/o): bm-raven
->       0000000000000000-000000003effffff (prio 0, i/o): alias bm-pci-memory @pci-memory 0000000000000000-000000003effffff
->       0000000080000000-00000000ffffffff (prio 0, i/o): alias bm-system @system 0000000000000000-000000007fffffff
+>   memory-region: pci_bridge_io
+>     0000000000000000-00000000ffffffff (prio 0, i/o): pci_bridge_io
+>       0000000000000060-0000000000000060 (prio 0, i/o): i8042-data
+>       0000000000000064-0000000000000064 (prio 0, i/o): i8042-cmd
+>       ...
 > 
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/pci-host/prep.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/pci/pci_bridge.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
