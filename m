@@ -2,90 +2,59 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93132C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 03:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9F1C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 04:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 577AD206E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 03:57:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="j7SxhjNU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577AD206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	by mail.kernel.org (Postfix) with ESMTPS id C2108206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 04:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2108206E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfbZU-0004SE-Gh
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 23:57:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56556)
+	id 1jfbgm-0006a5-VD
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 00:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jfbYd-00040O-01
- for qemu-devel@nongnu.org; Sun, 31 May 2020 23:56:16 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:41520)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jfbYb-0005iy-OZ
- for qemu-devel@nongnu.org; Sun, 31 May 2020 23:56:14 -0400
-Received: by mail-qk1-x741.google.com with SMTP id n11so7874688qkn.8
- for <qemu-devel@nongnu.org>; Sun, 31 May 2020 20:56:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=8LUWltuiSD7IEOVLWl1mhgKxYxmmAD9i3SdDJ74iRJc=;
- b=j7SxhjNULxtxiyUs7kyRaCA35k8FDl5MnBMwh/uPLJtmIRNKSVzoqYa9ArkEEGi+dT
- ZB3BSySCy0qTklIQKTfe4M4dtu2Q1/+7GrVpo09ErEY/4nlXSGYvhikvsIeMjF2cmDjm
- 1K3B26FWDzCmzxiMHtGvyrdWJT1D0JXe8zHgw/MIBXsstWVlbyy2FNxKbr7BbHPmoZtx
- YdEvtneQ4a47PjynDGrZ7HCuUp0TRpEj31KzrlZRkH3XRYfKY4futuToi2rOFXqL2OYb
- KhRX9fEKknbA6U/kh9sRAHM/Glxdr934VY4A6bFQAX3ZOTveSSInpyEZoZkVXGTQ4p0M
- hMYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=8LUWltuiSD7IEOVLWl1mhgKxYxmmAD9i3SdDJ74iRJc=;
- b=iYUBGypxCEfmiW3lv2f2PEGDsh0pDluSh+O0NfzJzuWxoRXGmwKHRsaC8gCvyLvLEY
- Qn5Yh29tAEVmF5nxCBXZ/nnHusi+FmPSfsZjJ/2JfpYynL70+LYwA8dqeXqUdfArwsV8
- 3YPnaj3srO9cup8PU40ubBB8wa/6zkIGdQBKAoSj336haB24C37SPSqmR0LePuKHrJdM
- KCuVZTks9t3H13gznkOuPpzQF1tvh1HyQghewGlz3NYYQ/0J2t2qyJ1zlFG7LAzlRg95
- t4J35cxT3I0EiLUU6j7Gl2Hm5Hd0YFYXCTegb+M2IXxx/QXGxVE7vk3clTmMdRR8zmO0
- fAFw==
-X-Gm-Message-State: AOAM532Bdvcnqjz5oiwGTo/VO3zVfcQYprTNwK3UkC1Prq6ixfqZVror
- k7CmrcaB5v9ujL2B33lNpJ+t7Q==
-X-Google-Smtp-Source: ABdhPJwx7KiLCmtj/8+mRq9ul+qOFO4yoEwu0c27G4CmUx6BkNHPeunGnDYTEjQBrV3z9b8vxDKBjw==
-X-Received: by 2002:a05:620a:2012:: with SMTP id
- c18mr17002290qka.313.1590983771851; 
- Sun, 31 May 2020 20:56:11 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id s15sm15671071qtc.95.2020.05.31.20.56.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 31 May 2020 20:56:11 -0700 (PDT)
-Date: Sun, 31 May 2020 23:56:10 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v1 11/12] util: Added tsan annotate for thread name.
-Message-ID: <20200601035610.GA2184251@sff>
-References: <20200529132341.755-1-robert.foley@linaro.org>
- <20200529132341.755-11-robert.foley@linaro.org>
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jfbfq-0005wl-3w; Mon, 01 Jun 2020 00:03:42 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3771 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jfbfo-00081y-GG; Mon, 01 Jun 2020 00:03:41 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 25604FEA423AB5663262;
+ Mon,  1 Jun 2020 12:03:30 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 1 Jun 2020 12:03:21 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+Subject: [PATCH] migration: Count new_dirty instead of real_dirty
+Date: Mon, 1 Jun 2020 12:02:50 +0800
+Message-ID: <20200601040250.38324-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529132341.755-11-robert.foley@linaro.org>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::741;
- envelope-from=cota@braap.org; helo=mail-qk1-x741.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhukeqian1@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 00:03:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,23 +67,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Chao Fan <fanc.fnst@cn.fujitsu.com>,
+ Keqian Zhu <zhukeqian1@huawei.com>, wanghaibin.wang@huawei.com,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 09:23:41 -0400, Robert Foley wrote:
-> This allows us to see the name of the thread in tsan
-> warning reports such as this:
-> 
->   Thread T7 'CPU 1/TCG' (tid=24317, running) created by main thread at:
-> 
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+DIRTY_LOG_INITIALLY_ALL_SET feature is on the queue. This fixs the
+dirty rate calculation for this feature. After introducing this
+feature, real_dirty_pages is equal to total memory size at begining.
+This causing wrong dirty rate and false positive throttling.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+BTW, real dirty rate is not suitable and not very accurate.
 
-Thanks,
+1. For not suitable: We mainly concern on the relationship between
+   dirty rate and network bandwidth. Net increasement of dirty pages
+   makes more sense.
+2. For not very accurate: With manual dirty log clear, some dirty pages
+   will be cleared during each peroid, our "real dirty rate" is less
+   than real "real dirty rate".
 
-		Emilio
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ include/exec/ram_addr.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 5e59a3d8d7..af9677e291 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -443,7 +443,7 @@ static inline
+ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                                ram_addr_t start,
+                                                ram_addr_t length,
+-                                               uint64_t *real_dirty_pages)
++                                               uint64_t *accu_dirty_pages)
+ {
+     ram_addr_t addr;
+     unsigned long word = BIT_WORD((start + rb->offset) >> TARGET_PAGE_BITS);
+@@ -469,7 +469,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+             if (src[idx][offset]) {
+                 unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+                 unsigned long new_dirty;
+-                *real_dirty_pages += ctpopl(bits);
+                 new_dirty = ~dest[k];
+                 dest[k] |= bits;
+                 new_dirty &= bits;
+@@ -502,7 +501,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                         start + addr + offset,
+                         TARGET_PAGE_SIZE,
+                         DIRTY_MEMORY_MIGRATION)) {
+-                *real_dirty_pages += 1;
+                 long k = (start + addr) >> TARGET_PAGE_BITS;
+                 if (!test_and_set_bit(k, dest)) {
+                     num_dirty++;
+@@ -511,6 +509,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+         }
+     }
+ 
++    *accu_dirty_pages += num_dirty;
+     return num_dirty;
+ }
+ #endif
+-- 
+2.19.1
+
 
