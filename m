@@ -2,82 +2,84 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DDCC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11989C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:17:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D727C2073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB0662073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 21:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="szQjvNPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D727C2073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w8S7MfXJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0662073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfrnv-00039H-S8
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 17:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60452)
+	id 1jfrnw-0003Db-Qw
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 17:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jfrmO-0001bu-2k
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:15:32 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:39295)
+ id 1jfrmT-0001cT-DL
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:15:37 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:40519)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jfrmM-0006SP-8W
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:15:31 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id h95so389922pje.4
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 14:15:29 -0700 (PDT)
+ id 1jfrmO-0006To-3r
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 17:15:37 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id j21so4053785pgb.7
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 14:15:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Gw5m1x5Xbx58fV+wiK/fT00tZsNBDwX2ki+9aHXy5lw=;
- b=szQjvNPROIFpzZ+hAg6ifcsU1NrSdRftp9A9GejNYGsE1RRIwZeF0JAWjqmtoCTrzA
- GWgSL+g/MK7gWorSIUXEKEAmSCS0YhMbKZuDZzQrh6HO459brh5C77SvhSi8t0+uVPUR
- SWqtats+tFzDn6cFLr3fXA57N1pJNit3xWZdfXyKuWDQPohU15Q6y588B4HT1t9Vabtp
- 8aDWwW4hFv78d7zC5r1ytKNf0DrJCiYnwZUqh0i0FMQNWZ+VtZq6riLMviyniB7KQ4T6
- RJjgkJXS7Yvx/vTpOuQeGtyZrwHOACK+xHfUYj5dZsGnFEk6Fx01BIF+E3m7EnU1sq01
- k5Kw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=YdJ/B9O5ArjScFjmcZvMgsnG616gX1+G8Nql6rKNdMY=;
+ b=w8S7MfXJia0+uVT8JA/j7klliS6X/ixRMCeEgoVQ5E8UKEa0mEM/3ghOZbP/X3IJdd
+ eqzMcwZkSVDBhfZF4nvGaNmse1eQ6BfecBclC40ZsvxHwmQpQdeFkSd/FNXJDnxi2V75
+ A0DI6g+eZb3CCAR7HdpCVh/ubUSKyvvKc/hwIJfdLBjSmy3HnD9GLhUPlkJPaciX6/jv
+ BH96KghYBh7hvcXDNUfImMsCBbvl4CgJl2efuBhmFWLjPqsRLjH2W6qW0FZ1RWk2y9xP
+ zi8XSVt4feq2uTbNq2PHXOLhqn69Duuo9tGL8tAygClFLO3zH0A7+YYEmUpfysIBAUMQ
+ ctNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Gw5m1x5Xbx58fV+wiK/fT00tZsNBDwX2ki+9aHXy5lw=;
- b=RdPQ69Dbe5zFFmdU8zxNErqw4nHAllWoJ7PCJYET81gzImDilib/I4pgz2Y6HVuifK
- Ca2kYO6X6GFqvY+VUYkiRcuwgbYDvSVPONHpsu7MYFnmVyPtuxiCsHDBxDx+pYgaolz+
- C0TO4CVElW1TZ3OjWQ7LI+gszuO5HObGanE7my1TeWv0nd2b1skqajxw48rH68RWxy2p
- ozZ9JmxofWqK+TGquJ7n4hdjjCTUomR/2L048+Kx8ryP8DZXjeFtaGQAMi8+VJUKBFeE
- hYwIlSRQcjBhZPQw9BVDCLylqkh7vgXxOj0AgccImZJnUKh57mkFRB6gMmw7naO3ZeGt
- 841Q==
-X-Gm-Message-State: AOAM531qbrDnfljWDmlfoiLFvsT+dXV3h9Gmv4irUGfp8IhpgFP6k4Sw
- 4cj6NxiATUh6nJt3y9bv27f8n4g2WwwYBw==
-X-Google-Smtp-Source: ABdhPJxm9Ek8fVPJepXKKnvmxkPpF/ngaU0xNXNegpMvuX45YNpQQR+v1iVZbNbkRqOYpFEgOxcWRA==
-X-Received: by 2002:a17:902:7885:: with SMTP id
- q5mr22215535pll.320.1591046128130; 
- Mon, 01 Jun 2020 14:15:28 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=YdJ/B9O5ArjScFjmcZvMgsnG616gX1+G8Nql6rKNdMY=;
+ b=o1nPof72c3aTUmmJvASeQGVQWaA4cSk/YuUuefvb9nbrcIUTmbIU1DVs6yVv0hJ2zF
+ FMZqQ2W3T9v2eQLmkNnSAvWSxY2EZ3nEH75/PicAHHOetzqH7mpyqzD53eSPDXusC77I
+ P+O+wlonlDRkJK5fl6wPWqN9QCz+FRWwBLkqwxBCpfi8RY3bI/Cbm0y88mR63OgVjVsV
+ hH3Cp4mGO0Wk738DIR3DrLeAQxNG2Rj/OHy2goAFJ92ewDMEcxMEZm7iknC8nVxxXrZR
+ O2e6sN6JVEFMIFXo0COhafMUULbQNF3j8SbxKeetOOj6jH2Cus5EmEhFu7HkEw3YiSos
+ +uAw==
+X-Gm-Message-State: AOAM530K6QIx4SoExP/4YeaQBEgxVtmKkwwWcjeEaqICiZWK9W9+Ucdo
+ eMTHTOTH9IBvYQlFH4lN8o0NLbt7bd2R0A==
+X-Google-Smtp-Source: ABdhPJzQDSHgwdULxh2FHzFugHs02UKFrTqIjVs+KKLK1KKNJmblk1wBMGx/ftIPLdVc+g1fiuX8DQ==
+X-Received: by 2002:a62:15c7:: with SMTP id 190mr22262910pfv.190.1591046130364; 
+ Mon, 01 Jun 2020 14:15:30 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:85d8:9a30:f0f7:b100])
- by smtp.gmail.com with ESMTPSA id j24sm330131pga.51.2020.06.01.14.15.26
+ by smtp.gmail.com with ESMTPSA id j24sm330131pga.51.2020.06.01.14.15.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 14:15:27 -0700 (PDT)
+ Mon, 01 Jun 2020 14:15:29 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 0/9] tests/vm: Add support for aarch64 VMs
-Date: Mon,  1 Jun 2020 17:14:12 -0400
-Message-Id: <20200601211421.1277-1-robert.foley@linaro.org>
+Subject: [PATCH v9 1/9] tests/vm: pass args through to BaseVM's __init__
+Date: Mon,  1 Jun 2020 17:14:13 -0400
+Message-Id: <20200601211421.1277-2-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200601211421.1277-1-robert.foley@linaro.org>
+References: <20200601211421.1277-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=robert.foley@linaro.org; helo=mail-pj1-x102e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x52d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,65 +101,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
- peter.puhov@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, philmd@redhat.com, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is version 9 of the patch series to
-add support for aarch64 VMs in the vm-build infrastructure.
- - Ubuntu 18.04 aarch64 VM
- - CentOS 8 aarch64 VM
+Adding the args parameter to BaseVM's __init__.
+We will shortly need to pass more parameters to the class
+so let's just pass args rather than growing the parameter list.
 
-v8: https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08458.html
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ tests/vm/basevm.py | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-Changes in v9:
-- Fixed one bug/typo in configure for efi-aarch64.
-- Fixed indentation of efi-aarch64 code in configure.
-- Updated file header for ubuntuvm.py
-- Few minor changes in ConsoleSocket
-- Updated some comments in basevm.py around the call to 
-  QEMUMachine regarding drain_console=True.
-
-Robert Foley (9):
-  tests/vm: pass args through to BaseVM's __init__
-  tests/vm: Add configuration to basevm.py
-  tests/vm: Added configuration file support
-  tests/vm: Add common Ubuntu python module
-  tests/vm: Added a new script for ubuntu.aarch64.
-  tests/vm: Added a new script for centos.aarch64.
-  tests/vm: change scripts to use self._config
-  python/qemu: Add ConsoleSocket for optional use in QEMUMachine
-  tests/vm: Add workaround to consume console
-
- configure                         |  29 ++++
- python/qemu/console_socket.py     | 110 +++++++++++++
- python/qemu/machine.py            |  23 ++-
- tests/vm/Makefile.include         |  22 +++
- tests/vm/aarch64vm.py             | 106 +++++++++++++
- tests/vm/basevm.py                | 256 ++++++++++++++++++++++++------
- tests/vm/centos-8-aarch64.ks      |  51 ++++++
- tests/vm/centos.aarch64           | 227 ++++++++++++++++++++++++++
- tests/vm/conf_example_aarch64.yml |  51 ++++++
- tests/vm/conf_example_x86.yml     |  50 ++++++
- tests/vm/fedora                   |  17 +-
- tests/vm/freebsd                  |  16 +-
- tests/vm/netbsd                   |  19 +--
- tests/vm/openbsd                  |  17 +-
- tests/vm/ubuntu.aarch64           |  68 ++++++++
- tests/vm/ubuntu.i386              |  46 ++----
- tests/vm/ubuntuvm.py              |  60 +++++++
- 17 files changed, 1045 insertions(+), 123 deletions(-)
- create mode 100644 python/qemu/console_socket.py
- create mode 100644 tests/vm/aarch64vm.py
- create mode 100644 tests/vm/centos-8-aarch64.ks
- create mode 100755 tests/vm/centos.aarch64
- create mode 100644 tests/vm/conf_example_aarch64.yml
- create mode 100644 tests/vm/conf_example_x86.yml
- create mode 100755 tests/vm/ubuntu.aarch64
- create mode 100644 tests/vm/ubuntuvm.py
-
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index a80b616a08..5a58e6c393 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -61,11 +61,10 @@ class BaseVM(object):
+     # 4 is arbitrary, but greater than 2,
+     # since we found we need to wait more than twice as long.
+     tcg_ssh_timeout_multiplier = 4
+-    def __init__(self, debug=False, vcpus=None, genisoimage=None,
+-                 build_path=None):
++    def __init__(self, args):
+         self._guest = None
+-        self._genisoimage = genisoimage
+-        self._build_path = build_path
++        self._genisoimage = args.genisoimage
++        self._build_path = args.build_path
+         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
+                                                          suffix=".tmp",
+                                                          dir="."))
+@@ -78,7 +77,7 @@ class BaseVM(object):
+         self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
+         open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
+ 
+-        self.debug = debug
++        self.debug = args.debug
+         self._stderr = sys.stderr
+         self._devnull = open(os.devnull, "w")
+         if self.debug:
+@@ -92,8 +91,8 @@ class BaseVM(object):
+                        (",ipv6=no" if not self.ipv6 else ""),
+             "-device", "virtio-net-pci,netdev=vnet",
+             "-vnc", "127.0.0.1:0,to=20"]
+-        if vcpus and vcpus > 1:
+-            self._args += ["-smp", "%d" % vcpus]
++        if args.jobs and args.jobs > 1:
++            self._args += ["-smp", "%d" % args.jobs]
+         if kvm_available(self.arch):
+             self._args += ["-enable-kvm"]
+         else:
+@@ -456,8 +455,7 @@ def main(vmcls):
+             return 1
+         logging.basicConfig(level=(logging.DEBUG if args.debug
+                                    else logging.WARN))
+-        vm = vmcls(debug=args.debug, vcpus=args.jobs,
+-                   genisoimage=args.genisoimage, build_path=args.build_path)
++        vm = vmcls(args)
+         if args.build_image:
+             if os.path.exists(args.image) and not args.force:
+                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
 -- 
 2.17.1
 
