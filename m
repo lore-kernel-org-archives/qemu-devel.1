@@ -6,39 +6,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCA3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 13:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 980E3C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 13:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E4DD2074B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 13:53:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4DD2074B
+	by mail.kernel.org (Postfix) with ESMTPS id 2AC6B2074B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 13:54:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC6B2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfks8-0001SY-Qt
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 09:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33152)
+	id 1jfktL-00033D-7w
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 09:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jfknf-0003pp-EV; Mon, 01 Jun 2020 09:48:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38782 helo=relay3.sw.ru)
+ id 1jfkne-0003od-8L; Mon, 01 Jun 2020 09:48:22 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38772 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jfknc-0001k4-50; Mon, 01 Jun 2020 09:48:23 -0400
+ id 1jfknc-0001k9-1H; Mon, 01 Jun 2020 09:48:21 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jfknN-0005dY-Qd; Mon, 01 Jun 2020 16:48:05 +0300
+ id 1jfknN-0005dY-KW; Mon, 01 Jun 2020 16:48:05 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 6/6] iotests: Dump QCOW2 image metadata in JSON format with
- qcow2.py
-Date: Mon,  1 Jun 2020 16:48:13 +0300
-Message-Id: <1591019293-211155-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v3 1/6] iotests: Add extension names to qcow2.py dump
+Date: Mon,  1 Jun 2020 16:48:08 +0300
+Message-Id: <1591019293-211155-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -69,243 +68,295 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Represent QCOW2 metadata dumping with qcow2.py script in JSON format
+Header extension:         Feature table
+magic                     0x6803f857
+length                    192
+data                      <binary>
 
-{
-    "QCOW2_header_extensions": [
-        {
-            "Header_extension": "Feature table",
-            "magic": "0x6803f857",
-            "length": 192,
-            "data_str": "<binary>"
-        },
-        {
-            "Header_extension": "Bitmaps",
-            "magic": "0x23852875",
-            "length": 24,
-            "data": {
-                "nb_bitmaps": 2,
-                "reserved32": 0,
-                "bitmap_directory_size": 64,
-                "bitmap_directory_offset": 1048576,
-                "entries": [
-                    {
-                        "name": "bitmap-1",
-                        "flags": [],
-                        "flag_bits": 0,
-                        "bitmap_table_offset": 589824,
-                        "bitmap_table_size": 8,
-                        "type": 1,
-                        "granularity": 16,
-                        "name_size": 8,
-                        "extra_data_size": 0,
-                        "bitmap_table": {
-                            "table_entries": [
-                                {
-                                    "type": "serialized",
-                                    "offset": 655360,
-                                    "size": 65536
-                                },
+The change incurs modification of the output in 031, 036 and 061 test
+cases.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2.py | 108 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 105 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/031.out  | 22 +++++++++++-----------
+ tests/qemu-iotests/036.out  |  4 ++--
+ tests/qemu-iotests/061.out  | 18 +++++++++---------
+ tests/qemu-iotests/qcow2.py | 23 ++++++++++++++++++++---
+ 4 files changed, 42 insertions(+), 25 deletions(-)
 
+diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
+index 5a4beda..966c8d9 100644
+--- a/tests/qemu-iotests/031.out
++++ b/tests/qemu-iotests/031.out
+@@ -24,7 +24,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -52,7 +52,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -80,12 +80,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             72
+ 
+-Header extension:
++Header extension:         Backing format
+ magic                     0xe2792aca
+ length                    11
+ data                      'host_device'
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -115,12 +115,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -148,12 +148,12 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+@@ -181,17 +181,17 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Backing format
+ magic                     0xe2792aca
+ length                    11
+ data                      'host_device'
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+ 
+-Header extension:
++Header extension:         Unknown
+ magic                     0x12345678
+ length                    31
+ data                      'This is a test header extension'
+diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
+index e409acf..81a7366 100644
+--- a/tests/qemu-iotests/036.out
++++ b/tests/qemu-iotests/036.out
+@@ -24,7 +24,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ incompatible_features     []
+ compatible_features       []
+ autoclear_features        [63]
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -36,7 +36,7 @@ No errors were found on the image.
+ incompatible_features     []
+ compatible_features       []
+ autoclear_features        []
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index a51ad1b..7821b7f 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -24,7 +24,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -82,7 +82,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -138,7 +138,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -193,7 +193,7 @@ autoclear_features        [42]
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -262,7 +262,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -324,7 +324,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -353,7 +353,7 @@ autoclear_features        []
+ refcount_order            4
+ header_length             112
+ 
+-Header extension:
++Header extension:         Feature table
+ magic                     0x6803f857
+ length                    336
+ data                      <binary>
+@@ -491,7 +491,7 @@ wrote 65536/65536 bytes at offset 2147483648
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 3221225472
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-    (0.00/100%)
+    (12.50/100%)
+    (25.00/100%)
+    (37.50/100%)
+    (50.00/100%)
+    (62.50/100%)
+    (75.00/100%)
+    (87.50/100%)
+    (100.00/100%)
+    (100.00/100%)
++    (0.00/100%)    (12.50/100%)    (25.00/100%)    (37.50/100%)    (50.00/100%)    (62.50/100%)    (75.00/100%)    (87.50/100%)    (100.00/100%)    (100.00/100%)
+ No errors were found on the image.
+ 
+ === Testing progress report with snapshot ===
+@@ -506,7 +506,7 @@ wrote 65536/65536 bytes at offset 2147483648
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 3221225472
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-    (0.00/100%)
+    (6.25/100%)
+    (12.50/100%)
+    (18.75/100%)
+    (25.00/100%)
+    (31.25/100%)
+    (37.50/100%)
+    (43.75/100%)
+    (50.00/100%)
+    (56.25/100%)
+    (62.50/100%)
+    (68.75/100%)
+    (75.00/100%)
+    (81.25/100%)
+    (87.50/100%)
+    (93.75/100%)
+    (100.00/100%)
+    (100.00/100%)
++    (0.00/100%)    (6.25/100%)    (12.50/100%)    (18.75/100%)    (25.00/100%)    (31.25/100%)    (37.50/100%)    (43.75/100%)    (50.00/100%)    (56.25/100%)    (62.50/100%)    (68.75/100%)    (75.00/100%)    (81.25/100%)    (87.50/100%)    (93.75/100%)    (100.00/100%)    (100.00/100%)
+ No errors were found on the image.
+ 
+ === Testing version downgrade with external data file ===
 diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
-index 76e0c69..fd1ef4f 100755
+index 94a07b2..e824b09 100755
 --- a/tests/qemu-iotests/qcow2.py
 +++ b/tests/qemu-iotests/qcow2.py
-@@ -3,11 +3,21 @@
- import sys
- import struct
- import string
-+import json
- 
- 
-+dump_json = False
- cluster_size = 0
- 
- 
-+class ComplexEncoder(json.JSONEncoder):
-+    def default(self, obj):
-+        if hasattr(obj, 'get_info_dict'):
-+            return obj.get_info_dict()
-+        else:
-+            return json.JSONEncoder.default(self, obj)
-+
-+
- class Qcow2BitmapTableEntry:
- 
-     BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
-@@ -23,6 +33,9 @@ class Qcow2BitmapTableEntry:
-             index = entry & self.BME_TABLE_ENTRY_FLAG_ALL_ONES
-         self.type = self.bmte_type[index]
- 
-+    def get_info_dict(self):
-+        return dict(type=self.type, offset=self.offset, size=self.cluster_size)
-+
- 
- class Qcow2BitmapTable:
- 
-@@ -39,6 +52,9 @@ class Qcow2BitmapTable:
-                                              entry.cluster_size))
-         print("")
- 
-+    def get_info_dict(self):
-+        return dict(table_entries=self.entries)
-+
- 
- class Qcow2BitmapDirEntry:
- 
-@@ -102,6 +118,18 @@ class Qcow2BitmapDirEntry:
- 
-         self.bitmap_table.print_bitmap_table()
- 
-+    def get_info_dict(self):
-+        return dict(name=self.name,
-+                    flags=self.bitmap_flags,
-+                    flag_bits=self.flag_bits,
-+                    bitmap_table_offset=self.bitmap_table_offset,
-+                    bitmap_table_size=self.bitmap_table_size,
-+                    type=self.type,
-+                    granularity=self.granularity_bits,
-+                    name_size=self.name_size,
-+                    extra_data_size=self.extra_data_size,
-+                    bitmap_table=self.bitmap_table)
-+
- 
- class Qcow2BitmapDirectory:
- 
-@@ -177,6 +205,31 @@ class Qcow2BitmapExt:
-         self.dump_bitmap_ext()
-         self.dump_bitmap_directory()
- 
-+    def get_info_dict(self):
-+        return dict(nb_bitmaps=self.nb_bitmaps,
-+                    reserved32=self.reserved32,
-+                    bitmap_directory_size=self.bitmap_directory_size,
-+                    bitmap_directory_offset=self.bitmap_directory_offset,
-+                    entries=self.bitmaps)
-+
-+
-+class Qcow2HeaderDoc:
-+
-+    def __init__(self, h):
-+        self.header = h
-+
-+    def get_info_dict(self):
-+        return dict(QCOW2_header=self.header)
-+
-+
-+class Qcow2HeaderExtensionsDoc:
-+
-+    def __init__(self, extensions):
-+        self.extensions = extensions
-+
-+    def get_info_dict(self):
-+        return dict(QCOW2_header_extensions=self.extensions)
-+
+@@ -6,19 +6,36 @@ import string
  
  class QcowHeaderExtension:
  
-@@ -224,6 +277,17 @@ class QcowHeaderExtension:
-         if self.obj is not None:
-             self.obj.load(fd)
- 
-+    def get_info_dict(self):
-+        he_dict = dict(Header_extension=self.name,
-+                       magic=hex(self.magic),
-+                       length=self.length)
-+        if self.obj is not None:
-+            he_dict.update(data=self.obj)
-+        else:
-+            he_dict.update(data_str=self.data_str)
++    QCOW2_EXT_MAGIC_BACKING_FORMAT = 0xE2792ACA
++    QCOW2_EXT_MAGIC_FEATURE_TABLE = 0x6803f857
++    QCOW2_EXT_MAGIC_CRYPTO_HEADER = 0x0537be77
++    QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
++    QCOW2_EXT_MAGIC_DATA_FILE = 0x44415441
 +
-+        return he_dict
-+
+     def __init__(self, magic, length, data):
+         if length % 8 != 0:
+             padding = 8 - (length % 8)
+             data += b"\0" * padding
  
+-        self.magic  = magic
++        self.magic = magic
+         self.length = length
+-        self.data   = data
++        self.data = data
++        self.name = self.extension_name(magic)
+ 
+     @classmethod
+     def create(cls, magic, data):
+         return QcowHeaderExtension(magic, len(data), data)
+ 
++    def extension_name(self, magic):
++        return {
++            self.QCOW2_EXT_MAGIC_BACKING_FORMAT: 'Backing format',
++            self.QCOW2_EXT_MAGIC_FEATURE_TABLE: 'Feature table',
++            self.QCOW2_EXT_MAGIC_CRYPTO_HEADER: 'Crypto header',
++            self.QCOW2_EXT_MAGIC_BITMAPS: 'Bitmaps',
++            self.QCOW2_EXT_MAGIC_DATA_FILE: 'Data file',
++        }.get(magic, 'Unknown')
++
++
  class QcowHeader:
  
-@@ -353,9 +417,34 @@ class QcowHeader:
-             print("%-25s" % f[2], value_str)
-         print("")
+     uint32_t = 'I'
+@@ -151,7 +168,7 @@ class QcowHeader:
+             else:
+                 data = "<binary>"
  
-+    def get_info_dict(self):
-+        return dict(magic=hex(self.magic),
-+                    version=self.version,
-+                    backing_file_offset=hex(self.backing_file_offset),
-+                    backing_file_size=self.backing_file_size,
-+                    cluster_bits=self.cluster_bits,
-+                    size=self.size,
-+                    crypt_method=self.crypt_method,
-+                    l1_size=self.l1_size,
-+                    l1_table_offset=hex(self.l1_table_offset),
-+                    refcount_table_offset=hex(self.refcount_table_offset),
-+                    refcount_table_clusters=self.refcount_table_clusters,
-+                    nb_snapshots=self.nb_snapshots,
-+                    snapshot_offset=hex(self.snapshot_offset),
-+                    incompatible_features=self.incompatible_features,
-+                    compatible_features=self.compatible_features,
-+                    autoclear_features=self.autoclear_features,
-+                    refcount_order=self.refcount_order,
-+                    header_length=self.header_length)
-+
-     def dump_extensions(self):
--        for ex in self.extensions:
-+        if dump_json:
-+            ext_doc = Qcow2HeaderExtensionsDoc(self.extensions)
-+            print(json.dumps(ext_doc.get_info_dict(), indent=4,
-+                             cls=ComplexEncoder))
-+            return
- 
-+        for ex in self.extensions:
-             print("%-25s %s" % ("Header extension:", ex.name))
+-            print("Header extension:")
++            print("%-25s %s" % ("Header extension:", ex.name))
              print("%-25s %#x" % ("magic", ex.magic))
              print("%-25s %d" % ("length", ex.length))
-@@ -368,7 +457,11 @@ class QcowHeader:
- 
- def cmd_dump_header(fd):
-     h = QcowHeader(fd)
--    h.dump()
-+    if dump_json:
-+        h_doc = Qcow2HeaderDoc(h)
-+        print(json.dumps(h_doc.get_info_dict(), indent=4, cls=ComplexEncoder))
-+    else:
-+        h.dump()
-     h.dump_extensions()
- 
- def cmd_dump_header_exts(fd):
-@@ -460,6 +553,12 @@ cmds = [
- ]
- 
- def main(filename, cmd, args):
-+    global dump_json
-+    dump_json = '-j' in sys.argv
-+    if dump_json:
-+        sys.argv.remove('-j')
-+        args.remove('-j')
-+
-     fd = open(filename, "r+b")
-     try:
-         for name, handler, num_args, desc in cmds:
-@@ -476,11 +575,14 @@ def main(filename, cmd, args):
-         fd.close()
- 
- def usage():
--    print("Usage: %s <file> <cmd> [<arg>, ...]" % sys.argv[0])
-+    print("Usage: %s <file> <cmd> [<arg>, ...] [<key>, ...]" % sys.argv[0])
-     print("")
-     print("Supported commands:")
-     for name, handler, num_args, desc in cmds:
-         print("    %-20s - %s" % (name, desc))
-+    print("")
-+    print("Supported keys:")
-+    print("    %-20s - %s" % ('-j', 'Dump in JSON format'))
- 
- if __name__ == '__main__':
-     if len(sys.argv) < 3:
+             print("%-25s %s" % ("data", data))
 -- 
 1.8.3.1
 
