@@ -2,100 +2,89 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A707C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C84C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:57:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4297B206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:42:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E03DB206F1
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:57:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W78FLHJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4297B206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KcVwRkyn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E03DB206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfgxZ-0007W6-IH
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 05:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60402)
+	id 1jfhBx-0003Xb-24
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 05:57:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jfgwf-0006dY-3n
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:41:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29278
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jfgwe-0007xh-9e
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:41:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591004482;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:mime-version:mime-version:
- content-type:content-type: content-transfer-encoding:content-transfer-encoding;
- bh=7R4WkhjnWyeLH0UmRJ4/Cy6AU8TkX7D45y5OIgQ9Iqs=;
- b=W78FLHJP4pgzC3xYlKlmz766Sra2q8xZafMngtI1MkYFq01yYzv/V1db7CFgQ0OU+W7XcI
- HunAWKh0eJyQefODm4G6vTIft83tDcM0HXMGisYs4qY6KollzaGPmGQRnhNpZePp9oyrGI
- 03KK02F53aqMocc4PhGfjpulavv6Mq0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-_aNYYLFrO3qKw91Ot2gvFA-1; Mon, 01 Jun 2020 05:41:19 -0400
-X-MC-Unique: _aNYYLFrO3qKw91Ot2gvFA-1
-Received: by mail-wm1-f72.google.com with SMTP id v23so2465527wmj.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 02:41:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfhBA-00036z-C3
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:56:24 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39926)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfhB8-00024s-BG
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:56:24 -0400
+Received: by mail-ej1-x644.google.com with SMTP id f7so8635969ejq.6
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 02:56:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NYC6Ebdmwf7RZyIAMfm0Dysd6AENpI1O+6NVUSvgJsc=;
+ b=KcVwRkyn1LTBz+nY05gQXUxXM0I9GI56mGGk6gVllBl2HYgFDhKBsndDUnHk1HnxCk
+ swfOrU8ck9vZSzCHVe/b4hI/VOOEV7TMartvcrXN0kD15hQI0yzr8+xRoM9Nd0Ud6JzB
+ COFB744zoBdVnNDsRTX0d5Ln4eE2XESLJz5LI1Q2sJNoMnlPnDNr7dl4OH2KyLTHAJkT
+ D+Amf0/uxQGu1hSDUEPDoZkZ/wjJ+4jdOpJYkd9nIycTJuKhmGomHnHaNJyWp8ptqyun
+ tj+N1F2lpZiMj8aV/SbHss5gpR73kGePDJe7EhY/jLs5YCtWChfT7wJRZPWC/k5bSV0L
+ x1Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:user-agent:reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=7R4WkhjnWyeLH0UmRJ4/Cy6AU8TkX7D45y5OIgQ9Iqs=;
- b=nlQ7MsPpglk4tsnkfU5CcDENGz6xzg4l9/Gz6q+DqiDUetts5e/iCTVogXCK066XMN
- vI6BClLtb454oZrhmuQafN2bRaDoZhevqU9fMZs/TsQHIkpYddImdWtOP65pPvDD+I76
- yCLiwIo3IiOge1KkVSY6n0r+9WkfjVh0wPHKG5SaGiJFfAQ3ZjQlA3PoIi4bfzq0aiew
- rbJXbbrGTyubZRT/Ad1LCrPZ1PnA98/QuSdLJL7WIekY5b0PKiTi6xcfehRpkuljUaI1
- H64xM8e+7yv1z+BUFg2w3oxSMy06l3pnKNsID+xkIRT2M2dq8K8cQasOAjANFZ/cEk8F
- sUPQ==
-X-Gm-Message-State: AOAM531UNFh6TZ3AahSTO1Fjr51QC0DED4s4AfZxANuTEVPcWGTvCmFp
- /JY+x+qQox46FqhxhxJ1KfYNTGFzc8kxpSLnUsdWLjjKzKrTZ7I7cjH3Ci4fYJjl+IxhH5YcMM3
- UnmZJ+EE6ZDH11Yc=
-X-Received: by 2002:a1c:4189:: with SMTP id
- o131mr21627419wma.110.1591004478351; 
- Mon, 01 Jun 2020 02:41:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJziNYdM6TkUvDrPEzTBfStQSm0MdutJAH9KY3s9OZM/1yICCnZTsfEWrLEkKI4yAzKNPgsN/Q==
-X-Received: by 2002:a1c:4189:: with SMTP id
- o131mr21627407wma.110.1591004478098; 
- Mon, 01 Jun 2020 02:41:18 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
- by smtp.gmail.com with ESMTPSA id f11sm14276205wrj.2.2020.06.01.02.41.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 02:41:17 -0700 (PDT)
-From: Juan Quintela <quintela@redhat.com>
-To: kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: KVM call for 2020-06-02
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Mon, 01 Jun 2020 11:41:16 +0200
-Message-ID: <87d06j6s3n.fsf@secure.mitica>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NYC6Ebdmwf7RZyIAMfm0Dysd6AENpI1O+6NVUSvgJsc=;
+ b=AvGX3/plZS6Hw2ZrVUTe+uEOPK+mJvKFhf+RvTDqrVVmeYLvSjaTPorVXDboG+QTE0
+ ephrQM5U9lydzucGpCsV/ezWlHSqxf+fgZaRRH18glkObqjNQ0f/tghtqhwET44lVZzp
+ Om6pkJOcS0EMhdeenJavB6slB7cEfByIwZjlCWwm+FQkUsWYGp+egwr8Wii3MLheItWN
+ QPT6wv3yIAuDG4VeF4vJQNZbhIiJYXKK4zfjk8a075Zu+KduJleVSkVgcTFI3VHjui07
+ tBVUC4xasD88igFXTAZhFuFQfFywIZWvKzHOA+HQX4/iiFpbKsMCgyy1V3efRcL0R4fa
+ Xwnw==
+X-Gm-Message-State: AOAM5314lou5GasgDw2UUxF3d8mwHwDcg9HhUsdiB6TtI72BmZRcXfkg
+ 8ujGsCHDjRf/qhSO/OvM+PsoIN/CP8Qhj/Ti82I=
+X-Google-Smtp-Source: ABdhPJxf5L5GstBQdNT0MX+HYwUomlcW9Gg8ry30Ckxqgu8QS4M9X+tR0lfu7OBILqdcWdfwVVKlXCWNOvAhmmKYZDQ=
+X-Received: by 2002:a17:906:f20b:: with SMTP id
+ gt11mr11213616ejb.307.1591005380817; 
+ Mon, 01 Jun 2020 02:56:20 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200601092057.10555-1-f4bug@amsat.org>
+In-Reply-To: <20200601092057.10555-1-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jun 2020 11:56:10 +0200
+Message-ID: <CAL1e-=ju88pJcXiK_KN1w5qbFR5MBNJqbGCo-ZtYnDmVo7O+ZQ@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Volunteer for maintaining the Renesas
+ hardware
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=quintela@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 02:05:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,71 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Jun 1, 2020 at 11:21 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> I don't have much clue about the Renesas hardware, but at least
+> I know now the source files a little bit, so I volunteer to pick
+> up patches and send pull-requests for them during my scarce
+> hobbyist time, until someone else with more knowledge steps up
+> to do this job instead.
+>
+> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 
+There is alive and well Renesas target maintainer that obviously has
+the access to Renesas hardware, and I have no idea why you should
+be the maintainer for something that you say do not have much clue,
+while at the same time omitting the original Renesas contributor.
 
-Hi
+Scandalous.
 
-Please, send any topic that you are interested in covering.
-There is already a topic from last call:
+Regards,
+Aleksandar
 
-Last minute suggestion after recent IRC chat with Alex Benn=C3=A9e and
-Thomas Huth:
-
-"Move some of the build/CI infrastructure to GitLab."
-
-Pro/Con?
-
- - GitLab does not offer s390x/ppc64el =3D> keep Travis for these?
-
-How to coordinate efforts?
-
-What we want to improve? Priorities?
-
-Who can do which task / is motivated.
-
-What has bugged us recently:
-- Cross-build images (currently rebuilt all the time on Shippable)
-
-Long term interests:
-
-- Collect quality metrics
-  . build time
-  . test duration
-  . performances
-  . binary size
-  . runtime memory used
-
-- Collect code coverage
-
-Note, this is orthogonal to the "Gating CI" task Cleber is working on:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg688150.html
-
-
-
-
-At the end of Monday I will send an email with the agenda or the
-cancellation of the call, so hurry up.
-
-After discussions on the QEMU Summit, we are going to have always open a
-KVM call where you can add topics.
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a=
-3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
-
+>  MAINTAINERS | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0944d9c731..cbba3ac757 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -298,9 +298,7 @@ SH4 TCG CPUs
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  S: Odd Fixes
+>  F: target/sh4/
+> -F: hw/sh4/
+>  F: disas/sh4.c
+> -F: include/hw/sh4/
+>
+>  SPARC TCG CPUs
+>  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> @@ -1238,6 +1236,18 @@ F: pc-bios/canyonlands.dt[sb]
+>  F: pc-bios/u-boot-sam460ex-20100605.bin
+>  F: roms/u-boot-sam460ex
+>
+> +Renesas Hardware
+> +----------------
+> +SH4 Hardware
+> +M: Aurelien Jarno <aurelien@aurel32.net>
+> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> +S: Odd Fixes
+> +F: hw/sh4/
+> +F: hw/char/sh_serial.c
+> +F: hw/intc/sh_intc.c
+> +F: hw/timer/sh_timer.c
+> +F: include/hw/sh4/
+> +
+>  SH4 Machines
+>  ------------
+>  R2D
+> @@ -1246,6 +1256,7 @@ S: Maintained
+>  F: hw/sh4/r2d.c
+>  F: hw/intc/sh_intc.c
+>  F: hw/timer/sh_timer.c
+> +F: include/hw/sh4/sh_intc.h
+>
+>  Shix
+>  M: Magnus Damm <magnus.damm@gmail.com>
+> --
+> 2.21.3
+>
+>
 
