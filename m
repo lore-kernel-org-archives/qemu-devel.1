@@ -1,127 +1,76 @@
-Return-Path: <SRS0=NdIa=7N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34068C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 23:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F65FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 00:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D009C206A4
-	for <qemu-devel@archiver.kernel.org>; Sun, 31 May 2020 23:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 549732067B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 00:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="BWWkXuwC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D009C206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="crj31est"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549732067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfXXM-0006CO-3j
-	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 19:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35620)
+	id 1jfYkz-0007Nf-Ht
+	for qemu-devel@archiver.kernel.org; Sun, 31 May 2020 20:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robhenry@microsoft.com>)
- id 1jfXWJ-0005cq-Jh
- for qemu-devel@nongnu.org; Sun, 31 May 2020 19:37:35 -0400
-Received: from mail-bn7nam10on2126.outbound.protection.outlook.com
- ([40.107.92.126]:8774 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robhenry@microsoft.com>)
- id 1jfXWH-00020c-Tn
- for qemu-devel@nongnu.org; Sun, 31 May 2020 19:37:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R0nTGCIvLJdB0wHPfmoFpBWEIil8D/HwRxtgu6hVEFArfrX51w94VLLA7QGV6tW1dbBsrCLbF06MSziL08iuVVD5buw1C6O1bKdczBw7sVi93ILYxmWP0zvcBv8OsiU3BkQwictJXlpPuKncJE9OxeM12QBA3Jue5WIDJaJk74ZxtA9bR0T7EGVTTqmO9pncsWy5CfJyYPfCaSL86ze+LxD3sw07aBPayD1eQjRzxEaF7yvpgvOBVn15jBw57XvyePI00kbmIAejVImclZ9fWI9DhZieobG9Dn/OL3mrG75Z+HD0qdVzKmNhmT95fFYVBzYqmI80dWiq8Z86oeqr2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tGKXk/HiJISTmu13xOY4iUJyqlbY/PBgQeXWaZJENyE=;
- b=TseE2LUn8uMNqxmvZaKjm441ZNFn53pOBQ+5oz9Dc1q1YruyEoLZwnWOHRR0phmTp3JB0Zb3v+giD/j+xuwYudW5me350pWxNrPIhF+g1xEKuiNhkkxjYOB66A8fmRtjeSddanQq2bd0T9MZCMx/tXqF8kXVArAqoa12ozE/0xpx+SlAgdR+RV0qxmVnDuUbCS0zEFoHcDQEIl02jZRa30t67tUceeLQt4WkSXP0WWLnLSqzcilsLPA4lXQFMXAM8TmeftLh4Zl6XUMbjogvGQTSHnu85R/pIDTk2IKe0VqXjUIWRcU97pAd7DOeuC7FMzUNpwFUUJOwOqUBvl71sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tGKXk/HiJISTmu13xOY4iUJyqlbY/PBgQeXWaZJENyE=;
- b=BWWkXuwC4CeRz993i3yXWAb41Mo1wx7RWPnlVLYBzn0avEE9siz0GGe43ZSFo3C8Megp33NiR7ue7+pfK1IUkerwdVMs1xA6FC6PIZBIxfIe409DneRx3SW1ZX9ZTpU2HNzxJ95GNDv3VG7EcAcXpRHUJk78Tgp8k5tF5Muhj+c=
-Received: from BL0PR2101MB1026.namprd21.prod.outlook.com
- (2603:10b6:207:30::21) by BL0PR2101MB0962.namprd21.prod.outlook.com
- (2603:10b6:207:30::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.5; Sun, 31 May
- 2020 23:22:29 +0000
-Received: from BL0PR2101MB1026.namprd21.prod.outlook.com
- ([fe80::bc6a:97fa:9127:9fc6]) by BL0PR2101MB1026.namprd21.prod.outlook.com
- ([fe80::bc6a:97fa:9127:9fc6%4]) with mapi id 15.20.3066.007; Sun, 31 May 2020
- 23:22:29 +0000
-From: Robert Henry <robhenry@microsoft.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: Re: ia-32/ia-64 fxsave64 instruction behavior when saving mmx
-Thread-Topic: ia-32/ia-64 fxsave64 instruction behavior when saving mmx
-Thread-Index: AQHWNd5quifUeAt/N0utXBrhr3uc7ajC2MGj
-Date: Sun, 31 May 2020 23:22:29 +0000
-Message-ID: <BL0PR2101MB1026CD468E4F0929086C177FD68D0@BL0PR2101MB1026.namprd21.prod.outlook.com>
-References: <BL0PR2101MB1026B7400F5A568C9D5FC9DBD68F0@BL0PR2101MB1026.namprd21.prod.outlook.com>
-In-Reply-To: <BL0PR2101MB1026B7400F5A568C9D5FC9DBD68F0@BL0PR2101MB1026.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-05-31T23:22:22.168Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard; 
-authentication-results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=microsoft.com;
-x-originating-ip: [97.126.3.203]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 46624393-b40c-4503-78b7-08d805b97cc3
-x-ms-traffictypediagnostic: BL0PR2101MB0962:
-x-microsoft-antispam-prvs: <BL0PR2101MB0962ECFA482D8E394B714DCCD68D0@BL0PR2101MB0962.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0420213CCD
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9Rii1QABiBz0kBL+0hYkkxwHxocdsoZGp0fxNFwSHzGpzIYVMFhGHhaFFg80U62WxusfYTNnF0fcUtxY1HRiX+AdWlbJovIZZuZ1VtJKMYrct4qQZT+Z/WQ/K7tIUlg5S5GHmQJuCtJooogJdJHXaasORsIlYN2O9Cf5nc51GzSxCZCkC4uVCFyv+gH59Kyg66iC8zvMauj5K5LwYZ+cax/PzCDBJM/1IjilHasXZo7sIfmQnUcQQ7ox4rWrqCqpx1pxIQnqE75APiEnKWMnegYTJFTSIiViLrvlDW3+fiU9RB6KzkdlPuoYlddfH05f0mXxtYuLG0PCCu3J5gL9keoNerdutgYOBg21HnLspyJY1ksm93rnLVO4N+yn0XCEk+W0a/PDIt5eZQG0861/OA==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BL0PR2101MB1026.namprd21.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(39860400002)(376002)(136003)(396003)(366004)(76116006)(316002)(26005)(7696005)(66446008)(6916009)(66476007)(66556008)(64756008)(66946007)(6506007)(53546011)(2906002)(33656002)(52536014)(71200400001)(19627405001)(186003)(10290500003)(966005)(86362001)(9686003)(55016002)(8990500004)(478600001)(166002)(8936002)(5660300002)(8676002)(82960400001)(82950400001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: ihK6MV5FyOuWn3xni6S7m+lUzIxRCby1Gx1TEKUYbYO95i48mBZNC0XJ4PM8g+bpW2BmJG9vuMmtSc1ez/2n6l35U3bXg5SM7O4sd0W8X1nzHRiwpDWeidu6wnkQmSteoLWmXYorU6oOmH1C/PbFm69i9XsCK61M6Z1CegBq/kCVQiJyAOIfpSKmE6dCPGiMnXD5J0Qjrb1pXFDkvRLCEunYztdf6zRRMFGqS/iXub5rcfNQsZf0XgUPMP//UllXhWuOQNHTtVlPZYnVoWsuLpX02+LKWFLj1IGBI0Q1HE5zq/qIwi/5LdXIq5xgicDAeP5Rv7ofPJnuEOQxiRv4tnYQr2SUwUf639+5iVHkgv0ijuqn7Xswyf3qIfBpJyE9xsz6hSzvtPYfjU2HlCxTfSvkn9x+P7cZlUvEzyyvLehgtvBj2wH+r8kmN/cFaXjZLfIAYJTMtCGgZoWvGKv6Exq6WvXQNZuzip97qrceC+U=
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_BL0PR2101MB1026CD468E4F0929086C177FD68D0BL0PR2101MB1026_"
+ (Exim 4.90_1) (envelope-from <13824125580@163.com>)
+ id 1jfYkJ-0006yC-Ft
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 20:56:07 -0400
+Received: from m13112.mail.163.com ([220.181.13.112]:61186)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <13824125580@163.com>)
+ id 1jfYkF-0003IY-Gi
+ for qemu-devel@nongnu.org; Sun, 31 May 2020 20:56:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=tBRRP
+ ylaO9dhv+VsT+EBoK7R2HFkt9u2Xx1wW+EBZfU=; b=crj31estuzd692mqMl9Al
+ skcWyEl5nqyHPOd8DomJau6Pajt+b89hveoFGV0ccRhp+xemLW+YlA2RevKP7k6c
+ +9eRFdjozDdvqXYrLr3OEtZTY0k7Wy+/j5A+PRCs05t0oOpD4wf+RC+4Vtj11d/N
+ c/KTKT1mPjVqtJ7/jrivfw=
+Received: from 13824125580$163.com ( [61.143.53.198] ) by
+ ajax-webmail-wmsvr112 (Coremail) ; Mon, 1 Jun 2020 08:55:47 +0800 (CST)
+X-Originating-IP: [61.143.53.198]
+Date: Mon, 1 Jun 2020 08:55:47 +0800 (CST)
+From: tugouxp <13824125580@163.com>
+To: qemu-devel@nongnu.org
+Subject: according what does the qemu know to exit current TB and find
+ helper functions from environment?
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
+ Copyright (c) 2002-2020 www.mailtech.cn 163com
+X-CM-CTRLDATA: 96P5cWZvb3Rlcl9odG09MTczNzo2MQ==
+Content-Type: multipart/alternative; 
+ boundary="----=_Part_9688_1206773769.1590972947296"
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46624393-b40c-4503-78b7-08d805b97cc3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2020 23:22:29.2239 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1CJr6BN2D6kgdMoeR3RgyoAYWuIOBKTOwq1czRAxC3ci8ZPOgjgwiB+drWAODpKO5EN71lj6gF8ZbfOSFcx3oQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR2101MB0962
-Received-SPF: pass client-ip=40.107.92.126;
- envelope-from=robhenry@microsoft.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 19:37:32
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Message-ID: <37d914ae.a6f.1726d609b61.Coremail.13824125580@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: cMGowAAXGiwTUtReDRg5AA--.21619W
+X-CM-SenderInfo: bprtmjyurskkiyq6il2tof0z/1tbiVgw2QlqzlQKdUAABsc
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Received-SPF: pass client-ip=220.181.13.112; envelope-from=13824125580@163.com;
+ helo=m13112.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 20:55:49
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, FROM_LOCAL_DIGITS=0.001,
+ FROM_LOCAL_HEX=0.006, HTML_MESSAGE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,182 +87,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BL0PR2101MB1026CD468E4F0929086C177FD68D0BL0PR2101MB1026_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+------=_Part_9688_1206773769.1590972947296
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-Here's additional information.
+SGkgZm9sa3M6CgoKICAgYSBxdWVzdGlvbnMgcHV6emxlcyBtZSBkdXJpbmcgcmV2aWV3IHRoZSBx
+ZW11IGNvZGUgb2YgNS4wLjAsIHRha2UgdmV4cHJlc3MgZW11bGF0aW9uIGFybSBBOSBvbiBSVE9T
+ICBmb3IgZXhhbXBsZS4KdGhlIGVtdWxhdGVkIFJUT1MgaGFzIGl0cyBvd24gInByaW50ZiIgaW1w
+bGVtZW50YXRpb25zLCBzbyBkdXJpbmcgdGhlIHFlbXUgZW11bGF0aW9ucywgaXQgd291bGQgZmlu
+ZCAKICAgaGVscGVyX2xlX3N0bF9tbXUoKQogICAgICAgICBzdG9yZV9oZWxwZXIoKQogICAgICAg
+ICAgIC4uLi4uLi4uLi4uLi4uLi4uLi4uLi4KICAgICAgICAgICAgICBwbDAxMV93cml0ZSgpOwog
+ICAgICAgICAgICAgICAgICAgIHdyaXRldigpOyAgLy9zeXNjYWxsCmFuZCBmaW5hbGx5LCB0aGUg
+aGVscGVyIHdvdWxkIGNhbGwgdGhlIHBsMDExX3dyaXRlIHRvIGVtdWxhdGUgdGhlIGFjdHVhbCBz
+dGRpbyBvdXRwdXQgZnVuY3Rpb25zLgpidXQsIGhvdyBkaWQgdGhlIFRDQiBUQiBibG9jayBrbm93
+IHRoaXMgZHVyaW5nIHRoZSB0cmFuc2xhdGlvbnM/IHRoZXJlIG1heSBiZSBvdGhlcnMgZGlmZmVy
+ZW50ICJwcmludGYiIGltcGxlbWVudCBpb25zIG9uIGRpZmZlcmVudCAgdGFyZ2V0LCAKaG93IHRo
+ZSB0Y2cga25vd3MgdGhhdCBhIHNwZWNpYWwgaGVscGVyIGZ1bmN0aW9ucyBuZWVkIHRvIGJlIGNh
+bGxlZCBhbmQgb3RoZXJzIG5vdCwgZnJvbSB0aGUgYmluYXJ5IGNvZGUgZGlzYXNzZW1ibHkgbGFu
+Z3VhZ2Ugb2YgdGhlIGVtdWxhdGVkIHRhcmdldCwgdGhlcmUgaXMgbm8Kb2J2aW91cyBzaWduIHRv
+IG1ha2UgYW55b25lIGtub3cgd2hpY2ggaW5zdHV0aW9ucyBpcyBzcGVjaWFsIGFuZCBuZWVkIHRv
+IGVtdWxhdGlvbiBieSBoZWxwZXIsIEhvdyBnZXQgdGhpcz8KCgpUaGFuayB5b3UuCiAgCgoKCgoK
 
-All of the remill tests of the legacy MMX instructions fail. These instruct=
-ions work on 64-bit registers aliased with the lower 64-bits of the x87 fp8=
-0 registers.  The tests fail because remill expects the fxsave64 instructio=
-n to deliver 16 bits of 1's (infinity or nan prefix) in the fp80 exponent, =
-eg bits 79:64.  Metal does this, but QEMU does not.
+------=_Part_9688_1206773769.1590972947296
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
-Reading of Intel Software development manual, table 3.44 (https://www.felix=
-cloutier.com/x86/FXSAVE.html#tbl-3-44) says these 16 bits are reserved, but=
- another version of the manual (http://math-atlas.sourceforge.net/devel/arc=
-h/ia32_arch.pdf) section 9.6.2 "Transitions between x87 fpu and mmx code" s=
-ays a write to an MMX register sets those 16 bits to all 1s.
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+SGkgZm9sa3M6PC9kaXY+
+PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij4m
+bmJzcDsgJm5ic3A7YSBxdWVzdGlvbnMgcHV6emxlcyBtZSBkdXJpbmcgcmV2aWV3IHRoZSBxZW11
+IGNvZGUgb2YgNS4wLjAsIHRha2UgdmV4cHJlc3MgZW11bGF0aW9uIGFybSBBOSBvbiBSVE9TJm5i
+c3A7IGZvciBleGFtcGxlLjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+dGhlIGVtdWxhdGVk
+IFJUT1MgaGFzIGl0cyBvd24gInByaW50ZiIgaW1wbGVtZW50YXRpb25zLCBzbyBkdXJpbmcgdGhl
+IHFlbXUgZW11bGF0aW9ucywgaXQgd291bGQgZmluZCZuYnNwOzwvZGl2PjxkaXYgc3R5bGU9Im1h
+cmdpbjowOyI+Jm5ic3A7ICZuYnNwO2hlbHBlcl9sZV9zdGxfbW11KCk8L2Rpdj48ZGl2IHN0eWxl
+PSJtYXJnaW46MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtzdG9yZV9oZWxw
+ZXIoKTwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
+c3A7ICZuYnNwOyAmbmJzcDsuLi4uLi4uLi4uLi4uLi4uLi4uLi4uPC9kaXY+PGRpdiBzdHlsZT0i
+bWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
+cDsgcGwwMTFfd3JpdGUoKTs8L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46MDsiPiZuYnNwOyAmbmJz
+cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
+OyB3cml0ZXYoKTsmbmJzcDsgLy9zeXNjYWxsPC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij5h
+bmQgZmluYWxseSwgdGhlIGhlbHBlciB3b3VsZCBjYWxsIHRoZSBwbDAxMV93cml0ZSB0byBlbXVs
+YXRlIHRoZSBhY3R1YWwgc3RkaW8gb3V0cHV0IGZ1bmN0aW9ucy48L2Rpdj48ZGl2IHN0eWxlPSJt
+YXJnaW46MDsiPmJ1dCwgaG93IGRpZCB0aGUgVENCIFRCIGJsb2NrIGtub3cgdGhpcyBkdXJpbmcg
+dGhlIHRyYW5zbGF0aW9ucz8gdGhlcmUgbWF5IGJlIG90aGVycyBkaWZmZXJlbnQgInByaW50ZiIg
+aW1wbGVtZW50IGlvbnMgb24gZGlmZmVyZW50Jm5ic3A7IHRhcmdldCwmbmJzcDs8L2Rpdj48ZGl2
+IHN0eWxlPSJtYXJnaW46MDsiPmhvdyB0aGUgdGNnIGtub3dzIHRoYXQgYSBzcGVjaWFsIGhlbHBl
+ciBmdW5jdGlvbnMgbmVlZCB0byBiZSBjYWxsZWQgYW5kIG90aGVycyBub3QsIGZyb20gdGhlIGJp
+bmFyeSBjb2RlIGRpc2Fzc2VtYmx5IGxhbmd1YWdlIG9mIHRoZSBlbXVsYXRlZCB0YXJnZXQsIHRo
+ZXJlIGlzIG5vPC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij5vYnZpb3VzIHNpZ24gdG8gbWFr
+ZSBhbnlvbmUga25vdyB3aGljaCBpbnN0dXRpb25zIGlzIHNwZWNpYWwgYW5kIG5lZWQgdG8gZW11
+bGF0aW9uIGJ5IGhlbHBlciwgSG93IGdldCB0aGlzPzwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjow
+OyI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+VGhhbmsgeW91LjwvZGl2PjxkaXYg
+c3R5bGU9Im1hcmdpbjowOyI+Jm5ic3A7Jm5ic3A7PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOjA7
+Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0i
+bWFyZ2luOjA7Ij48YnI+PC9kaXY+PC9kaXY+PGJyPjxicj48c3BhbiB0aXRsZT0ibmV0ZWFzZWZv
+b3RlciI+PHA+PGJyLz4mbmJzcDs8L3A+PC9zcGFuPg==
+------=_Part_9688_1206773769.1590972947296--
 
-In digging through the code for the implementation of the SSE/mmx instructi=
-on pavgb I see a nice clean implementation in the SSE_HELPER_B macro which =
-takes a MMXREG which is an MMREG_UNION which does not provide, to the exten=
-t that I can figure this out, a handle to bits 79:64 of the aliased-with x8=
-7 register.
-
-I find it hard to believe that an apparent bug like this has been here "for=
-ever". Am I missing something?
-
-Robert Henry
-________________________________
-From: Robert Henry
-Sent: Friday, May 29, 2020 10:38 AM
-To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
-Subject: ia-32/ia-64 fxsave64 instruction behavior when saving mmx
-
-Background: The ia-32/ia-64 fxsave64 instruction saves fp80 or legacy SSE m=
-mx registers. The mmx registers are saved as if they were fp80 values. The =
-lower 64 bits of the constructed fp80 value is the mmx register.  The upper=
- 16 bits of the constructed fp80 value are reserved; see the last row of ta=
-ble 3-44 of https://www.felixcloutier.com/x86/fxsave#tbl-3-44
-
-The Intel core i9-9980XE Skylake metal I have puts 0xffff into these reserv=
-ed 16 bits when saving MMX.
-
-QEMU appears to put 0's there.
-
-Does anybody have insight as to what "reserved" really means, or must be, i=
-n this case?  I take the verb "reserved" to mean something other than "unde=
-fined".
-
-I came across this issue when running the remill instruction test engine.  =
-See my issue https://github.com/lifting-bits/remill/issues/423 For better o=
-r worse, remill assumes that those bits are 0xffff, not 0x0000
-
-
---_000_BL0PR2101MB1026CD468E4F0929086C177FD68D0BL0PR2101MB1026_
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
->
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-Here's additional information.</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-<div><br>
-</div>
-<div>All of the remill tests of the legacy MMX instructions fail. These ins=
-tructions work on 64-bit registers aliased with the lower 64-bits of the x8=
-7 fp80 registers. &nbsp;The tests fail because remill expects the fxsave64 =
-instruction to deliver 16 bits of 1's
- (infinity or nan prefix) in the fp80 exponent, eg bits 79:64. &nbsp;Metal =
-does this, but QEMU does not.<br>
-</div>
-<div><br>
-</div>
-<div>Reading of Intel Software development manual, table 3.44 (https://www.=
-felixcloutier.com/x86/FXSAVE.html#tbl-3-44) says these 16 bits are reserved=
-, but another version of the manual (http://math-atlas.sourceforge.net/deve=
-l/arch/ia32_arch.pdf) section 9.6.2
- &quot;Transitions between x87 fpu and mmx code&quot; says a write to an MM=
-X register sets those 16 bits to all 1s.<br>
-</div>
-<div><br>
-</div>
-<div>In digging through the code for the implementation of the SSE/mmx inst=
-ruction pavgb I see a nice clean implementation in the SSE_HELPER_B macro w=
-hich takes a MMXREG which is an MMREG_UNION which does not provide, to the =
-extent that I can figure this out,
- a handle to bits 79:64 of the aliased-with x87 register.<br>
-</div>
-<div><br>
-</div>
-<div>I find it hard to believe that an apparent bug like this has been here=
- &quot;forever&quot;. Am I missing something?<br>
-</div>
-<div><br>
-</div>
-<span>Robert Henry</span><br>
-</div>
-<div id=3D"appendonsend"></div>
-<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
-yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Robert Henry<br>
-<b>Sent:</b> Friday, May 29, 2020 10:38 AM<br>
-<b>To:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Subject:</b> ia-32/ia-64 fxsave64 instruction behavior when saving mmx</=
-font>
-<div>&nbsp;</div>
-</div>
-<style type=3D"text/css" style=3D"display:none">
-<!--
-p
-	{margin-top:0;
-	margin-bottom:0}
--->
-</style>
-<div dir=3D"ltr">
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-Background: The ia-32/ia-64 fxsave64 instruction saves fp80 or legacy SSE m=
-mx registers. The mmx registers are saved as if they were fp80 values. The =
-lower 64 bits of the constructed fp80 value is the mmx register.&nbsp; The =
-upper 16 bits of the constructed fp80
- value are reserved; see the last row of table 3-44 of&nbsp;<a href=3D"http=
-s://www.felixcloutier.com/x86/fxsave#tbl-3-44" id=3D"LPNoLP231595">https://=
-www.felixcloutier.com/x86/fxsave#tbl-3-44</a></div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-The Intel core i9-9980XE Skylake metal I have puts 0xffff into these reserv=
-ed 16 bits when saving MMX.</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-QEMU appears to put 0's there.</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-Does anybody have insight as to what &quot;reserved&quot; really means, or =
-must be, in this case?&nbsp; I take the verb &quot;reserved&quot; to mean s=
-omething other than &quot;undefined&quot;.</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-I came across this issue when running the remill instruction test engine.&n=
-bsp; See my issue&nbsp;<a href=3D"https://github.com/lifting-bits/remill/is=
-sues/423" style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-siz=
-e:12pt">https://github.com/lifting-bits/remill/issues/423</a>&nbsp;For
- better or worse, remill assumes that those bits are 0xffff, not 0x0000</di=
-v>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-</div>
-</body>
-</html>
-
---_000_BL0PR2101MB1026CD468E4F0929086C177FD68D0BL0PR2101MB1026_--
 
