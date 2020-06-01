@@ -6,91 +6,80 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 406ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CADAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:17:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E9D206E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:11:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F35AE206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 09:17:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsK8JgwR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E9D206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BcPY4l0D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35AE206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfgU1-0002QB-40
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 05:11:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57578)
+	id 1jfgZV-0006Mk-4h
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 05:17:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfgTS-0001uD-GU; Mon, 01 Jun 2020 05:11:14 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38019)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfgTQ-0002ml-Uu; Mon, 01 Jun 2020 05:11:14 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f185so10580484wmf.3;
- Mon, 01 Jun 2020 02:11:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=0NHKCC2ZM3RNLuaUKMH/VgdKQS0ppaSfMzXAY8OLTr8=;
- b=lsK8JgwRzqjmiFc/npOdne9N3JOVIeQV1tRNu896E/tOTK3dx6kwcpuwsLhD3p0KdW
- HISfTdZoaUeTDEmuKh9qVWvHHPFAYyXZR5wxEIt1WOEj91VukYsGfddCEeH+SReqZofO
- 7cU6PAZLsoc413fj91VFMix0wQ/7hgAKwHeFdoep5rNrRMGDx1OVvfP9yZYcTM6+Wy5M
- NdRYyDglOUHcDzBUQZ5I8kRCz+vhLdsC7o/3qYgqXXUoHhmoSY39lvKg4h1IVNt0IGtU
- 0RuxWXFkRWcIXryzo29KrDo8+Zt5HNzd9+mkJ9L4vu+Eqec0trYuVKTn+wT32A3Z8z2n
- t18Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0NHKCC2ZM3RNLuaUKMH/VgdKQS0ppaSfMzXAY8OLTr8=;
- b=SICpBZYBrIZDTA4rGu/Mf9XAYb/Spx/fOY9HED3MrHalU8tnS/kHlwdP3EhONBl7Aw
- 84H4qjpmJefZxwgAzz9ksGB7GMZ2RFDsP2FFUdyB1kFWH+GybKD/OZmFvq/TT9X9pFme
- g6hrI5oXTL3ugyQ1ZWDR7L2rb7YnAkurXz4Gdn7MlhqMB8CiWiuLz16/Ap0phwxzBpkr
- yYPOI8wYZTwasLHQ3++yDycEUjaoJaVd6XMqO1vFxIVmH/R8gQ3jL1AVWWneNVeUCs+T
- i5QKql9vG4lw52VR6ivjVIFGg8ETPirAT/WhBK1lDagfxMRXgdhbNNxvCchkmtEY6EVB
- Dqjw==
-X-Gm-Message-State: AOAM533PzlzFqxdHMX7rOV+2/KesHdRikMQXUccblR7l81AiwGR626v9
- skt9AWGK9/MvNNRyO45Q3Ms=
-X-Google-Smtp-Source: ABdhPJwEhNjZcBQDCJd7jvZrEijY8LbCG2LoH6Eo5LbKMKrpUHsLH3gXTz2bSd2d6R+U4eVsom9OAw==
-X-Received: by 2002:a1c:6042:: with SMTP id u63mr20463260wmb.65.1591002671026; 
- Mon, 01 Jun 2020 02:11:11 -0700 (PDT)
-Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id 37sm20848156wrk.61.2020.06.01.02.11.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 01 Jun 2020 02:11:10 -0700 (PDT)
-Subject: Re: [PATCH 0/5] hw/sh4: current patch queue
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200530092306.26628-1-f4bug@amsat.org>
- <87eer0v25c.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8279188f-f6a7-4d0e-50d9-de1c66619e50@amsat.org>
-Date: Mon, 1 Jun 2020 11:11:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jfgYe-0005Mo-8U
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:16:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48535
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jfgYd-00043d-98
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:16:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591002993;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0Wd9igXbzydG2FapnoJya+QCDVjj2Ujw2KrJzi5Gj9E=;
+ b=BcPY4l0DmJCRVSuEI5NzO5NYi7rub8uuNCbAmB2Y0BC9i6bqZH4u5Nw0DwVXuyu2lzCoRr
+ hsSWBGzDFSl4C8jQDooX84/+so8NYht5bS2OJzrri33KVpkx5PcuN4eWdIRC3JR56c54qP
+ 9HsO25eZj6YP7SDx0U2j7ovGo8hqKBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-DxNkUf26OiCA4Azbb0arTw-1; Mon, 01 Jun 2020 05:16:30 -0400
+X-MC-Unique: DxNkUf26OiCA4Azbb0arTw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33292800053;
+ Mon,  1 Jun 2020 09:16:27 +0000 (UTC)
+Received: from work-vm (ovpn-113-144.ams2.redhat.com [10.36.113.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D68E5C1B2;
+ Mon,  1 Jun 2020 09:16:20 +0000 (UTC)
+Date: Mon, 1 Jun 2020 10:16:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <20200601091618.GC2743@work-vm>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200529221926.GA3168@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87eer0v25c.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200529221926.GA3168@linux.intel.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 02:19:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,62 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
- Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/20 12:18 PM, Alex Bennée wrote:
+* Sean Christopherson (sean.j.christopherson@intel.com) wrote:
+> On Thu, May 21, 2020 at 01:42:46PM +1000, David Gibson wrote:
+> > A number of hardware platforms are implementing mechanisms whereby the
+> > hypervisor does not have unfettered access to guest memory, in order
+> > to mitigate the security impact of a compromised hypervisor.
+> > 
+> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > to accomplish this in a different way, using a new memory protection
+> > level plus a small trusted ultravisor.  s390 also has a protected
+> > execution environment.
+> > 
+> > The current code (committed or draft) for these features has each
+> > platform's version configured entirely differently.  That doesn't seem
+> > ideal for users, or particularly for management layers.
+> > 
+> > AMD SEV introduces a notionally generic machine option
+> > "machine-encryption", but it doesn't actually cover any cases other
+> > than SEV.
+> > 
+> > This series is a proposal to at least partially unify configuration
+> > for these mechanisms, by renaming and generalizing AMD's
+> > "memory-encryption" property.  It is replaced by a
+> > "guest-memory-protection" property pointing to a platform specific
+> > object which configures and manages the specific details.
+> > 
+> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> > can be extended to cover the Intel and s390 mechanisms as well,
+> > though.
+> > 
+> > Note: I'm using the term "guest memory protection" throughout to refer
+> > to mechanisms like this.  I don't particular like the term, it's both
+> > long and not really precise.  If someone can think of a succinct way
+> > of saying "a means of protecting guest memory from a possibly
+> > compromised hypervisor", I'd be grateful for the suggestion.
 > 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> Many of the features are also going far beyond just protecting memory, so
+> even the "memory" part feels wrong.  Maybe something like protected-guest
+> or secure-guest?
 > 
->> Hi,
->>
->> As there is no SH4 active maintainer, I gathered various
->> patches in a single series, in case someone is willing to
->> apply them.
-> 
-> I'm sure you you could put yourself down as an "Odd Fixes" maintainer
-> and put together a PR if you want?
+> A little imprecision isn't necessarily a bad thing, e.g. memory-encryption
+> is quite precise, but also wrong once it encompasses anything beyond plain
+> old encryption.
 
-  Odd Fixes: It has a maintainer but they don't have time to do
-             much other than throw the odd patch in.
+The common thread I think is 'untrusted host' - but I don't know of a
+better way to describe that.
 
-OK 'Odd Fixes' matches what I can offer as a hobbyist.
-I'm happy to help avoiding this code to bitrot, as long as I don't get
-the same pressure imposed on other targets.
-After all this Renesas hardware has a lot in common with the RX I've
-been looking at recently.
+Dave
 
-> 
->>
->> CI report:
->> https://travis-ci.org/github/philmd/qemu/builds/692828388
->>
->> Regards,
->>
->> Phil.
->>
->> Philippe Mathieu-Daudé (3):
->>   hw/sh4: Use MemoryRegion typedef
->>   hw/sh4: Extract timer definitions to 'hw/timer/tmu012.h'
->>   hw/timer/sh_timer: Remove unused 'qemu/timer.h' include
->>
->> Thomas Huth (2):
->>   tests/acceptance: Add boot tests for sh4 QEMU advent calendar image
->>   .travis.yml: Test SH4 QEMU advent calendar image
->>
->>  include/hw/sh4/sh.h                    | 12 +-----------
->>  include/hw/timer/tmu012.h              | 23 +++++++++++++++++++++++
->>  hw/sh4/sh7750.c                        |  1 +
->>  hw/timer/sh_timer.c                    |  3 ++-
->>  .travis.yml                            |  2 +-
->>  tests/acceptance/boot_linux_console.py | 13 +++++++++++--
->>  6 files changed, 39 insertions(+), 15 deletions(-)
->>  create mode 100644 include/hw/timer/tmu012.h
-> 
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
