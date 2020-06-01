@@ -2,81 +2,88 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45436C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25772C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15B9120679
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:42:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B9120679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B8AD2207FB
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:42:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G6KW+VUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8AD2207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfjlT-0004oR-Bn
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54098)
+	id 1jfjlk-00056v-QK
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:42:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfjkU-0003xY-EN
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:41:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58334)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jfjkh-00047P-N4
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:41:15 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36353)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfjkT-0004oj-2w
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:41:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jfjkP-0000kq-Kc
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 12:40:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E21DD2E8131
- for <qemu-devel@nongnu.org>; Mon,  1 Jun 2020 12:40:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jfjkf-0004qT-HC
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:41:15 -0400
+Received: by mail-oi1-x241.google.com with SMTP id a137so8739884oii.3
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 05:41:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7cQwu++5r97GefBBbzXmn7DEQRMqtA0rO8DZSn+gEpo=;
+ b=G6KW+VUiLGIR6D2R8dhWyJ8YxJrD4RLr/E/DFzz22yFJ5wAB+bZmKCR/i2uIcyLIOi
+ dMACfGV8ca8aJ4y3lxkva+LUdk1TwEENIYABdiJaacgPN7Knx7jgZAK5+lVKzdbtkq6q
+ rrTFUbRkvY/4GhGrEsYgnP2QJfHuUE+HajOrMFws4Hg9tagFQ7uirJlC54iYCwzvt5iH
+ sViC/IMgu+upMKlgJz8YuDmHM83z3k51zmdThm6nwL5WLFjJgFCeF2EguOZBcFPwzdI3
+ fR0h7D9hUPVMWa1qxJiWERp1tEmcOFJzkDoKaqCnXn83Oi/39RiPi0Iz2i1pSgavA8XQ
+ MxtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7cQwu++5r97GefBBbzXmn7DEQRMqtA0rO8DZSn+gEpo=;
+ b=hLNt1NNrC3cwb+7uFnza2U4lcOZRElmQZpC80K4R0bC5l/usKT7swWrBIVJJbrC/47
+ ZANuXCNWhaqfvWi3JJp9pSjQ3pI/a55rrBdmaWPz57xTjS9XralzcFTRMaXGnLMBb0jG
+ IB/plCiEn8valwN/U6h+20krFUjxa6ZjNBcBMyBBrEXZY0nf4N3f6ifcY3winqID10SN
+ DzdzK4RP5TdqH2YVKQUoTXbSwVXar1B9M3hLq7KwgXg8DmBSF30ko2daRuN0HYhZR7oc
+ L7FDoGJi3pyqI0htmRoJBM1H6r9g1psNDI58zA5K4gsY7bSXELq/zecp2Vpqzqum0bRU
+ 4Z9g==
+X-Gm-Message-State: AOAM5303Velh7+a3Okp43EKuxp9O7vFObGUbqgBky2nXBmj0EbBLV+LL
+ tscz7s0VXsO8vqxW2t0fWhf3vv8c3aIuYrCLp0PjoYBs4BQ=
+X-Google-Smtp-Source: ABdhPJwfNRNd84DfrB4SmvQ3sbqcDHqbpxeHpjQj7M0mZ6ibGBjnuNs9d6GvujSjUTB2MpvTc4Yrzw0w/VW10iBhn28=
+X-Received: by 2002:aca:5152:: with SMTP id f79mr3697194oib.146.1591015272318; 
+ Mon, 01 Jun 2020 05:41:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Jun 2020 12:33:16 -0000
-From: sles <1844053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jamespharvey20 slesru
-X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
-X-Launchpad-Bug-Modifier: sles (slesru)
-References: <156855280668.581.6516749257263798071.malonedeb@wampee.canonical.com>
-Message-Id: <159101479636.13151.4189723858312481406.malone@soybean.canonical.com>
-Subject: [Bug 1844053] Re: task blocked for more than X seconds - events
- drm_fb_helper_dirty_work
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ce297d88a7f64596d6fdf0a717d3f3849df7ce68
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 08:40:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+References: <20200530092204.1746-1-fangying1@huawei.com>
+In-Reply-To: <20200530092204.1746-1-fangying1@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jun 2020 13:41:01 +0100
+Message-ID: <CAFEAcA91gsTpkeH6SVPoGKDFOgCJVxV=wvBOT57eagcYeMiarQ@mail.gmail.com>
+Subject: Re: [PATCH] target/arm/cpu: adjust virtual time for cortex series cpu
+To: Ying Fang <fangying1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,112 +92,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844053 <1844053@bugs.launchpad.net>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, wu.wubin@huawei.com,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have the same problem running ubuntu 20.04 on Centos 7 host with
-qlx...
+On Sat, 30 May 2020 at 10:22, Ying Fang <fangying1@huawei.com> wrote:
+>
+> Virtual time adjustment was implemented for virt-5.0 machine type,
+> but the cpu property was enabled only for host-passthrough and
+> max cpu model. Let's add it for arm cortex series cpu which has
+> the gernic timer feature enabled.
+>
+> Signed-off-by: Ying Fang <fangying1@huawei.com>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 32bec156f2..a564141b22 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1973,6 +1973,9 @@ static void cortex_a7_initfn(Object *obj)
+>      cpu->ccsidr[1] = 0x201fe00a; /* 32K L1 icache */
+>      cpu->ccsidr[2] = 0x711fe07a; /* 4096K L2 unified cache */
+>      define_arm_cp_regs(cpu, cortexa15_cp_reginfo); /* Same as A15 */
+> +    if (kvm_enabled()) {
+> +        kvm_arm_add_vcpu_properties(obj);
+> +    }
+>  }
 
--- =
+If we have the same bit of code in all these initfns,
+that suggests we should probably actually be doing this
+in some more generic place conditional on some cpu feature
+or other test. The commit message suggests we should add
+this property for every CPU which is using KVM and has
+the generic timers, in which case we could perhaps
+have the call to kvm_arm_add_vcpu_properties moved to
+arm_cpu_post_init(), and then have the kvm_arm_add_vcpu_properties
+function check the ARM_FEATURE_GENERIC_TIMER flag to see
+whether to add the property or not.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844053
-
-Title:
-  task blocked for more than X seconds - events drm_fb_helper_dirty_work
-
-Status in QEMU:
-  New
-
-Bug description:
-  I've had bunches of these errors on 9 different boots, between
-  2019-08-21 and now, with Arch host and guest, from linux 5.1.16 to
-  5.2.14 on host and guest, with QEMU 4.0.0 and 4.1.0.  spice 0.14.2,
-  spice-gtk 0.37, spice-protocol 0.14.0, virt-viewer 8.0.
-
-  I've been fighting with some other issues related to a 5.2 btrfs
-  regression, a QEMU qxl regression (see bug 1843151) which I ran into
-  when trying to temporarily abandon virtio-vga, and I haven't paid
-  enough attention to what impact specifically this virtio_gpu issue has
-  on the system In journalctl, I can see I often rebooted minutes after
-  they occurred, but sometimes much later.  That must mean whenever I
-  saw it happen that I rebooted the VM, or potentially it impacted
-  functionality of the system.
-
-  Please let me know if and how I can get more information for you if
-  needed.
-
-  I've replicated this on both a system with integrated ASPEED video,
-  and on an AMD Vega 64 running amdgpu.
-
-  As an example, I have one boot which reported at 122 seconds, 245,
-  368, 491, 614, 737, 860, 983, 1105, 1228, then I rebooted.
-
-  I have another that reported 122/245/368/491/614/737, went away for 10
-  minutes, then started reporting again 122/245/368/491, and went away.
-  Then, I rebooted about 20 hours later.
-
-  Host system has no graphical impact when this happens, and logs
-  nothing in its journalctl.
-
-  Guest is tty mode only, with kernel argument "video=3D1280x1024".  No x
-  server.
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  INFO: task kworker/0:1:15 blocked for more than 122 seconds.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tainted 5.2.14-1 #1
-  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  kworker/0:1     D    0    15      2 0x800004000
-  Workqueue: events drm_fb_helper_dirty_work [drm_kms_helper]
-  Call Trace:
-  =C2=A0? __schedule+0x27f/0x6d0
-  =C2=A0schedule+0x3d/0xc0
-  =C2=A0virtio_gpu_queue_fenced_ctrl_buffer+0xa1/0x130 [virtio_gpu]
-  =C2=A0? wait_woken+0x80/0x80
-  =C2=A0virtio_gpu_surface_dirty+0x2a5/0x300 [virtio_gpu]
-  =C2=A0drm_fb_helper_dirty_work+0x156/0x160 [drm_kms_helper]
-  =C2=A0process_one_work+0x19a/0x3b0
-  =C2=A0worker_tread+0x50/0x3a0
-  =C2=A0kthread+0xfd/0x130
-  =C2=A0? process_one_work+0x3b0/0x3b0
-  =C2=A0? kthread_park+0x80/0x80
-  =C2=A0ret_from_fork+0x35/0x40
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  /usr/bin/qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0-name vm,process=3Dqemu:vm \
-  =C2=A0=C2=A0=C2=A0-no-user-config \
-  =C2=A0=C2=A0=C2=A0-nodefaults \
-  =C2=A0=C2=A0=C2=A0-nographic \
-  =C2=A0=C2=A0=C2=A0-uuid <uuid> \
-  =C2=A0=C2=A0=C2=A0-pidfile <pidfile> \
-  =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
-=3Doff \
-  =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS \
-  =C2=A0=C2=A0=C2=A0-smp cpus=3D4,cores=3D2,threads=3D1,sockets=3D2 \
-  =C2=A0=C2=A0=C2=A0-m 4G \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
-are/ovmf/x64/OVMF_CODE.fd \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,file=3D/var/qemu/efivar=
-s/vm.fd \
-  =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay \
-  =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/spice.vm.sock,disable-ticketing=
- \
-  =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0 \
-  =C2=A0=C2=A0=C2=A0-usbdevice tablet \
-  =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3DF4:F6:34=
-:F6:34:2d,bus=3Dpcie.0,addr=3D3 \
-  =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1 \
-  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/vm,=
-if=3Dnone,discard=3Dunmap,cache=3Dnone,aio=3Dthreads
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844053/+subscriptions
+thanks
+-- PMM
 
