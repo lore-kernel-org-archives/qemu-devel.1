@@ -2,88 +2,88 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B178BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 17:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7731820734
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FE9C206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 17:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCVQ6H2b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7731820734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQgtkA3I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE9C206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfniz-0003RG-K9
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 12:55:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55258)
+	id 1jfo3n-0007zU-LB
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 13:17:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jfni8-0002QT-M1
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:54:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38024
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jfni8-0002q2-0D
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:54:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591030491;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Qybf7gWpXrl/2he2NAZm8CNJByGPr4Py5v1EMy+EOgU=;
- b=VCVQ6H2bXhexHByUsQT8WRfNonrSbSNoh23gP5+GP0aVkpk91hjVpyt5MWu62WD4u18Fnm
- QFNUzocI3XY9L2q7Q4dGEoDZ1ZysNTfnrEdRT+WGRnq9Kam6BFR99J19R52UgR9F1jt3En
- SiIVdpyglV5YLi3+PnAWd5jfgFvLP5Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-ARqnnT5GO_-RspCLJHqnVQ-1; Mon, 01 Jun 2020 12:54:49 -0400
-X-MC-Unique: ARqnnT5GO_-RspCLJHqnVQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FFA7461;
- Mon,  1 Jun 2020 16:54:48 +0000 (UTC)
-Received: from work-vm (ovpn-113-144.ams2.redhat.com [10.36.113.144])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 30B6D7A1EF;
- Mon,  1 Jun 2020 16:54:47 +0000 (UTC)
-Date: Mon, 1 Jun 2020 17:54:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v2 6/6] migration/migration.c: Fix hang in
- ram_save_host_page
-Message-ID: <20200601165444.GJ2743@work-vm>
-References: <cover.1590007004.git.lukasstraub2@web.de>
- <e79085bbe2d46dfa007dd41820194d5e2d4fcd80.1590007004.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>)
+ id 1jfo36-0007Yw-8C; Mon, 01 Jun 2020 13:16:32 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36106)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>)
+ id 1jfo35-0006z6-HW; Mon, 01 Jun 2020 13:16:31 -0400
+Received: by mail-wm1-x342.google.com with SMTP id d128so304107wmc.1;
+ Mon, 01 Jun 2020 10:16:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vwMcGbn4VMVX4fL4DOaU5fLjB0F3M4FChwZGaT/JMNk=;
+ b=HQgtkA3INVURVp3HOaXwoKBptirpCtwDiTP0WjeL2sK6a8zaBIx00rat0me27PcfhM
+ XzswENTZhY5XmPZijqmAPplnxndKlzbpW9PEPX94FxHLjoYzph4d7m72FaThM1QhVcl0
+ tc+0h+iUlDtaUbqvXWVWEg6A9EsAKVop1XRWYqakDJ3cfNPHwW5kTmx6ITWT7EA6nJIh
+ ycjeYacYAJ7l8wCyWBKdIv4cVxUHAgV6FIjQAMd+Y+VW8J3GLBO9UzkhKdtMuhHSgaJy
+ SgdNfvobJCD8l/HbfsOXJR4llH3gu1vyJfVVbUa4p+3GJYa2WXM4z6UlFYaFWJ9+inKO
+ 4chg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vwMcGbn4VMVX4fL4DOaU5fLjB0F3M4FChwZGaT/JMNk=;
+ b=Ss1yS934i0KWJIYMDFUxSXhMgNTW49iFA0kJ038Y+0mAuLiUUUFNjyKC9EOblkPd1o
+ s+QczXdVLkvG9Iiqi+CiTGiGtvuoIjbjfh825ooin4VYAIsw1ekJrLoOLSFk0vpobe5E
+ 0STkPVl3XeN7jQqi/z92eb1Y9PhC2pJ4T35FeTjZlqMoillGZOSK/z6+jaJvvQiTOKYe
+ XbbNVc3iOIn13Zb7Es68hAassc7y9znzHAUyOSB6fBLt2bkQFG70KHsu4RNQMO+DoIPu
+ MnvPp5s3LbX7g5UmIAMvYTadYARQ7gt22vdab1uw9n66x++N+UkNkr5D9MjFRVAjZEsg
+ otNQ==
+X-Gm-Message-State: AOAM5337ElQLkdePU31WfMmJv0FnhZueJVQdzy61fgrFNlCprsRjjlG7
+ euae5Iel/7ZJbTVkiYmc9TFu81Vn
+X-Google-Smtp-Source: ABdhPJzbRjvhpcuiZ5309uOKrbHZAlhWR1ExbTXwV723QeNdUYpcmN0FCREQHGs+cayuig2w3fq/AA==
+X-Received: by 2002:a1c:9cd4:: with SMTP id f203mr351056wme.26.1591031788592; 
+ Mon, 01 Jun 2020 10:16:28 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id
+ d18sm108282wrn.34.2020.06.01.10.16.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 01 Jun 2020 10:16:28 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [v1] docs: Add to gdbstub documentation the PhyMemMode
+Date: Mon,  1 Jun 2020 20:16:09 +0300
+Message-Id: <20200601171609.1665397-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <e79085bbe2d46dfa007dd41820194d5e2d4fcd80.1590007004.git.lukasstraub2@web.de>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 05:35:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=arilou@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,51 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> migration_rate_limit will erroneously ratelimit a shutdown socket,
-> which causes the migration thread to hang in ram_save_host_page
-> if the socket is shutdown.
-> 
-> Fix this by explicitly testing if the socket has errors or was
-> shutdown in migration_rate_limit.
-> 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+The PhyMemMode gdb extension command was missing from the gdb.rst
+document.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ docs/system/gdb.rst | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-and queued this one (the others in the series are the same as the v1)
-
-
-> ---
->  migration/migration.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 187ac0410c..e8bd32d48c 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -3347,6 +3347,10 @@ bool migration_rate_limit(void)
->      bool urgent = false;
->      migration_update_counters(s, now);
->      if (qemu_file_rate_limit(s->to_dst_file)) {
-> +
-> +        if (qemu_file_get_error(s->to_dst_file)) {
-> +            return false;
-> +        }
->          /*
->           * Wait for a delay to do rate limiting OR
->           * something urgent to post the semaphore.
-> --
-> 2.20.1
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/docs/system/gdb.rst b/docs/system/gdb.rst
+index a40145fcf8..abda961e2b 100644
+--- a/docs/system/gdb.rst
++++ b/docs/system/gdb.rst
+@@ -87,3 +87,23 @@ three commands you can query and set the single step behavior:
+       (gdb) maintenance packet Qqemu.sstep=0x5
+       sending: "qemu.sstep=0x5"
+       received: "OK"
++
++
++Another feature that QEMU gdbstub provides is to toggle the memory GDB
++works with, by default GDB will show the current process memory respecting
++the virtual address translation.
++
++If you want to examine/change the physical memory you can set the gdbstub
++to work with the physical memory rather with the virtual one.
++
++The memory mode can be checked by sending the following command:
++
++``maintenance packet qqemu.PhyMemMode``
++    This will return either 0 or 1, 1 indicates you are currently in the
++    physical memory mode.
++
++``maintenance packet Qqemu.PhyMemMode:1``
++    This will change the memory mode to physical memory.
++
++``maintenance packet Qqemu.PhyMemMode:0``
++    This will change it back to normal memory mode.
+-- 
+2.25.1
 
 
