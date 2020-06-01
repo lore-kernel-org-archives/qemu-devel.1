@@ -2,98 +2,71 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B09EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8BEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:31:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 331512073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54A072073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:31:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IENq2kfY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331512073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMa5m4br"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A072073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfnJO-0002WW-FK
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 12:29:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52446)
+	id 1jfnL6-0004OF-IH
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 12:31:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jfnIb-000255-Jb
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:28:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56636
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1jfnJz-0003QZ-Jl
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:29:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35611
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jfnIZ-0004sK-Rf
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:28:28 -0400
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1jfnJy-0005FH-Pe
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:29:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591028906;
+ s=mimecast20190719; t=1591028993;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=omCX/201/bqxo8gzog+yl11Z4cOuOGzzmz618nHPnKY=;
- b=IENq2kfYohrdbejdUyal8WXk3JoMgbJCDehAhYjxnbtgwpNxDZyAYXrn78vAYN913yX+b4
- 3n5vVRw87rONgYqLUDPsjqF248AXSv9FsViJeoYY9RBYHjliV7R/Eho3yHwZc844bTj0XU
- OTe+r4/HlqseobRezx/cB+lNqImgyZU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-eCdqEQJWO9q7Ve2I5t1Ssg-1; Mon, 01 Jun 2020 12:28:24 -0400
-X-MC-Unique: eCdqEQJWO9q7Ve2I5t1Ssg-1
-Received: by mail-wm1-f72.google.com with SMTP id 18so51667wmu.1
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 09:28:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=omCX/201/bqxo8gzog+yl11Z4cOuOGzzmz618nHPnKY=;
- b=nC5YTRWmWpsWbiMBCEcRaMp1Y+/goDbox8e3n1J1MZpPP7Z+gF7Fbofi6hOWPRTJvh
- Jxg2up9QsDAsKqBI+DP3yvDfpW+u0PpciN/SOmsSGZwOnyx2/MyiLqE9gxKKK0GSQEcb
- IJDqnc0JoGUZnY2MZmF6wqmPf366PjGAa7ELIHH5hm7QAZAuN1dZY9v38drmg697uV2l
- loEerqWt1Vj+HOVrVMXaGg2iOe0UKtXG71iYGZ56VBrAV/bfShLjBjiF945L2hlV40U/
- MzUJJ6OiT0xX9vPZ6dpQwvcSg4IW3fLfmOjpg1WVudr+ZfoyPvQb3U7GlZ8bnq322y2b
- zghQ==
-X-Gm-Message-State: AOAM531J/6mlaT0hzku61rLlk4kkqxn//hs00oRstfo/fPkuIxYqpjjK
- 9UOTeZldJBRv3enMM0+97g1jmIG2OlVsJSAYpURx4wGXYXi3CMTaSJqCA3JN8Ur9TAa3F9RXLMx
- nGf8cE29aR4vkN70=
-X-Received: by 2002:a5d:4745:: with SMTP id o5mr21454328wrs.87.1591028902996; 
- Mon, 01 Jun 2020 09:28:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhsvh0Sh74X4vryrk02aW3MiEcFKVEGIod0AiztLPpQ/auP6P3hTld4JawtUNoTUeFbJ307w==
-X-Received: by 2002:a5d:4745:: with SMTP id o5mr21454306wrs.87.1591028902582; 
- Mon, 01 Jun 2020 09:28:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1c3:280a:2d69:cc83?
- ([2001:b07:6468:f312:1c3:280a:2d69:cc83])
- by smtp.gmail.com with ESMTPSA id b14sm63307wmj.47.2020.06.01.09.28.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 01 Jun 2020 09:28:22 -0700 (PDT)
-Subject: Re: [RFC PATCH] qemu/thread: Mark qemu_thread_exit() with 'noreturn'
- attribute
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200601093808.13102-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a558f58-ef6f-4eac-1511-854148a419fc@redhat.com>
-Date: Mon, 1 Jun 2020 18:28:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Hp6g3usZEvqE7RTho6vJhMIGHGMEOVc/ycYHFOFJyrg=;
+ b=GMa5m4brq3vVhVyBttd5QX2T75I+qRS8/irJgK1gxnjXsOsUHWArsJFruV7Fv+oDBMcdkg
+ ZgmUB3ca2NohMX77f+WPV2ze7+Q3XG/IjfLayFjgRwUsbKzZiPnGVT44yq4SwTrBxIr8iv
+ dn+7mk2svfSYJt/BD5yqVkDD+uLAfOE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-Elr_PoayNCqdiq7IeLTDmg-1; Mon, 01 Jun 2020 12:29:51 -0400
+X-MC-Unique: Elr_PoayNCqdiq7IeLTDmg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0349464;
+ Mon,  1 Jun 2020 16:29:50 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.40.193.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE64B1002389;
+ Mon,  1 Jun 2020 16:29:43 +0000 (UTC)
+From: Julia Suvorova <jusual@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/pci/pcie: Move hot plug capability check to pre_plug
+ callback
+Date: Mon,  1 Jun 2020 18:29:34 +0200
+Message-Id: <20200601162934.842648-1-jusual@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200601093808.13102-1-philmd@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jusual@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 05:35:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -116,47 +89,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/06/20 11:38, Philippe Mathieu-Daudé wrote:
-> After upgrading to Ubuntu 20.04 LTS, GCC 9.3 complains:
-> 
->   util/qemu-thread-posix.c: In function ‘qemu_thread_exit’:
->   util/qemu-thread-posix.c:577:6: error: function might be candidate for attribute ‘noreturn’ [-Werror=suggest-attribute=noreturn]
->     577 | void qemu_thread_exit(void *retval)
->         |      ^~~~~~~~~~~~~~~~
-> 
-> Fix by marking the qemu_thread_exit function with QEMU_NORETURN
-> to set the 'noreturn' attribute.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> RFC because I'm not sure the error is correct, or we should
-> simply ignore it by default with -Wno-suggest-attribute=noreturn.
-> ---
->  include/qemu/thread.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-> index d22848138e..06c058fb58 100644
-> --- a/include/qemu/thread.h
-> +++ b/include/qemu/thread.h
-> @@ -177,7 +177,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->  void *qemu_thread_join(QemuThread *thread);
->  void qemu_thread_get_self(QemuThread *thread);
->  bool qemu_thread_is_self(QemuThread *thread);
-> -void qemu_thread_exit(void *retval);
-> +void qemu_thread_exit(void *retval) QEMU_NORETURN;
->  void qemu_thread_naming(bool enable);
->  
->  struct Notifier;
-> 
+Check for hot plug capability earlier to avoid removing devices attached
+during the initialization process.
 
-Yes, it's correct.  Queued, thanks.
+Run qemu with an unattached drive:
+  -drive file=$FILE,if=none,id=drive0 \
+  -device pcie-root-port,id=rp0,slot=3,bus=pcie.0,hotplug=off
+Hotplug a block device:
+  device_add virtio-blk-pci,id=blk0,drive=drive0,bus=rp0
+If hotplug fails on plug_cb, drive0 will be deleted.
 
-Paolo
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+Hard to say if it's a bug or generally acceptable behaviour, but seems like
+hotplug_handler_plug should never fail.
+
+ hw/pci/pcie.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index f50e10b8fb..5b9c022d91 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -407,6 +407,17 @@ static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
+ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                Error **errp)
+ {
++    PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
++    uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
++    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
++
++    /* Check if hot-plug is disabled on the slot */
++    if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
++        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
++                         DEVICE(hotplug_pdev)->id);
++        return;
++    }
++
+     pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
+ }
+ 
+@@ -415,7 +426,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+ {
+     PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
+     uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
+-    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
+     PCIDevice *pci_dev = PCI_DEVICE(dev);
+ 
+     /* Don't send event when device is enabled during qemu machine creation:
+@@ -431,13 +441,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
+-    /* Check if hot-plug is disabled on the slot */
+-    if ((sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
+-        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
+-                         DEVICE(hotplug_pdev)->id);
+-        return;
+-    }
+-
+     /* To enable multifunction hot-plug, we just ensure the function
+      * 0 added last. When function 0 is added, we set the sltsta and
+      * inform OS via event notification.
+-- 
+2.25.4
 
 
