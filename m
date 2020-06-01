@@ -2,82 +2,86 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01325C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 07:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E057DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 07:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C32432074B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 07:54:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABACA20734
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 07:56:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lf6WSvaS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C32432074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rtglodC+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABACA20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jffHY-0005MZ-2T
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 03:54:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49724)
+	id 1jffIq-0007Ui-W3
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 03:56:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jffGo-0004UQ-U7
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 03:54:06 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:39622)
+ id 1jffGr-0004Xs-UP
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 03:54:09 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56037)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jffGn-0003m5-Sz
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 03:54:06 -0400
-Received: by mail-wm1-x335.google.com with SMTP id k26so10341678wmi.4
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 00:54:05 -0700 (PDT)
+ id 1jffGr-0003nF-5H
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 03:54:09 -0400
+Received: by mail-wm1-x343.google.com with SMTP id c71so9729395wmd.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 00:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jJ/v/EysUDhGfZCpBwRkB6y1RGEXcHe/UG8wv9qC27o=;
- b=lf6WSvaS+g8Msb9x+5SalmyMSEdr/ywIFABE17VkNJqn1xPaV3+/eZ/ST2cHrn+Zfo
- grXX4hiPD0WDCwMoWfo9YckRgHBPIbl9FcVg3m0nd5KvEiihTCwSN/E7muwXfmiA1Xbi
- +clmc2IGYsRwku/Yls2U1Zx9mPVIgrjClnLF2HwTnv4L1HWhs0jdCoA+p8nlXcrNNBNK
- jAAGNuNuMZ9myEFe+kXETGdDEJbqPzcFR0qDpjNVNN/AgdDWWn8P5uifRD6JfItvgQAj
- vRcoA5a3kQ5q0aoKTev7yuizOeuQV2jyfzHaoS3pF62slgHkkzBkV+vms5HO8L+UwL44
- bpYw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=qIaVQcM8g4+k990uhebVSTEuTami8Xbb/Exe9m7N3F0=;
+ b=rtglodC+M7ycyijwz/p8HSQw8WBbaZx2/nu27IGJKU3I5BepOGqDjUYxAjV3IYgagn
+ NZmBGRJiieee5DSJsPzi1GJlLawG9NF9mBDtJJaarGzg+kqFRQMOcltVKnk2+rd3+xTo
+ w64zleQ8KB2ktAdqhIIQ4VSTnV5DeXdKqJT75Ge/OJCbtQ3DI1PVkGR7NHfO7qu7A7ei
+ /mpvCPsHBPvMDB8XfNFFQTSIa1+fCn3tBZykfQXRkDUE+4eJ02I7yivpO4KmsCqfBgpP
+ OnnVOlRP8IioOAt6B3qL5GeERGJpQPLE63199DDCWMYz9PnJTVfoNBQFIMH76m9H1yUO
+ FpzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=jJ/v/EysUDhGfZCpBwRkB6y1RGEXcHe/UG8wv9qC27o=;
- b=YxMtVOB3UPUAWQbNMCVoPcVmcY3AR9gL2CN2nKQAnWYl0rpsHKUA8kn+7xxInlsfXs
- m44fkQAWXoaYSfn+MvMY6Er8ZNcb5PAWuTTvK3FMuMMB9A/cWdbQYQ7Viuf0wkO+xKSa
- RYf08eQZ+uMQzWwWt09uamkMSzwd/ULQCurLxYcZmk/LBTJJvy/nITWjar/iyoiZ/+s3
- lEChb1ZfoazS20odD2hVC0SXw9JguuWln5967a2CBGPmj2KNR80Zl4/Wshjym3ygXsXC
- az4ed7VIH+sdJNwGQRBBGHff7pSaKlTPSfXVrRXDDasA5Pxi4vzq7u1LTGU++7G5SOs8
- +xdw==
-X-Gm-Message-State: AOAM532b9Dh5vnD4cXn3PvFhUbSUOTdhvs6a0204WXsZrIxhrZufVAmM
- Bo1bmmfQDQ4J99uxZWsMiDZEu8W9
-X-Google-Smtp-Source: ABdhPJzGjBrYWa9vnhxxu0yncxw4Mbo45S/n1bqrnqkbqZA8B8wic0JF+lA4cmVNuZFyl5Pbvg90qw==
-X-Received: by 2002:a1c:9a57:: with SMTP id c84mr13023717wme.62.1590998043832; 
- Mon, 01 Jun 2020 00:54:03 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=qIaVQcM8g4+k990uhebVSTEuTami8Xbb/Exe9m7N3F0=;
+ b=Ihdr1halRmd7RwAejrOKrAY8EIj3SecNKl3qJOwrQKcj9h/reJooVm+GflrlhMVdDQ
+ gdmkELcPiuE6bu8UmT83yvxFRAY8h2VWxlrsRAuG37syD7a8L+Z1vnxn5RieMuGxKCqk
+ /kqycTUMZ/6OzwTqdfU9FcdWCjXxTuT7Qvb2WrTnE5dY4ALqFcDePZjiFOb1TnCDLYe+
+ F4iWpdGhSlLIdfZOnye20S7nlzt16XdmxnVy0NWs/EsLnjo5fIyFi8hOvo6fzuLmNfrs
+ O2QMPp9ue+2t4n96S9n1z5w1lkzuoi1Mw9W5J1UDYt92wKNERxp8wahanDGtx2n9s8Kw
+ eeOw==
+X-Gm-Message-State: AOAM532P8shM8eDeihC2E8irhBdS5u9MzTanFihSw/zWtA4Jwu0LbQQK
+ FHREBq8WshEr7Rhq1b/BRa0IuK/P
+X-Google-Smtp-Source: ABdhPJxDULYAQrfePoPBFwEyskWhOaczq8BQx/huhaDQGrNnFu38FQK6yaFQfE81+rCjs8u7IAHTeg==
+X-Received: by 2002:a1c:4302:: with SMTP id q2mr20423265wma.54.1590998047778; 
+ Mon, 01 Jun 2020 00:54:07 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id b18sm19294949wrn.88.2020.06.01.00.54.02
+ by smtp.gmail.com with ESMTPSA id b18sm19294949wrn.88.2020.06.01.00.54.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 00:54:03 -0700 (PDT)
+ Mon, 01 Jun 2020 00:54:07 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] exec: Kill CPUReadMemoryFunc/CPUWriteMemoryFunc typedefs
-Date: Mon,  1 Jun 2020 09:53:57 +0200
-Message-Id: <20200601075400.2043-1-f4bug@amsat.org>
+Subject: [PATCH 3/3] exec/cpu-common: Move MUSB specific typedefs to
+ 'hw/usb/musb.h'
+Date: Mon,  1 Jun 2020 09:54:00 +0200
+Message-Id: <20200601075400.2043-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200601075400.2043-1-f4bug@amsat.org>
+References: <20200601075400.2043-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,29 +112,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Followed Peter's suggestions:
+The CPUReadMemoryFunc/CPUWriteMemoryFunc typedefs are legacy
+remnant from before the conversion to MemoryRegions.
+Since they are now only used in tusb6010.c and hcd-musb.c,
+move them to "hw/usb/musb.h" and rename them appropriately.
 
- * delete the unused MmeoryRegionMmio
- * move these typedefs into include/hw/usb.h and rename them
-   to MUSBReadFunc and MUSBWriteFunc, since that's all they're
-   used for now
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/exec/cpu-common.h | 3 ---
+ include/hw/usb/musb.h     | 9 +++++----
+ hw/usb/hcd-musb.c         | 4 ++--
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg708165.html
-
-Philippe Mathieu-Daudé (3):
-  exec/memory: Remove unused MemoryRegionMmio type
-  hw/usb: Move device-specific declarations to new 'musb.h' header
-  exec/cpu-common: Move MUSB specific typedefs to 'hw/usb/musb.h'
-
- include/exec/cpu-common.h |  3 ---
- include/exec/memory.h     |  6 -----
- include/hw/usb.h          | 30 -------------------------
- include/hw/usb/musb.h     | 47 +++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-musb.c         |  5 +++--
- hw/usb/tusb6010.c         |  1 +
- 6 files changed, 51 insertions(+), 41 deletions(-)
- create mode 100644 include/hw/usb/musb.h
-
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index b47e5630e7..d5e285d2b5 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -43,9 +43,6 @@ extern ram_addr_t ram_size;
+ 
+ /* memory API */
+ 
+-typedef void CPUWriteMemoryFunc(void *opaque, hwaddr addr, uint32_t value);
+-typedef uint32_t CPUReadMemoryFunc(void *opaque, hwaddr addr);
+-
+ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length);
+ /* This should not be used by devices.  */
+ ram_addr_t qemu_ram_addr_from_host(void *ptr);
+diff --git a/include/hw/usb/musb.h b/include/hw/usb/musb.h
+index 26b50132ff..c874b9f292 100644
+--- a/include/hw/usb/musb.h
++++ b/include/hw/usb/musb.h
+@@ -13,8 +13,6 @@
+ #ifndef HW_USB_MUSB_H
+ #define HW_USB_MUSB_H
+ 
+-#include "exec/cpu-common.h"
+-
+ enum musb_irq_source_e {
+     musb_irq_suspend = 0,
+     musb_irq_resume,
+@@ -32,8 +30,11 @@ enum musb_irq_source_e {
+     musb_irq_max /* total number of interrupts defined */
+ };
+ 
+-extern CPUReadMemoryFunc * const musb_read[];
+-extern CPUWriteMemoryFunc * const musb_write[];
++/* TODO convert hcd-musb to QOM/qdev and remove MUSBReadFunc/MUSBWriteFunc */
++typedef void MUSBWriteFunc(void *opaque, hwaddr addr, uint32_t value);
++typedef uint32_t MUSBReadFunc(void *opaque, hwaddr addr);
++extern MUSBReadFunc * const musb_read[];
++extern MUSBWriteFunc * const musb_write[];
+ 
+ typedef struct MUSBState MUSBState;
+ 
+diff --git a/hw/usb/hcd-musb.c b/hw/usb/hcd-musb.c
+index ea7a89fd0c..82865abe65 100644
+--- a/hw/usb/hcd-musb.c
++++ b/hw/usb/hcd-musb.c
+@@ -1540,13 +1540,13 @@ static void musb_writew(void *opaque, hwaddr addr, uint32_t value)
+     };
+ }
+ 
+-CPUReadMemoryFunc * const musb_read[] = {
++MUSBReadFunc * const musb_read[] = {
+     musb_readb,
+     musb_readh,
+     musb_readw,
+ };
+ 
+-CPUWriteMemoryFunc * const musb_write[] = {
++MUSBWriteFunc * const musb_write[] = {
+     musb_writeb,
+     musb_writeh,
+     musb_writew,
 -- 
 2.21.3
 
