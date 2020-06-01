@@ -2,84 +2,83 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469CFC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 04:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AFFC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 05:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14A192073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 04:57:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71A772074B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 05:17:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVmOaDKX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14A192073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8cQZhx8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A772074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfcVT-00080w-CP
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 00:57:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60106)
+	id 1jfcpg-00033i-Gq
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 01:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jfcUN-00079A-MA; Mon, 01 Jun 2020 00:55:55 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:39881)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jfcUL-00005m-NU; Mon, 01 Jun 2020 00:55:55 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id p123so4565554yba.6;
- Sun, 31 May 2020 21:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TL7HDmvtrq4YxgEcyXi3dU6ysRk7QJZZ4X9tIteT15g=;
- b=EVmOaDKXk48eL8r84FMTe8nMa67BYHmC1bQPnnaZHR9ab1hJy3DRx5ws6kCiT5PVhz
- yQ9MCNEiobn8QpzNL1CZ+xSaPlKi9kMz59sjlzvB5rJ7iaFwK809R4XX6B3fgL3h2es+
- x316Z125PAFriZ/JklViN6cuMdmWsWqH+tHZ7Ns3UHclHqzi4EIUX0QteHN9SOCq2qcu
- SY97mw1szwbkHomlKJjyZSTzAQJ32ctJlTNvm1eX0+rzRUMarX5YPqaXgCSbrxNHhE08
- 19mr4FInQBPIzOXMgI3DhVf2rBKs3vL4i5ij1nhcmkXK9B5o4JALIZoOStmofVXAXE/w
- 6vpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TL7HDmvtrq4YxgEcyXi3dU6ysRk7QJZZ4X9tIteT15g=;
- b=ec+vQKJfhwZc5YPRS5ygH0vzbOk9BgzeP9OJAAJ2FtEdUSjs0E3RuYtqIzVNorvheK
- APgeTThg0Q9lEHlK8+mIO+9WI1174xySUykEdrNSZJ2ZtcEoIZ/mkRbbArB8yLoQQ3/1
- FweEFSWpfqbtr+W3ZpzljiimOBs4I+Yoa2o5eqY3EX7gX7sP8zYVudfiK/G4ZJriabY8
- EKTWb2ZDzpHyIUsYQu46m/PxAmQ85xpBU9yU98C00LKj3VX2O50+zx4aTD3oNX8H95Z8
- pIkbqvD4YWv3Cvx5X/f5Nn70/EQ1rqQfSrK/YjxhQNRtvrHvVi6kp2pxQ3cRJTCWLA7Q
- 8GVQ==
-X-Gm-Message-State: AOAM530aJLdArZvW/dfL56Rfwm9hnPbZ6GeoFG8X5EHnFpeo13SRYgW7
- LBe8MAgjAMEoQnbvsaI1sVyoCXPDSroNU2CWMug=
-X-Google-Smtp-Source: ABdhPJxpxZTh3kAzUwDSfRaoa0FmBA/PKx9WDvrRhp+0hM8A0HuZVmBMEuqgUsN7C3CeUKZI6R829nPLx+/wS9PLZz4=
-X-Received: by 2002:a25:7404:: with SMTP id p4mr28339107ybc.517.1590987352503; 
- Sun, 31 May 2020 21:55:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jfcp6-0002Ts-Kx
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 01:17:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47665
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jfcp5-0005GQ-3q
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 01:17:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590988637;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=oCiNvpJiTfcWHSHEFdz0CVcYmxnGRQLzbV5Jbd7xZBY=;
+ b=N8cQZhx8+GZKanYz5r6gDVItGHCO/j1idwN4OCW34sPMYAwR5HshRGnkxo9QTMUE/+3/Cs
+ MVnRBZ2ZhOJyUIri3lBiVPPMdAFdLcCSVYFiAqTM9twP8kYSusLn5vdzhnhld1Eon/4wWG
+ xw0upZHe0P5dhMtWWgY0ZZRlTpPsVkA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-pWdFGdV1OLy1RCc7FkE32A-1; Mon, 01 Jun 2020 01:17:14 -0400
+X-MC-Unique: pWdFGdV1OLy1RCc7FkE32A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7276A107B7C5;
+ Mon,  1 Jun 2020 05:17:13 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-190.sin2.redhat.com
+ [10.67.116.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 087C419C4F;
+ Mon,  1 Jun 2020 05:17:01 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>
+Subject: [PATCH] msix: add valid.accepts methods to check address
+Date: Mon,  1 Jun 2020 10:44:54 +0530
+Message-Id: <20200601051454.826415-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <cover.1590704110.git.alistair.francis@wdc.com>
- <dec5eeaaaea2f9ea5776a3a31d41fd8ec246a06c.1590704110.git.alistair.francis@wdc.com>
-In-Reply-To: <dec5eeaaaea2f9ea5776a3a31d41fd8ec246a06c.1590704110.git.alistair.francis@wdc.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 1 Jun 2020 12:55:41 +0800
-Message-ID: <CAEUhbmUSA7HXucPpgcqoWdeSy7T3utVzg=1_3tKbU+EdMqh8NA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] docs: deprecated: Update the -bios documentation
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/31 23:56:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,25 +91,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Anatoly Trosinenko <anatoly.trosinenko@gmail.com>, Ren Ding <rding@gatech.edu>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 6:24 AM Alistair Francis
-<alistair.francis@wdc.com> wrote:
->
-> Update the -bios deprecation documentation to describe the new
-> behaviour.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  docs/system/deprecated.rst | 28 +++++++++++++---------------
->  1 file changed, 13 insertions(+), 15 deletions(-)
->
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
+While doing msi-x mmio operations, a guest may send an address
+that leads to an OOB access issue. Add valid.accepts methods to
+ensure that ensuing mmio r/w operation don't go beyond regions.
+
+Reported-by: Ren Ding <rding@gatech.edu>
+Reported-by: Hanqing Zhao <hanqing@gatech.edu>
+Reported-by: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/pci/msix.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+index 29187898f2..d90d66a3b8 100644
+--- a/hw/pci/msix.c
++++ b/hw/pci/msix.c
+@@ -193,6 +193,15 @@ static void msix_table_mmio_write(void *opaque, hwaddr addr,
+     msix_handle_mask_update(dev, vector, was_masked);
+ }
+ 
++static bool msix_table_accepts(void *opaque, hwaddr addr, unsigned size,
++                                    bool is_write, MemTxAttrs attrs)
++{
++    PCIDevice *dev = opaque;
++    uint16_t tbl_size = dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE;
++
++    return dev->msix_table + addr + 4 <= dev->msix_table + tbl_size;
++}
++
+ static const MemoryRegionOps msix_table_mmio_ops = {
+     .read = msix_table_mmio_read,
+     .write = msix_table_mmio_write,
+@@ -200,6 +209,7 @@ static const MemoryRegionOps msix_table_mmio_ops = {
+     .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
++        .accepts = msix_table_accepts
+     },
+ };
+ 
+@@ -221,6 +231,15 @@ static void msix_pba_mmio_write(void *opaque, hwaddr addr,
+ {
+ }
+ 
++static bool msix_pba_accepts(void *opaque, hwaddr addr, unsigned size,
++                                    bool is_write, MemTxAttrs attrs)
++{
++    PCIDevice *dev = opaque;
++    uint16_t pba_size = QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8;
++
++    return dev->msix_pba + addr + 4 <= dev->msix_pba + pba_size;
++}
++
+ static const MemoryRegionOps msix_pba_mmio_ops = {
+     .read = msix_pba_mmio_read,
+     .write = msix_pba_mmio_write,
+@@ -228,6 +247,7 @@ static const MemoryRegionOps msix_pba_mmio_ops = {
+     .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
++        .accepts = msix_pba_accepts
+     },
+ };
+ 
+-- 
+2.26.2
+
 
