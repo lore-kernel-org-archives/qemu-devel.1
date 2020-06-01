@@ -2,84 +2,91 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45ABBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D4C12074B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:32:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4C12074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 15FE8206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJaXMXmB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FE8206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfpEQ-0005Mp-Th
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 14:32:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39868)
+	id 1jfpNP-00008R-4b
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 14:41:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfp83-0007KP-8M
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47064)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jfp81-00046M-JY
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:25:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jfp7z-0000L3-IV
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 18:25:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8ADCC2E80E7
- for <qemu-devel@nongnu.org>; Mon,  1 Jun 2020 18:25:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Jun 2020 18:18:04 -0000
-From: Richard Henderson <1880332@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jfpMD-000768-U8
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47233
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jfpMC-0000NP-TO
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591036819;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GMgXmwsT0ZMPDuvgnPnj8GTOcKiU1qr0vzAPPB73P1Q=;
+ b=NJaXMXmBdbhI1b5E9V5WAbHmVrjftf0eE74s3jE4NkP0xPEQpG9sdZ6F1FAScv0q26Ylwo
+ S25CVldoCFBti4kyoPvg3+AqsvaxJNUeTOmk6l1TQnT7xK5Hd5ZqgUYG0UqFRIIVjbvw/v
+ j6xQUKBM3PkrrJsSx8jok1szhh+6/Jk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-RUubKlE8MQCQNt9GYhO5Mw-1; Mon, 01 Jun 2020 14:40:17 -0400
+X-MC-Unique: RUubKlE8MQCQNt9GYhO5Mw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94731107ACF6;
+ Mon,  1 Jun 2020 18:40:16 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-113-144.ams2.redhat.com
+ [10.36.113.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1624110016DA;
+ Mon,  1 Jun 2020 18:40:14 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hectormf rth
-X-Launchpad-Bug-Reporter: =?utf-8?q?H=C3=A9ctor_Molinero_Fern=C3=A1ndez_=28?=
- =?utf-8?q?hectormf=29?=
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <159026122753.1613.8522405227035466257.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159103548444.13304.16190678052169196758.malone@soybean.canonical.com>
-Subject: [Bug 1880332] Re: Possible regression in QEMU 5.0.0 after
- CVE-2020-10702 (segmentation fault)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c8e65379c990defb6d174ae0aead26a6ec82098a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 13:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PULL 02/12] migration/rdma: cleanup rdma context before g_free to
+ avoid memleaks
+Date: Mon,  1 Jun 2020 19:39:54 +0100
+Message-Id: <20200601184004.272784-3-dgilbert@redhat.com>
+In-Reply-To: <20200601184004.272784-1-dgilbert@redhat.com>
+References: <20200601184004.272784-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 13:44:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,66 +95,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880332 <1880332@bugs.launchpad.net>
+Cc: mszeredi@redhat.com, lukasstraub2@web.de, quintela@redhat.com,
+ pannengyuan@huawei.com, f4bug@amsat.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a compiler bug affecting (at least) libcrypto.so.1.1:
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-  179d90:       d503233f        paciasp
-  179d94:       a9bb7bfd        stp     x29, x30, [sp, #-80]!
-...
-  17a400:       d50323bf        autiasp
-  17a404:       f84507fd        ldr     x29, [sp], #80
-  17a408:       d65f03c0        ret
+When error happen in initializing 'rdma_return_path', we should cleanup rdma context
+before g_free(rdma) to avoid some memleaks. This patch fix that.
 
-The PAC happens with the initial sp:
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Message-Id: <20200508100755.7875-3-pannengyuan@huawei.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/rdma.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-  X30=3D0000005501de55fc  SP=3D00000055018477a0
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 72e8b1c95b..ec45d33ba3 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -4094,20 +4094,20 @@ void rdma_start_outgoing_migration(void *opaque,
+         rdma_return_path = qemu_rdma_data_init(host_port, errp);
+ 
+         if (rdma_return_path == NULL) {
+-            goto err;
++            goto return_path_err;
+         }
+ 
+         ret = qemu_rdma_source_init(rdma_return_path,
+             s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
+ 
+         if (ret) {
+-            goto err;
++            goto return_path_err;
+         }
+ 
+         ret = qemu_rdma_connect(rdma_return_path, errp);
+ 
+         if (ret) {
+-            goto err;
++            goto return_path_err;
+         }
+ 
+         rdma->return_path = rdma_return_path;
+@@ -4120,6 +4120,8 @@ void rdma_start_outgoing_migration(void *opaque,
+     s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
+     migrate_fd_connect(s, NULL);
+     return;
++return_path_err:
++    qemu_rdma_cleanup(rdma);
+ err:
+     g_free(rdma);
+     g_free(rdma_return_path);
+-- 
+2.26.2
 
-while the AUTH happens with the decremented sp:
-
-  X30=3D0011005501de55fc  SP=3D0000005501847750
-
-Since the salt (sp) is different for the two operations, the
-authorization should and does fail:
-
-  X30=3D0020005501de55fc
-
-Note bit 53 is now set in x30, which is the error indication.
-
-The compiler must move the authiasp down below the ldr pop.
-
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880332
-
-Title:
-  Possible regression in QEMU 5.0.0 after CVE-2020-10702 (segmentation
-  fault)
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I've come across a very specific situation, but I'm sure it could be
-  replicated in other cases.
-
-  In QEMU 5.0.0 when I use user emulation with a cURL binary for aarch64
-  and connect to a server using TLS 1.2 and ECDHE-ECDSA-
-  CHACHA20-POLY1305 cypher a segmentation fault occurs.
-
-  I attach a Dockerfile that reproduces this crash and the strace output
-  with and without the de0b1bae6461f67243282555475f88b2384a1eb9 commit
-  reverted.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880332/+subscriptions
 
