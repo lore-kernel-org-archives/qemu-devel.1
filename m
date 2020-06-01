@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D6AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDDCC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:18:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F89206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FD12206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 16:18:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UAEcn3bS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F89206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STS9Azod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FD12206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfn8q-0001dC-91
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 12:18:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50906)
+	id 1jfn8r-0001gd-HF
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 12:18:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfn5Q-00059b-9y
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:14:52 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:38608)
+ id 1jfn5T-0005Hb-PO
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:14:55 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:33607)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jfn5O-0001W5-Sq
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:14:51 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id f185so90858wmf.3
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 09:14:50 -0700 (PDT)
+ id 1jfn5S-0001Wd-3P
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 12:14:55 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id j198so324822wmj.0
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 09:14:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ErceqITnGhLCPYkCifzq710iEZfD+Gb1EMJUjvYvPyk=;
- b=UAEcn3bS8BDbr2dRRdDILGIMQavd9FiDzG9h7aMZNnYWtMzHEfcD2vKkM16q2JqhnK
- sztjGewD7iEw+zAPedHXak8euOAHscfcOMAHsH//J6nE+tBikRVHZmPMqLXVaO/YbC7X
- P16tqMfngPIk1Gl1xHgWuPX99t/r4NCXNI0cEiQ7XNGK1LjGHYXMFywAONSHAfEIvyqz
- Hc0COr+YCQxf3TKA+GfL2QEQYDacXWGCLoLmY1oVOwcPe5rG2131LuQogSZg00NhCpHn
- ROPh4FpnRN7t7ErzwPaas4c11iabqD6CZLPvlJRrOeVPRtGbBKV7Z0bNSeWBMkpm41yC
- DVsQ==
+ bh=Li+ZxqOvBnHhwlFkNS7cHG2yKEmymfLFzHdiZWMqey8=;
+ b=STS9AzodsE7qq473JsyXWHzjOdcIIeIGOnjmCqo+EXPsuegk6SKS4UxhAQ8IzhfxQo
+ zJGiHjLioMTzbIjiS7OAs9+8d9o8NXp9zbD1/m7bevsRBUOVixaXzK2tHbkD6iR7zWBR
+ BAjeAslVhW17ljYlC8mepCHmIQqQCMl+3/DVCxEVN21/zOlz7Xinn42XoquiQ0nzIRA+
+ 2fVI4YhKRMpi+f5xRznH6FrM60I8FWGQHFwrUF2fwPugK9hmWP1LtX4J0Zrk85qSP0V5
+ dJj6tcuMmbcWMrFmZXaWotz8//DSVCiI6EiarQ9qZW85zgTGqOZas+32A4C2ZHw6wc07
+ j/TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ErceqITnGhLCPYkCifzq710iEZfD+Gb1EMJUjvYvPyk=;
- b=KQbDz+G2VhHTOK6qgCgk1IgOm0F3eG8u0qLy9SDo6y/TKh8hiTbv7AEUTCf9GsH8LP
- 8PYvY7/ajLCsm2WfRxIC2q+2zkxJamArhg6FWUTmXmhNUbMQU5VZH4zzmodO4Fnbzk0r
- KYHb5lU2kNJ0GJRaZDp5woN2s3YX1Uefaunc/rBfErhrZuaa/D1OiR6aVRJVgwjVsvSj
- guQvokerP5jDj/HFXKXsBFNWVOgRfKL3HPO/9cGhacrkHr1sMsB/cw4rWe1wltxZnS7N
- ACgWqudLAvnRvWvftN9hSET6EU106TcshPkMiTyZkydoZY0cvVJSU7DDiZmFZiOtHijO
- UVAw==
-X-Gm-Message-State: AOAM531WDniGTBjOHX3L1Q2DfPS3uSx7GOiGSUA0Ky1NiFIjpBnVS1gc
- aY1vciKr7O/2zJ627wb8xNQ=
-X-Google-Smtp-Source: ABdhPJxT2KfLyf1O+BdbNLNGQzvFhnfEmVdrHDW2EybFYWktiSNpjg9HXQrXbcePw4/HL4QiM/L52Q==
-X-Received: by 2002:a1c:c908:: with SMTP id f8mr98912wmb.150.1591028089362;
- Mon, 01 Jun 2020 09:14:49 -0700 (PDT)
+ bh=Li+ZxqOvBnHhwlFkNS7cHG2yKEmymfLFzHdiZWMqey8=;
+ b=cm03Joasf8liYqpohzRJZcBbraC1YdmNjTnr8+qrG/9DRovOtOZTlxs2+b17ArbZS5
+ UFk9P2bbovd3gbGk9Y127dG6/iBHIPzH6hmc90QLrLSlL0lwsl1dIeSztjVquYbnHs4U
+ AQdf7hMLm2h+uMRUfdxXVLuoptwm/kDM54WaGqxr2y/HbfU2EijllE2qvotUEUXDQosP
+ AvFvNz56rTBswRZisBK2iU3zxEjEgaMwCsnuOvHOWz74Yb79YJDY8gOE9wZidtfqxLqj
+ o09K5R5x45BB7+wh3V6pq/hsLtwat9gDwoC/mYqIRVZo6/wwiRhp6v0V/+r3RaPazugf
+ 2VNA==
+X-Gm-Message-State: AOAM530USYpGuwwH57TRrtLquu3kDTTQ63MjqDuZ98/9OCm/FHEQ/Z3l
+ 9QUb93+Sn7miPM5r5o5vc6c=
+X-Google-Smtp-Source: ABdhPJyZcrsF+SLaEzfxijqiROsrL1xJlA+B3QO2VRbxVEkTGDI5QPw/irNQpZvCteoI2HzNTRy9Kg==
+X-Received: by 2002:a1c:a901:: with SMTP id s1mr117563wme.66.1591028092565;
+ Mon, 01 Jun 2020 09:14:52 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id a6sm21309896wrn.38.2020.06.01.09.14.47
+ by smtp.gmail.com with ESMTPSA id a6sm21309896wrn.38.2020.06.01.09.14.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 09:14:48 -0700 (PDT)
+ Mon, 01 Jun 2020 09:14:51 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
  Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: [PATCH 04/12] hw/timer: RX62N 8-Bit timer (TMR)
-Date: Mon,  1 Jun 2020 18:14:33 +0200
-Message-Id: <20200601161441.8086-5-f4bug@amsat.org>
+Subject: [PATCH 06/12] hw/char: RX62N serial communication interface (SCI)
+Date: Mon,  1 Jun 2020 18:14:35 +0200
+Message-Id: <20200601161441.8086-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200601161441.8086-1-f4bug@amsat.org>
 References: <20200601161441.8086-1-f4bug@amsat.org>
@@ -80,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -116,8 +116,7 @@ Sender: "Qemu-devel"
 
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-renesas_tmr: 8bit timer modules.
-This part use many renesas's CPU.
+This module supported only non FIFO type.
 Hardware manual.
 https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
 
@@ -126,87 +125,83 @@ Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200224141923.82118-16-ysato@users.sourceforge.jp>
-[PMD: Split from CMT, filled VMStateField for migration]
+Message-Id: <20200224141923.82118-17-ysato@users.sourceforge.jp>
+[PMD: Filled VMStateField for migration]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/timer/renesas_tmr.h |  55 ++++
- hw/timer/renesas_tmr.c         | 477 +++++++++++++++++++++++++++++++++
- hw/timer/Kconfig               |   3 +
- hw/timer/Makefile.objs         |   1 +
- 4 files changed, 536 insertions(+)
- create mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 hw/timer/renesas_tmr.c
+ include/hw/char/renesas_sci.h |  51 +++++
+ hw/char/renesas_sci.c         | 350 ++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ 4 files changed, 405 insertions(+)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_tmr.h
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
 new file mode 100644
-index 0000000000..cf3baa7a28
+index 0000000000..efdebc620a
 --- /dev/null
-+++ b/include/hw/timer/renesas_tmr.h
-@@ -0,0 +1,55 @@
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,51 @@
 +/*
-+ * Renesas 8bit timer Object
++ * Renesas Serial Communication Interface
 + *
 + * Copyright (c) 2018 Yoshinori Sato
 + *
 + * SPDX-License-Identifier: GPL-2.0-or-later
 + */
 +
-+#ifndef HW_TIMER_RENESAS_TMR_H
-+#define HW_TIMER_RENESAS_TMR_H
++#ifndef HW_CHAR_RENESAS_SCI_H
++#define HW_CHAR_RENESAS_SCI_H
 +
-+#include "qemu/timer.h"
++#include "chardev/char-fe.h"
 +#include "hw/sysbus.h"
 +
-+#define TYPE_RENESAS_TMR "renesas-tmr"
-+#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
-+
-+enum timer_event {
-+    cmia = 0,
-+    cmib = 1,
-+    ovi = 2,
-+    none = 3,
-+    TMR_NR_EVENTS = 4
-+};
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
 +
 +enum {
-+    TMR_CH = 2,
-+    TMR_NR_IRQ = 3 * TMR_CH
++    ERI = 0,
++    RXI = 1,
++    TXI = 2,
++    TEI = 3,
++    SCI_NR_IRQ = 4
 +};
 +
-+typedef struct RTMRState {
++typedef struct {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +    /*< public >*/
 +
-+    uint64_t input_freq;
 +    MemoryRegion memory;
++    QEMUTimer timer;
++    CharBackend chr;
++    qemu_irq irq[SCI_NR_IRQ];
 +
-+    int64_t tick;
-+    uint8_t tcnt[TMR_CH];
-+    uint8_t tcora[TMR_CH];
-+    uint8_t tcorb[TMR_CH];
-+    uint8_t tcr[TMR_CH];
-+    uint8_t tccr[TMR_CH];
-+    uint8_t tcor[TMR_CH];
-+    uint8_t tcsr[TMR_CH];
-+    int64_t div_round[TMR_CH];
-+    uint8_t next[TMR_CH];
-+    qemu_irq cmia[TMR_CH];
-+    qemu_irq cmib[TMR_CH];
-+    qemu_irq ovi[TMR_CH];
-+    QEMUTimer timer[TMR_CH];
-+} RTMRState;
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
++
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    uint64_t input_freq;
++} RSCIState;
 +
 +#endif
-diff --git a/hw/timer/renesas_tmr.c b/hw/timer/renesas_tmr.c
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
 new file mode 100644
-index 0000000000..446f2eacdd
+index 0000000000..5d7c6e6523
 --- /dev/null
-+++ b/hw/timer/renesas_tmr.c
-@@ -0,0 +1,477 @@
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,350 @@
 +/*
-+ * Renesas 8bit timer
++ * Renesas Serial Communication Interface
 + *
 + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
 + *            (Rev.1.40 R01UH0033EJ0140)
@@ -233,478 +228,351 @@ index 0000000000..446f2eacdd
 +#include "hw/irq.h"
 +#include "hw/registerfields.h"
 +#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_tmr.h"
++#include "hw/char/renesas_sci.h"
 +#include "migration/vmstate.h"
 +
-+REG8(TCR, 0)
-+  FIELD(TCR, CCLR,  3, 2)
-+  FIELD(TCR, OVIE,  5, 1)
-+  FIELD(TCR, CMIEA, 6, 1)
-+  FIELD(TCR, CMIEB, 7, 1)
-+REG8(TCSR, 2)
-+  FIELD(TCSR, OSA,  0, 2)
-+  FIELD(TCSR, OSB,  2, 2)
-+  FIELD(TCSR, ADTE, 4, 2)
-+REG8(TCORA, 4)
-+REG8(TCORB, 6)
-+REG8(TCNT, 8)
-+REG8(TCCR, 10)
-+  FIELD(TCCR, CKS,   0, 3)
-+  FIELD(TCCR, CSS,   3, 2)
-+  FIELD(TCCR, TMRIS, 7, 1)
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE,  0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR,  3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
 +
-+#define INTERNAL  0x01
-+#define CASCADING 0x03
-+#define CCLR_A    0x01
-+#define CCLR_B    0x02
-+
-+static const int clkdiv[] = {0, 1, 2, 8, 32, 64, 1024, 8192};
-+
-+static uint8_t concat_reg(uint8_t *reg)
++static int can_receive(void *opaque)
 +{
-+    return (reg[0] << 8) | reg[1];
-+}
-+
-+static void update_events(RTMRState *tmr, int ch)
-+{
-+    uint16_t diff[TMR_NR_EVENTS], min;
-+    int64_t next_time;
-+    int i, event;
-+
-+    if (tmr->tccr[ch] == 0) {
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[ch], TCCR, CSS) == 0) {
-+        /* external clock mode */
-+        /* event not happened */
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) == CASCADING) {
-+        /* cascading mode */
-+        if (ch == 1) {
-+            tmr->next[ch] = none;
-+            return ;
-+        }
-+        diff[cmia] = concat_reg(tmr->tcora) - concat_reg(tmr->tcnt);
-+        diff[cmib] = concat_reg(tmr->tcorb) - concat_reg(tmr->tcnt);
-+        diff[ovi] = 0x10000 - concat_reg(tmr->tcnt);
++    RSCIState *sci = RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
 +    } else {
-+        /* separate mode */
-+        diff[cmia] = tmr->tcora[ch] - tmr->tcnt[ch];
-+        diff[cmib] = tmr->tcorb[ch] - tmr->tcnt[ch];
-+        diff[ovi] = 0x100 - tmr->tcnt[ch];
++        return FIELD_EX8(sci->scr, SCR, RE);
 +    }
-+    /* Search for the most recently occurring event. */
-+    for (event = 0, min = diff[0], i = 1; i < none; i++) {
-+        if (min > diff[i]) {
-+            event = i;
-+            min = diff[i];
-+        }
-+    }
-+    tmr->next[ch] = event;
-+    next_time = diff[event];
-+    next_time *= clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    next_time *= NANOSECONDS_PER_SECOND;
-+    next_time /= tmr->input_freq;
-+    next_time += qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(&tmr->timer[ch], next_time);
 +}
 +
-+static int elapsed_time(RTMRState *tmr, int ch, int64_t delta)
++static void receive(void *opaque, const uint8_t *buf, int size)
 +{
-+    int divrate = clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    int et;
-+
-+    tmr->div_round[ch] += delta;
-+    if (divrate > 0) {
-+        et = tmr->div_round[ch] / divrate;
-+        tmr->div_round[ch] %= divrate;
-+    } else {
-+        /* disble clock. so no update */
-+        et = 0;
-+    }
-+    return et;
-+}
-+
-+static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
-+{
-+    int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    int elapsed, ovf = 0;
-+    uint16_t tcnt[2];
-+    uint32_t ret;
-+
-+    delta = (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input_freq;
-+    if (delta > 0) {
-+        tmr->tick = now;
-+
-+        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) == INTERNAL) {
-+            /* timer1 count update */
-+            elapsed = elapsed_time(tmr, 1, delta);
-+            if (elapsed >= 0x100) {
-+                ovf = elapsed >> 8;
-+            }
-+            tcnt[1] = tmr->tcnt[1] + (elapsed & 0xff);
-+        }
-+        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
-+        case INTERNAL:
-+            elapsed = elapsed_time(tmr, 0, delta);
-+            tcnt[0] = tmr->tcnt[0] + elapsed;
-+            break;
-+        case CASCADING:
-+            if (ovf > 0) {
-+                tcnt[0] = tmr->tcnt[0] + ovf;
-+            }
-+            break;
++    RSCIState *sci = RSCI(opaque);
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
 +        }
 +    } else {
-+        tcnt[0] = tmr->tcnt[0];
-+        tcnt[1] = tmr->tcnt[1];
++        sci->rdr = buf[0];
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
 +    }
-+    if (size == 1) {
-+        return tcnt[ch];
++}
++
++static void send_byte(RSCIState *sci)
++{
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(&sci->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
++}
++
++static void txend(void *opaque)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
 +    } else {
-+        ret = 0;
-+        ret = deposit32(ret, 0, 8, tcnt[1]);
-+        ret = deposit32(ret, 8, 8, tcnt[0]);
-+        return ret;
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
 +    }
 +}
 +
-+static uint8_t read_tccr(uint8_t r)
++static void update_trtime(RSCIState *sci)
 +{
-+    uint8_t tccr = 0;
-+    tccr = FIELD_DP8(tccr, TCCR, TMRIS,
-+                     FIELD_EX8(r, TCCR, TMRIS));
-+    tccr = FIELD_DP8(tccr, TCCR, CSS,
-+                     FIELD_EX8(r, TCCR, CSS));
-+    tccr = FIELD_DP8(tccr, TCCR, CKS,
-+                     FIELD_EX8(r, TCCR, CKS));
-+    return tccr;
++    /* char per bits */
++    sci->trtime = 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *= 32 * sci->brr;
++    sci->trtime *= 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *= NANOSECONDS_PER_SECOND;
++    sci->trtime /= sci->input_freq;
 +}
 +
-+static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
++static bool sci_is_tr_enabled(RSCIState *sci)
 +{
-+    RTMRState *tmr = opaque;
-+    int ch = addr & 1;
-+    uint64_t ret;
++    return FIELD_EX8(sci->scr, SCR, TE) || FIELD_EX8(sci->scr, SCR, RE);
++}
 +
-+    if (size == 2 && (ch != 0 || addr == A_TCR || addr == A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "renesas_tmr: Invalid read size 0x%"
-+                                       HWADDR_PRIX "\n",
-+                      addr);
-+        return UINT64_MAX;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        ret = 0;
-+        ret = FIELD_DP8(ret, TCR, CCLR,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CCLR));
-+        ret = FIELD_DP8(ret, TCR, OVIE,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, OVIE));
-+        ret = FIELD_DP8(ret, TCR, CMIEA,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEA));
-+        ret = FIELD_DP8(ret, TCR, CMIEB,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEB));
-+        return ret;
-+    case A_TCSR:
-+        ret = 0;
-+        ret = FIELD_DP8(ret, TCSR, OSA,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSA));
-+        ret = FIELD_DP8(ret, TCSR, OSB,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSB));
-+        switch (ch) {
-+        case 0:
-+            ret = FIELD_DP8(ret, TCSR, ADTE,
-+                            FIELD_EX8(tmr->tcsr[ch], TCSR, ADTE));
-+            break;
-+        case 1: /* CH1 ADTE unimplement always 1 */
-+            ret = FIELD_DP8(ret, TCSR, ADTE, 1);
-+            break;
++static void sci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
++{
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!sci_is_tr_enabled(sci)) {
++            sci->smr = val;
++            update_trtime(sci);
 +        }
-+        return ret;
-+    case A_TCORA:
-+        if (size == 1) {
-+            return tmr->tcora[ch];
-+        } else if (ch == 0) {
-+            return concat_reg(tmr->tcora);
-+        }
-+    case A_TCORB:
-+        if (size == 1) {
-+            return tmr->tcorb[ch];
-+        } else {
-+            return concat_reg(tmr->tcorb);
-+        }
-+    case A_TCNT:
-+        return read_tcnt(tmr, size, ch);
-+    case A_TCCR:
-+        if (size == 1) {
-+            return read_tccr(tmr->tccr[ch]);
-+        } else {
-+            return read_tccr(tmr->tccr[0]) << 8 | read_tccr(tmr->tccr[1]);
-+        }
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                                 " not implemented\n",
-+                      addr);
 +        break;
++    case A_BRR:
++        if (!sci_is_tr_enabled(sci)) {
++            sci->brr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr = val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr = val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) == 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
++        break;
++    case A_SCMR:
++        sci->scmr = val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr = val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX " "
++                                 "not implemented\n",
++                      offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr offset, unsigned size)
++{
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr = sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
 +    }
 +    return UINT64_MAX;
 +}
 +
-+static void tmr_write_count(RTMRState *tmr, int ch, unsigned size,
-+                            uint8_t *reg, uint64_t val)
-+{
-+    if (size == 1) {
-+        reg[ch] = val;
-+        update_events(tmr, ch);
-+    } else {
-+        reg[0] = extract32(val, 8, 8);
-+        reg[1] = extract32(val, 0, 8);
-+        update_events(tmr, 0);
-+        update_events(tmr, 1);
-+    }
-+}
-+
-+static void tmr_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    RTMRState *tmr = opaque;
-+    int ch = addr & 1;
-+
-+    if (size == 2 && (ch != 0 || addr == A_TCR || addr == A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_tmr: Invalid write size 0x%" HWADDR_PRIX "\n",
-+                      addr);
-+        return;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        tmr->tcr[ch] = val;
-+        break;
-+    case A_TCSR:
-+        tmr->tcsr[ch] = val;
-+        break;
-+    case A_TCORA:
-+        tmr_write_count(tmr, ch, size, tmr->tcora, val);
-+        break;
-+    case A_TCORB:
-+        tmr_write_count(tmr, ch, size, tmr->tcorb, val);
-+        break;
-+    case A_TCNT:
-+        tmr_write_count(tmr, ch, size, tmr->tcnt, val);
-+        break;
-+    case A_TCCR:
-+        tmr_write_count(tmr, ch, size, tmr->tccr, val);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                                 " not implemented\n",
-+                      addr);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps tmr_ops = {
-+    .write = tmr_write,
-+    .read  = tmr_read,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
++static const MemoryRegionOps sci_ops = {
++    .write = sci_write,
++    .read  = sci_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl.max_access_size = 1,
++    .valid.max_access_size = 1,
 +};
 +
-+static void timer_events(RTMRState *tmr, int ch);
-+
-+static uint16_t issue_event(RTMRState *tmr, int ch, int sz,
-+                        uint16_t tcnt, uint16_t tcora, uint16_t tcorb)
++static void rsci_reset(DeviceState *dev)
 +{
-+    uint16_t ret = tcnt;
++    RSCIState *sci = RSCI(dev);
++    sci->smr = sci->scr = 0x00;
++    sci->brr = 0xff;
++    sci->tdr = 0xff;
++    sci->rdr = 0x00;
++    sci->ssr = 0x84;
++    sci->scmr = 0x00;
++    sci->semr = 0x00;
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
 +
-+    switch (tmr->next[ch]) {
-+    case none:
-+        break;
-+    case cmia:
-+        if (tcnt >= tcora) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) == CCLR_A) {
-+                ret = tcnt - tcora;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEA)) {
-+                qemu_irq_pulse(tmr->cmia[ch]);
-+            }
-+            if (sz == 8 && ch == 0 &&
-+                FIELD_EX8(tmr->tccr[1], TCCR, CSS) == CASCADING) {
-+                tmr->tcnt[1]++;
-+                timer_events(tmr, 1);
-+            }
++static void sci_event(void *opaque, QEMUChrEvent event)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (event == CHR_EVENT_BREAK) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
 +        }
-+        break;
-+    case cmib:
-+        if (tcnt >= tcorb) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) == CCLR_B) {
-+                ret = tcnt - tcorb;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEB)) {
-+                qemu_irq_pulse(tmr->cmib[ch]);
-+            }
-+        }
-+        break;
-+    case ovi:
-+        if ((tcnt >= (1 << sz)) && FIELD_EX8(tmr->tcr[ch], TCR, OVIE)) {
-+            qemu_irq_pulse(tmr->ovi[ch]);
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
 +    }
-+    return ret;
 +}
 +
-+static void timer_events(RTMRState *tmr, int ch)
++static void rsci_realize(DeviceState *dev, Error **errp)
 +{
-+    uint16_t tcnt;
++    RSCIState *sci = RSCI(dev);
 +
-+    tmr->tcnt[ch] = read_tcnt(tmr, 1, ch);
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) != CASCADING) {
-+        tmr->tcnt[ch] = issue_event(tmr, ch, 8,
-+                                    tmr->tcnt[ch],
-+                                    tmr->tcora[ch],
-+                                    tmr->tcorb[ch]) & 0xff;
-+    } else {
-+        if (ch == 1) {
-+            return ;
-+        }
-+        tcnt = issue_event(tmr, ch, 16,
-+                           concat_reg(tmr->tcnt),
-+                           concat_reg(tmr->tcora),
-+                           concat_reg(tmr->tcorb));
-+        tmr->tcnt[0] = (tcnt >> 8) & 0xff;
-+        tmr->tcnt[1] = tcnt & 0xff;
++    if (sci->input_freq == 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
 +    }
-+    update_events(tmr, ch);
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
 +}
 +
-+static void timer_event0(void *opaque)
-+{
-+    RTMRState *tmr = opaque;
-+
-+    timer_events(tmr, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RTMRState *tmr = opaque;
-+
-+    timer_events(tmr, 1);
-+}
-+
-+static void rtmr_reset(DeviceState *dev)
-+{
-+    RTMRState *tmr = RTMR(dev);
-+    tmr->tcr[0]   = tmr->tcr[1]   = 0x00;
-+    tmr->tcsr[0]  = 0x00;
-+    tmr->tcsr[1]  = 0x10;
-+    tmr->tcnt[0]  = tmr->tcnt[1]  = 0x00;
-+    tmr->tcora[0] = tmr->tcora[1] = 0xff;
-+    tmr->tcorb[0] = tmr->tcorb[1] = 0xff;
-+    tmr->tccr[0]  = tmr->tccr[1]  = 0x00;
-+    tmr->next[0]  = tmr->next[1]  = none;
-+    tmr->tick = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void rtmr_init(Object *obj)
++static void rsci_init(Object *obj)
 +{
 +    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-+    RTMRState *tmr = RTMR(obj);
++    RSCIState *sci = RSCI(obj);
 +    int i;
 +
-+    memory_region_init_io(&tmr->memory, OBJECT(tmr), &tmr_ops,
-+                          tmr, "renesas-tmr", 0x10);
-+    sysbus_init_mmio(d, &tmr->memory);
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
 +
-+    for (i = 0; i < ARRAY_SIZE(tmr->ovi); i++) {
-+        sysbus_init_irq(d, &tmr->cmia[i]);
-+        sysbus_init_irq(d, &tmr->cmib[i]);
-+        sysbus_init_irq(d, &tmr->ovi[i]);
++    for (i = 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
 +    }
-+    timer_init_ns(&tmr->timer[0], QEMU_CLOCK_VIRTUAL, timer_event0, tmr);
-+    timer_init_ns(&tmr->timer[1], QEMU_CLOCK_VIRTUAL, timer_event1, tmr);
++    timer_init_ns(&sci->timer, QEMU_CLOCK_VIRTUAL, txend, sci);
 +}
 +
-+static const VMStateDescription vmstate_rtmr = {
-+    .name = "rx-tmr",
++static const VMStateDescription vmstate_rsci = {
++    .name = "renesas-sci",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_INT64(tick, RTMRState),
-+        VMSTATE_UINT8_ARRAY(tcnt, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tcora, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tcorb, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tcr, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tccr, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tcor, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(tcsr, RTMRState, TMR_CH),
-+        VMSTATE_INT64_ARRAY(div_round, RTMRState, TMR_CH),
-+        VMSTATE_UINT8_ARRAY(next, RTMRState, TMR_CH),
-+        VMSTATE_TIMER_ARRAY(timer, RTMRState, TMR_CH),
++        VMSTATE_INT64(trtime, RSCIState),
++        VMSTATE_INT64(rx_next, RSCIState),
++        VMSTATE_UINT8(smr, RSCIState),
++        VMSTATE_UINT8(brr, RSCIState),
++        VMSTATE_UINT8(scr, RSCIState),
++        VMSTATE_UINT8(tdr, RSCIState),
++        VMSTATE_UINT8(ssr, RSCIState),
++        VMSTATE_UINT8(rdr, RSCIState),
++        VMSTATE_UINT8(scmr, RSCIState),
++        VMSTATE_UINT8(semr, RSCIState),
++        VMSTATE_UINT8(read_ssr, RSCIState),
++        VMSTATE_TIMER(timer, RSCIState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static Property rtmr_properties[] = {
-+    DEFINE_PROP_UINT64("input-freq", RTMRState, input_freq, 0),
++static Property rsci_properties[] = {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void rtmr_class_init(ObjectClass *klass, void *data)
++static void rsci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->vmsd = &vmstate_rtmr;
-+    dc->reset = rtmr_reset;
-+    device_class_set_props(dc, rtmr_properties);
++    dc->realize = rsci_realize;
++    dc->vmsd = &vmstate_rsci;
++    dc->reset = rsci_reset;
++    device_class_set_props(dc, rsci_properties);
 +}
 +
-+static const TypeInfo rtmr_info = {
-+    .name = TYPE_RENESAS_TMR,
++static const TypeInfo rsci_info = {
++    .name = TYPE_RENESAS_SCI,
 +    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RTMRState),
-+    .instance_init = rtmr_init,
-+    .class_init = rtmr_class_init,
++    .instance_size = sizeof(RSCIState),
++    .instance_init = rsci_init,
++    .class_init = rsci_class_init,
 +};
 +
-+static void rtmr_register_types(void)
++static void rsci_register_types(void)
 +{
-+    type_register_static(&rtmr_info);
++    type_register_static(&rsci_info);
 +}
 +
-+type_init(rtmr_register_types)
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 59b3f44d69..7039c2a686 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -35,3 +35,6 @@ config CMSDK_APB_TIMER
- config CMSDK_APB_DUALTIMER
-     bool
-     select PTIMER
-+
-+config RENESAS_TMR
-+    bool
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index dece235fd7..44fb47a433 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -23,6 +23,7 @@ common-obj-$(CONFIG_OMAP) += omap_gptimer.o
- common-obj-$(CONFIG_OMAP) += omap_synctimer.o
- common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
- common-obj-$(CONFIG_SH4) += sh_timer.o
-+common-obj-$(CONFIG_RENESAS_TMR) += renesas_tmr.o
- common-obj-$(CONFIG_DIGIC) += digic-timer.o
- common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..874627520c 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
  
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 9e9a6c1aff..996c170750 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -20,6 +20,7 @@ common-obj-$(CONFIG_SH4) += sh_serial.o
+ common-obj-$(CONFIG_DIGIC) += digic-uart.o
+ common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
++common-obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
 -- 
 2.21.3
 
