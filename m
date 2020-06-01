@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88275C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 14:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7FFC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 14:18:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5249920738
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 14:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64C8320738
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 14:18:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m7KgInLW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5249920738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4A8VmVc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C8320738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jflFX-0004iE-FG
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 10:17:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37366)
+	id 1jflHG-0006ua-LP
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 10:18:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jflE9-0002xI-CV; Mon, 01 Jun 2020 10:15:45 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39809)
+ id 1jflEA-0002yT-3I; Mon, 01 Jun 2020 10:15:46 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38233)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jflE7-0007y9-RT; Mon, 01 Jun 2020 10:15:45 -0400
-Received: by mail-wm1-x344.google.com with SMTP id k26so11542055wmi.4;
- Mon, 01 Jun 2020 07:15:43 -0700 (PDT)
+ id 1jflE9-0007yS-68; Mon, 01 Jun 2020 10:15:45 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f185so11544461wmf.3;
+ Mon, 01 Jun 2020 07:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=W1QfjnoxgOl1dLnHFXbO/n4gzPKJ9EZXLUkU+m3W2Dk=;
- b=m7KgInLWpq8xaaOgriflsimDe2GR6UhauuP6MsGZtUdinXY4Vpg7QvQa96AMu2iKBX
- acEFhFXNj7Rxow0aSEwpL4Xu6x9sdOdlnV7IFOoRIGLKqnJqkLhAnVK2sctCe6+H4G6E
- aC++B0/GxT8O6nEqH4D0VllsiLk1tnKPjCuIxTHVEXLOngxV+z2NPpDIFYAP/hKyUctX
- 4jUYWFVsWO9saKGIs7GZHKjFd//3WP9sDAl2NArcCiB9NeQ3ami9cimx6nX4Ka1A4r/Z
- kP84Ad+9Z6ON/QU506mN+g13+ML++Ows+NwQ8yYo7P1KsI+GZ3s24m0fFimIuf97CSYy
- 1S6g==
+ bh=LuboXwwmJJxrw629GERS8oE+/5r5G4adyReMjUbvFag=;
+ b=p4A8VmVcuXbkLUA5Zc/oR0QKb9jeU5O51ZWt5ZJc2OrHlSxbKryuybH/Re4cALq8QU
+ Rdj9zAehC+MTLMK1WZo7mT/g5melGgB3ATMEQ1aIeqe7OcmnayVAVdBUT2d1ffwfmuTL
+ km07qG4uvV2UwtiXim6SU1Lq9krw7IZXfawg8yN3PEmimJShTsDLyTPoW0Kewfex7kvE
+ BTnZkv8hqNSVkWHffRynMRR+nG3vik2Rxwr3A6mRIuEQH/y51rybWJUoA63YksGjZzZP
+ 0b3npJwI58cqqH73arloMj9rL4zxwzYZdLEcea/2hR3468Pz1OMozU1Xruxql3WMau/d
+ K5eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=W1QfjnoxgOl1dLnHFXbO/n4gzPKJ9EZXLUkU+m3W2Dk=;
- b=BQmvn8q/eNv7j2xCqpfOZXWrSLzDZDY51Ot3vn9bz8ZxvHtYIxIvcaZ5NJnR7Ce9hx
- WjojBmzCSs5Xmck0nOywnNOw6OeHtVdymcUBl9aHxIhQkKNwlOcRpApnyw7dKAeb3Qsv
- 260irJm36Hih307vJdXSTOAVadJEOxDEkGky4PEI0nlcie9aEFm7ohWLEfKzfIX5KvHT
- ynSHew8Nv5oyb9EYUn1Z8ZvkbfiuublwPVtRuWpUDnBfnSMMpv5lFPatwov+Tz2t9yRN
- gmQoyFw17MK0kbKqwbV9cyDWPN7Infq8Jmz6JVkvVlVSQhatuAK/ErYYEdsE/13NRuyW
- xCEQ==
-X-Gm-Message-State: AOAM531Hni+5ITdz887N0xoI34sul+0f1WYjUmJt/OXwdckU/34tI7y3
- C48x+Fjsy22kAwov5roKF6THPrnm
-X-Google-Smtp-Source: ABdhPJz8TmPwL4zTqTOiZI3hrQSYxJHcxwjQKmJjBNep+TD8EU/GTQD9oeE/GtxgCVzHiunwljbfQQ==
-X-Received: by 2002:a05:600c:21c2:: with SMTP id
- x2mr22018833wmj.33.1591020941824; 
- Mon, 01 Jun 2020 07:15:41 -0700 (PDT)
+ bh=LuboXwwmJJxrw629GERS8oE+/5r5G4adyReMjUbvFag=;
+ b=esuqNOMm+anDhqnFpVswKKWORvNmI24umpqgd3l0QhlnPvi5EMXA7wZsQvVjZRQr+v
+ KaIofnnYxiJOnPmNRnU87SEyD9p8+B7OJE/fU/r04uf4FIxXbTcwab/mdOYZCIVFDQNN
+ sBe7ssMF0BA90o7I2KyN6fo+u4cbFrbwmavzujJONF1/ZEHi4w4ykicowKIUnD3km+KF
+ tt+G+HHA/Au31yI85WmS6wt8g1+D9O4HF4WCgmQK02smS8g0uSrayfmNgoXhdIqOGUeb
+ BSdoRsj0psngdspBnxL2aVJCli44cGiMBdPaP2oUuzAeRMxsMos+2b7kDD0vusTzT1CZ
+ MDQg==
+X-Gm-Message-State: AOAM532thS9xWFP/OOKRvIcwcBlxhrbZfU7Brj29zjDBNhLaSQMpDNXM
+ 4lhgPaLHXSugXfZSwLNz641RSkAO
+X-Google-Smtp-Source: ABdhPJzZPsdO8FhxN00Ui3RnrFeQ6J9OABs8d51B8WZwrFT0Yh9TW5By7W1MLh+07ObVzVWNr2eaNQ==
+X-Received: by 2002:a05:600c:2215:: with SMTP id
+ z21mr22238380wml.48.1591020942958; 
+ Mon, 01 Jun 2020 07:15:42 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.43])
- by smtp.gmail.com with ESMTPSA id a124sm12864182wmh.4.2020.06.01.07.15.40
+ by smtp.gmail.com with ESMTPSA id a124sm12864182wmh.4.2020.06.01.07.15.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 07:15:41 -0700 (PDT)
+ Mon, 01 Jun 2020 07:15:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] hw/usb: Move device-specific declarations to new
- 'hcd-musb.h' header
-Date: Mon,  1 Jun 2020 16:15:35 +0200
-Message-Id: <20200601141536.15192-3-f4bug@amsat.org>
+Subject: [PATCH v2 3/3] exec/cpu-common: Move MUSB specific typedefs to
+ 'hw/usb/hcd-musb.h'
+Date: Mon,  1 Jun 2020 16:15:36 +0200
+Message-Id: <20200601141536.15192-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200601141536.15192-1-f4bug@amsat.org>
 References: <20200601141536.15192-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -111,136 +111,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the declarations for the MUSB-HDRC USB2.0 OTG compliant core
-into a separate header.
+The CPUReadMemoryFunc/CPUWriteMemoryFunc typedefs are legacy
+remnant from before the conversion to MemoryRegions.
+Since they are now only used in tusb6010.c and hcd-musb.c,
+move them to "hw/usb/musb.h" and rename them appropriately.
 
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/usb.h          | 30 -------------------------
- include/hw/usb/hcd-musb.h | 46 +++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-musb.c         |  1 +
- hw/usb/tusb6010.c         |  1 +
- 4 files changed, 48 insertions(+), 30 deletions(-)
- create mode 100644 include/hw/usb/hcd-musb.h
+ include/exec/cpu-common.h | 3 ---
+ include/hw/usb/hcd-musb.h | 9 +++++----
+ hw/usb/hcd-musb.c         | 4 ++--
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index 1cf1cd9584..e2128c7c45 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -474,36 +474,6 @@ bool usb_host_dev_is_scsi_storage(USBDevice *usbdev);
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index b47e5630e7..d5e285d2b5 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -43,9 +43,6 @@ extern ram_addr_t ram_size;
  
- #define VM_USB_HUB_SIZE 8
+ /* memory API */
  
--/* hw/usb/hdc-musb.c */
+-typedef void CPUWriteMemoryFunc(void *opaque, hwaddr addr, uint32_t value);
+-typedef uint32_t CPUReadMemoryFunc(void *opaque, hwaddr addr);
 -
--enum musb_irq_source_e {
--    musb_irq_suspend = 0,
--    musb_irq_resume,
--    musb_irq_rst_babble,
--    musb_irq_sof,
--    musb_irq_connect,
--    musb_irq_disconnect,
--    musb_irq_vbus_request,
--    musb_irq_vbus_error,
--    musb_irq_rx,
--    musb_irq_tx,
--    musb_set_vbus,
--    musb_set_session,
--    /* Add new interrupts here */
--    musb_irq_max, /* total number of interrupts defined */
--};
+ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length);
+ /* This should not be used by devices.  */
+ ram_addr_t qemu_ram_addr_from_host(void *ptr);
+diff --git a/include/hw/usb/hcd-musb.h b/include/hw/usb/hcd-musb.h
+index 26b50132ff..c874b9f292 100644
+--- a/include/hw/usb/hcd-musb.h
++++ b/include/hw/usb/hcd-musb.h
+@@ -13,8 +13,6 @@
+ #ifndef HW_USB_MUSB_H
+ #define HW_USB_MUSB_H
+ 
+-#include "exec/cpu-common.h"
 -
--typedef struct MUSBState MUSBState;
--
+ enum musb_irq_source_e {
+     musb_irq_suspend = 0,
+     musb_irq_resume,
+@@ -32,8 +30,11 @@ enum musb_irq_source_e {
+     musb_irq_max /* total number of interrupts defined */
+ };
+ 
 -extern CPUReadMemoryFunc * const musb_read[];
 -extern CPUWriteMemoryFunc * const musb_write[];
--
--MUSBState *musb_init(DeviceState *parent_device, int gpio_base);
--void musb_reset(MUSBState *s);
--uint32_t musb_core_intr_get(MUSBState *s);
--void musb_core_intr_clear(MUSBState *s, uint32_t mask);
--void musb_set_size(MUSBState *s, int epnum, int size, int is_tx);
--
- /* usb-bus.c */
++/* TODO convert hcd-musb to QOM/qdev and remove MUSBReadFunc/MUSBWriteFunc */
++typedef void MUSBWriteFunc(void *opaque, hwaddr addr, uint32_t value);
++typedef uint32_t MUSBReadFunc(void *opaque, hwaddr addr);
++extern MUSBReadFunc * const musb_read[];
++extern MUSBWriteFunc * const musb_write[];
  
- #define TYPE_USB_BUS "usb-bus"
-diff --git a/include/hw/usb/hcd-musb.h b/include/hw/usb/hcd-musb.h
-new file mode 100644
-index 0000000000..26b50132ff
---- /dev/null
-+++ b/include/hw/usb/hcd-musb.h
-@@ -0,0 +1,46 @@
-+/*
-+ * "Inventra" High-speed Dual-Role Controller (MUSB-HDRC), Mentor Graphics,
-+ * USB2.0 OTG compliant core used in various chips.
-+ *
-+ * Only host-mode and non-DMA accesses are currently supported.
-+ *
-+ * Copyright (C) 2008 Nokia Corporation
-+ * Written by Andrzej Zaborowski <balrog@zabor.org>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef HW_USB_MUSB_H
-+#define HW_USB_MUSB_H
-+
-+#include "exec/cpu-common.h"
-+
-+enum musb_irq_source_e {
-+    musb_irq_suspend = 0,
-+    musb_irq_resume,
-+    musb_irq_rst_babble,
-+    musb_irq_sof,
-+    musb_irq_connect,
-+    musb_irq_disconnect,
-+    musb_irq_vbus_request,
-+    musb_irq_vbus_error,
-+    musb_irq_rx,
-+    musb_irq_tx,
-+    musb_set_vbus,
-+    musb_set_session,
-+    /* Add new interrupts here */
-+    musb_irq_max /* total number of interrupts defined */
-+};
-+
-+extern CPUReadMemoryFunc * const musb_read[];
-+extern CPUWriteMemoryFunc * const musb_write[];
-+
-+typedef struct MUSBState MUSBState;
-+
-+MUSBState *musb_init(DeviceState *parent_device, int gpio_base);
-+void musb_reset(MUSBState *s);
-+uint32_t musb_core_intr_get(MUSBState *s);
-+void musb_core_intr_clear(MUSBState *s, uint32_t mask);
-+void musb_set_size(MUSBState *s, int epnum, int size, int is_tx);
-+
-+#endif
+ typedef struct MUSBState MUSBState;
+ 
 diff --git a/hw/usb/hcd-musb.c b/hw/usb/hcd-musb.c
-index c29fbef6fc..5ab13feb3a 100644
+index 5ab13feb3a..85f5ff5bd4 100644
 --- a/hw/usb/hcd-musb.c
 +++ b/hw/usb/hcd-musb.c
-@@ -23,6 +23,7 @@
- #include "qemu/osdep.h"
- #include "qemu/timer.h"
- #include "hw/usb.h"
-+#include "hw/usb/hcd-musb.h"
- #include "hw/irq.h"
- #include "hw/hw.h"
+@@ -1540,13 +1540,13 @@ static void musb_writew(void *opaque, hwaddr addr, uint32_t value)
+     };
+ }
  
-diff --git a/hw/usb/tusb6010.c b/hw/usb/tusb6010.c
-index 17580876c6..27eb28d3e4 100644
---- a/hw/usb/tusb6010.c
-+++ b/hw/usb/tusb6010.c
-@@ -23,6 +23,7 @@
- #include "qemu/module.h"
- #include "qemu/timer.h"
- #include "hw/usb.h"
-+#include "hw/usb/hcd-musb.h"
- #include "hw/arm/omap.h"
- #include "hw/hw.h"
- #include "hw/irq.h"
+-CPUReadMemoryFunc * const musb_read[] = {
++MUSBReadFunc * const musb_read[] = {
+     musb_readb,
+     musb_readh,
+     musb_readw,
+ };
+ 
+-CPUWriteMemoryFunc * const musb_write[] = {
++MUSBWriteFunc * const musb_write[] = {
+     musb_writeb,
+     musb_writeh,
+     musb_writew,
 -- 
 2.21.3
 
