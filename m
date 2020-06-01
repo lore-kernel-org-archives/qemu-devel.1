@@ -2,71 +2,74 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BF9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 15:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E14CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 15:13:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68EF4206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 15:05:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EF4206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF1CA20738
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 15:13:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="cgv60H+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1CA20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfm0S-0004au-Kn
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 11:05:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
+	id 1jfm7l-0000rG-1B
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 11:13:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jflzc-0003vT-Bo; Mon, 01 Jun 2020 11:04:48 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2101 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jfm6Z-0007xI-QX
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 11:11:59 -0400
+Received: from nylar.uni-paderborn.de ([2001:638:502:c003::18]:42152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jflzb-0003GK-3J; Mon, 01 Jun 2020 11:04:47 -0400
-Received: from lhreml707-chm.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 41EB44215281041623E2;
- Mon,  1 Jun 2020 16:04:34 +0100 (IST)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml707-chm.china.huawei.com (10.201.108.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Mon, 1 Jun 2020 16:04:33 +0100
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
- Mon, 1 Jun 2020 16:04:33 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org"
- <qemu-arm@nongnu.org>
-Subject: [Question] Regarding PMU initialization within the QEMU for ARM VCPUs
-Thread-Topic: [Question] Regarding PMU initialization within the QEMU for ARM
- VCPUs
-Thread-Index: AdY3+/mIYt1+TQdDQmymnxAa7PkUWw==
-Date: Mon, 1 Jun 2020 15:04:33 +0000
-Message-ID: <b2e401cd17fe49d792d09b31bd726e35@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.30.0]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jfm6Z-0004eT-0m
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 11:11:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:MIME-Version
+ :References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+ Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=tMc0vnjbQXPQUNrgS179VaVHVjpu/SGBHlmCv2j3lZg=; b=cgv60H+sw/mqfEuOJFlhQoMHXR
+ LsIwwHFwBZLhJ00pVCcFqLJ+znWrR0etSXo9Ka6uppoY2QKHAdo7LcBnmwWTERBpwt++jFpAKNbRH
+ 3djvk4NbLntXWycug6cCmTXT0ktcLytS8bDjpnMbVRRnlItmPDJZxdU+NREoaUc8w/xY=;
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/5] target/tricore: Implement tricore_cpu_get_phys_page_debug
+Date: Mon,  1 Jun 2020 17:11:18 +0200
+Message-Id: <20200601151119.33196-5-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200601151119.33196-1-kbastian@mail.uni-paderborn.de>
+References: <20200601151119.33196-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=185.176.76.210;
- envelope-from=salil.mehta@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 11:04:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-IMT-Spam-Score: 0.0 ()
+X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=6661700, da=78633381,
+ mc=167, sc=3, hc=164, sp=1, fso=6661700, re=0, sd=0, hd=0
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2020.6.1.150616, AntiVirus-Engine: 5.74.0,
+ AntiVirus-Data: 2020.6.1.5740001
+X-IMT-Authenticated-Sender: uid=kbastian,ou=People,o=upb,c=de
+Received-SPF: pass client-ip=2001:638:502:c003::18;
+ envelope-from=kbastian@mail.uni-paderborn.de; helo=nylar.uni-paderborn.de
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,79 +82,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, "mst@redhat.com" <mst@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
-I could see below within function fdt_add_pmu_nodes() part of
-hw/arm/virt.c during virt machine initialization time:
+this also removes tricore_cpu_get_phys_page_attrs_debug() as it was a
+temporary fix from b190f477e29c7cd03a8fee49c96d27f160e3f5b0.
 
-Observation:
-In below function, support of PMU feature is being checked for
-each vcpu and if the PMU is found part of the features then PMU
-is initialized with in the host/KVM. But if there is even one
-vcpu which is found to not support the PMU then loop is exited
-and PMU is not initialized for the rest of the vcpus as well.
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-Id: <20200529072148.284037-5-kbastian@mail.uni-paderborn.de>
+---
+ target/tricore/cpu.c    | 10 +---------
+ target/tricore/helper.c | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 9 deletions(-)
 
-static void fdt_add_pmu_nodes(const VirtMachineState *vms)
-{
-    CPUState *cpu;
-    ARMCPU *armcpu;
-    uint32_t irqflags =3D GIC_FDT_IRQ_FLAGS_LEVEL_HI;
-
-    CPU_FOREACH(cpu) {
-        armcpu =3D ARM_CPU(cpu);
-        if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-            return; ------> Here, loop exits & function returns
-        }
-        if (kvm_enabled()) {
-            if (kvm_irqchip_in_kernel()) {
-                kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ));
-            }
-            kvm_arm_pmu_init(cpu);
-        }
-    }
-
-    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_2) {
-        irqflags =3D deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
-                             GIC_FDT_IRQ_PPI_CPU_WIDTH,
-                             (1 << vms->smp_cpus) - 1);
-    }
-
-    armcpu =3D ARM_CPU(qemu_get_cpu(0));
-    qemu_fdt_add_subnode(vms->fdt, "/pmu");
-    if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
-        const char compat[] =3D "arm,armv8-pmuv3";
-        qemu_fdt_setprop(vms->fdt, "/pmu", "compatible",
-                         compat, sizeof(compat));
-        qemu_fdt_setprop_cells(vms->fdt, "/pmu", "interrupts",
-                               GIC_FDT_IRQ_TYPE_PPI, VIRTUAL_PMU_IRQ, irqfl=
-ags);
-    }
-}
-
-Questions:
-Q1. Not sure what is the logic of the premature exit and not
-    continuing with further checks and initialization of other
-    VCPU PMUs?
-Q2. Does it even makes sense to have PMUs initialized for some
-    vcpus and not for others unless we have heterogeneous system?=20
-Q3. Also, there is a per virt machine knob of vcc->no_pmu.
-    This is something which user could specify at the init time
-    and perhaps only once but we don't use it for ARM. Perhaps
-    should have been used even before entering this function
-    to enable or disable the support as per user config?
-Q4. This function  fdt_* looks to be wrongly named. The info
-    being initialized here shall be used even when ACPI is
-    being used. Initialization part and FDT info looked
-    mixed up here if I am right?
-
-
-Best regards
-Salil
-
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 743b404a95..c8c1e9e7d5 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -23,14 +23,6 @@
+ #include "exec/exec-all.h"
+ #include "qemu/error-report.h"
+ 
+-static hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
+-                                         MemTxAttrs *attrs)
+-{
+-    error_report("function cpu_get_phys_page_attrs_debug not "
+-                    "implemented, aborting");
+-    return -1;
+-}
+-
+ static inline void set_feature(CPUTriCoreState *env, int feature)
+ {
+     env->features |= 1ULL << feature;
+@@ -161,7 +153,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+     cc->dump_state = tricore_cpu_dump_state;
+     cc->set_pc = tricore_cpu_set_pc;
+     cc->synchronize_from_tb = tricore_cpu_synchronize_from_tb;
+-    cc->get_phys_page_attrs_debug = tricore_cpu_get_phys_page_attrs_debug;
++    cc->get_phys_page_debug = tricore_cpu_get_phys_page_debug;
+     cc->tcg_initialize = tricore_tcg_init;
+     cc->tlb_fill = tricore_cpu_tlb_fill;
+ }
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index d5db7b2c03..7715293263 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -42,6 +42,19 @@ static int get_physical_address(CPUTriCoreState *env, hwaddr *physical,
+ 
+     return ret;
+ }
++
++hwaddr tricore_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    TriCoreCPU *cpu = TRICORE_CPU(cs);
++    hwaddr phys_addr;
++    int prot;
++    int mmu_idx = cpu_mmu_index(&cpu->env, false);
++
++    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
++        return -1;
++    }
++    return phys_addr;
++}
+ #endif
+ 
+ /* TODO: Add exeption support*/
+-- 
+2.26.2
 
 
