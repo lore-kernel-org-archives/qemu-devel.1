@@ -2,89 +2,88 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E2BC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16145C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:30:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E60302077D
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:23:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0C1B20679
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 12:30:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCGjytDF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E60302077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nm6s4OMd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C1B20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfjTL-0006Sb-7s
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:23:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51728)
+	id 1jfjaA-00013W-0y
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 08:30:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jfjOc-0007vB-9q
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:18:26 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:41380)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jfjOZ-0007m0-L2
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:18:25 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id j10so11252062wrw.8
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 05:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=sHSdc0omkhqpxjCauytiNdW8vYCwQDAfVEOw9sLViU4=;
- b=VCGjytDFUd6wPDJwvbAH36a10LWO7guhj1HKmoTs8f5NbTYM8TTc7ZZVLnCFwDHga3
- /kWon1hYWhMriLnnLvQYFcKPDlN1ug/W7NB7Ut4GEpXAPDL2m/xcO3bnQb3mzHQDKchg
- dmW6i3fiB0UTxnHWHBPcgw4EcTjwY02HUTPoDpuvvfegGCfVS7yf9ogSWcxZE7Nu8tFq
- r5DhFZm3MT7RSCR2JzusMAKj9qzBo733mNIZMqvwrGWAeqUB9FrTQt/kvEcxrTYvfvhI
- zvvGW86qp5sg/KiPFOKNBG8Y27myQHbfE6rTWa2ObDNtdBIP9UrGyjkU5bm34arrYPoB
- 3c9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=sHSdc0omkhqpxjCauytiNdW8vYCwQDAfVEOw9sLViU4=;
- b=Ly4+/59cMqYN6XcGvgg+Lms0jUcmAgqIML2oX3IAGb2Xg7s/+XbKHOJLt+CtRVyt6G
- Ln7BUbN4xla+fUCV3rl8i6Ixf9fQqjd/oxgqv9E2gD9chiJfsBdrudXAZsQMabxryB7v
- AlfHEAn40Xt0rXYiPvZJoeaajdrsyzk8U+bLSiafcULZhnnSoZMLiobYm0ECG3Wxtne/
- rdTmCyHjW4UqJ9fy03OavyfRm/W8P0lmkfK9LT8oTwhTfe+gwUx8RulnMhXyyjbPAR5k
- gMt6zNeSd6rJbH6v+bMynvbmJvlDlILx2E3na3jRt2ixUDeN1LPgVrbsNu6seo1bigT7
- f6MA==
-X-Gm-Message-State: AOAM530dfaspbj1pIIqRhj7Ub6AKNqNwiiHQwX8WksgvfmlttegAPOo6
- zdTBGVl2G6rA1ONK0bLe6XGrln0/UtE=
-X-Google-Smtp-Source: ABdhPJw9FSeeA705vA8g4+eCmPdd/aIDeQm/77McHNqVRm70+8Qmn9oC6KcBkJgJ75UkmFhKVsoV0A==
-X-Received: by 2002:adf:e4d1:: with SMTP id v17mr6524836wrm.224.1591013902112; 
- Mon, 01 Jun 2020 05:18:22 -0700 (PDT)
-Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id y185sm12332136wmy.11.2020.06.01.05.18.21
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jun 2020 05:18:21 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/6] hw/mips: Add CPU IRQ3 delivery for KVM
-Date: Mon,  1 Jun 2020 14:18:15 +0200
-Message-Id: <1591013898-23391-4-git-send-email-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1591013898-23391-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1591013898-23391-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jfjZJ-000079-W7
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:29:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24683
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jfjZI-0001x8-PT
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 08:29:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591014567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y2AYaxn/6IwGDHHB/RW0wmGgaHhVlO6z2tV/aerIGeQ=;
+ b=Nm6s4OMdNE6ASn+uO0sGx8O9ujWxE86KnqFyfAwHo9tcHsTAHQ1uGehSPEPLy4T6AS0I3l
+ EzrqcxGY+NRe6xJHiEjIlUAp0NkHkjsDxoPsJClyGeexqf0rkj52Z/+D4z0uPpRtV9LJiQ
+ /SySjdSXgu6WhUtnzxmefSe3oN/S+qg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-P6yltwKhOSK0U390joYZDg-1; Mon, 01 Jun 2020 08:29:25 -0400
+X-MC-Unique: P6yltwKhOSK0U390joYZDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 835F5A0BD7;
+ Mon,  1 Jun 2020 12:29:24 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5C005C1D4;
+ Mon,  1 Jun 2020 12:29:22 +0000 (UTC)
+Date: Mon, 1 Jun 2020 14:29:17 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Subject: Re: About the kvm-no-adjvtime CPU property
+Message-ID: <20200601122917.fyp2kwqzsodahnzu@kamzik.brq.redhat.com>
+References: <b4389848-10fd-a906-9901-d1d354ce4842@huawei.com>
+ <20200601080718.jul5r4qebpeieyfl@kamzik.brq.redhat.com>
+ <3d8729db-067c-31f9-dd69-02a218f1b53e@huawei.com>
+MIME-Version: 1.0
+In-Reply-To: <3d8729db-067c-31f9-dd69-02a218f1b53e@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=drjones@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 02:19:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,40 +96,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, aleksandar.qemu.devel@gmail.com
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wu.wubin@huawei.com,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Huacai Chen <zltjiangshi@gmail.com>
+On Mon, Jun 01, 2020 at 08:07:31PM +0800, Ying Fang wrote:
+> 
+> 
+> On 2020/6/1 16:07, Andrew Jones wrote:
+> > On Sat, May 30, 2020 at 04:56:26PM +0800, Ying Fang wrote:
+> > > About the kvm-no-adjvtime CPU property
+> > > 
+> > > Hi Andrew,
+> > > To adjust virutal time, a new kvm cpu property kvm-no-adjvtime
+> > > was introduced to 5.0 virt machine types. However the cpu
+> > > property was enabled only for host-passthrough and max cpu model.
+> > > As for other cpu model like cortex-a57, cortex-a53, cortex-a72,
+> > > this kvm-adjvtime is not enabled by default, which means the
+> > > virutal time can not be adjust for them.
+> > > 
+> > > Here, for example, if VM is configured with kvm enabled:
+> > > 
+> > >    <cpu mode='custom' match='exact' check='partial'>
+> > >      <model fallback='allow'>cortex-a72</model>
+> > >      <topology sockets='2' dies='1' cores='2' threads='1'/>
+> > >      <numa>
+> > >        <cell id='0' cpus='0-1' memory='16777216' unit='KiB'/>
+> > >        <cell id='1' cpus='2-3' memory='16777216' unit='KiB'/>
+> > >      </numa>
+> > >    </cpu>
+> > > 
+> > > We cannot adjust virtual time even if 5.0 virt machine is used.
+> > > So i'd like to add it to other cpu model, do you have any
+> > > suggestions here ?
+> > > 
+> > > 
+> > 
+> > Hi Fang,
+> > 
+> > The cpu feature only requires kvm.  If a cpu model may be used with kvm,
+> > then the feature can be allowed to be used with the model.  What I find
+> > interesting is that the cpu model is being used with kvm instead of 'host'
+> > or 'max'.  Can you explain the reasons for that?  Currently, when using
+> yes，the cpu model is indeed used with kvm.
+> 
+> There is a situation where the host cpu model is Cortex-A72 and
+> a 'custom' cpu mode is used to keep insrtuction set compatible between
+> the source and destination host machine when doing live migration.
+> So the host physical machine cpu model is Cortex-A72 but
+> host-passthrough model is mode used here.
 
-Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch add
-IP3 delivery as well, because Loongson-3 based machine use both IRQ2
-(CPU's IP2) and IRQ3 (CPU's IP3).
+Are the source and destinations hosts used in the migration identical?
+If so, then the guest can use cpu 'host' and disable cpu features that
+should not be exposed (e.g. -cpu host,pmu=off).  If the source and
+destination hosts are not identical, then I'm curious what those exact
+differences are.  With the way AArch64 KVM works today, even using the
+Cortex-A72 cpu model should require identical hosts when migrating.  Or,
+at least both hosts must be compatible with Cortex-A72 and any difference
+in ID registers must be somehow getting hidden from the guest.
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <1588501221-1205-4-git-send-email-chenhc@lemote.com>
----
- hw/mips/mips_int.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 4a1bf84..0f9c6f0 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -51,7 +51,7 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
-         env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
-     }
- 
--    if (kvm_enabled() && irq == 2) {
-+    if (kvm_enabled() && (irq == 2 || irq == 3)) {
-         kvm_mips_set_interrupt(cpu, irq, level);
-     }
- 
--- 
-2.7.4
+Thanks,
+drew
 
 
