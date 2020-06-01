@@ -2,87 +2,88 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F764C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4410C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B0BB206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EB98206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e73CoYSZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0BB206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uXHnbtqC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB98206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfhkT-0004d0-HO
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 06:32:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37472)
+	id 1jfhlx-0006Ck-O7
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 06:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jfhhC-0001aI-4e
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:29:30 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33462)
+ id 1jfhkH-0004qg-I4
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:32:41 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38859)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jfhhB-0001Z6-9d
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:29:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l11so11012487wru.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 03:29:28 -0700 (PDT)
+ id 1jfhkG-0002BA-4G
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:32:41 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f185so10828148wmf.3
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 03:32:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=mLkfz/YrugHPHOMu6u+ikmgFpMqWiCRAofB3gGvkuNw=;
- b=e73CoYSZbhv9t7+T7ytNT9KHNgHBZRU6EW4TeUxBZTU9BRKXIBDZiMDgGJQc7Nmk/A
- 9AsMziaxTG4yGG79U4hrEi/+h63ZUY7Qi/RBpVH6LH+1hevD+ze5oIOKQri4l9X7EkWt
- Ou7IqL8iYI0Sg/+iBIo+nY9B/QSec3R9sEVz7Ypov+ILU0oePDA/mh/6K4ZGi6gPEcBd
- JyrddO6MPqYcBEpwzkdbAh5H5kq1zu0DyheYERUyylujHM6gjroBbuAo/Ei/fd6wh3t9
- 2LaLVlGx53+GajcFvKOL1O729Ueid9ohuPfix77ck3si+7I+ohfRbLy/P5X/G3Q11ExP
- Pi/A==
+ bh=XsL6FKxWCCAoiMn+xELJ5UvMBzEdFAXZf/Y+QJf8cv8=;
+ b=uXHnbtqCKuLE8LpmRriBscnkCeAPuwXrPPktxx6IS0DU8KaDimLuc1YXJqMleeFq/t
+ TS0/s+mLF7vBXgQE9oU7vDnDjBbRC0i07laNI3uQuDcHoc5IBP2dJTV/cHy2USEe4IsA
+ D48BVVmZg6U2DjhUBNAarn5Yy74WjgkLAJd9FS11mU1qJIpAvFodMNbUic/uTR0janGQ
+ O2mPNRSqs8Drcurc8vMjhV611YeHX/qfEkakX3sa/VD1fjFTeAKrWg489dGcBKVWUUAY
+ DTNLTwvRFiIbXotuUsY4w/tLE6Tme8M5fu70Ba7LuEGIHcwtQg/ZLsdHbsQ6JrPjDSqG
+ HxfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=mLkfz/YrugHPHOMu6u+ikmgFpMqWiCRAofB3gGvkuNw=;
- b=Pph/35DqClqRry7CUXA1ibSeYov2MUSajLzBL7JfR6bp5t8Lt0nScoWCko44AVP0IG
- wVKyyfcSmVjmrLtQ4Dv+NBZt993c4AsXNKmV/j0+/e4POzN9hJsMQeoU7tdATEZCDgEQ
- MdmD/kxuiJdNwP2PG2ZVt68KK0TsgnCquBkovKtUf5f/5dY9V6EO2oc3KIH0S/4emKYD
- 2jtTH1FUav1+Ej1JmLJmsuCVplDfw+TPzBT4UN5e0nqV+V9BKNX7cXWBsZcM7bfuu6X2
- kJa7PuVs5sbYdpCXgSucHEBVDjTTXINS9ihgPsMJh3bFX4cgzdwKnufkHxFaYNSib/J4
- c45g==
-X-Gm-Message-State: AOAM530wWmMUTF5JOwZZIr3bXw5vWM3UbSvOdnoLKL61YNquuBG0P7yX
- 49hx8fOEAckZp3evxirBxQISbLqNS3k=
-X-Google-Smtp-Source: ABdhPJwy8s1bH2ZE//NGP2m4WwTzFcWIDGRoUOSbPNF0JwfmpxW3dgteR9f16O4XqwuVe7dhQUteKQ==
-X-Received: by 2002:adf:ab44:: with SMTP id r4mr20759104wrc.261.1591007367779; 
- Mon, 01 Jun 2020 03:29:27 -0700 (PDT)
+ bh=XsL6FKxWCCAoiMn+xELJ5UvMBzEdFAXZf/Y+QJf8cv8=;
+ b=GBuNuF15NVM6++CdxoOW08crRgj35Z6n94FANxmOeEo0G9Gl8PVstX1YEyM3jijqho
+ qswKdritJkbBoRCcZvSR/PpBR3BZPFn1fZDF92XbHGa7Eu5WUmsrjsMReQXPTAbybu0Y
+ LUxkAamF7NY08/qD8Ukw/pBYFW95uP5VxgYUpMoQ6YOpvKr0/Xk30eVFmhj5eM4avQNN
+ rERHkSyux5kiKK0RQtT4OxX5zPCHf8XhrtsSOGjVCF9u3XFC2r4yyk3fBodu38x4MoFa
+ kbHut32wlsdcCcgTt8II/OmsP6jh1ugI4UjrtNhDpLjQUoazpqqm4lBCGqxc7larRMYc
+ EnkQ==
+X-Gm-Message-State: AOAM530CbFiMDCPmyEJoXQ4R/r2B+rC9cVbBZ1K6QNxjwiykcuPn/j3q
+ cWEpa/b9xzZKRSVkAlu/DZEjgw==
+X-Google-Smtp-Source: ABdhPJx2cGIjytgTbyr5Z34t1M/pVVz61y9xEK5m7hUOJXPCY56VuOd6azbZWYuSH+tCaXb47Mf3Ow==
+X-Received: by 2002:a05:600c:1084:: with SMTP id
+ e4mr21842151wmd.144.1591007557848; 
+ Mon, 01 Jun 2020 03:32:37 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u3sm12998252wmg.38.2020.06.01.03.29.26
+ by smtp.gmail.com with ESMTPSA id k21sm16122360wrd.24.2020.06.01.03.32.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Jun 2020 03:29:26 -0700 (PDT)
+ Mon, 01 Jun 2020 03:32:36 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0F58E1FF7E;
- Mon,  1 Jun 2020 11:29:26 +0100 (BST)
-References: <1589806958-23511-1-git-send-email-frederic.konrad@adacore.com>
- <5ab6f370-6725-1cdb-1b82-24a58cb7642e@redhat.com>
- <dfd77414-83e8-755f-1386-13188b968aef@adacore.com>
+ by zen.linaroharston (Postfix) with ESMTP id B7BC91FF7E;
+ Mon,  1 Jun 2020 11:32:35 +0100 (BST)
+References: <20200530092306.26628-1-f4bug@amsat.org>
+ <87eer0v25c.fsf@linaro.org>
+ <8279188f-f6a7-4d0e-50d9-de1c66619e50@amsat.org>
 User-agent: mu4e 1.5.1; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Fred Konrad <konrad@adacore.com>
-Subject: Re: [PATCH] semihosting: remove the pthread include which seems unused
-In-reply-to: <dfd77414-83e8-755f-1386-13188b968aef@adacore.com>
-Date: Mon, 01 Jun 2020 11:29:26 +0100
-Message-ID: <87wo4r6pvd.fsf@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 0/5] hw/sh4: current patch queue
+In-reply-to: <8279188f-f6a7-4d0e-50d9-de1c66619e50@amsat.org>
+Date: Mon, 01 Jun 2020 11:32:35 +0100
+Message-ID: <87tuzv6pq4.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,51 +105,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, frederic.konrad@adacore.com,
+Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
+ Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Fred Konrad <konrad@adacore.com> writes:
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> Le 5/18/20 =C3=A0 3:50 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit :
->> On 5/18/20 3:02 PM, konrad@adacore.com wrote:
->>> From: KONRAD Frederic <frederic.konrad@adacore.com>
->>>
->>> This have been introduced by:
->>>    8de702cb677c8381fb702cae252d6b69aa4c653b
->>>
->>> It doesn't seem to be used so remove it.
->>>
->>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->>> ---
->>>   hw/semihosting/console.c | 1 -
->>>   1 file changed, 1 deletion(-)
->>>
->>> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
->>> index 6346bd7..22e7827 100644
->>> --- a/hw/semihosting/console.c
->>> +++ b/hw/semihosting/console.c
->>> @@ -23,7 +23,6 @@
->>>   #include "exec/exec-all.h"
->>>   #include "qemu/log.h"
->>>   #include "chardev/char.h"
->>> -#include <pthread.h>
->>>   #include "chardev/char-fe.h"
->>>   #include "sysemu/sysemu.h"
->>>   #include "qemu/main-loop.h"
->>>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> On 5/31/20 12:18 PM, Alex Benn=C3=A9e wrote:
 >>=20
+>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>=20
+>>> Hi,
+>>>
+>>> As there is no SH4 active maintainer, I gathered various
+>>> patches in a single series, in case someone is willing to
+>>> apply them.
+>>=20
+>> I'm sure you you could put yourself down as an "Odd Fixes" maintainer
+>> and put together a PR if you want?
 >
-> Thanks for the review, Philippe.  Can this go through qemu-trivial?
+>   Odd Fixes: It has a maintainer but they don't have time to do
+>              much other than throw the odd patch in.
+>
+> OK 'Odd Fixes' matches what I can offer as a hobbyist.
+> I'm happy to help avoiding this code to bitrot, as long as I don't get
+> the same pressure imposed on other targets.
 
-Sure:
+Yeah Odd Fixes doesn't imply anything other than at least some might
+look at it. It's easier that convincing someone else who cares even less
+to put it in a PR for you ;-)
 
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> After all this Renesas hardware has a lot in common with the RX I've
+> been looking at recently.
+>
+>>=20
+>>>
+>>> CI report:
+>>> https://travis-ci.org/github/philmd/qemu/builds/692828388
+>>>
+>>> Regards,
+>>>
+>>> Phil.
+>>>
+>>> Philippe Mathieu-Daud=C3=A9 (3):
+>>>   hw/sh4: Use MemoryRegion typedef
+>>>   hw/sh4: Extract timer definitions to 'hw/timer/tmu012.h'
+>>>   hw/timer/sh_timer: Remove unused 'qemu/timer.h' include
+>>>
+>>> Thomas Huth (2):
+>>>   tests/acceptance: Add boot tests for sh4 QEMU advent calendar image
+>>>   .travis.yml: Test SH4 QEMU advent calendar image
+>>>
+>>>  include/hw/sh4/sh.h                    | 12 +-----------
+>>>  include/hw/timer/tmu012.h              | 23 +++++++++++++++++++++++
+>>>  hw/sh4/sh7750.c                        |  1 +
+>>>  hw/timer/sh_timer.c                    |  3 ++-
+>>>  .travis.yml                            |  2 +-
+>>>  tests/acceptance/boot_linux_console.py | 13 +++++++++++--
+>>>  6 files changed, 39 insertions(+), 15 deletions(-)
+>>>  create mode 100644 include/hw/timer/tmu012.h
+>>=20
+>>=20
+
 
 --=20
 Alex Benn=C3=A9e
