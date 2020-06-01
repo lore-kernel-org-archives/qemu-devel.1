@@ -6,82 +6,83 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17184C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8440FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8887206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CD79206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 18:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0+Ucr8T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8887206A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSblAU30"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CD79206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfpNh-0000fP-26
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 14:41:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42136)
+	id 1jfpNk-0000mj-EB
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 14:41:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jfpMO-0007KY-Bl
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36646
- helo=us-smtp-1.mimecast.com)
+ id 1jfpMR-0007RC-1W
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49744
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jfpMN-0000Ru-JZ
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:32 -0400
+ id 1jfpMQ-0000S1-82
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 14:40:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591036831;
+ s=mimecast20190719; t=1591036833;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lZ7A3P+PwIYLctkAyC7UJgyIv7xUHiwVdokylR25WsU=;
- b=P0+Ucr8TsCoYSQDP+N7fGm6HOcBtS8oBb9/3S6PimOYKkgp4yBWM1oEv+8hn4qquaw5Tgo
- ZnijqCkGJ2MFtjBOvRgzoj8MV5G0JeDxBnp7Ui/2kja1L7VBxA45hXHgcgfkvDRY4vwEZ6
- sJwAsEZVSNjLdVbcyL4kctYQoz/YQqU=
+ bh=YLL/4+sLim9ZzGWfU83WOKeAhXZLGqTMZXg+rFGvS4g=;
+ b=XSblAU30AjPkAdMCXfnXgAz0MiFBgo3pk4Dh0/ZxWRY32Dpurh59LfQedYV/srakQCF7it
+ GeMh3K6ooz3CRn9NwmNERw+MjnkGe19TyaV3h3HyQg7lvVgcB8kbjWHGjbfHx6+DB4rgEi
+ fhH4Eq+gXbdXVJ0t5aGAnzSKk2/z72c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-DsewDDCIP8CR9g65TeXVyQ-1; Mon, 01 Jun 2020 14:40:28 -0400
-X-MC-Unique: DsewDDCIP8CR9g65TeXVyQ-1
+ us-mta-449-uIB3KYUvMMCPBa8frUbOwA-1; Mon, 01 Jun 2020 14:40:25 -0400
+X-MC-Unique: uIB3KYUvMMCPBa8frUbOwA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 726DE107B7D1;
- Mon,  1 Jun 2020 18:40:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE720835B46;
+ Mon,  1 Jun 2020 18:40:23 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-113-144.ams2.redhat.com
  [10.36.113.144])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE3DC1001281;
- Mon,  1 Jun 2020 18:40:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 54C5D1001281;
+ Mon,  1 Jun 2020 18:40:22 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/12] migration/colo.c: Use cpu_synchronize_all_states()
-Date: Mon,  1 Jun 2020 19:40:00 +0100
-Message-Id: <20200601184004.272784-9-dgilbert@redhat.com>
+Subject: [PULL 06/12] migration/vmstate: Remove unnecessary MemoryRegion
+ forward declaration
+Date: Mon,  1 Jun 2020 19:39:58 +0100
+Message-Id: <20200601184004.272784-7-dgilbert@redhat.com>
 In-Reply-To: <20200601184004.272784-1-dgilbert@redhat.com>
 References: <20200601184004.272784-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 11:55:48
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 14:40:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,40 +101,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lukas Straub <lukasstraub2@web.de>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-cpu_synchronize_all_pre_loadvm() marks all vcpus as dirty, so the
-registers are loaded from CPUState before we continue running
-the vm. However if we failover during checkpoint, CPUState is not
-initialized and the registers are loaded with garbage. This causes
-guest hangs and crashes.
+"migration/vmstate.h" only uses pointer to MemoryRegion, which
+is already forward declared in "qemu/typedefs.h".
 
-Fix this by using cpu_synchronize_all_states(), which initializes
-CPUState from the current cpu registers additionally to marking
-the vcpus as dirty.
-
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Message-Id: <9675031ce557b73ebd10e7bd20ebbf57f30b177c.1589193382.git.lukasstraub2@web.de>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200530165512.15225-1-f4bug@amsat.org>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/colo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/migration/vmstate.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index fe0d6e93e5..d00b3b9d6b 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -705,7 +705,7 @@ static void colo_incoming_process_checkpoint(MigrationIncomingState *mis,
-     }
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 30667631bc..eafa39f560 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -1199,7 +1199,6 @@ static inline int vmstate_register(VMStateIf *obj, int instance_id,
+ void vmstate_unregister(VMStateIf *obj, const VMStateDescription *vmsd,
+                         void *opaque);
  
-     qemu_mutex_lock_iothread();
--    cpu_synchronize_all_pre_loadvm();
-+    cpu_synchronize_all_states();
-     ret = qemu_loadvm_state_main(mis->from_src_file, mis);
-     qemu_mutex_unlock_iothread();
- 
+-struct MemoryRegion;
+ void vmstate_register_ram(struct MemoryRegion *memory, DeviceState *dev);
+ void vmstate_unregister_ram(struct MemoryRegion *memory, DeviceState *dev);
+ void vmstate_register_ram_global(struct MemoryRegion *memory);
 -- 
 2.26.2
 
