@@ -2,87 +2,89 @@ Return-Path: <SRS0=dyow=7O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D30FAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D94C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9845C20659
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:01:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F294206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jun 2020 10:16:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iTRjg5Ha"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9845C20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jwoQq5Yy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F294206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfhGF-0000pp-Pf
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 06:01:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34150)
+	id 1jfhUj-0005zm-PU
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 06:16:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jfhCn-0004SC-KR
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:58:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26504
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jfhCm-0002M0-OK
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 05:58:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591005484;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Cif6shDiFIIebK2O/FLIPfwOJKvLDdwl+bcOYC5ZpUs=;
- b=iTRjg5Ha80W92qoNq9X23X7PdNu/pRwW2XPdc8M2P8BKNTNJY4wBiNNKhyHyZXtoxLYiRN
- qgAqtlmzehqFJQGLegEh/x+kIA3RZDcaO/1lJQ0Udz18yjiC55kw+3QQTbWVxGlml1ufgg
- ekWHMJCSrcqFR+m2dBiYm16Xw2kRJoA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-_Hz7qmH4OhCfyLQBX11aAg-1; Mon, 01 Jun 2020 05:58:02 -0400
-X-MC-Unique: _Hz7qmH4OhCfyLQBX11aAg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FE8C107ACCD;
- Mon,  1 Jun 2020 09:58:01 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-56.ams2.redhat.com [10.36.113.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B45585C1B2;
- Mon,  1 Jun 2020 09:57:58 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Subject: [PATCH v3 3/4] arm/acpi: TPM2 ACPI table support
-Date: Mon,  1 Jun 2020 11:57:36 +0200
-Message-Id: <20200601095737.32671-4-eric.auger@redhat.com>
-In-Reply-To: <20200601095737.32671-1-eric.auger@redhat.com>
-References: <20200601095737.32671-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfhU5-0005ZF-Be
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:15:57 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:36263)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jfhU3-0007le-5q
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 06:15:57 -0400
+Received: by mail-ej1-x644.google.com with SMTP id z5so8714211ejb.3
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 03:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UOnkjTRjCT/pIju6vypRqyHeNEoIr7vkJue17/ffWvU=;
+ b=jwoQq5Yy4w040P53669ZNL5bIWwZ910Bmz76Wi3Ubtx8xT4EfWEtZkVXklwu305Kag
+ ovG9zwPmP/zafsg+xPaJfNFkeK4hQuHwhWYz7nfgmVQ+ndjrwEBlHrDec+AnAw0gGAd8
+ knDifeLuWrIb6HdIQ7wb0cFHW2vlbhDDBYKA/e2bz6SYfCt7rsjylabiFU4graKk05SJ
+ hz30+Ulx4pMfDO+Ew/JK8nbrhbDYtHgEIqgiSF0ESQxdS4i3EyEV2o2VYaKEkkN1svl3
+ DMzJIu53uz5oZXkwyDJqTK58DHRFXrAH08+jkBb7mSmpnrtdxqGmLeuS5bq1+eEebxPz
+ viAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UOnkjTRjCT/pIju6vypRqyHeNEoIr7vkJue17/ffWvU=;
+ b=PYAAw/xqp3GSRe0mOYyknqLybFmwq7R1WJWD1/MPJLt+/mZP34sOBB567p3CPc/jYJ
+ MukkdjgLPtHPjEYiIWfjz9RA48xKmUhAkdTrTWbR4jxjlEMoySHZiRuiE9ocfU+1zNV6
+ Ic16MD6j5uRMpyhQtNG7fonuqu5RBTDO5K3t28mQLlefZDQYaxOSJ7SRvQ0jK/axqXlm
+ LBKmQRciXO4UTfvdG+nEOJ6PbsXbAutpNZ9K4AMqk2PON57BXmZcUYEsMSENp2Id7AAs
+ aeShZLtPKoqj41Y7oSejpe6bo8T6G2BhE58wZkkb0rRnssppWTHMrLDmSyAMBQoq8To4
+ WXfA==
+X-Gm-Message-State: AOAM531nk3lfpPWkkZP8bLoznwjdKn3a3MDK0ZwbnhzkMhk57romvM76
+ rrU9OgZg64tu0ZP6j72WkWD/6f6rEdHqpHNAq5w=
+X-Google-Smtp-Source: ABdhPJz4aCIC21GBSilBq3JzNuuOxuNkKyLsSCR/dJKbg2SjJntcwAMTfou8P8acvq/+e2iLkqYDOil13d80wohENR0=
+X-Received: by 2002:a17:906:46d3:: with SMTP id
+ k19mr19452766ejs.349.1591006553534; 
+ Mon, 01 Jun 2020 03:15:53 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 05:35:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
+ <1588501221-1205-3-git-send-email-chenhc@lemote.com>
+ <CAL1e-=hVq4eSoh8pr5sOykJe9kP0-xjEybwFWPb7m5nWh34RVw@mail.gmail.com>
+In-Reply-To: <CAL1e-=hVq4eSoh8pr5sOykJe9kP0-xjEybwFWPb7m5nWh34RVw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jun 2020 12:15:42 +0200
+Message-ID: <CAL1e-=jG0nAce7Un6WYAwA50v+qaOcWvfMEsWWeKY1VE4jUgfw@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V3 2/7] hw/mips: Implement the kvm_type() hook in
+ MachineClass
+To: Huacai Chen <zltjiangshi@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,101 +97,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, drjones@redhat.com, lersek@redhat.com,
- ardb@kernel.org, philmd@redhat.com
+Cc: Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a TPM2 ACPI table if a TPM2.0 sysbus device has been
-dynamically instantiated.
+On Mon, Jun 1, 2020 at 11:01 AM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+> On Sun, May 3, 2020 at 12:24 PM Huacai Chen <zltjiangshi@gmail.com> wrote:
+> >
+> > MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
+> > can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
+> > MachineClass. Besides, libvirt uses a null-machine to detect the kvm
+> > capability, so by default it will return "KVM not supported" on a VZ
+> > platform. Thus, null-machine also need the kvm_type() hook.
+> >
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > ---
+>
+> Applied to MIPS queue.
+>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Huacai,
 
----
+There were some problems during integration of this patch that I do
+before any pull request. I will for now omit it from the pull request I
+plan to send today. I leave to you to integrate the patch in some future
+series of yours, the one that will complete KVM support for Loongson 3.
 
-v2 -> v3:
-- do not to need to create the log area anymore
+In other words, this patch is "unapplied" to MIPS queue.
 
-v1 -> v2:
-- reuse generic build_tpm2() and alloc log area externally
-- call tpm_find() once in build_tpm2()
----
- include/sysemu/tpm.h     | 2 ++
- hw/acpi/aml-build.c      | 5 +++--
- hw/arm/virt-acpi-build.c | 7 +++++++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+Best Regards,
+Aleksandar
 
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index f37851b1aa..03fb25941c 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -50,6 +50,8 @@ typedef struct TPMIfClass {
- 
- #define TPM_IS_TIS_ISA(chr)                         \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
-+#define TPM_IS_TIS_SYSBUS(chr)                      \
-+    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_SYSBUS)
- #define TPM_IS_CRB(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
- #define TPM_IS_SPAPR(chr)                           \
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index b37052c1b4..d24e9e6c3a 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1885,17 +1885,18 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-     unsigned log_addr_offset =
-         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-     uint8_t start_method_params[12] = {};
-+    TPMIf *tpmif = tpm_find();
- 
-     /* platform class */
-     build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-     /* reserved */
-     build_append_int_noprefix(table_data, 0, 2);
--    if (TPM_IS_TIS_ISA(tpm_find())) {
-+    if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
-         /* address of control area */
-         build_append_int_noprefix(table_data, 0, 8);
-         /* start method */
-         build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
--    } else if (TPM_IS_CRB(tpm_find())) {
-+    } else if (TPM_IS_CRB(tpmif)) {
-         build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-         build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
-     } else {
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 1b0a584c7b..6d152ab481 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -41,12 +41,14 @@
- #include "hw/acpi/pci.h"
- #include "hw/acpi/memory_hotplug.h"
- #include "hw/acpi/generic_event_device.h"
-+#include "hw/acpi/tpm.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
- #include "hw/mem/nvdimm.h"
- #include "sysemu/numa.h"
- #include "sysemu/reset.h"
-+#include "sysemu/tpm.h"
- #include "kvm_arm.h"
- #include "migration/vmstate.h"
- #include "hw/acpi/ghes.h"
-@@ -844,6 +846,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-         build_iort(tables_blob, tables->linker, vms);
-     }
- 
-+    if (tpm_get_version(tpm_find()) == TPM_VERSION_2_0) {
-+        acpi_add_table(table_offsets, tables_blob);
-+        build_tpm2(tables_blob, tables->linker, tables->tcpalog);
-+    }
-+
-     /* XSDT is pointed to by RSDP */
-     xsdt = tables_blob->len;
-     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
--- 
-2.20.1
-
+> Best Regards,
+> Aleksandar
+>
+> >  hw/core/Makefile.objs  |  2 +-
+> >  hw/core/null-machine.c |  4 ++++
+> >  hw/mips/Makefile.objs  |  2 +-
+> >  hw/mips/common.c       | 31 +++++++++++++++++++++++++++++++
+> >  include/hw/mips/mips.h |  3 +++
+> >  5 files changed, 40 insertions(+), 2 deletions(-)
+> >  create mode 100644 hw/mips/common.c
+> >
+> > diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> > index 1d540ed..b5672f4 100644
+> > --- a/hw/core/Makefile.objs
+> > +++ b/hw/core/Makefile.objs
+> > @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
+> >  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
+> >  common-obj-$(CONFIG_SOFTMMU) += sysbus.o
+> >  common-obj-$(CONFIG_SOFTMMU) += machine.o
+> > -common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+> >  common-obj-$(CONFIG_SOFTMMU) += loader.o
+> >  common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
+> >  common-obj-$(CONFIG_SOFTMMU) += numa.o
+> >  common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
+> > +obj-$(CONFIG_SOFTMMU) += null-machine.o
+> >  obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
+> >
+> >  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+> > diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> > index cb47d9d..94a36f9 100644
+> > --- a/hw/core/null-machine.c
+> > +++ b/hw/core/null-machine.c
+> > @@ -17,6 +17,7 @@
+> >  #include "sysemu/sysemu.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "hw/core/cpu.h"
+> > +#include "hw/mips/mips.h"
+> >
+> >  static void machine_none_init(MachineState *mch)
+> >  {
+> > @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)
+> >      mc->max_cpus = 1;
+> >      mc->default_ram_size = 0;
+> >      mc->default_ram_id = "ram";
+> > +#ifdef TARGET_MIPS
+> > +    mc->kvm_type = mips_kvm_type;
+> > +#endif
+> >  }
+> >
+> >  DEFINE_MACHINE("none", machine_none_machine_init)
+> > diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+> > index 525809a..2f7795b 100644
+> > --- a/hw/mips/Makefile.objs
+> > +++ b/hw/mips/Makefile.objs
+> > @@ -1,4 +1,4 @@
+> > -obj-y += addr.o mips_int.o
+> > +obj-y += addr.o common.o mips_int.o
+> >  obj-$(CONFIG_R4K) += mips_r4k.o
+> >  obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
+> >  obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
+> > diff --git a/hw/mips/common.c b/hw/mips/common.c
+> > new file mode 100644
+> > index 0000000..0e33bd0
+> > --- /dev/null
+> > +++ b/hw/mips/common.c
+> > @@ -0,0 +1,31 @@
+> > +/*
+> > + * Common MIPS routines
+> > + *
+> > + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
+> > + * This code is licensed under the GNU GPL v2.
+> > + */
+> > +
+> > +#include <linux/kvm.h>
+> > +#include "qemu/osdep.h"
+> > +#include "qemu-common.h"
+> > +#include "hw/boards.h"
+> > +#include "hw/mips/mips.h"
+> > +#include "sysemu/kvm_int.h"
+> > +
+> > +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> > +{
+> > +    int r;
+> > +    KVMState *s = KVM_STATE(machine->accelerator);
+> > +
+> > +    r = kvm_check_extension(s, KVM_CAP_MIPS_VZ);
+> > +    if (r > 0) {
+> > +        return KVM_VM_MIPS_VZ;
+> > +    }
+> > +
+> > +    r = kvm_check_extension(s, KVM_CAP_MIPS_TE);
+> > +    if (r > 0) {
+> > +        return KVM_VM_MIPS_TE;
+> > +    }
+> > +
+> > +    return -1;
+> > +}
+> > diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+> > index 0af4c3d..2ac0580 100644
+> > --- a/include/hw/mips/mips.h
+> > +++ b/include/hw/mips/mips.h
+> > @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len);
+> >
+> >  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
+> >
+> > +/* common.c */
+> > +int mips_kvm_type(MachineState *machine, const char *vm_type);
+> > +
+> >  #endif
+> > --
+> > 2.7.0
+> >
+> >
 
