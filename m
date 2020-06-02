@@ -2,75 +2,78 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE29BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:18:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C45A1206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 762C8206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:18:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iSaG6kJg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C45A1206E2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tuK7mL7C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 762C8206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgCQ6-0001M2-0f
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 15:17:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58628)
+	id 1jgCQz-0002sV-OQ
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 15:18:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgCP2-0007xM-R7
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:48 -0400
-Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:35641)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jgCON-0006sl-Q7
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:07 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:45696)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgCP1-0002kf-W3
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:48 -0400
-Received: by mail-oo1-xc42.google.com with SMTP id e12so848oou.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 12:16:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jgCOM-0002gF-Pt
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:07 -0400
+Received: by mail-lf1-x144.google.com with SMTP id d7so6836990lfi.12
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 12:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ic7fPz06RaWkgr64ftTjkfkKW1JNWUsa+NLTMAHbEVw=;
- b=iSaG6kJg1zB6sYpmQfl2djcDyKuTV2hjSzG2mQGK2BQ/ydnGysR0s/kXWH8WqNYqAM
- h9RoMtolIS7L9xGLZBdO4fbq8k9oZjAPeuZfMwbqhx6nhnylCqq86u8a8zhHwISBA/Sk
- hfd1YeglDcJOHwJpxnyDmYBm1B8+vcSP2P36CXcfuwSbiWmu9PbarwMLebgUAQTcx7gn
- CkPJXbyhq2Bn/lMmM54/U19TLvcR9Z7+wAkzLhywR4tw2yOTYsXrnQBjx/5r9vbBqy0f
- LftmfHXkQ4BXnVw6wBGjUXvxnD/DwBynkthJBLwqLd8S6tP90wunp3XMW7F+wTkb86dN
- 8evw==
+ :cc:content-transfer-encoding;
+ bh=xE0FMFRz0266AhDA3ntouWhDWg+Hf2FUnHPNPKctPbs=;
+ b=tuK7mL7C7+QMQEP7RBrNLUQQPNfNfpidj5O3YX3ufH7oARJE7uM2/DXwrv8LqKfRNH
+ JR7jrsgKxqhuHNkonYtPG8pTujG/xdODJcu+u+wxDeEUWYZZ5uZPZ92kBridE0S+W6kX
+ 5ohUt9upqZ2363ik8MfB77ywkUPHgMrfZbxLgaMGCcsD7EG0wbRIb6QUp5n75BKcb+IW
+ EqPwL/SzEDsyFZkHAL/Q4QvbgK2NxAdwRUqAW3hwVuVqftfcPGgQnPoZFqmfl0ah2qwj
+ 8sOM0g3Rmh6j3mzWFH04gbTA7RxZvWyTYEoGPAunoc3chWUr+Crt3OB0uuPHwxXIW/a8
+ 9+bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ic7fPz06RaWkgr64ftTjkfkKW1JNWUsa+NLTMAHbEVw=;
- b=sDbLXXCKWStuPT7/RhmAsvI5aQF1U1pYX8kDQkBZnm01lXpRK37CZgUBnVjTKFnpOK
- fbQv5Cz1QxaJmFOenJQCtbrCd9zm6sj9E+qqkX18y3/8yScesnv/5IW+4+oI1+sLJubT
- YHC6LR82DQ+g2zfV+1w5CTL2ECLnV8ll6XhFlVqjmiGfXOTfxq9enExdBjwP/t/DgVWk
- G3iWqRZZR79qXlNN3QaiNu/QRjTt/U9CkjZbxlUUR/r+Qg4CWiHcAcqt7avfLO1L+pCQ
- u4rcb6YUlnYHoH7g/D75AFgpFRwgtoLAJS6LqnbdY6LdyrxIui2XfO0tIwdLnflCrL3T
- 93Wg==
-X-Gm-Message-State: AOAM531C0XhDofyHO29F+OZK9dP5rA3SjtABUIa1XLFCJ47gNHpQMpli
- fUdsZrODjHi6MWl5D3pVBgVG7jbW/UAlIH+CbmU6OA==
-X-Google-Smtp-Source: ABdhPJx4P1ej7L1wdHVmiBYmKcrTBjuOF594ddNMuG9VR+8NqnPfqOi3YffEXrPOyVS/zF1P0da7MdNbeNHQ1ILOI5Q=
-X-Received: by 2002:a4a:381:: with SMTP id 123mr19822854ooi.85.1591125406730; 
- Tue, 02 Jun 2020 12:16:46 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xE0FMFRz0266AhDA3ntouWhDWg+Hf2FUnHPNPKctPbs=;
+ b=bowAz8HJgofiPLQ38SRlOE5bfrvR31oZMwMrsTi9104CI0V9GmcvqX310MPwM65Y1D
+ qKv7X64RHK9h2unPV6BcXnVBs5FgzhBlJAXbohgNCnYT5BFLSAgT5xSMRISqBAlAiMPC
+ TFXmCP0tH537e3k1fLCScELy3jz/dKKTTOZvzUeDu9qT7IsxRgzaUBGwmP+bZ7AflfTL
+ noYVP1u05sdTpYXPWLbmeS7XoITUdKbrWlqBAXAWtQsaI0Y8wSzuiefg9/C51Bg0bXVJ
+ LML2T2gek7WspnmDAkDFCpo4HleSu8iFyFzRjpzGHUxU2uV6985DnhaQ+Kt0bVGS+1ow
+ v+IA==
+X-Gm-Message-State: AOAM5334CL5SOFGRseKPkktTMlzJrPNyAnnfxEMVaH96f8EK+QEy1Zn+
+ o3q/RpOxGfDKCe1n+pbgTM+UFD/0+GUOw5iHvvEluQ==
+X-Google-Smtp-Source: ABdhPJwl4ki+E2s4qsZVUGK88vIfM67xVge83Jk3IxH3BNe9cleMr03qaIu9pZUGd1BWGxTPGGT4Y1a+eZmQBCuVZr0=
+X-Received: by 2002:ac2:5cd1:: with SMTP id f17mr421938lfq.4.1591125363907;
+ Tue, 02 Jun 2020 12:16:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200514212831.31248-1-richard.henderson@linaro.org>
-In-Reply-To: <20200514212831.31248-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Jun 2020 20:16:36 +0100
-Message-ID: <CAFEAcA8y=oF7N2NZCsw818rs__uviQgs7gdrfwC9iA7KvwFZDA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] target/arm: Convert crypto to gvec
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <20200602154624.4460-1-alex.bennee@linaro.org>
+ <20200602154624.4460-9-alex.bennee@linaro.org>
+In-Reply-To: <20200602154624.4460-9-alex.bennee@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Tue, 2 Jun 2020 15:16:02 -0400
+Message-ID: <CAEyhzFvTF7Sh1ugq_O9CwADf3LmkWjdCHqmafQC0wkDMKQH1=A@mail.gmail.com>
+Subject: Re: [PATCH v1 8/9] plugins: new hwprofile plugin
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc42.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -92,31 +95,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, "Emilio G. Cota" <cota@braap.org>,
+ kuhn.chenqun@huawei.com, Peter Puhov <peter.puhov@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 May 2020 at 22:28, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> In addition, this fixes the missing tail clearing for SVE.
->
-> The sha1, sha256, sm3 routines that are not fully generalized
-> are not used by sve -- it only supports the newer algorithms.
->
-> I'm not sure that this:
->
-> Based-on: <20200508151055.5832-1-richard.henderson@linaro.org>
-> ("tcg vector rotate operations")
->
-> will be sufficient for patchew, because it also relies on
-> today's target-arm.next merge to master.  But you get the idea.
+Hi,
 
-Now I've just applied your latest tcg pull, are all the
-prerequisites for this series in master?
+On Tue, 2 Jun 2020 at 11:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+<snip>
+> diff --git a/tests/plugin/hwprofile.c b/tests/plugin/hwprofile.c
+> new file mode 100644
+> index 00000000000..f5e0639e762
+> --- /dev/null
+> +++ b/tests/plugin/hwprofile.c
+<snip>
+> +static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t mem=
+info,
+> +                       uint64_t vaddr, void *udata)
+> +{
+> +    struct qemu_plugin_hwaddr *hwaddr =3D qemu_plugin_get_hwaddr(meminfo=
+, vaddr);
+> +
+> +    if (!hwaddr || !qemu_plugin_hwaddr_is_io(hwaddr)) {
+> +        return;
+> +    } else {
+> +        char *name =3D qemu_plugin_hwaddr_device_name(hwaddr);
+> +        DeviceCounts *counts;
+> +
+> +        g_mutex_lock(&lock);
+> +        counts =3D (DeviceCounts *) g_hash_table_lookup(devices, name);
+> +        if (!counts) {
+> +            uint64_t off =3D qemu_plugin_hwaddr_device_offset(hwaddr);
+> +            uint64_t base =3D vaddr - off;
+> +            counts =3D new_count(name, base);
+> +        } else {
+> +            g_free(name);
+> +        }
+> +
+> +        if (detail) {
+> +            uint64_t off =3D qemu_plugin_hwaddr_device_offset(hwaddr);
+> +            IOLocationCounts *io_count =3D g_hash_table_lookup(counts->a=
+ccess_pattern, &off);
+> +            if (!io_count) {
+> +                io_count =3D new_location(off);
+> +                g_hash_table_insert(counts->access_pattern, &off, io_cou=
+nt);
+> +            }
+> +            if (qemu_plugin_mem_is_store(meminfo)) {
+> +                io_count->writes++;
+> +                io_count->cpu_write |=3D (1 << cpu_index);
+> +            } else {
+> +                io_count->reads++;
+> +                io_count->cpu_read |=3D (1 << cpu_index);
+> +            }
+> +        } else {
+> +            if (qemu_plugin_mem_is_store(meminfo)) {
+> +                counts->total_writes++;
+> +                counts->cpu_write |=3D (1 << cpu_index);
+> +            } else {
+> +                counts->total_reads++;
+> +                counts->cpu_read |=3D (1 << cpu_index);
 
-thanks
--- PMM
+The bitmasks cpu_read and cpu_write are ints.  Maybe to account for
+larger core counts
+> 32, we could assert if the cpu_index is >=3D 32?
+
+> +            }
+> +        }
+> +        g_mutex_unlock(&lock);
+> +    }
+> +}
+> +
+> +static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb=
+)
+> +{
+> +    size_t n =3D qemu_plugin_tb_n_insns(tb);
+> +    size_t i;
+> +
+> +    for (i =3D 0; i < n; i++) {
+> +        struct qemu_plugin_insn *insn =3D qemu_plugin_tb_get_insn(tb, i)=
+;
+> +        qemu_plugin_register_vcpu_mem_cb(insn, vcpu_haddr,
+> +                                         QEMU_PLUGIN_CB_NO_REGS,
+> +                                         rw, NULL);
+> +    }
+> +}
+> +
+> +QEMU_PLUGIN_EXPORT
+> +int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
+> +                        int argc, char **argv)
+> +{
+> +    int i;
+> +
+> +    for (i =3D 0; i < argc; i++) {
+> +        char *opt =3D argv[i];
+> +        if (g_strcmp0(opt, "read") =3D=3D 0) {
+> +            rw =3D QEMU_PLUGIN_MEM_R;
+> +        } else if (g_strcmp0(opt, "write") =3D=3D 0) {
+> +            rw =3D QEMU_PLUGIN_MEM_W;
+> +        } else if (g_strcmp0(opt, "detail") =3D=3D 0) {
+
+When testing out the options, I noticed that
+if we supply arguments of "read", and "write", then we will only get
+the last one set, "write", since rw gets overwritten.
+One option would be to error out if more than one of these read/write
+args is supplied.
+
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Tested-by: Robert Foley <robert.foley@linaro.org>
+
+> +            detail =3D true;
+> +        } else {
+> +            fprintf(stderr, "option parsing failed: %s\n", opt);
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    plugin_init();
+> +
+> +    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
+> +    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
+> +    return 0;
+> +}
+> diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+> index b3250e2504c..d87b8d40699 100644
+> --- a/tests/plugin/Makefile
+> +++ b/tests/plugin/Makefile
+> @@ -14,6 +14,7 @@ NAMES +=3D hotblocks
+>  NAMES +=3D howvec
+>  NAMES +=3D hotpages
+>  NAMES +=3D lockstep
+> +NAMES +=3D hwprofile
+>
+>  SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
+>
+> --
+> 2.20.1
+>
 
