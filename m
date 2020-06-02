@@ -2,72 +2,95 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0938BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB3AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:29:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D40142068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:23:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40142068D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 87C6D206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:29:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jbJemOs7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87C6D206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg8li-0006yS-3Z
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:23:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50268)
+	id 1jg8ql-0000oN-Qs
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:29:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jg8jc-0004Zi-FJ
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:21:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:56699)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jg8jb-0008GP-Ax
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:21:48 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MVvCn-1jWPS62lyn-00RmiI; Tue, 02 Jun 2020 17:21:45 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] target/m68k: implement opcode fetoxm1
-Date: Tue,  2 Jun 2020 17:21:35 +0200
-Message-Id: <20200602152135.774894-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200602152135.774894-1-laurent@vivier.eu>
-References: <20200602152135.774894-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jg8ps-0000Ng-EQ
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:28:16 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jg8pr-0001qS-2z
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:28:15 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q11so3852545wrp.3
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 08:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=xOS5Vdd1CuaNmlrGTv+unkVsjpZ8zcR6/RwStctFfBQ=;
+ b=jbJemOs7qnddyfl8TFriI4v2X7t1mOcciLHNFI6TQb7p1amkuxDK9RkaAd1toXMsz+
+ 4nya9lnSxIFgg8Rv65lQQlprH92i3OLx9tGjq7A5OEd0Ok8nx3XEqtiFH1hnOoMiWTRo
+ //XNEIR1bgkkhYgDFz9560y4VD3wOCkb8UJ9fljyGabo74kjaRAC5LeTLE56TQmyaqdv
+ rN3GjE/WiZwsxa6gjuzB0dJMG+2d2LJDV2pHArR1FGSfVNriZxDObj6KUpzNFXDxgfZ7
+ 3uS+Q9o18HvOxq7QfRAwtqFrW27VLucsX1JZ6tPCrmZbTvm5AWCiVVOGynl0pTdO2BLp
+ A+AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=xOS5Vdd1CuaNmlrGTv+unkVsjpZ8zcR6/RwStctFfBQ=;
+ b=TTzgMkwOK5jDaX70To37+YHwfrMgFSqAPdh+8WdoJTNEnJOabybl/VZGHDqK0Apb5Z
+ uWlbhniwNAq2gNE4LBeorVbuszWB111hc4Dz6F4B8NeiEkDRqihFFWNhgnN45kGc5qsW
+ EZr5AdzIGH/777re5x2DlI3/1Q9b2mJ/D1iW7Y679Q+J7OxTkdpsYgGuFYqocsFbiuzZ
+ C4vlzlO+TD1d5iIe6XAyhS90pnjY8EFqeVcSyXHtH/CJx+XxPBy8ysAjAWPkcziKov3/
+ VpDxJgFb6sgna7MAgaI/VQSZFQU8Sjk13eI/9jVquqYfmoFiRPtCp23HOxcPC2sKxLfI
+ 2USg==
+X-Gm-Message-State: AOAM532JN17Pol1aTngdIHajoT3FCcgLIGNpoAadCKPyfdVwqRN5G43c
+ TmbBkVLIGSeNcjeM685/lbfBeg==
+X-Google-Smtp-Source: ABdhPJxFcItQTiGXOoRQdSO4P/AaHcs8JfKu/1uJkBkNdXIPRjavHhde4LX/sMHiXp458totbvXJcA==
+X-Received: by 2002:adf:8041:: with SMTP id 59mr25645961wrk.278.1591111692419; 
+ Tue, 02 Jun 2020 08:28:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b80sm53219wme.43.2020.06.02.08.28.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 02 Jun 2020 08:28:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 57E7D1FF7E;
+ Tue,  2 Jun 2020 16:28:10 +0100 (BST)
+References: <20200602113702.28549-1-f4bug@amsat.org>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] .travis.yml: Temporarily disable the aarch64 job
+In-reply-to: <20200602113702.28549-1-f4bug@amsat.org>
+Date: Tue, 02 Jun 2020 16:28:10 +0100
+Message-ID: <87lfl57aid.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wGgm4wo+FhCfaDRFvdtWI7upNhydgEkGR4/fcVgLHGP5xlH/CL+
- 4QEB0My3usX0blwNpL3lAJQaIlt0MOILFhPteiN6mf8rcSAfFpyMS6bfh+GQU9nVX+RZp+o
- xhW9ZqsIoD8sQAG8T97kOAHdCaRulTaXo0uYgSm302BhMRk+RLmU7tueg6YYetUVnENXyT5
- lQzpLSeSJyMgBuLAeOenw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:mJEJ9SBE/F4=:b5dsjvjH6A/WzKH3d5WCma
- eHUI1Cwdrn7oS7zJbevFbwO0ViLW5AK210yZHgtYqilM32m8toulVlMbAy/wyBRtO/1sJETGf
- pQ1VYehragzIFE2rcj2P9oRCXKmJNbeRiLnM5v6nk2sIkD9+INyJORQTdjdIHlwFbzDPPqihc
- anvm7YIcgZjwFeTxFTW7KHjlcAdAIQdzASlcWwCO6zTL2re8WcrcNLXAu/htufwqe4dTbOeeB
- XD4S3Ab5glgCE8oDKn0pcCbWxniPJfrUV+aG3ju9KKbHHN00u9FaYlFhKHhg3q0I2lhN04wby
- /lJ2n8pUdFftEJ7XknHOGHbFIdhgOL+lSN6wz2rb1Pot19z9oN422LSpemuaRuco1qLWgkd0+
- IQBwWI4Pg6yYc8lcQmNrvBHP395/zcHGYPCGyiuC7Fc0EtDNBtfpl2nE5vIbSBFvc+r++I1NS
- tHMj4Yvw7OHkS+ZlZZ7UNyUWFs3kYOuNlZ7hbYdEa/21FDtWEOiGjKOnWZ1N/Fx8MCtzspmkz
- 3ieJ7VSXaidfniqhnGplo8f+jzNOjYFv3QDKh8Pq4w7M/wpiUoTDUsY0ccuCJkeLL0ctFxbJj
- X6HTbRsMLkdxy/Ol4FFFKsTrvX1rXdXdxeipAapnfrT20ZjGKq77T0zG9hkZHf2zhVEtElTv3
- erLXpMHj15UQQMvHGu+Y6y9bTAhjsE0vZ1gV5rxepJwsuFYvnUIyo3bswnNp1UlakdxnDOV4D
- ZOiqm11jADpUo8d580oqXG7JWNBoPp5DGmL/uy/4c/9zvi9m8xGdNUhUZgsRYu91plFGIHlFg
- QqQVnqZDRIdiReI/UVJ29rZVR5s+AFq3UM8VAwqvbvWGUIh4NIn3DZs81ll+tmqwe56nIA+
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 11:21:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,83 +103,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Fam Zheng <fam@euphon.net>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Example provided in the launchpad bug fails with:
 
-   qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-   Illegal instruction (core dumped)
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-It appears fetoxm1 is not implemented:
+> Travis-CI Aarch64 runners are currently broken, the build fails
+> because the filesystem quota is full [1]:
+>
+>     AR      libqemuutil.a
+>   nm: qemu-sockets.o: Bad value
+>     LINK    qemu-ga
+>   qga/main.o: In function `main':
+>   /home/travis/build/qemu/qemu/qga/main.c:1494: undefined reference to `s=
+ocket_local_address'
+>   qga/channel-posix.o: In function `ga_channel_open':
+>   /home/travis/build/qemu/qemu/qga/channel-posix.c:210: undefined referen=
+ce to `socket_parse'
+>   /home/travis/build/qemu/qemu/qga/channel-posix.c:193: undefined referen=
+ce to `unix_listen'
+>   /home/travis/build/qemu/qemu/qga/channel-posix.c:218: undefined referen=
+ce to `socket_listen'
+>   collect2: error: ld returned 1 exit status
+>   Makefile:686: recipe for target 'qemu-ga' failed
+>   make: *** [qemu-ga] Error 1
+>
+> Per [2], LXD container have 'approx 18GB' of storage, but our runner show:
+>
+>   $ df -h
+>   Filesystem                                                             =
+                            Size  Used Avail Use% Mounted on
+>   /var/snap/lxd/common/lxd/storage-pools/instances/containers/travis-job-=
+qemu-qemu-693775643/rootfs  895G   38G  854G   5% /
+>
+> As we suppose a filesystem quota makes our build fail,
+> disable the aarch64 job as a temporary kludge.
+>
+> [1] https://travis-ci.org/github/qemu/qemu/jobs/693775643
+> [2] https://docs.travis-ci.com/user/reference/overview/#virtualisation-en=
+vironment-vs-operating-system
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  .travis.yml | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 564be50a3c..3569ee99b3 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -399,6 +399,7 @@ jobs:
+>          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+>=20=20
+>      - name: "[aarch64] GCC check-tcg"
+> +      if: false # Temporarily disabled due to problem in aarch64 runner.
+>        arch: arm64
+>        dist: xenial
+>        addons:
 
-   IN: expm1f
-   0x800005cc: fetoxm1x %fp2,%fp0
-   Disassembler disagrees with translator over instruction decoding
-   Please report this to qemu-devel@nongnu.org
+I was experimenting with something along the lines of:
 
-   (gdb) x/2hx 0x800005cc
-   0x800005cc: 0xf200 0x0808
+--8<---------------cut here---------------start------------->8---
+.travis.yml: allow failure for unreliable hosts
 
-This patch adds the instruction.
+They will still run but they won't get in the way of the result.
 
-Bug: https://bugs.launchpad.net/qemu/+bug/1881450
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200531131951.631902-1-laurent@vivier.eu>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/helper.h     | 1 +
- target/m68k/fpu_helper.c | 5 +++++
- target/m68k/translate.c  | 3 +++
- 3 files changed, 9 insertions(+)
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index feee7be62655..77808497a95c 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -83,6 +83,7 @@ DEF_HELPER_3(fatan, void, env, fp, fp)
- DEF_HELPER_3(fasin, void, env, fp, fp)
- DEF_HELPER_3(facos, void, env, fp, fp)
- DEF_HELPER_3(fatanh, void, env, fp, fp)
-+DEF_HELPER_3(fetoxm1, void, env, fp, fp)
- DEF_HELPER_3(ftanh, void, env, fp, fp)
- DEF_HELPER_3(fsinh, void, env, fp, fp)
- DEF_HELPER_3(fcosh, void, env, fp, fp)
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 36e6c704d1d0..9acf60dfd443 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -641,6 +641,11 @@ void HELPER(fatanh)(CPUM68KState *env, FPReg *res, FPReg *val)
-     res->d = floatx80_atanh(val->d, &env->fp_status);
- }
- 
-+void HELPER(fetoxm1)(CPUM68KState *env, FPReg *res, FPReg *val)
-+{
-+    res->d = floatx80_etoxm1(val->d, &env->fp_status);
-+}
-+
- void HELPER(ftanh)(CPUM68KState *env, FPReg *res, FPReg *val)
- {
-     res->d = floatx80_tanh(val->d, &env->fp_status);
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index c093f6c683e8..3fc67aa45261 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5160,6 +5160,9 @@ DISAS_INSN(fpu)
-     case 0x06: /* flognp1 */
-         gen_helper_flognp1(cpu_env, cpu_dest, cpu_src);
-         break;
-+    case 0x08: /* fetoxm1 */
-+        gen_helper_fetoxm1(cpu_env, cpu_dest, cpu_src);
-+        break;
-     case 0x09: /* ftanh */
-         gen_helper_ftanh(cpu_env, cpu_dest, cpu_src);
-         break;
--- 
-2.26.2
+1 file changed, 5 insertions(+)
+.travis.yml | 5 +++++
 
+modified   .travis.yml
+@@ -429,6 +429,7 @@ jobs:
+       env:
+         - TEST_CMD=3D"make check check-tcg V=3D1"
+         - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_TA=
+RGETS}"
++        - UNRELIABLE=3Dtrue
+=20
+     - name: "[ppc64] GCC check-tcg"
+       arch: ppc64le
+@@ -493,6 +494,7 @@ jobs:
+       env:
+         - TEST_CMD=3D"make check check-tcg V=3D1"
+         - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_TA=
+RGETS},s390x-linux-user"
++        - UNRELIABLE=3Dtrue
+       script:
+         - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+         - BUILD_RC=3D0 && make -j${JOBS} || BUILD_RC=3D$?
+@@ -535,6 +537,7 @@ jobs:
+         - TEST_CMD=3D"make check-unit"
+         - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm
+                   --disable-tools --host-cc=3Dclang --cxx=3Dclang++"
++        - UNRELIABLE=3Dtrue
+=20
+     # Release builds
+     # The make-release script expect a QEMU version, so our tag must start=
+ with a 'v'.
+@@ -556,3 +559,5 @@ jobs:
+         - mkdir -p release-build && cd release-build
+         - ../configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exi=
+t 1; }
+         - make install
++  allow_failures:
++    - env: UNRELIABLE=3Dtrue
+--8<---------------cut here---------------end--------------->8---
+
+
+
+--=20
+Alex Benn=C3=A9e
 
