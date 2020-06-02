@@ -2,91 +2,106 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92073C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9E9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 14:09:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E2E82074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:56:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSZKs896"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2E82074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86583206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 14:09:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86583206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg7Oq-0006yr-Co
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 09:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35166)
+	id 1jg7bb-0004uQ-P8
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 10:09:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jg7OF-0006On-8W
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 09:55:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22447
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jg7OE-0000mA-9L
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 09:55:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591106137;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NGYOAyyD99wYiWqBcRcOA8kdzUTjUB9FXFWdJxtZas0=;
- b=hSZKs8968nU9qyB9cGFclcGJmgNSjYbLpQORJ+gDEn2DatKr3KORqMcoucjphxW8+Ml30X
- gKor8oaAcBtaY7tQOXptN/YoNd0GW7NkHEoG7ek17uoXCLk0QE11kp3k8rUGWrI9webYmw
- vHUUNYNfFyB4RNEYD30dnmApfgVggXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-E6BKoKT5MMWR2E-3GltP7g-1; Tue, 02 Jun 2020 09:55:33 -0400
-X-MC-Unique: E6BKoKT5MMWR2E-3GltP7g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F0798015CE;
- Tue,  2 Jun 2020 13:55:32 +0000 (UTC)
-Received: from [10.36.113.56] (ovpn-113-56.ams2.redhat.com [10.36.113.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B4691001281;
- Tue,  2 Jun 2020 13:55:27 +0000 (UTC)
-Subject: Re: [PATCH v3 1/4] acpi: Convert build_tpm2() to build_append* API
-To: Stefan Berger <stefanb@linux.ibm.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200601095737.32671-1-eric.auger@redhat.com>
- <20200601095737.32671-2-eric.auger@redhat.com>
- <46c71777-b588-ce1f-eb8d-de1c5b3e2186@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6bd7f3a0-5a40-823e-bf67-309c9995e18e@redhat.com>
-Date: Tue, 2 Jun 2020 15:55:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jg7ah-000444-IU; Tue, 02 Jun 2020 10:08:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62162)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jg7ag-0004Ya-H9; Tue, 02 Jun 2020 10:08:31 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 052E4pZ6086693; Tue, 2 Jun 2020 10:08:27 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31cw8uap93-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 02 Jun 2020 10:08:26 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 052E5CO5090321;
+ Tue, 2 Jun 2020 10:08:26 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31cw8uap88-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 02 Jun 2020 10:08:26 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 052E0f2V008421;
+ Tue, 2 Jun 2020 14:08:24 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma01wdc.us.ibm.com with ESMTP id 31bf492f39-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 02 Jun 2020 14:08:24 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 052E8OiY44892522
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 2 Jun 2020 14:08:24 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 305BA112063;
+ Tue,  2 Jun 2020 14:08:24 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 14896112061;
+ Tue,  2 Jun 2020 14:08:24 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  2 Jun 2020 14:08:24 +0000 (GMT)
+Subject: Re: [RFC 1/6] test/tpm-emu: include sockets and channel headers in
+ tpm-emu header
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
+References: <20200601102113.1207-1-eric.auger@redhat.com>
+ <20200601102113.1207-2-eric.auger@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <915c28b6-b2cc-76ef-8d33-8422dfb5e619@linux.ibm.com>
+Date: Tue, 2 Jun 2020 10:08:23 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <46c71777-b588-ce1f-eb8d-de1c5b3e2186@linux.ibm.com>
+In-Reply-To: <20200601102113.1207-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 06:26:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-02_13:2020-06-02,
+ 2020-06-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ malwarescore=0 phishscore=0 impostorscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 mlxlogscore=999 cotscore=-2147483648 priorityscore=1501
+ spamscore=0 mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006020100
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 10:08:28
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,90 +121,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
-On 6/2/20 3:30 PM, Stefan Berger wrote:
-> On 6/1/20 5:57 AM, Eric Auger wrote:
->> In preparation of its move to the generic acpi code,
->> let's convert build_tpm2() to use build_append API. This
->> latter now is prefered in place of direct ACPI struct field
->> settings with manual endianness conversion.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>   hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
->>   1 file changed, 19 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index b5669d6c65..f0d35d7b17 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -2298,30 +2298,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker
->> *linker, GArray *tcpalog)
->>   static void
->>   build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->>   {
->> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
->> +    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data,
->> sizeof(AcpiTableHeader));
-> 
-> And now you want to build the data structure by pushing fields? I would
-> definitely NOT do this.
+On 6/1/20 6:21 AM, Eric Auger wrote:
+> Include sockets and channel headers to that the header is
+> self-contained.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-If I didn't misinterpret things, this was recommended by Drew and Igor
-as buid_append* API avoids to take care of endianness and this is the
-API now used in the generic ACPI code. Besides I also think that in that
-case it does not simplify things but maybe I did that the wrong way? Or
-maybe I didn't understand your remark?
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Thanks
 
-Eric
-> 
-> 
->>       unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
->>       unsigned log_addr_offset =
->>           (char *)&tpm2_ptr->log_area_start_address - table_data->data;
->> +    uint8_t start_method_params[12] = {};
->>   -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
->> +    /* platform class */
->> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
->> +    /* reserved */
->> +    build_append_int_noprefix(table_data, 0, 2);
->>       if (TPM_IS_TIS_ISA(tpm_find())) {
->> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
->> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
->> +        /* address of control area */
->> +        build_append_int_noprefix(table_data, 0, 8);
->> +        /* start method */
->> +        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO,
->> 4);
->>       } else if (TPM_IS_CRB(tpm_find())) {
->> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
->> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
->> +        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
->> +        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
->>       } else {
->>           g_warn_if_reached();
->>       }
->>   -    tpm2_ptr->log_area_minimum_length =
->> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
->> +    /* platform specific parameters */
->> +    g_array_append_vals(table_data, &start_method_params, 12);
->>   -    acpi_data_push(tcpalog,
->> le32_to_cpu(tpm2_ptr->log_area_minimum_length));
->> +    /* log area minimum length */
->> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
->> +
->> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->>       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE,
->> tcpalog, 1,
->>                                false);
->>         /* log area start address to be filled by Guest linker */
->> +    build_append_int_noprefix(table_data, 0, 8);
->>       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>                                      log_addr_offset, log_addr_size,
->>                                      ACPI_BUILD_TPMLOG_FILE, 0);
-> 
-> 
+> ---
+>   tests/qtest/tpm-emu.h | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/tests/qtest/tpm-emu.h b/tests/qtest/tpm-emu.h
+> index a4f1d64226..73f3bed0c4 100644
+> --- a/tests/qtest/tpm-emu.h
+> +++ b/tests/qtest/tpm-emu.h
+> @@ -16,6 +16,9 @@
+>   #define TPM_RC_FAILURE 0x101
+>   #define TPM2_ST_NO_SESSIONS 0x8001
+>   
+> +#include "qemu/sockets.h"
+> +#include "io/channel.h"
+> +
+>   struct tpm_hdr {
+>       uint16_t tag;
+>       uint32_t len;
+
 
 
