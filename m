@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA63CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE66C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96874207D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 441152067B
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:51:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CPl2hDcB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96874207D8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ul2p1678"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441152067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg9Az-0000S5-Tj
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:50:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55688)
+	id 1jg9CD-0001fx-2O
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:51:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jg97X-0003W1-80
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:31 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32797)
+ id 1jg97f-0003jI-4q
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:39 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37120)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jg97W-0007cm-C8
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:30 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l11so3930874wru.0
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 08:46:29 -0700 (PDT)
+ id 1jg97e-0007da-0N
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:38 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x13so3922638wrv.4
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 08:46:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QSCo20FpmcSa9pqRC9AwXDY8+utkLNtj0/ksS5sWNSA=;
- b=CPl2hDcBqDkH8YckenHJHDWIKS2aLw0vI3NKfQGRwbEkNP1HZQG78k8XORGUwMWHgi
- fG9OEsGzpY2BWMW/2Z+boNgBwi5De/OAlQxlHH7alUoZXu6w6JJesZh+1I0yZtAq/P34
- hhkHl3PsPxgj2+OIwwJl7zu4xprDwaLGn7Q0ymUYdgJTiX4LvczRb33ydePABlkcGC0d
- wGx67xXUXGZVss4x+btdUUGq7iQhB2O4BfCaUJ6Eoz8JIgm4+qoSqZVFU8eqj3DRlC7O
- s0lhH1hDMK1n6d4IVeCu54rq2jV0zUM+CUr97OeNIbwPvLOz9Zsugm9CDffg3LX09m5f
- Ht8A==
+ bh=D98gPKyXYpHfK2vdgoTLIOCcijD4DQVmE2DVfMIiR4I=;
+ b=Ul2p16782znMcbsKpUw0Xm/g/AeHDL2ZSBciVmljZk8//OPHCBdPCJk8dnfLFihx06
+ XODtINTxB+ww5N3Dtuh/8jUv4RxmvrXbstAVsUpELiIGNfjDYIFW9AQSOkteAEw10Y1c
+ dA3YpTnWkBxU99/HzeQlDImeyyGJG8OVaPOR0orp2UqLxt5YuJvBy4kO2VgYUWkyXDTD
+ VC4HANX9Uy5euDTNSBVdaSXJcR/0MZm+AAdNyEPdKDtZO74FG1CUChHAPLq2wI3wuNrc
+ Jq+1IITF1y1vW4m90iDZt4Hp+8lksjqrnrPRstKfug1T+Ozwip98K4crr0vxr+B4mHTS
+ 4eYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QSCo20FpmcSa9pqRC9AwXDY8+utkLNtj0/ksS5sWNSA=;
- b=UoQXqp8yMw5P/jLK9mt9oz4j+65v+n/AL0ViGjHkVLJG03vB8L/TDnsGY19ryEQzER
- F/qA/lgGXdO7ZCFvNSJSmhYzG9gju4dm+KjbQMIHqdm80I/22KJ+O6oeJ6kQbr9Or5LD
- awEwT7IrwWMstNF9QHWzASgdzUBkFhQDtZ+rEwwRHewk0wcx3mDLM+Ns0WMm0cLZdRpb
- WwhhDg+BVdz1kovOVzO0Rn2r4GZlML9GZGz6swZbVkpeFYRmpUnybPO1hYVQ+kGiqCSp
- KctNs1J59syHQ2/q2Zvi3fmV/y678TFkdRc1TFAJDXL4HiSNOGtUEuEh9y/69n65MLsL
- Nsxg==
-X-Gm-Message-State: AOAM533Np0DNECI9bajZEh859UoTekiqFqp1WMzEWEwPBm0L6lYDtqKD
- x+dRYd7yPns1dB4StlbsmUXnmw==
-X-Google-Smtp-Source: ABdhPJySCeji1fTkNCIPcDpNZxe8XdwV6Ty9YuadGok7QwzK3DnDooR53ACTbfDVIIgA5AdY0hyKMA==
-X-Received: by 2002:a5d:4008:: with SMTP id n8mr26269887wrp.82.1591112788931; 
- Tue, 02 Jun 2020 08:46:28 -0700 (PDT)
+ bh=D98gPKyXYpHfK2vdgoTLIOCcijD4DQVmE2DVfMIiR4I=;
+ b=Hm2D5bMNFVfKI54TmKszaFBe9fr/JKHSC79X11rUzsRJmKTQMlrQ15KFT1imomxn57
+ 2/69NMOoDIpYHsdwy7SVCp34ZSXxP632zpcNNezFF5vSRHlwyQYHMXxWsDO6736Rylj8
+ vBxTvJl6V5yOAt4w2N3D+7Ij9pKnJDgA/TrB3axmyfn5d7EdRgjZl5w/J+zWPs6UBRqo
+ IJFC1QDLoHrG571ik0Rn1HaDRjrYMfGlj4s7aeEYseeB9lTQRvTev/Su1lCLTfG9SBtE
+ 73vRzdEBAz1wqzgmcH5Ks0fOn9WcrbaDz83NNFK+yQIauv8+wa79wahud9tFYQ2lpOzO
+ DuTQ==
+X-Gm-Message-State: AOAM530spmD5C4eoWXg8JibMuWZEEW1W4pqEVYP4kZh4+q58LFpp2auK
+ /4PpD6l9OVSK9mg+wjfvYn8J+w==
+X-Google-Smtp-Source: ABdhPJwdCD/FKV7MGBtwwb4puXuOLX3KQGY5CnARp56Juo109Rc9iXy/Hp5mpC81H6r/K0rNujFcCw==
+X-Received: by 2002:adf:a50e:: with SMTP id i14mr15141142wrb.21.1591112796558; 
+ Tue, 02 Jun 2020 08:46:36 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d17sm5003905wrg.75.2020.06.02.08.46.25
+ by smtp.gmail.com with ESMTPSA id l17sm186818wmi.16.2020.06.02.08.46.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 08:46:25 -0700 (PDT)
+ Tue, 02 Jun 2020 08:46:32 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 82B1A1FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id D7B241FF93;
  Tue,  2 Jun 2020 16:46:24 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 3/9] scripts/clean-includes: Mark 'qemu/qemu-plugin.h' as
- special header
-Date: Tue,  2 Jun 2020 16:46:18 +0100
-Message-Id: <20200602154624.4460-4-alex.bennee@linaro.org>
+Subject: [PATCH  v1 7/9] plugins: add API to return a name for a IO device
+Date: Tue,  2 Jun 2020 16:46:22 +0100
+Message-Id: <20200602154624.4460-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200602154624.4460-1-alex.bennee@linaro.org>
 References: <20200602154624.4460-1-alex.bennee@linaro.org>
@@ -104,43 +103,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
+Cc: robert.foley@linaro.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This may well end up being anonymous but it should always be unique.
 
-"qemu/qemu-plugin.h" isn't meant to be include by QEMU codebase,
-but by 3rd party plugins that QEMU can use. These plugins can be
-built out of QEMU and don't include "qemu/osdep.h".
-Mark "qemu/qemu-plugin.h" as a special header that doesn't need
-to be cleaned for "qemu/osdep.h".
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200524215654.13256-1-f4bug@amsat.org>
 ---
- scripts/clean-includes | 1 +
- 1 file changed, 1 insertion(+)
+ include/qemu/qemu-plugin.h |  5 +++++
+ plugins/api.c              | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/scripts/clean-includes b/scripts/clean-includes
-index dd938daa3ec..795b3bea318 100755
---- a/scripts/clean-includes
-+++ b/scripts/clean-includes
-@@ -123,6 +123,7 @@ for f in "$@"; do
-       ;;
-     *include/qemu/osdep.h | \
-     *include/qemu/compiler.h | \
-+    *include/qemu/qemu-plugin.h | \
-     *include/glib-compat.h | \
-     *include/sysemu/os-posix.h | \
-     *include/sysemu/os-win32.h | \
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index bab8b0d4b3a..43c6a9e857f 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -335,6 +335,11 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+ bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
+ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
+ 
++/*
++ * Returns a string representing the device. Plugin must free() it
++ */
++char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr);
++
+ typedef void
+ (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
+                              qemu_plugin_meminfo_t info, uint64_t vaddr,
+diff --git a/plugins/api.c b/plugins/api.c
+index bbdc5a4eb46..3c73de8c1c2 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -303,6 +303,24 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
+     return 0;
+ }
+ 
++char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr)
++{
++#ifdef CONFIG_SOFTMMU
++    if (haddr && haddr->is_io) {
++        MemoryRegionSection *mrs = haddr->v.io.section;
++        if (!mrs->mr->name) {
++            return g_strdup_printf("anon%08lx", 0xffffffff & (uintptr_t) mrs->mr);
++        } else {
++            return g_strdup(mrs->mr->name);
++        }
++    } else {
++        return g_strdup("RAM");
++    }
++#else
++    return g_strdup("Invalid");
++#endif
++}
++
+ /*
+  * Queries to the number and potential maximum number of vCPUs there
+  * will be. This helps the plugin dimension per-vcpu arrays.
 -- 
 2.20.1
 
