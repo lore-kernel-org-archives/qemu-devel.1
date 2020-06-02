@@ -2,83 +2,96 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035F8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 18:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D9BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 18:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD10E2072F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 18:36:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD10E2072F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 32D2D20734
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 18:36:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ul2nTHtu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D2D20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgBm0-0000Xq-V3
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 14:36:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54468)
+	id 1jgBmM-00018u-Fl
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 14:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgBl9-0008E2-B1
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 14:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57612)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jgBlh-0000EI-25
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 14:36:09 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgBl6-0003Jo-PX
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 14:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jgBl3-0005O1-Bf
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 398B12E810B
- for <qemu-devel@nongnu.org>; Tue,  2 Jun 2020 18:35:29 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jgBlf-0003VU-Um
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 14:36:08 -0400
+Received: by mail-io1-xd41.google.com with SMTP id h4so8633366iob.10
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 11:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=E5kB349qPSwX27+o8Rqn2/Bjfsyq6rA2EO1yuyc7SpA=;
+ b=ul2nTHtuF8gusCJZLu83Lv3b+fZkn1KOH36ssL+MMu+a93ukM8Rkk9ux9F3X5Ubeg1
+ rPZUYwVr7yl7XJWBC00wADV+p3r5sn6DlPhDxxx26vL0JQGnHNKO+4bbrdeyaamdgc0G
+ dXbJxdo9qR93AEyo8Fcm/3qGYHam2bt9FrUES0wL4sk7GIYgLlQwSTBHkx7lhkdXdHuC
+ inhkPKhQD/62av2Z8QU3VKcsa0ao8qwSDZxTCRwsk+0jKeyo6wC0pTTdvNL0hCj5P4Ul
+ b+biIaxDPxDQeg9A1fDxZ66gZ5LtDjp/SimARivrgO38xJdemxhN7DStgMHo0nrO7oAR
+ mmCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=E5kB349qPSwX27+o8Rqn2/Bjfsyq6rA2EO1yuyc7SpA=;
+ b=la6pcULUlao2EBTQzP1+SplWMOboGhHCgP7rm6bNi/xyFi43jGdp2Na/PpbbzGUQf4
+ /j/rWnEAbG9jNDkWKpyo9OE0j7HyNkX9i3aCzYrNBanfcCvgEiHMYaGq660cfu2aRXMY
+ mkltznw3dAGyEIT8ffF72amssA2jvjLAo3A83ZMYvxzgFRRqMS4CxtCmZJbHS4IMrh9h
+ UJv2Xb9HcsHdEW4TWW8xeWYphkakrLNJiaCBEGQHggBOwzY452lZiJztSmzvdSVTBLND
+ 3+N1Qe0oHij9ogeaU0p7rSZl/wBCuAnf4DyjoSVgKA0aVzwdRaCXT7Mo9HJmetgrN2tg
+ eDXA==
+X-Gm-Message-State: AOAM53344XNwqhmpISEg1ZVQZg0bGAO6dMJRUb19VY/MkxT8H9Iu/HKM
+ mupH2+16oPbdMf3nrzHTetKvyHQlBDc/75VNXq0=
+X-Google-Smtp-Source: ABdhPJxUXq5CEVyt0HJ4kxbmuFH9U/Oab5TklJwR1+1uzVNnhBSTGuPIMBzdX0LEKtgW2KPaHn5jTsK9gswLePrj9SU=
+X-Received: by 2002:a05:6638:dd3:: with SMTP id
+ m19mr27212294jaj.106.1591122966438; 
+ Tue, 02 Jun 2020 11:36:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <CALQG_Wh7eMt9U3gWkZZGDq0RFvWfuSVoiNBRNnPS_cDVfUc30w@mail.gmail.com>
+ <CAFEAcA_1+rDcjD7Lyk9ESSkPAKmJwF=0ZdwkgQYUDp8Gtn6jHA@mail.gmail.com>
+ <CALQG_WgP=ZebEMrXh_EpQJXqJPi48i6nwZU_yWq7VqhV_=eTVQ@mail.gmail.com>
+ <CAFEAcA_iW_0jTk=9hCh+UatyhY_HFgzmZeSxqqyUCH19Vv1jCA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_iW_0jTk=9hCh+UatyhY_HFgzmZeSxqqyUCH19Vv1jCA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 2 Jun 2020 11:26:56 -0700
+Message-ID: <CAKmqyKPHsLtp09kmydg+JawJm67ryW5h+Am3hu2Jx-T0K_xtDg@mail.gmail.com>
+Subject: Re: gdbstub.c CPU clusters not handled for ThreadInfo packets
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jun 2020 18:27:48 -0000
-From: Laurent Vivier <1881450@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=Laurent@vivier.eu; 
-X-Launchpad-Bug-Tags: m68k
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ahmedkrmn laurent-vivier
-X-Launchpad-Bug-Reporter: Ahmed Karaman (ahmedkrmn)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159088695339.29529.1797786788240960646.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159112246955.5999.5418709614180687282.launchpad@wampee.canonical.com>
-Subject: [Bug 1881450] Re: Emulation of a math function fails for m68k Linux
- user mode
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0c8971c1bf087c6d5929c789b163d3c38754afba
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 11:35:30
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,54 +100,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1881450 <1881450@bugs.launchpad.net>
+Cc: Luc Michel <luc.michel@greensocs.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Fabien Chouteau <chouteau@adacore.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+On Tue, Jun 2, 2020 at 10:27 AM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Tue, 2 Jun 2020 at 18:19, Fabien Chouteau <chouteau@adacore.com> wrote=
+:
+> > Le mar. 2 juin 2020 =C3=A0 18:44, Peter Maydell <peter.maydell@linaro.o=
+rg> a =C3=A9crit :
+> > >
+> > > By default gdb does not attach to all clusters (this is IIRC somethin=
+g
+> > > that can't
+> > > be influenced on the QEMU end);
+> >
+> > You mean I cannot have QEMU attach all clusters by default?
+>
+> I mean that the end of the gdb remote protocol connection that
+> decides what to attach to is gdb, not QEMU. In theory gdb could
+> be improved to automatically attach to all available inferiors,
+> or the remote protocol could be improved to allow the QEMU end
+> to say "I recommend you attach to inferiors X, Y and Z". But
+> at the moment that doesn't exist so the best you can do I suspect
+> is going to be to script gdb to do the attaching without you
+> having to type the commands yourself.
+>
+> > > are you explicitly asking it to attach to the second cluster?
+> >
+> > So far the behavior that we had was to see all the CPUs without asking
+> > explicitly.
+> > I want to go back to that behavior because the current situation is a
+> > huge drawback for our users.
+>
+> That works when there's only one cluster. When there's multiple
+> clusters, by default gdb will show you all the CPUs in the first
+> cluster. Would the behaviour be better if the other cluster in
+> this machine was the first (default) one?
+>
+> > > https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg07035.htm=
+l
+> > > is a mailing list post from January which gives the gdb commands whic=
+h
+> > > ought to cause it to attach to the second cluster on this machine.
+> >
+> > The commands:
+> >         target extended-remote :1234
+> >         add-inferior
+> >         inferior 2
+> >         attach 2
+> >         set schedule-multiple
+> >         info threads
 
--- =
+I just updated the QEMU RISC-V wiki to include these steps:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1881450
+https://wiki.qemu.org/Documentation/Platforms/RISCV#Attaching_GDB
 
-Title:
-  Emulation of a math function fails for m68k Linux user mode
+Alistair
 
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Please check the attached math-example.c file.
-  When running the m68k executable under QEMU, it results in an =
-
-  "Illegal instruction" error.
-  Other targets don't produce this error.
-
-  Steps to reproduce the bug:
-
-  1. Download the math-example.c attached file.
-  2. Compile it by running:
-  =C2=A0=C2=A0=C2=A0m68k-linux-gnu-gcc -O2 -static math-example.c -o math-e=
-xample-m68k -lm
-  3. Run the executable with QEMU:
-  =C2=A0=C2=A0=C2=A0/build/qemu-5.0.0/build-gcc/m68k-linux-user/qemu-m68k m=
-ath-example-m68k
-
-  The output of execution is:
-  =C2=A0=C2=A0=C2=A0Profiling function expm1f():
-  =C2=A0=C2=A0=C2=A0qemu: uncaught target signal 4 (Illegal instruction) - =
-core dumped
-  =C2=A0=C2=A0=C2=A0Illegal instruction (core dumped)
-
-  Output when running on other targets:
-  =C2=A0=C2=A0=C2=A0Profiling function expm1f():
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Elapsed time: 47 ms
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Control result: 71804.953125
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1881450/+subscriptions
+> >
+> > Do not work for me, "attach 2" in GDB asks me to kill the debugged prog=
+ram.
+>
+> Hmm. That's the behavior for 'target remote' but 'target extended-remote'
+> ought to support multiple inferiors. What gdb version is this?
+>
+> thanks
+> -- PMM
+>
 
