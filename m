@@ -2,93 +2,89 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E87C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99716C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C03C52073B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:15:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 658072068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:39:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MARswyJB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03C52073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCJs6u7Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 658072068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfwSv-0000fU-0l
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 22:15:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44258)
+	id 1jfwpm-0005bt-Kj
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 22:39:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jfwSA-0000Bm-2s
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:14:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23921
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jfwS8-0001nW-KW
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:14:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591064095;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WTq8dNN1pvnR9ivxTSzhI6MMk3ub1rKt+JtuxqVe9AA=;
- b=MARswyJB1G41iLiW/YYpR7YxyOarQF4i/tDwSyOROzQe8+a+QEx/Hl3Vt8pcVCnFs+C8lH
- kJFJmGWYWETayLL9RWlWMbPq/IvFdp6I3mVETUccU3Zk9LSdr79B2dTaTEhw4RiNd8aZJz
- f6Mzhqo/AeOJ05Vb0sP3HUnEKtklvTo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-rQDPjvx-MUuQUL8HsjDLBw-1; Mon, 01 Jun 2020 22:14:52 -0400
-X-MC-Unique: rQDPjvx-MUuQUL8HsjDLBw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBA421856948;
- Tue,  2 Jun 2020 02:14:51 +0000 (UTC)
-Received: from [10.72.12.140] (ovpn-12-140.pek2.redhat.com [10.72.12.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25193D020D;
- Tue,  2 Jun 2020 02:14:49 +0000 (UTC)
-Subject: Re: [PATCH 1/1] e1000e: Added ICR clearing by corresponding IMS bit.
-To: Andrew Melnichenko <andrew@daynix.com>
-References: <20200513113125.1465650-1-andrew@daynix.com>
- <20200513113125.1465650-2-andrew@daynix.com>
- <57ab1532-c3a6-e631-5b0e-e89fc4d82873@redhat.com>
- <7d8202a5-58ad-d7e9-db29-3316834547b8@redhat.com>
- <CABcq3pGy1yPiEusHnQMwFOwa3hbqXaMWGUi0TnrMLhetMXzq9w@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <080ffdec-8fc3-f856-48d2-06c671ea900a@redhat.com>
-Date: Tue, 2 Jun 2020 10:14:48 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <CABcq3pGy1yPiEusHnQMwFOwa3hbqXaMWGUi0TnrMLhetMXzq9w@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 22:14:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jfwot-0004mO-Vy
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:38:32 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41379)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jfwos-0005KJ-MB
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:38:27 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 64so4346991pfg.8
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 19:38:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=aGgFDTFQPYvKqjEcC1kdvs9lciiYvG5xsZOnEhZpU3c=;
+ b=UCJs6u7ZPVgOzplRWTWt1LOrOedQUikIcFqeDcUPf6zjskKBAhrne/A8B5SFV/44TZ
+ D76iW3FmzzNsUZejfkm/Jh7hil77hojPG4D61nkfNer/ERXzcxxzAT4NPpA/rUGuzsfY
+ nDldItJT6hNp7uCzNcgX1ZnEYDViCBCdOfqlmw/WP9gm5PZjeuXl87D0lqnGlm/LVu5q
+ ArCPeiXAfbRkYRBL+ipcNOJ4nfuylrDLXM7XAorJjc+VtgCPYxPloR89rN46RHaOIYkw
+ XtMRB7Y8JcMwseIGP8i3aZF5oANKxKsE4YbIK+ngbBmSF89WUxaxpnGeZe05aCRrMxPA
+ X0mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=aGgFDTFQPYvKqjEcC1kdvs9lciiYvG5xsZOnEhZpU3c=;
+ b=NNhj9eJVEJLLNiXnOYSZOhORTAVfcUb47XH6gbfM2mhyCSRkk6nKfogVwwqOhQwfrG
+ MnwYb5A2nKJvE+yKCX5ZUjVOCvVI0Joo4AysitDPfI0PaVl4fUdCsPUXNKZtaxsawQsg
+ 5JGZD1PYxSkQrN3d7/1qlPIFEXlvNgKsy5sH7t9jlQal1mR3vCFAk/baNeR+iP4z1jYF
+ oi6kMDmye3jHzOMA+kEbuGhu7kvkMUeCCrtUBAZLgl6qQzuxoa0BG/YGOX9bCJAuzAi6
+ j6yYUbBcIzxCsUCl+Jtb9+knrXqEognlxagem15UyAcgJgAfHpdovT3qaJHZ/FzGbdt7
+ kJgg==
+X-Gm-Message-State: AOAM531HmCMbBlc51cXjO8k7+c7RzOv5WIsY7SdiZQjG2fZWcypF/NTw
+ 4bZ6GRl9xM6P1JsQtRsxefM=
+X-Google-Smtp-Source: ABdhPJxNmBS19L7QX+dHVUPyjJBBIjb/nzSHsmDN0CFTZQ+vJhDLTudtyZkvcdeR9xXt3WcsB2zpUg==
+X-Received: by 2002:a63:ad43:: with SMTP id y3mr21332620pgo.435.1591065504851; 
+ Mon, 01 Jun 2020 19:38:24 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id j186sm630761pfb.220.2020.06.01.19.38.22
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 01 Jun 2020 19:38:24 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH for-5.1 V4 0/7] mips: Add Loongson-3 machine support (with KVM)
+Date: Tue,  2 Jun 2020 10:39:13 +0800
+Message-Id: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,142 +97,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, in QEMU we just define two CPU types:
 
-On 2020/6/2 上午12:47, Andrew Melnichenko wrote:
-> As I understand it, the e1000e.c was implemented by 82574L 
-> spec(https://www.intel.com/content/dam/doc/datasheet/82574l-gbe-controller-datasheet.pdf).
-> In the same spec there is 10.2.4 paragraph which provides more details 
-> when ICR should be cleared.
->
->     • Case 1 - Interrupt Mask register equals 0x0000 (mask all): ICR
->     content is cleared.
->     • Case 2 - Interrupt was asserted (ICR.INT_ASSERT=1) and auto mask
->     is active: ICR
->     content is cleared, and the IAM register is written to the IMC
->     register.
->     • Case 3 - Interrupt was not asserted (ICR.INT_ASSERT=0): Read has
->     no side affect.
->
+1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
 
-Thanks for the pointer, so it looks to me the current implementation is 
-fine ?
+Loongson-3 lacks English documents. I've tried to translated them with
+translate.google.com, and the machine translated documents (together
+with their original Chinese versions) are available here.
 
-static uint32_t
-e1000e_mac_icr_read(E1000ECore *core, int index)
-{
-     uint32_t ret = core->mac[ICR];
-     trace_e1000e_irq_icr_read_entry(ret);
+Loongson-3A R1 (Loongson-3A1000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf (Chinese Version)
 
-     if (core->mac[IMS] == 0) {
-         trace_e1000e_irq_icr_clear_zero_ims();
-         core->mac[ICR] = 0;
-     }
+Loongson-3A R2 (Loongson-3A2000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
 
+Loongson-3A R3 (Loongson-3A3000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf (Chinese Version)
 
-// This is the case 1)
+Loongson-3A R4 (Loongson-3A4000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
+http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
+User Manual Part 2:
+I'm sorry that it is unavailable now.
 
+We are preparing to add QEMU's Loongson-3 support. MIPS VZ extension is
+fully supported in Loongson-3A R4+, so we at first add QEMU/KVM support
+in this series. And the next series will add QEMU/TCG support (it will
+emulate Loongson-3A R1).
 
-     if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
-         (core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
-         trace_e1000e_irq_icr_clear_iame();
-         core->mac[ICR] = 0;
-         trace_e1000e_irq_icr_process_iame();
-         e1000e_clear_ims_bits(core, core->mac[IAM]);
-     }
+We already have a full functional Linux kernel (based on Linux-5.4.x LTS
+but not upstream yet) here:
 
+https://github.com/chenhuacai/linux
 
-// This is the case 2) and case 3)
+How to use QEMU/Loongson-3?
+1, Download kernel source from the above URL;
+2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+3, Boot a Loongson-3A4000 host with this kernel;
+4, Build QEMU-5.0.0 with this patchset;
+5, modprobe kvm;
+6, Use QEMU with TCG (available in future):
+       qemu-system-mips64el -M loongson3,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ... 
+   Use QEMU with KVM (available at present): 
+       qemu-system-mips64el -M loongson3,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ... 
 
-     trace_e1000e_irq_icr_read_exit(core->mac[ICR]);
-     e1000e_update_interrupt_state(core);
-     return ret;
-}
+   The "-cpu" parameter can be omitted here and QEMU will use the correct type for TCG/KVM automatically.
 
+V1 -> V2:
+1, Add a cover letter;
+2, Improve CPU definitions;
+3, Remove LS7A-related things (Use GPEX instead);
+4, Add a description of how to run QEMU/Loongson-3.
 
-Thanks
+V2 -> V3:
+1, Fix all possible checkpatch.pl errors and warnings.
 
+V3 -> V4:
+1, Sync code with upstream;
+2, Remove merged patches;
+3, Fix build failure without CONFIG_KVM;
+4, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>.
 
->
-> On Fri, May 29, 2020 at 10:35 AM Jason Wang <jasowang@redhat.com 
-> <mailto:jasowang@redhat.com>> wrote:
->
->
->     On 2020/5/29 下午3:18, Jason Wang wrote:
->     >
->     > On 2020/5/13 下午7:31, andrew@daynix.com
->     <mailto:andrew@daynix.com> wrote:
->     >> From: Andrew Melnychenko <andrew@daynix.com
->     <mailto:andrew@daynix.com>>
->     >>
->     >> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1707441
->     >> Added ICR clearing if there is IMS bit - according to the note by
->     >> section 13.3.27 of the 8257X developers manual.
->     >>
->     >> Signed-off-by: Andrew Melnychenko <andrew@daynix.com
->     <mailto:andrew@daynix.com>>
->     >> ---
->     >>   hw/net/e1000e_core.c | 10 ++++++++++
->     >>   hw/net/trace-events  |  1 +
->     >>   2 files changed, 11 insertions(+)
->     >>
->     >> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->     >> index d5676871fa..10212d7932 100644
->     >> --- a/hw/net/e1000e_core.c
->     >> +++ b/hw/net/e1000e_core.c
->     >> @@ -2624,6 +2624,16 @@ e1000e_mac_icr_read(E1000ECore *core,
->     int index)
->     >>           e1000e_clear_ims_bits(core, core->mac[IAM]);
->     >>       }
->     >>   +    /*
->     >> +     * PCIe* GbE Controllers Open Source Software Developer's
->     Manual
->     >> +     * 13.3.27 Interrupt Cause Read Register
->     >> +     */
->     >> +    if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
->     >> +        (core->mac[ICR] & core->mac[IMS])) {
->     >> + trace_e1000e_irq_icr_clear_icr_bit_ims(core->mac[ICR],
->     >> core->mac[IMS]);
->     >> +        core->mac[ICR] = 0;
->     >> +    }
->     >> +
->     >
->     >
->     > Hi Andrew:
->     >
->     > So my comments still. I think we need to implement 82574l
->     behavior (if
->     > you go through e1000e.c all chapters it mentioned is for 82574l
->     > datasheet not the one you pointed to me).
->     >
->     > And actually the 82574l behavior is much more simpler.
->
->
->     To be more specific.
->
->     See chapter 7.4.5 which describes the ICR clearing.
->
->     It has three methods for clearing: auto-clear, clear-on-write and
->     clear-on-read.
->
->     And in the part of "Read to clear" it said:
->
->     """
->     All bits in the ICR register are cleared on a read to ICR.
->
->     """
->
->     So there's no need to IMS and other stuffs here.
->
->     Thanks
->
->
->     >
->     > Thanks
->
+Huacai Chen(4):
+ hw/mips: Implement the kvm_type() hook in MachineClass
+ target/mips: Add Loongson-3 CPU definition
+ hw/mips: Add Loongson-3 machine support (with KVM)
+ MAINTAINERS: Add myself as Loongson-3 maintainer
 
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ MAINTAINERS                          |   5 +
+ default-configs/mips64el-softmmu.mak |   1 +
+ hw/core/Makefile.objs                |   2 +-
+ hw/core/null-machine.c               |   4 +
+ hw/mips/Kconfig                      |  10 +
+ hw/mips/Makefile.objs                |   3 +-
+ hw/mips/common.c                     |  42 ++
+ hw/mips/loongson3.c                  | 901 +++++++++++++++++++++++++++++++++++
+ include/hw/mips/mips.h               |   3 +
+ target/mips/cpu.h                    |  28 ++
+ target/mips/internal.h               |   2 +
+ target/mips/mips-defs.h              |   7 +-
+ target/mips/translate.c              |   2 +
+ target/mips/translate_init.inc.c     |  86 ++++
+ 14 files changed, 1092 insertions(+), 4 deletions(-)
+ create mode 100644 hw/mips/common.c
+ create mode 100644 hw/mips/loongson3.c
+--
+2.7.0
 
