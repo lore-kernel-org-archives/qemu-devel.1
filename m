@@ -2,124 +2,162 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD2FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD9CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:33:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8553206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9B7E206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:33:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="Jft/qXQ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8553206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVinkFiO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B7E206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgEyj-0000px-2Q
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 18:01:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48822)
+	id 1jgFTD-0007Ea-Qz
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 18:33:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgEwP-0007Hz-R9
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:59:25 -0400
-Received: from mail-dm6nam12on2081.outbound.protection.outlook.com
- ([40.107.243.81]:12311 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgEwN-0002uQ-PZ
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:59:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G/vOys+ZOXP9e91sjn27Z/ucMcDiZN96mPNnA9ErDUx/wF2tokou4g2gDr8xNnV3uTwoTx37IEq+AlYsNiaLry9JOxDbdvSzpkVtTn6IQPF0Td8YGYDP3SS9P+CXOUpzHpJX8Rx4CJZKOiy12TvRscF+gRsVpH4ZiGwk+fArzuubVaXbPnzPCU2bzS/xptofffdcNXm6ZYIlmS2XHbYBUsUgqzQeZhNPNBOC6xEhqD935hRz02JL46XnrQU9EuGTd3TJWcPeehhAgnoWUJAj8yrF4lnB0s3o87qoQMFo6t5CGJml5d2ki4Yic0OkHqy+HBg+S7jwc2hGnuIv7g1iVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TEPtWsMT9LzAXMPJw9DUXaXD62FPvnZhiHnrCNTTvf0=;
- b=gEijLllBJQjgXFl/MAxlzqNiI0u7zgGMmTLWNfT00OXjN9l4iA4jHUDDZXrReDShWOLQ0I8C0XPWEMPyXnK2PpLzIcdx26BcGo8mv5wW4EGpqOAT8h7uzT6+d/j8Pv01u5O9GxlCkE42350q5DUfyIZpbbPwiQsy8Kp4lrk4MmTj7sYkaGviAA2gSQthSW1hoeswOtis9glrkTrKCYeufBuWoPxBHmQG/gG7km/Sq4y7/CPq7nBqK5dfj+9WrGxi9iRYqrlcS/pUBKPmtNe2prC5WryY3ud6We1vkAvsMeIXILp8AgwDlLnqKBlAaHTBuTZr3HeV3XEM1ywz8yWpXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TEPtWsMT9LzAXMPJw9DUXaXD62FPvnZhiHnrCNTTvf0=;
- b=Jft/qXQ6ySq+kAOLHyXdZN6AcTaL4KEdq7hcAydwDM6J2ljhw+QVSFvpwNbXBkv5yeJBnaDqodxFaqKmyv4PAVkp5qK4qI1r5hJZFw22kFjPvvMhQgQJWLOemM5mPPZDR+jgdTZhasjWMKLg9+kxs+Nh8ukAOt80UV1rq/+th24=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2414.namprd12.prod.outlook.com (2603:10b6:802:2e::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Tue, 2 Jun
- 2020 21:59:21 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3045.024; Tue, 2 Jun 2020
- 21:59:21 +0000
-Subject: RE: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding functions
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
- <158396721426.58170.2930696192478912976.stgit@naples-babu.amd.com>
- <20200602171838.GG577771@habkost.net>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <e68f8536-40fe-3c35-7d66-04f20fcabb8e@amd.com>
-Date: Tue, 2 Jun 2020 16:59:19 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgFRY-0006hR-5b
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:31:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35196
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgFRW-0002D5-Sv
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:31:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591137093;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0dvGsjmEyi/BZzz0pboCUBS+Sbul3LznGXLZ4kBPJZk=;
+ b=OVinkFiOlee7Sp7xuzSOU558y6NNFErtN9IE1S2Qa6eA69kDOx2//2toEckCyAmMSr0k6R
+ jbBMz0VMmCRgBp/RK4BgS54xmIIYP/hackUeRyC80sITnxcDj1SVp9yOtKFh97FMVHE6DL
+ 4O7aEL4TxC4ZpSMW/cxCl935t2uuKw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-v3X6cVpKODWnDIr3FJW_Dw-1; Tue, 02 Jun 2020 18:31:30 -0400
+X-MC-Unique: v3X6cVpKODWnDIr3FJW_Dw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19AA98018A6;
+ Tue,  2 Jun 2020 22:31:29 +0000 (UTC)
+Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B548B78B56;
+ Tue,  2 Jun 2020 22:31:24 +0000 (UTC)
+Subject: Re: [PATCH v2 00/16] python: add mypy support to python/qemu
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200602214528.12107-1-jsnow@redhat.com>
+ <da267698-75a7-1c2c-ea0c-cc95427233d3@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <c5851c2e-96fe-8455-41b1-74514d9cfd9b@redhat.com>
+Date: Tue, 2 Jun 2020 18:31:23 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200602171838.GG577771@habkost.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR11CA0049.namprd11.prod.outlook.com
- (2603:10b6:5:14c::26) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.79] (165.204.77.1) by
- DM6PR11CA0049.namprd11.prod.outlook.com (2603:10b6:5:14c::26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3045.22 via Frontend Transport; Tue, 2 Jun 2020 21:59:20 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ad613ca0-8e98-4a28-9679-08d807403485
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2414:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB241483A0BF1C81E5CC8C8BC5958B0@SN1PR12MB2414.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:459;
-X-Forefront-PRVS: 0422860ED4
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: l8n4xcEpOoYwzzhPHDzmrqx5rA+XUt9XDK85xPR8yuNpfcuZJg0OrSZGBbaFVDQVhi7hm7ZsvU7kPg8ZHpkZH7HnGsoQYP5VukRU5EE+nwzm6pCVNRalDsSswMmnjeprcd/KS91OBuJx2ZkzbfuUseOqa+GEiQOKkXpFS5QueKoPIzNXnhI+NA6t4Uq5WUcT93HvLfkunE6XXrCCUtqJxs6ValMz3QANg5vWxKCC0ytnUvk/TpmMDGGTeYwtkQAbTrNFRfmFwZIfELPaNkoqIAm1rdLzcJbOTc7iWhzWWUKjPPXiKaXmoWXyfTqF2nGVO3krkz83roirwO5Av7mntFINI9FAb/MFfmv37H3Ys0u8DhJDE9aRUU80cPEoW5mFJ/vFN/24J8fupE9zulKZLJpzXh6CKJ3o/9VjWbeFXxmo7eWJs3yVFzusb4XgkybuJsiJ1Alu9MU+yMXhAWqPmA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(376002)(396003)(136003)(366004)(39860400002)(8936002)(31686004)(8676002)(316002)(2616005)(66476007)(16576012)(66556008)(66946007)(956004)(6916009)(86362001)(54906003)(31696002)(4326008)(2906002)(44832011)(966005)(83380400001)(36756003)(5660300002)(6486002)(26005)(186003)(16526019)(45080400002)(83080400001)(52116002)(478600001)(53546011)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: ZE5FJqRScvKKgarlgRW8dyjzPV8m+R0+t9PQ6odxwfot1HAuI0fVteiLEPbtTSwPmdKECZhFaXdOnoLRNzJ7xBjLET1sZYYer70ylrXa4JgYwUU3cwrew4SLypEgL/IMst9gJ0cezk1GKi4d/Q27b0doZ7SA7LU0I/FjIrEVBf7jNs4IvcLspitxDf4BLQA9fX87iPC5THL/ttPx986yHgsxjbkvfNbJeUaYDI+IIwXYBwdblQEBh89pYVIdpNzzLpCEfcva+3uFhb17hkv2B52CKZ/jL+++0q0pcCSwpu5rL29QnUMEGnREQNP+2fAkEN5vjDrsmLbXIhOH/3nTDzUitjirGq6ZgYzBKqBKwnfTucBwj2L+iiVqKpv7dwc8z9+GaW90tfnNmVJse0n9y4KPyU5SIwI7nP7r7xXMTk5XvylhJ03JzLt1FSG/wy5nwq+o8++vEgRSdEqSNwH0F668FT0DvDflkwwFrBjmJZ4=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad613ca0-8e98-4a28-9679-08d807403485
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2020 21:59:21.5225 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j85xkG+MPhAhEEEIDrsJiJQES9RPBZIOjhuavbc6olc5qn/p5CGsmlqwbgDPGM6u
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2414
-Received-SPF: none client-ip=40.107.243.81; envelope-from=Babu.Moger@amd.com;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 17:59:22
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <da267698-75a7-1c2c-ea0c-cc95427233d3@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 15:54:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,142 +170,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-> -----Original Message-----
-> From: Eduardo Habkost <ehabkost@redhat.com>
-> Sent: Tuesday, June 2, 2020 12:19 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@twiddle.net;
-> mst@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org
-> Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding
-> functions
+On 6/2/20 5:51 PM, Eric Blake wrote:
+> On 6/2/20 4:45 PM, John Snow wrote:
+>> Requires: 20200602194844.15258-1-jsnow@redhat.com
 > 
-> Hi,
+> I don't know if patchew understand that, or if it requires:
 > 
-> It looks like this series breaks -device and CPU hotplug:
+> Based-on: 20200602194844.15258-1-jsnow@redhat.com
 > 
-> On Wed, Mar 11, 2020 at 05:53:34PM -0500, Babu Moger wrote:
-> > These functions add support for building EPYC mode topology given the smp
-> > details like numa nodes, cores, threads and sockets.
-> >
-> > The new apic id decoding is mostly similar to current apic id decoding
-> > except that it adds a new field node_id when numa configured. Removes all
-> > the hardcoded values. Subsequent patches will use these functions to build
-> > the topology.
-> >
-> > Following functions are added.
-> > apicid_llc_width_epyc
-> > apicid_llc_offset_epyc
-> > apicid_pkg_offset_epyc
-> > apicid_from_topo_ids_epyc
-> > x86_topo_ids_from_idx_epyc
-> > x86_topo_ids_from_apicid_epyc
-> > x86_apicid_from_cpu_idx_epyc
-> >
-> > The topology details are available in Processor Programming Reference (PPR)
-> > for AMD Family 17h Model 01h, Revision B1 Processors. The revision guides
-> are
-> > available from the bugzilla Link below.
-> > Link:
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
-> kernel.org%2Fshow_bug.cgi%3Fid%3D206537&amp;data=02%7C01%7Cbabu.m
-> oger%40amd.com%7C3487f40d37df4d59097d08d807190248%7C3dd8961fe488
-> 4e608e11a82d994e183d%7C0%7C0%7C637267151289763739&amp;sdata=wE0
-> ukXIVh0l5eNQWsv6VDE9UZEVJmisofaW192gcZAI%3D&amp;reserved=0
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > Acked-by: Igor Mammedov <imammedo@redhat.com>
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> [...]
-> >  typedef struct X86CPUTopoIDs {
-> >      unsigned pkg_id;
-> > +    unsigned node_id;
+>>
+>> This series is extracted from my larger series that attempted to bundle
+>> our python module as an installable module. These fixes don't require
+>> that,
+>> so they are being sent first as I think there's less up for debate in
+>> here.
+>>
+>> This requires my "refactor shutdown" patch as a pre-requisite.
+>>
+>> "v2":
+>> - This version supports iotests 297
+>> - Many patches merged by Phil are removed
+>> - Replaces iotests.py type aliases with centralized ones
+>>    (See patch 2)
+>> - Imports etc are reworked to use the non-installable
+>>    package layout instead. (Mostly important for patch 3)
+>>
+>> Testing this out:
+>> - You'll need Python3.6+
+>> - I encourage you to use a virtual environment!
+>> - You don't necessarily need these exact versions, but I didn't test the
+>>    lower bounds, use older versions at your peril:
+>>    - pylint==2.5.0
+>>    - mypy=0.770
+>>    - flake8=3.7.8
+>>
+>>> cd ~/src/qemu/python/
+>>> flake8 qemu
+>>> mypy --strict qemu
+>>> cd qemu
+>>> pylint *.py
+>>
+>> These should all 100% pass.
+>>
+>> ---
+>>
+>> Open RFC: What's the right way to hook this into make check to prevent
+>> regressions?
 > 
-> You have added a new field here.
+> We recently added iotest 297 in group meta; is there a way to run
+> './check -g meta' alongside the other iotests that 'make check' already
+> triggers?
 > 
-> >      unsigned die_id;
-> >      unsigned core_id;
-> >      unsigned smt_id;
-> [...]
-> > +static inline apic_id_t
-> > +x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
-> > +                              const X86CPUTopoIDs *topo_ids)
-> > +{
-> > +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
-> > +           (topo_ids->node_id << apicid_node_offset_epyc(topo_info)) |
-> 
-> You are using the new field here.
-> 
-> > +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
-> > +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
-> > +           topo_ids->smt_id;
-> > +}
-> 
-> But you are not initializing node_id in one caller of apicid_from_topo_ids():
-> 
-> static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->                             DeviceState *dev, Error **errp)
-> {
->     [...]
->     X86CPUTopoIDs topo_ids;
->     [...]
->     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
->         [...]
->         topo_ids.pkg_id = cpu->socket_id;
->         topo_ids.die_id = cpu->die_id;
->         topo_ids.core_id = cpu->core_id;
->         topo_ids.smt_id = cpu->thread_id;
->         cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
->     }
->     [...]
-> }
-> 
-> Result: -device is broken when using -cpu EPYC:
-> 
->   $ qemu-system-x86_64 -machine q35,accel=kvm -smp
-> 1,maxcpus=2,cores=1,threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-
-> cpu,core-id=0,socket-id=1,thread-id=0
->   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,thread-
-> id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0] with APIC ID 21855,
-> valid index range 0:1
-> 
-> This happens because APIC ID is calculated using uninitialized
-> memory.
-This patch should initialize the node_id. But I am not sure how to
-reproduce the bug. Can you please send me the full command line to
-reproduce the problem. Also test different options.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..047b4b9391 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1539,6 +1539,9 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         int max_socket = (ms->smp.max_cpus - 1) /
-                                 smp_threads / smp_cores / x86ms->smp_dies;
-+        unsigned nr_nodes = MAX(topo_info.nodes_per_pkg, 1);
-+        unsigned cores_per_node = DIV_ROUND_UP((x86ms->smp_dies * smp_cores *
-+                                                smp_threads), nr_nodes);
+If we want to distribute any of this code independently of qemu.git (And
+I think we do), I think relying on the iotests infrastructure will hurt
+more than it will help.
 
-         /*
-          * die-id was optional in QEMU 4.0 and older, so keep it optional
-@@ -1585,6 +1588,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-         topo_ids.die_id = cpu->die_id;
-         topo_ids.core_id = cpu->core_id;
-         topo_ids.smt_id = cpu->thread_id;
-+        topo_ids.node_id = (cpu->core_id / cores_per_node) % nr_nodes;
-         cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
-     }
+I think I should try to maintain some independence of this folder from
+the rest of the QEMU base; so it should be able to run the linting tests
+under its own power.
+
+(So, I guess, a Makefile?)
+
+but there's further problems: this infrastructure is 3.6+ only, but the
+build system only requires 3.5+. It has to be an optional testing target
+that executes only when it's possible to. It also requires additional
+dependencies not checked for in configure -- mypy, pylint, and flake8.
+
+I am wondering if there's a nice way to create a check target that
+builds a virtual environment with pinned dependencies, and then uses
+that to run the lint tests. As long as the machine you're running on has
+at least python3.6+ it should be able to run the tests.
+
+I just don't really have a plan yet...
+
+--js
 
 
