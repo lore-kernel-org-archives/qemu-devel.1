@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C21C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5B9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D726F2072F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:46:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA8420738
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:48:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4BnyUy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D726F2072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etDeopgl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA8420738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgA3A-0004bh-4F
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 12:46:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37534)
+	id 1jgA5J-0006aX-E4
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 12:48:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgA1M-000291-Gd
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:44:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54884
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgA4W-00064A-NM
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:47:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50987
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgA1L-0003Td-KU
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:44:12 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgA4V-00059B-65
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:47:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591116250;
+ s=mimecast20190719; t=1591116446;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7zks8Pg2USUyBWa/KTgyij6tgPSnSQcS7T1di8GfPDQ=;
- b=Y4BnyUy5MVUOzBVLG+rwyxwguwHJaD+LVT3AkurB/hooxQl/K37fIpx6zhvR68hMTmIqLg
- fE+pfeb9GjXUXpVk9WJlZFCfOypTaWDHbJBmXl52V9y+28mImy34y7kByzzS/NZCxWuY4p
- sDwMoqga6jkgCGEH+0DIPuIgHCza95E=
+ bh=5XCxDmZqJIqh9clVIpBTYWu/HtCQv0qmyDdMeRtV98c=;
+ b=etDeopgl0R7PMHDJ3PajSHTAB+7Wm+ylUTrYAG+Bnf4jktEvKnts2Gw1qUZg0rtn5Eoq+8
+ SMc/ZREnpBK/BRP4wYylaUZ3+irLhThAdZnjJg1mWUMFrnpunLGumguVWAwaVbYM8Wz5pl
+ ueFBblSXGXAoTHtpiVoCqWq5S4sRpvY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-xbyUlNbYNpWSvGn-PARHlg-1; Tue, 02 Jun 2020 12:44:08 -0400
-X-MC-Unique: xbyUlNbYNpWSvGn-PARHlg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-501-s9vEWufFOh2wPRoA6Y1KQg-1; Tue, 02 Jun 2020 12:47:24 -0400
+X-MC-Unique: s9vEWufFOh2wPRoA6Y1KQg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BD7C100CCD7;
- Tue,  2 Jun 2020 16:44:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0813100CCD2;
+ Tue,  2 Jun 2020 16:47:23 +0000 (UTC)
 Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 42BCD6116F;
- Tue,  2 Jun 2020 16:44:04 +0000 (UTC)
-Subject: Re: [PATCH RFC 01/32] python/qemu: create qemu.lib module
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 398755C541;
+ Tue,  2 Jun 2020 16:47:07 +0000 (UTC)
+Subject: Re: [PATCH RFC 03/32] python//machine.py: remove bare except
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-2-jsnow@redhat.com>
- <20200602100837.GA5940@linux.fritz.box>
+ <20200514055403.18902-4-jsnow@redhat.com>
+ <20200602110100.GD5940@linux.fritz.box>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -135,28 +135,28 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <864d1ab3-3f57-1d10-1f46-19cd7856d99a@redhat.com>
-Date: Tue, 2 Jun 2020 12:44:03 -0400
+Message-ID: <4f2193c7-019f-c921-b213-2d9f83a6a860@redhat.com>
+Date: Tue, 2 Jun 2020 12:47:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200602100837.GA5940@linux.fritz.box>
+In-Reply-To: <20200602110100.GD5940@linux.fritz.box>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 06:26:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 23:49:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -184,44 +184,25 @@ Sender: "Qemu-devel"
 
 
 
-On 6/2/20 6:08 AM, Kevin Wolf wrote:
+On 6/2/20 7:01 AM, Kevin Wolf wrote:
 > Am 14.05.2020 um 07:53 hat John Snow geschrieben:
->> move python/qemu/*.py to python/qemu/lib/*.py.
->>
->> To create a namespace package, the 'qemu' directory itself shouldn't
->> have module files in it. Thus, these files will go under a 'lib' package
->> directory instead.
->>
->> Bolster the lib/__init__.py file a little bit, Make the top-level
->> classes and functions available directly inside the `qemu.lib`
->> namespace, to facilitate a convenient shorthand:
->>
->>> from qemu.lib import QEMUQtestMachine, QEMUMonitorProtocol
->>
->> Lastly, update all of the existing import directives.
->>
->> (Note: these scripts were not necessarily tested to see if they still
->> work. Some of these scripts are in obvious states of disrepair and it is
->> beyond the scope of this patch to attempt to fix them.)
+>> Catch only the timeout error; if there are other problems, allow the
+>> stack trace to be visible.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  python/qemu/__init__.py                   | 11 -----
 > 
-> When trying to reproduce your mypy problem, I was wondering why mypy was
-> complaining that it couldn't find qemu.lib. The reason is that removing
-> __init__.py from qemu means it's not a valid module any more. If I
-> recreate it locally, mypy stops complaining.
-> 
-> So I think we need to leave this file here.
+> Having a visible stack trace is nice, but don't we still want to kill
+> the qemu process to be sure that it's gone even though we can't wait for
+> it to be shut down cleanly?
 > 
 > Kevin
 > 
 
-Depends. You'll want --namespace-packages to parse a PEP420 namespace.
+Ah, yes. I should kill and re-raise. I think Vladimir checked in some
+code here recently that kept this patch from applying, so I'll have to
+re-tune it anyway.
 
-(It's not a given we definitely want a PEP420 namespace, but that's what
-I created here.)
+Thanks for the spot.
 
 --js
 
