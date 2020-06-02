@@ -2,93 +2,89 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EC4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD4CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:40:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B2932074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CCFC206A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAlU0unf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B2932074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZFUEfox"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCFC206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg5Eo-0006kF-Ij
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 07:37:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38056)
+	id 1jg5HT-0000gQ-GL
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 07:40:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jg5ED-0006Jg-MB
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:37:09 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33319)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jg5EC-00053v-Sw
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:37:09 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l11so3081311wru.0
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 04:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ceQh7KDuSbqfQzt8ZZjn6/6jQP1zHqPfpK2+Po808Os=;
- b=CAlU0unfq+/CxdT8MnAnQlcQpTDleS31L/yFpLn9mzlhJgRqDASXBOBPtMZqVPab89
- 7ZVFu+WPfWziTRLntYfS8D+jjtS4fnZAOViT45amYKGas0nooEp9aYUm1IodaBECdb34
- cK1opBwGtd7NT+gaAv4a2mle4haio7zt3Jk2hQjeg2+AJ5Z9O9CIz70enzeZy/Mi2TzL
- b2Iautb/12Swhd6lFwnpp5WuNgAs+WjoFlzRzptnCQizWxfScytIV6N5UrtBa4/qhaJR
- p6UJzL2u/1pEyYx1mOpHhA3Lyc4JmBS5lMyAnRf9Vbh0Oypfk9mjW7tjG+WClp5Dldk3
- IFbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=ceQh7KDuSbqfQzt8ZZjn6/6jQP1zHqPfpK2+Po808Os=;
- b=T9GzTyZsAgTzKa5gAOJLPO3FRMxjI6JvYydNj+DsYcpoDRiEZeshd+17a+Fpr6yR+M
- WO6Kzs0Ti7IsCMLsf7J2VNsIF+v1zRhs/H3jJCz2EJ59nPoVo0RWTFiuTdNDoYroiho0
- evxE+oNj1/KlNqjdq+6ApY1RY+3P6CsUgRKPa4c2ljTHcTDHemu+kbJMyQzLO7xDMHiI
- dlC80/T1JOIp73Ia1+CyI/56/vxgBMzGSSiKIb6mTZb1qNy7YP6FY/0FQ7yQiqvehRBh
- PFq/CyPZ7AIe76zjhWpQSIhTfApWOgONUlIqWqbG4DLCA7PyoZvO5YM316A+DS80V7XN
- iX0A==
-X-Gm-Message-State: AOAM532baKLuvDUG+0ap3eQd1Uk3pTnD6pXtVdBwVURnOtdg8/40K5Bb
- sK8/xIYu/bDyHEYIxMEHYf6s9j6r
-X-Google-Smtp-Source: ABdhPJy2DlwYfsHNj1jf718PBA1GxO7+zcdpRWVqJgnLwM0aXfGzFJlSat0rgFt7CiVIw746wcNHXw==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr25659060wro.414.1591097824709; 
- Tue, 02 Jun 2020 04:37:04 -0700 (PDT)
-Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id z12sm3822247wrg.9.2020.06.02.04.37.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 04:37:03 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] .travis.yml: Temporarily disable the aarch64 job
-Date: Tue,  2 Jun 2020 13:37:02 +0200
-Message-Id: <20200602113702.28549-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jg5Ga-00089T-Uc
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:39:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28278
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jg5GZ-0005SE-J8
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:39:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591097974;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iYLpVsLp/f/yA4wx+yqX/lgqq4VfZA4A9vuREHBIsuQ=;
+ b=FZFUEfox403Abh6ewu9i5rSKlrJmjNkPe0kPYkyw72/37P0BJroFHQb9ODXhH57WP3rvVA
+ XLwyjvuVtt0eSDXb6sagxaEaHc/nS29ShAPdzyxbZEez2pNbPAegpkKNDvhaKT9lWCXxug
+ 7UTvMB5kAScKJY18unTsBvC5sCuTAn8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-OM-ObyoQO5iZE24mjT4LtQ-1; Tue, 02 Jun 2020 07:39:32 -0400
+X-MC-Unique: OM-ObyoQO5iZE24mjT4LtQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F1B280058E;
+ Tue,  2 Jun 2020 11:39:31 +0000 (UTC)
+Received: from [10.36.113.56] (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D0BF579A3;
+ Tue,  2 Jun 2020 11:39:24 +0000 (UTC)
+Subject: Re: [PATCH] checkpatch: reversed logic with acpi test checks
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20200602053614.54745-1-mst@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <42dc9203-e7bd-1f69-dad8-a4311a5a6b64@redhat.com>
+Date: Tue, 2 Jun 2020 13:39:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200602053614.54745-1-mst@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 23:49:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,61 +97,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Travis-CI Aarch64 runners are currently broken, the build fails
-because the filesystem quota is full [1]:
+Hi,
 
-    AR      libqemuutil.a
-  nm: qemu-sockets.o: Bad value
-    LINK    qemu-ga
-  qga/main.o: In function `main':
-  /home/travis/build/qemu/qemu/qga/main.c:1494: undefined reference to `socket_local_address'
-  qga/channel-posix.o: In function `ga_channel_open':
-  /home/travis/build/qemu/qemu/qga/channel-posix.c:210: undefined reference to `socket_parse'
-  /home/travis/build/qemu/qemu/qga/channel-posix.c:193: undefined reference to `unix_listen'
-  /home/travis/build/qemu/qemu/qga/channel-posix.c:218: undefined reference to `socket_listen'
-  collect2: error: ld returned 1 exit status
-  Makefile:686: recipe for target 'qemu-ga' failed
-  make: *** [qemu-ga] Error 1
+On 6/2/20 7:36 AM, Michael S. Tsirkin wrote:
+> Logic reversed: allowed list should just be ignored. Instead we
+> only take that into account :(
+> 
+> Fixes: e11b06a880ca ("checkpatch: ignore allowed diff list")
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Per [2], LXD container have 'approx 18GB' of storage, but our runner show:
+Fixes issues reported in "[RFC 0/6] TPM-TIS bios-tables-test" cover letter
 
-  $ df -h
-  Filesystem                                                                                         Size  Used Avail Use% Mounted on
-  /var/snap/lxd/common/lxd/storage-pools/instances/containers/travis-job-qemu-qemu-693775643/rootfs  895G   38G  854G   5% /
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-As we suppose a filesystem quota makes our build fail,
-disable the aarch64 job as a temporary kludge.
+Thanks
 
-[1] https://travis-ci.org/github/qemu/qemu/jobs/693775643
-[2] https://docs.travis-ci.com/user/reference/overview/#virtualisation-environment-vs-operating-system
+Eric
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- .travis.yml | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index 564be50a3c..3569ee99b3 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -399,6 +399,7 @@ jobs:
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
-     - name: "[aarch64] GCC check-tcg"
-+      if: false # Temporarily disabled due to problem in aarch64 runner.
-       arch: arm64
-       dist: xenial
-       addons:
--- 
-2.21.3
+
+> ---
+>  scripts/checkpatch.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 0ba213e9f2..55aa45dc16 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -1267,7 +1267,7 @@ sub checkfilename {
+>          # files and when changing tests.
+>  	if ($name =~ m#^tests/data/acpi/# and not $name =~ m#^\.sh$#) {
+>  		$$acpi_testexpected = $name;
+> -	} elsif ($name =~ m#^tests/qtest/bios-tables-test-allowed-diff.h$#) {
+> +	} elsif (not $name =~ m#^tests/qtest/bios-tables-test-allowed-diff.h$#) {
+>  		$$acpi_nontestexpected = $name;
+>  	}
+>  	if (defined $$acpi_testexpected and defined $$acpi_nontestexpected) {
+> 
 
 
