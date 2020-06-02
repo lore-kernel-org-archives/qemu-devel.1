@@ -8,79 +8,77 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E60CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4D5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 134532068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:39:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36E912068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 02:40:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rFvg5uhk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134532068D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="quF1DIWd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36E912068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfwps-0005l7-3C
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 22:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36836)
+	id 1jfwqr-0007DF-Eu
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 22:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jfwp4-0004q0-9R
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:38:40 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45086)
+ id 1jfwq9-0006fJ-IS
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:39:45 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:42358)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jfwp3-0005Ms-BC
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:38:37 -0400
-Received: by mail-pl1-x643.google.com with SMTP id y11so712272plt.12
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 19:38:36 -0700 (PDT)
+ id 1jfwq8-0005XR-Bz
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 22:39:45 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id b5so1507945pfp.9
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 19:39:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=OK/DTB71BDOFzUlV1g9OxdUAuN7LmiZPAncyEdpJig8=;
- b=rFvg5uhk7b7AoAXbSJ33+Sk8HSHqN9/3UuNd5Xzd50dEwW6p0z7tiyPun7TBK0OH+V
- rN+SJ6MIDVptx9sG2qBFB/CCCcaH7c3oZ6yLP3r3Vq4SSBXw0EA9vE+nPPrLULAY4UDJ
- UJqPtzVrAsaXEl+vhUD3Uqtb9ocrflQ8uReT3phb/XZWJ0ETl0LvLDYGLYzyL6Ec2eT/
- 4aEsCweMJt0g14zeGmFiKcXHyGS0nwdTvel/o9hd8OlVRgeDHttfCyOH83/b3qoxla0b
- CnvBH3lQeWNdZ2qsT8Y2zZEvOpa3K0xCjEZK/iQ2idLy4BNG6f3lu2+rAfHtR6wbALA8
- JNcA==
+ bh=Pja4TRHYcV39jROvm5UhXGDO0MXNz8Qe9iULx5cF5qI=;
+ b=quF1DIWdGsdjNC6pFdoyecxp+8BbHFstg+BRhOyhzSc5qua0JubOGcuzsyLSi0dHAI
+ kfj2o84cqAt45894wZ8ELDVjwLLo+LwT0bps5cvep8Gt76AkXazrPr/4VzJjvqtXIdlu
+ NZkvG4VrLLpFP2sfry7ZGSkH+xLsQVJsSXfHJlaVIA0xwbPfoiayrE3ao5wqI/MdM7R6
+ mTbdoSsphUIzVHfD8+ssltBXY/1X25OMMds2BdwLxR79NlCEXhdmhQIcm5w42rrKJsnw
+ Z8tHK+ZxNJRru5kGCxUFK53ZdmKo5SQm43MvZEVaZqJpDCWyzryyQjW4urlr0BZ78xGM
+ YSWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=OK/DTB71BDOFzUlV1g9OxdUAuN7LmiZPAncyEdpJig8=;
- b=cpWnHt5z4n/yFPCX5kj163yZ08eOroP1vJ8oUzLiKIxF0foEFJ6yGPw78UVkfkOOiW
- vNNoKO0i7VnK/bwiCw18G1C98nElcQUyrlPcMiHJLRKFBmqefiycNqMs+WCHCIA32i5D
- owfJYHcnPPJMFEKvwBofivxLIXahGVEPcrJHsGSwODLNAINGCUwrxEV3+4MlcFlpIYnI
- j4VqM80XIC3aXPuagXB5fKG9f8+BeLAVvUqjmScbIWtnvg//QNm5oWjzfx+emWTdrZOg
- mbj91lJugzpt+Oe10FrVdAxXfC96eUelYxwfq63Nn9wi8eJEQrvKLOHo/Z4i9c4PQyXW
- fJKQ==
-X-Gm-Message-State: AOAM533YFjPASJgMCYIsvOT+T2LvkCqVSXtSE2v7SDUX7iFi+bWBObpv
- n8WUtE4h4rLsLofglApz97Y=
-X-Google-Smtp-Source: ABdhPJxQyIXhCmXDNRIto+ZAvJehoiL4IR6mUqzq5P623uRpfNB3fZ6j0GpHbzDplxNyawQHgRGPNQ==
-X-Received: by 2002:a17:90a:3261:: with SMTP id
- k88mr2813656pjb.0.1591065515874; 
- Mon, 01 Jun 2020 19:38:35 -0700 (PDT)
+ bh=Pja4TRHYcV39jROvm5UhXGDO0MXNz8Qe9iULx5cF5qI=;
+ b=dAg/PjI6lDvZS/QIcQhKjOIraFUnLvuPZGsrBTSRCJO2lPWAlZDanTsc0Mnv5cBp+L
+ mQdxrMrnrXFJNh8zixsc31yQUP0Et9P2XEy7TlwPfns1DpV6Ozpm1dHTo6hr2io575i3
+ mt4P53QzrxUIVKYed4POdG0GEZ81XtBNH10lONj9ZDcOqyNBpila55j2DDPNXDojv4Qj
+ HygGT6BknhBfaxIFI0xU2cg+IRaNZsPxD9gO5YlkaouluYzCu8ooIwM+hhZMX/PQFq7r
+ ebapXI09lZGLZKHpFrCjLpunGlk6fyi8ITVL3ts3OaAbakP3pvLNnw3F0A1GCN34+Q0E
+ jb8g==
+X-Gm-Message-State: AOAM533C+bRX0H3IkA6f7CgUxoBchvAvb9IAnWcp+kdKdC+QfOkVwCDH
+ mW1Z3f7oqt//ozHqoiP7rtQ=
+X-Google-Smtp-Source: ABdhPJwI7/mls9Xihe20WmhitgqGIqvVGMK/ebX7j/AKWOvgKH0AodgG6xPuML9R6d8biqK+kfvzxQ==
+X-Received: by 2002:aa7:808e:: with SMTP id v14mr24150064pff.168.1591065582958; 
+ Mon, 01 Jun 2020 19:39:42 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id j186sm630761pfb.220.2020.06.01.19.38.33
+ by smtp.gmail.com with ESMTPSA id j186sm630761pfb.220.2020.06.01.19.39.40
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jun 2020 19:38:35 -0700 (PDT)
+ Mon, 01 Jun 2020 19:39:42 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
- MachineClass
-Date: Tue,  2 Jun 2020 10:39:14 +0800
-Message-Id: <1591065557-9174-2-git-send-email-chenhc@lemote.com>
+Subject: [PATCH for-5.1 V4 2/4] target/mips: Add Loongson-3 CPU definition
+Date: Tue,  2 Jun 2020 10:39:15 +0800
+Message-Id: <1591065557-9174-3-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
 References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,133 +107,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
-can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
-MachineClass. Besides, libvirt uses a null-machine to detect the kvm
-capability, so by default it will return "KVM not supported" on a VZ
-platform. Thus, null-machine also need the kvm_type() hook.
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, we just define two CPU types:
+1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Loongson-3A has CONFIG6 and CONFIG7, so add their bit-fields as well.
+
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- hw/core/Makefile.objs  |  2 +-
- hw/core/null-machine.c |  4 ++++
- hw/mips/Makefile.objs  |  2 +-
- hw/mips/common.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/mips/mips.h |  3 +++
- 5 files changed, 51 insertions(+), 2 deletions(-)
- create mode 100644 hw/mips/common.c
+ target/mips/cpu.h                | 28 +++++++++++++
+ target/mips/internal.h           |  2 +
+ target/mips/mips-defs.h          |  7 +++-
+ target/mips/translate.c          |  2 +
+ target/mips/translate_init.inc.c | 86 ++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 123 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 1d540ed..b5672f4 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
- common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
- common-obj-$(CONFIG_SOFTMMU) += sysbus.o
- common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- common-obj-$(CONFIG_SOFTMMU) += loader.o
- common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
- common-obj-$(CONFIG_SOFTMMU) += numa.o
- common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
-+obj-$(CONFIG_SOFTMMU) += null-machine.o
- obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 94d01ea..0b3c987 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -940,7 +940,35 @@ struct CPUMIPSState {
+ #define CP0C5_UFR          2
+ #define CP0C5_NFExists     0
+     int32_t CP0_Config6;
++    int32_t CP0_Config6_rw_bitmask;
++#define CP0C6_BPPASS          31
++#define CP0C6_KPOS            24
++#define CP0C6_KE              23
++#define CP0C6_VTLBONLY        22
++#define CP0C6_LASX            21
++#define CP0C6_SSEN            20
++#define CP0C6_DISDRTIME       19
++#define CP0C6_PIXNUEN         18
++#define CP0C6_SCRAND          17
++#define CP0C6_LLEXCEN         16
++#define CP0C6_DISVC           15
++#define CP0C6_VCLRU           14
++#define CP0C6_DCLRU           13
++#define CP0C6_PIXUEN          12
++#define CP0C6_DISBLKLYEN      11
++#define CP0C6_UMEMUALEN       10
++#define CP0C6_SFBEN           8
++#define CP0C6_FLTINT          7
++#define CP0C6_VLTINT          6
++#define CP0C6_DISBTB          5
++#define CP0C6_STPREFCTL       2
++#define CP0C6_INSTPREF        1
++#define CP0C6_DATAPREF        0
+     int32_t CP0_Config7;
++    int64_t CP0_Config7_rw_bitmask;
++#define CP0C7_NAPCGEN       2
++#define CP0C7_UNIMUEN       1
++#define CP0C7_VFPUCGEN      0
+     uint64_t CP0_LLAddr;
+     uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+     int32_t CP0_MAARI;
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 1bf274b..7853cb1 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -36,7 +36,9 @@ struct mips_def_t {
+     int32_t CP0_Config5;
+     int32_t CP0_Config5_rw_bitmask;
+     int32_t CP0_Config6;
++    int32_t CP0_Config6_rw_bitmask;
+     int32_t CP0_Config7;
++    int32_t CP0_Config7_rw_bitmask;
+     target_ulong CP0_LLAddr_rw_bitmask;
+     int CP0_LLAddr_shift;
+     int32_t SYNCI_Step;
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index a831bb4..c2c96db 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -51,8 +51,9 @@
+  */
+ #define INSN_LOONGSON2E   0x0001000000000000ULL
+ #define INSN_LOONGSON2F   0x0002000000000000ULL
+-#define INSN_VR54XX       0x0004000000000000ULL
+-#define INSN_R5900        0x0008000000000000ULL
++#define INSN_LOONGSON3A   0x0004000000000000ULL
++#define INSN_VR54XX       0x0008000000000000ULL
++#define INSN_R5900        0x0010000000000000ULL
+ /*
+  *   bits 56-63: vendor-specific ASEs
+  */
+@@ -94,6 +95,8 @@
+ /* Wave Computing: "nanoMIPS" */
+ #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
  
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index cb47d9d..94a36f9 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -17,6 +17,7 @@
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/core/cpu.h"
-+#include "hw/mips/mips.h"
- 
- static void machine_none_init(MachineState *mch)
- {
-@@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->max_cpus = 1;
-     mc->default_ram_size = 0;
-     mc->default_ram_id = "ram";
-+#ifdef TARGET_MIPS
-+    mc->kvm_type = mips_kvm_type;
-+#endif
- }
- 
- DEFINE_MACHINE("none", machine_none_machine_init)
-diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-index 739e2b7..3b3e6ea 100644
---- a/hw/mips/Makefile.objs
-+++ b/hw/mips/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += addr.o mips_int.o
-+obj-y += addr.o common.o mips_int.o
- obj-$(CONFIG_R4K) += r4k.o
- obj-$(CONFIG_MALTA) += gt64xxx_pci.o malta.o
- obj-$(CONFIG_MIPSSIM) += mipssim.o
-diff --git a/hw/mips/common.c b/hw/mips/common.c
-new file mode 100644
-index 0000000..4d8e141
---- /dev/null
-+++ b/hw/mips/common.c
-@@ -0,0 +1,42 @@
-+/*
-+ * Common MIPS routines
-+ *
-+ * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
-+ * This code is licensed under the GNU GPL v2.
-+ */
++#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
 +
-+#include <linux/kvm.h>
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/boards.h"
-+#include "hw/mips/mips.h"
-+#include "sysemu/kvm_int.h"
-+
-+#ifndef CONFIG_KVM
-+
-+int mips_kvm_type(MachineState *machine, const char *vm_type)
-+{
-+    return 0;
-+}
-+
-+#else
-+
-+int mips_kvm_type(MachineState *machine, const char *vm_type)
-+{
-+    int r;
-+    KVMState *s = KVM_STATE(machine->accelerator);
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_VZ);
-+    if (r > 0) {
-+        return KVM_VM_MIPS_VZ;
-+    }
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_TE);
-+    if (r > 0) {
-+        return KVM_VM_MIPS_TE;
-+    }
-+
-+    return -1;
-+}
-+
-+#endif
-diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
-index 0af4c3d..2ac0580 100644
---- a/include/hw/mips/mips.h
-+++ b/include/hw/mips/mips.h
-@@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len);
- 
- DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
- 
-+/* common.c */
-+int mips_kvm_type(MachineState *machine, const char *vm_type);
-+
- #endif
+ /*
+  * Strictly follow the architecture standard:
+  * - Disallow "special" instruction handling for PMON/SPIM.
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 25b595a..2caf4cb 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
+     env->CP0_Config5 = env->cpu_model->CP0_Config5;
+     env->CP0_Config5_rw_bitmask = env->cpu_model->CP0_Config5_rw_bitmask;
+     env->CP0_Config6 = env->cpu_model->CP0_Config6;
++    env->CP0_Config6_rw_bitmask = env->cpu_model->CP0_Config6_rw_bitmask;
+     env->CP0_Config7 = env->cpu_model->CP0_Config7;
++    env->CP0_Config7_rw_bitmask = env->cpu_model->CP0_Config7_rw_bitmask;
+     env->CP0_LLAddr_rw_bitmask = env->cpu_model->CP0_LLAddr_rw_bitmask
+                                  << env->cpu_model->CP0_LLAddr_shift;
+     env->CP0_LLAddr_shift = env->cpu_model->CP0_LLAddr_shift;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index 6d145a9..a31f229 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -802,6 +802,92 @@ const mips_def_t mips_defs[] =
+         .mmu_type = MMU_TYPE_R4000,
+     },
+     {
++        .name = "Loongson-3A1000",
++        .CP0_PRid = 0x6305,
++        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
++        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
++                       (MMU_TYPE_R4000 << CP0C0_MT),
++        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
++                       (3 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
++                       (3 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
++                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
++        .CP0_Config2 = MIPS_CONFIG2 | (7 << CP0C2_SS) | (4 << CP0C2_SL) |
++                       (3 << CP0C2_SA),
++        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_LPA),
++        .CP0_LLAddr_rw_bitmask = 0,
++        .SYNCI_Step = 32,
++        .CCRes = 2,
++        .CP0_Status_rw_bitmask = 0x74D8FFFF,
++        .CP0_PageGrain = (1 << CP0PG_ELPA),
++        .CP0_PageGrain_rw_bitmask = (1 << CP0PG_ELPA),
++        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64) |
++                    (0x1 << FCR0_PS) | (0x1 << FCR0_L) | (0x1 << FCR0_W) |
++                    (0x1 << FCR0_D) | (0x1 << FCR0_S),
++        .CP1_fcr31 = 0,
++        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
++        .SEGBITS = 42,
++        .PABITS = 48,
++        .insn_flags = CPU_LOONGSON3A,
++        .mmu_type = MMU_TYPE_R4000,
++    },
++    {
++        .name = "Loongson-3A4000",
++        .CP0_PRid = 0x14C000,
++        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
++        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
++                       (MMU_TYPE_R4000 << CP0C0_MT),
++        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
++                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
++                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
++                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
++        .CP0_Config2 = MIPS_CONFIG2 | (5 << CP0C2_SS) | (5 << CP0C2_SL) |
++                       (15 << CP0C2_SA),
++        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
++                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
++                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
++        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
++                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
++        .CP0_Config4_rw_bitmask = 0,
++        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_CRCP) | (1 << CP0C5_NFExists),
++        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
++                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
++                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
++        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
++                       (1 << CP0C6_SFBEN) | (1 << CP0C6_VLTINT) |
++                       (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
++        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
++                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) |
++                                  (1 << CP0C6_LASX) | (1 << CP0C6_SSEN) |
++                                  (1 << CP0C6_DISDRTIME) | (1 << CP0C6_PIXNUEN) |
++                                  (1 << CP0C6_SCRAND) | (1 << CP0C6_LLEXCEN) |
++                                  (1 << CP0C6_DISVC) | (1 << CP0C6_VCLRU) |
++                                  (1 << CP0C6_DCLRU) | (1 << CP0C6_PIXUEN) |
++                                  (1 << CP0C6_DISBLKLYEN) | (1 << CP0C6_UMEMUALEN) |
++                                  (1 << CP0C6_SFBEN) | (1 << CP0C6_FLTINT) |
++                                  (1 << CP0C6_VLTINT) | (1 << CP0C6_DISBTB) |
++                                  (3 << CP0C6_STPREFCTL) | (1 << CP0C6_INSTPREF) |
++                                  (1 << CP0C6_DATAPREF),
++        .CP0_Config7 = 0,
++        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) |
++                                  (1 << CP0C7_VFPUCGEN),
++        .CP0_LLAddr_rw_bitmask = 1,
++        .SYNCI_Step = 16,
++        .CCRes = 2,
++        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
++        .CP0_PageGrain = (1 << CP0PG_ELPA),
++        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
++                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
++        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64) |
++                    (0x1 << FCR0_PS) | (0x1 << FCR0_L) | (0x1 << FCR0_W) |
++                    (0x1 << FCR0_D) | (0x1 << FCR0_S),
++        .CP1_fcr31 = 0,
++        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
++        .SEGBITS = 48,
++        .PABITS = 48,
++        .insn_flags = CPU_LOONGSON3A,
++        .mmu_type = MMU_TYPE_R4000,
++    },
++    {
+         /* A generic CPU providing MIPS64 DSP R2 ASE features.
+            FIXME: Eventually this should be replaced by a real CPU model. */
+         .name = "mips64dspr2",
 -- 
 2.7.0
 
