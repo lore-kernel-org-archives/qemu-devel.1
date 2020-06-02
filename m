@@ -2,94 +2,72 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE997C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C851BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9BBE20659
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:17:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drRSJT5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BBE20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9385C2068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:22:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9385C2068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg8fa-0001t2-TC
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:17:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49358)
+	id 1jg8kR-0005RX-RZ
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:22:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jg8ed-0000wB-Jw
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:16:39 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48976
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jg8ec-0006nF-Ho
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:16:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591110997;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F5d0r4xpOaaozoK2FL/klQUzR7XC88uuoH579R6j7uQ=;
- b=drRSJT5Y6WrC9gYKSShCb47i7JKG3oodvTVX3zVtUfGdqG4+bSQPHEa84PElpLNcKQ30u/
- vumionq5uwy8rf5IIcsJ7dNn7Jt9fMpVRR9mvCLfXmKuIwmseS/Q860vir4STUZMQb0PT7
- SBY6PcULFyav/A85medG1VZTvk916cI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-9wC5EBKrOzq-0QIPxwlFjw-1; Tue, 02 Jun 2020 11:16:34 -0400
-X-MC-Unique: 9wC5EBKrOzq-0QIPxwlFjw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B06E107ACCA;
- Tue,  2 Jun 2020 15:16:32 +0000 (UTC)
-Received: from [10.36.113.56] (ovpn-113-56.ams2.redhat.com [10.36.113.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F5157E7E1;
- Tue,  2 Jun 2020 15:16:27 +0000 (UTC)
-Subject: Re: [PATCH v3 1/4] acpi: Convert build_tpm2() to build_append* API
-To: Stefan Berger <stefanb@linux.ibm.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200601095737.32671-1-eric.auger@redhat.com>
- <20200601095737.32671-2-eric.auger@redhat.com>
- <46c71777-b588-ce1f-eb8d-de1c5b3e2186@linux.ibm.com>
- <6bd7f3a0-5a40-823e-bf67-309c9995e18e@redhat.com>
- <a85cc67e-2d8a-2034-3b85-6e8c8d7dcad6@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b1cf9216-39ff-c597-c919-b944f76ec9b0@redhat.com>
-Date: Tue, 2 Jun 2020 17:16:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jg8jb-0004XD-5g
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:21:47 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:52453)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jg8jZ-0008G5-AD
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:21:46 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MsI0I-1ir3Db1DZa-00tint; Tue, 02 Jun 2020 17:21:41 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/2] M68k for 5.1 patches
+Date: Tue,  2 Jun 2020 17:21:33 +0200
+Message-Id: <20200602152135.774894-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <a85cc67e-2d8a-2034-3b85-6e8c8d7dcad6@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 22:14:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:TbfejHmcwJbP4kx9WULJFGcNQ7Q+FhM16STmqALA96J2DnUxJlp
+ sy9eipvnrr5bxaoV9HHcW+eDvVK1hz1a2RGZvci8LA/Wj+5/FNXEPCmvRcWxlnALD/RTKhu
+ B5kZOzretocUl5013Q6JOzIXftAtSkr4Tg5mZyziPrs3FYYc5n0ZHx5ylvUGQHDKB6cWpBl
+ 9Wa674Fjv3CNLlSYieJOA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WLdFHQ37R4s=:/rexFZsLLldjFyyuciCVRM
+ P7tRio/JoIQQaR1W15J1gXlT+GbntSjtJ3QDIiuJxcN7ysj+tjzRSrIy8SHL3C7pORTpE5sjU
+ kHkmZb+b0G7yS5vdFWLqZ8+Kv8dTODjvI9GOcTgoCYLncxVA6cKq2I9C1o9dEwIzVFSWTpk8L
+ pKsNipHD3h7vWTK9s2GVeIwN6fGTm7UC95LlN8wnu5eAsDPv2ujBUMBq/pvMqNyxjHz+iJQZu
+ gcrrywgIvgfQdM6e2tJhJc4gvXKd9QtEXgficMbHp6yLBjE4TYnkOZYogPOE9qgxBfNmQvzJ9
+ OroFn30L9a6ilBbYMEkd5iEvJ7TyrWK+AFCkh4Gw8rNjUUFhcTvThTTLMx4RJ/ymecjjw/Jf8
+ wSeW6TgLIBpEkTG3CzhWXlFWB7kM4e0BlF2n10iBuvUNCh/4u87vlYUZkl/njiS329dJ69k91
+ 0WAkpOU+RZK9pHNqlM6eja6h2m2jVkXk3Ub6+RBGJNeeQnKWkFI4NSi8bQ2xEVNho7S+qYqFR
+ +Wej01NZ2JGICcLs4xl+5eNKtbtTc/Dc9d48FVHqPMN9bG/ezlFO+Vr5lPr18vfDbCFT1FxY7
+ xG/IICl0EjTZwrwEfrFOstXoWOHCODlrPMv5CyWXSgogSesn7vF2VD3913wcgFGZy4VijDiJt
+ 4xLVpF4NtSTFh2fad96ADO73kAoNa2/iPpPm6OXB2oPB/LfCIPaNw0c6SYAlQjnbf2TwCEFln
+ m9uWDaR07uRHYCkLTZLT2a92bb6eFH+3htS5uuLDD6Gz0HwxpM+KeKNt2vZkCWg+IOXRvl7NG
+ qskAdOo0Iact7Tac3hWpp9TC5VeWx2SvgeYndWuhfArffFKgPMAdzNnspiCqHlWH6PMIk25
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 11:21:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,127 +80,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, drjones@redhat.com, lersek@redhat.com,
- ardb@kernel.org, philmd@redhat.com
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
-
-On 6/2/20 4:24 PM, Stefan Berger wrote:
-> On 6/2/20 9:55 AM, Auger Eric wrote:
->> Hi Stefan,
->> On 6/2/20 3:30 PM, Stefan Berger wrote:
->>> On 6/1/20 5:57 AM, Eric Auger wrote:
->>>> In preparation of its move to the generic acpi code,
->>>> let's convert build_tpm2() to use build_append API. This
->>>> latter now is prefered in place of direct ACPI struct field
->>>> settings with manual endianness conversion.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> ---
->>>>    hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
->>>>    1 file changed, 19 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>>> index b5669d6c65..f0d35d7b17 100644
->>>> --- a/hw/i386/acpi-build.c
->>>> +++ b/hw/i386/acpi-build.c
->>>> @@ -2298,30 +2298,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker
->>>> *linker, GArray *tcpalog)
->>>>    static void
->>>>    build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->>>>    {
->>>> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof
->>>> *tpm2_ptr);
->>>> +    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data,
->>>> sizeof(AcpiTableHeader));
->>> And now you want to build the data structure by pushing fields? I would
->>> definitely NOT do this.
->> If I didn't misinterpret things, this was recommended by Drew and Igor
->> as buid_append* API avoids to take care of endianness and this is the
->> API now used in the generic ACPI code. Besides I also think that in that
->> case it does not simplify things but maybe I did that the wrong way? Or
->> maybe I didn't understand your remark?
-> 
-> 
-> If that's what they are saying... I would prefer filling out data
-> structures with functions like cpu_to_acpi16() because that seems to be
-> less error prone.
-understood. Let's wait for other comments and we will make a decision
-wrt direction.
-> 
-> 
->>>
->>>>        unsigned log_addr_size =
->>>> sizeof(tpm2_ptr->log_area_start_address);
->>>>        unsigned log_addr_offset =
->>>>            (char *)&tpm2_ptr->log_area_start_address -
->>>> table_data->data;
->>>> +    uint8_t start_method_params[12] = {};
->>>>    -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
->>>> +    /* platform class */
->>>> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
->>>> +    /* reserved */
->>>> +    build_append_int_noprefix(table_data, 0, 2);
->>>>        if (TPM_IS_TIS_ISA(tpm_find())) {
->>>> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
->>>> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
->>>> +        /* address of control area */
->>>> +        build_append_int_noprefix(table_data, 0, 8);
->>>> +        /* start method */
->>>> +        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO,
->>>> 4);
->>>>        } else if (TPM_IS_CRB(tpm_find())) {
->>>> -        tpm2_ptr->control_area_address =
->>>> cpu_to_le64(TPM_CRB_ADDR_CTRL);
->>>> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
->>>> +        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
->>>> +        build_append_int_noprefix(table_data,
->>>> TPM2_START_METHOD_CRB, 4);
->>>>        } else {
->>>>            g_warn_if_reached();
->>>>        }
->>>>    -    tpm2_ptr->log_area_minimum_length =
->>>> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
->>>> +    /* platform specific parameters */
->>>> +    g_array_append_vals(table_data, &start_method_params, 12);
-> 
-> Maybe this should be wrapped in an inline function like
-> build_append_array() or so.
-Hum OK
-> 
-> 
->>>>    -    acpi_data_push(tcpalog,
->>>> le32_to_cpu(tpm2_ptr->log_area_minimum_length));
->>>> +    /* log area minimum length */
->>>> +    build_append_int_noprefix(table_data,
->>>> TPM_LOG_AREA_MINIMUM_SIZE, 4);
->>>> +
->>>> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-> 
-> 
-> At this point we have a double-allocation of log memory on x86_64. You'd
-> need the patch I posted to create the TCPA table only for TPM 1.2.
-This series applies on top of this patch (mentionned in the cover letter).
-> 
-> 
-> 
->>>>        bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE,
->>>> tcpalog, 1,
->>>>                                 false);
->>>>          /* log area start address to be filled by Guest linker */
->>>> +    build_append_int_noprefix(table_data, 0, 8);
->>>>        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>>>                                       log_addr_offset, log_addr_size,
->>>>                                       ACPI_BUILD_TPMLOG_FILE, 0);
->>>
-> 
-> 
-> 
-Thanks
-
-Eric
-
+The following changes since commit 853a60b87024b2f5d7c0c54a432d7798cb679900=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-202006=
+01a' into staging (2020-06-01 21:34:47 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/vivier/qemu-m68k.git tags/m68k-for-5.1-pull-request=0D
+=0D
+for you to fetch changes up to 250b1da35d579f42319af234f36207902ca4baa4:=0D
+=0D
+  target/m68k: implement opcode fetoxm1 (2020-06-02 13:59:02 +0200)=0D
+=0D
+----------------------------------------------------------------=0D
+Two fixes for the 68040 FPU=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Laurent Vivier (2):=0D
+  target/m68k: implement fmove.l #<data>,FPCR=0D
+  target/m68k: implement opcode fetoxm1=0D
+=0D
+ target/m68k/helper.h     |  1 +=0D
+ target/m68k/fpu_helper.c |  5 +++++=0D
+ target/m68k/translate.c  | 17 +++++++++++++++++=0D
+ 3 files changed, 23 insertions(+)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
