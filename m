@@ -2,122 +2,120 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 216EDC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 537D8C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4B1D20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:07:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 230E220674
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 13:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="w7U/C2of"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B1D20674
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="a1HBFNgc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230E220674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg6db-0008DW-6I
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 09:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51634)
+	id 1jg6df-0008JM-C4
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 09:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Stefan.Brankovic@syrmia.com>)
- id 1jg3sw-0005tH-NF
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 06:11:06 -0400
-Received: from mail-eopbgr40092.outbound.protection.outlook.com
- ([40.107.4.92]:56095 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jg5UN-0000Ta-Vq
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:53:51 -0400
+Received: from mail-db8eur05on2098.outbound.protection.outlook.com
+ ([40.107.20.98]:20705 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Stefan.Brankovic@syrmia.com>)
- id 1jg3su-00056Q-IZ
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 06:11:06 -0400
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jg5UM-0000f1-8p
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:53:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GGlPeoDBhOkOKcwQoGh9MsgveRI7L3iD4zDArAXbuxVHBRXodiZ5PIqVYNjlP17M06j1oW4t1vMi+9kWZnLRhIFei7XYYk4OwglkXvHohXUlRkxoSugONdMkc9WquwKXZC5hUGaueEuB3bODggZcFJOMYzquP19sZDuNGuQ+fPz6DxxZP2m/mqtsOmDzXkq7A6+EtBWSQihrJ/vFtL4qM52VFB3QcwJcES9H1EHGuivTBzH1OkMYR8//7cschAHAA8PjjG8sFvBhMBCfwo/JOlHh2jn5/Q6QQ+809UOmINQXnWEcbOx9P7k2/q3irGXJBNWWm9/aevPqdoYCui/8+w==
+ b=g43R9V5ivuHZVMWxB1V58cG2i5daayqAiSsreByhMpBRiuUTJaFPHOxscssA75QrkVAB0y4Olk8LrLZRGf9O/hMtVjOFmmaHXizBnNbb5sZCJXRkXZloI1TCHiTpR70SYFp/y0ySWnxpBw2lhVDi4RF8KoyrRkTjmLku9R17czlBHixAdjp8rZ+E4U/0XVa0Qzt+Gk/tvvIpHf9coxwJQt1fWMKR1Uz8rjCDILaR1ItdwH1EeYFEPbv6ZVFLHQfVs447V+5pTRdQtM6sGaC0jYfvAfmgmdhYHnIuPdG/9TY0l3PEte4Copyfa/HKBnv3YLlVu/2/8AaG+7KkFoepKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P3H5x2NKsOKgA1+kxGEyF1j+NH4j2vGwVOTRnyZRppI=;
- b=RClgpM6c1xJ4S15eONV1/8BTI3AvIpCbIxE9zM3iRdtVg4jbyn/SMOppM6kT74tqODcveHa1c1sYmnpLfjzsQOlv9sM5twmrd7Vxe03KQQODvlFUpnmI9xmSWZb5YSkD5afaLa+Ld+d2pv5WFVX9QTn0rfcMFVG4QCmGxlcLbUFPyAahoxle/lOJDBJvjn1Se5ihHjhZ4hU9Ax/xmHdd0KPmW6IX+8A0AhljCBjvb/e5/Lwao4SPkqUzlxTy3fURJXn1sKjuvHkGBY1pF30EhEqCN3pQ1huxjXWodQKQ5N1xV7cc359OKKMv8vbO+PNtDlN3KNX4on0TfvKBseoSOg==
+ bh=TY44iFpp45jA4aUldAT2cU45SX6PumUBvKPAEPX4oBE=;
+ b=S2k+Ao59VEhLVLe0YVOd398pLMAQzKpYCCDNjZ0WAWqHEEmYmgh6ouhzPt1DgpY8VjMNnfdB11vAAiZr6let/VdLtt8tBKTsYMGmw+wIj73dxTdzozPpdqvXhXdJLeJA2MuqdBSOQEZs9bGlEIBeJrFCjhuQ72j13A7ZG2/SjesNm4S0XqLFMz5D/m9fqqV32PD6rVaq3MBpbziy+5VCshanH0MoJwXTGZSBqOLzpW05Uigff2C8HKofeOARyqxHmUI+lXyem9SFxIw9B9YUfiI9RzbKyZDqj94EVtAd3XbCeRStyMRuBaO08jiagtdMEWdUavGuTt2FR8UTQqEYeA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
  dkim=pass header.d=syrmia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P3H5x2NKsOKgA1+kxGEyF1j+NH4j2vGwVOTRnyZRppI=;
- b=w7U/C2ofPRJwx035erNS/TJ4efICj8pPcA27JRtn2L60ecSZT8z0yov5pUzbjFkpg5cknWMv6yzIrueAiqG7SOGIn5+aC1xcu97D6OeBe7+6grmWTG1yqET9fuUBf/arKecCcsUNZCHszUK2+hqOqfsSHfdT8emvjIP+x1Y4wFc=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=syrmia.com;
-Received: from AM0PR03MB3844.eurprd03.prod.outlook.com (2603:10a6:208:6b::15)
- by AM0PR03MB5811.eurprd03.prod.outlook.com (2603:10a6:208:15c::23)
+ bh=TY44iFpp45jA4aUldAT2cU45SX6PumUBvKPAEPX4oBE=;
+ b=a1HBFNgc2ZOSYinITR0a0H/PdfiaAPHCAVlSUiBNMWIHLcqdRZ7/4+Bx03z/N88dm1pR4USTftg3YXByZy+ql3I51KIUzSRra58gF16oF5kHkCtNytInEyZUqjOn+1yhc+2U43K2pngiqccNgTdSOPBx2jt2l41ovRKFWMYdej4=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
+ by AM6PR03MB4022.eurprd03.prod.outlook.com (2603:10a6:20b:22::27)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.19; Tue, 2 Jun
- 2020 09:55:59 +0000
-Received: from AM0PR03MB3844.eurprd03.prod.outlook.com
- ([fe80::948d:5fa2:b171:c070]) by AM0PR03MB3844.eurprd03.prod.outlook.com
- ([fe80::948d:5fa2:b171:c070%6]) with mapi id 15.20.3045.022; Tue, 2 Jun 2020
- 09:55:59 +0000
-Subject: Re: [PATCH 2/2] mailmap: Change email address of Stefan Brankovic
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.22; Tue, 2 Jun
+ 2020 11:53:45 +0000
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::7935:50dd:e879:bca8]) by AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::7935:50dd:e879:bca8%7]) with mapi id 15.20.3045.024; Tue, 2 Jun 2020
+ 11:53:45 +0000
+From: Filip Bozuta <filip.bozuta@syrmia.com>
 To: qemu-devel@nongnu.org
-References: <20200602085215.12585-1-aleksandar.qemu.devel@gmail.com>
- <20200602085215.12585-3-aleksandar.qemu.devel@gmail.com>
-From: Stefan Brankovic <stefan.brankovic@syrmia.com>
-Message-ID: <3777cc8d-3459-b69e-fce0-853e2932e904@syrmia.com>
-Date: Tue, 2 Jun 2020 11:55:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200602085215.12585-3-aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: LO2P265CA0383.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a3::35) To AM0PR03MB3844.eurprd03.prod.outlook.com
- (2603:10a6:208:6b::15)
+Subject: [PATCH 3/5] linux-user: Add strace support for printing arguments of
+ lseek()
+Date: Tue,  2 Jun 2020 13:53:29 +0200
+Message-Id: <20200602115331.1659-4-filip.bozuta@syrmia.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200602115331.1659-1-filip.bozuta@syrmia.com>
+References: <20200602115331.1659-1-filip.bozuta@syrmia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P265CA0116.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:c::32) To AM6PR03MB5233.eurprd03.prod.outlook.com
+ (2603:10a6:20b:d1::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.10.101] (147.91.217.239) by
- LO2P265CA0383.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:a3::35) with Microsoft
+Received: from bozuta-ubuntu-18.syrmia.com (46.240.135.226) by
+ LO2P265CA0116.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:c::32) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3045.19 via Frontend Transport; Tue, 2 Jun 2020 09:55:58 +0000
-X-Originating-IP: [147.91.217.239]
+ 15.20.3045.19 via Frontend Transport; Tue, 2 Jun 2020 11:53:45 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [46.240.135.226]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9b975579-63d3-4ea3-8715-08d806db26a1
-X-MS-TrafficTypeDiagnostic: AM0PR03MB5811:
-X-Microsoft-Antispam-PRVS: <AM0PR03MB5811203C12BBC91E4001B6D3EA8B0@AM0PR03MB5811.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1388;
+X-MS-Office365-Filtering-Correlation-Id: 8ff77803-ffb1-48d1-c095-08d806eb9a9d
+X-MS-TrafficTypeDiagnostic: AM6PR03MB4022:
+X-Microsoft-Antispam-PRVS: <AM6PR03MB402250E78E9FCA995A233880EB8B0@AM6PR03MB4022.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-Forefront-PRVS: 0422860ED4
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DqGPJ8c88SlNpsU20Q7Cfeat4xEhOjTv3MIH9HwL9abtNNTBuKEoBNql5dvz44P6d69HvdEqYOjELeI9awtxEZeLzKWz7AN1JyqLC00mjeyeKJXierbddkyWGZvPlXB/EldGAu1m7bHnmfd7rj1l6xyBNdkJspy5uJsiQmswRs3yCLPlIHvSFieWb8yQNUoU3e8MQ8dwpFSoIDMlMgO9QqdmOIkqVYr/4XFQw9mf0hf1Uz3zND3yYoOQukfqG9iEDyoffSXP8Kzi6O13Ir9GfQa1HyAaariL2q6J4KHz5FiGrtHxK7/r/nlFJlSonKXczGLMHtX8kyvS0W3DcKUFnCsH5qJM6SgXtLV0VNd/7G9+ViDsv8ztLsT2PdQ7oA6J
+X-Microsoft-Antispam-Message-Info: mqBxfN3cH2/KL2b3sbGbDDM9TTgJ6YEWc9iDPMo4I+whjvVTwSSaFtAGLDHrpUEh9IU6iTnJus6ejhk2A/vBpxtuX/TgdPUM0p75ztU75WDZB3rhT4andeLEwe8quoJNzgfYPaatpKzPeiY/NibwyutxgLNoNToYU+QZIWZV+TpzXvU72ZG4HZJlCDsZyJp4yFHtkPMEpJYor4wP+glDRD8FW65Ws2uaYZ3NmFoykAE/mL4k4QHy4dyNOWJQ18Gj1jxTU6DQ7Wyd2Uhgrg+6D2p7eZGWV9I4MlVHvGuhOzFkxvw9jS2k8uqI/Qevh0PTfyj4LFVOR3gFmI7zTpW6mG8IgL9jrpAzVhxc8K/m19W2cq6UvNT95tEmRLReTdGyrsIczTxHn7+lGu6CFsDvWQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR03MB3844.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(366004)(39830400003)(376002)(396003)(346002)(136003)(52116002)(5660300002)(16526019)(186003)(26005)(44832011)(16576012)(4744005)(316002)(8676002)(4326008)(8936002)(956004)(2616005)(6486002)(31696002)(86362001)(6916009)(2906002)(66556008)(508600001)(66476007)(36756003)(66946007)(31686004)(43740500002);
+ SFS:(366004)(376002)(346002)(39830400003)(136003)(396003)(966005)(44832011)(956004)(2906002)(4326008)(36756003)(2616005)(86362001)(508600001)(66556008)(66476007)(7696005)(66946007)(26005)(8676002)(52116002)(6666004)(6916009)(8936002)(316002)(1076003)(5660300002)(16526019)(83380400001)(186003)(6486002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: gNwOQiP69BCxu0laxBKUXGRKOW8hJyCzHnzkTjaFhHCQHzI8gtIB7tDEI/QOhG9oKfNAkqvOdy+5zc0meWgykEz0JUoeo4k2xu5XuBbMpgMueDCVwNgNYXqTRzWrVsevAfchyAIRg8DDARveeqTwbubCYQlQgdFy1jOewwexcaDKu+alusVJJZ8oJv5ON6rlRJJqnnJ8Kpcy+/lPS3Pxl3rhKgMiPsG1NaNYAMYY7+OOdaqoIYEu4s4lLeoZUOK65a4IkErg6RP06kuXOupOeCksQyo5b0DfssiEN+42EURK7saF0U6CloM4AlyVPYx0mCuQTmom5Tvt5qn29OLjcawPJ4HMPl1EwPP2zJn1wgh+bo23YpC/oMVS113HNTkC04uHDKOWg9veLP5kRil8kuLbTQDmGCn3nocqr6nzehFNwyZl+iApze7rbHXKBd9I8awnIkR8UF40xa5zjtdN2E2/uD9TBFajU3VPTIfnTLc=
+X-MS-Exchange-AntiSpam-MessageData: MVdfOyOCc8H+oDkAELDIVokZcsgcQGWKMqQYG1mCfMjDEyafCHRAepTF3eGsQKUCNFrpMU1GcofznuUwL6TOez6Gv9lyLn9P6m1lqpRX633DdfZyqG4X3P1PdQS3dsXDbYYa98zolfBN5JclDyUENBcxVI4MI2L1H3PJ4IOHF6Zty74GgecKMudQ4UoKu6wuok4VGE/WhAEn+nxVp1wpq5E+f6TeUjeqZX4Rq5fJ00tjG54Dy13HaPaYwPOxkVD5k2Ig6EMb7oIGQ1jKcP0m4R1wBKyDNq7zhp6kdo1k2wLsYsp2/cDhX6SsMjhElLIW9TpPXXQOlsjv7E0JCrqes3i2TcC8B+LAHhuRQeNGppzEu+A7EexXEulIh4R4/GqzLdnqAzvxPNygwSnVjKJ/ddn9hV6PFiiobj4roSNfcLdy7BCGyRr0WLFX6SO3LqrSiweWMXMaaZX+cr/6ORawWn0nyRI2eMkC+knU+bF56Ko=
 X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b975579-63d3-4ea3-8715-08d806db26a1
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2020 09:55:58.9859 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ff77803-ffb1-48d1-c095-08d806eb9a9d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2020 11:53:45.6264 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bhAkFhdzbKP56ZfEOiL8kcnBICKXKR7Nu8TdG3XxIZ8X0Ea4kWhAFtK84kTGJfeivLfmGmibAI2sXE8CYUH0cs9jyO7/KeU+RhWmbFPaV7k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR03MB5811
-Received-SPF: pass client-ip=40.107.4.92;
- envelope-from=Stefan.Brankovic@syrmia.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 06:11:02
+X-MS-Exchange-CrossTenant-UserPrincipalName: oLTDXS0C7jrVwGlt7zS+Hqp75Gk5m4Q4TP+TTFe/r17PFeDML1ZhNVb9aA5e5hwDy7LgRYUB+faZOLZYkIhN+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB4022
+Received-SPF: pass client-ip=40.107.20.98;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 07:53:45
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 5
-X-Spam_score: 0.5
-X-Spam_bar: /
-X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, RCVD_IN_SBL_CSS=3.335,
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -133,33 +131,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-On 2.6.20. 10:52, Aleksandar Markovic wrote:
-> Stefan Brankovic wants to use his new email address for his future
-> work in QEMU.
->
-> CC: Stefan Brankovic <stefan.brankovic@syrmia.com>
-> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Reviewed-by: Stefan Brankovic <stefan.brankovic@syrmia.com>
-> ---
->   .mailmap | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/.mailmap b/.mailmap
-> index 9f2a3a55f9..84f36592ba 100644
-> --- a/.mailmap
-> +++ b/.mailmap
-> @@ -52,6 +52,7 @@ Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
->   Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
->   Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
->   Philippe Mathieu-Daudé <philmd@redhat.com> <f4bug@amsat.org>
-> +Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
->   Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
->   
->   # Also list preferred name forms where people have changed their
+This patch implements strace argument printing functionality for syscall:
+
+    *lseek - reposition read/write file offset
+
+         off_t lseek(int fd, off_t offset, int whence)
+         man page: https://www.man7.org/linux/man-pages/man2/lseek.2.html
+
+Implementation notes:
+
+    The syscall's third argument "whence" has predefined values:
+    "SEEK_SET","SEEK_CUR","SEEK_END","SEEK_DATA","SEEK_HOLE"
+    and thus a separate printing function "print_lseek" was stated
+    in file "strace.list". This function is defined in "strace.c"
+    by using an existing function "print_raw_param()" to print
+    the first and second argument and a switch(case) statement
+    for the predefined values of the third argument.
+    Values "SEEK_DATA" and "SEEK_HOLE" are defined in kernel version 3.1.
+    That is the reason why case statements for these values are
+    enwrapped in #ifdef directive.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+---
+ linux-user/strace.c    | 32 ++++++++++++++++++++++++++++++++
+ linux-user/strace.list |  2 +-
+ 2 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 5cf419989c..b7f012f1b5 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1768,6 +1768,38 @@ print__llseek(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_lseek
++static void
++print_lseek(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_raw_param("%ld", arg1, 0);
++    switch (arg2) {
++    case SEEK_SET:
++        qemu_log("SEEK_SET"); break;
++    case SEEK_CUR:
++        qemu_log("SEEK_CUR"); break;
++    case SEEK_END:
++        qemu_log("SEEK_END"); break;
++#ifdef SEEK_DATA
++    case SEEK_DATA:
++        qemu_log("SEEK_DATA"); break;
++#endif
++#ifdef SEEK_HOLE
++    case SEEK_HOLE:
++        qemu_log("SEEK_HOLE"); break;
++#endif
++    default:
++        print_raw_param("%#x", arg2, 1);
++        qemu_log(" /* SEEK_??? */");
++    }
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #if defined(TARGET_NR_socket)
+ static void
+ print_socket(const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 8d51c54bca..5a56212532 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -513,7 +513,7 @@
+ { TARGET_NR_lremovexattr, "lremovexattr" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_lseek
+-{ TARGET_NR_lseek, "lseek" , NULL, NULL, NULL },
++{ TARGET_NR_lseek, "lseek" , NULL, print_lseek, NULL },
+ #endif
+ #ifdef TARGET_NR_lsetxattr
+ { TARGET_NR_lsetxattr, "lsetxattr" , NULL, NULL, NULL },
+-- 
+2.17.1
+
 
