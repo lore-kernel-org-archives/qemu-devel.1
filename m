@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2C9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F66C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:41:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09627206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7C87206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:41:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tzvkefgh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09627206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EiYaQbbd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C87206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgAsS-0000yO-9y
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:39:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45012)
+	id 1jgAuv-0002Jk-1Q
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:41:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgArn-0000ME-47
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:38:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50501
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgAuK-0001oa-5H
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:41:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28224
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgArm-0006RU-D9
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:38:22 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgAuJ-0006pJ-BS
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:40:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591119501;
+ s=mimecast20190719; t=1591119658;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jPj5g/Ec6humWQb0RfOQP5lOfEhnG6pEEBXEq/sgDQE=;
- b=TzvkefghV6mo0NqJHXLv8DBVfNCjsxsV2Hx9D3djJBHEpOUASs2UDM6L3suueiBJ8IRiVK
- jcY9KpzZAthblPqB4/4eiCjDkrnBI9pSMDbVObLMbubc89D2CU+FLrdH3F+qVFVObacTdP
- +zEjwA6QrBM8PYDjjIL+/lQCxAMyVb4=
+ bh=H9qNwAaxo4jx2WQS38WGuKHj+6jOx3loBFRfyZN4AAc=;
+ b=EiYaQbbdOgzy/ILhnn9Xg3O6uht+UTSeLYWzjnGyTlkbWR/MeHXwMQPaPnQZI5ae7n1zV3
+ GrsOG6LGfF9vXl1D3YuyreinPwmO5uSqLqYQZVc9RYzsL+oDWdEzz3aS6lKB8+W6B50ca/
+ upSbL+jQKUoy8vZCp19HzajMJT79BCA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-zlYFmXLIOvOvN-jM_KNRFg-1; Tue, 02 Jun 2020 13:38:19 -0400
-X-MC-Unique: zlYFmXLIOvOvN-jM_KNRFg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-426-L-a_D4IFMEWc_zv9eNk33w-1; Tue, 02 Jun 2020 13:40:56 -0400
+X-MC-Unique: L-a_D4IFMEWc_zv9eNk33w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1798800053;
- Tue,  2 Jun 2020 17:38:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27C6F461;
+ Tue,  2 Jun 2020 17:40:55 +0000 (UTC)
 Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 22A8C6062D;
- Tue,  2 Jun 2020 17:38:18 +0000 (UTC)
-Subject: Re: [PATCH v3 5/6] iotests: Dump bitmap table entries serialized in
- QCOW2 image
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9770419C4F;
+ Tue,  2 Jun 2020 17:40:54 +0000 (UTC)
+Subject: Re: [PATCH v3 6/6] iotests: Dump QCOW2 image metadata in JSON format
+ with qcow2.py
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1591019293-211155-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1591019293-211155-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <a3c600cd-5b54-d6b4-d86c-a9d94f14d0e6@redhat.com>
-Date: Tue, 2 Jun 2020 12:38:17 -0500
+Message-ID: <c9fc9f2e-c81a-cd63-ac08-6fb8dd9cfc13@redhat.com>
+Date: Tue, 2 Jun 2020 12:40:54 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <1591019293-211155-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1591019293-211155-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 22:14:55
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 06:26:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -105,30 +105,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/1/20 8:48 AM, Andrey Shinkevich wrote:
-> Add bitmap table info to the QCOW2 metadata dump with qcow2.py.
+> Represent QCOW2 metadata dumping with qcow2.py script in JSON format
 > 
-> Bitmap name               bitmap-1
-> ...
-> itmap table    type            offset          size
+> {
+>      "QCOW2_header_extensions": [
+>          {
+>              "Header_extension": "Feature table",
+>              "magic": "0x6803f857",
+>              "length": 192,
+>              "data_str": "<binary>"
+>          },
+>          {
+>              "Header_extension": "Bitmaps",
+>              "magic": "0x23852875",
+>              "length": 24,
+>              "data": {
+>                  "nb_bitmaps": 2,
+>                  "reserved32": 0,
 
-Missed a character from the paste
+Lengthy, but for a debug tool that's sometimes what you need.
 
->          0       serialized      0xa0000         65536
->          1       all-zeroes      0x0             65536
->          2       all-zeroes      0x0             65536
->          3       all-zeroes      0x0             65536
->          4       all-zeroes      0x0             65536
->          5       all-zeroes      0x0             65536
->          6       all-zeroes      0x0             65536
->          7       all-zeroes      0x0             65536
-> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->   tests/qemu-iotests/qcow2.py | 48 +++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 48 insertions(+)
+>   tests/qemu-iotests/qcow2.py | 108 ++++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 105 insertions(+), 3 deletions(-)
 > 
 
-Otherwise looks fine.
+My python is not the strongest, but nothing jumped out at me, and the 
+end results look good.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
