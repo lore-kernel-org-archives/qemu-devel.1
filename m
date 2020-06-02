@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F9FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F30EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 110C9206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEA8F206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZTuFCuM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110C9206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HH64tEcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA8F206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg1aH-0005pT-89
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 03:43:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54800)
+	id 1jg1bI-0008Lm-82
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 03:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <morecache@gmail.com>)
- id 1jg1ZM-00046k-HL
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43726)
+ id 1jg1ZG-0003sv-3n
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55726)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <morecache@gmail.com>)
- id 1jg1ZL-0000a3-QE
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:44 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so2270514wrr.10
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 00:42:43 -0700 (PDT)
+ id 1jg1ZF-0000ZB-CE
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:37 -0400
+Received: by mail-wm1-x341.google.com with SMTP id c71so1870180wmd.5
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 00:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lSNxJ+he1VqHG88avCPlJcq6eRPaf7eHxjBV+zd6EhI=;
- b=kZTuFCuMjB3ghBIgMQ0K9uRPLmJWGOcOVynrHoAsZqekzg/xKbK9woa7hBqkXtDmJv
- Nenln085oeOakQLqltvMCp/FEdcoF6FSZraZNdWi0Ev5vgY3r83h0Yx6c3AVm/LlFkiC
- PuUxtPkjAV8OKXzpdnklCc2389JpCA2jYO78tc49XWHiyMyqeLN6rSnql0PlduiFKkIh
- 8vSs5s4JPyBA3VAWc6kArp426KNNBlc6ecfk4bqe6gSN5cy6OZolxz+VxD4KFv7fTZOA
- BwPRZN2mnMCO9Tsyba3Mn/dvlEJmXKMNI/bpCsPUUOPL1FAsDZHq2yj+FQUJprRqp9U/
- Ruqw==
+ bh=jhAbJ4GRGhtDDVKIxTwS8TPvMGErkabeXRmJPRzEdzM=;
+ b=HH64tEcTh2bYLaAwptSA5cSoe0GnCZleCtOT+lWyHEDZe+ZE6bwAqxFczuBRNRa62J
+ 4fAkk83vTdEUfHfkSiQkVxzRUhsk3ddXak0mQRNl5QM4u7m08tVJQv4v/wOc+ybMhEUo
+ 0s/ge9ChCFGiNogcpyW7cuQHgLLvPdLYO7uAPsaXWDpITr1yoDizOsxB3W3NUaPE22PM
+ q0J9R+ElNGW5pNu5u8Yamk4UhNBtQzqeHWjLpobIj//N4+8H63fTotFQ5wSkfz3Kknx5
+ NZmESQSfYp9X2hnB16LJglKpPCqWNJWt9Vj8peYjX+UcQUXHp1dy+77kmEZdPWvYc7vD
+ e9rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=lSNxJ+he1VqHG88avCPlJcq6eRPaf7eHxjBV+zd6EhI=;
- b=Oen859da21EblgiYqXIybhwRY4eTXTTROBULNTJdR4nKG6UM9YcgNg5KGi5/FNec1R
- cTeOgzwTYV0DpDY4JOZzLFEz6KHrbmg7IHNFj7l87DUIUf8xIFGNnlRFIYmtUzOTVWd4
- Bj/Uf4Pt2JUz1L48Bi6aklvPJBMtfKpuMqNkpZxVHNCs+8b2pJv8gIP5f00Mic3HPTF9
- yuZPEeOEnZQSmk35OgdSNx+pctF3KWb0D6ZeAaVFJAa/m0xtTo1tXtbb1C2xqJBYX0u5
- I39j7Tu9IvLJhaFnw6zSTHQKSXNzgMlN8+TQvufQ8sUoJGZr5njBKCSs28EhHsLXqI9e
- bB9Q==
-X-Gm-Message-State: AOAM5302A6k4y4OqI30SlV3aPrECB7qoYSxSJPb30g478PohyPZZRX/G
- S+doFAzLhBnwFJMBpC6whcYNhXSOOiI=
-X-Google-Smtp-Source: ABdhPJx37iEAkXIMtWiY0UI6lVC5EbjpCaKyW+Z5CJuc7DiZR3OYR5+09G5Q1OcpEB+B/L4Il0+Agw==
-X-Received: by 2002:adf:f186:: with SMTP id h6mr23913799wro.22.1591083762300; 
- Tue, 02 Jun 2020 00:42:42 -0700 (PDT)
+ bh=jhAbJ4GRGhtDDVKIxTwS8TPvMGErkabeXRmJPRzEdzM=;
+ b=WPnqr95D96awvb8Ap4XXs/Gq/g8v9tozzOIRPvN4kN7+6J+pVTm4XKoZdHUSYp8oIK
+ fyipJBGAUOBrl2Pa6oU/kaPOd0E21M63saluG3z1QXGpfm2HZnb1zASt4j4ZkwQrKyH5
+ U1cQrUPyqj7zCFsZwuWhevka90r8Tb2ejjd7aGehV+Pvon5I0ZKGZW09EXW/6QzWlCyy
+ Z4xOVUHY6jwBzCgCzimnYCQMj5/b9fAU1bl6PEKfnMGK9UVdWVLLCJCNxv3yUaRrmb6g
+ Vd22DukKxKHTevstZs4i61ShS9e8P9r+uQ0ry5GI/6i7+hmW/0wG554V4rrnGBGoU6N9
+ c0oA==
+X-Gm-Message-State: AOAM533uPUtfGuD+SXB6wb+gPcYUQL6KGKddLhJcWVZFjkGZ+30B2Mqv
+ z69z4WOpg4hzAyU+PvJWLvaMNaUo3UM=
+X-Google-Smtp-Source: ABdhPJyFD57ySBj1mj6h6wHYgqD+b1Ksjg2wi6MMtqvOj/WUHNl+4VOZ801yFkyo4cp30jRG/Wo9MA==
+X-Received: by 2002:a1c:3c89:: with SMTP id j131mr2820557wma.59.1591083754653; 
+ Tue, 02 Jun 2020 00:42:34 -0700 (PDT)
 Received: from t440p.suse.asia (60-251-47-115.HINET-IP.hinet.net.
  [60.251.47.115])
- by smtp.gmail.com with ESMTPSA id w3sm2294518wmg.44.2020.06.02.00.42.38
+ by smtp.gmail.com with ESMTPSA id w3sm2294518wmg.44.2020.06.02.00.42.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 00:42:41 -0700 (PDT)
+ Tue, 02 Jun 2020 00:42:34 -0700 (PDT)
 From: Lin Ma <lma@suse.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] scsi-disk: Add support for the GET LBA STATUS 16 command
-Date: Tue,  2 Jun 2020 15:42:01 +0800
-Message-Id: <20200602074201.10879-5-lma@suse.com>
+Subject: [PATCH 2/4] block: Add GET LBA STATUS support
+Date: Tue,  2 Jun 2020 15:41:59 +0800
+Message-Id: <20200602074201.10879-3-lma@suse.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200602074201.10879-1-lma@suse.com>
 References: <20200602074201.10879-1-lma@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=morecache@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=morecache@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -108,132 +108,72 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Lin Ma <lma@suse.com>
 ---
- hw/scsi/scsi-disk.c      | 92 ++++++++++++++++++++++++++++++++++++++++
- include/scsi/constants.h |  1 +
- 2 files changed, 93 insertions(+)
+ block/block-backend.c          | 38 ++++++++++++++++++++++++++++++++++
+ include/sysemu/block-backend.h |  2 ++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 387503e11b..2d2c6b4b82 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -1866,6 +1866,91 @@ static void scsi_disk_emulate_write_data(SCSIRequest *req)
-     }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 6936b25c83..feb1f38b98 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1650,6 +1650,44 @@ int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
+     return blk_prw(blk, offset, NULL, bytes, blk_pdiscard_entry, 0);
  }
  
-+typedef struct GetLbaStatusCBData {
-+    uint32_t num_blocks;
-+    uint32_t is_deallocated;
-+    SCSIDiskReq *r;
-+} GetLbaStatusCBData;
-+
-+static void scsi_get_lba_status_complete(void *opaque, int ret);
-+
-+static void scsi_get_lba_status_complete_noio(GetLbaStatusCBData *data, int ret)
++static int coroutine_fn
++blk_do_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
++                      uint32_t *num_blocks, uint32_t *is_deallocated)
 +{
-+    SCSIDiskReq *r = data->r;
-+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
++    int ret;
 +
-+    assert(r->req.aiocb == NULL);
++    blk_wait_while_drained(blk);
 +
-+    block_acct_start(blk_get_stats(s->qdev.conf.blk), &r->acct,
-+                     s->qdev.blocksize, BLOCK_ACCT_GET_LBA_STATUS);
-+
-+    r->req.aiocb = blk_aio_get_lba_status(s->qdev.conf.blk,
-+                                          r->req.cmd.lba * s->qdev.blocksize,
-+                                          s->qdev.blocksize,
-+                                          scsi_get_lba_status_complete, data);
-+    return;
-+}
-+
-+static void scsi_get_lba_status_complete(void *opaque, int ret)
-+{
-+    GetLbaStatusCBData *data = opaque;
-+    SCSIDiskReq *r = data->r;
-+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-+
-+    assert(r->req.aiocb != NULL);
-+    r->req.aiocb = NULL;
-+
-+    aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
-+    if (scsi_disk_req_check_error(r, ret, true)) {
-+        g_free(data);
-+        goto done;
++    ret = blk_check_byte_request(blk, offset, bytes);
++    if (ret < 0) {
++        return ret;
 +    }
 +
-+    block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
-+    scsi_req_unref(&r->req);
-+    g_free(data);
-+
-+done:
-+    aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
++    return bdrv_co_get_lba_status(blk->root, offset, bytes, num_blocks,
++                                  is_deallocated);
 +}
 +
-+static void scsi_disk_emulate_get_lba_status(SCSIRequest *req, uint8_t *outbuf)
++static void blk_aio_get_lba_status_entry(void *opaque)
 +{
-+    SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
-+    GetLbaStatusCBData *data;
-+    uint32_t *num_blocks;
-+    uint32_t *is_deallocated;
++    BlkAioEmAIOCB *acb = opaque;
++    BlkRwCo *rwco = &acb->rwco;
 +
-+    data = g_new0(GetLbaStatusCBData, 1);
-+    data->r = r;
-+    num_blocks = &(data->num_blocks);
-+    is_deallocated = &(data->is_deallocated);
++    void *data = acb->common.opaque;
++    uint32_t *num_blocks = &data[0];
++    uint32_t *is_deallocated = &data[sizeof(uint32_t)];
 +
-+    scsi_req_ref(&r->req);
-+    scsi_get_lba_status_complete_noio(data, 0);
-+
-+    /* 8 + 16 is the length in bytes of response header and
-+     * one LBA status descriptor
-+     */
-+    memset(outbuf, 0, 8 + 16);
-+    outbuf[3] = 20;
-+    outbuf[8] = (req->cmd.lba >> 56) & 0xff;
-+    outbuf[9] = (req->cmd.lba >> 48) & 0xff;
-+    outbuf[10] = (req->cmd.lba >> 40) & 0xff;
-+    outbuf[11] = (req->cmd.lba >> 32) & 0xff;
-+    outbuf[12] = (req->cmd.lba >> 24) & 0xff;
-+    outbuf[13] = (req->cmd.lba >> 16) & 0xff;
-+    outbuf[14] = (req->cmd.lba >> 8) & 0xff;
-+    outbuf[15] = req->cmd.lba & 0xff;
-+    outbuf[16] = (*num_blocks >> 24) & 0xff;
-+    outbuf[17] = (*num_blocks >> 16) & 0xff;
-+    outbuf[18] = (*num_blocks >> 8) & 0xff;
-+    outbuf[19] = *num_blocks & 0xff;
-+    outbuf[20] = *is_deallocated ? 1 : 0;
-+
-+    return;
++    rwco->ret = blk_do_get_lba_status(rwco->blk, rwco->offset, acb->bytes,
++                                      num_blocks, is_deallocated);
++    blk_aio_complete(acb);
 +}
 +
- static int32_t scsi_disk_emulate_command(SCSIRequest *req, uint8_t *buf)
++BlockAIOCB *blk_aio_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
++                                   BlockCompletionFunc *cb, void *opaque)
++{
++    return blk_aio_prwv(blk, offset, bytes, NULL, blk_aio_get_lba_status_entry,
++                        0, cb, opaque);
++}
++
+ /* To be called between exactly one pair of blk_inc/dec_in_flight() */
+ static int coroutine_fn blk_do_flush(BlockBackend *blk)
  {
-     SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
-@@ -2076,6 +2161,13 @@ static int32_t scsi_disk_emulate_command(SCSIRequest *req, uint8_t *buf)
- 
-             /* Protection, exponent and lowest lba field left blank. */
-             break;
-+        } else if ((req->cmd.buf[1] & 31) == SAI_GET_LBA_STATUS) {
-+            if (req->cmd.lba > s->qdev.max_lba) {
-+                goto illegal_lba;
-+            }
-+            scsi_disk_emulate_get_lba_status(req, outbuf);
-+            r->iov.iov_len = req->cmd.xfer;
-+            return r->iov.iov_len;
-         }
-         trace_scsi_disk_emulate_command_SAI_unsupported();
-         goto illegal_request;
-diff --git a/include/scsi/constants.h b/include/scsi/constants.h
-index 874176019e..1b6417898a 100644
---- a/include/scsi/constants.h
-+++ b/include/scsi/constants.h
-@@ -154,6 +154,7 @@
-  * SERVICE ACTION IN subcodes
-  */
- #define SAI_READ_CAPACITY_16  0x10
-+#define SAI_GET_LBA_STATUS  0x12
- 
- /*
-  * READ POSITION service action codes
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 8203d7f6f9..cd527ec0c9 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -171,6 +171,8 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
+                           BlockCompletionFunc *cb, void *opaque);
+ BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk, int64_t offset, int bytes,
+                              BlockCompletionFunc *cb, void *opaque);
++BlockAIOCB *blk_aio_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
++                                   BlockCompletionFunc *cb, void *opaque);
+ void blk_aio_cancel(BlockAIOCB *acb);
+ void blk_aio_cancel_async(BlockAIOCB *acb);
+ int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
 -- 
 2.24.0
 
