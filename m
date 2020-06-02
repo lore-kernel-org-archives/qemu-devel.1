@@ -2,86 +2,82 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B91C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CCAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D824206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:14:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 525F4206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 19:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tI4SU1I2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D824206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="nf74jj68"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 525F4206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgCN0-00068Y-Jk
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 15:14:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58338)
+	id 1jgCPT-0008Bk-IG
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 15:17:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgCMR-0005Y8-0q
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:14:07 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39036)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgCMQ-0002Fd-4j
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:14:06 -0400
-Received: by mail-oi1-x244.google.com with SMTP id d67so8013946oig.6
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 12:14:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Q22uLXcm8fCaLcZwsI/bM8xs70lPNORKeZA3nuPJLUw=;
- b=tI4SU1I2z5ZAD/ZEcPRbJN8SRghczLInaR8Iu3GtocLrqc3/iQDIBtcD9ip9z/f06z
- UTjuWe0zaz11yZBH6DkGg99dmA1006rQD4ViD72yjweFdqb/ZmK/EdpJM2yFfZL7msZp
- oomKw0HVgg9nv66rkKWfz17dHLIC75KynR2rgnUsANehGbJ1dfDE6fEOPJTMYxn/2BTw
- 23bD/pp6GdUWwfZ2vMngayiPhx1rhPpwG2/kBnvdp4W1Oa07c5G47XiwC70kmyREdyO8
- i/zl189pR+jKo4tYfnQv/jzu9ktbV7ZkLRtc7tPxq058d0RMorOUdhoTgveanpnCPFWm
- bb7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Q22uLXcm8fCaLcZwsI/bM8xs70lPNORKeZA3nuPJLUw=;
- b=neMAwBKWQgTLM9RzmGpN5mYz7T4BNflvn1jHwJuJ1hkqVu3N60R01w6mNWEhs9Kb0V
- iaebgRVG6fJ9ED9UOSjWqCWkSaNxFhLoq6hUqEqIei8FefkStLeI6VRtL4F+sSx3DY6c
- dDMVOG+afafZAP9U5pt4ibI+v2kuR1NIMp2vJp7y5abptX/9NZzqjwIldzaybzLSadmV
- 1QnL+fxPuwPwRedwZlL1dtYgx8alSkjFPVQ4rocPMyUE87U/9FhLe3XvwOEE3i7ZXJjE
- NufGtj30fKnaJ1ODnT/ernpeD/2GEaTJNN18qc7Pq9foqkw5+pwiQOTHH4/gFhpd3D2x
- 1rQQ==
-X-Gm-Message-State: AOAM530nwQ/vsuo4DUa5ste+0vpq/crkSuau2ZB1aMswrht6FV7A1aCy
- b66+dL3wXFpAZNZMuhaEuiecej8FNGwPd2UJzxTJAg==
-X-Google-Smtp-Source: ABdhPJwuk0/g19UYAYl/TpIr8aAcNxkzyuvLc49gN+ATnAQHP92xy6prnRyezdBncOKSTkZm9Krim+AANfbRr2bTFwU=
-X-Received: by 2002:aca:5152:: with SMTP id f79mr3823960oib.146.1591125244839; 
- Tue, 02 Jun 2020 12:14:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jgCOI-0006mx-F7
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:02 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:7499)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jgCOG-0002fu-Hs
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 15:16:01 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ed6a5170000>; Tue, 02 Jun 2020 12:14:31 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Tue, 02 Jun 2020 12:15:58 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Tue, 02 Jun 2020 12:15:58 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Jun
+ 2020 19:15:48 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 2 Jun 2020 19:15:42 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH 1/2] vfio iommu: Use shift operation for 64-bit integer
+ division
+Date: Wed, 3 Jun 2020 00:12:36 +0530
+Message-ID: <1591123357-18297-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-References: <20200518164052.18689-1-richard.henderson@linaro.org>
- <20200518164052.18689-8-richard.henderson@linaro.org>
-In-Reply-To: <20200518164052.18689-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Jun 2020 20:13:53 +0100
-Message-ID: <CAFEAcA9goz6quKG7zEGtOkYEUhfX10PB_MNMr6Vzvfz1OCZgSw@mail.gmail.com>
-Subject: Re: [PATCH 7/8] decodetree: Implement non-overlapping groups
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1591125272; bh=INqjvK9GUaUbxLFgl48meRA1JF55U/PN28DUQip5ODw=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ X-NVConfidentiality:MIME-Version:Content-Type;
+ b=nf74jj68gnc1+aFA7sAwgGRbx3LNaY4TeBPQ1iQ1fiuq9oVC/sks0FPkmP+OyAIDg
+ mDBylHAUaDeLLJWJaT+T/w1mlGOAYUcUVbLyyZONgunbPm5OxHOQFN8hsbxq3VVZl8
+ kejWb3rY4ofxOVluebAJ6mIUrmj3/Yw45riyYNfTztWXhaW+lY/zqfzuOiT480sMMR
+ JLqCRdeTwg+SlA5lNU4T3HZdzjVyTqnSmWFysk3AZJvrxccXJL8G4dE7NmPckvKQ2h
+ G9hfHMsBEYBNmbnC6llVX/h8/nyWDtBMIMPXE3KCCTpWa2O4U2KxiowhZGGAGlgo66
+ IhQaq+EFYFKmw==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 15:15:59
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,58 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 May 2020 at 17:41, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Intended to be nested within overlapping groups.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  scripts/decodetree.py | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
->
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 0ba01e049c..a9739f671d 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -1021,21 +1021,22 @@ def parse_file(f, parent_pat):
->          del toks[0]
->
->          # End nesting?
-> -        if name == '}':
-> +        if name == '}' or name == ']':
->              if len(toks) != 0:
->                  error(start_lineno, 'extra tokens after close brace')
->              if len(parent_pat.pats) < 2:
->                  error(lineno, 'less than two patterns within braces')
->
-> +            # Make sure { } and [ ] nest properly.
-> +            if (name == '}') != isinstance(parent_pat, IncMultiPattern):
-> +                error(lineno, 'mismatched close brace')
-> +
->              try:
->                  parent_pat = nesting_pats.pop()
->              except:
-> -                error(lineno, 'mismatched close brace')
-> +                error(lineno, 'extra close brace')
->
->              nesting -= 2
-> -            if indent != nesting:
-> -                error(lineno, 'indentation ', indent, ' != ', nesting)
-> -
+Fixes compilation error with ARCH=i386.
 
-Why do we lose this error check ?
+Error fixed by this commit:
+ld: drivers/vfio/vfio_iommu_type1.o: in function `vfio_dma_populate_bitmap':
+>> vfio_iommu_type1.c:(.text+0x666): undefined reference to `__udivdi3'
 
+Fixes: d6a4c185660c (vfio iommu: Implementation of ioctl for dirty pages tracking)
 
->              toks = []
->              continue
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reported-by: kbuild test robot <lkp@intel.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 97a29bc04d5d..9d9c8709a24c 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -227,11 +227,12 @@ static void vfio_dma_bitmap_free(struct vfio_dma *dma)
+ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+ {
+ 	struct rb_node *p;
++	unsigned long pgshift = __ffs(pgsize);
+ 
+ 	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+ 		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
+ 
+-		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
++		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) >> pgshift, 1);
+ 	}
+ }
+ 
+-- 
+2.7.0
+
 
