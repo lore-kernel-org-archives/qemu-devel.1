@@ -2,71 +2,68 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CB3C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25812C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D2C82072F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:47:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF5FD205CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVBz8/CG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2C82072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xm4//WFg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5FD205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgElK-0007KC-GS
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 17:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47306)
+	id 1jgEnG-0001nc-2J
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 17:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEj6-0004oa-Fg
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:45:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30285
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEj7-0004p8-00
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:45:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39659
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEj4-0008Ir-39
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEj3-0008Gz-VI
  for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:45:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591134337;
+ s=mimecast20190719; t=1591134334;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GT6U2bxbUb9Mw2IcL8NNeCjQ97NYBIX3pDsA3BoritU=;
- b=WVBz8/CGTZQ94tLFDimvgK2eVPuArfI2lRNksbYN72DeQPMFx9FwNon9TQSY3gk23ajZbE
- 29Ah4L3nUktNy6OLMYz0/Y23Y/uaz2SVqeos661X2thj1y55+vtvgnUR4bPsO9ISweCPny
- 430dbcyNkMIA+y4ZRITAzDlmmNV3e6w=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=rqZB51V3cTzy1njpNQQHBgWPqmvG1ZQB9vTn6Cngork=;
+ b=Xm4//WFgVVFUM4IYjdUc7oyc3pJP3pHYMYMmcaHn/Q7yWmGWZZOETVDAtEzKINN+6U1mHN
+ rCQLt2Ak6zzmRra2o28zUDnhsHVkR3aMs+66F5dsLMeJWOXFoIKsT65BdCfXg3clkNm6Tw
+ 2thkYN3ayhnAgNer79resn0rPvBs6hs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-OYdNBhd1M4SsMqjiOc0a7g-1; Tue, 02 Jun 2020 17:45:35 -0400
-X-MC-Unique: OYdNBhd1M4SsMqjiOc0a7g-1
+ us-mta-312-UvKpFAQdMimtL2ndIk8Lsg-1; Tue, 02 Jun 2020 17:45:31 -0400
+X-MC-Unique: UvKpFAQdMimtL2ndIk8Lsg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5BAE80B724;
- Tue,  2 Jun 2020 21:45:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B14F80474D;
+ Tue,  2 Jun 2020 21:45:30 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7960660BE1;
- Tue,  2 Jun 2020 21:45:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1E26060BE1;
+ Tue,  2 Jun 2020 21:45:28 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/16] python/qmp.py: re-absorb MonitorResponseError
-Date: Tue,  2 Jun 2020 17:45:15 -0400
-Message-Id: <20200602214528.12107-4-jsnow@redhat.com>
-In-Reply-To: <20200602214528.12107-1-jsnow@redhat.com>
-References: <20200602214528.12107-1-jsnow@redhat.com>
+Subject: [PATCH v2 00/16] python: add mypy support to python/qemu
+Date: Tue,  2 Jun 2020 17:45:12 -0400
+Message-Id: <20200602214528.12107-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -99,113 +96,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When I initially split this out, I considered this more of a machine
-error than a QMP protocol error, but I think that's misguided.
+Requires: 20200602194844.15258-1-jsnow@redhat.com
 
-Move this back to qmp.py and name it QMPResponseError. Convert
-qmp.command() to use this exception type.
+This series is extracted from my larger series that attempted to bundle
+our python module as an installable module. These fixes don't require that,
+so they are being sent first as I think there's less up for debate in here.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This requires my "refactor shutdown" patch as a pre-requisite.
+
+"v2":
+- This version supports iotests 297
+- Many patches merged by Phil are removed
+- Replaces iotests.py type aliases with centralized ones
+  (See patch 2)
+- Imports etc are reworked to use the non-installable
+  package layout instead. (Mostly important for patch 3)
+
+Testing this out:
+- You'll need Python3.6+
+- I encourage you to use a virtual environment!
+- You don't necessarily need these exact versions, but I didn't test the
+  lower bounds, use older versions at your peril:
+  - pylint==2.5.0
+  - mypy=0.770
+  - flake8=3.7.8
+
+> cd ~/src/qemu/python/
+> flake8 qemu
+> mypy --strict qemu
+> cd qemu
+> pylint *.py
+
+These should all 100% pass.
+
 ---
- python/qemu/machine.py        | 15 +--------------
- python/qemu/qmp.py            | 17 +++++++++++++++--
- scripts/render_block_graph.py |  7 +++++--
- 3 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index a2abd2c35e3..b2b7ae9fbf9 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -48,19 +48,6 @@ class QEMUMachineAddDeviceError(QEMUMachineError):
-     """
- 
- 
--class MonitorResponseError(qmp.QMPError):
--    """
--    Represents erroneous QMP monitor reply
--    """
--    def __init__(self, reply):
--        try:
--            desc = reply["error"]["desc"]
--        except KeyError:
--            desc = reply
--        super().__init__(desc)
--        self.reply = reply
--
--
- class QEMUMachine:
-     """
-     A QEMU VM
-@@ -464,7 +451,7 @@ def command(self, cmd, conv_keys=True, **args):
-         if reply is None:
-             raise qmp.QMPError("Monitor is closed")
-         if "error" in reply:
--            raise MonitorResponseError(reply)
-+            raise qmp.QMPResponseError(reply)
-         return reply["return"]
- 
-     def get_qmp_event(self, wait=False):
-diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-index 8388c7b6030..aa8a666b8ab 100644
---- a/python/qemu/qmp.py
-+++ b/python/qemu/qmp.py
-@@ -61,6 +61,19 @@ class QMPTimeoutError(QMPError):
-     """
- 
- 
-+class QMPResponseError(QMPError):
-+    """
-+    Represents erroneous QMP monitor reply
-+    """
-+    def __init__(self, reply: QMPMessage):
-+        try:
-+            desc = reply['error']['desc']
-+        except KeyError:
-+            desc = reply
-+        super().__init__(desc)
-+        self.reply = reply
-+
-+
- class QEMUMonitorProtocol:
-     """
-     Provide an API to connect to QEMU via QEMU Monitor Protocol (QMP) and then
-@@ -251,8 +264,8 @@ def command(self, cmd, **kwds):
-         Build and send a QMP command to the monitor, report errors if any
-         """
-         ret = self.cmd(cmd, kwds)
--        if "error" in ret:
--            raise Exception(ret['error']['desc'])
-+        if 'error' in ret:
-+            raise QMPResponseError(ret)
-         return ret['return']
- 
-     def pull_event(self, wait=False):
-diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.py
-index 409b4321f2e..da6acf050d1 100755
---- a/scripts/render_block_graph.py
-+++ b/scripts/render_block_graph.py
-@@ -25,7 +25,10 @@
- from graphviz import Digraph
- 
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python'))
--from qemu.machine import MonitorResponseError
-+from qemu.qmp import (
-+    QEMUMonitorProtocol,
-+    QMPResponseError,
-+)
- 
- 
- def perm(arr):
-@@ -102,7 +105,7 @@ def command(self, cmd):
-         reply = json.loads(subprocess.check_output(ar))
- 
-         if 'error' in reply:
--            raise MonitorResponseError(reply)
-+            raise QMPResponseError(reply)
- 
-         return reply['return']
- 
+Open RFC: What's the right way to hook this into make check to prevent
+regressions?
+
+John Snow (16):
+  python/qmp.py: Define common types
+  iotests.py: use qemu.qmp type aliases
+  python/qmp.py: re-absorb MonitorResponseError
+  python/qmp.py: Do not return None from cmd_obj
+  python/qmp.py: add casts to JSON deserialization
+  python/qmp.py: add QMPProtocolError
+  python/machine.py: Fix monitor address typing
+  python/machine.py: reorder __init__
+  python/machine.py: Don't modify state in _base_args()
+  python/machine.py: Handle None events in event_wait
+  python/machine.py: use qmp.command
+  python/machine.py: Add _qmp access shim
+  python/machine.py: fix _popen access
+  python/qemu: make 'args' style arguments immutable
+  iotests.py: Adjust HMP kwargs typing
+  python/qemu: Add mypy type annotations
+
+ python/qemu/accel.py          |   8 +-
+ python/qemu/machine.py        | 267 ++++++++++++++++++++--------------
+ python/qemu/qmp.py            | 111 ++++++++++----
+ python/qemu/qtest.py          |  54 ++++---
+ scripts/render_block_graph.py |   7 +-
+ tests/qemu-iotests/iotests.py |  11 +-
+ 6 files changed, 285 insertions(+), 173 deletions(-)
+
 -- 
 2.21.3
 
