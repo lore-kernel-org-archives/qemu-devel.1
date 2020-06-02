@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811C0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 00:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5115CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 00:11:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49053206A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 00:07:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20D2C206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 00:11:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qmmSlgAF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49053206A4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="illVb5fh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D2C206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jfuSN-0001BF-If
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 20:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53028)
+	id 1jfuWS-0002PU-AW
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jun 2020 20:11:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jfuQz-0000Gv-SC
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 20:05:37 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38632)
+ id 1jfuVe-0001n8-UA
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 20:10:26 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37864)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jfuQy-0001OZ-VJ
- for qemu-devel@nongnu.org; Mon, 01 Jun 2020 20:05:37 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id d6so563747pjs.3
- for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 17:05:36 -0700 (PDT)
+ id 1jfuVd-0004vQ-Nd
+ for qemu-devel@nongnu.org; Mon, 01 Jun 2020 20:10:26 -0400
+Received: by mail-pf1-x442.google.com with SMTP id a4so4202723pfo.4
+ for <qemu-devel@nongnu.org>; Mon, 01 Jun 2020 17:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=USC0QeRyJ21r34DHkvDccmYpIyA+yP7p3StBtTBk/0U=;
- b=qmmSlgAFgFH23unbu7Dvyqs0D0w1Mswa08bFbkNRh2SYN0K8XafA3hoBHrxlfzmh4o
- e6DGlkKTUb6Ib9qJqhI+ipfkVuYa4aMB+psUrL2Fx1y83M2N0mHyOQPU+zV5a6Svan+O
- 6G4m6F4Es25m0Vaffcae4pleIaoPgCRSRsYPHcEW+mdxxSgcZTQ1CT1gPTtnnh0AbYqJ
- he9b1J3rn8VSQTpZ4aZoSf0HRz0K2BAc4C/pxTTKFW8wiAsXQia2yJmu815E5DryKKl0
- wBwzGEViwoq7A1g2o4N7Ra+5xsdeXJrNYX+is/eTN5HjRdIqVAV4GCpfcQuxgfPQ4Jc4
- A+jA==
+ bh=fIKLbHoFKg+nznod2itU42c+/0e2vFiUewBNDVR2woY=;
+ b=illVb5fhOxZSpL6paFF/zFih/5SCmShPxekPzVodzrtSxB8k2nAPRHKd5iQhXx5P3V
+ tI2SfQAYd0wWCwOHcEYfax+tsw6bKst0Ftbj/fDM6p+3wg4IINot9hn9jbALLgLqX/Xa
+ WThNjKNBIcwHhlkdFoumCncKZJkAGHtoMfCj03lfjlFutQ1COBeEuDSwdZ6af6Zliomd
+ ErAql51P2F8Xp4oMCrHBTbhbwihK476K5MYUxSim/PtTxHl2tz1vO5wQtrDAv2SR/s8z
+ AU/U6ayMh2jsTEid7KZVT5o0cXzDcOL788x3stLqsS8ojm5iiGrpmR3hictVDaQ5hnRl
+ xO5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=USC0QeRyJ21r34DHkvDccmYpIyA+yP7p3StBtTBk/0U=;
- b=Rmo2a4+/VCurpGLlzaNe+1pep4UZrwQkILZg2EWd6xfsIWtfiSO7t0MLONLcxBtGcF
- ZZ1ruyCvb7DrpfDN+P5EGBZ8ExJhnCEqW4PR6ESbxhsdfvxwhxQ1cHPkBkGnw0InGXXM
- WDPMrq2p5DOncGvxPYMhF+piOOiBq+6Ow6JCyJlC9YkxMlr2aLVP4SdpnN+Znylotn6e
- 4q93eYOqwt+7I0wYtRcKCaVv/exDeia8jAiOXqMULiK3Zt771mUtNWabaKdLtPYG6exd
- ZznyX2BjrcjorGRwmJ3lVaHLwoSquvpXZVIWxKxbKLugm5+T/+3n2qJkGNQ+5VNatWcF
- +3/A==
-X-Gm-Message-State: AOAM531tdrWNeC2eFX8m1VsLpICgdzTpaMr/dxmd19rptQH05UGYdoUA
- 7LKO4lF7BASt3VgHKgUJTXI5Jg==
-X-Google-Smtp-Source: ABdhPJyGBcn6STEXlFR7PGOcCoKij32jGYPMcZp+PVbPjfk0IUjltI1fK/jL8nNxRODF1X8ZZ+QVog==
-X-Received: by 2002:a17:90a:31c:: with SMTP id 28mr2314407pje.2.1591056334264; 
- Mon, 01 Jun 2020 17:05:34 -0700 (PDT)
+ bh=fIKLbHoFKg+nznod2itU42c+/0e2vFiUewBNDVR2woY=;
+ b=XvL97gEd4Bv7WB377Zd3aV17SSQYBf9UK+qKDIf9v3rARZlRjzxDyBN/LdCJNx37A/
+ HFK8I0N4/alRyfFrVrrk76Id4JBXE1wc7gzyRn7ODK6HNPm3pBGzqLdZG1Wbg3CUGPpA
+ kSdhWhTMfgpK/Upe32JoxUkcHgW8r0HE99Fo1gQlxLo4XjTENG2vJw6Pt44vBqu3rNkr
+ /A1HZADlvq7SYBZ1YLTKUPUaEO7wkkgdc/hJkH5rMvt4TxXO0iTAi8j1Lrr+J90C6hX9
+ kiZxQ6vHquF34vgIO0Z9xSkVhibq5+KUXWg884HDcohmOo7T/BjSe1CuWCGjITxymPjg
+ FbBA==
+X-Gm-Message-State: AOAM532vYGosztz15hrChvO+r7KrypJy6y6x/NgklNyQ0wiJOm4Lj0+U
+ J+WeVTGv/jCjMu1It6+RpaUOnQ==
+X-Google-Smtp-Source: ABdhPJy8E+dBB+B6xxH6g4XYaRfMTQDSSVQjABsveDzD7SE5UnKrgiryvqCCTdscifAd58+mzrbIdQ==
+X-Received: by 2002:a62:8f45:: with SMTP id n66mr21589233pfd.276.1591056623457; 
+ Mon, 01 Jun 2020 17:10:23 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id r31sm525338pjg.2.2020.06.01.17.05.33
+ by smtp.gmail.com with ESMTPSA id z140sm502984pfc.135.2020.06.01.17.10.22
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 01 Jun 2020 17:05:33 -0700 (PDT)
-Subject: Re: [PATCH v2 2/3] hw/usb: Move device-specific declarations to new
- 'hcd-musb.h' header
+ Mon, 01 Jun 2020 17:10:22 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] exec/cpu-common: Move MUSB specific typedefs to
+ 'hw/usb/hcd-musb.h'
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200601141536.15192-1-f4bug@amsat.org>
- <20200601141536.15192-3-f4bug@amsat.org>
+ <20200601141536.15192-4-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <74967516-96d3-d113-c38c-bd0f770f4270@linaro.org>
-Date: Mon, 1 Jun 2020 17:05:31 -0700
+Message-ID: <ee8fffed-cbd0-53e2-2e94-c4c9555e81a9@linaro.org>
+Date: Mon, 1 Jun 2020 17:10:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200601141536.15192-3-f4bug@amsat.org>
+In-Reply-To: <20200601141536.15192-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,18 +114,19 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/1/20 7:15 AM, Philippe Mathieu-Daudé wrote:
-> Move the declarations for the MUSB-HDRC USB2.0 OTG compliant core
-> into a separate header.
+> The CPUReadMemoryFunc/CPUWriteMemoryFunc typedefs are legacy
+> remnant from before the conversion to MemoryRegions.
+> Since they are now only used in tusb6010.c and hcd-musb.c,
+> move them to "hw/usb/musb.h" and rename them appropriately.
 > 
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/hw/usb.h          | 30 -------------------------
->  include/hw/usb/hcd-musb.h | 46 +++++++++++++++++++++++++++++++++++++++
->  hw/usb/hcd-musb.c         |  1 +
->  hw/usb/tusb6010.c         |  1 +
->  4 files changed, 48 insertions(+), 30 deletions(-)
->  create mode 100644 include/hw/usb/hcd-musb.h
+>  include/exec/cpu-common.h | 3 ---
+>  include/hw/usb/hcd-musb.h | 9 +++++----
+>  hw/usb/hcd-musb.c         | 4 ++--
+>  3 files changed, 7 insertions(+), 9 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
