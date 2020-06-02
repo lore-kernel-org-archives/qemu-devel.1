@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D19E4C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B50C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AFB9206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:03:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FD332068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:04:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zWXRad9l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AFB9206C3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JsxMmYP9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD332068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgAK9-0000HV-QH
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:03:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39824)
+	id 1jgAKW-0001Gt-Rp
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:04:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgAIk-0005wT-6P
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:10 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39357)
+ id 1jgAIa-0005au-JB
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:00 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36320)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgAIi-0007R2-Qv
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:09 -0400
-Received: by mail-pl1-x641.google.com with SMTP id v24so1579696plo.6
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 10:02:08 -0700 (PDT)
+ id 1jgAIZ-0007Py-4Y
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:00 -0400
+Received: by mail-pl1-x644.google.com with SMTP id bg4so1589529plb.3
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 10:01:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tHqpToSLuNmT3+mxdztxkjY6kBf+OhopPIY/mAzI0FM=;
- b=zWXRad9lLOfYB1kXttHNm+JcpktLPnPGpwp7jC0FwNZQCg6PRYkS/OIVgOKccBA2TM
- /B3USpHFUcUsyinpJiow+8rOYAwHUbDr0Kud7Ec3k6gZS6qdKFZoUcZn4ptlBgxUdB7W
- G4olbpY4UX7ECn4Cn4SAhG56tycAYLDCdztHq+w4kDvn5QknpsGq/VPBwo+utQNttTwv
- HvL1uKdBB6QEUi0MZkegsskymKLBSe4rcdMvLZ0OBL3FH4/bwyQ+0sSrXdBPlUT2jCo+
- avA56rJnHa07OjSF05fUoGSlAJKy/WbsLlkm3SW3oV3ehkBE3RIu3Rn5cbiCKuHG1K86
- O8kQ==
+ bh=dJwDuWSZeLE696I9+Yn1ZicAuqxGocQvw+7wiJTGy8g=;
+ b=JsxMmYP9V58SOreJPqCe2Bup5PAIAS2gJCk+MiXYBLXbw8d9TDJDc9+x8zIt0IkzOg
+ D3o/2HHWX9cptvmgO7kt5LZ2ewU6TYgvu5NqJDaamsvrDaRXFtwbNTq1EpoZaP/Kntvn
+ 4gsCVH6+gK7MW0RDROlE/K+/6xe+70Uae6f1eQlWemXiu8GzvvCt0KybheOK4KG3erwF
+ Nq4vrG7EEJ/cEmcGcL8Rtz4pppHQ7Zn0jiJCohWMXPTWIfSMkomvFKGyyCSqVvyTpNJE
+ Bb8RGjRjVSNqF6zNb5TmGSX6R5yHGTalxKkrPTmG05f4hqpxiWIVQAJE6V2SziSZfU5P
+ 4V7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tHqpToSLuNmT3+mxdztxkjY6kBf+OhopPIY/mAzI0FM=;
- b=NQFBf2cJmqAPtL6+9fwPI33WfWDniJiincnKqoa9pEPcxEpMp8jzpR7ftUd4EUG1hb
- o/iIQzqmTXcPKV4OkLuW6nF3QR9kn2kqW2sDM29VKpZI2g/YmCpv/Lis7Tg3Kto1kIlJ
- AUferlV8GEIYUoZ37uooOUgfCJ2pZGHcH4uqz1iIZljI9RSSiGQFEmflgWx9rpU/K14u
- 5tyGtcYe0Ky4Stw0gdREz0Euv8QuABIoieFm5yXtopQzWYyOCPfIYnb8njQJNmTb0BdI
- pudmBGjKHMY6vmAKR9INEqaAEtx42LTvM73h7oHP7CooGfYAGI0i7mPF+htdFVjLstRC
- v9aA==
-X-Gm-Message-State: AOAM530079jYTOFzhNDxuGs9fI6fG7H/shnAfdiYVAbcHztXZH5SJiin
- jzqboaJJaeTf5rE+Si6R+Q4jSf6pVcA=
-X-Google-Smtp-Source: ABdhPJxGjH5MdEur0AM3tXciVZgUXl0C6kbK91WqbKJVgQU1pkO91xxYk7KNGEg0Y6LfueCl8a05DQ==
-X-Received: by 2002:a17:902:c3d3:: with SMTP id
- j19mr26285210plj.47.1591117326991; 
- Tue, 02 Jun 2020 10:02:06 -0700 (PDT)
+ bh=dJwDuWSZeLE696I9+Yn1ZicAuqxGocQvw+7wiJTGy8g=;
+ b=qkoUUiZBDbdIdT6wXgFi3rccnMqt1F1vGR3vfIfZ0q4ww/YrkaCMOFl94rX52cKcUY
+ /uPaIKllMMQ7/YPj2506wji32LcTKC7YEpEby6r8/I9ogYe+sgoZcRVEtt7r3l4lBAtw
+ jE6Vvoco+fAffk+a1si3lwagFzE17sC9EJCCAXy+j8NGqwj3QtCL50oMJ5Q3NqH8KlbA
+ kDG+9oLqi4GW4Q4q6F3OgFfaM5Fx9Df8+AlZw/KDDLyLNjfMZwQkxiAlYLkbC5DfxuYD
+ Y4r9w8mfQkDpfOv6BvO9YTNLggYqpnK80PjtIyFKog6WvYQ3GhE/VlcXNghrV7LeUNcR
+ VvAg==
+X-Gm-Message-State: AOAM531f0R7PUBNlSIZTSM6M9pN9sTwiwx1ipNdlOb7ohop7jSd3iCam
+ 6aIBNg2PJG+Pe8ykt3eSYYSXCGZ/+5M=
+X-Google-Smtp-Source: ABdhPJwvsolhROaMT6dbwZfJ9CkfT3/OHFMGIuL16zmhWLHbmMJdRn89b5rfH/fHesD6GhBfPO2Qyg==
+X-Received: by 2002:a17:90a:17e9:: with SMTP id
+ q96mr171373pja.56.1591117317393; 
+ Tue, 02 Jun 2020 10:01:57 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h11sm2723630pjk.20.2020.06.02.10.02.05
+ by smtp.gmail.com with ESMTPSA id h11sm2723630pjk.20.2020.06.02.10.01.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 10:02:06 -0700 (PDT)
+ Tue, 02 Jun 2020 10:01:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/12] tcg: Improve move ops in liveness_pass_2
-Date: Tue,  2 Jun 2020 10:01:49 -0700
-Message-Id: <20200602170151.321389-11-richard.henderson@linaro.org>
+Subject: [PULL 03/12] tcg: Remove expansion to shift by vector from do_shifts
+Date: Tue,  2 Jun 2020 10:01:42 -0700
+Message-Id: <20200602170151.321389-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200602170151.321389-1-richard.henderson@linaro.org>
 References: <20200602170151.321389-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,110 +106,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the output of the move is dead, then the last use is in
-the store.  If we propagate the input to the store, then we
-can remove the move opcode entirely.
+We do not reflect this expansion in tcg_can_emit_vecop_list,
+so it is unused and unusable.  However, we actually perform
+the same expansion in do_gvec_shifts, so it is also unneeded.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.c | 78 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 56 insertions(+), 22 deletions(-)
+ tcg/tcg-op-vec.c | 35 +++++++++++------------------------
+ 1 file changed, 11 insertions(+), 24 deletions(-)
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 97558ec068..1aa6cb47f2 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -2982,34 +2982,68 @@ static bool liveness_pass_2(TCGContext *s)
-         }
+diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+index 488f9bd27b..fb1250fee6 100644
+--- a/tcg/tcg-op-vec.c
++++ b/tcg/tcg-op-vec.c
+@@ -707,7 +707,7 @@ void tcg_gen_rotrv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ }
  
-         /* Outputs become available.  */
--        for (i = 0; i < nb_oargs; i++) {
--            arg_ts = arg_temp(op->args[i]);
-+        if (opc == INDEX_op_mov_i32 || opc == INDEX_op_mov_i64) {
-+            arg_ts = arg_temp(op->args[0]);
-             dir_ts = arg_ts->state_ptr;
--            if (!dir_ts) {
--                continue;
-+            if (dir_ts) {
-+                op->args[0] = temp_arg(dir_ts);
-+                changes = true;
-+
-+                /* The output is now live and modified.  */
-+                arg_ts->state = 0;
-+
-+                if (NEED_SYNC_ARG(0)) {
-+                    TCGOpcode sopc = (arg_ts->type == TCG_TYPE_I32
-+                                      ? INDEX_op_st_i32
-+                                      : INDEX_op_st_i64);
-+                    TCGOp *sop = tcg_op_insert_after(s, op, sopc);
-+                    TCGTemp *out_ts = dir_ts;
-+
-+                    if (IS_DEAD_ARG(0)) {
-+                        out_ts = arg_temp(op->args[1]);
-+                        arg_ts->state = TS_DEAD;
-+                        tcg_op_remove(s, op);
-+                    } else {
-+                        arg_ts->state = TS_MEM;
-+                    }
-+
-+                    sop->args[0] = temp_arg(out_ts);
-+                    sop->args[1] = temp_arg(arg_ts->mem_base);
-+                    sop->args[2] = arg_ts->mem_offset;
-+                } else {
-+                    tcg_debug_assert(!IS_DEAD_ARG(0));
-+                }
-             }
--            op->args[i] = temp_arg(dir_ts);
--            changes = true;
-+        } else {
-+            for (i = 0; i < nb_oargs; i++) {
-+                arg_ts = arg_temp(op->args[i]);
-+                dir_ts = arg_ts->state_ptr;
-+                if (!dir_ts) {
-+                    continue;
-+                }
-+                op->args[i] = temp_arg(dir_ts);
-+                changes = true;
+ static void do_shifts(unsigned vece, TCGv_vec r, TCGv_vec a,
+-                      TCGv_i32 s, TCGOpcode opc_s, TCGOpcode opc_v)
++                      TCGv_i32 s, TCGOpcode opc)
+ {
+     TCGTemp *rt = tcgv_vec_temp(r);
+     TCGTemp *at = tcgv_vec_temp(a);
+@@ -716,48 +716,35 @@ static void do_shifts(unsigned vece, TCGv_vec r, TCGv_vec a,
+     TCGArg ai = temp_arg(at);
+     TCGArg si = temp_arg(st);
+     TCGType type = rt->base_type;
+-    const TCGOpcode *hold_list;
+     int can;
  
--            /* The output is now live and modified.  */
--            arg_ts->state = 0;
-+                /* The output is now live and modified.  */
-+                arg_ts->state = 0;
- 
--            /* Sync outputs upon their last write.  */
--            if (NEED_SYNC_ARG(i)) {
--                TCGOpcode sopc = (arg_ts->type == TCG_TYPE_I32
--                                  ? INDEX_op_st_i32
--                                  : INDEX_op_st_i64);
--                TCGOp *sop = tcg_op_insert_after(s, op, sopc);
-+                /* Sync outputs upon their last write.  */
-+                if (NEED_SYNC_ARG(i)) {
-+                    TCGOpcode sopc = (arg_ts->type == TCG_TYPE_I32
-+                                      ? INDEX_op_st_i32
-+                                      : INDEX_op_st_i64);
-+                    TCGOp *sop = tcg_op_insert_after(s, op, sopc);
- 
--                sop->args[0] = temp_arg(dir_ts);
--                sop->args[1] = temp_arg(arg_ts->mem_base);
--                sop->args[2] = arg_ts->mem_offset;
-+                    sop->args[0] = temp_arg(dir_ts);
-+                    sop->args[1] = temp_arg(arg_ts->mem_base);
-+                    sop->args[2] = arg_ts->mem_offset;
- 
--                arg_ts->state = TS_MEM;
--            }
--            /* Drop outputs that are dead.  */
--            if (IS_DEAD_ARG(i)) {
--                arg_ts->state = TS_DEAD;
-+                    arg_ts->state = TS_MEM;
-+                }
-+                /* Drop outputs that are dead.  */
-+                if (IS_DEAD_ARG(i)) {
-+                    arg_ts->state = TS_DEAD;
-+                }
-             }
-         }
+     tcg_debug_assert(at->base_type >= type);
+-    tcg_assert_listed_vecop(opc_s);
+-    hold_list = tcg_swap_vecop_list(NULL);
+-
+-    can = tcg_can_emit_vec_op(opc_s, type, vece);
++    tcg_assert_listed_vecop(opc);
++    can = tcg_can_emit_vec_op(opc, type, vece);
+     if (can > 0) {
+-        vec_gen_3(opc_s, type, vece, ri, ai, si);
++        vec_gen_3(opc, type, vece, ri, ai, si);
+     } else if (can < 0) {
+-        tcg_expand_vec_op(opc_s, type, vece, ri, ai, si);
++        const TCGOpcode *hold_list = tcg_swap_vecop_list(NULL);
++        tcg_expand_vec_op(opc, type, vece, ri, ai, si);
++        tcg_swap_vecop_list(hold_list);
+     } else {
+-        TCGv_vec vec_s = tcg_temp_new_vec(type);
+-
+-        if (vece == MO_64) {
+-            TCGv_i64 s64 = tcg_temp_new_i64();
+-            tcg_gen_extu_i32_i64(s64, s);
+-            tcg_gen_dup_i64_vec(MO_64, vec_s, s64);
+-            tcg_temp_free_i64(s64);
+-        } else {
+-            tcg_gen_dup_i32_vec(vece, vec_s, s);
+-        }
+-        do_op3_nofail(vece, r, a, vec_s, opc_v);
+-        tcg_temp_free_vec(vec_s);
++        g_assert_not_reached();
      }
+-    tcg_swap_vecop_list(hold_list);
+ }
+ 
+ void tcg_gen_shls_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_i32 b)
+ {
+-    do_shifts(vece, r, a, b, INDEX_op_shls_vec, INDEX_op_shlv_vec);
++    do_shifts(vece, r, a, b, INDEX_op_shls_vec);
+ }
+ 
+ void tcg_gen_shrs_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_i32 b)
+ {
+-    do_shifts(vece, r, a, b, INDEX_op_shrs_vec, INDEX_op_shrv_vec);
++    do_shifts(vece, r, a, b, INDEX_op_shrs_vec);
+ }
+ 
+ void tcg_gen_sars_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_i32 b)
+ {
+-    do_shifts(vece, r, a, b, INDEX_op_sars_vec, INDEX_op_sarv_vec);
++    do_shifts(vece, r, a, b, INDEX_op_sars_vec);
+ }
+ 
+ void tcg_gen_bitsel_vec(unsigned vece, TCGv_vec r, TCGv_vec a,
 -- 
 2.25.1
 
