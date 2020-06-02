@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E512C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B23FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47EAF206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:58:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 653C4206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 21:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5zBAijR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47EAF206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOFEyuiE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653C4206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgEvL-0005BT-Ir
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 17:58:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47396)
+	id 1jgEvT-0005Pb-NL
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 17:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEjP-0005Gv-Ad
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:45:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48192
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEjX-0005Tv-Pt
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:46:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51267
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEjO-0008SX-2y
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:45:59 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgEjV-0008Tu-GB
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 17:46:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591134357;
+ s=mimecast20190719; t=1591134360;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8rScsdZiWSfPPTJL0UGkB6AtAaEGgD4vNhN/UdNeA2U=;
- b=J5zBAijR2F6B7X7zQATuDwGNx8qJycT1+cU8YzncodfItf4o12sMzVtsWy+jvDcLwOoG78
- sYpqDyBEOogoGh5BEVCquIZUa9z60v3ZB0RPNiVNjHFCK7ar+4ngyr1CJTuvByMI6pad6X
- pvq5RTLuN8lk+Jhi2WIu20lL+J/t2LA=
+ bh=XXZsgNy8ylD2Xon0Zvh4kBHu+MYqm9yocytCFoFU9TE=;
+ b=iOFEyuiEdkQnhAr+lrD583TceOVAsA9aJfK8DAC/98gHhDFHdBLoQ7ndNFsZ6JMtyIyfD5
+ SpLPhOcPK3ikdORQoJEL+SAPVV61PrVvp3PKVEsfGBhXfizr3kcTg+H0JmHHwyR01NOckM
+ nkMwLtb2pJKDHJcKkZ3TNS1BGLWFJ8c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-40lmcYYjPua1M-Q6LBeKgQ-1; Tue, 02 Jun 2020 17:45:53 -0400
-X-MC-Unique: 40lmcYYjPua1M-Q6LBeKgQ-1
+ us-mta-322-VVNjTjJqPou8lFRWT4RpNQ-1; Tue, 02 Jun 2020 17:45:58 -0400
+X-MC-Unique: VVNjTjJqPou8lFRWT4RpNQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52424107ACCA;
- Tue,  2 Jun 2020 21:45:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FF051083E80;
+ Tue,  2 Jun 2020 21:45:57 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18FF661987;
- Tue,  2 Jun 2020 21:45:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6594A61984;
+ Tue,  2 Jun 2020 21:45:54 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/16] python/machine.py: use qmp.command
-Date: Tue,  2 Jun 2020 17:45:23 -0400
-Message-Id: <20200602214528.12107-12-jsnow@redhat.com>
+Subject: [PATCH v2 13/16] python/machine.py: fix _popen access
+Date: Tue,  2 Jun 2020 17:45:25 -0400
+Message-Id: <20200602214528.12107-14-jsnow@redhat.com>
 In-Reply-To: <20200602214528.12107-1-jsnow@redhat.com>
 References: <20200602214528.12107-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,70 +100,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-machine.py and qmp.py both do the same thing here; refactor machine.py
-to use qmp.py's functionality more directly.
+As always, Optional[T] causes problems with unchecked access. Add a
+helper that asserts the pipe is present before we attempt to talk with
+it.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/machine.py | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ python/qemu/machine.py | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index a835b7550da..5add7a28eaf 100644
+index 9c45bdfb1e4..64197fc8492 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -25,6 +25,8 @@
- import socket
- import tempfile
- from typing import (
-+    Any,
-+    Dict,
-     List,
-     Optional,
-     Type,
-@@ -450,17 +452,23 @@ def set_qmp_monitor(self, enabled=True):
-             self._qmp_set = False
-             self._qmp = None
+@@ -113,7 +113,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+         # Runstate
+         self._qemu_log_path = None
+         self._qemu_log_file = None
+-        self._popen = None
++        self._popen: Optional['subprocess.Popen[bytes]'] = None
+         self._events = []
+         self._iolog = None
+         self._qmp_set = True   # Enable QMP monitor by default.
+@@ -225,6 +225,12 @@ def is_running(self):
+         """Returns true if the VM is running."""
+         return self._popen is not None and self._popen.poll() is None
  
--    def qmp(self, cmd, conv_keys=True, **args):
--        """
--        Invoke a QMP command and return the response dict
--        """
-+    @classmethod
-+    def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
-         qmp_args = dict()
-         for key, value in args.items():
--            if conv_keys:
-+            if _conv_keys:
-                 qmp_args[key.replace('_', '-')] = value
-             else:
-                 qmp_args[key] = value
-+        return qmp_args
++    @property
++    def _subp(self) -> 'subprocess.Popen[bytes]':
++        if self._popen is None:
++            raise QEMUMachineError('Subprocess pipe not present')
++        return self._popen
++
+     def exitcode(self):
+         """Returns the exit code if possible, or None."""
+         if self._popen is None:
+@@ -235,7 +241,7 @@ def get_pid(self):
+         """Returns the PID of the running process, or None."""
+         if not self.is_running():
+             return None
+-        return self._popen.pid
++        return self._subp.pid
  
-+    def qmp(self, cmd: str,
-+            conv_keys: bool = True,
-+            **args: Any) -> QMPMessage:
-+        """
-+        Invoke a QMP command and return the response dict
-+        """
-+        qmp_args = self._qmp_args(conv_keys, **args)
-         return self._qmp.cmd(cmd, args=qmp_args)
- 
-     def command(self, cmd, conv_keys=True, **args):
-@@ -469,12 +477,8 @@ def command(self, cmd, conv_keys=True, **args):
-         On success return the response dict.
-         On failure raise an exception.
+     def _load_io_log(self):
+         if self._qemu_log_path is not None:
+@@ -365,7 +371,7 @@ def wait(self):
          """
--        reply = self.qmp(cmd, conv_keys, **args)
--        if reply is None:
--            raise qmp.QMPError("Monitor is closed")
--        if "error" in reply:
--            raise qmp.QMPResponseError(reply)
--        return reply["return"]
-+        qmp_args = self._qmp_args(conv_keys, **args)
-+        return self._qmp.command(cmd, **qmp_args)
+         Wait for the VM to power off
+         """
+-        self._popen.wait()
++        self._subp.wait()
+         if self._qmp:
+             self._qmp.close()
+         self._post_shutdown()
+@@ -377,8 +383,8 @@ def _hard_shutdown(self) -> None:
+         if not self.is_running():
+             return
  
-     def get_qmp_event(self, wait=False):
+-        self._popen.kill()
+-        self._popen.wait(timeout=60)
++        self._subp.kill()
++        self._subp.wait(timeout=60)
+ 
+     def _soft_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
+         """
+@@ -395,7 +401,7 @@ def _soft_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
+                 self._qmp.cmd('quit')
+             self._qmp.close()
+ 
+-        self._popen.wait(timeout=timeout)
++        self._subp.wait(timeout=timeout)
+ 
+     def _do_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
          """
 -- 
 2.21.3
