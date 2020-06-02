@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39028C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 286A5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0683C206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB077206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 07:43:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UjHXT5b+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0683C206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bau/dU6N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB077206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg1a4-0005Jn-5z
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 03:43:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54778)
+	id 1jg1aB-0005aB-0D
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 03:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <morecache@gmail.com>)
- id 1jg1ZB-0003lZ-9j
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:33 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43724)
+ id 1jg1ZH-0003wC-SN
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:39 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:55872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <morecache@gmail.com>)
- id 1jg1ZA-0000Ym-LY
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:33 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so2269927wrr.10
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 00:42:32 -0700 (PDT)
+ id 1jg1ZH-0000Zj-9u
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 03:42:39 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id c71so1870280wmd.5
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 00:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bFt0WsKi9YCNdM7hkyu3tuuPZYw4VooHNM+xovmMUSU=;
- b=UjHXT5b+mAHucrJN+ZcFcwlt4a7/rA+EDtXusPHC+3wo7dFu0POHseQ/H2tSunibjN
- eg6As0H9nuVDoyV6r2L0lx69QjH/mC87krqnX4yMN2YU/688/F8hVL17UJdH8C8zO5NO
- DTvZTClUy1Lw+Af0bI++6Zpxelkm8Z+YXQQgAEkWV/Ij7lKU16ls6/Yh10ge+qU9IjhF
- g5x+3fbZq25ChZNqGN8C1JV456pfzIaDpFaQExtMFASuw7yUCrNJIB2h6d0OA9Nps+VZ
- 0ma2bmy9F55JEE78QnIQq2thqOGOnlBqUjNUDZJlWZ7/YyuTd12cAbwgWRvbM12P/mx0
- /5iQ==
+ bh=+1zDIDD5Ac1G0o+sZnIC0Y87pDen00GlH6TX0f0+z20=;
+ b=Bau/dU6Ng5FJRYIR+5Jqsgha7wM9+N+56gTWMOiqwi2oyb9lyH96cFRxdp/Ab7Qxg+
+ +HTMPWY0/CZvLooYBvIqFqBOkqV8T6u4StBohNPxdMKokn/ZBN8OSeqkm2mnrrvUUQpz
+ Z/P6hgqI/+6fKnJCRtzNuvFRyXmFwG/dVvnn6IVDyQLZkwAu9dsRR5MOFB128Z9UuA1a
+ Bu1SX+exf+ivTkoUQtxwp4wSfp5iJKRrhxTay/+QLBsSh07EqQpQisrx++r+qBT1nfxZ
+ /tqFHu4as6Y4kJe8csHwlmBuucfVidPKkzsw9Cb59fGBeSw94hcrC7pIu9JmhjITxPvk
+ dZDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=bFt0WsKi9YCNdM7hkyu3tuuPZYw4VooHNM+xovmMUSU=;
- b=Irjf4pJFYbrDcQKYigU5rHWo9gi3Rlv2Afg2F3pcRE7uIFFIujWN7hxo0+3+ppPKL2
- eC1xbsSJfRpucJz21ouSC5x/tRAIV8RoVmt3PdKSq3oiCIuNM4/71rf2BNQzh0SntO41
- VmhLphLHBqQ+A4T1IbYTHLwbdGWUun0uaebX7bXkSjX9H6YtIQJNQmSl5hOVHHG3j5GQ
- c6iCW4NA+Emd4+Qol+6hLmgKWBsPBDzYMIegOK+UUwV6UGCXHpc3N0ppRcO2dTWsArHJ
- 3TSryPCCe2HzDqg48Nu7kf795kBulAVNfXHrvZG7fGiDgC8bi69WB7be5cgSJzBSvo3S
- MbrQ==
-X-Gm-Message-State: AOAM5324mg2R1b6RTRRYrGZbpeb6+yFTTRWxYCcH++X7mBIfklaeM4U3
- SPEjz5D+xSEypFzx2K8Pj5OOLz+jZwE=
-X-Google-Smtp-Source: ABdhPJxicM6rpPP9PklDqcsi02NSQb1Yq9AysFhDVJeVZg4YJVUxyEu056EqBOTCBgwNAIRJ/vZOdw==
-X-Received: by 2002:adf:f389:: with SMTP id m9mr23676786wro.195.1591083751265; 
- Tue, 02 Jun 2020 00:42:31 -0700 (PDT)
+ bh=+1zDIDD5Ac1G0o+sZnIC0Y87pDen00GlH6TX0f0+z20=;
+ b=j3IRk5S3Rsj8uo7UxVc5SlKYEpXB1nfOYRXWy7nIAQ5cG1CPfem0TW7vEkmQnzNyEe
+ tRkS6OPcVPOr7VKxBsUxgD0tKztVB0/vOmfAx9K13ZcDjyc5kQ4tDCViNsF//JkWJBBe
+ CZra+6897BsC6XX1D5ruun9FIhtwRxoXJNE3gpyWE4H+G418EQOe3xFvM8WBpB6znTNS
+ 9jTxnpnATwMmNFeKSrqC4bcgG6au9ipZKkCQaz2Kjw9ntCtLT4wlNlD2zsL0Runwep9R
+ mkUtvOBTM0VDmApFcRHBnM86Z9E1zXABqYpslA6CSsFD479CyWwkdMXgwVT1U2IXTx9F
+ KPxw==
+X-Gm-Message-State: AOAM532oTAQ3nn/7VR/GuHY7gkWkXP6HK91MtHI/4bbx/fH0IJiZUktA
+ kZ02ox/paWhL4+sSBB5FZ0TIlq1UJfQ=
+X-Google-Smtp-Source: ABdhPJw5aidY05pDdf151pOu8+9XKa13pjvSkry29NKrLblhWBL9CrPERwxVAo254nj/BiGDLvYCTw==
+X-Received: by 2002:a1c:62d6:: with SMTP id w205mr2735145wmb.97.1591083757916; 
+ Tue, 02 Jun 2020 00:42:37 -0700 (PDT)
 Received: from t440p.suse.asia (60-251-47-115.HINET-IP.hinet.net.
  [60.251.47.115])
- by smtp.gmail.com with ESMTPSA id w3sm2294518wmg.44.2020.06.02.00.42.28
+ by smtp.gmail.com with ESMTPSA id w3sm2294518wmg.44.2020.06.02.00.42.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 00:42:30 -0700 (PDT)
+ Tue, 02 Jun 2020 00:42:37 -0700 (PDT)
 From: Lin Ma <lma@suse.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] block: Add bdrv_co_get_lba_status
-Date: Tue,  2 Jun 2020 15:41:58 +0800
-Message-Id: <20200602074201.10879-2-lma@suse.com>
+Subject: [PATCH 3/4] block: Add block accounting code for GET LBA STATUS
+Date: Tue,  2 Jun 2020 15:42:00 +0800
+Message-Id: <20200602074201.10879-4-lma@suse.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200602074201.10879-1-lma@suse.com>
 References: <20200602074201.10879-1-lma@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=morecache@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=morecache@gmail.com; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -106,68 +106,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The get lba status wrapper based on the bdrv_block_status. The following
-patches will add GET LBA STATUS 16 support for scsi emulation layer.
-
 Signed-off-by: Lin Ma <lma@suse.com>
 ---
- block/io.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ include/block/accounting.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/io.c b/block/io.c
-index 121ce17a49..dacc3c2471 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2186,6 +2186,49 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                            BDRV_REQ_ZERO_WRITE | flags);
- }
+diff --git a/include/block/accounting.h b/include/block/accounting.h
+index 878b4c3581..645014fb0b 100644
+--- a/include/block/accounting.h
++++ b/include/block/accounting.h
+@@ -38,6 +38,7 @@ enum BlockAcctType {
+     BLOCK_ACCT_WRITE,
+     BLOCK_ACCT_FLUSH,
+     BLOCK_ACCT_UNMAP,
++    BLOCK_ACCT_GET_LBA_STATUS,
+     BLOCK_MAX_IOTYPE,
+ };
  
-+int coroutine_fn
-+bdrv_co_get_lba_status(BdrvChild *child, int64_t offset, int64_t bytes,
-+                       uint32_t *num_blocks, uint32_t *is_deallocated)
-+{
-+    BlockDriverState *bs = child->bs;
-+    int ret;
-+    int64_t target_size, count = 0;
-+    bool first = true;
-+    uint8_t wanted_bit1 = 0;
-+
-+    target_size = bdrv_getlength(bs);
-+    if (target_size < 0) {
-+        return -EIO;
-+    }
-+
-+    if (offset < 0 || bytes < 0) {
-+        return -EIO;
-+    }
-+
-+    for ( ; offset <= target_size - bytes; offset += count) {
-+        ret = bdrv_block_status(bs, offset, bytes, &count, NULL, NULL);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+        if (first) {
-+            if (ret & BDRV_BLOCK_ZERO) {
-+                wanted_bit1 = BDRV_BLOCK_ZERO >> 1;;
-+                *is_deallocated = 1;
-+            } else {
-+                wanted_bit1 = 0;
-+            }
-+            first = false;
-+        }
-+        if ((ret & BDRV_BLOCK_ZERO) >> 1 == wanted_bit1) {
-+            (*num_blocks)++;
-+        } else {
-+            break;
-+        }
-+    }
-+out:
-+    return ret;
-+}
-+
- /*
-  * Flush ALL BDSes regardless of if they are reachable via a BlkBackend or not.
-  */
 -- 
 2.24.0
 
