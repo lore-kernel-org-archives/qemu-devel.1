@@ -2,123 +2,164 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0827C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 20:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F103C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 20:12:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B9B7207FB
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 20:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0B920734
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 20:12:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZJ7utb5n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B9B7207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YYavBlDW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0B920734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgDG2-0004hl-NG
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 16:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35678)
+	id 1jgDH3-0005f1-Fg
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 16:12:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jgDFQ-0004Cu-Cg; Tue, 02 Jun 2020 16:10:56 -0400
-Received: from mail-eopbgr80113.outbound.protection.outlook.com
- ([40.107.8.113]:27905 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jgDFN-0005BW-Iw; Tue, 02 Jun 2020 16:10:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hsCGLhVcRDkBfCJSAySYVQBMk8Yx8ONUFaN93FebK8pw6BE02S51bjoLDrBJ9Se3ocH0+aNZcMrQ5IaI9Dhxade8UkSODqanhd2C1oUWbZJCJMNHBYyEY1wxV5zyTvsB72eL/OUJ7doDBFuU7Atx0f0bob6WgOVt2xxKcMdSV4hoRS6uU7L6W4FigHtoCHd0fVmesIVTV9DgExM+daDyqbjvwisg7hWtHlq1cojs/2ULEaN+2Upw68YhCrhLNI0J0C6dCLqgG0ZaH3xgLRM7bE02CWcMssIsqurDw3aAhR+jGs08Qydn1WFtMT1LXvS3Ug3s8DqEIrIAHkFJChU4Ng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TMNVsFUTV/o+Xd2HqMTYH5mLlgXeDeSl9PqasjDm+Pw=;
- b=KnF3kde916I9Up9L73yMAOOiaaB7HfgK/1luGaIVgT75ZccJkPC4qRoRVgpQzgy8QXvRZ+GDMM8n9HR7glHVqzHnw+k/qNuwJvNJPpf+J6tyhcogg5z9eOMLUO52gvn0VhvDcI2OF1OkqdStIjDZKd2bga1VZ8kscT/940dVO2x6sJ2oqxLsh4Vs/IVj+2VzHk0iD9HaWcT6xp6itYuGG/yzh3/L2CQod5MJgcafyd+AP+z4cwsA8plkahu0Z2iTwiXdbBIeacTAw0BX19JXBK9SV7rHm9edP+kf75Eef0aLMqQX0q82bISW1xMx02OR8aWtSnsIXLIR5CS022GjUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TMNVsFUTV/o+Xd2HqMTYH5mLlgXeDeSl9PqasjDm+Pw=;
- b=ZJ7utb5n2K5hoqunMntnVW/yYX2eZ63kI1w1Pq925vMSEZgihTh1OqqVHsCXd4xHk4bbPoztuxgVlLZ+TShWkJVg/TPO/dSVVzQ7Uk6GpOFELoDuRMTEI61cpeTZ+ztYjsmNb1dKz8lY7KGRLNu/tiyKtKSmy9ZZuwp1FhRCi5E=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5303.eurprd08.prod.outlook.com (2603:10a6:20b:102::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Tue, 2 Jun
- 2020 20:10:50 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3045.024; Tue, 2 Jun 2020
- 20:10:50 +0000
-Subject: Re: [PATCH v3 3/6] iotests: dump bitmap extension data with qcow2.py
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1591019293-211155-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f3c795d3-ec7f-48bf-ef2a-4d302d351636@virtuozzo.com>
-Date: Tue, 2 Jun 2020 23:10:48 +0300
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgDG1-0004pf-Nn
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 16:11:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57759
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgDFz-0005LX-V0
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 16:11:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591128690;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=w9mCzC6dLOC13kGhBVE9k2XoaTcEIYN+HUH7iTQxx+o=;
+ b=YYavBlDWsPsctaoQ9bH5veEHdAEy92tanSUbQRDrs4UwDI6+iRue1ZymAtspR0OSy52rky
+ Gr35PPdhDqTsAFLLjL4jzO27US5Nf6ELmWC7iDuJ3TRqJBA+fJvUQJaTz82SxGdsfjuj4O
+ eAak3jJLKnvnIF97KWqUkvl7PnYwmWg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-LNs8l1U3O0iE1lKZ3MQobQ-1; Tue, 02 Jun 2020 16:11:28 -0400
+X-MC-Unique: LNs8l1U3O0iE1lKZ3MQobQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7686D1800D42;
+ Tue,  2 Jun 2020 20:11:27 +0000 (UTC)
+Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 734B25C221;
+ Tue,  2 Jun 2020 20:11:25 +0000 (UTC)
+Subject: Re: [PATCH RFC 26/32] python//machine.py: use qmp.command
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-27-jsnow@redhat.com>
+ <0baff903-779b-c583-8ba6-6a28a4a10a42@redhat.com>
+ <20200602101855.GB5940@linux.fritz.box>
+ <20200602102646.GC5940@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <905083c7-0521-8988-a3e3-adac7080aac7@redhat.com>
+Date: Tue, 2 Jun 2020 16:11:23 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <1591019293-211155-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR05CA0107.eurprd05.prod.outlook.com
- (2603:10a6:207:1::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.153) by
- AM3PR05CA0107.eurprd05.prod.outlook.com (2603:10a6:207:1::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Tue, 2 Jun 2020 20:10:49 +0000
-X-Originating-IP: [185.215.60.153]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: df945812-da64-40a9-7321-08d807310b59
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5303:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53036AAAFACBBB9680864516C18B0@AM7PR08MB5303.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:983;
-X-Forefront-PRVS: 0422860ED4
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3V/iPWAukgX7tkjfIgd6XRaHk6doGazPxW75/37UWTnj/CuzLCZAYW7KncELu15jlX3yG0bqGi3hV0O3qqdsYKtS96q3+kG9KAtVsM5/Kq4H2S0Td1T3t+1kybDCcG9AVKrW2jH7b07FVcGahBRmrHHk3ymaxjZOgAw3bBWyKTbsapbE2uT99xrxJRr3emQ7UCxM8MJb13YUxKq3gziMwgTQjg9AMIIwGRfwjfO94lO51mQMY2YyQkZFnEHUkp07KwpEfk6a3onWALCiIODyioFbQD15GQi3isDILrWcGmcqnem/MQ25x/thBckUo+nKkBBXvUYlXY9/IBmjuTkWh7pOyChtAYvUfEgMKcyyVFcKsZgiyQf2CAOBAkXQ+Zh8
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39850400004)(396003)(366004)(136003)(376002)(346002)(66476007)(66556008)(16526019)(186003)(31696002)(86362001)(66946007)(31686004)(26005)(83380400001)(2616005)(956004)(8676002)(8936002)(107886003)(6486002)(52116002)(478600001)(4326008)(316002)(2906002)(16576012)(36756003)(5660300002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: tvcKCB5Rdpg43837Wl75j6PBKiXhLr1vtWXYl1ooPj1JrGDUzbSR7FmsuF+GHeG8hDMxTMqH3i+GhiOtAJXfqClW8dpYz83eLfPZECQaki1E6okXlixdslj4AxbWPSceixIwFJq23tBnNkHXtZI7jGLvTCg2usgMyJZIjAizv0opHJYWW80UyJ/rt3+A5O6/oanv9bVpm6R1sohcgkh1VgNHFATE8GBEvGoy+J4DxrQCUyqHKI34heDbBLdTs7CBGHe9/HJ4jRf29AbE3tjoZbwd4qWY6HAlnwALEHGDpnBSj8f+Y3bplT8E7BHOE55fOrDC127MGjR0mr58C/kIpmaX7MP8Rw8mUhscPiiXSIQWaBFE9S+JGf1TcA9mGnTKLB1p2gGMG7HFHU+nS6pzKsR6segajy7kLc0VAO6jFcDFFNM0rSylE4h+c5iddMpTeswaKGAwM/mE1o2wNompfvrLULTWGE3+25qBHu+8HGxyNdvK3TC8XzqODJqYmHkN
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df945812-da64-40a9-7321-08d807310b59
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2020 20:10:49.9203 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3W3SU1R1RTtPeS3Wb7/wmBYwUsMVLm1dhamY4Qo2oWGyVHfmH2+XmsOwxKjcayPYDkjbhU/Eb2A7Thi5NLaNd/Vny5a0RiAhJlOkbeokeIA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5303
-Received-SPF: pass client-ip=40.107.8.113;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 16:10:51
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <20200602102646.GC5940@linux.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 15:54:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,111 +172,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-01.06.2020 16:48, Andrey Shinkevich wrote:
-> Add bitmap header extension data, if any, to the dump in qcow2.py.
-> 
-> Header extension:         Bitmaps
-> magic                     0x23852875
-> length                    24
-> nb_bitmaps                2
-> reserved32                0
-> bitmap_directory_size     0x40
-> bitmap_directory_offset   0x100000
-> 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   tests/qemu-iotests/qcow2.py | 42 +++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 41 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
-> index 18e4923..8286115 100755
-> --- a/tests/qemu-iotests/qcow2.py
-> +++ b/tests/qemu-iotests/qcow2.py
-> @@ -4,6 +4,39 @@ import sys
->   import struct
->   import string
->   
-> +
-> +class Qcow2BitmapExt:
-> +
-> +    uint32_t = 'I'
-> +    uint64_t = 'Q'
-> +
-> +    fields = [
-> +        [uint32_t, '%d',  'nb_bitmaps'],
-> +        [uint32_t, '%d',  'reserved32'],
-> +        [uint64_t, '%#x', 'bitmap_directory_size'],
-> +        [uint64_t, '%#x', 'bitmap_directory_offset']
-> +    ]
-> +
-> +    fmt = '>' + ''.join(field[0] for field in fields)
-> +
-> +    def __init__(self, data):
-> +
-> +        extension = struct.unpack(Qcow2BitmapExt.fmt, data)
-> +        self.__dict__ = dict((field[2], extension[i])
-> +                             for i, field in enumerate(Qcow2BitmapExt.fields))
-> +
-> +    def dump_bitmap_ext(self):
-> +        for f in Qcow2BitmapExt.fields:
-> +            value = self.__dict__[f[2]]
-> +            value_str = f[1] % value
-> +
-> +            print("%-25s" % f[2], value_str)
-> +        print("")
-> +
-> +    def dump_ext(self):
-> +        self.dump_bitmap_ext()
-
-Hmm, don't see, why this can't be one function named "dump".
-
-Still, I do think it should be moved to parent class of both Qcow2BitmapExt and QcowHeader,
-I'll send refactoring follow-up, so it doesn't really matter now.
-
-> +
-> +
->   class QcowHeaderExtension:
->   
->       QCOW2_EXT_MAGIC_BACKING_FORMAT = 0xE2792ACA
-> @@ -13,12 +46,16 @@ class QcowHeaderExtension:
->       QCOW2_EXT_MAGIC_DATA_FILE = 0x44415441
->   
->       def __init__(self, magic, length, data):
-> +        self.obj = None
->           data_str = data[:length]
->           if all(c in string.printable.encode('ascii') for c in data_str):
->               data_str = "'%s'" % data_str.decode('ascii')
->           else:
->               data_str = "<binary>"
->   
-> +        if magic == self.QCOW2_EXT_MAGIC_BITMAPS:
-> +            self.obj = Qcow2BitmapExt(data)
-> +
->           if length % 8 != 0:
->               padding = 8 - (length % 8)
->               data += b"\0" * padding
-> @@ -172,7 +209,10 @@ class QcowHeader:
->               print("%-25s %s" % ("Header extension:", ex.name))
->               print("%-25s %#x" % ("magic", ex.magic))
->               print("%-25s %d" % ("length", ex.length))
-> -            print("%-25s %s" % ("data", ex.data_str))
-> +            if ex.obj is not None:
-> +                ex.obj.dump_ext()
-> +            else:
-> +                print("%-25s %s" % ("data", ex.data_str))
-
-this change make it more obvious that this should be method of QcowHeaderExtension.
-
-Still, this works as is, nothing serious:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 
--- 
-Best regards,
-Vladimir
+On 6/2/20 6:26 AM, Kevin Wolf wrote:
+> I think I prefer the explicit Dict[str, Any] because it doesn't end up
+> duplicating the default value, but I just wanted to mention that this
+> option exists, too.
+
+Oh, I see what's going on here now! Thanks, that's very helpful! In this
+case, for now, I think I like your first solution, too.
+
+Someday in the future, I want to look into strictly typed generated SDK
+objects where mypy *does* know the types of every field in a QMP command
+object.
+
+That's not today, and it's probably not soon, (and it might be never,)
+but until then, explicitly hinting the kwargs to be Dict[str, Any] is
+reasonable enough.
+
+Thank you so much!
+
+--js
+
 
