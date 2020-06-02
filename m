@@ -2,90 +2,97 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE74C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CB9A206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63FD1206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:09:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DUdqWApC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CB9A206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lmghepCX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FD1206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgAOB-00005j-48
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:07:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39832)
+	id 1jgAPU-0002l5-KQ
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgAIl-00060q-U6
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:11 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46880)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jgAKx-0002ne-7p
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:04:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33505)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgAIk-0007R9-UV
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:02:11 -0400
-Received: by mail-pg1-x542.google.com with SMTP id p21so5331777pgm.13
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 10:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=v9PYVllY3D8WNVt+/GwKgHsq/9t/7VocWb4hJT0OXq8=;
- b=DUdqWApC0mD3QNG3NHWDAoEp6AeMLviM5Ltzd//uViT8ztuR4zhDiIqWpXr8/67See
- DBbv3ps0XeHWqfy5gDGJKoSe3w0SkUw6rBUX/HcbMMA1UuYVlqL0YPjmsYT1Ygp0SZ/i
- gicj2s4i7z9llKYQXZtGzUiSRxHLHoGsxZAJTt8+Kb5td8eV2pscyBNwTfW05KMG5uxq
- iCMwW9APn96zQABSKcKQrd9xiEdjX8J1Djh5/Qd7bGE27yGlQhX2Zm3Z7yN6T7UiB/xX
- fLp3MljyRaQDUs6opaP3wuWiJUnsyg2l0rpuZx26hMTpLTHNGAMu0RlRM+g/EsWXhSWs
- gmFg==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jgAKw-0007jC-9n
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:04:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l11so4181768wru.0
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 10:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TAtBZ9LmSFvncfGWbBMfAxu7cgDs/GE8yqsBZ01qbP4=;
+ b=lmghepCXGvtjgefjAoeBRLPiCM7QQb99s+UhOd5cL0QkrECbbeQDVsPTVAT2M0vr6W
+ 8gUS9Z0Jw3fk9hy50EZo8VhJbiMuKyY6hQEuyAKZHjS85JmFyMsK/SDjLXbfI0+3g5tQ
+ 9p/Sqq5buJ7i9B/YZwp41eCKwEc8radjww7siGGxFXhMkimQmwbhQLUHxeMfQBq4+97B
+ u395TApVP4ELTk4Ay1g9Rra7loim6+MnG0bacWbkegnslPE+Mkboi7GpYZtEaWlz9erw
+ UdtiAYc0y4BuFBQr24zeAetnzLAtqpqbl+N2FhIdtSXxf2SFCc28R/sLVe0NyZ8obOa9
+ hV1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=v9PYVllY3D8WNVt+/GwKgHsq/9t/7VocWb4hJT0OXq8=;
- b=adnptLaXCCpg3TrKqa90JRjmlCJrH5PtgwxD3RxDxcWExqRTv+BTkEar6tDybZZs0k
- 2P9IhhFQ9SgEs1GMdY1mtZwjvn9Pb9QmtLXqKlebhNzVAUCZnxbn2+3NmlnGuZqu+4cy
- JMNfha9NFaT3tvtPqReNAtqrL/OOnujankwG9rNAxUhvLvwW11ylqfscehYhC7puWRtM
- X23UECNUZtM9gfayG3/3fFbZwtQvBu++4fpa2yzkqy4LWjLwgKrQZPOHaBw88J5nPUEM
- C2i0Jx99Oc9fSfRe+V+xmvj1C2Rfa1t/MiA6R9a9Sa4qMogJIEIE0fDJsMcfeJuNbWYi
- 04ew==
-X-Gm-Message-State: AOAM533yVJRc7WBYXYhp091KzKPsLNRFcCsHsdD0A0ZR9zw2atarrK6i
- ukvczWTgGTXYucd50KQYMK/fJrISv2A=
-X-Google-Smtp-Source: ABdhPJxoPtaqaA0Y5mlpcLKtnsmfYi2cp5VbxYGp+2HlAU6LEsWJ3NWxdThCpMZSdrSE2iiuNHGFlQ==
-X-Received: by 2002:a63:724a:: with SMTP id c10mr24670392pgn.130.1591117328540; 
- Tue, 02 Jun 2020 10:02:08 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h11sm2723630pjk.20.2020.06.02.10.02.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 10:02:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 11/12] accel/tcg: Adjust cpu_signal_handler for NetBSD/arm
-Date: Tue,  2 Jun 2020 10:01:50 -0700
-Message-Id: <20200602170151.321389-12-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200602170151.321389-1-richard.henderson@linaro.org>
-References: <20200602170151.321389-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TAtBZ9LmSFvncfGWbBMfAxu7cgDs/GE8yqsBZ01qbP4=;
+ b=eXMeYlLpQdBkGOgD1GkvsiFf6V4S+ZTHX5XGs0IDhfuouQso4MiJgVE1Zw94eEmFR4
+ m9pBjsjJJ+6jR1+uIN9m4380YJuTK8DQyRA+6ZnuXsCO+xp6EVcuZmCb7WE8jbSBrYAE
+ 275Bv5+cainxEjMMPkUZp6ytWOjY0bRqqSyoonY5UepCZ/1TmQXiLHSUllKybDtWIjox
+ 4MYcCKrhBdn8P8QjFrN24XPxWQ8VeHI6tl0jOvkSNXgHPGVunlaBtJ2987uGi8uC6GV3
+ ESw09mGhXqzzHDRJNFC4bHSg8LrBCKplgRjnwO4RKzCzDRGQ/fKbMGrOfAApOb/x21AQ
+ MFYw==
+X-Gm-Message-State: AOAM530VIH91SFaHv56srr1frVOvweAlB22Y/gp8AtGzGG9AIee22Wpw
+ rK05UpRkL547bKrPD/Etzgc=
+X-Google-Smtp-Source: ABdhPJwo4KkU4tA/K9NXUTGuFa6mcelry0WdFYGB1CF62u0GzaHNWtqXUo6oMraGrQPIiIHQuoGJPQ==
+X-Received: by 2002:a5d:6986:: with SMTP id g6mr28166232wru.27.1591117464472; 
+ Tue, 02 Jun 2020 10:04:24 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id q128sm467243wma.38.2020.06.02.10.04.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 02 Jun 2020 10:04:23 -0700 (PDT)
+Subject: Re: [PATCH 00/10] Add RX hardware emulation
+To: Yoshinori Sato <ysato@users.sourceforge.jp>
+References: <20200531162427.57410-1-ysato@users.sourceforge.jp>
+ <d7fc8b59-5a22-8383-b939-1cc73f8c2e66@amsat.org>
+ <87zh9mn9g5.wl-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b0c9bbb1-1a4f-e682-7d0a-ea622fc5a1af@amsat.org>
+Date: Tue, 2 Jun 2020 19:04:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <87zh9mn9g5.wl-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -100,71 +107,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nick Hudson <skrll@netbsd.org>, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nick Hudson <skrll@netbsd.org>
+Hi Yoshinori,
 
-Fix building on NetBSD/arm by extracting the FSR value from the
-correct siginfo_t field.
+On 6/1/20 4:32 PM, Yoshinori Sato wrote:
+> On Mon, 01 Jun 2020 01:45:47 +0900,
+> Philippe Mathieu-Daudé wrote:
+>>
+>> On 5/31/20 6:24 PM, Yoshinori Sato wrote:
+>>> Hello.
+>>>
+>>> This series add to hardware emulation module for RX target.
+>>>
+>>> Details below.
+>>> Interrupt controller, 8bit timer, 16bit comapare match timer and
+>>> SCI is RX62N integrated peripheral.
+>>> rx-virt - RX62N MCU and external RAM. It like gdb simulator.
+>>>
+>>> The compare match timer has a CPU interface similar to the SH4 timer.
+>>> sh_timer will be deprecated and integrated into this module.
+>>> SCI is also implemented in sh_serial, but the functionality is omitted.
+>>> I implemented the complete one as renesas_sci.
+>>>
+>>> git repository here.
+>>> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/hw-rx-20200601
+>>
+>> Sigh. It is a bit unfortunate and demotivating that we can not
+>> coordinate this. I was going to send a pre-merge for this today.
+>>
+>> What is positive is you unified some SH4/RX peripherals.
+>>
+>> I'll try to merge both series. If it takes too long, I might send my
+>> current queue for you to review, then go back to this one you just sent.
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+> 
+> Oh. Sorry.
+> 
+> The old code had some spec differences.
+> I have fixed those mistakes here.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Nick Hudson <skrll@netbsd.org>
-Message-Id: <20200516154147.24842-1-skrll@netbsd.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/user-exec.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Yes, I am glad to see how it evolved, in particular how you merged the
+SH4/RX common peripherals :)
 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 52359949df..bc391eb454 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -517,6 +517,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- 
- #if defined(__NetBSD__)
- #include <ucontext.h>
-+#include <sys/siginfo.h>
- #endif
- 
- int cpu_signal_handler(int host_signum, void *pinfo,
-@@ -525,10 +526,12 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-     siginfo_t *info = pinfo;
- #if defined(__NetBSD__)
-     ucontext_t *uc = puc;
-+    siginfo_t *si = pinfo;
- #else
-     ucontext_t *uc = puc;
- #endif
-     unsigned long pc;
-+    uint32_t fsr;
-     int is_write;
- 
- #if defined(__NetBSD__)
-@@ -539,10 +542,17 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-     pc = uc->uc_mcontext.arm_pc;
- #endif
- 
--    /* error_code is the FSR value, in which bit 11 is WnR (assuming a v6 or
--     * later processor; on v5 we will always report this as a read).
-+#ifdef __NetBSD__
-+    fsr = si->si_trap;
-+#else
-+    fsr = uc->uc_mcontext.error_code;
-+#endif
-+    /*
-+     * In the FSR, bit 11 is WnR, assuming a v6 or
-+     * later processor.  On v5 we will always report
-+     * this as a read, which will fail later.
-      */
--    is_write = extract32(uc->uc_mcontext.error_code, 11, 1);
-+    is_write = extract32(fsr, 11, 1);
-     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
--- 
-2.25.1
+> 
+> I would like to merge this if possible.
 
+I posted the v33 of your v32:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg708317.html
+
+As it is mostly reviewed and tested, it seems more reasonable to merge
+what is reviewed, and then apply your latest patches on top. It took us
+already a long time to get there, and I'd not start again to review 30
+more times this version.
+
+I believe if would be easier this way, you review/ack the v33 and we get
+the peripheral cleanup on top. My 2 cents, feel free to disagree and
+insist on restarting the whole review process.
+
+Regards,
+
+Phil.
 
