@@ -2,108 +2,92 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63819C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 23:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F3DC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 23:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CD4720663
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 23:02:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD4720663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5764E20663
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 23:03:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxabPTes"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5764E20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgFvE-00050V-GE
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 19:02:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55824)
+	id 1jgFw9-0006iF-KB
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 19:03:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgFuI-0003jx-H2
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 19:01:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51370)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgFuC-00073b-Jo
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 19:01:18 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jgFu9-0003RN-RS
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 23:01:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CB6B32E8114
- for <qemu-devel@nongnu.org>; Tue,  2 Jun 2020 23:01:09 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jgFuJ-0003kx-RL
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 19:01:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39575
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jgFuH-00073n-RC
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 19:01:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591138876;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=VNraw3J703+tWxlWRZHKZHiUsgvpB6flKyeCJyKfzqk=;
+ b=WxabPTes2FL5YnyV7CAzVUANyz6xee5FxnCzUMk1gd3yDXp/WB38ntd65z86cW89hjxtXp
+ LyN9juUZr4m4+Om9hwFeznpGFSRC1++Q53bSSNqFqNVMQMzeJeZpus9HERW2Ut7hqbKXLx
+ suNRUN59kpiudwUXdk84SIZAFsLifco=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-w7HYiQQ4OXKHbp9RqLSqYQ-1; Tue, 02 Jun 2020 19:01:11 -0400
+X-MC-Unique: w7HYiQQ4OXKHbp9RqLSqYQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96E8118B6423;
+ Tue,  2 Jun 2020 23:01:10 +0000 (UTC)
+Received: from localhost (ovpn-113-102.phx2.redhat.com [10.3.113.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B5EAC10016DA;
+ Tue,  2 Jun 2020 23:01:06 +0000 (UTC)
+Date: Tue, 2 Jun 2020 19:01:05 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding functions
+Message-ID: <20200602230105.GI577771@habkost.net>
+References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
+ <158396721426.58170.2930696192478912976.stgit@naples-babu.amd.com>
+ <20200602171838.GG577771@habkost.net>
+ <e68f8536-40fe-3c35-7d66-04f20fcabb8e@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jun 2020 22:49:11 -0000
-From: Brian Murray <1805256@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=In Progress; importance=Undecided; 
- assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=Triaged; importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Fix Committed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Fix Committed; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: block-proposed-bionic block-proposed-eoan
- block-proposed-focal ikeradar patch qemu-img verification-needed
- verification-needed-eoan verification-needed-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
- jan-glauber-i janitor jnsnow kongzizaixian lizhengui paelzer philmd
- rafaeldtinoco ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Brian Murray (brian-murray)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <159113815213.5458.8360662394484641146.malone@wampee.canonical.com>
-Subject: [Bug 1805256] Please test proposed package
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 46cd8b4a6c6d0162cc8499eff1091e17cb6b99fc
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 19:01:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <e68f8536-40fe-3c35-7d66-04f20fcabb8e@amd.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 15:54:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -112,232 +96,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello dann, or anyone else affected,
+On Tue, Jun 02, 2020 at 04:59:19PM -0500, Babu Moger wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Eduardo Habkost <ehabkost@redhat.com>
+> > Sent: Tuesday, June 2, 2020 12:19 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@twiddle.net;
+> > mst@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org
+> > Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding
+> > functions
+> > 
+> > Hi,
+> > 
+> > It looks like this series breaks -device and CPU hotplug:
+> > 
+> > On Wed, Mar 11, 2020 at 05:53:34PM -0500, Babu Moger wrote:
+> > > These functions add support for building EPYC mode topology given the smp
+> > > details like numa nodes, cores, threads and sockets.
+> > >
+> > > The new apic id decoding is mostly similar to current apic id decoding
+> > > except that it adds a new field node_id when numa configured. Removes all
+> > > the hardcoded values. Subsequent patches will use these functions to build
+> > > the topology.
+> > >
+> > > Following functions are added.
+> > > apicid_llc_width_epyc
+> > > apicid_llc_offset_epyc
+> > > apicid_pkg_offset_epyc
+> > > apicid_from_topo_ids_epyc
+> > > x86_topo_ids_from_idx_epyc
+> > > x86_topo_ids_from_apicid_epyc
+> > > x86_apicid_from_cpu_idx_epyc
+> > >
+> > > The topology details are available in Processor Programming Reference (PPR)
+> > > for AMD Family 17h Model 01h, Revision B1 Processors. The revision guides
+> > are
+> > > available from the bugzilla Link below.
+> > > Link:
+> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
+> > kernel.org%2Fshow_bug.cgi%3Fid%3D206537&amp;data=02%7C01%7Cbabu.m
+> > oger%40amd.com%7C3487f40d37df4d59097d08d807190248%7C3dd8961fe488
+> > 4e608e11a82d994e183d%7C0%7C0%7C637267151289763739&amp;sdata=wE0
+> > ukXIVh0l5eNQWsv6VDE9UZEVJmisofaW192gcZAI%3D&amp;reserved=0
+> > >
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > Acked-by: Igor Mammedov <imammedo@redhat.com>
+> > > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > [...]
+> > >  typedef struct X86CPUTopoIDs {
+> > >      unsigned pkg_id;
+> > > +    unsigned node_id;
+> > 
+> > You have added a new field here.
+> > 
+> > >      unsigned die_id;
+> > >      unsigned core_id;
+> > >      unsigned smt_id;
+> > [...]
+> > > +static inline apic_id_t
+> > > +x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
+> > > +                              const X86CPUTopoIDs *topo_ids)
+> > > +{
+> > > +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
+> > > +           (topo_ids->node_id << apicid_node_offset_epyc(topo_info)) |
+> > 
+> > You are using the new field here.
+> > 
+> > > +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+> > > +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
+> > > +           topo_ids->smt_id;
+> > > +}
+> > 
+> > But you are not initializing node_id in one caller of apicid_from_topo_ids():
+> > 
+> > static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> >                             DeviceState *dev, Error **errp)
+> > {
+> >     [...]
+> >     X86CPUTopoIDs topo_ids;
+> >     [...]
+> >     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> >         [...]
+> >         topo_ids.pkg_id = cpu->socket_id;
+> >         topo_ids.die_id = cpu->die_id;
+> >         topo_ids.core_id = cpu->core_id;
+> >         topo_ids.smt_id = cpu->thread_id;
+> >         cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+> >     }
+> >     [...]
+> > }
+> > 
+> > Result: -device is broken when using -cpu EPYC:
+> > 
+> >   $ qemu-system-x86_64 -machine q35,accel=kvm -smp
+> > 1,maxcpus=2,cores=1,threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-
+> > cpu,core-id=0,socket-id=1,thread-id=0
 
-Accepted qemu into eoan-proposed. The package will build now and be
-available at https://launchpad.net/ubuntu/+source/qemu/1:4.0+dfsg-
-0ubuntu9.7 in a few hours, and then in the -proposed repository.
+[1]
 
-Please help us by testing this new package.  See
-https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
-to enable and use -proposed.  Your feedback will aid us getting this
-update out to other Ubuntu users.
+> >   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,thread-
+> > id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0] with APIC ID 21855,
+> > valid index range 0:1
+> > 
+> > This happens because APIC ID is calculated using uninitialized
+> > memory.
+> This patch should initialize the node_id. But I am not sure how to
+> reproduce the bug. Can you please send me the full command line to
+> reproduce the problem. Also test different options.
 
-If this package fixes the bug for you, please add a comment to this bug,
-mentioning the version of the package you tested, what testing has been
-performed on the package and change the tag from verification-needed-
-eoan to verification-done-eoan. If it does not fix the bug for you,
-please add a comment stating that, and change the tag to verification-
-failed-eoan. In either case, without details of your testing we will not
-be able to proceed.
+The full command line is above[1].
 
-Further information regarding the verification process can be found at
-https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
-advance for helping!
 
-N.B. The updated package will be released to -updates after the bug(s)
-fixed by this package have been verified and the package has been in
--proposed for a minimum of 7 days.
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2128f3d6fe..047b4b9391 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1539,6 +1539,9 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+>          int max_socket = (ms->smp.max_cpus - 1) /
+>                                  smp_threads / smp_cores / x86ms->smp_dies;
 
-** Tags added: block-proposed-eoan
+So, here's the input you are using to calculate topo_ids.node_id:
 
-** Changed in: qemu (Ubuntu Bionic)
-       Status: In Progress =3D> Fix Committed
+> +        unsigned nr_nodes = MAX(topo_info.nodes_per_pkg, 1);
 
-** Tags added: verification-needed-bionic
+When is topo_info.nodes_per_pkg allowed to be 0?
 
--- =
+> +        unsigned cores_per_node = DIV_ROUND_UP((x86ms->smp_dies * smp_cores *
+> +                                                smp_threads), nr_nodes);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+x86ms->smp_dies should be available at topo_info.dies_per_pkg,
+smp_cores should available at topo_info.cores_per_die,
+smp_threads should be available at topo_info.threads_per_core,
+nr_nodes should be available at topo_info.nodes_per_pkg.
 
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
+> 
+>          /*
+>           * die-id was optional in QEMU 4.0 and older, so keep it optional
+> @@ -1585,6 +1588,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> +        topo_ids.node_id = (cpu->core_id / cores_per_node) % nr_nodes;
 
-Status in kunpeng920:
-  In Progress
-Status in kunpeng920 ubuntu-18.04 series:
-  Triaged
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  Triaged
-Status in kunpeng920 ubuntu-19.10 series:
-  Triaged
-Status in kunpeng920 ubuntu-20.04 series:
-  Triaged
-Status in kunpeng920 upstream-kernel series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Fix Committed
-Status in qemu source package in Eoan:
-  Fix Committed
-Status in qemu source package in Focal:
-  Fix Committed
+apicid_from_topo_ids() have access to topo_info and topo_ids, If
+all the information you need to calculate node_id is already
+available inside topo_info + topo_ids, we could be calculating it
+inside apicid_from_topo_ids().  Why don't we do it?
 
-Bug description:
-  [Impact]
+Also, is topo_ids.core_id really allowed to be larger than
+cores_per_node when calling apicid_from_topo_ids()?
 
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
+>          cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
+> 
 
-  [Test Case]
+-- 
+Eduardo
 
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
