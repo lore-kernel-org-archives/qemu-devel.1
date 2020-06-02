@@ -2,63 +2,96 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D01D3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 14:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F63C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4BC02074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 14:59:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4BC02074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE202074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:01:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tAu5Falp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE202074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg8Ni-0000rB-Ut
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 10:59:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46048)
+	id 1jg8Pv-0002JK-FW
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:01:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jg8Mz-0008Rx-Jy; Tue, 02 Jun 2020 10:58:25 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:43084)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jg8Mx-0000te-TY; Tue, 02 Jun 2020 10:58:24 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 8F77874633F;
- Tue,  2 Jun 2020 16:58:19 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 7126C74633E; Tue,  2 Jun 2020 16:58:19 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 6FA1874632C;
- Tue,  2 Jun 2020 16:58:19 +0200 (CEST)
-Date: Tue, 2 Jun 2020 16:58:19 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Andrea_Palmat=E8?= <andrea.palmate@gmail.com>
-Subject: Re: Sam460Ex screen mode, audio and network
-In-Reply-To: <alpine.BSF.2.22.395.2006021510140.40694@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.22.395.2006021647240.70962@zero.eik.bme.hu>
-References: <CAD+yzTSr2edTNmzkGOH7todx7uVPbL_BSNSJPb62mJWCUSa8NA@mail.gmail.com>
- <4d64c939-3431-b637-488e-676a5f9171e5@amsat.org>
- <alpine.BSF.2.22.395.2006021510140.40694@zero.eik.bme.hu>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jg8Oj-0001cy-E7; Tue, 02 Jun 2020 11:00:14 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33061)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jg8Oi-0001Bs-5Q; Tue, 02 Jun 2020 11:00:13 -0400
+Received: by mail-wm1-x344.google.com with SMTP id j198so2442382wmj.0;
+ Tue, 02 Jun 2020 08:00:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=LP4IaES+Cgr4zDPbJ6yM8Eq9WPEoFGx8egQ6nV/yoXk=;
+ b=tAu5Falp0P3uHZrWyfopi3YAxu0joL6vo0bUueuQ2wp/iPCNb1TLIEcPrYlVnyyPk8
+ IERZbCS1F8Ewhy4pznEIZFl0gmcGJqRBTHxFV8np1MG0eayzeYhONvI5Rh6Cw+ZOoO/t
+ Kaz5pAPczlh3GzWTKsNNM3yoMFdpQSem3ZPQqQ6MnComq4YghgD32ytLJGjKuFITJ9qd
+ NzjSMF3LDBZylBTHOyk5czDQohbNUV0Cq5nMleUsmeV++wq+HFAl4gFAfvZc5+YhAkcz
+ L8kCR2M+dVsqHI8+r/TtdTQw/kmAwgor1dmGUdGc46AZOWj1oPhFvgv1rPxdX/zwWApy
+ Ofeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LP4IaES+Cgr4zDPbJ6yM8Eq9WPEoFGx8egQ6nV/yoXk=;
+ b=Cvvf1BXm+CBaBekgZKJLEm3a18o1DyFwfQ2sw037NOI7uxD3c+d7HMWU/fApiWpo8i
+ LhdihDIwMUYgs5I0+yY/iOEsxMDr9nJ9QRo04Ms8bTUIwhXt1LX2d48E6GMHxUBaCgxt
+ tq0J9C0rNmGK708P3QZWLm3SLlAN1+fi9JX9AWQicEkBScuRFD9fhNOMFL9SqvxzFClq
+ iEahqSV4kWvsY5CiDHB7TalmvYxIh3k7zlcHA9Uthn3aHGzq/T2XwyhrBExg2X/wVI8o
+ Oi1FeAZjwyxlH4sErrA46a5VJF11On7hRAcON5gVEfX38d32+mQ/n7By+tQRg/VEVBdp
+ 7O+w==
+X-Gm-Message-State: AOAM5334BoZB9McfDb59mcfBPZ9kPw7kg0IEKv7K9J+R9irMh8+8J0IQ
+ tch6Pj1KEqCJEOg0S3p+lvGIUWgw
+X-Google-Smtp-Source: ABdhPJztGDzM5LgSZm+0dEO0RXI8Tzaz1SPUvqP7q/msYP1Rc6IOFLGWqPNLUCBx/JeRageetKE4KQ==
+X-Received: by 2002:a1c:a5ce:: with SMTP id o197mr4687922wme.85.1591110009946; 
+ Tue, 02 Jun 2020 08:00:09 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id 5sm70629wmz.16.2020.06.02.08.00.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 02 Jun 2020 08:00:09 -0700 (PDT)
+Subject: Re: [PATCH] docs/system: Document Aspeed boards
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200602135050.593692-1-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a46437ce-1be4-3c0a-8403-1c279ad8b90b@amsat.org>
+Date: Tue, 2 Jun 2020 17:00:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-816818955-1591109899=:70962"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 10:58:19
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200602135050.593692-1-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,43 +104,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- qemu-discuss@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 6/2/20 3:50 PM, Cédric Le Goater wrote:
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> ---
+>  docs/system/arm/aspeed.rst | 85 ++++++++++++++++++++++++++++++++++++++
+>  docs/system/target-arm.rst |  1 +
+>  2 files changed, 86 insertions(+)
+>  create mode 100644 docs/system/arm/aspeed.rst
+> 
+> diff --git a/docs/system/arm/aspeed.rst b/docs/system/arm/aspeed.rst
+> new file mode 100644
+> index 000000000000..45f891eb3cad
+> --- /dev/null
+> +++ b/docs/system/arm/aspeed.rst
+> @@ -0,0 +1,85 @@
+> +Aspeed family boards (``*-bmc``, ``ast2500-evb``, ``ast2600-evb``)
+> +==================================================================
+> +
+> +The QEMU Aspeed machines model BMCs of various OpenPOWER systems and
+> +Aspeed evaluation boards. They are based on different releases of the
+> +Aspeed SoC : the AST2400 integrating an ARM926EJ-S CPU (400MHz), the
+> +AST2500 with an ARM1176JZS CPU (800MHz) and more recently the AST2600
+> +with dual cores ARM Cortex A7 CPUs (1.2GHz).
+> +
+> +The SoC comes with RAM, Gigabit ethernet, USB, SD/MMC, USB, SPI, I2C,
+> +etc.
+> +
+> +AST2400 SoC based machines :
+> +
+> +- ``palmetto-bmc``         OpenPOWER Palmetto POWER8 BMC
+> +
+> +AST2500 SoC based machines :
+> +
+> +- ``ast2500-evb``          Aspeed AST2500 Evaluation board
+> +- ``romulus-bmc``          OpenPOWER Romulus POWER9 BMC
+> +- ``witherspoon-bmc``      OpenPOWER Witherspoon POWER9 BMC
+> +- ``sonorapass-bmc``       OCP SonoraPass BMC
+> +- ``swift-bmc``            OpenPOWER Swift BMC POWER9
+> +
+> +AST2600 SoC based machines :
+> +
+> +- ``ast2600-evb``          Aspeed AST2600 Evaluation board (Cortex A7)
+> +- ``tacoma-bmc``           OpenPOWER Witherspoon POWER9 AST2600 BMC
+> +
+> +Supported devices
+> +-----------------
+> +
+> + * SMP (for the AST2600 Cortex-A7)
+> + * Interrupt Controller (VIC)
+> + * Timer Controller
+> + * RTC Controller
+> + * I2C Controller
+> + * System Control Unit (SCU)
+> + * SRAM mapping
+> + * X-DMA Controller (basic interface)
+> + * Static Memory Controller (SMC or FMC) - Only SPI Flash support
+> + * SPI Memory Controller
+> + * USB 2.0 Controller
+> + * SD/MMC storage controllers
+> + * SDRAM controller (dummy interface for basic settings and training)
+> + * Watchdog Controller
+> + * GPIO Controller (Master only)
+> + * UART
+> + * Ethernet controllers
+> +
+> +
+> +Missing devices
+> +---------------
+> +
+> + * Coprocessor support
+> + * ADC (out of tree implementation)
+> + * PWM and Fan Controller
+> + * LPC Bus Controller
+> + * Slave GPIO Controller
+> + * Super I/O Controller
 
---3866299591-816818955-1591109899=:70962
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Is there public datasheet for this?
 
-On Tue, 2 Jun 2020, BALATON Zoltan wrote:
-> On Tue, 2 Jun 2020, Philippe Mathieu-Daudé wrote:
->> Cc'ing the sam460ex maintainer.
->> On 6/1/20 8:01 PM, Andrea Palmatè wrote:
->>> It is working on an i5 laptop. I've tried to use the native screen mode
->>> 1366x768 but it has some problems. It seems a stride problem and so is
->>> not usable
+> + * Hash/Crypto Engine
+> + * PCI-Express 1 Controller
+> + * Graphic Display Controller
+> + * PECI Controller
+> + * MCTP Controller
+> + * Mailbox Controller
+> + * Virtual UART
+
+Uh what is that? :)
+
+> + * eSPI Controller
+> + * I3C Controller
+> +
+> +Boot options
+> +------------
+> +
+> +The Aspeed machines can be started using the -kernel option to load a
+> +Linux kernel or from a firmare image which can be downloaded from the
+> +OpenPOWER jenkins :
+> +
+> +   https://openpower.xyz/
+> +
+> +The image should be attached as an MTD drive. Run :
+> +
+> +.. code-block:: bash
+> +
+> +  $ qemu-system-arm -M romulus-bmc -nic user \
+> +	-drive file=flash-romulus,format=raw,if=mtd -nographic
+> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+> index dce384cb0e3e..1bd477a2936c 100644
+> --- a/docs/system/target-arm.rst
+> +++ b/docs/system/target-arm.rst
+> @@ -81,6 +81,7 @@ undocumented; you can get a complete list by running
+>     arm/realview
+>     arm/versatile
+>     arm/vexpress
+> +   arm/aspeed
+
+Maybe we should keep this section sorted.
+
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>     arm/musicpal
+>     arm/nseries
+>     arm/orangepi
 >
-> I'm not sure if it's a problem on AmigaOS side or in emulation. How to 
-> reproduce this? Such resolution does not show up for me in ScreenMode prefs 
-> so cannot be simply selected.
-
-OK I've got it. I think you've unticked default and set a custom width. 
-This seems to set the width of frame buffer in memory but the mode the 
-card is programmed to use is still the one selected from the list so this 
-won't work. It seems to be either a bug in AmigaOS or the width option 
-does not do what you may think. Maybe ask AmigaOS developers or aCube who 
-wrote the driver about this. (Another known issue is that 24/32 bit modes 
-are not available with the AmigaOS SM502 driver which would be needed for 
-optimal performance with QEMU, the 16 bit mode it offers is much slower 
-because it has to be converted on every display update.)
-
-Regards,
-BALATON Zoltan
---3866299591-816818955-1591109899=:70962--
 
