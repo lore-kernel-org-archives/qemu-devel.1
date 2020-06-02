@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14184C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D629CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D329F2067B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DEE72067B
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 15:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sZoi3Bja"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D329F2067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W65GZhjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DEE72067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg9D1-0003OI-54
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:52:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55706)
+	id 1jg9Dg-0004FT-Sh
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 11:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jg97c-0003cY-32
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:36 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52446)
+ id 1jg97g-0003m9-IY
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:40 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35381)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jg97b-0007dL-3d
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:35 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r9so3410927wmh.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 08:46:34 -0700 (PDT)
+ id 1jg97e-0007dh-Uc
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 11:46:40 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x14so3922887wrp.2
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 08:46:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uvMYxLr0Nl/kQDg+PeIHS1bjqHOZjTucP3buAR3WOFI=;
- b=sZoi3Bja+i3ID+6DKXNmzxL80Rqrw5oDLfooP3kNM+VyxrF/x2LJcoh8tSkOc//IYY
- B6qIFvkVMEDyF6RwuM4zdwSoZ/9WnddA1cUBpTYm50RzbwWR0wbd3/LwqkDVb12zAWfd
- 6kl51LgXKwX+0/XpDBuPBO41hzaRKl9nKCv253O6Qbf6yD3KdOJhgo3CbEIVrLGRR7B9
- HKFu6S3OFqH6wZ9VXeht6t0+tMFZVIdKgg8121wA412LaScpLdyx2XBBXMYp97S7YrI9
- lzD39hlRLLqmNhfnUjCZ1r6IsrIkarJXQLR/3pPWaw7bD7944usolRKgov+0JrxSutKS
- Tc5A==
+ bh=D7IUd/fMXoOGoaV/5qSVVzKkzaDzbDEGnaTAgX8XWeQ=;
+ b=W65GZhjnZ98xwCzBbH0fHzuuUkAIA01tNSHq/Alu6fN+EyyuvKkcLCdAt+278dEtDe
+ 0+k/ch+rEK6wYrP0EAWYowzRCfgz1/keWSt1+beEc+/SqG4jC4+vqSqH7024pgM6872R
+ z4pXloEmu4sKFxCiNrcugWNfF0At/sO4LANKLsRpvBVNpNHUnqK14pM14eCTRnJ6f8x1
+ VkVVQKjBnizmQEKccSUJyVw3rtHAQS9IxL22OBiAD52Yr/ZGf0Ho94Cp+Fe28XmZPBIR
+ ayU5x7AJAdoZf/k/UqImCpYsxFkHMXumgpW2807LQ6FM6DzlPI3TF951XFsB6n7enTSZ
+ W0Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uvMYxLr0Nl/kQDg+PeIHS1bjqHOZjTucP3buAR3WOFI=;
- b=mjiC+2k7BRmG0Dycx907VE3jxMi3DUmfro4Hmhw5ntDY9xf9bUMaF74jhbvyS0Y53s
- cDNjeiYDNm1pwg4vl0DjmG0haX97zU+K+ImhPYBq2BptH61mHKbORxN3EFMLNIi+0oPD
- ha6M14O/daFKV4nTEOq5Fdera1R7icjy1+Htzz6i/lRHKJklaHZcApckCuoLVKfbYgVe
- 5miA7RDkBfa4q+NaPKsqRCpCAHmFlD2PGziQCAlm6rpgnE/x2YAFQ8Aa9U+XoOwzC/dN
- Ta+20XiqsPjTOEWox7UVBEVKWobqh9LDlLmgNcfmMsUYeJXk2JyUvSXrgcSYJPvDN36r
- 3GTw==
-X-Gm-Message-State: AOAM533+fVF2YztASOJA3dXCboMvRsJ6aWu8iFvik8p8LFV+1TGr8xn1
- QvPkBkARSdob+IDcz8QRzCPmww==
-X-Google-Smtp-Source: ABdhPJydLknq4NSSvfQ2Qi0ZW04oolrS5QPna+zl7sCqU/LUXRg5R7Bs6lvw/hkhvEjScPoeNOHgvg==
-X-Received: by 2002:a7b:ce15:: with SMTP id m21mr4705152wmc.117.1591112793713; 
- Tue, 02 Jun 2020 08:46:33 -0700 (PDT)
+ bh=D7IUd/fMXoOGoaV/5qSVVzKkzaDzbDEGnaTAgX8XWeQ=;
+ b=BDBT/ZiwpUc6f4FevCcD2alw+Xk1XdleceFhbzAQVPnEj+wA04gRpV9JTPF3nNSo6t
+ Vxca52OKQV4xsqo6aeEPyCyV5QgOOhJWfZQ3hCvn2XNxTe7mQRQPlierMiAWYkjgq5tc
+ XBcXhs00fMrUpwLEabg5SD71nbMzw/KPsNCWVKPA5uMf+Jd7J+qy+Wui+nuXaEe5upS9
+ F5ALB1bCqTUX0NVaJPQhRbgO6Ca3uJRrQ5pME8M2BkNiQwHHzWOaE4IgFFDOf2dcQblk
+ skz5nEwHTAvfj2fGFuqQ8BDSC+kG3Id9w2GwLhJ3IHxyI/nfhKhr/nxkLaLZQ0kyj3WU
+ hZGQ==
+X-Gm-Message-State: AOAM531Tcr+/UbbjIZSpzcgEBHMywItjcYHrKHt0TGwribt8kgUVXBmi
+ BzGbXbBoIX8JxUwTmjBvy+7EbA==
+X-Google-Smtp-Source: ABdhPJwXTKriSjywj7DPAmySKxgQ5vcoi4Iv/lES/7bRkQ6tS7IQsvgbHA3J5VqLG1z9zsVZvgioBg==
+X-Received: by 2002:adf:fdcd:: with SMTP id i13mr25544969wrs.190.1591112797582; 
+ Tue, 02 Jun 2020 08:46:37 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i3sm4366144wrm.83.2020.06.02.08.46.27
+ by smtp.gmail.com with ESMTPSA id 37sm4682599wrk.61.2020.06.02.08.46.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 08:46:30 -0700 (PDT)
+ Tue, 02 Jun 2020 08:46:32 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id ABE0B1FF91;
- Tue,  2 Jun 2020 16:46:24 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 10D451FF98;
+ Tue,  2 Jun 2020 16:46:25 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 5/9] cputlb: ensure we re-fill the TLB if it has reset
-Date: Tue,  2 Jun 2020 16:46:20 +0100
-Message-Id: <20200602154624.4460-6-alex.bennee@linaro.org>
+Subject: [PATCH  v1 9/9] .travis.yml: allow failure for unreliable hosts
+Date: Tue,  2 Jun 2020 16:46:24 +0100
+Message-Id: <20200602154624.4460-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200602154624.4460-1-alex.bennee@linaro.org>
 References: <20200602154624.4460-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,56 +103,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>, robert.foley@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
  kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Any write to a device might cause a re-arrangement of memory
-triggering a TLB flush and potential re-size of the TLB invalidating
-previous entries. This would cause users of qemu_plugin_get_hwaddr()
-to see the warning:
-
-  invalid use of qemu_plugin_get_hwaddr
-
-because of the failed tlb_lookup which should always succeed. We catch
-this case by checking to see if the list of entries has been cleared
-and if so triggering a re-fill.
+They will still run but they won't get in the way of the result.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- accel/tcg/cputlb.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ .travis.yml | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index eb2cf9de5e6..b7d329f7155 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1091,6 +1091,20 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-                                MMU_DATA_STORE, mmu_idx, iotlbentry->attrs, r,
-                                retaddr);
-     }
-+
-+    /*
-+     * The memory_region_dispatch may have triggered a flush/resize
-+     * so for plugins we need to ensure we have reset the tlb_entry
-+     * so any later lookup is correct.
-+     */
-+#ifdef CONFIG_PLUGIN
-+    if (env_tlb(env)->d[mmu_idx].n_used_entries == 0) {
-+        int size = op & MO_SIZE;
-+        tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
-+                 mmu_idx, retaddr);
-+    }
-+#endif
-+
-     if (locked) {
-         qemu_mutex_unlock_iothread();
-     }
+diff --git a/.travis.yml b/.travis.yml
+index 564be50a3c1..ec6367af1f0 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -429,6 +429,7 @@ jobs:
+       env:
+         - TEST_CMD="make check check-tcg V=1"
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
++        - UNRELIABLE=true
+ 
+     - name: "[ppc64] GCC check-tcg"
+       arch: ppc64le
+@@ -493,6 +494,7 @@ jobs:
+       env:
+         - TEST_CMD="make check check-tcg V=1"
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
++        - UNRELIABLE=true
+       script:
+         - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+         - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
+@@ -535,6 +537,7 @@ jobs:
+         - TEST_CMD="make check-unit"
+         - CONFIG="--disable-containers --disable-tcg --enable-kvm
+                   --disable-tools --host-cc=clang --cxx=clang++"
++        - UNRELIABLE=true
+ 
+     # Release builds
+     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
+@@ -556,3 +559,5 @@ jobs:
+         - mkdir -p release-build && cd release-build
+         - ../configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+         - make install
++  allow_failures:
++    - env: UNRELIABLE=true
 -- 
 2.20.1
 
