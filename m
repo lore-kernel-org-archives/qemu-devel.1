@@ -2,154 +2,87 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD9CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02075C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9B7E206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:33:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4035205CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 22:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVinkFiO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B7E206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjGKWEqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4035205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgFTD-0007Ea-Qz
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 18:33:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53074)
+	id 1jgFpx-0002YC-Ut
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 18:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgFRY-0006hR-5b
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:31:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35196
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jgFox-0001k5-GH
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:55:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53167
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgFRW-0002D5-Sv
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:31:35 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jgFov-0005kk-Fe
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 18:55:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591137093;
+ s=mimecast20190719; t=1591138543;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=0dvGsjmEyi/BZzz0pboCUBS+Sbul3LznGXLZ4kBPJZk=;
- b=OVinkFiOlee7Sp7xuzSOU558y6NNFErtN9IE1S2Qa6eA69kDOx2//2toEckCyAmMSr0k6R
- jbBMz0VMmCRgBp/RK4BgS54xmIIYP/hackUeRyC80sITnxcDj1SVp9yOtKFh97FMVHE6DL
- 4O7aEL4TxC4ZpSMW/cxCl935t2uuKw0=
+ in-reply-to:in-reply-to:references:references;
+ bh=yOyWCqoM7bc+/Np1Rx4qM9Y9f+faU7CSLk9N7YSHCbw=;
+ b=NjGKWEqTB3LIIA+VOvV0AlUjAyKxCrHYUM21tLI3YkyEOlde8JcG4Bxl0sqhoNAiXf4uV8
+ VOUvfvRqA7T7RsKvJHuO8XnLWGJtgUscfMo74GhcYK4SV3llwL0ZD1SGi3882gXRUFAmTZ
+ 7Wi0LFzuJDWQTXbpjQCCRu5OpsnHeoE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-v3X6cVpKODWnDIr3FJW_Dw-1; Tue, 02 Jun 2020 18:31:30 -0400
-X-MC-Unique: v3X6cVpKODWnDIr3FJW_Dw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-74-Hnyd_kPnPKm9vpQ5vn3iYA-1; Tue, 02 Jun 2020 18:55:42 -0400
+X-MC-Unique: Hnyd_kPnPKm9vpQ5vn3iYA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19AA98018A6;
- Tue,  2 Jun 2020 22:31:29 +0000 (UTC)
-Received: from [10.10.112.142] (ovpn-112-142.rdu2.redhat.com [10.10.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B548B78B56;
- Tue,  2 Jun 2020 22:31:24 +0000 (UTC)
-Subject: Re: [PATCH v2 00/16] python: add mypy support to python/qemu
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200602214528.12107-1-jsnow@redhat.com>
- <da267698-75a7-1c2c-ea0c-cc95427233d3@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c5851c2e-96fe-8455-41b1-74514d9cfd9b@redhat.com>
-Date: Tue, 2 Jun 2020 18:31:23 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88AC680058E;
+ Tue,  2 Jun 2020 22:55:39 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3F48A5D9CC;
+ Tue,  2 Jun 2020 22:55:28 +0000 (UTC)
+Date: Tue, 2 Jun 2020 16:55:27 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200602165527.34137955@x1.home>
+In-Reply-To: <20200430003949.GN12879@joy-OptiPlex-7040>
+References: <20200422073628.GA12879@joy-OptiPlex-7040>
+ <20200424191049.GU3106@work-vm>
+ <20200426013628.GC12879@joy-OptiPlex-7040>
+ <20200427153743.GK2923@work-vm>
+ <20200428005429.GJ12879@joy-OptiPlex-7040>
+ <20200428141437.GG2794@work-vm>
+ <20200429072616.GL12879@joy-OptiPlex-7040>
+ <20200429082201.GA2834@work-vm>
+ <20200429093555.GM12879@joy-OptiPlex-7040>
+ <20200429094844.GE2834@work-vm>
+ <20200430003949.GN12879@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <da267698-75a7-1c2c-ea0c-cc95427233d3@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 15:54:57
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 17:45:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -170,89 +103,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, philmd@redhat.com
+Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+ "He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 29 Apr 2020 20:39:50 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-
-On 6/2/20 5:51 PM, Eric Blake wrote:
-> On 6/2/20 4:45 PM, John Snow wrote:
->> Requires: 20200602194844.15258-1-jsnow@redhat.com
+> On Wed, Apr 29, 2020 at 05:48:44PM +0800, Dr. David Alan Gilbert wrote:
+> <snip>
+> > > > > > > > > > > > > > An mdev type is meant to define a software compatible interface, so in
+> > > > > > > > > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > > > > > > > > > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > > > > > > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > > > > > > > > > > > prerequisite to that is that they provide the same software interface,
+> > > > > > > > > > > > > > which means they should be the same mdev type.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a  
+> > > > > > > > > > > > > management  
+> > > > > > > > > > > > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > > > > > > > > > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > > > > > > > > > > > there going to be a new class hierarchy created to enumerate all
+> > > > > > > > > > > > > > possible migrate-able devices?
+> > > > > > > > > > > > > >  
+> > > > > > > > > > > > > yes, management tool needs to guess and test migration compatible
+> > > > > > > > > > > > > between two devices. But I think it's not the problem only for
+> > > > > > > > > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > > > > > > > > > > > to
+> > > > > > > > > > > > > first assume that the two mdevs have the same type of parent devices
+> > > > > > > > > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > > > > > > > > > > > possibilities.
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > on the other hand, for two mdevs,
+> > > > > > > > > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > > > > > > > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > > > > > > > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > > > > > > > > > > > mdev1 <-> mdev2.  
+> > > > > > > > > > > > 
+> > > > > > > > > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > > > > > > > > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > > > > > > > > > > > choice is to report the same mdev type on both pdev1 and pdev2.  
+> > > > > > > > > > > I think that's exactly the value of this migration_version interface.
+> > > > > > > > > > > the management tool can take advantage of this interface to know if two
+> > > > > > > > > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
+> > > > > > > > > > > or mix.
+> > > > > > > > > > > 
+> > > > > > > > > > > as I know, (please correct me if not right), current libvirt still
+> > > > > > > > > > > requires manually generating mdev devices, and it just duplicates src vm
+> > > > > > > > > > > configuration to the target vm.
+> > > > > > > > > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> > > > > > > > > > > same mdev type).
+> > > > > > > > > > > But it does not justify that hybrid cases should not be allowed. otherwise,
+> > > > > > > > > > > why do we need to introduce this migration_version interface and leave
+> > > > > > > > > > > the judgement of migration compatibility to vendor driver? why not simply
+> > > > > > > > > > > set the criteria to something like "pciids of parent devices are equal,
+> > > > > > > > > > > and mdev types are equal" ?
+> > > > > > > > > > > 
+> > > > > > > > > > >   
+> > > > > > > > > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out.   
+> > > > > > > > > > > could you help me understand why it will bring trouble to upper stack?
+> > > > > > > > > > > 
+> > > > > > > > > > > I think it just needs to read src migration_version under src dev node,
+> > > > > > > > > > > and test it in target migration version under target dev node. 
+> > > > > > > > > > > 
+> > > > > > > > > > > after all, through this interface we just help the upper layer
+> > > > > > > > > > > knowing available options through reading and testing, and they decide
+> > > > > > > > > > > to use it or not.
+> > > > > > > > > > >   
+> > > > > > > > > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > > > > > > > > > > > phys<->phys migration? If an customer does want to migrate between a 
+> > > > > > > > > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > > > > > > > > > > > instance (with the same type as the source mdev) instead of using vendor 
+> > > > > > > > > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > > > > > > > > > > > usage then such tradeoff might be worthywhile...
+> > > > > > > > > > > >  
+> > > > > > > > > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> > > > > > > > > > > difference to phys<->mdev, right?
+> > > > > > > > > > > I think the vendor string for a mdev device is something like:
+> > > > > > > > > > > "Parent PCIID + mdev type + software version", and
+> > > > > > > > > > > that for a phys device is something like:
+> > > > > > > > > > > "PCIID + software version".
+> > > > > > > > > > > as long as we don't migrate between devices from different vendors, it's
+> > > > > > > > > > > easy for vendor driver to tell if a phys device is migration compatible
+> > > > > > > > > > > to a mdev device according it supports it or not.  
+> > > > > > > > > > 
+> > > > > > > > > > It surprises me that the PCIID matching is a requirement; I'd assumed
+> > > > > > > > > > with this clever mdev name setup that you could migrate between two
+> > > > > > > > > > different models in a series, or to a newer model, as long as they
+> > > > > > > > > > both supported the same mdev view.
+> > > > > > > > > >   
+> > > > > > > > > hi Dave
+> > > > > > > > > the migration_version string is transparent to userspace, and is
+> > > > > > > > > completely defined by vendor driver.
+> > > > > > > > > I put it there just as an example of how vendor driver may implement it.
+> > > > > > > > > e.g.
+> > > > > > > > > the src migration_version string is "src PCIID + src software version", 
+> > > > > > > > > then when this string is write to target migration_version node,
+> > > > > > > > > the vendor driver in the target device will compare it with its own
+> > > > > > > > > device info and software version.
+> > > > > > > > > If different models are allowed, the write just succeeds even
+> > > > > > > > > PCIIDs in src and target are different.
+> > > > > > > > > 
+> > > > > > > > > so, it is the vendor driver to define whether two devices are able to
+> > > > > > > > > migrate, no matter their PCIIDs, mdev types, software versions..., which
+> > > > > > > > > provides vendor driver full flexibility.
+> > > > > > > > > 
+> > > > > > > > > do you think it's good?  
+> > > > > > > > 
+> > > > > > > > Yeh that's OK; I guess it's going to need to have a big table in their
+> > > > > > > > with all the PCIIDs in.
+> > > > > > > > The alternative would be to abstract it a little; e.g. to say it's
+> > > > > > > > an Intel-gpu-core-v4  and then it would be less worried about the exact
+> > > > > > > > clock speed etc - but yes you might be right htat PCIIDs might be best
+> > > > > > > > for checking for quirks.
+> > > > > > > >  
+> > > > > > > glad that you are agreed with it:)
+> > > > > > > I think the vendor driver still can choose a way to abstract a little
+> > > > > > > (e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
+> > > > > > > migration_string would be something like "Intel-gpu-core-v4 + instance
+> > > > > > > number + software version".
+> > > > > > > IOW, they can choose anything they think appropriate to identify migration
+> > > > > > > compatibility of a device.
+> > > > > > > But Alex is right, we have to prevent namespace overlapping. So I think
+> > > > > > > we need to ensure src and target devices are from the same vendors.
+> > > > > > > or, any other ideas?  
+> > > > > > 
+> > > > > > That's why I kept the 'Intel' in that example; or PCI vendor ID; I was  
+> > > > > Yes, it's a good idea!
+> > > > > could we add a line in the doc saying that
+> > > > > it is the vendor driver to add a unique string to avoid namespace
+> > > > > collision?  
+> > > > 
+> > > > So why don't we split the difference; lets say that it should start with
+> > > > the hex PCI Vendor ID.
+> > > >  
+> > > The problem is for mdev devices, if the parent devices are not PCI devices, 
+> > > they don't have PCI vendor IDs.  
+> > 
+> > Hmm it would be best not to invent a whole new way of giving unique
+> > idenitifiers for vendors if we can.
+> >   
+> what about leveraging the flags in vfio device info ?
 > 
-> I don't know if patchew understand that, or if it requires:
+> #define VFIO_DEVICE_FLAGS_RESET (1 << 0)        /* Device supports reset */
+> #define VFIO_DEVICE_FLAGS_PCI   (1 << 1)        /* vfio-pci device */
+> #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)     /* vfio-platform device */
+> #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)        /* vfio-amba device */
+> #define VFIO_DEVICE_FLAGS_CCW   (1 << 4)        /* vfio-ccw device */
+> #define VFIO_DEVICE_FLAGS_AP    (1 << 5)        /* vfio-ap device */
 > 
-> Based-on: 20200602194844.15258-1-jsnow@redhat.com
+> Then for migration_version string,
+> The first 64 bits are for device type, the second 64 bits are for device id.
+> e.g.
+> for PCI devices, it could be
+> VFIO_DEVICE_FLAGS_PCI + PCI ID.
 > 
->>
->> This series is extracted from my larger series that attempted to bundle
->> our python module as an installable module. These fixes don't require
->> that,
->> so they are being sent first as I think there's less up for debate in
->> here.
->>
->> This requires my "refactor shutdown" patch as a pre-requisite.
->>
->> "v2":
->> - This version supports iotests 297
->> - Many patches merged by Phil are removed
->> - Replaces iotests.py type aliases with centralized ones
->>    (See patch 2)
->> - Imports etc are reworked to use the non-installable
->>    package layout instead. (Mostly important for patch 3)
->>
->> Testing this out:
->> - You'll need Python3.6+
->> - I encourage you to use a virtual environment!
->> - You don't necessarily need these exact versions, but I didn't test the
->>    lower bounds, use older versions at your peril:
->>    - pylint==2.5.0
->>    - mypy=0.770
->>    - flake8=3.7.8
->>
->>> cd ~/src/qemu/python/
->>> flake8 qemu
->>> mypy --strict qemu
->>> cd qemu
->>> pylint *.py
->>
->> These should all 100% pass.
->>
->> ---
->>
->> Open RFC: What's the right way to hook this into make check to prevent
->> regressions?
+> Currently in the doc, we only define PCI devices to use PCI ID as the second
+> 64 bits. In future, if other types of devices want to support migration,
+> they can define their own parts of device id. e.g. use ACPI ID as the
+> second 64-bit...
 > 
-> We recently added iotest 297 in group meta; is there a way to run
-> './check -g meta' alongside the other iotests that 'make check' already
-> triggers?
-> 
+> sounds good?
 
-If we want to distribute any of this code independently of qemu.git (And
-I think we do), I think relying on the iotests infrastructure will hurt
-more than it will help.
+[dead thread resurrection alert]
 
-I think I should try to maintain some independence of this folder from
-the rest of the QEMU base; so it should be able to run the linting tests
-under its own power.
+Not really.  We're deep into territory that we were trying to avoid.
+We had previously defined the version string as opaque (not
+transparent) specifically because we did not want userspace to make
+assumptions about compatibility based on the content of the string.  It
+was 100% left to the vendor driver to determine compatibility.  The
+mdev type was the full extent of the first level filter that userspace
+could use to narrow the set of potentially compatible devices.  If we
+remove that due to physical device migration support, I'm not sure how
+we simplify the problem for userspace.
 
-(So, I guess, a Makefile?)
+We need to step away from PCI IDs and parent devices.  We're not
+designing a solution that only works for PCI, there's no guarantee that
+parent devices are similar or even from the same vendor.
 
-but there's further problems: this infrastructure is 3.6+ only, but the
-build system only requires 3.5+. It has to be an optional testing target
-that executes only when it's possible to. It also requires additional
-dependencies not checked for in configure -- mypy, pylint, and flake8.
+Does the mdev type sufficiently solve the problem for mdev devices?  If
+so, then what can we learn from it and how can we apply an equivalence
+to physical devices?  For example, should a vfio bus driver (vfio-pci
+or vfio-mdev) expose vfio_migration_type and vfio_migration_version
+attributes under the device in sysfs where the _type provides the first
+level, user transparent, matching string (ex. mdev type for mdev
+devices) while the _version provides the user opaque, vendor known
+compatibility test?
 
-I am wondering if there's a nice way to create a check target that
-builds a virtual environment with pinned dependencies, and then uses
-that to run the lint tests. As long as the machine you're running on has
-at least python3.6+ it should be able to run the tests.
+This pushes the problem out to the drivers where we can perhaps
+incorporate the module name to avoid collisions.  For example Yan's
+vendor extension proposal makes use of vfio-pci with extension modules
+loaded via an alias incorporating the PCI vendor and device ID.  So
+vfio-pci might use a type of "vfio-pci:$ALIAS".
 
-I just don't really have a plan yet...
+It's still a bit messy that someone needs to go evaluate all these
+types between devices that exist and mdev devices that might exist if
+created, but I don't have any good ideas to resolve that (maybe a new
+class hierarchy?).  Thanks,
 
---js
+Alex
 
 
