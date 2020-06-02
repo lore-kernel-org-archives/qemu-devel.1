@@ -2,112 +2,98 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D803C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F9DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08DFB2077D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:30:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF19C2065C
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 16:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHB81eic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08DFB2077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CKGQkpxe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF19C2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg9oU-0004L3-9Y
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 12:30:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35412)
+	id 1jg9t0-0006fZ-3D
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 12:35:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jg9nS-0003gz-3L
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:29:50 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57314
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jg9nP-0000OC-4y
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:29:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591115386;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BGMGIeD7NkkAhxUwJKv1MAja5tGqFCMcN5LPZpDApjY=;
- b=HHB81eicPaFp3dexYCq50sBGA9LitNpV3jKqYnJKkJHUMMONy2h7IwAZQRkc78qPtXkI86
- QYJASHzsrVFfckcArwrkCtk21ruidrJ0UDdAcXeXikRNJ3gwmrBe2hegiOHh24wlbbpYYK
- l8WLqUutSUz+B4zSVs5H8uJBWFzR6+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-v4BgZb-ZOkSXJE6F1qgU5g-1; Tue, 02 Jun 2020 12:29:43 -0400
-X-MC-Unique: v4BgZb-ZOkSXJE6F1qgU5g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D032835B40;
- Tue,  2 Jun 2020 16:29:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-81.ams2.redhat.com
- [10.36.114.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B4BC22BE58;
- Tue,  2 Jun 2020 16:29:39 +0000 (UTC)
-Subject: Re: [PATCH v7 00/14] LUKS: encryption slot management using amend
- interface
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200518122041.10694-1-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3266027d-8baf-a970-3141-3131106ff98c@redhat.com>
-Date: Tue, 2 Jun 2020 18:29:38 +0200
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jg9s9-00062A-3P
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:34:41 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41802)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jg9s6-0001EC-4G
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 12:34:40 -0400
+Received: by mail-pl1-x643.google.com with SMTP id y17so1546239plb.8
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 09:34:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4neyI7w/aPFVvIQR2mi0T1kfTloVSrPlHZ3gtXs8pEg=;
+ b=CKGQkpxedfXA3y2L3n3566Fp6FCKDI8u3dz36Mu7vCHo+UTwUHy6VoTBDEGE6rQn+8
+ jCCVy6Aadb38cy2dXtLcq9BijE0L/D9fFZ8jJc1TnnaMTNkk71eyGdz/EDeqa//Nt+Kb
+ xB2YVHu82bBbkc0cEM5cH/kui2upJb/CI1b0zC3qOywGMwAnOYc0XVeVEWK5ql0WPQz7
+ WLutEMXcgpSzVaI3JwtxiYzz4ZA+IQpfaieFtmHXkBt6vSQyRPwJ5r2DTRjGs2JGzXmD
+ IYXTHFRPk6G9bqgxYkIib2UEoZTfEsIJnV/IyQ+YTs5fkbkiI806gZ4ipzd/V8/zJgfW
+ dX9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4neyI7w/aPFVvIQR2mi0T1kfTloVSrPlHZ3gtXs8pEg=;
+ b=PVY3d5qjxRySRFc58VfQgOtDENcNn7KBVEF6vWcuws3wzH207Q6wqva7cQhFh+8nzT
+ bt+X+d2oNncTzDHn3f5BQGcAb3RmC5piBvrsp0qPnraCMVaMz95u7n+mZ5lQ78x2EQzG
+ PpG6Sk/lyKsT6HbtoGFWqivrlgwiVYTBXkYYQ0VEmBIimayreJMIY4EEF1UIPqJBZ1MJ
+ lAE45eJPmtGZiJOGK8hDxxpX4eKaog5kax7fRZtGlXhQRRKxJtYakKmMhvjzrmhP++iN
+ NnAnkF6n8FDw2zTkP3guB9i0mgxekBvE/k75VQFWpfQymxzAk9lnUXqG4SJOiY5ZMT5o
+ sheA==
+X-Gm-Message-State: AOAM532+xFoeoQH00C8r5kdOGDQfj7TbFL/XGXS2adappB+Wd5w4hJ+5
+ TdIRWL3ReeRP7ODL/nY/0/Msbw==
+X-Google-Smtp-Source: ABdhPJzGd0zf7P7lqIb7NgKBzF3Ha8UcjzngZ2o0ecPgcyPM21f25u65wzCome4hVDKQHA86+o8ESg==
+X-Received: by 2002:a17:90a:65c9:: with SMTP id
+ i9mr146533pjs.201.1591115675105; 
+ Tue, 02 Jun 2020 09:34:35 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id e1sm2636854pgj.0.2020.06.02.09.34.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 02 Jun 2020 09:34:34 -0700 (PDT)
+Subject: Re: [PATCH v1 5/9] cputlb: ensure we re-fill the TLB if it has reset
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200602154624.4460-1-alex.bennee@linaro.org>
+ <20200602154624.4460-6-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d27ce2e9-f6a3-0f54-83ed-888d731002fb@linaro.org>
+Date: Tue, 2 Jun 2020 09:34:32 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200518122041.10694-1-mlevitsk@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200602154624.4460-6-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 22:14:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,79 +106,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: robert.foley@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
+ kuhn.chenqun@huawei.com, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.05.20 14:20, Maxim Levitsky wrote:
-> Hi!
-> Here is the updated series of my patches, incorporating all the feedback I received.
+On 6/2/20 8:46 AM, Alex Bennée wrote:
+> Any write to a device might cause a re-arrangement of memory
+> triggering a TLB flush and potential re-size of the TLB invalidating
+> previous entries. This would cause users of qemu_plugin_get_hwaddr()
+> to see the warning:
+> 
+>   invalid use of qemu_plugin_get_hwaddr
+> 
+> because of the failed tlb_lookup which should always succeed. We catch
+> this case by checking to see if the list of entries has been cleared
+> and if so triggering a re-fill.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  accel/tcg/cputlb.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index eb2cf9de5e6..b7d329f7155 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -1091,6 +1091,20 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+>                                 MMU_DATA_STORE, mmu_idx, iotlbentry->attrs, r,
+>                                 retaddr);
+>      }
+> +
+> +    /*
+> +     * The memory_region_dispatch may have triggered a flush/resize
+> +     * so for plugins we need to ensure we have reset the tlb_entry
+> +     * so any later lookup is correct.
+> +     */
+> +#ifdef CONFIG_PLUGIN
+> +    if (env_tlb(env)->d[mmu_idx].n_used_entries == 0) {
+> +        int size = op & MO_SIZE;
+> +        tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
+> +                 mmu_idx, retaddr);
 
-You asked me on IRC what to do to get this series to move forward;
-considering I don’t think there were objections from anyone but me on
-v6, there are no further (substantial) objections from anyone on v7, and
-I gave all feedback I had on v6, I don’t think there’s much you can do
-right now.  (Sorry for the delay, but, well, I was on PTO as you know.)
+Ouch.  What if the target has a soft tlb fill, so this requires a call into the
+OS, so this fill actually raises another exception?  This will not be happy fun
+making.
 
-As usual, I’ll try to get around to see whether I can rebase your series
-myself (because Dan hinted at some conflicts), and whether I feel like
-my comments were appropriately addressed (which I have little doubt
-about).  That’s the plan.
+I recall I had objections to recording this translation, saying that "we can
+always get it back again".  Clearly I was wrong, and we should just preserve
+the required CPUTLBEntry details before they're lost by a device.
 
-Note from a couple minutes later: From what I can see, the rebase
-conflicts don’t look too wild, but I don’t feel quite comfortable
-addressing all of them.  There’s a functional one I could address in
-qemu-img.c (patch 3), where we need to bump OPTION_FORCE from 269 to
-276.  I could do that, but that’s not the only one, unfortunately.
 
-Patch 7 needs a bit more extensive modification: First, we need
-%s/bdrv_filter_default_perms/bdrv_default_perms/.  Second, this will
-still not compile, because the .bdrv_child_perm interface has changed.
-BdrvChildRole is now an integer, so we also need
-s/const BdrvChildRole \*/BdrvChildRole /.
-(That gives us the nice side effect of being able to align the second
-line of the bdrv_default_perms() parameters (called from
-block_crypto_child_perms()) on the opening parenthesis.)
-
-Third, it becomes really interesting.  With these changes, it would be
-wrong, because bdrv_default_perms() will then not use the permissions
-for a filter but for an image file with metadata – because that’s what
-the LUKS file child is.
-
-But that’s actually a bug that’s already there (and that I introduced).
- It makese sense to fix it in your series here, because to fix it we
-need a dedicated block_crypto_child_perms() function anyway.
-
-So, well.  Do we want to cheat?  Just let block_crypto_child_perms()
-call bdrv_default_perms() with role=BDRV_CHILD_FILTERED?  That would be
-the previous behavior, but it would also be bad cheating.
-
-The comment that exists (before patch 7) above
-bdrv_crypto_luks.bdrv_child_perm says that we just want to allow
-share-rw=on, and we could achieve that simply by force-sharing the WRITE
-permission after invoking bdrv_default_perms() with the actual role
-(which is BDRV_CHILD_IMAGE).
-
-But what about the other stuff that sets
-bdrv_default_perms_for_storage() apart from bdrv_filter_default_perms()?
- I.e., force-taking WRITE and RESIZE permissions if the file is
-writable; force-taking the CONSISTENT_READ permission because we need
-the metadata; and unsharing the RESIZE permission?
-
-I think the best thing to do would be to call bdrv_default_perms() with
-the @role passed to block_crypto_child_perms() (i.e., BDRV_CHILD_IMAGE),
-and then relaxing the permissions, that is to share the WRITE and RESIZE
-persmissions, and to perhaps restore the WRITE and RESIZE permissions
-from what’s given to block_crypto_child_perms() (i.e., *nperm &= ~(WRITE
-| RESIZE); *nperm |= perm & (WRITE | RESIZE);), because LUKS doesn’t
-need them unless the image may actually be written.
-
-(OTOH, force-taking CONSISTENT_READ seems entirely reasonable.)
-
-Max
-
+r~
 
