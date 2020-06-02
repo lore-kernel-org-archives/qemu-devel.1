@@ -2,65 +2,88 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFF0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FA6C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7BFD206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:36:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7BFD206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 2061D206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:37:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6zZGSqg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2061D206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgAqB-0006ow-TZ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:36:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44640)
+	id 1jgAqU-0007OS-Bk
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:37:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jgApN-0005g7-RK; Tue, 02 Jun 2020 13:35:53 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:36708)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jgApL-00068B-2y; Tue, 02 Jun 2020 13:35:53 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 08F1274594E;
- Tue,  2 Jun 2020 19:35:46 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id BB050745702; Tue,  2 Jun 2020 19:35:45 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id B651E7456F8;
- Tue,  2 Jun 2020 19:35:45 +0200 (CEST)
-Date: Tue, 2 Jun 2020 19:35:45 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Andrea_Palmat=E8?= <andrea.palmate@gmail.com>
-Subject: Re: Sam460Ex screen mode, audio and network
-In-Reply-To: <CAD+yzTTqHtQY-c9rJe-BLmaGPK8QdMuVyKxJo+-SeL8WV1k4-g@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2006021912270.10465@zero.eik.bme.hu>
-References: <CAD+yzTSr2edTNmzkGOH7todx7uVPbL_BSNSJPb62mJWCUSa8NA@mail.gmail.com>
- <4d64c939-3431-b637-488e-676a5f9171e5@amsat.org>
- <alpine.BSF.2.22.395.2006021510140.40694@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2006021647240.70962@zero.eik.bme.hu>
- <CAD+yzTRCwsMgG9JUoyCi7ecc_Vmph7GJjrdH7moqLGfmKMjvVg@mail.gmail.com>
- <CAD+yzTTqHtQY-c9rJe-BLmaGPK8QdMuVyKxJo+-SeL8WV1k4-g@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgApf-00065g-Iv
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:36:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58384
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgApd-0006As-Sp
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:36:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591119368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=daGZQVL1EnsEaUYs5+OmeOjxhTo92oCx+3VSrC87WRQ=;
+ b=f6zZGSqgtiLUaHMLcUUAueSwzuDjQhfa0KwlcDz2b/Ut073e50Iu4FSaNeApUOjjO4BeQ7
+ uYyTwcG4pei5giG6XJ3ON2jMHXaUBZ+W7pFfcJ+w73MGO8T2jMWZQAzzTulQRnjikZtMxk
+ pEhzrP8Gpz8XYY5lb2oe1y0wDmZLW5o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-W-9pImPgPeicB_OV0REAww-1; Tue, 02 Jun 2020 13:36:02 -0400
+X-MC-Unique: W-9pImPgPeicB_OV0REAww-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9017C461;
+ Tue,  2 Jun 2020 17:36:01 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC71319C4F;
+ Tue,  2 Jun 2020 17:36:00 +0000 (UTC)
+Subject: Re: [PATCH v3 4/6] iotests: Dump bitmap directory info with qcow2.py
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1591019293-211155-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b9b51392-055e-d947-7ca0-91878f817587@redhat.com>
+Date: Tue, 2 Jun 2020 12:35:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-916472972-1591119345=:10465"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 13:35:46
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+In-Reply-To: <1591019293-211155-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 23:49:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,73 +97,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- qemu-discuss@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 6/1/20 8:48 AM, Andrey Shinkevich wrote:
+> Read and dump entries from the bitmap directory of QCOW2 image with the
+> script qcow2.py.
+> 
+> Header extension:         Bitmaps
+> ...
+> Bitmap name               bitmap-1
+> flag                      auto
+> bitmap_table_offset       0xf0000
+> bitmap_table_size         8
+> flag_bits                 2
+> type                      1
+> granularity_bits          16
+> name_size                 8
+> extra_data_size           0
+> 
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2.py | 104 +++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 103 insertions(+), 1 deletion(-)
+> 
 
---3866299591-916472972-1591119345=:10465
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+> +        self.bitmap_flags = []
+> +        BME_FLAG_IN_USE = 1
+> +        BME_FLAG_AUTO = 1 << 1
 
-On Tue, 2 Jun 2020, Andrea Palmatè wrote:
-> Regard the resolution. I've seen if i call the video mode SM502 instead of
-> SiliconMotion 502 it doesn't show the 1366x762 resolution.. that's weird..
+Would it be worth using '1 << 0' for BME_FLAG_IN_USE, to make it obvious 
+that these are consecutive bits, especially if we later add a third bit?
 
-I don't know much about how this works but maybe it has to match the chip 
-or monitor driver to show up? I think on AmigaOS these use 
-SiliconMotion502 name instead of the short name.
 
->> In the meanwhile i've tried to add -device ES1370 but i get no audio at
->> all. I've also a lot of shared "memfd open() failed: Function not
->> implemented" errors on console
+> +        for n in range(self.nb_bitmaps):
+> +            buf = fd.read(buf_size)
+> +            dir_entry = Qcow2BitmapDirEntry(buf)
+> +            fd.seek(dir_entry.extra_data_size, 1)
+> +            bitmap_name = fd.read(dir_entry.name_size)
+> +            dir_entry.name = bitmap_name.decode('ascii')
+> +            self.bitmaps.append(dir_entry)
+> +            entry_raw_size = dir_entry.bitmap_dir_entry_raw_size()
+> +            shift = ((entry_raw_size + 7) & ~7) - entry_raw_size
+> +            fd.seek(shift, 1)
 
-I get none of these problems on Linux. Maybe it's a problem with WSL? If 
-you're on Windows why don't you try a native Windows build? The official 
-QEMU download page seems to not have 5.0.0 build yet but there are some 
-alternative builds on the emaculation.com forum which should work. For 
-AmigaOS use the vanilla 5.0.0 build, ignore the patched screamer sound 
-build which is only needed for MacOS on mac99. See:
+Is there a symbolic constant instead of the magic '1' for fd.seek()?
 
-https://www.emaculation.com/doku.php/ppc-osx-on-qemu-for-windows
 
->> Regard the video mode. I'm pretty sure that resolutions like 1366x768
->> should work but not unticking the "default" checkbox. They needs to be
->> created by Screenmode program. The strange thing is that during
->> installation i've created successfully the resolution (that however had
->> that problem). Now with the OS even if the resolution is created i have
->> 1024x768 twice.
+> @@ -157,7 +256,10 @@ class QcowHeader:
+>               else:
+>                   padded = (length + 7) & ~7
+>                   data = fd.read(padded)
+> -                self.extensions.append(QcowHeaderExtension(magic, length, data))
+> +                self.extensions.append(QcowHeaderExtension(magic, length,
+> +                                                           data))
 
-If you can compile QEMU sources you could try printing 
-SM501_DC_PANEL_FB_WIDTH and SM501_DC_PANEL_FB_HEIGHT in 
-sm501_disp_ctrl_write() in qemu/hw/display/sm501.c to see what resolution 
-the guest programs the card. The high 16 bits are the value to check. 
-Haven't tried with adding a mode but with unticking default and setting 
-width these remained 1024x768. Your screen shot looks like the window is a 
-bit smaller than 1366x768 but it's wide aspect not 4:3 so maybe it did 
-change mode but not sure to what size and if that matches your resolution 
-(looks like it doesn't that's why you get garbled output).
+Should this reformatting be done earlier in the series to minimize churn?
 
->> I've also a problem that host mouse pointer is shown. I've read that i
->> need to add a "tabled" device in the xml file. But where i have to create
->> that file? Keep in mind that i'm using Ubuntu on Windows 10 via WSL and not
->> an ubuntu machine
+> +        for ex in self.extensions:
+> +            ex.load(fd)
+>   
+>       def update_extensions(self, fd):
+>   
+> 
 
-What you read is for vitual machines created via libvirt and probably 
-using other OS than AmigaOS so does not apply to your case. You can add a 
-tablet with -device usb-tablet (see -device help for all options) but I 
-don't think AmigaOS has a tablet driver so likely it won't work so you can 
-ignore that. If the build from emaculation.com did not fix this you may 
-try adding -sdl instead to use the SDL graphics backend which works better 
-for this, people had problem with the default gtk backend and mouse on the 
-emaculation.com forum and recommended using -sdl instead.
+Fixing the things I pointed out does not seem major, so
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Regards,
-BALATON Zoltan
---3866299591-916472972-1591119345=:10465--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
