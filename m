@@ -2,85 +2,88 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D90C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:20:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E70BF206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EBEB2068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 17:20:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="URWuc9H0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70BF206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=adacore-com.20150623.gappssmtp.com header.i=@adacore-com.20150623.gappssmtp.com header.b="gEjSSEus"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBEB2068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgAZW-0006Kk-5k
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:19:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42664)
+	id 1jgAaO-0007Dd-I7
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 13:20:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jgAYs-0005tL-Es
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:18:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24023
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jgAYr-0002Bq-8D
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:18:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591118328;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=SYCYylt73zAm4Z0YIZSJT/5gykRVZ8fXgPKYhU1W7Kw=;
- b=URWuc9H0WeipDmT63S936VFqFQ4EaaYqIQZK+n7ykkx4SVirHIAM8mY3Gj4gYZrJCn08ce
- BPLqmSzQCLZI6FKsr7FB24bkJkfIlNtjrJvFdQuk7JjVTzFb59IunR/kr7dTN68+xNMyiy
- RhXzw4ZZjEcUAv0JgK1MdMMO+IG0Rz0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-0hI3zwjePPyrsfcUo0mK2Q-1; Tue, 02 Jun 2020 13:18:44 -0400
-X-MC-Unique: 0hI3zwjePPyrsfcUo0mK2Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 705AB19200C8;
- Tue,  2 Jun 2020 17:18:43 +0000 (UTC)
-Received: from localhost (ovpn-113-102.phx2.redhat.com [10.3.113.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B62E78EFE;
- Tue,  2 Jun 2020 17:18:40 +0000 (UTC)
-Date: Tue, 2 Jun 2020 13:18:38 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding functions
-Message-ID: <20200602171838.GG577771@habkost.net>
-References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
- <158396721426.58170.2930696192478912976.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <chouteau@adacore.com>)
+ id 1jgAZo-0006m2-1c
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:19:48 -0400
+Received: from mail-io1-xd2d.google.com ([2607:f8b0:4864:20::d2d]:43687)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chouteau@adacore.com>)
+ id 1jgAZm-0002P8-VK
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 13:19:47 -0400
+Received: by mail-io1-xd2d.google.com with SMTP id h4so8376011iob.10
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 10:19:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=adacore-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=naT145SaWxXJx4cfmQmrA0LvsRtIewFrmKNYrZxFSgw=;
+ b=gEjSSEus1xPNEmC3jti7++EKMhZAi12+HIuhH1hz6ekOz+sFWeaAyvhvUnlmuGxQAC
+ 1wRtyBXdm+ztV52OsQPSZ8auNosyTTplHKA9IqeW9xJtHzILVFbgxoj2PZ3fGnJSCofI
+ 8Omc53SgLmyVcGaiZopLRJ1Yj+aBkuhcR5OUNpmBmwNJglMIHXDEGkuYcJ092Gz63x9e
+ VfmbBcL3lYAv8bkcqHdlMc6e4gpnhqj6kCkAqXa2YLzozPScyfWgdx9sfjVd04vorCrW
+ +N6G/9ZTkKcYG08w7eC9OHhWPVUBs74ApYbQ4X+Alcvn02Emat9JJdnOHrBxtupNAVFH
+ aSGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=naT145SaWxXJx4cfmQmrA0LvsRtIewFrmKNYrZxFSgw=;
+ b=bPgL0tahQf8uCAQ5E79eTNQiYLJ4+GUWTT1r08thTZX7h7jWH8kVUd4qG1h/MpVyH2
+ UgdHMkRW6HaNtb4ROZCFqq2v0gZXKrBQj59ZFBUPcck6b+v8o2LFZMmk57Qc1qmuM5mt
+ hF4mvbzPzM1iLY+W79Ii5MwADdKxOfXhLXkw9V1BALTmNr8opUGOVCtfVmfPT+G8pDlM
+ rWW3OhBvK15u0yRbVSVXGtKiRdj2XMzOG7v3+n23XXk8oan64JCbz8fIrflAamF6eo4T
+ Ov/Bk/PQu+fC0ugTcmX65OkRcO8vOL7JAZBVGySdrhkZKCZhMw5VOVQSMPHGg1yHxcRB
+ HmqA==
+X-Gm-Message-State: AOAM530WTooLNxqa0YYiZ3wC9dq32Kr5iptgdtyrUWk1DstrxGmDpFXf
+ RDuTkeR8oqWB9IGqTwhmvEbOpMH7oWbvC4uAq158Yw==
+X-Google-Smtp-Source: ABdhPJxr4NbeJ+k7h02ednpn5Kyhs3cTSsv4is9cm9d1bn0PzSbbtPFPz1N2EvIb3tXoZhZ5y43k6zkYCI1qFiCcevY=
+X-Received: by 2002:a05:6638:d05:: with SMTP id
+ q5mr25647189jaj.2.1591118385795; 
+ Tue, 02 Jun 2020 10:19:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <158396721426.58170.2930696192478912976.stgit@naples-babu.amd.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/01 23:49:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CALQG_Wh7eMt9U3gWkZZGDq0RFvWfuSVoiNBRNnPS_cDVfUc30w@mail.gmail.com>
+ <CAFEAcA_1+rDcjD7Lyk9ESSkPAKmJwF=0ZdwkgQYUDp8Gtn6jHA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_1+rDcjD7Lyk9ESSkPAKmJwF=0ZdwkgQYUDp8Gtn6jHA@mail.gmail.com>
+From: Fabien Chouteau <chouteau@adacore.com>
+Date: Tue, 2 Jun 2020 19:19:35 +0200
+Message-ID: <CALQG_WgP=ZebEMrXh_EpQJXqJPi48i6nwZU_yWq7VqhV_=eTVQ@mail.gmail.com>
+Subject: Re: gdbstub.c CPU clusters not handled for ThreadInfo packets
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d2d;
+ envelope-from=chouteau@adacore.com; helo=mail-io1-xd2d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,96 +96,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Thank you Peter,
 
-It looks like this series breaks -device and CPU hotplug:
+Le mar. 2 juin 2020 =C3=A0 18:44, Peter Maydell <peter.maydell@linaro.org> =
+a =C3=A9crit :
+>
+> By default gdb does not attach to all clusters (this is IIRC something
+> that can't
+> be influenced on the QEMU end);
 
-On Wed, Mar 11, 2020 at 05:53:34PM -0500, Babu Moger wrote:
-> These functions add support for building EPYC mode topology given the smp
-> details like numa nodes, cores, threads and sockets.
-> 
-> The new apic id decoding is mostly similar to current apic id decoding
-> except that it adds a new field node_id when numa configured. Removes all
-> the hardcoded values. Subsequent patches will use these functions to build
-> the topology.
-> 
-> Following functions are added.
-> apicid_llc_width_epyc
-> apicid_llc_offset_epyc
-> apicid_pkg_offset_epyc
-> apicid_from_topo_ids_epyc
-> x86_topo_ids_from_idx_epyc
-> x86_topo_ids_from_apicid_epyc
-> x86_apicid_from_cpu_idx_epyc
-> 
-> The topology details are available in Processor Programming Reference (PPR)
-> for AMD Family 17h Model 01h, Revision B1 Processors. The revision guides are
-> available from the bugzilla Link below.
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
-[...]
->  typedef struct X86CPUTopoIDs {
->      unsigned pkg_id;
-> +    unsigned node_id;
+You mean I cannot have QEMU attach all clusters by default?
 
-You have added a new field here.
+> are you explicitly asking it to attach to the second cluster?
 
->      unsigned die_id;
->      unsigned core_id;
->      unsigned smt_id;
-[...]
-> +static inline apic_id_t
-> +x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
-> +                              const X86CPUTopoIDs *topo_ids)
-> +{
-> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
-> +           (topo_ids->node_id << apicid_node_offset_epyc(topo_info)) |
+So far the behavior that we had was to see all the CPUs without asking
+explicitly.
+I want to go back to that behavior because the current situation is a
+huge drawback for our users.
 
-You are using the new field here.
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg07035.html
+> is a mailing list post from January which gives the gdb commands which
+> ought to cause it to attach to the second cluster on this machine.
 
-> +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
-> +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
-> +           topo_ids->smt_id;
-> +}
+The commands:
+        target extended-remote :1234
+        add-inferior
+        inferior 2
+        attach 2
+        set schedule-multiple
+        info threads
 
-But you are not initializing node_id in one caller of apicid_from_topo_ids():
+Do not work for me, "attach 2" in GDB asks me to kill the debugged program.
 
-static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-                            DeviceState *dev, Error **errp)
-{
-    [...]
-    X86CPUTopoIDs topo_ids;
-    [...]
-    if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-        [...]
-        topo_ids.pkg_id = cpu->socket_id;
-        topo_ids.die_id = cpu->die_id;
-        topo_ids.core_id = cpu->core_id;
-        topo_ids.smt_id = cpu->thread_id;
-        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
-    }
-    [...]
-}
-
-Result: -device is broken when using -cpu EPYC:
-
-  $ qemu-system-x86_64 -machine q35,accel=kvm -smp 1,maxcpus=2,cores=1,threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-cpu,core-id=0,socket-id=1,thread-id=0
-  qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,thread-id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0] with APIC ID 21855, valid index range 0:1
-
-This happens because APIC ID is calculated using uninitialized
-memory.
-
--- 
-Eduardo
-
+Thanks for your help,
 
