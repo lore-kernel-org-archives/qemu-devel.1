@@ -2,83 +2,93 @@ Return-Path: <SRS0=xYMn=7P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 818ECC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FC182074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B2932074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jun 2020 11:37:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LL3pbRxC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC182074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAlU0unf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B2932074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jg51o-0003oe-JL
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 07:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35008)
+	id 1jg5Eo-0006kF-Ij
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 07:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jg512-0002i3-0S
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:23:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46930
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jg50z-0002As-4b
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:23:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591097005;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=WGk1tC7qnH7nYU05249E3LupTPwIgztrAb6BXmc7Agw=;
- b=LL3pbRxCMW8J2cKFHaa8jgAwZR7JGLI828me9ntGeDZ+7a4MUmxyj3e98IANodtQ8WMFSj
- eLXK6VkzUiIz41rhpFDFGbOiCDUxAwDxcpkPG7JxMdiFHbhHY7rn5OopOuyng4aafzUBVL
- 92kUUFYu6HybEOZJr9O0xWu2C585w3A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-QD_vVaKoM4iZeLZYrxSRYg-1; Tue, 02 Jun 2020 07:23:23 -0400
-X-MC-Unique: QD_vVaKoM4iZeLZYrxSRYg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E4A8185694C;
- Tue,  2 Jun 2020 11:23:23 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-75.ams2.redhat.com [10.36.113.75])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 083BA78EFC;
- Tue,  2 Jun 2020 11:23:16 +0000 (UTC)
-Date: Tue, 2 Jun 2020 13:23:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH] virtio-blk: Disable request queuing while switching
- contexts
-Message-ID: <20200602112314.GF5940@linux.fritz.box>
-References: <20200602081112.32426-1-slp@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jg5ED-0006Jg-MB
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:37:09 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33319)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jg5EC-00053v-Sw
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 07:37:09 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l11so3081311wru.0
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 04:37:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ceQh7KDuSbqfQzt8ZZjn6/6jQP1zHqPfpK2+Po808Os=;
+ b=CAlU0unfq+/CxdT8MnAnQlcQpTDleS31L/yFpLn9mzlhJgRqDASXBOBPtMZqVPab89
+ 7ZVFu+WPfWziTRLntYfS8D+jjtS4fnZAOViT45amYKGas0nooEp9aYUm1IodaBECdb34
+ cK1opBwGtd7NT+gaAv4a2mle4haio7zt3Jk2hQjeg2+AJ5Z9O9CIz70enzeZy/Mi2TzL
+ b2Iautb/12Swhd6lFwnpp5WuNgAs+WjoFlzRzptnCQizWxfScytIV6N5UrtBa4/qhaJR
+ p6UJzL2u/1pEyYx1mOpHhA3Lyc4JmBS5lMyAnRf9Vbh0Oypfk9mjW7tjG+WClp5Dldk3
+ IFbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=ceQh7KDuSbqfQzt8ZZjn6/6jQP1zHqPfpK2+Po808Os=;
+ b=T9GzTyZsAgTzKa5gAOJLPO3FRMxjI6JvYydNj+DsYcpoDRiEZeshd+17a+Fpr6yR+M
+ WO6Kzs0Ti7IsCMLsf7J2VNsIF+v1zRhs/H3jJCz2EJ59nPoVo0RWTFiuTdNDoYroiho0
+ evxE+oNj1/KlNqjdq+6ApY1RY+3P6CsUgRKPa4c2ljTHcTDHemu+kbJMyQzLO7xDMHiI
+ dlC80/T1JOIp73Ia1+CyI/56/vxgBMzGSSiKIb6mTZb1qNy7YP6FY/0FQ7yQiqvehRBh
+ PFq/CyPZ7AIe76zjhWpQSIhTfApWOgONUlIqWqbG4DLCA7PyoZvO5YM316A+DS80V7XN
+ iX0A==
+X-Gm-Message-State: AOAM532baKLuvDUG+0ap3eQd1Uk3pTnD6pXtVdBwVURnOtdg8/40K5Bb
+ sK8/xIYu/bDyHEYIxMEHYf6s9j6r
+X-Google-Smtp-Source: ABdhPJy2DlwYfsHNj1jf718PBA1GxO7+zcdpRWVqJgnLwM0aXfGzFJlSat0rgFt7CiVIw746wcNHXw==
+X-Received: by 2002:adf:ed49:: with SMTP id u9mr25659060wro.414.1591097824709; 
+ Tue, 02 Jun 2020 04:37:04 -0700 (PDT)
+Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id z12sm3822247wrg.9.2020.06.02.04.37.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 02 Jun 2020 04:37:03 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] .travis.yml: Temporarily disable the aarch64 job
+Date: Tue,  2 Jun 2020 13:37:02 +0200
+Message-Id: <20200602113702.28549-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200602081112.32426-1-slp@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 03:23:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,127 +101,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 02.06.2020 um 10:11 hat Sergio Lopez geschrieben:
-> Disable request queuing while switching contexts on
-> virtio_blk_data_plane_[start|stop](), preventing requests from getting
-> queued on the wrong context.
-> 
-> Placing requests on the wrong context may lead to them being wrongly
-> accessed in parallel from different threads, potentially leading to
-> multiple issues.
-> 
-> For example, stopping and resuming a VM multiple times while the guest
-> is generating I/O on a virtio_blk device can trigger a crash with a
-> stack tracing looking like this one:
-> 
-> <------>
->  Thread 2 (Thread 0x7ff736765700 (LWP 1062503)):
->  #0  0x00005567a13b99d6 in iov_memset
->      (iov=0x6563617073206f4e, iov_cnt=1717922848, offset=516096, fillc=0, bytes=7018105756081554803)
->      at util/iov.c:69
->  #1  0x00005567a13bab73 in qemu_iovec_memset
->      (qiov=0x7ff73ec99748, offset=516096, fillc=0, bytes=7018105756081554803) at util/iov.c:530
->  #2  0x00005567a12f411c in qemu_laio_process_completion (laiocb=0x7ff6512ee6c0) at block/linux-aio.c:86
->  #3  0x00005567a12f42ff in qemu_laio_process_completions (s=0x7ff7182e8420) at block/linux-aio.c:217
->  #4  0x00005567a12f480d in ioq_submit (s=0x7ff7182e8420) at block/linux-aio.c:323
->  #5  0x00005567a12f43d9 in qemu_laio_process_completions_and_submit (s=0x7ff7182e8420)
->      at block/linux-aio.c:236
->  #6  0x00005567a12f44c2 in qemu_laio_poll_cb (opaque=0x7ff7182e8430) at block/linux-aio.c:267
->  #7  0x00005567a13aed83 in run_poll_handlers_once (ctx=0x5567a2b58c70, timeout=0x7ff7367645f8)
->      at util/aio-posix.c:520
->  #8  0x00005567a13aee9f in run_poll_handlers (ctx=0x5567a2b58c70, max_ns=16000, timeout=0x7ff7367645f8)
->      at util/aio-posix.c:562
->  #9  0x00005567a13aefde in try_poll_mode (ctx=0x5567a2b58c70, timeout=0x7ff7367645f8)
->      at util/aio-posix.c:597
->  #10 0x00005567a13af115 in aio_poll (ctx=0x5567a2b58c70, blocking=true) at util/aio-posix.c:639
->  #11 0x00005567a109acca in iothread_run (opaque=0x5567a2b29760) at iothread.c:75
->  #12 0x00005567a13b2790 in qemu_thread_start (args=0x5567a2b694c0) at util/qemu-thread-posix.c:519
->  #13 0x00007ff73eedf2de in start_thread () at /lib64/libpthread.so.0
->  #14 0x00007ff73ec10e83 in clone () at /lib64/libc.so.6
-> 
->  Thread 1 (Thread 0x7ff743986f00 (LWP 1062500)):
->  #0  0x00005567a13b99d6 in iov_memset
->      (iov=0x6563617073206f4e, iov_cnt=1717922848, offset=516096, fillc=0, bytes=7018105756081554803)
->      at util/iov.c:69
->  #1  0x00005567a13bab73 in qemu_iovec_memset
->      (qiov=0x7ff73ec99748, offset=516096, fillc=0, bytes=7018105756081554803) at util/iov.c:530
->  #2  0x00005567a12f411c in qemu_laio_process_completion (laiocb=0x7ff6512ee6c0) at block/linux-aio.c:86
->  #3  0x00005567a12f42ff in qemu_laio_process_completions (s=0x7ff7182e8420) at block/linux-aio.c:217
->  #4  0x00005567a12f480d in ioq_submit (s=0x7ff7182e8420) at block/linux-aio.c:323
->  #5  0x00005567a12f4a2f in laio_do_submit (fd=19, laiocb=0x7ff5f4ff9ae0, offset=472363008, type=2)
->      at block/linux-aio.c:375
->  #6  0x00005567a12f4af2 in laio_co_submit
->      (bs=0x5567a2b8c460, s=0x7ff7182e8420, fd=19, offset=472363008, qiov=0x7ff5f4ff9ca0, type=2)
->      at block/linux-aio.c:394
->  #7  0x00005567a12f1803 in raw_co_prw
->      (bs=0x5567a2b8c460, offset=472363008, bytes=20480, qiov=0x7ff5f4ff9ca0, type=2)
->      at block/file-posix.c:1892
->  #8  0x00005567a12f1941 in raw_co_pwritev
->      (bs=0x5567a2b8c460, offset=472363008, bytes=20480, qiov=0x7ff5f4ff9ca0, flags=0)
->      at block/file-posix.c:1925
->  #9  0x00005567a12fe3e1 in bdrv_driver_pwritev
->      (bs=0x5567a2b8c460, offset=472363008, bytes=20480, qiov=0x7ff5f4ff9ca0, qiov_offset=0, flags=0)
->      at block/io.c:1183
->  #10 0x00005567a1300340 in bdrv_aligned_pwritev
->      (child=0x5567a2b5b070, req=0x7ff5f4ff9db0, offset=472363008, bytes=20480, align=512, qiov=0x7ff72c0425b8, qiov_offset=0, flags=0) at block/io.c:1980
->  #11 0x00005567a1300b29 in bdrv_co_pwritev_part
->      (child=0x5567a2b5b070, offset=472363008, bytes=20480, qiov=0x7ff72c0425b8, qiov_offset=0, flags=0)
->      at block/io.c:2137
->  #12 0x00005567a12baba1 in qcow2_co_pwritev_task
->      (bs=0x5567a2b92740, file_cluster_offset=472317952, offset=487305216, bytes=20480, qiov=0x7ff72c0425b8, qiov_offset=0, l2meta=0x0) at block/qcow2.c:2444
->  #13 0x00005567a12bacdb in qcow2_co_pwritev_task_entry (task=0x5567a2b48540) at block/qcow2.c:2475
->  #14 0x00005567a13167d8 in aio_task_co (opaque=0x5567a2b48540) at block/aio_task.c:45
->  #15 0x00005567a13cf00c in coroutine_trampoline (i0=738245600, i1=32759) at util/coroutine-ucontext.c:115
->  #16 0x00007ff73eb622e0 in __start_context () at /lib64/libc.so.6
->  #17 0x00007ff6626f1350 in  ()
->  #18 0x0000000000000000 in  ()
-> <------>
-> 
-> This is also known to cause crashes with this message (assertion
-> failed):
-> 
->  aio_co_schedule: Co-routine was already scheduled in 'aio_co_schedule'
-> 
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1812765
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  hw/block/dataplane/virtio-blk.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-> index 1b52e8159c..f1c7ba69c0 100644
-> --- a/hw/block/dataplane/virtio-blk.c
-> +++ b/hw/block/dataplane/virtio-blk.c
-> @@ -214,12 +214,17 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
->      vblk->dataplane_started = true;
->      trace_virtio_blk_data_plane_start(s);
->  
-> +    /* Prevent requests from getting queued on the old context */
-> +    blk_set_disable_request_queuing(s->conf->conf.blk, true);
-> +
->      r = blk_set_aio_context(s->conf->conf.blk, s->ctx, &local_err);
->      if (r < 0) {
->          error_report_err(local_err);
->          goto fail_guest_notifiers;
->      }
->  
-> +    blk_set_disable_request_queuing(s->conf->conf.blk, false);
-> +
+Travis-CI Aarch64 runners are currently broken, the build fails
+because the filesystem quota is full [1]:
 
-Why are we even getting new requests that could possibly be queued? This
-is in virtio_blk_data_plane_start/stop(), so clearly the device should
-be idle and the virtio queues shouldn't be processed at all at the same
-time?
+    AR      libqemuutil.a
+  nm: qemu-sockets.o: Bad value
+    LINK    qemu-ga
+  qga/main.o: In function `main':
+  /home/travis/build/qemu/qemu/qga/main.c:1494: undefined reference to `socket_local_address'
+  qga/channel-posix.o: In function `ga_channel_open':
+  /home/travis/build/qemu/qemu/qga/channel-posix.c:210: undefined reference to `socket_parse'
+  /home/travis/build/qemu/qemu/qga/channel-posix.c:193: undefined reference to `unix_listen'
+  /home/travis/build/qemu/qemu/qga/channel-posix.c:218: undefined reference to `socket_listen'
+  collect2: error: ld returned 1 exit status
+  Makefile:686: recipe for target 'qemu-ga' failed
+  make: *** [qemu-ga] Error 1
 
-blk_set_disable_request_queuing() feels more like a hack that hides the
-bug instead of fixing it.
+Per [2], LXD container have 'approx 18GB' of storage, but our runner show:
 
-Kevin
+  $ df -h
+  Filesystem                                                                                         Size  Used Avail Use% Mounted on
+  /var/snap/lxd/common/lxd/storage-pools/instances/containers/travis-job-qemu-qemu-693775643/rootfs  895G   38G  854G   5% /
+
+As we suppose a filesystem quota makes our build fail,
+disable the aarch64 job as a temporary kludge.
+
+[1] https://travis-ci.org/github/qemu/qemu/jobs/693775643
+[2] https://docs.travis-ci.com/user/reference/overview/#virtualisation-environment-vs-operating-system
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.travis.yml b/.travis.yml
+index 564be50a3c..3569ee99b3 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -399,6 +399,7 @@ jobs:
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+     - name: "[aarch64] GCC check-tcg"
++      if: false # Temporarily disabled due to problem in aarch64 runner.
+       arch: arm64
+       dist: xenial
+       addons:
+-- 
+2.21.3
 
 
