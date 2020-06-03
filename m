@@ -2,82 +2,83 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42765C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 12:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2981EC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 12:39:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07FD120678
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 12:39:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDA7820678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 12:39:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dAn5yiax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FD120678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVWJx2Kn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA7820678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgSfo-0006qg-5B
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 08:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49154)
+	id 1jgSfr-0006xb-4C
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 08:39:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jgSei-0005dt-UF; Wed, 03 Jun 2020 08:38:04 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36872)
+ id 1jgSek-0005er-H5; Wed, 03 Jun 2020 08:38:06 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:46888)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jgSee-0006OO-Dl; Wed, 03 Jun 2020 08:38:02 -0400
-Received: by mail-wr1-x441.google.com with SMTP id x13so2193053wrv.4;
- Wed, 03 Jun 2020 05:37:59 -0700 (PDT)
+ id 1jgSej-0006OV-39; Wed, 03 Jun 2020 08:38:06 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id x6so2148274wrm.13;
+ Wed, 03 Jun 2020 05:38:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ac+9C3hXCYIKboqKG/Gxdg5RbUyXr3fNOMpH5cOaPJg=;
- b=dAn5yiax3BDfYEMOthmqiFpzlDJ2FcVknMuuh8LaJX9ICxavIbsgXi3G/iyNNyyvnK
- uNQ8QuJOEmxCh5yfWd7WUnRDJhbuGXjeNeGTwbOIfohnknJKL4XpdyldrjQWObbTSYFA
- g0OimCAVlDpbhuZmb7wajwp1RuM/O+Av7AvVZBFjHYo9+t1bMWkGevLQgvOfFFOFaxNY
- qrPvEcZKAMx3/DNklDKRdBeklflCR+UnGVVkBkfx+3eldqTeZlWsNyWZK4dNHB8YgKaO
- f28oaJafOGUeT69DV9sOsUS+o2zd488kvxj72wAyp1Ui6IXFcxKGdVZabSTVf7Fv9VWK
- xTVQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=dQpGwQIn8Qp72xpxhIH2uANRxIHLlNTW+u2aj7Hblvg=;
+ b=OVWJx2Kn29vAMe+mCF5zfaQv2AbDd+qpUGfkkaaXIVCzkifWw/rN+W7Vyfe44gv9xn
+ Py3cSYGJlkuxGdmZOHYb5nsbLbdm+3iiiJvcTI9j6+i0kXziW2+vRjAv7JC2ua0oak7o
+ YaQnbSj5RETsb4jGeUtfDzLCzm76xG2ANk4nsE7PKNP6GHpyqG2AAcFmckWpax4SrkPg
+ Bb7gtTr8AOfK5uPLEHIfckgld47OGpQOC8dt4AKMyfaA7XakBgZsolG8HgL5KPfdMexL
+ YL5yTLgGSCL75dKEcZW/SyArl8IymoBms4NyTEiC1k/4Gp/yYJRyInG1hVI5oLTdKH2q
+ DbZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=ac+9C3hXCYIKboqKG/Gxdg5RbUyXr3fNOMpH5cOaPJg=;
- b=Ptc19QQ4G3vKxrYqhjvYm7TG/akl6ViTx+oaDUXJqE+sSDjS9sU9aWzwSyk111APjh
- W7h8gHqKbXEUJxKoNbBVgfnNAjeCHrFVJ9CpA7r0mOh1KxLJILXPMfQwOff0Jzt7vvyM
- WpJpA66Y5XRZphTWb7B2KXgNn8GSj2/xu9Tk4EPOx/cfkKTLOa89YHx2FA3yIJUXlHT5
- 2wpsm8bI9xBhMQ/XIkiCCfKQp0qwk23YH+f0EVP3oCBhH7fRr5/I5fmFGtr8FZsafxyB
- hv5imLJ1j2OnXvPIkKWFhF6IeDRTQu2yHvFK8a5pEk28Tr8bgM6YGrEXd3vRzkbsw7+O
- VdSQ==
-X-Gm-Message-State: AOAM531/C2UeXgZY5ueBenfHXLMoOZglyrs6o0LvPjQlC2IBMdw710Y5
- FPEYxwO/earSv0H04G5Q3xwmweoN
-X-Google-Smtp-Source: ABdhPJxE/bacFXzAo+0CK347tVAdAzvJ2Gxc8e1tHWWG6illF1eDX3JoXa9S57K6hjbSD5E3QgZ4/w==
-X-Received: by 2002:a05:6000:1192:: with SMTP id
- g18mr32472936wrx.326.1591187878361; 
- Wed, 03 Jun 2020 05:37:58 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=dQpGwQIn8Qp72xpxhIH2uANRxIHLlNTW+u2aj7Hblvg=;
+ b=lp44edT1/D/m0faH/8jsaR/j6h12p6C58kS1aFgXK1qTEAvgiFBSCoz8OOG6+jA6xg
+ SGJlR6/jszz/z4/X1vWQ9jHia3hOXDwh/31VIXGJ4A3nlu7V6dIkR85aognjgB/zB/bZ
+ 7ZBulaXd1Ubsddm/m4jNZBYJ1cefgQyw5jlFk2ooz3eER3wYP7NrP39JDsL6r5xlnZOF
+ mFA74nL3JnSq1/2sFjqJ5RxH30OuI3LYIP3hDUhe53AAKa1R6EkZqigBpqSlC5Bs/nTK
+ OwzGys3uKwQzu/bWGbC1dT1mTH72Ng2uFoWRCy/E6Fz8PHMW8iisAXvUaIFHKQ/6+Fdn
+ hsFQ==
+X-Gm-Message-State: AOAM530g80KvCzvmTh8Za1NGq/k+XL2HfehMyoTbNnqmYXMcwREfHwck
+ 7KwC5mUKeF7FcCtx3rWWnH6jPGor
+X-Google-Smtp-Source: ABdhPJwffy1u/Qr3EXdVZVUpSlRZ1FLhRmUoEkF4YGDRSN2RqYRhixsVticQIuvJb2c6gJpMpO0jgg==
+X-Received: by 2002:a5d:4a04:: with SMTP id m4mr33729076wrq.153.1591187880043; 
+ Wed, 03 Jun 2020 05:38:00 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id r5sm3370983wrq.0.2020.06.03.05.37.56
+ by smtp.gmail.com with ESMTPSA id r5sm3370983wrq.0.2020.06.03.05.37.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 03 Jun 2020 05:37:57 -0700 (PDT)
+ Wed, 03 Jun 2020 05:37:59 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] target/unicore32: Semihosting cleanup
-Date: Wed,  3 Jun 2020 14:37:51 +0200
-Message-Id: <20200603123754.19059-1-f4bug@amsat.org>
+Subject: [PATCH 1/3] target/unicore32: Remove unused headers
+Date: Wed,  3 Jun 2020 14:37:52 +0200
+Message-Id: <20200603123754.19059-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200603123754.19059-1-f4bug@amsat.org>
+References: <20200603123754.19059-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,27 +110,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trivial cleanups around semihosting code.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ target/unicore32/helper.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Guan: Do you have binaries to run testing?
-
-I couldn't rebuild anything from https://github.com/gxt/UniCore32
-that you referenced here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg608054.html
-- u-boot patches are missing
-- which gnu-toolchain-unicore should we use?
-- your webpage is down: http://mprc.pku.edu.cn/~guanxuetao/
-- there are too many warnings reported for QEMU 2.7-stable.
-
-Philippe Mathieu-Daudé (3):
-  target/unicore32: Remove unused headers
-  target/unicore32: Replace DPRINTF() by qemu_log_mask(GUEST_ERROR)
-  target/unicore32: Prefer qemu_semihosting_log_out() over curses
-
- default-configs/unicore32-softmmu.mak |  1 +
- target/unicore32/helper.c             | 70 +++++----------------------
- 2 files changed, 13 insertions(+), 58 deletions(-)
-
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index 7d538e2144..53292ae311 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -12,9 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+-#include "exec/gdbstub.h"
+ #include "exec/helper-proto.h"
+-#include "qemu/host-utils.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "ui/console.h"
+ #endif
 -- 
 2.21.3
 
