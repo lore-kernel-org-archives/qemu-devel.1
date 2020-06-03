@@ -2,131 +2,95 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A212DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F32A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6662E20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:12:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAB7720678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Re82C88i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6662E20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vbpWWuUp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB7720678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgLhs-0000rW-H8
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 01:12:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52364)
+	id 1jgLmC-0002Lt-2B
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 01:17:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgLhF-0000Fw-Jb
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 01:12:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40044
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgLhE-0008C2-7O
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 01:12:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591161131;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YzcpkdU6gmgtNSWUA1+uSr6y1uotxKrX7rUTKU9u3nw=;
- b=Re82C88iqHmuD5XxaJ44ZpVySCYdPmwt8hqrJP+1P9QV071wTcuAbV7M21IhMHF2siZuUQ
- sRzeQ2rwa8MRN0bWwLkLAvkqljltY0gQkPzBbIkkLacwBtE0l5RKGF8COkDd2ynlc7Q28B
- CA6yOyigOKG6BvV2N5rV9afXr04GNKY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-5_xZ73K5PHibNmw883a7VQ-1; Wed, 03 Jun 2020 01:12:09 -0400
-X-MC-Unique: 5_xZ73K5PHibNmw883a7VQ-1
-Received: by mail-wr1-f71.google.com with SMTP id s7so584857wrm.16
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 22:12:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jgLlV-0001mw-KW; Wed, 03 Jun 2020 01:16:37 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56224)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jgLlU-0000lv-UY; Wed, 03 Jun 2020 01:16:37 -0400
+Received: by mail-wm1-x343.google.com with SMTP id c71so543324wmd.5;
+ Tue, 02 Jun 2020 22:16:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Muqzcfi0chH/Y7Tor0GgBKAK3xF2W5UhW3gXe8RB6yo=;
+ b=vbpWWuUp8cTmzDxijOVO6HiDqFDbSBroDHTgBp/oZFUOisRGIl9HfXHmkGqF2cnGI6
+ 2ciBbWuDpAeMScW6tOCmp1VczC09LVuPqyAQh5gDJRQNU6eeCwhR2SfHJBE1yKziT4s/
+ 6zlhbmfWjKR6bGnv9ic/QDtIHY0OiMCAsz2NaBbEJShRKbbZ5LFWbQqg1U1CEj9uqEOD
+ fsx4XmV7LKkJ1M3wpCnD/VPcEJZBDTXlmdipxxTAjtNKMppUiwvu8rS0xKTdGaanHmvO
+ KTz13gj/WWjghkpCvCD5+7i7z1MFn5fjvqG44dvqfkYE3nhd9F56tCv1x0yvqUfVeiD+
+ TdTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=YzcpkdU6gmgtNSWUA1+uSr6y1uotxKrX7rUTKU9u3nw=;
- b=LvJj/zm0ZUXBaTIkzJ68d5z+gJfJg6X2YAEbgOLgACZ5F1ZqPIk0dfXZ1SPbpqnw6k
- 9QwaYUQj2rR7dHHcpKpJX3xfMOsM9xHRm977Jdk96Hv/QeEaoxRm3yiNjBOTo7RdWxcS
- 8RI1f4iKOTOPJvHUvEU2V7KLoLj/EGruUCTjG0jgs9OZebWcLUJy/95aOfyTBVNVdqGU
- jSvKWgxDYRKXrEFpZ6ufihDDZ0OqaT1z1xsBefiTRPlvQIscCkURKvyPX8nuulS45ikM
- oEbyez/pUGTek0TLBX9I4NRF0hR7YX4hzT08OH9dVr34qxNLgze7HHVktp8Vs1litX5/
- psVQ==
-X-Gm-Message-State: AOAM532jSddkN6pN18fYqZFG+sdf7KlJwNj67M/gxPtq/J9oxtyVoB3z
- uIg6Rn4AZaXqrHexcPmQj2pesyWLjKwX6r2u7TxnrtA7fHdLlreEZJ0yd9Z3gZcxV7vk5QU17aU
- l+vmT+/sTlyhay7o=
-X-Received: by 2002:a1c:7e43:: with SMTP id z64mr6735072wmc.72.1591161128498; 
- Tue, 02 Jun 2020 22:12:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhXRa6XzzImOqYzSeI+aTMd0LKtOSN8nZ+KHiQ1cImcJMNXUhjLnnW8cMfuJwZ3f3YPnTpjA==
-X-Received: by 2002:a1c:7e43:: with SMTP id z64mr6735062wmc.72.1591161128313; 
- Tue, 02 Jun 2020 22:12:08 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Muqzcfi0chH/Y7Tor0GgBKAK3xF2W5UhW3gXe8RB6yo=;
+ b=cMVzzxCqH0ne3nAMPcm75E/nCxfnupJxxF3pfpOwtJHfw2rD2SSs0zk1icEfWcSNzY
+ C1Y813lGR/vaVXfm6vaUIoa26fht3AmTYcW+Mz9JounnnPX5sRdZCb1hEhaoNfRamDE4
+ q/1tLA0jkyJaXG5ie4XbDbMEbXhX8hJGaC33s/JmlmJ2nHsAQDaH+nkqB6V50kLeyL1/
+ kfRtgkBgIWwg0MAwzomc5uS87vSEvFtMNuzbbMW4GwmHZvTHpdKEKMziW4ofjPq0qGLE
+ 5WAQbRFV63PA9ToAH889JUZxOlzTQbJXXOA4mxd5PTDNSmJKbCrhKK2mWAuojo3zHzAs
+ QLWw==
+X-Gm-Message-State: AOAM532ve4b5BM2yY7zXbvSixu1LlcADPatTjmnJfY07P7oe8GrOmPB2
+ 85eLmUt6NRzb4So+S5ZloDI=
+X-Google-Smtp-Source: ABdhPJwN7yfF4vvn6CBrhFy7v+BFkCFfr9N7le+mjwoCpofUuhhHm71UAP/CIRMK1veFf6GIKAru9A==
+X-Received: by 2002:a1c:25c3:: with SMTP id l186mr7001395wml.103.1591161395165; 
+ Tue, 02 Jun 2020 22:16:35 -0700 (PDT)
 Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id j190sm1154460wmb.33.2020.06.02.22.12.06
+ by smtp.gmail.com with ESMTPSA id 5sm1814108wrr.5.2020.06.02.22.16.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 02 Jun 2020 22:12:07 -0700 (PDT)
-Subject: Re: [PATCH 1/1] util/oslib: Returns real thread identifier on FreeBSD
- and NetBSD
-To: David CARLIER <devnexen@gmail.com>, Thomas Huth <thuth@redhat.com>,
- pbonzini@readhat.com, qemu-trivial@nongnu.org
-References: <CA+XhMqwMsmoYwNtkrvAEG_j_-8L=+PYcXSz--1Qg622szArkRQ@mail.gmail.com>
- <f9ebb603-0a0e-8775-8405-dd8de2493a3f@redhat.com>
- <CA+XhMqx6_mWvb-5Z2Mbtw3V-q-WkZPnOF10VK=iLwSwUGnOJAQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ee2dcfe2-66f0-63f4-33a0-e5731e5d9d08@redhat.com>
-Date: Wed, 3 Jun 2020 07:12:06 +0200
+ Tue, 02 Jun 2020 22:16:34 -0700 (PDT)
+Subject: Re: [PATCH] hw/isa/apm: Convert debug printf()s to trace events
+To: qemu-devel@nongnu.org
+References: <20200524164806.12658-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c79a9dd3-fd68-ea43-90c0-ad2b9cb87c22@amsat.org>
+Date: Wed, 3 Jun 2020 07:16:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CA+XhMqx6_mWvb-5Z2Mbtw3V-q-WkZPnOF10VK=iLwSwUGnOJAQ@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200524164806.12658-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,60 +103,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Ed Maste <emaste@freebsd.org>,
- qemu-devel@nongnu.org, bauerchen@tencent.com, Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping?
+ping for review?
 
-On 5/26/20 9:29 AM, David CARLIER wrote:
-> From 792fbcd9114f43bd80fd1ef5b25cd9935a536f9f Mon Sep 17 00:00:00 2001
-> From: David Carlier <devnexen@gmail.com>
-> Date: Tue, 26 May 2020 08:25:26 +0100
-> Subject: [PATCH] util/oslib: Returns the real thread identifier on FreeBSD and
->  NetBSD
+On 5/24/20 6:48 PM, Philippe Mathieu-Daudé wrote:
+> Convert APM_DPRINTF() to trace events and remove ifdef'ry.
 > 
-> getpid is good enough in a mono thread context, however
->  thr_self/_lwp_self reflects the real current thread identifier
->  from a given process.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  util/oslib-posix.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  hw/isa/apm.c        | 15 +++++----------
+>  hw/isa/trace-events |  4 ++++
+>  2 files changed, 9 insertions(+), 10 deletions(-)
 > 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 062236a1ab..916f1be224 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -48,11 +48,13 @@
->  #ifdef __FreeBSD__
->  #include <sys/sysctl.h>
->  #include <sys/user.h>
-> +#include <sys/thr.h>
->  #include <libutil.h>
->  #endif
-> 
->  #ifdef __NetBSD__
->  #include <sys/sysctl.h>
-> +#include <lwp.h>
->  #endif
-> 
->  #include "qemu/mmap-alloc.h"
-> @@ -84,6 +86,13 @@ int qemu_get_thread_id(void)
+> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
+> index 6300b1ba7a..bce266b957 100644
+> --- a/hw/isa/apm.c
+> +++ b/hw/isa/apm.c
+> @@ -24,14 +24,8 @@
+>  #include "hw/isa/apm.h"
+>  #include "hw/pci/pci.h"
+>  #include "migration/vmstate.h"
+> +#include "trace.h"
+>  
+> -//#define DEBUG
+> -
+> -#ifdef DEBUG
+> -# define APM_DPRINTF(format, ...)       printf(format, ## __VA_ARGS__)
+> -#else
+> -# define APM_DPRINTF(format, ...)       do { } while (0)
+> -#endif
+>  
+>  /* fixed I/O location */
+>  #define APM_STS_IOPORT  0xb3
+> @@ -41,8 +35,8 @@ static void apm_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
 >  {
->  #if defined(__linux__)
->      return syscall(SYS_gettid);
-> +#elif defined(__FreeBSD__)
-> +    /* thread id is up to INT_MAX */
-> +    long tid;
-> +    thr_self(&tid);
-> +    return (int)tid;
-> +#elif defined(__NetBSD__)
-> +    return _lwp_self();
->  #else
->      return getpid();
->  #endif
+>      APMState *apm = opaque;
+>      addr &= 1;
+> -    APM_DPRINTF("apm_ioport_writeb addr=0x%" HWADDR_PRIx
+> -                " val=0x%02" PRIx64 "\n", addr, val);
+> +
+> +    trace_apm_io_write(addr, val);
+>      if (addr == 0) {
+>          apm->apmc = val;
+>  
+> @@ -65,7 +59,8 @@ static uint64_t apm_ioport_readb(void *opaque, hwaddr addr, unsigned size)
+>      } else {
+>          val = apm->apms;
+>      }
+> -    APM_DPRINTF("apm_ioport_readb addr=0x%" HWADDR_PRIx " val=0x%02x\n", addr, val);
+> +    trace_apm_io_read(addr, val);
+> +
+>      return val;
+>  }
+>  
+> diff --git a/hw/isa/trace-events b/hw/isa/trace-events
+> index 202f8938e7..3544c6213c 100644
+> --- a/hw/isa/trace-events
+> +++ b/hw/isa/trace-events
+> @@ -9,3 +9,7 @@ superio_create_ide(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x,
+>  # pc87312.c
+>  pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
+>  pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
+> +
+> +# apm.c
+> +apm_io_read(uint8_t addr, uint8_t val) "read addr=0x%x val=0x%02x"
+> +apm_io_write(uint8_t addr, uint8_t val) "write addr=0x%x val=0x%02x"
 > 
-
 
