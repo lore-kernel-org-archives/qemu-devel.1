@@ -2,90 +2,85 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E59AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 19:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C3AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 19:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 305DE2067B
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 19:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4736D2067B
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 19:29:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JoLj3EFc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 305DE2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B5quf2Bq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4736D2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgZ3N-0007gT-6S
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 15:27:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35536)
+	id 1jgZ4n-00009b-JY
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 15:29:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgZ2Q-0007Ao-Ds
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 15:26:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20611
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgZ2P-00076d-GE
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 15:26:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591212416;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z3rsp1lITzHuJ3hon2Fq1CyznwPEk23zrr+ZQMRUygU=;
- b=JoLj3EFcV0lPuE0H3gNOXe0QGaKube0RB0msQTQlE0tg5x0bfkL4/N7W9NARHQ4rilWehf
- pRcKGet/TrUr1O4cPTsr+eMHlGReudkFX8+taUIkL4rw01gSlmQNK2gZGPcylL1y4sUVka
- 9UaH+sIs1ULTYxYldnDDN5o6P+IE4kc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-jWfkU_qONUmxXK063zNXRA-1; Wed, 03 Jun 2020 15:26:51 -0400
-X-MC-Unique: jWfkU_qONUmxXK063zNXRA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 313D4185695A;
- Wed,  3 Jun 2020 19:26:50 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 857A25C240;
- Wed,  3 Jun 2020 19:26:46 +0000 (UTC)
-Subject: Re: [PATCH v3] osdep: Make MIN/MAX evaluate arguments only once
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200603013603.2400199-1-eblake@redhat.com>
- <03a13d47-fe7d-88e5-b92e-3c396591f9c7@linaro.org>
- <ecef14ce-47ca-749e-25b4-8e3ee378bd34@redhat.com>
- <2e894b8d-a510-0689-83dc-f6c8da16410e@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b4edd86c-a4cc-0b1d-ae28-009fe0a471e1@redhat.com>
-Date: Wed, 3 Jun 2020 14:26:46 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgZ46-0008Bv-BW
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 15:28:42 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:36363)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgZ44-0007at-MO
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 15:28:41 -0400
+Received: by mail-ej1-x641.google.com with SMTP id z5so3434522ejb.3
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 12:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yFkxj4Z1MMHcofbLREtvJ46j1yv76xg7ZRDVnHhkcs8=;
+ b=B5quf2Bqjm2rZwegVxJ5JaKFgmFKcxryBDmzygndL3Sve4aFKUt6B/Eosj5+flf68c
+ ZJ+80lzZ5cyVGYPbaWjRiRd3cYHGku2Q8tEQOsfMkBXkbZ5zEPBbfJsx/raTpv8ZYxwQ
+ IsIv5iFRwtSQT9ZXUPaiw2vFrspb8OIxovsEkQJsEBdBIeejiWd9KPtKmbChY5UC2vNr
+ GHB5cPpFCzoWEnY4Wr16UAQLsao0xYgHEY24W71K+N+Jhi4rLP2tldJ2S+nXMjgF7p6w
+ NTwdZBl3O5TsQfKkSXqhGc5sCLmiI9gREpXYLZQy9awv44MdIa8eaMjHX5XdOJVLXFNA
+ UvlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yFkxj4Z1MMHcofbLREtvJ46j1yv76xg7ZRDVnHhkcs8=;
+ b=JYCCgnBAPxq/EuCjhStDVlaHOQHCcGqxfca2BVXOVVmIIMGOlQqbJbwYLqkXP2th+t
+ cYogjbTxX9lIBwndVBBrxXXtumjwR0MqxOXrii0ujv50IY8m6DRnfeU+VAYR+5zZPrhz
+ qOIySTZYiUgxRIgOZul4GMQC6k07ufH2ySM+Hhanp1rBSSNqHhGJNPVkNoJpUr19Q/1m
+ rkfWrL9nefcLJX2rAMEvTp/6g2Ljh7TlGNdk7cSk9yMZG6CKcCJcMbqfmEWTG9nApp66
+ If0AWBiFqIkJJ8kImt24OewezlPTNB90cw387d3ojHIk5CdxeGnYYQIwsb23gWusEZtR
+ b8VA==
+X-Gm-Message-State: AOAM5328pY0eWud6/hansIt7sjID4hHxW0zkYF3bLz9bs0mJ81GpYWkH
+ AxF9F5HK6Z48LiPQGn/840R580UlANtaYl7pKLSJVw==
+X-Google-Smtp-Source: ABdhPJxQt0ien7KRflqNvmPNMYvuWsXPVMz9pHo38+6OzFWhGQRzV4ap3B9zPymBRO0brRlh95BUNKWfScty1BLThnc=
+X-Received: by 2002:a17:906:7848:: with SMTP id
+ p8mr823163ejm.244.1591212519067; 
+ Wed, 03 Jun 2020 12:28:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2e894b8d-a510-0689-83dc-f6c8da16410e@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 15:26:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1588208375-19556-1-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1588208375-19556-1-git-send-email-wei.w.wang@intel.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 3 Jun 2020 12:28:27 -0700
+Message-ID: <CAFXwXrm4R5nxk6ruTJ2kP5dUnF7Qm3TfRRiKVAUDNA1uwYf65w@mail.gmail.com>
+Subject: Re: [PATCH v3] migration/xbzrle: add encoding rate
+To: Wei Wang <wei.w.wang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,54 +93,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- crosthwaite.peter@gmail.com, quintela@redhat.com, f4bug@amsat.org,
- dgilbert@redhat.com, kraxel@redhat.com, dirty.ice.hu@gmail.com,
- pbonzini@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: kevin.tian@intel.com, Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ gloryxiao@tencent.com, yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/3/20 11:32 AM, Richard Henderson wrote:
+On Wed, 29 Apr 2020 at 18:54, Wei Wang <wei.w.wang@intel.com> wrote:
+> +        if (xbzrle_counters.pages == rs->xbzrle_pages_prev) {
+> +            xbzrle_counters.encoding_rate = 0;
+> +        } else if (!encoded_size) {
+> +            xbzrle_counters.encoding_rate = UINT64_MAX;
+> +        } else {
+> +            xbzrle_counters.encoding_rate = unencoded_size / encoded_size;
+> +        }
 
->>> I'd prefer we generate a compile-time error than a runtime trap (or nothing,
->>> depending on compiler flags controlling __builtin_unreachable).
->>
->> What we have DOES produce a compile-time error.  If either expression to
->> MIN_CONST() is not actually const, the fact that __builtin_unreachable()
->> returns void causes a compilation failure because a value is expected.
-> 
-> Ah!  Well, that's good and certainly sufficient for my needs.
-> 
-> I do now wonder if it wouldn't be clearer to use "(void)0"
-> instead of __builtin_unreachable, and add a note to the comment just above.
+With clang 10, this produces
 
-Yes, I just tested; using "((void)0)" in place of 
-"__builtin_unreachable()" has the same effect (no change to valid use, 
-and still a compiler error on misuse). gcc:
+  CC      aarch64-softmmu/migration/ram.o
+/home/rth/qemu/qemu/migration/ram.c:919:45: error: implicit conversion
+from 'unsigned long' to 'double' changes value from
+18446744073709551615 to 18446744073709551616
+[-Werror,-Wimplicit-int-float-conversion]
+            xbzrle_counters.encoding_rate = UINT64_MAX;
+                                          ~ ^~~~~~~~~~
+/usr/include/stdint.h:130:23: note: expanded from macro 'UINT64_MAX'
+# define UINT64_MAX             (__UINT64_C(18446744073709551615))
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/stdint.h:107:25: note: expanded from macro '__UINT64_C'
+#  define __UINT64_C(c) c ## UL
+                        ^~~~~~~
+<scratch space>:36:1: note: expanded from here
+18446744073709551615UL
+^~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
 
-/home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
-/home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as 
-it ought to be
-  1225 |             i = MIN_CONST(i, n);
-       |               ^
+UINT64_MAX apprears both arbitrary and wrong.
 
-clang:
+The only way I can imagine encoded_size == 0 is unencoded_size == 0,
+so 0 seems like the correct answer.  Moreover, it really seems like
+the first test sufficiently covers that possibility.
 
-/home/eblake/qemu/qemu-img.c:1225:15: error: assigning to 'int' from 
-incompatible type 'void'
-             i = MIN_CONST(i, n);
-               ^ ~~~~~~~~~~~~~~~
+In addition, the only user of this value is
+
+> +        monitor_printf(mon, "xbzrle encoding rate: %0.2f\n",
+> +                       info->xbzrle_cache->encoding_rate);
+
+which would be quite happy to print NaN even if the 0/0 computation
+were to run.  Though as I say above, I don't think that's reachable.
 
 
-Of course, a comment explaining the intent can't hurt either.  I'll wait 
-to see if this gathers any other comments before spinning a v4 with that 
-change.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+r~
 
