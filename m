@@ -7,93 +7,86 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 253FEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 06:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD6AC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 06:41:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4B7120659
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 06:37:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC73A20659
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 06:41:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWt3nz/g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B7120659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JagkhRKQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC73A20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgN26-0005jU-7g
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 02:37:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60060)
+	id 1jgN5A-0007cC-0X
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 02:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jgN1X-0005D5-9q; Wed, 03 Jun 2020 02:37:15 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36589)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jgN1W-000837-Ff; Wed, 03 Jun 2020 02:37:14 -0400
-Received: by mail-wm1-x344.google.com with SMTP id d128so732383wmc.1;
- Tue, 02 Jun 2020 23:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=GahUl7iml0F/qGrBXr0n7uqNZtwDbY8JOObISZ7TsKg=;
- b=SWt3nz/gTQxFRzhrBUcu/wGGOPCASDx3r9AIzuPI3asZXlHzJglkDGPfZT/cAI0373
- ewNPJl45eKk6r2tu82vqeoulqGGJPY2tuUUXxd9wAnJJmx6P/CBX4phL67fhwwrZefFP
- oMdHQ6mth7nhy/MxjhHjUWX4Z84DQcmaq6IHxjyDQbhsRYJobYV1FhXpmKgAz9FSAwmt
- M5VXgQgkmxUMxsSg26NjLWt6YdnzT9yq/6f9vLo04AggqUUIlnarl/fAouEQJv4vWDl9
- fiRgrPw0DLlcy2Gikq9FWhMNwo/PN+DMwMMuWIW1kJ55Fr3s5qLUQCf9UUD7qlRPs2C6
- 05EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=GahUl7iml0F/qGrBXr0n7uqNZtwDbY8JOObISZ7TsKg=;
- b=KXWYMptVgn50rXWssm84EXxgIrC9jl1/3/SZ7IeLtAJYfAw147vXrAiGzbxtTXpBfM
- /qLw00AG3JTIhZ366Ce34RFP5Z/mQWIKfcb7awo7eZM3LZMB7jpKj/BGfrcdbpVRchXV
- IYyE/CuWmplJt3nq6YHbdTjGy25OPhT1jIMRr0KJtp8R8IRd5dd06GzyT8bkKocFlW8I
- u2JcNW0u1peF9LoyD5MoQmakHwYzab7pMUwygOB4lbIKeOIUXMKeWFb2CbLiwWuz/Mr/
- Nlg1vYEYlr69MYROtoMPkxbzW3Gfn0TPJylg7UKVof3Y/iHWQMWmrDy/xkVgQ+XSUxlP
- LhKg==
-X-Gm-Message-State: AOAM531V/ECJ0KUcTePrRZgvfKMKZHXMiod0SWf1ccs2IB65rG/pJl5m
- vkiGoCjoN/bdi/MRMeIcndEEvB62
-X-Google-Smtp-Source: ABdhPJyBrJpVey9iNxqvKI3ryfMIbJTxKeChn31QiFCN9sOXGHFPBSJV1WS2ZjLsRfoDcu/U1skiZw==
-X-Received: by 2002:a1c:1b11:: with SMTP id b17mr7211333wmb.123.1591166232306; 
- Tue, 02 Jun 2020 23:37:12 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id a1sm1515981wmd.28.2020.06.02.23.37.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 02 Jun 2020 23:37:11 -0700 (PDT)
-Subject: Re: [PATCH 1/2] sd: sdhci: Implement basic vendor specific register
- support
-To: Guenter Roeck <linux@roeck-us.net>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200603052404.30788-1-linux@roeck-us.net>
- <20200603052404.30788-2-linux@roeck-us.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bac1b68a-3cee-5e60-dd6e-a866b04d2226@amsat.org>
-Date: Wed, 3 Jun 2020 08:37:11 +0200
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jgN48-000728-Hm
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 02:39:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31006
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jgN46-0008GZ-27
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 02:39:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591166391;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nCJgsEWFDx1Y96EDI0WLsUS6Jy25cenHHB0IfUucqMc=;
+ b=JagkhRKQxNFK/cxpVyPiH2vLvkOl+OiIXB0+9vmdXpmwt0qjlOieXAMCUHn0mnD93SU3MW
+ OWbfPRT8tS9wlzX8979PBQHe3AXG86j8nPgn/LhwXXVW/ERpRyAM1qeiH1/TgaHY0bh/Br
+ bsN9YiJnm8TkgsgC423U/lcXlnMdbI0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-RtPyU9JMMHSSantJ4ifJCw-1; Wed, 03 Jun 2020 02:39:48 -0400
+X-MC-Unique: RtPyU9JMMHSSantJ4ifJCw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD6F11005510;
+ Wed,  3 Jun 2020 06:39:45 +0000 (UTC)
+Received: from [10.72.12.214] (ovpn-12-214.pek2.redhat.com [10.72.12.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C66560C47;
+ Wed,  3 Jun 2020 06:39:28 +0000 (UTC)
+Subject: Re: [RFC v3 8/8] vhost-vdpa: introduce vhost-vdpa net client
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com
+References: <20200529140620.28759-1-lulu@redhat.com>
+ <20200529140620.28759-9-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4ae425c2-6b5f-5f64-9e26-f20b8f52f996@redhat.com>
+Date: Wed, 3 Jun 2020 14:39:27 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200603052404.30788-2-linux@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200529140620.28759-9-lulu@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,139 +99,439 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ Tiwei Bie <tiwei.bie@intel.com>, aadam@redhat.com, rdunlap@infradead.org,
+ hanand@xilinx.com, lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Guenter,
 
-On 6/3/20 7:24 AM, Guenter Roeck wrote:
-> The Linux kernel's IMX code now uses vendor specific commands.
-> This results in endless warnings when booting the Linux kernel.
-> 
-> sdhci-esdhc-imx 2194000.usdhc: esdhc_wait_for_card_clock_gate_off:
-> 	card clock still not gate off in 100us!.
-> 
-> Implement support for the vendor specific command implemented in IMX hardware
-> to be able to avoid this warning.
-> 
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+On 2020/5/29 下午10:06, Cindy Lu wrote:
+> From: Tiwei Bie <tiwei.bie@intel.com>
+
+
+Similar for this patch, you can change the git author and keep sobs for 
+both Tiwei and Ling Shan.
+
+
+>
+> This patch set introduces a new net client type: vhost-vdpa.
+> vhost-vdpa net client will set up a vDPA device which is specified
+> by a "vhostdev" parameter.
+>
+> Co-authored-by: Lingshan Zhu <lingshan.zhu@intel.com>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->  hw/sd/sdhci-internal.h |  5 +++++
->  hw/sd/sdhci.c          | 18 +++++++++++++++++-
->  include/hw/sd/sdhci.h  |  5 +++++
->  3 files changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index e7c8a523b5..e8c753d6d1 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -75,6 +75,7 @@
->  #define SDHC_CMD_INHIBIT               0x00000001
->  #define SDHC_DATA_INHIBIT              0x00000002
->  #define SDHC_DAT_LINE_ACTIVE           0x00000004
-> +#define SDHC_IMX_CLOCK_GATE_OFF        0x00000080
->  #define SDHC_DOING_WRITE               0x00000100
->  #define SDHC_DOING_READ                0x00000200
->  #define SDHC_SPACE_AVAILABLE           0x00000400
-> @@ -289,7 +290,10 @@ extern const VMStateDescription sdhci_vmstate;
->  
->  
->  #define ESDHC_MIX_CTRL                  0x48
+>   include/net/vhost-vdpa.h |  19 ++++
+>   include/net/vhost_net.h  |   2 +-
+>   net/Makefile.objs        |   2 +-
+>   net/clients.h            |   2 +
+>   net/net.c                |   3 +
+>   net/vhost-vdpa.c         | 235 +++++++++++++++++++++++++++++++++++++++
+>   qapi/net.json            |  26 ++++-
+>   7 files changed, 285 insertions(+), 4 deletions(-)
+>   create mode 100644 include/net/vhost-vdpa.h
+>   create mode 100644 net/vhost-vdpa.c
+>
+> diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
+> new file mode 100644
+> index 0000000000..6ce0d04f72
+> --- /dev/null
+> +++ b/include/net/vhost-vdpa.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * vhost-vdpa.h
+> + *
+> + * Copyright(c) 2017-2018 Intel Corporation.
+> + * Copyright(c) 2020 Red Hat, Inc.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
 > +
->  #define ESDHC_VENDOR_SPEC               0xc0
-> +#define ESDHC_IMX_FRC_SDCLK_ON          (1 << 8)
-
-I searched for the datasheet but couldn't find any, so I suppose it is
-only available under NDA. I can not review much (in particular I wanted
-to check the register sizes), anyway the overall looks OK:
-
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Also:
-
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> +#ifndef VHOST_VDPA_H
+> +#define VHOST_VDPA_H
 > +
->  #define ESDHC_DLL_CTRL                  0x60
->  
->  #define ESDHC_TUNING_CTRL               0xcc
-> @@ -326,6 +330,7 @@ extern const VMStateDescription sdhci_vmstate;
->  #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
->      DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
->      DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
-> +    DEFINE_PROP_UINT8("vendor", _state, vendor, SDHCI_VENDOR_NONE), \
->      \
->      /* Capabilities registers provide information on supported
->       * features of this specific host controller implementation */ \
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 1b75d7bab9..eb2be6529e 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -1569,11 +1569,13 @@ static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
->          }
->          break;
->  
-> +    case ESDHC_VENDOR_SPEC:
-> +        ret = s->vendor_spec;
-> +        break;
->      case ESDHC_DLL_CTRL:
->      case ESDHC_TUNE_CTRL_STATUS:
->      case ESDHC_UNDOCUMENTED_REG27:
->      case ESDHC_TUNING_CTRL:
-> -    case ESDHC_VENDOR_SPEC:
->      case ESDHC_MIX_CTRL:
->      case ESDHC_WTMK_LVL:
->          ret = 0;
-> @@ -1596,7 +1598,21 @@ usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
->      case ESDHC_UNDOCUMENTED_REG27:
->      case ESDHC_TUNING_CTRL:
->      case ESDHC_WTMK_LVL:
-> +        break;
+> +struct vhost_net;
+> +struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
+> +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
 > +
->      case ESDHC_VENDOR_SPEC:
-> +        s->vendor_spec = value;
-> +        switch (s->vendor) {
-> +        case SDHCI_VENDOR_IMX:
-> +            if (value & ESDHC_IMX_FRC_SDCLK_ON) {
-> +                s->prnsts &= ~SDHC_IMX_CLOCK_GATE_OFF;
-> +            } else {
-> +                s->prnsts |= SDHC_IMX_CLOCK_GATE_OFF;
-> +            }
-> +            break;
-> +        default:
-> +            break;
+> +#endif /* VHOST_VDPA_H */
+> diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> index 56e67fe164..0b87d3c6e9 100644
+> --- a/include/net/vhost_net.h
+> +++ b/include/net/vhost_net.h
+> @@ -41,4 +41,4 @@ uint64_t vhost_net_get_acked_features(VHostNetState *net);
+>   
+>   int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
+>   int vhost_net_get_device_id(struct vhost_net *net, uint32_t *device_id);
+> -endif
+> +#endif
+> diff --git a/net/Makefile.objs b/net/Makefile.objs
+> index c5d076d19c..5ab45545db 100644
+> --- a/net/Makefile.objs
+> +++ b/net/Makefile.objs
+> @@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
+>   tap-obj-y ?= tap-stub.o
+>   common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
+>   common-obj-$(CONFIG_WIN32) += tap-win32.o
+> -
+> +common-obj-$(CONFIG_VHOST_NET_VDPA) += vhost-vdpa.o
+>   vde.o-libs = $(VDE_LIBS)
+>   
+>   common-obj-$(CONFIG_CAN_BUS) += can/
+> diff --git a/net/clients.h b/net/clients.h
+> index a6ef267e19..92f9b59aed 100644
+> --- a/net/clients.h
+> +++ b/net/clients.h
+> @@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char *name,
+>   int net_init_vhost_user(const Netdev *netdev, const char *name,
+>                           NetClientState *peer, Error **errp);
+>   
+> +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+> +                        NetClientState *peer, Error **errp);
+>   #endif /* QEMU_NET_CLIENTS_H */
+> diff --git a/net/net.c b/net/net.c
+> index 599fb61028..82624ea9ac 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -965,6 +965,9 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+>   #ifdef CONFIG_VHOST_NET_USER
+>           [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
+>   #endif
+> +#ifdef CONFIG_VHOST_NET_VDPA
+> +        [NET_CLIENT_DRIVER_VHOST_VDPA] = net_init_vhost_vdpa,
+> +#endif
+>   #ifdef CONFIG_L2TPV3
+>           [NET_CLIENT_DRIVER_L2TPV3]    = net_init_l2tpv3,
+>   #endif
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> new file mode 100644
+> index 0000000000..7b98c142b5
+> --- /dev/null
+> +++ b/net/vhost-vdpa.c
+> @@ -0,0 +1,235 @@
+> +/*
+> + * vhost-vdpa.c
+> + *
+> + * Copyright(c) 2017-2018 Intel Corporation.
+> + * Copyright(c) 2020 Red Hat, Inc.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "clients.h"
+> +#include "net/vhost_net.h"
+> +#include "net/vhost-vdpa.h"
+> +#include "hw/virtio/vhost-vdpa.h"
+> +#include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/option.h"
+> +#include "qapi/error.h"
+> +#include <sys/ioctl.h>
+> +#include <err.h>
+> +#include "standard-headers/linux/virtio_net.h"
+> +#include "monitor/monitor.h"
+> +#include "hw/virtio/vhost.h"
+> +
+> +/* Todo:need to add the multiqueue support here */
+> +typedef struct VhostVDPAState {
+> +    NetClientState nc;
+> +    struct vhost_vdpa vhost_vdpa;
+> +    VHostNetState *vhost_net;
+> +    uint64_t acked_features;
+> +    bool started;
+> +} VhostVDPAState;
+> +
+> +VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
+> +{
+> +    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +    return s->vhost_net;
+> +}
+> +
+> +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc)
+> +{
+> +    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +    return s->acked_features;
+> +}
+> +
+> +static int vhost_vdpa_check_device_id(NetClientState *nc)
+
+
+A better name is needed, something like "vhost_vdpa_net_check_devie_id" 
+is better.
+
+
+> +{
+> +    uint32_t device_id;
+> +    int ret;
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +    /* Get the device id from hw*/
+
+
+The code explains itself, so no need for this comment.
+
+
+> +    ret = vhost_net_get_device_id(s->vhost_net, &device_id);
+> +    if (device_id != VIRTIO_ID_NET) {
+> +        return -ENOTSUP;
+> +    }
+> +    return ret;
+> +}
+> +
+> +static void vhost_vdpa_del(NetClientState *ncs)
+> +{
+> +    VhostVDPAState *s;
+> +
+> +    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +
+> +    s = DO_UPCAST(VhostVDPAState, nc, ncs);
+> +
+> +    if (s->vhost_net) {
+> +        /* save acked features */
+> +        uint64_t features = vhost_net_get_acked_features(s->vhost_net);
+> +        if (features) {
+> +            s->acked_features = features;
 > +        }
->          break;
->  
->      case SDHC_HOSTCTL:
-> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index c6868c9699..5d9275f3d6 100644
-> --- a/include/hw/sd/sdhci.h
-> +++ b/include/hw/sd/sdhci.h
-> @@ -74,6 +74,7 @@ typedef struct SDHCIState {
->      uint16_t acmd12errsts; /* Auto CMD12 error status register */
->      uint16_t hostctl2;     /* Host Control 2 */
->      uint64_t admasysaddr;  /* ADMA System Address Register */
-> +    uint16_t vendor_spec;  /* Vendor specific register */
->  
->      /* Read-only registers */
->      uint64_t capareg;      /* Capabilities Register */
-> @@ -96,8 +97,12 @@ typedef struct SDHCIState {
->      uint32_t quirks;
->      uint8_t sd_spec_version;
->      uint8_t uhs_mode;
-> +    uint8_t vendor;        /* For vendor specific functionality */
->  } SDHCIState;
->  
-> +#define SDHCI_VENDOR_NONE       0
-> +#define SDHCI_VENDOR_IMX        1
+
+
+I'm not sure I get here, is the acked_features used in the 
+vhost_net_cleanup()?
+
+
+> +        vhost_net_cleanup(s->vhost_net);
+> +    }
+> +}
 > +
->  /*
->   * Controller does not provide transfer-complete interrupt when not
->   * busy.
-> 
+> +static int vhost_vdpa_add(NetClientState *ncs, void *be)
+> +{
+> +    VhostNetOptions options;
+> +    struct vhost_net *net = NULL;
+> +    VhostVDPAState *s;
+> +    int ret;
+> +
+> +    options.backend_type = VHOST_BACKEND_TYPE_VDPA;
+> +
+> +    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +
+> +    s = DO_UPCAST(VhostVDPAState, nc, ncs);
+> +
+> +    options.net_backend = ncs;
+> +    options.opaque      = be;
+> +    options.busyloop_timeout = 0;
+> +    net = vhost_net_init(&options);
+> +    if (!net) {
+> +        error_report("failed to init vhost_net for queue");
+> +        goto err;
+> +    }
+> +
+> +    if (s->vhost_net) {
+> +        vhost_net_cleanup(s->vhost_net);
+> +        g_free(s->vhost_net);
+> +    }
+> +    s->vhost_net = net;
+> +    /* check the device id for vdpa */
+
+
+The comment could be removed as well.
+
+
+> +    ret = vhost_vdpa_check_device_id(ncs);
+> +    if (ret) {
+> +        goto err;
+> +    }
+> +    return 0;
+> +err:
+> +    if (net) {
+> +        vhost_net_cleanup(net);
+> +    }
+> +    vhost_vdpa_del(ncs);
+> +    return -1;
+> +}
+> +
+> +static void vhost_vdpa_cleanup(NetClientState *nc)
+> +{
+> +    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +
+> +    if (s->vhost_net) {
+> +        vhost_net_cleanup(s->vhost_net);
+> +        g_free(s->vhost_net);
+> +        s->vhost_net = NULL;
+> +    }
+> +
+> +    qemu_purge_queued_packets(nc);
+
+
+Why this is needed?
+
+Thanks
+
+
+> +}
+> +
+> +static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
+> +{
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +
+> +    return true;
+> +}
+> +
+> +static bool vhost_vdpa_has_ufo(NetClientState *nc)
+> +{
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +    uint64_t  features = 0;
+> +
+> +    features |= (1ULL << VIRTIO_NET_F_HOST_UFO);
+> +    features = vhost_net_get_features(s->vhost_net, features);
+> +    return !!(features & (1ULL << VIRTIO_NET_F_HOST_UFO));
+> +
+> +}
+> +
+> +static NetClientInfo net_vhost_vdpa_info = {
+> +        .type = NET_CLIENT_DRIVER_VHOST_VDPA,
+> +        .size = sizeof(VhostVDPAState),
+> +        .cleanup = vhost_vdpa_cleanup,
+> +        .has_vnet_hdr = vhost_vdpa_has_vnet_hdr,
+> +        .has_ufo = vhost_vdpa_has_ufo,
+> +};
+> +
+> +static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
+> +                               const char *name, const char *vhostdev,
+> +                               bool has_fd, char *fd)
+> +{
+> +    NetClientState *nc = NULL;
+> +    VhostVDPAState *s;
+> +    int vdpa_device_fd = -1;
+> +    Error *err = NULL;
+> +    int ret = 0;
+> +    assert(name);
+> +
+> +    nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
+> +    snprintf(nc->info_str, sizeof(nc->info_str), "vhost-vdpa");
+> +    nc->queue_index = 0;
+> +
+> +    s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +
+> +    if (has_fd) {
+> +        vdpa_device_fd = monitor_fd_param(cur_mon, fd, &err);
+> +    } else{
+> +        vdpa_device_fd = open(vhostdev, O_RDWR);
+> +    }
+> +
+> +    if (vdpa_device_fd == -1) {
+> +        return -errno;
+> +    }
+> +    s->vhost_vdpa.device_fd = vdpa_device_fd;
+> +    ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
+> +    assert(s->vhost_net);
+> +
+> +    if (ret) {
+> +        if (has_fd) {
+> +            close(vdpa_device_fd);
+> +        }
+> +    }
+> +    return ret;
+> +}
+> +
+> +static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
+> +{
+> +    const char *name = opaque;
+> +    const char *driver, *netdev;
+> +
+> +    driver = qemu_opt_get(opts, "driver");
+> +    netdev = qemu_opt_get(opts, "netdev");
+> +    if (!driver || !netdev) {
+> +        return 0;
+> +    }
+> +
+> +    if (strcmp(netdev, name) == 0 &&
+> +        !g_str_has_prefix(driver, "virtio-net-")) {
+> +        error_setg(errp, "vhost-vdpa requires frontend driver virtio-net-*");
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+> +                        NetClientState *peer, Error **errp)
+> +{
+> +    const NetdevVhostVDPAOptions *opts;
+> +
+> +    assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+> +    opts = &netdev->u.vhost_vdpa;
+> +    /* verify net frontend */
+> +    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_net,
+> +                          (char *)name, errp)) {
+> +        return -1;
+> +    }
+> +    return net_vhost_vdpa_init(peer, "vhost_vdpa", name, opts->vhostdev,
+> +                    opts->has_fd, opts->fd);
+> +}
+> diff --git a/qapi/net.json b/qapi/net.json
+> index cebb1b52e3..37507ce9ba 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -428,6 +428,27 @@
+>       '*vhostforce':    'bool',
+>       '*queues':        'int' } }
+>   
+> +##
+> +# @NetdevVhostVDPAOptions:
+> +#
+> +# Vhost-vdpa network backend
+> +#
+> +# @vhostdev: name of a vdpa dev path in sysfs
+> +#            (default path:/dev/vhost-vdpa-$ID)
+> +#
+> +# @fd: file descriptor of an already opened vdpa device
+> +#
+> +# @queues: number of queues to be created for multiqueue vhost-vdpa
+> +#          (default: 1)
+> +#
+> +# Since: 5.1
+> +##
+> +{ 'struct': 'NetdevVhostVDPAOptions',
+> +  'data': {
+> +    '*vhostdev':     'str',
+> +    '*fd':           'str',
+> +    '*queues':       'int' } }
+> +
+>   ##
+>   # @NetClientDriver:
+>   #
+> @@ -437,7 +458,7 @@
+>   ##
+>   { 'enum': 'NetClientDriver',
+>     'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+> +            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
+>   
+>   ##
+>   # @Netdev:
+> @@ -465,7 +486,8 @@
+>       'bridge':   'NetdevBridgeOptions',
+>       'hubport':  'NetdevHubPortOptions',
+>       'netmap':   'NetdevNetmapOptions',
+> -    'vhost-user': 'NetdevVhostUserOptions' } }
+> +    'vhost-user': 'NetdevVhostUserOptions',
+> +    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
+>   
+>   ##
+>   # @NetLegacy:
 
 
