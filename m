@@ -2,130 +2,54 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA843C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A3CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:39:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79A7620679
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:38:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bE9GzoPX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A7620679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B122E20679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:39:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B122E20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgUWn-0001AC-NY
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33682)
+	id 1jgUYH-0003dc-02
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:39:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgUVR-0007hW-Vr
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:36:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43538
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgUVQ-0005lu-9I
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:36:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591194995;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jShcf6r14QddKNgr+dD5dhGl+o2Cd2OLCwje7MJIWkg=;
- b=bE9GzoPXYt722kHENreU+AYN3I1GZ9CyGZOwhvATmUM+TLPQ8ZjvbmqPJsyxfrBQcR+SR6
- BpdjIdb+YOmxNgBdqF9wvO9WfTDrob9xMqDuX/tFB9Hvh1gEmFbaQuJ772A6GeVTvLX/k1
- sGf+nDOXk1U1P6DXrF3e38Cl4BIdlaI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-8-D7DFelMiKYM4cX37_6bg-1; Wed, 03 Jun 2020 10:36:31 -0400
-X-MC-Unique: 8-D7DFelMiKYM4cX37_6bg-1
-Received: by mail-wm1-f69.google.com with SMTP id v23so953282wmj.0
- for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 07:36:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=jShcf6r14QddKNgr+dD5dhGl+o2Cd2OLCwje7MJIWkg=;
- b=G1cTKK2W9m+BBSqCs35gdsO7UMDqU0njFkxTe4GhTjksfeh85vJ/16h6rFW1DTGHlj
- fKUlFef38FcythtJilhI7d6UNuO/Ksq39mNxqYJtcW0k7LtgjhegYHtTGzx8rrgh0meu
- 7tQ7vaYmEtuyAkIB2XYfD7nr3BNj6ISpezFO7PJyzju51YYaeqE641NA0R/8dsU6DtJu
- UGNZXQdlWIRdZiQoQlScRQ8zErxJGu0+JM4AmeRHSvgoWNqdwf4SunR7iopwe3+DI95u
- qtx4Y5luct0CEH/7/xje+r0DZcr+eSEVHPV41gCrnwLXZWUsJu010ExUVnAC7AgSccZx
- M4UQ==
-X-Gm-Message-State: AOAM530yFtjvY94IwlXnWuu4IQOreW5bO/IQ+hUXWR1e4KSAejtQlJOo
- 9sCDvH+DDaYqH3KvxksjfyIgNPx1pRWzhcDevP1OL0yrDv+H3jWdpMVjnO7nfbuw38GjWmorBQ5
- vmE9goq8uQYyNe8I=
-X-Received: by 2002:adf:c6c5:: with SMTP id c5mr22074362wrh.13.1591194990106; 
- Wed, 03 Jun 2020 07:36:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPutnxG1HHD8y19dFBrP6wucJatLWt1wRleaIoIPFcdgVbjmkKG2Ls4DhLT5gM07jYZ24Ntw==
-X-Received: by 2002:adf:c6c5:: with SMTP id c5mr22074348wrh.13.1591194989915; 
- Wed, 03 Jun 2020 07:36:29 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id t8sm3139950wmi.46.2020.06.03.07.36.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 03 Jun 2020 07:36:29 -0700 (PDT)
-Subject: Re: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for
- MacOS
-To: Justin Hibbits <chmeeedalf@gmail.com>
-References: <CA+XhMqwH6btbKFD0Ei47e+QHN2eBPG5H2PTS92MAje2Tij4Y=A@mail.gmail.com>
- <76587685-fa03-6dd6-5ca3-caeaf3c7504b@redhat.com>
- <20200603090921.64351a28@titan.knownspace>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <4e3b6904-5dfe-0608-88e9-2e051265fcd2@redhat.com>
-Date: Wed, 3 Jun 2020 16:36:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200603090921.64351a28@titan.knownspace>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jgUXa-0002d6-DO; Wed, 03 Jun 2020 10:38:50 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60350 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jgUXY-0005yE-0g; Wed, 03 Jun 2020 10:38:49 -0400
+Received: from [192.168.15.173] (helo=iris.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <den@openvz.org>)
+ id 1jgUXP-00043t-E6; Wed, 03 Jun 2020 17:38:39 +0300
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 1/1] block: propagate discard alignment from format drivers to
+ the guest
+Date: Wed,  3 Jun 2020 17:38:40 +0300
+Message-Id: <20200603143840.31856-1-den@openvz.org>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
+ helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 10:38:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,81 +62,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
- qemu-devel@nongnu.org, John Arbuckle <programmingkidx@gmail.com>,
- David CARLIER <devnexen@gmail.com>, Izik Eidus <izik@veertu.com>,
- pbonzini@redhat.com, Mikhail Gusarov <dottedmag@dottedmag.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/3/20 4:09 PM, Justin Hibbits wrote:
-> On Wed, 3 Jun 2020 08:08:42 +0200
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
-> 
->> Cc'ing more developers.
->>
->> On 5/26/20 10:40 PM, David CARLIER wrote:
->>> From b24a6702beb2a4e2a9c1c03b69c6d1dd07d4cf08 Mon Sep 17 00:00:00
->>> 2001 From: David Carlier <devnexen@gmail.com>
->>> Date: Tue, 26 May 2020 21:35:27 +0100
->>> Subject: [PATCH] util/oslib: current process full path resolution
->>> on MacOS
->>>
->>> Using existing libproc to fill the path.
->>>
->>> Signed-off-by: David Carlier <devnexen@gmail.com>
->>> ---
->>>  util/oslib-posix.c | 13 +++++++++++++
->>>  1 file changed, 13 insertions(+)
->>>
->>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->>> index 062236a1ab..96f0405ee6 100644
->>> --- a/util/oslib-posix.c
->>> +++ b/util/oslib-posix.c
->>> @@ -55,6 +55,10 @@
->>>  #include <sys/sysctl.h>
->>>  #endif
->>>
->>> +#ifdef __APPLE__
->>> +#include <libproc.h>
->>> +#endif
->>> +
->>>  #include "qemu/mmap-alloc.h"
->>>
->>>  #ifdef CONFIG_DEBUG_STACK_USAGE
->>> @@ -366,6 +370,15 @@ void qemu_init_exec_dir(const char *argv0)
->>>              p = buf;
->>>          }
->>>      }
->>> +#elif defined(__APPLE__)
->>> +    {
->>> +        uint32_t len;
->>> +        len = proc_pidpath(getpid(), buf, sizeof(buf) - 1);
->>> +        if (len > 0) {
->>> +            buf[len] = 0;
->>> +            p = buf;
->>> +        }
->>> +    }
->>>  #endif
->>>      /* If we don't have any way of figuring out the actual
->>> executable location then try argv[0].  */
->>>   
->>
-> 
-> Apologies, I don't have context for this.  Why was I CC'd on this?
+Nowaday SCSI drivers in guests are able to align UNMAP requests before
+sending to the device. Right now QEMU provides an ability to set
+this via "discard_granularity" property of the block device which could
+be used by management layer.
 
-I did after finding this patch of yours:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg639033.html
+Though, in particular, from the point of QEMU, there is
+pdiscard_granularity on the format driver level, f.e. on QCOW2 or iSCSI.
+It would be beneficial to pass this value as a default for this
+property.
 
-> 
-> Does proc_pidpath() not NUL-terminate its written string?  And, given
-> from my quick google search, it looks like this function is private and
-> subject to change, so can you guarantee that the returned length is the
-> *written* length, not the full string length?  If not, you could be
-> overwriting other arbitrary data.
-> 
-> - Justin
-> 
+Technically this should reduce the amount of use less UNMAP requests
+from the guest to the host. Basic test confirms this. Fedora 31 guest
+during 'fstrim /' on 32 Gb disk has issued 401/415 requests with/without
+proper alignment to QEMU.
+
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+CC: John Snow <jsnow@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Fam Zheng <fam@euphon.net>
+---
+ block/block-backend.c          | 11 +++++++++++
+ hw/core/machine.c              | 15 ++++++++++++++-
+ hw/ide/qdev.c                  |  3 ++-
+ hw/scsi/scsi-disk.c            |  5 ++++-
+ include/hw/block/block.h       |  2 +-
+ include/sysemu/block-backend.h |  6 ++++++
+ 6 files changed, 38 insertions(+), 4 deletions(-)
+
+Changes from v1:
+- fixed typos in description
+- added machine type compatibility layer as suggested by Kevin
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 6936b25c83..9342a475cb 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2222,6 +2222,17 @@ int blk_probe_geometry(BlockBackend *blk, HDGeometry *geo)
+     return bdrv_probe_geometry(blk_bs(blk), geo);
+ }
+ 
++int blk_discard_granularity(BlockBackend *blk)
++{
++    BlockDriverState *bs = blk_bs(blk);
++
++    if (bs == NULL) {
++        return DEFAULT_DISCARD_GRANULARITY;
++    }
++
++    return bs->bl.pdiscard_alignment;
++}
++
+ /*
+  * Updates the BlockBackendRootState object with data from the currently
+  * attached BlockDriverState.
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index bb3a7b18b1..08a242d606 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,7 +28,20 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+ 
+-GlobalProperty hw_compat_5_0[] = {};
++GlobalProperty hw_compat_5_0[] = {
++    { "ide-cd", "discard_granularity", "0xffffffff" },
++    { "ide-hd", "discard_granularity", "0xffffffff" },
++    { "ide-drive", "discard_granularity", "0xffffffff" },
++    { "scsi-hd", "discard_granularity", "0xffffffff" },
++    { "scsi-cd", "discard_granularity", "0xffffffff" },
++    { "scsi-disk", "discard_granularity", "0xffffffff" },
++    { "virtio-blk-pci", "discard_granularity", "0xffffffff" },
++    { "xen-block", "discard_granularity", "0xffffffff" },
++    { "usb-storage", "discard_granularity", "0xffffffff" },
++    { "swim-drive", "discard_granularity", "0xffffffff" },
++    { "floppy", "discard_granularity", "0xffffffff" },
++    { "nvme", "discard_granularity", "0xffffffff" },
++};
+ const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+ 
+ GlobalProperty hw_compat_4_2[] = {
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 06b11583f5..e515dbeb0e 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -179,7 +179,8 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+         }
+     }
+ 
+-    if (dev->conf.discard_granularity == -1) {
++    if (dev->conf.discard_granularity == -1 ||
++        dev->conf.discard_granularity == -2) {
+         dev->conf.discard_granularity = 512;
+     } else if (dev->conf.discard_granularity &&
+                dev->conf.discard_granularity != 512) {
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 387503e11b..6b809608e4 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -48,7 +48,6 @@
+ #define SCSI_MAX_INQUIRY_LEN        256
+ #define SCSI_MAX_MODE_LEN           256
+ 
+-#define DEFAULT_DISCARD_GRANULARITY (4 * KiB)
+ #define DEFAULT_MAX_UNMAP_SIZE      (1 * GiB)
+ #define DEFAULT_MAX_IO_SIZE         INT_MAX     /* 2 GB - 1 block */
+ 
+@@ -2381,6 +2380,10 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+     if (s->qdev.conf.discard_granularity == -1) {
+         s->qdev.conf.discard_granularity =
+             MAX(s->qdev.conf.logical_block_size, DEFAULT_DISCARD_GRANULARITY);
++    } else if (s->qdev.conf.discard_granularity == -2) {
++        s->qdev.conf.discard_granularity =
++            MAX(s->qdev.conf.logical_block_size,
++                blk_discard_granularity(s->qdev.conf.blk));
+     }
+ 
+     if (!s->version) {
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index d7246f3862..53d4a38044 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -54,7 +54,7 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+     DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+     DEFINE_PROP_UINT32("discard_granularity", _state,                   \
+-                       _conf.discard_granularity, -1),                  \
++                       _conf.discard_granularity, -2),                  \
+     DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           \
+                             ON_OFF_AUTO_AUTO),                          \
+     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 8203d7f6f9..241a759432 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -13,6 +13,7 @@
+ #ifndef BLOCK_BACKEND_H
+ #define BLOCK_BACKEND_H
+ 
++#include "qemu/units.h"
+ #include "qemu/iov.h"
+ #include "block/throttle-groups.h"
+ 
+@@ -25,6 +26,10 @@
+  */
+ #include "block/block.h"
+ 
++
++#define DEFAULT_DISCARD_GRANULARITY (4 * KiB)
++
++
+ /* Callbacks for block device models */
+ typedef struct BlockDevOps {
+     /*
+@@ -246,6 +251,7 @@ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+ int blk_load_vmstate(BlockBackend *blk, uint8_t *buf, int64_t pos, int size);
+ int blk_probe_blocksizes(BlockBackend *blk, BlockSizes *bsz);
+ int blk_probe_geometry(BlockBackend *blk, HDGeometry *geo);
++int blk_discard_granularity(BlockBackend *blk);
+ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
+                                   BlockCompletionFunc *cb,
+                                   void *opaque, int ret);
+-- 
+2.17.1
 
 
