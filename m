@@ -2,133 +2,94 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1532FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BA1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95BC720679
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:26:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACBB120679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OF2OW+AV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95BC720679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NV+uDE0/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBB120679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgQbj-0005Mv-JR
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 06:26:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56014)
+	id 1jgQcj-0006dm-00
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 06:27:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgQaf-0004bl-1F
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgQag-0004cy-AZ
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 06:25:46 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:35217)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgQac-0002j7-2i
  for qemu-devel@nongnu.org; Wed, 03 Jun 2020 06:25:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52605
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgQac-0002iz-4r
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 06:25:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591179939;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=pux3LW7BFkI5cJ9ItmoK2BPp3sa7Ux7FowOXzS17mOo=;
- b=OF2OW+AVs96FdQts83jPoFgmngRaTzDh98yZy2eihwrmKHPsDamJeQhg94bmkkrS0KgjsZ
- foYF+JTfM1lvTUfIjfbUQIAaN3tMEMld1urvJN1UNCbjTKieDQYqL7tET7rJn2XVa3rZG+
- ktNpUD6KMT60I/QXI8u/SKQd3oQ6Qns=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-evr-C5cKMVyh-JT0sdcaWQ-1; Wed, 03 Jun 2020 06:25:38 -0400
-X-MC-Unique: evr-C5cKMVyh-JT0sdcaWQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5F0B805738;
- Wed,  3 Jun 2020 10:25:36 +0000 (UTC)
-Received: from [10.36.113.192] (ovpn-113-192.ams2.redhat.com [10.36.113.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F2D3E10013C3;
- Wed,  3 Jun 2020 10:25:32 +0000 (UTC)
-Subject: Re: [PULL 04/12] hmp: Simplify qom-set
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200601184004.272784-1-dgilbert@redhat.com>
- <20200601184004.272784-5-dgilbert@redhat.com>
- <87pnai7ymz.fsf@dusky.pond.sub.org> <20200602092601.GD2758@work-vm>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <847cb8b5-1507-46cf-495a-952d41a3c2b2@redhat.com>
-Date: Wed, 3 Jun 2020 12:25:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: by mail-wr1-x429.google.com with SMTP id x14so1773160wrp.2
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 03:25:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=yM7ccoOjIlHcfCrTHErjg5t21HrhgQH2bwHf/Gyv8p8=;
+ b=NV+uDE0/uGe1EbJxIUCkYYSMf0l+WuXQqPEsDM+M/SVKcCXmC4fjLEOVAXDO99Qtbo
+ fUAa01MTcKlhoFLHKtxBI5+ka477QgJ8pSucsYb6wOvDgVWHcvItBS51Ao1wOmV82/7u
+ J8Hofviwywdl6KzdyI16/lxZzKQ2VnabVGhEev9Klw3WHUIiMy5Ms/4icKkQ/XM6EWsU
+ YhG/mkw8kCr5qjUeqdbODkGX58oZhivvD5JKfSVYw+61H38KFcijGMiQr6cGObyT2+di
+ we8+NuzuvlEoB6/Zz9XGW14t0KdHW14zn5hcFsYR+FJowH77Sk6UhWDEdsuVclQnhR4N
+ UKlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=yM7ccoOjIlHcfCrTHErjg5t21HrhgQH2bwHf/Gyv8p8=;
+ b=tswXhpTx2l9FcUiGlbLWNBZC7kIuX7p3DO0EcrU7M2jZKy0nYIMZhd+f8uNGwu0AGO
+ R72/kiOiLM/qEM+nsHPO+OtsSZQ1OE7zZHxBm+9bWPRoarHSdBLGZGPTGEEStxMj3Ckd
+ XyyqOpf4aHZs1AmKT2DE2oxcQa4pm/BjB/qlPpRWZBwIwty60QT4gOuwzAbJHYbtNdUt
+ 1pGFmU5n6u2e/a78z65fimhSg95f4eubuULNzvY/LY3PsMZz+j2jszvpRB+/4/WRaERQ
+ ekRiC37dz3TvymEcmSk59yUU+eNDJPy+q1c0e7Tj/lCDZGNyd9pvRhhlGRkysJ2FYTHP
+ jivA==
+X-Gm-Message-State: AOAM530QliBq6kNadNy3uwCyWDJ1sLtoTVFj1VI8WH5t70PJL5CjA8pS
+ EeRv77QaokXgbhIjzWUjwTbmXQ==
+X-Google-Smtp-Source: ABdhPJwWTtCivqFZyliyxQfq3VNVovMnG1KTUWR67REDWrCaCLDwpWWT5G2UHn+5VyPbv5ZNmB8guA==
+X-Received: by 2002:adf:f58b:: with SMTP id f11mr30473772wro.155.1591179939643; 
+ Wed, 03 Jun 2020 03:25:39 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j5sm2692786wrm.57.2020.06.03.03.25.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 03 Jun 2020 03:25:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 449C91FF7E;
+ Wed,  3 Jun 2020 11:25:36 +0100 (BST)
+References: <20200603095137.lt6dafpqpa4jzx2n@schnipp-desktop>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: Re: How do I add my tcg tests to check-tcg?
+In-reply-to: <20200603095137.lt6dafpqpa4jzx2n@schnipp-desktop>
+Date: Wed, 03 Jun 2020 11:25:36 +0100
+Message-ID: <87v9k85tun.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200602092601.GD2758@work-vm>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:04:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,53 +102,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mszeredi@redhat.com, lukasstraub2@web.de, quintela@redhat.com,
- pannengyuan@huawei.com, qemu-devel@nongnu.org, f4bug@amsat.org,
- stefanha@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02.06.20 11:26, Dr. David Alan Gilbert wrote:
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
->>
->>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>
->>> Simplify qom_set by making it use qmp_qom_set and the JSON parser.
->>>
->>> (qemu) qom-get /machine smm
->>> "auto"
->>> (qemu) qom-set /machine smm "auto"
->>>
->>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> Message-Id: <20200520151108.160598-3-dgilbert@redhat.com>
->>> Reviewed-by: Philippe Mathieu-DaudÃƒÂ© <philmd@redhat.com>
->>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>   With 's'->'S' type change suggested by Paolo and Markus
->>
->> This is actually more than just simplification, it's disarming a bear
->> trap: the string visitor is restricted to a subset of the QAPI types,
->> and when you qom-set a property with a type it can't handle, QEMU
->> aborts.  I mentioned this in the discussion of possible ways out of the
->> qom-get impasse, but missed reraising it in patch review.
->>
->> A suitably amended commit would be nice, but respinning the PR just for
->> that may not be worthwhile.
-> 
-> A bit late; still as long as we're removing bear traps not adding them.
 
-This breaks qom-set for my (virtio-mem) use case:
+Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
 
-echo "qom-set vm0 requested-size 300M" | sudo nc -U /var/tmp/mon_src
-QEMU 5.0.50 monitor - type 'help' for more information
-(qemu) qom-set vm0 requested-size 300M
-Error: Expecting at most one JSON value
+> Hi Alex,
+>
+> I have some time again to integrate my tcg tests patch for TriCore [1]. H=
+owever,
+> I'm struggeling a bit to get through the details of the Makefiles. I'm as=
+suming
+> the right rule to run is 'make check-tcg'. I tried running that for
+> xtensa-softmmu, arm-softmmu, and aarch64-softmmu, but they are always ski=
+pped.
+> Digging into the Makefiles I found that there is some way to use the dock=
+erfiles
+> to run the test. Can someone elighten me on how to properly use this?
 
--- 
-Thanks,
+The configure script in tests/tcg/configure.sh will probe for available
+cross compilers (or take a passed in one). Failing that you can fall
+back to a docker image which has the compilers included.
 
-David / dhildenb
+The result should end up in:
+  $(BUILD_DIR)/tests/tcg/config-$(PROBE_TARGET).mak
 
+Assuming you have a CROSS_CC_GUEST or DOCKER_IMAGE and
+DOCKER_CROSS_CC_GUEST defined there the makefiles should allow building
+of the tests.
+
+For linux-user we include the tests/tcg/multiarch/Makefile.target as
+well as the target specific one. The CC variable should already be setup
+to build either via docker or using the installed setup.
+
+We don't have a linker or assembler in the tooling so everything is
+invoked via the compiler with the appropriate flags to call the
+sub-tools if required. Most rules are single file compile and link.
+
+For softmmu tests things are a bit more bespoke. The tooling will make
+sure things are setup and then include
+tests/tcg/multiarch/system/Makefile.softmmu-target and=20
+tests/tcg/$ARCH/Makefile.softmmu-target. The main purpose of the arch
+specific Makefile is to provide the appropriate build instructions to
+build a system image for the multiarch tests and any target specific
+tests.
+
+To support the multiarch tests you need a boot.S and a kernel.ld that
+defines a simple boot and a __sys_outc helper function. There is a
+minilib which provides for a basic printf like output. The boot should
+call main and then return the int code via some mechanism to signal the
+pass/fail of the test. For aarch64 this is done with semihosting.
+
+Please let me know if you have any more questions.
+
+>
+> Thanks and cheers,
+> Bastian
+>
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg00074.html
+
+
+--=20
+Alex Benn=C3=A9e
 
