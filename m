@@ -2,95 +2,96 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C356C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D35C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:27:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4709C20659
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AE2320679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:27:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IpsGYu4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4709C20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="POMB9JDJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE2320679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgWDa-0004ws-FN
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46864)
+	id 1jgWF1-00076b-Es
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:27:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgW9C-00070Q-2I
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:21:46 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:35001)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgW9B-0005qc-4Z
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:21:45 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id o6so2108322pgh.2
- for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 09:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=msmLFa3O+w7t96a3nOWC8TF3c0RLdvg1TLuU9z9XynE=;
- b=IpsGYu4LkRRbavjuxO/67eEiW2+2+UQR2hFFSw58LWF8lLK3WLCekuZcLY7XzrdLqi
- V7PaGZRoXhKqbBcU9iCIVgNY89acIyRYvSTAp0QLl0rqzJ7bAEhAakhOFjjp/7vMgOgH
- 6uJ8MSAnLvMe1v2BXODkG+UpCu4AvJ/mpvegwaVeIKEWAAGWbSWpVdX5HyKEcvw1q4Gm
- HGJ6DP9e3OPvNV0bm4CuhrVPPiLgvR2e42Sh97uQCiA+6cbb+11GGCQelIIRewuQJ9co
- BVAhQ7XJtoA56cSmrCoSeo460PGzFFAKwtXy8cqnNHe+rLaoVbZZSJpGpYlGQxw6FK+A
- uByw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=msmLFa3O+w7t96a3nOWC8TF3c0RLdvg1TLuU9z9XynE=;
- b=V2ou/C5EHV4pwGg75ZG4Swk96Cv93kW9HIjKFx3VBiQj/xFFk2hRO6gmJ2o2GI/gdp
- gh25UGkclL9m+2ve6KppUygn2Pmo7yNOLU4Ai3QMGVc6gkXJ/pbM/lYJRDGIb/1YzNb0
- 9tXyFFt/s3hSAcCU0kkT8EKMXMeavc15ec/CH3lo8Oh6RE/099iNPr61hGFvEytfb8Nn
- 18C1NpFs2Olk8G6PVv75SE1mx8ae9KCr+zYooi9KxgeQXgBjOyiFWtsbkBUN2ZYwJ+VJ
- N34KK6AQiiGqOecCPmliJ6X+TB++C6ZAyDsrEaR5hX20slb72FJe9brK++dyEpiLfQLW
- yfdw==
-X-Gm-Message-State: AOAM532Yt2x95I+1FWuIvxahAWdADg8stRGwhQNo80W3D0ttA/cFq5y8
- vBxFDIy8xQzQ0DygN/5tg3+bfA==
-X-Google-Smtp-Source: ABdhPJwtWTpa8k+i0dZgo2J2WXhpr57ql4qPrALHfIfnaf4NgAJb9BDAaUrJm7GCcQoHO0W6bwoSGQ==
-X-Received: by 2002:a62:b402:: with SMTP id h2mr32230980pfn.221.1591201303590; 
- Wed, 03 Jun 2020 09:21:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id d5sm259555pju.4.2020.06.03.09.21.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 03 Jun 2020 09:21:42 -0700 (PDT)
-Subject: Re: another tst-arm-mte bug: qemu-system segfaults
-To: Szabolcs Nagy <szabolcs.nagy@arm.com>
-References: <20200529120427.GB18623@arm.com>
- <9aa721e6-e72f-20bc-73b4-19fc3f493241@linaro.org>
- <20200603135053.GD21536@arm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7ca0e091-7797-12cd-0c6f-41e453580e0a@linaro.org>
-Date: Wed, 3 Jun 2020 09:21:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=416cc4bc0=alistair.francis@wdc.com>)
+ id 1jgWAF-0007hJ-PC
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:51 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49287)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=416cc4bc0=alistair.francis@wdc.com>)
+ id 1jgWAE-000625-PY
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1591201371; x=1622737371;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=ORE7QyYcMOsNvtsv4aawW11202e/vbLm4srPqvw5q60=;
+ b=POMB9JDJC+RqUKT7oRNVpmCuApG4enMK1PN5lpJ9Oe0d/laDilCynFv+
+ FAh654lgqinuVLm1kkYaiOH925Y7AzSnS7f56T7XD0SmYeTC8G4AJgsy2
+ gLakgMyhA6NLQqgzzEMRM636gxdfRiXN1rMsTOrXM8MeO9ypu6qnQz9PL
+ oRJmdXN/Zc0oRc+6RJMB67TiEePVvrH6tSw/TUUr901FAWNL9OIeZEckE
+ 1Z3bAfhkR7zsRudiw9s/Yd/9vp37YrUKRW8C5TyzUaMQD08Fgh/CW+Ysf
+ tXXfDfZi1ISXiDMhWLwxdWfg3d9rB0bZZqMGiG0uj00tENvdQSYZTEvln A==;
+IronPort-SDR: l715QZFRMjJEK6tMQoibHZpmIoUhZxqgR1myE1VlM8RRKTnb61H/kBR3B+ZAwZ2/h7qA8Sbfp8
+ rGzB8z79yOCbJ4mOhRiNaNfa5W0aAL0IFJZXmMHixx5XNUV2EjXCclgrh7+NvUxf1tSF+JR8/M
+ OLXaLe/ApJpxQ1hgM2i5QeA59UWIJTUZTYXVA+1VAf5PApkCntBUZmnb9r39ByWvrT9PG1R54E
+ vq8h5UMuTNGqC4gshjaK/3263anl7WRmdtTYmh7jlKT7EAbJ+2H+Wp+XTv86q3Mm29FNOuWFmf
+ fjs=
+X-IronPort-AV: E=Sophos;i="5.73,468,1583164800"; d="scan'208";a="143451360"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Jun 2020 00:22:41 +0800
+IronPort-SDR: zkpshR5Fj4ZWu+Nq5u/vYWpXBQYV5l09qjSC0TJs6OVG6Md++c8z4wVjWgqKaeousY1W6uX8+P
+ nv9f0YWpklvpvooFQq0gCuZQG2PpZ0L2w=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Jun 2020 09:11:46 -0700
+IronPort-SDR: m+akeVPDYEp1yj8EzI7aBcd3oHiEjprWTzBk0VNv07WwAlrwRRrsbqDA1tLs+B0Cnc7hvnbafK
+ glnhmwTzGVOA==
+WDCIronportException: Internal
+Received: from cne220230.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.144])
+ by uls-op-cesaip02.wdc.com with ESMTP; 03 Jun 2020 09:22:40 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL 03/15] hw/riscv: sifive_u: Remove the riscv_ prefix of the soc*
+ functions
+Date: Wed,  3 Jun 2020 09:13:46 -0700
+Message-Id: <20200603161352.744204-4-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200603161352.744204-1-alistair.francis@wdc.com>
+References: <20200603161352.744204-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200603135053.GD21536@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=416cc4bc0=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 12:22:40
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,24 +105,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nd@arm.com, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/3/20 6:50 AM, Szabolcs Nagy wrote:
-> thanks my tests now get further but later i run into
-> the previous assert failure:
-> 
-> target/arm/mte_helper.c:97:allocation_tag_mem: assertion failed: (tag_size <= in_page)
-> 
-> i might be able to reduce it to a small reproducer
-> this time. i assume that will help.
+From: Bin Meng <bin.meng@windriver.com>
 
-Dang, I had hoped that the one fix would cover both -- it's definitely in the
-same area.  Yes, a small reproducer will help, but I will also try again with
-your larger reproducer.
+To keep consistency with the machine* functions, remove the riscv_
+prefix of the soc* functions.
 
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1590072147-13035-1-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1590072147-13035-1-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_u.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-r~
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 4299bdf480..f9fef2be91 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -481,7 +481,7 @@ static void sifive_u_machine_init_register_types(void)
+ 
+ type_init(sifive_u_machine_init_register_types)
+ 
+-static void riscv_sifive_u_soc_init(Object *obj)
++static void sifive_u_soc_instance_init(Object *obj)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+     SiFiveUSoCState *s = RISCV_U_SOC(obj);
+@@ -520,7 +520,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
+                           TYPE_CADENCE_GEM);
+ }
+ 
+-static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
++static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+     SiFiveUSoCState *s = RISCV_U_SOC(dev);
+@@ -635,32 +635,32 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+         memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+ }
+ 
+-static Property riscv_sifive_u_soc_props[] = {
++static Property sifive_u_soc_props[] = {
+     DEFINE_PROP_UINT32("serial", SiFiveUSoCState, serial, OTP_SERIAL),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+-static void riscv_sifive_u_soc_class_init(ObjectClass *oc, void *data)
++static void sifive_u_soc_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+-    device_class_set_props(dc, riscv_sifive_u_soc_props);
+-    dc->realize = riscv_sifive_u_soc_realize;
++    device_class_set_props(dc, sifive_u_soc_props);
++    dc->realize = sifive_u_soc_realize;
+     /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+     dc->user_creatable = false;
+ }
+ 
+-static const TypeInfo riscv_sifive_u_soc_type_info = {
++static const TypeInfo sifive_u_soc_type_info = {
+     .name = TYPE_RISCV_U_SOC,
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(SiFiveUSoCState),
+-    .instance_init = riscv_sifive_u_soc_init,
+-    .class_init = riscv_sifive_u_soc_class_init,
++    .instance_init = sifive_u_soc_instance_init,
++    .class_init = sifive_u_soc_class_init,
+ };
+ 
+-static void riscv_sifive_u_soc_register_types(void)
++static void sifive_u_soc_register_types(void)
+ {
+-    type_register_static(&riscv_sifive_u_soc_type_info);
++    type_register_static(&sifive_u_soc_type_info);
+ }
+ 
+-type_init(riscv_sifive_u_soc_register_types)
++type_init(sifive_u_soc_register_types)
+-- 
+2.26.2
+
 
