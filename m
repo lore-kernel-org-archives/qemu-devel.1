@@ -2,103 +2,65 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F047C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 00:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C39A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:05:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FD6C206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 00:47:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="wY3J5oII";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="svIqS5v8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD6C206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9256420663
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:05:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9256420663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgHYe-0004VG-Da
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 20:47:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42462)
+	id 1jgHqj-0000iX-QL
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jgHY3-0003xG-R1; Tue, 02 Jun 2020 20:46:27 -0400
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:38477)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgHq8-0008WK-EY; Tue, 02 Jun 2020 21:05:08 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59168 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jgHY2-0005sX-CC; Tue, 02 Jun 2020 20:46:27 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
- by mailout.west.internal (Postfix) with ESMTP id 2C82E642;
- Tue,  2 Jun 2020 20:46:23 -0400 (EDT)
-Received: from imap2 ([10.202.2.52])
- by compute3.internal (MEProxy); Tue, 02 Jun 2020 20:46:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type; s=fm2; bh=7Yr9sQZveh3RFZSr00zd/xCbOzSG4e2
- csVh5T9HsnJU=; b=wY3J5oIIxNkJpg4siTrGvC8LGKrYEAoaKqo4w18HsAtBVkL
- XhDnYOzCRIJm3HCC70gQxoFsqCRuMsqwOw+/mv4svm0H8l4uyXiMbFzqBDQ44isa
- 7jGahCcBaooN300fzLgunSnucX5eNOTXYOyuJllTUNpjQooAunWgvHdWHUEx0blX
- 4gow6bqIWPctz9eOcIH7i0ru8udAA7OmVM8H+kwtoS0XHaLsbZy2UIArGGp5PBjq
- G/D/wplLP/DQL/PR5sujHP8W8nWbkcHYkvfX2Lcs4t7h1Rl4QEE647f6f4ilQSSj
- YnsrIUKLnOXGEAMQ7Z7zoqEtZaxoBrbIpdmdRFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=7Yr9sQ
- Zveh3RFZSr00zd/xCbOzSG4e2csVh5T9HsnJU=; b=svIqS5v8T7cqMfIFcREKjj
- 1ffHiumk+WPUQ45j7qfAHpyHSVpmeWV6y89gwr5nGD2iSDOk6VoRAMJjXDHtL/LI
- G+mHr2bkv2skfCO1JVnKU/bWE5Xs6HaNFKAnhbaIdL3HjOr+msGbAAI77Ey8NCmy
- UERNat47pDDA8lriG4ZtCMpjgYUZINjVA6wb7QFAYzrkUAYP8kMaOM/KzY0DXPMR
- LXXdOVMKmp2CIuMgM0ELz+4xoIb3Ac8WslpcU1gXfUaNKeVo7LhXBLvqplbMKMR3
- +FF3liM53z0ovmVScdJm3M7qz6dLmFNvli2+QUSkgs8hEDrcBAFOgEpq5trgWuCQ
- ==
-X-ME-Sender: <xms:3fLWXnTlkOE_6J-HJUvZ8gSepzyVUE7yWCGHoezKnyvTrcc64K9dEw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudefkedgfeefucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdetnhgu
- rhgvficulfgvfhhfvghrhidfuceorghnughrvgifsegrjhdrihgurdgruheqnecuggftrf
- grthhtvghrnhephefhfeekgfekudevheffheeihedujeefjeevjeefudfgfeeutdeuvdeh
- hfevueffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
- eprghnughrvgifsegrjhdrihgurdgruh
-X-ME-Proxy: <xmx:3fLWXowGvp_rYhBqKlRIf3e8-Skd53g_nuFgX8-4lYo7oN9MuqwFvQ>
- <xmx:3fLWXs3pOiYU9aFwNyMLT-TKIfeUygPn6OY78Ko1XEeqMiQd6DE1ew>
- <xmx:3fLWXnAmA8kzdIIVKpWAQBbWBE7oVGcl8q_U2JzMPTYZR3QIGzqFwQ>
- <xmx:3vLWXjsIUriRek_ZUD9XGx3VQAnlW7GqVp1HJyIjkvioIn2C-Zo4XA>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 0BCEEE00C9; Tue,  2 Jun 2020 20:46:21 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-519-g0f677ba-fm-20200601.001-g0f677ba6
-Mime-Version: 1.0
-Message-Id: <e3d11c90-86d9-4daf-ba4c-9da98942e578@www.fastmail.com>
-In-Reply-To: <80e5403f-a842-4542-41d3-d1d8236af637@kaod.org>
-References: <20200602135050.593692-1-clg@kaod.org>
- <a46437ce-1be4-3c0a-8403-1c279ad8b90b@amsat.org>
- <80e5403f-a842-4542-41d3-d1d8236af637@kaod.org>
-Date: Wed, 03 Jun 2020 10:15:59 +0930
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "Peter Maydell" <peter.maydell@linaro.org>
-Subject: Re: [PATCH] docs/system: Document Aspeed boards
-Content-Type: text/plain
-Received-SPF: pass client-ip=64.147.123.20; envelope-from=andrew@aj.id.au;
- helo=wout4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 20:46:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgHq6-0002I6-LQ; Tue, 02 Jun 2020 21:05:08 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D7EBB57D5887912644D7;
+ Wed,  3 Jun 2020 09:04:52 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.233) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0;
+ Wed, 3 Jun 2020 09:04:42 +0800
+Subject: Re: [PATCH] target/arm/cpu: adjust virtual time for cortex series cpu
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200530092204.1746-1-fangying1@huawei.com>
+ <CAFEAcA91gsTpkeH6SVPoGKDFOgCJVxV=wvBOT57eagcYeMiarQ@mail.gmail.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <27efd94c-88fd-1166-fb94-fd3faa1d2e68@huawei.com>
+Date: Wed, 3 Jun 2020 09:04:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA91gsTpkeH6SVPoGKDFOgCJVxV=wvBOT57eagcYeMiarQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.233]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 21:04:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,30 +73,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Cameron Esfahani via <qemu-devel@nongnu.org>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, wu.wubin@huawei.com,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> 
-> >> + * Hash/Crypto Engine
-> >> + * PCI-Express 1 Controller
-> >> + * Graphic Display Controller
-> >> + * PECI Controller
-> >> + * MCTP Controller
-> >> + * Mailbox Controller
-> >> + * Virtual UART
-> > 
-> > Uh what is that? :)
-> 
-> It is the host console. 
-> 
 
-To explain a little more, a 16550-compatible set of registers are exposed to 
-both the host (via e.g. the LPC bus) and the BMC, but the FIFOs are shared and 
-the transmissions are nothing more than register writes/reads from each side. 
-There's no RS-232 involved, hence "Virtual" I guess.
 
-Andrew
+On 2020/6/1 20:41, Peter Maydell wrote:
+> On Sat, 30 May 2020 at 10:22, Ying Fang <fangying1@huawei.com> wrote:
+>>
+>> Virtual time adjustment was implemented for virt-5.0 machine type,
+>> but the cpu property was enabled only for host-passthrough and
+>> max cpu model. Let's add it for arm cortex series cpu which has
+>> the gernic timer feature enabled.
+>>
+>> Signed-off-by: Ying Fang <fangying1@huawei.com>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 32bec156f2..a564141b22 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1973,6 +1973,9 @@ static void cortex_a7_initfn(Object *obj)
+>>       cpu->ccsidr[1] = 0x201fe00a; /* 32K L1 icache */
+>>       cpu->ccsidr[2] = 0x711fe07a; /* 4096K L2 unified cache */
+>>       define_arm_cp_regs(cpu, cortexa15_cp_reginfo); /* Same as A15 */
+>> +    if (kvm_enabled()) {
+>> +        kvm_arm_add_vcpu_properties(obj);
+>> +    }
+>>   }
+> 
+> If we have the same bit of code in all these initfns,
+> that suggests we should probably actually be doing this
+> in some more generic place conditional on some cpu feature
+> or other test. The commit message suggests we should add
+> this property for every CPU which is using KVM and has
+> the generic timers, in which case we could perhaps
+> have the call to kvm_arm_add_vcpu_properties moved to
+> arm_cpu_post_init(), and then have the kvm_arm_add_vcpu_properties
+> function check the ARM_FEATURE_GENERIC_TIMER flag to see
+> whether to add the property or not.
+Thanks for pointing it out, to put kvm_arm_add_vcpu_properties into
+arm_cpu_post_init is much better.
+
+I will send a V2.
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
+Thanks
+Ying.
+
 
