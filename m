@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13ACFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:31:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65648C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:32:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C75FA2072F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:31:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E92D2072F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:32:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KEhc8Qj2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C75FA2072F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mmp5lRt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E92D2072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgIG1-0005x1-26
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:31:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48994)
+	id 1jgIGe-00079v-ED
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:32:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyo-0004w3-B2
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:06 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:36607)
+ id 1jgHyx-0005Nx-G4
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:15 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44494)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHym-0003fe-Ac
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:05 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id t7so572829pgt.3
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:03 -0700 (PDT)
+ id 1jgHyw-0003iC-Bl
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:15 -0400
+Received: by mail-pg1-x544.google.com with SMTP id p30so526560pgl.11
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XUP7fLUyNu7aJ/azDCnH0EjQhulMay9kUPV+jtINGnw=;
- b=KEhc8Qj2H4cBL5zFIOrVv9smT58yCnDEJXTViSyMCmY9+AOVN1BsJ4weduNBFWPhG9
- piPoZgYCuqFNUCpWvpxEFEslyb4xCtSJDiYydrPrpPW8ms1hfWMMeNfPdLGR/7AII8+0
- WRMx0SKOtycAAfkFyq8Vt/2ueBlxcsiItj6e9jX3IVN1WLEQxDfgC65AztwWx8DE2RVB
- xnLEpbxgMSKt7A2N5aYPYvl8jcdB55dmzBksTee5aX+hHAcc3fKQ1zA1IOTOKdfhope2
- a/e6VPCDKXHsoKG9UQrHeYKEYqnxySOoLCqq+5SEvHAPI9alD/uW+NPXM7Pm0uTvv6Qr
- AVcg==
+ bh=pJfY0SD5Bvg4zcu/wLj7Ethd3vdK/dfygcX+yAzAWwA=;
+ b=mmp5lRt3osAcx6TYFx/zaDZMVAWtr4g5vJ21BqwyqI/6hEjZR+CJH7PLrbSRRT7V4Q
+ cQoteJ4MTtKe0TbI+Cd9C7qeyIZuwJpYT6cy0U4ZfVZjVLOKU4Dh85XGtR/VvXFJrrwg
+ ityZISOOlnnjYVs1brt2+LTnvBTPA4s5rJtyrvGBfzrj73Vib/sV0yaq5MMJmBUfxFwS
+ jqRxQA4QghZGOe6e8Mc8dsvvMEqxvos/CTcqQHEvrwP4AAHSpMtK08xube7R9Tv1zEcL
+ zMmKq7k2vbjgQO/DdjsEQYPmJcPBMDHRYv/8Fc6+S0dc8p1T+2Wgr9xH58TGtsqEOGXh
+ 3P8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XUP7fLUyNu7aJ/azDCnH0EjQhulMay9kUPV+jtINGnw=;
- b=QMpBkbrh1tFI5xgmjHjJ5mO46MCQIGkzLXiyYEB6F14yktHSqNr2zatfEEspoHsJmr
- Us5u0hMpn32Iuihgtku8mIekFBkClSHwyTITg7TWeXPoDbnYpAlhbWjzQU96w41s/fEM
- wbZPgK/q51bZuSkOM1rPgz8ymtb/bkqQY3+fKrvzS86XQC9mstnXqIuV0u7rLkQWe6D7
- K5zvCJiJ7CabPSH2SUkIwSN65EFepTCAUrVEKbfbEVPtT1ESNKmpL53OpEwM8IJJC3d3
- JHB92R1lRdALxeLdq2LZUBgmk5tDpaevYdF4cdvxnKLjawQjH8zqdLK6r3imIlyaRv+9
- 0iUg==
-X-Gm-Message-State: AOAM533cH/h1myFcHNydif9wnurXBnI3FhwaG14FykGzeh2pBEUVhntA
- Z8Cas/bcX/LwSBDCtFJnLmlq8GrK2gI=
-X-Google-Smtp-Source: ABdhPJyjDTTP8TroAWBENOvING8jbh/Icx6r9gHMobJxv7cxWPol2aLcVWuDFsMiaTWVwJuqugWY4Q==
-X-Received: by 2002:a63:5f11:: with SMTP id t17mr25479831pgb.177.1591146842122; 
- Tue, 02 Jun 2020 18:14:02 -0700 (PDT)
+ bh=pJfY0SD5Bvg4zcu/wLj7Ethd3vdK/dfygcX+yAzAWwA=;
+ b=mslfA4v21IWic9a6YWDzSJF/7PZOQvpezbitTwGbRQIBqaiXxTh+ulac+DSNAQGyCk
+ 8BfBEqBRiQKtVkRfcGkuYvC8Z9Q5vHHnVraQiAyOQAPhirrWG31pJZxz3W4PQd2GDCe9
+ QiGR8+G53Cl+cGy93Sbnfv4fAojV6dFsgl/kburBaAeYZNaWnYpv0qk/oMJZSkSfB/EM
+ lX92jY9hJ/qmm2gwQlaF3W5oso2UGcRMBe/ia/oO7krNZyjqDrOnrAk1b2kx7YtFlMML
+ LiPIpHoJ3I3kvL3oWomDygYn2aRJbJobsC1arlRs52fDNv3877K6GC3aNGC8ZYLgYi3L
+ jhVw==
+X-Gm-Message-State: AOAM533Pl0XfSjXg9sT/aCUPl01Nz9h1nFvd8xh6zSJA2OgGVjGdywpN
+ mksHiF8kHSLcoPzTnHB7e8B8BHK6U1I=
+X-Google-Smtp-Source: ABdhPJwxn9d7DS90nNZTTlLaCp/teou0LlVb46lDdqgJggjht5QtLqDNRXYehAWrD3BWbrWlsRY6kA==
+X-Received: by 2002:a17:90a:950e:: with SMTP id
+ t14mr2112024pjo.99.1591146852605; 
+ Tue, 02 Jun 2020 18:14:12 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.00
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:14:01 -0700 (PDT)
+ Tue, 02 Jun 2020 18:14:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 33/42] target/arm: Add mte helpers for sve scalar + int
- ff/nf loads
-Date: Tue,  2 Jun 2020 18:13:08 -0700
-Message-Id: <20200603011317.473934-34-richard.henderson@linaro.org>
+Subject: [PATCH v7 41/42] target/arm: Create tagged ram when MTE is enabled
+Date: Tue,  2 Jun 2020 18:13:16 -0700
+Message-Id: <20200603011317.473934-42-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,581 +106,202 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because the elements are sequential, we can eliminate many tests all
-at once when the tag hits TCMA, or if the page(s) are not Tagged.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  98 ++++++++++++++++
- target/arm/sve_helper.c    |  98 ++++++++++++++--
- target/arm/translate-sve.c | 232 +++++++++++++++++++++++++------------
- 3 files changed, 342 insertions(+), 86 deletions(-)
+v5: Assign cs->num_ases to the final value first.
+    Downgrade to ID_AA64PFR1.MTE=1 if tag memory is not available.
+v6: Add secure tag memory for EL3.
+---
+ target/arm/cpu.h |  6 ++++++
+ hw/arm/virt.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.c | 51 ++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 106 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 8cead615b1..700ed0e1cb 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -1288,6 +1288,55 @@ DEF_HELPER_FLAGS_4(sve_ldff1sds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldff1dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldff1dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 17594226eb..deb270f25b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -792,6 +792,10 @@ struct ARMCPU {
+     /* MemoryRegion to use for secure physical accesses */
+     MemoryRegion *secure_memory;
  
-+DEF_HELPER_FLAGS_4(sve_ldff1bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bhu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bsu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bdu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bhs_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bss_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1bds_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++    /* MemoryRegion to use for allocation tag accesses */
++    MemoryRegion *tag_memory;
++    MemoryRegion *secure_tag_memory;
 +
-+DEF_HELPER_FLAGS_4(sve_ldff1hh_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hsu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hdu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hss_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hds_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldff1hh_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hsu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hdu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hss_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1hds_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldff1ss_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1sdu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1sds_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldff1ss_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1sdu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1sds_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldff1dd_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldff1dd_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
- DEF_HELPER_FLAGS_4(sve_ldnf1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldnf1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldnf1bsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-@@ -1319,6 +1368,55 @@ DEF_HELPER_FLAGS_4(sve_ldnf1sds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldnf1dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ldnf1dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+     /* For v8M, pointer to the IDAU interface provided by board/SoC */
+     Object *idau;
  
-+DEF_HELPER_FLAGS_4(sve_ldnf1bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bhu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bsu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bdu_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bhs_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bss_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1bds_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldnf1hh_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hsu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hdu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hss_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hds_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldnf1hh_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hsu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hdu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hss_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1hds_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldnf1ss_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1sdu_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1sds_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldnf1ss_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1sdu_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1sds_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_ldnf1dd_le_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+DEF_HELPER_FLAGS_4(sve_ldnf1dd_be_r_mte, TCG_CALL_NO_WG,
-+                   void, env, ptr, tl, i32)
-+
- DEF_HELPER_FLAGS_4(sve_st1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_st2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_st3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 8d69ccd0c4..85bf8e5de3 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4923,7 +4923,7 @@ static void record_fault(CPUARMState *env, uintptr_t i, uintptr_t oprsz)
-  */
- static inline QEMU_ALWAYS_INLINE
- void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
--                   uint32_t desc, const uintptr_t retaddr,
-+                   uint32_t desc, const uintptr_t retaddr, uint32_t mtedesc,
-                    const int esz, const int msz, const SVEContFault fault,
-                    sve_ldst1_host_fn *host_fn,
-                    sve_ldst1_tlb_fn *tlb_fn)
-@@ -4955,13 +4955,22 @@ void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     mem_off = info.mem_off_first[0];
-     flags = info.page[0].flags;
+@@ -2985,6 +2989,8 @@ typedef enum ARMMMUIdxBit {
+ typedef enum ARMASIdx {
+     ARMASIdx_NS = 0,
+     ARMASIdx_S = 1,
++    ARMASIdx_TagNS = 2,
++    ARMASIdx_TagS = 3,
+ } ARMASIdx;
  
-+    /* Since TBI must be set for MTE, !mtedesc => !mte_active. */
-+    if (info.page[0].attrs.target_tlb_bit1) {
-+        mtedesc = 0;
-+    }
-+
-     if (fault == FAULT_FIRST) {
-+        /* Trapping mte check for the first-fault element.  */
-+        if (mtedesc) {
-+            mte_check1(env, mtedesc, addr + mem_off, retaddr);
-+        }
-+
-         /*
-          * Special handling of the first active element,
-          * if it crosses a page boundary or is MMIO.
-          */
-         bool is_split = mem_off == info.mem_off_split;
--        /* TODO: MTE check. */
-         if (unlikely(flags != 0) || unlikely(is_split)) {
-             /*
-              * Use the slow path for cross-page handling.
-@@ -4997,7 +5006,10 @@ void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-                 /* Watchpoint hit, see below. */
-                 goto do_fault;
-             }
--            /* TODO: MTE check. */
-+            if (mtedesc &&
-+                !mte_probe1(env, mtedesc, addr + mem_off, retaddr)) {
-+                goto do_fault;
-+            }
-             /*
-              * Use the slow path for cross-page handling.
-              * This is RAM, without a watchpoint, and will not trap.
-@@ -5045,7 +5057,10 @@ void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-                      & BP_MEM_READ)) {
-                     goto do_fault;
-                 }
--                /* TODO: MTE check. */
-+                if (mtedesc &&
-+                    !mte_probe1(env, mtedesc, addr + mem_off, retaddr)) {
-+                    goto do_fault;
-+                }
-                 host_fn(vd, reg_off, host + mem_off);
-             }
-             reg_off += 1 << esz;
-@@ -5083,44 +5098,103 @@ void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     record_fault(env, reg_off, reg_max);
+ /* Return the Exception Level targeted by debug exceptions. */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 37462a6f78..c74cc3d78d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1412,6 +1412,16 @@ static void create_secure_ram(VirtMachineState *vms,
+     g_free(nodename);
  }
  
--#define DO_LDFF1_LDNF1_1(PART, ESZ) \
-+static inline QEMU_ALWAYS_INLINE
-+void sve_ldnfff1_r_mte(CPUARMState *env, void *vg, target_ulong addr,
-+                       uint32_t desc, const uintptr_t retaddr,
-+                       const int esz, const int msz, const SVEContFault fault,
-+                       sve_ldst1_host_fn *host_fn,
-+                       sve_ldst1_tlb_fn *tlb_fn)
++static void create_tag_ram(MemoryRegion *tag_sysmem,
++                           hwaddr base, hwaddr size,
++                           const char *name)
 +{
-+    uint32_t mtedesc = desc >> (SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
-+    int bit55 = extract64(addr, 55, 1);
++    MemoryRegion *tagram = g_new(MemoryRegion, 1);
 +
-+    /* Remove mtedesc from the normal sve descriptor. */
-+    desc = extract32(desc, 0, SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
-+
-+    /* Perform gross MTE suppression early. */
-+    if (!tbi_check(desc, bit55) ||
-+        tcma_check(desc, bit55, allocation_tag_from_addr(addr))) {
-+        mtedesc = 0;
-+    }
-+
-+    sve_ldnfff1_r(env, vg, addr, desc, retaddr, mtedesc,
-+                  esz, msz, fault, host_fn, tlb_fn);
++    memory_region_init_ram(tagram, NULL, name, size / 32, &error_fatal);
++    memory_region_add_subregion(tag_sysmem, base / 32, tagram);
 +}
 +
-+#define DO_LDFF1_LDNF1_1(PART, ESZ)                                     \
- void HELPER(sve_ldff1##PART##_r)(CPUARMState *env, void *vg,            \
-                                  target_ulong addr, uint32_t desc)      \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_FIRST, \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MO_8, FAULT_FIRST, \
-                   sve_ld1##PART##_host, sve_ld1##PART##_tlb);           \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_r)(CPUARMState *env, void *vg,            \
-                                  target_ulong addr, uint32_t desc)      \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_NO,    \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MO_8, FAULT_NO, \
-+                  sve_ld1##PART##_host, sve_ld1##PART##_tlb);           \
-+}                                                                       \
-+void HELPER(sve_ldff1##PART##_r_mte)(CPUARMState *env, void *vg,        \
-+                                     target_ulong addr, uint32_t desc)  \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_FIRST, \
-+                      sve_ld1##PART##_host, sve_ld1##PART##_tlb);       \
-+}                                                                       \
-+void HELPER(sve_ldnf1##PART##_r_mte)(CPUARMState *env, void *vg,        \
-+                                     target_ulong addr, uint32_t desc)  \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_NO, \
-                   sve_ld1##PART##_host, sve_ld1##PART##_tlb);           \
- }
- 
--#define DO_LDFF1_LDNF1_2(PART, ESZ, MSZ) \
-+#define DO_LDFF1_LDNF1_2(PART, ESZ, MSZ)                                \
- void HELPER(sve_ldff1##PART##_le_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST,  \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MSZ, FAULT_FIRST, \
-                   sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);     \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_le_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO,     \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MSZ, FAULT_NO,  \
-                   sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);     \
- }                                                                       \
- void HELPER(sve_ldff1##PART##_be_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST,  \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MSZ, FAULT_FIRST, \
-                   sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);     \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_be_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO,     \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), 0, ESZ, MSZ, FAULT_NO,  \
-                   sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);     \
-+}                                                                       \
-+void HELPER(sve_ldff1##PART##_le_r_mte)(CPUARMState *env, void *vg,     \
-+                                        target_ulong addr, uint32_t desc) \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST, \
-+                      sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb); \
-+}                                                                       \
-+void HELPER(sve_ldnf1##PART##_le_r_mte)(CPUARMState *env, void *vg,     \
-+                                        target_ulong addr, uint32_t desc) \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO, \
-+                      sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb); \
-+}                                                                       \
-+void HELPER(sve_ldff1##PART##_be_r_mte)(CPUARMState *env, void *vg,     \
-+                                        target_ulong addr, uint32_t desc) \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST, \
-+                      sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb); \
-+}                                                                       \
-+void HELPER(sve_ldnf1##PART##_be_r_mte)(CPUARMState *env, void *vg,     \
-+                                        target_ulong addr, uint32_t desc) \
-+{                                                                       \
-+    sve_ldnfff1_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO, \
-+                      sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb); \
- }
- 
- DO_LDFF1_LDNF1_1(bb,  MO_8)
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index c6029b032d..a1dc325104 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4720,104 +4720,188 @@ static bool trans_LD_zpri(DisasContext *s, arg_rpri_load *a)
- 
- static bool trans_LDFF1_zprr(DisasContext *s, arg_rprr_load *a)
+ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
  {
--    static gen_helper_gvec_mem * const fns[2][16] = {
--        /* Little-endian */
--        { gen_helper_sve_ldff1bb_r,
--          gen_helper_sve_ldff1bhu_r,
--          gen_helper_sve_ldff1bsu_r,
--          gen_helper_sve_ldff1bdu_r,
-+    static gen_helper_gvec_mem * const fns[2][2][16] = {
-+        { /* mte inactive, little-endian */
-+          { gen_helper_sve_ldff1bb_r,
-+            gen_helper_sve_ldff1bhu_r,
-+            gen_helper_sve_ldff1bsu_r,
-+            gen_helper_sve_ldff1bdu_r,
+     const VirtMachineState *board = container_of(binfo, VirtMachineState,
+@@ -1665,6 +1675,8 @@ static void machvirt_init(MachineState *machine)
+     const CPUArchIdList *possible_cpus;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *secure_sysmem = NULL;
++    MemoryRegion *tag_sysmem = NULL;
++    MemoryRegion *secure_tag_sysmem = NULL;
+     int n, virt_max_cpus;
+     bool firmware_loaded;
+     bool aarch64 = true;
+@@ -1819,6 +1831,35 @@ static void machvirt_init(MachineState *machine)
+                                      "secure-memory", &error_abort);
+         }
  
--          gen_helper_sve_ldff1sds_le_r,
--          gen_helper_sve_ldff1hh_le_r,
--          gen_helper_sve_ldff1hsu_le_r,
--          gen_helper_sve_ldff1hdu_le_r,
-+            gen_helper_sve_ldff1sds_le_r,
-+            gen_helper_sve_ldff1hh_le_r,
-+            gen_helper_sve_ldff1hsu_le_r,
-+            gen_helper_sve_ldff1hdu_le_r,
- 
--          gen_helper_sve_ldff1hds_le_r,
--          gen_helper_sve_ldff1hss_le_r,
--          gen_helper_sve_ldff1ss_le_r,
--          gen_helper_sve_ldff1sdu_le_r,
-+            gen_helper_sve_ldff1hds_le_r,
-+            gen_helper_sve_ldff1hss_le_r,
-+            gen_helper_sve_ldff1ss_le_r,
-+            gen_helper_sve_ldff1sdu_le_r,
- 
--          gen_helper_sve_ldff1bds_r,
--          gen_helper_sve_ldff1bss_r,
--          gen_helper_sve_ldff1bhs_r,
--          gen_helper_sve_ldff1dd_le_r },
-+            gen_helper_sve_ldff1bds_r,
-+            gen_helper_sve_ldff1bss_r,
-+            gen_helper_sve_ldff1bhs_r,
-+            gen_helper_sve_ldff1dd_le_r },
- 
--        /* Big-endian */
--        { gen_helper_sve_ldff1bb_r,
--          gen_helper_sve_ldff1bhu_r,
--          gen_helper_sve_ldff1bsu_r,
--          gen_helper_sve_ldff1bdu_r,
-+          /* mte inactive, big-endian */
-+          { gen_helper_sve_ldff1bb_r,
-+            gen_helper_sve_ldff1bhu_r,
-+            gen_helper_sve_ldff1bsu_r,
-+            gen_helper_sve_ldff1bdu_r,
- 
--          gen_helper_sve_ldff1sds_be_r,
--          gen_helper_sve_ldff1hh_be_r,
--          gen_helper_sve_ldff1hsu_be_r,
--          gen_helper_sve_ldff1hdu_be_r,
-+            gen_helper_sve_ldff1sds_be_r,
-+            gen_helper_sve_ldff1hh_be_r,
-+            gen_helper_sve_ldff1hsu_be_r,
-+            gen_helper_sve_ldff1hdu_be_r,
- 
--          gen_helper_sve_ldff1hds_be_r,
--          gen_helper_sve_ldff1hss_be_r,
--          gen_helper_sve_ldff1ss_be_r,
--          gen_helper_sve_ldff1sdu_be_r,
-+            gen_helper_sve_ldff1hds_be_r,
-+            gen_helper_sve_ldff1hss_be_r,
-+            gen_helper_sve_ldff1ss_be_r,
-+            gen_helper_sve_ldff1sdu_be_r,
- 
--          gen_helper_sve_ldff1bds_r,
--          gen_helper_sve_ldff1bss_r,
--          gen_helper_sve_ldff1bhs_r,
--          gen_helper_sve_ldff1dd_be_r },
-+            gen_helper_sve_ldff1bds_r,
-+            gen_helper_sve_ldff1bss_r,
-+            gen_helper_sve_ldff1bhs_r,
-+            gen_helper_sve_ldff1dd_be_r } },
++        /*
++         * The cpu adds the property if and only if MemTag is supported.
++         * If it is, we must allocate the ram to back that up.
++         */
++        if (object_property_find(cpuobj, "tag-memory", NULL)) {
++            if (!tag_sysmem) {
++                tag_sysmem = g_new(MemoryRegion, 1);
++                memory_region_init(tag_sysmem, OBJECT(machine),
++                                   "tag-memory", UINT64_MAX / 32);
 +
-+        { /* mte active, little-endian */
-+          { gen_helper_sve_ldff1bb_r_mte,
-+            gen_helper_sve_ldff1bhu_r_mte,
-+            gen_helper_sve_ldff1bsu_r_mte,
-+            gen_helper_sve_ldff1bdu_r_mte,
++                if (vms->secure) {
++                    secure_tag_sysmem = g_new(MemoryRegion, 1);
++                    memory_region_init(secure_tag_sysmem, OBJECT(machine),
++                                       "secure-tag-memory", UINT64_MAX / 32);
 +
-+            gen_helper_sve_ldff1sds_le_r_mte,
-+            gen_helper_sve_ldff1hh_le_r_mte,
-+            gen_helper_sve_ldff1hsu_le_r_mte,
-+            gen_helper_sve_ldff1hdu_le_r_mte,
++                    /* As with ram, secure-tag takes precedence over tag.  */
++                    memory_region_add_subregion_overlap(secure_tag_sysmem, 0,
++                                                        tag_sysmem, -1);
++                }
++            }
 +
-+            gen_helper_sve_ldff1hds_le_r_mte,
-+            gen_helper_sve_ldff1hss_le_r_mte,
-+            gen_helper_sve_ldff1ss_le_r_mte,
-+            gen_helper_sve_ldff1sdu_le_r_mte,
++            object_property_set_link(cpuobj, OBJECT(tag_sysmem),
++                                     "tag-memory", &error_abort);
++            if (vms->secure) {
++                object_property_set_link(cpuobj, OBJECT(secure_tag_sysmem),
++                                         "secure-tag-memory", &error_abort);
++            }
++        }
 +
-+            gen_helper_sve_ldff1bds_r_mte,
-+            gen_helper_sve_ldff1bss_r_mte,
-+            gen_helper_sve_ldff1bhs_r_mte,
-+            gen_helper_sve_ldff1dd_le_r_mte },
-+
-+          /* mte active, big-endian */
-+          { gen_helper_sve_ldff1bb_r_mte,
-+            gen_helper_sve_ldff1bhu_r_mte,
-+            gen_helper_sve_ldff1bsu_r_mte,
-+            gen_helper_sve_ldff1bdu_r_mte,
-+
-+            gen_helper_sve_ldff1sds_be_r_mte,
-+            gen_helper_sve_ldff1hh_be_r_mte,
-+            gen_helper_sve_ldff1hsu_be_r_mte,
-+            gen_helper_sve_ldff1hdu_be_r_mte,
-+
-+            gen_helper_sve_ldff1hds_be_r_mte,
-+            gen_helper_sve_ldff1hss_be_r_mte,
-+            gen_helper_sve_ldff1ss_be_r_mte,
-+            gen_helper_sve_ldff1sdu_be_r_mte,
-+
-+            gen_helper_sve_ldff1bds_r_mte,
-+            gen_helper_sve_ldff1bss_r_mte,
-+            gen_helper_sve_ldff1bhs_r_mte,
-+            gen_helper_sve_ldff1dd_be_r_mte } },
-     };
- 
-     if (sve_access_check(s)) {
-         TCGv_i64 addr = new_tmp_a64(s);
-         tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), dtype_msz(a->dtype));
-         tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
--        do_mem_zpa(s, a->rd, a->pg, addr, a->dtype, 0, false,
--                   fns[s->be_data == MO_BE][a->dtype]);
-+        do_mem_zpa(s, a->rd, a->pg, addr, a->dtype, 1, false,
-+                   fns[s->mte_active[0]][s->be_data == MO_BE][a->dtype]);
+         object_property_set_bool(cpuobj, true, "realized", &error_fatal);
+         object_unref(cpuobj);
      }
-     return true;
+@@ -1861,6 +1902,17 @@ static void machvirt_init(MachineState *machine)
+         create_uart(vms, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
+     }
+ 
++    if (tag_sysmem) {
++        create_tag_ram(tag_sysmem, vms->memmap[VIRT_MEM].base,
++                       machine->ram_size, "mach-virt.tag");
++        if (vms->secure) {
++            create_tag_ram(secure_tag_sysmem,
++                           vms->memmap[VIRT_SECURE_MEM].base,
++                           vms->memmap[VIRT_SECURE_MEM].size,
++                           "mach-virt.secure-tag");
++        }
++    }
++
+     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+ 
+     create_rtc(vms);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 8e6d4371cb..37b7cc2c9c 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1245,6 +1245,25 @@ void arm_cpu_post_init(Object *obj)
+     if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
+         qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
+     }
++
++#ifndef CONFIG_USER_ONLY
++    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
++        cpu_isar_feature(aa64_mte, cpu)) {
++        object_property_add_link(obj, "tag-memory",
++                                 TYPE_MEMORY_REGION,
++                                 (Object **)&cpu->tag_memory,
++                                 qdev_prop_allow_set_link_before_realize,
++                                 OBJ_PROP_LINK_STRONG);
++
++        if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
++            object_property_add_link(obj, "secure-tag-memory",
++                                     TYPE_MEMORY_REGION,
++                                     (Object **)&cpu->secure_tag_memory,
++                                     qdev_prop_allow_set_link_before_realize,
++                                     OBJ_PROP_LINK_STRONG);
++        }
++    }
++#endif
  }
  
- static bool trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a)
- {
--    static gen_helper_gvec_mem * const fns[2][16] = {
--        /* Little-endian */
--        { gen_helper_sve_ldnf1bb_r,
--          gen_helper_sve_ldnf1bhu_r,
--          gen_helper_sve_ldnf1bsu_r,
--          gen_helper_sve_ldnf1bdu_r,
-+    static gen_helper_gvec_mem * const fns[2][2][16] = {
-+        { /* mte inactive, little-endian */
-+          { gen_helper_sve_ldnf1bb_r,
-+            gen_helper_sve_ldnf1bhu_r,
-+            gen_helper_sve_ldnf1bsu_r,
-+            gen_helper_sve_ldnf1bdu_r,
+ static void arm_cpu_finalizefn(Object *obj)
+@@ -1735,17 +1754,43 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     unsigned int smp_cpus = ms->smp.cpus;
  
--          gen_helper_sve_ldnf1sds_le_r,
--          gen_helper_sve_ldnf1hh_le_r,
--          gen_helper_sve_ldnf1hsu_le_r,
--          gen_helper_sve_ldnf1hdu_le_r,
-+            gen_helper_sve_ldnf1sds_le_r,
-+            gen_helper_sve_ldnf1hh_le_r,
-+            gen_helper_sve_ldnf1hsu_le_r,
-+            gen_helper_sve_ldnf1hdu_le_r,
+-    if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++    /*
++     * We must set cs->num_ases to the final value before
++     * the first call to cpu_address_space_init.
++     */
++    if (cpu->tag_memory != NULL) {
++        cs->num_ases = 4;
++    } else if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+         cs->num_ases = 2;
++    } else {
++        cs->num_ases = 1;
++    }
  
--          gen_helper_sve_ldnf1hds_le_r,
--          gen_helper_sve_ldnf1hss_le_r,
--          gen_helper_sve_ldnf1ss_le_r,
--          gen_helper_sve_ldnf1sdu_le_r,
-+            gen_helper_sve_ldnf1hds_le_r,
-+            gen_helper_sve_ldnf1hss_le_r,
-+            gen_helper_sve_ldnf1ss_le_r,
-+            gen_helper_sve_ldnf1sdu_le_r,
- 
--          gen_helper_sve_ldnf1bds_r,
--          gen_helper_sve_ldnf1bss_r,
--          gen_helper_sve_ldnf1bhs_r,
--          gen_helper_sve_ldnf1dd_le_r },
-+            gen_helper_sve_ldnf1bds_r,
-+            gen_helper_sve_ldnf1bss_r,
-+            gen_helper_sve_ldnf1bhs_r,
-+            gen_helper_sve_ldnf1dd_le_r },
- 
--        /* Big-endian */
--        { gen_helper_sve_ldnf1bb_r,
--          gen_helper_sve_ldnf1bhu_r,
--          gen_helper_sve_ldnf1bsu_r,
--          gen_helper_sve_ldnf1bdu_r,
-+          /* mte inactive, big-endian */
-+          { gen_helper_sve_ldnf1bb_r,
-+            gen_helper_sve_ldnf1bhu_r,
-+            gen_helper_sve_ldnf1bsu_r,
-+            gen_helper_sve_ldnf1bdu_r,
- 
--          gen_helper_sve_ldnf1sds_be_r,
--          gen_helper_sve_ldnf1hh_be_r,
--          gen_helper_sve_ldnf1hsu_be_r,
--          gen_helper_sve_ldnf1hdu_be_r,
-+            gen_helper_sve_ldnf1sds_be_r,
-+            gen_helper_sve_ldnf1hh_be_r,
-+            gen_helper_sve_ldnf1hsu_be_r,
-+            gen_helper_sve_ldnf1hdu_be_r,
- 
--          gen_helper_sve_ldnf1hds_be_r,
--          gen_helper_sve_ldnf1hss_be_r,
--          gen_helper_sve_ldnf1ss_be_r,
--          gen_helper_sve_ldnf1sdu_be_r,
-+            gen_helper_sve_ldnf1hds_be_r,
-+            gen_helper_sve_ldnf1hss_be_r,
-+            gen_helper_sve_ldnf1ss_be_r,
-+            gen_helper_sve_ldnf1sdu_be_r,
- 
--          gen_helper_sve_ldnf1bds_r,
--          gen_helper_sve_ldnf1bss_r,
--          gen_helper_sve_ldnf1bhs_r,
--          gen_helper_sve_ldnf1dd_be_r },
-+            gen_helper_sve_ldnf1bds_r,
-+            gen_helper_sve_ldnf1bss_r,
-+            gen_helper_sve_ldnf1bhs_r,
-+            gen_helper_sve_ldnf1dd_be_r } },
-+
-+        { /* mte inactive, little-endian */
-+          { gen_helper_sve_ldnf1bb_r_mte,
-+            gen_helper_sve_ldnf1bhu_r_mte,
-+            gen_helper_sve_ldnf1bsu_r_mte,
-+            gen_helper_sve_ldnf1bdu_r_mte,
-+
-+            gen_helper_sve_ldnf1sds_le_r_mte,
-+            gen_helper_sve_ldnf1hh_le_r_mte,
-+            gen_helper_sve_ldnf1hsu_le_r_mte,
-+            gen_helper_sve_ldnf1hdu_le_r_mte,
-+
-+            gen_helper_sve_ldnf1hds_le_r_mte,
-+            gen_helper_sve_ldnf1hss_le_r_mte,
-+            gen_helper_sve_ldnf1ss_le_r_mte,
-+            gen_helper_sve_ldnf1sdu_le_r_mte,
-+
-+            gen_helper_sve_ldnf1bds_r_mte,
-+            gen_helper_sve_ldnf1bss_r_mte,
-+            gen_helper_sve_ldnf1bhs_r_mte,
-+            gen_helper_sve_ldnf1dd_le_r_mte },
-+
-+          /* mte inactive, big-endian */
-+          { gen_helper_sve_ldnf1bb_r_mte,
-+            gen_helper_sve_ldnf1bhu_r_mte,
-+            gen_helper_sve_ldnf1bsu_r_mte,
-+            gen_helper_sve_ldnf1bdu_r_mte,
-+
-+            gen_helper_sve_ldnf1sds_be_r_mte,
-+            gen_helper_sve_ldnf1hh_be_r_mte,
-+            gen_helper_sve_ldnf1hsu_be_r_mte,
-+            gen_helper_sve_ldnf1hdu_be_r_mte,
-+
-+            gen_helper_sve_ldnf1hds_be_r_mte,
-+            gen_helper_sve_ldnf1hss_be_r_mte,
-+            gen_helper_sve_ldnf1ss_be_r_mte,
-+            gen_helper_sve_ldnf1sdu_be_r_mte,
-+
-+            gen_helper_sve_ldnf1bds_r_mte,
-+            gen_helper_sve_ldnf1bss_r_mte,
-+            gen_helper_sve_ldnf1bhs_r_mte,
-+            gen_helper_sve_ldnf1dd_be_r_mte } },
-     };
- 
-     if (sve_access_check(s)) {
-@@ -4827,8 +4911,8 @@ static bool trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a)
-         TCGv_i64 addr = new_tmp_a64(s);
- 
-         tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), off);
--        do_mem_zpa(s, a->rd, a->pg, addr, a->dtype, 0, false,
--                   fns[s->be_data == MO_BE][a->dtype]);
-+        do_mem_zpa(s, a->rd, a->pg, addr, a->dtype, 1, false,
-+                   fns[s->mte_active[0]][s->be_data == MO_BE][a->dtype]);
++    if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+         if (!cpu->secure_memory) {
+             cpu->secure_memory = cs->memory;
+         }
+         cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
+                                cpu->secure_memory);
+-    } else {
+-        cs->num_ases = 1;
      }
-     return true;
- }
++
++    if (cpu->tag_memory != NULL) {
++        cpu_address_space_init(cs, ARMASIdx_TagNS, "cpu-tag-memory",
++                               cpu->tag_memory);
++        if (cpu->has_el3) {
++            cpu_address_space_init(cs, ARMASIdx_TagS, "cpu-tag-memory",
++                                   cpu->secure_tag_memory);
++        }
++    } else if (cpu_isar_feature(aa64_mte, cpu)) {
++        /*
++         * Since there is no tag memory, we can't meaningfully support MTE
++         * to its fullest.  To avoid problems later, when we would come to
++         * use the tag memory, downgrade support to insns only.
++         */
++        cpu->isar.id_aa64pfr1 =
++            FIELD_DP64(cpu->isar.id_aa64pfr1, ID_AA64PFR1, MTE, 1);
++    }
++
+     cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
+ 
+     /* No core_count specified, default to smp_cpus. */
 -- 
 2.25.1
 
