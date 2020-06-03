@@ -2,68 +2,89 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C3AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52552C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33104204EF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33104204EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B904205CB
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:06:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vUXIADRg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B904205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgVtw-0001Y2-9y
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44710)
+	id 1jgVuT-0002Ze-Db
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:06:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jgVsr-0000DD-NB
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:04:53 -0400
-Received: from esa6.hc3370-68.iphmx.com ([216.71.155.175]:6636)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jgVsq-0001CS-Fy
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:04:53 -0400
-Authentication-Results: esa6.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: iclSOewnqgMnEYbbuNZOrWgIki0MUWsRaG9w+d9ZEdBdU2pNLfDnytVvDhdvgBBZhAPGG+paFg
- AY+e3TVmPNe2G00vsJU9M4vl0KXn5UYtoq22C6YiYpWkBHTZjO0tmmDF9buWjcgViyifwacrd7
- vXBYSHhzT26BbNF9ZsWLVcg4u5G6bX+NTocDLVXAbOCsxcNgfILfw6v/zk91Z0+cVfDyNKfbBk
- k/dMcjig/zOJYrzqqyqaEJPJKnMWTCGVSgZ0AIcOoTPqHbBIElMFD9VmmHSHCeLbc08R9PZdqE
- FoQ=
-X-SBRS: 2.7
-X-MesageID: 19489761
-X-Ironport-Server: esa6.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.73,468,1583211600"; d="scan'208";a="19489761"
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3] xen: fix build without pci passthrough
-Date: Wed, 3 Jun 2020 17:04:42 +0100
-Message-ID: <20200603160442.3151170-1-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jgVtL-000136-MZ; Wed, 03 Jun 2020 12:05:23 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:38177)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jgVtI-0001Lu-OJ; Wed, 03 Jun 2020 12:05:23 -0400
+Received: by mail-il1-x143.google.com with SMTP id b5so3024682iln.5;
+ Wed, 03 Jun 2020 09:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gmttF+2yVWa/KjBeqzTU6vbuS5dUi0nwUzMuh0T3i/c=;
+ b=vUXIADRgQdMGgbEYwshh7CfYHGoE2TZHFyKQUfJ7jGJ1yGsGr/uCacFveFmY52HWcS
+ uhcpIHA81NsIpm0FpE0ufG++Lu6mt504mvogBQ75Ljgn+Uc/jqWfAU6BDEsg8oJhLUtq
+ uEeHL8h6S8AIy2wif6zCcpZudTOHiDMsml+X54/1DoZDCojqLblRKpKeRUic86rIjsYB
+ EVuhL2vLvoKLade3GAGsD1pERCuKtFBz5kPnwLtT4Mav6wKzLOqETEy0z768wblNRqPY
+ sTY5zGiQiQG5Q0rMZ1Hizz9IuOLPpX5v+Kkf0kDpkYrLSzI9ESnyACe/8s/Z8Vh+OpVd
+ 19SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gmttF+2yVWa/KjBeqzTU6vbuS5dUi0nwUzMuh0T3i/c=;
+ b=lZ0U24uJrq2CPGig3rLD5Qdxy68KJFrITgKpc58qwmwSXN9axMo4W5hNcWYwtrWggQ
+ AbF0hdI5iiSd7z1qVEj/GUZFFFjTc2/Xx2o8bt338ZQIe1k2ZQQnKy0OZLBWwX9OfnVt
+ MTMYQLJD6iaoF9VrWQnnS87FsNPqtrS+IYEhmx7TL6ElIo8VrnSD3upVVOXMOg8WEZy2
+ R6ZhHV+IZa2Qeppb/6xsHHkDkri57Km7TXpk1jHhxsDjvXxIYkwd3yY2ZI1s8smMxCOO
+ R26z9Mf8K5xhBm4Roz128FgM88AOw0f4YBMmrZts6Hn/wYb8UrO+7gjfTLGbtMaHKGdi
+ QAyw==
+X-Gm-Message-State: AOAM533KLairVxT1P5KshzcSimFuscQSSXs/ZJjtCXbz88NHUyPHRFMF
+ D6Z3/RCJXD9BNYkHC4tE0C6Up9BkgVHXIu6cTas=
+X-Google-Smtp-Source: ABdhPJzKEHPVQNNXNyz5drgp60TVQfI0tnttakZ3zEY2JANVP/xZisQghadiha1dhaZk7o9pD+Q3MXWRtGI4zXu9iKo=
+X-Received: by 2002:a92:aa07:: with SMTP id j7mr279955ili.40.1591200318930;
+ Wed, 03 Jun 2020 09:05:18 -0700 (PDT)
 MIME-Version: 1.0
+References: <cover.1590704015.git.alistair.francis@wdc.com>
+ <73cce2d0edd0d41ba15df403a2096bfa70bf0565.1590704015.git.alistair.francis@wdc.com>
+ <cc1a1671-b926-bb31-1ed2-d2920f0faf38@c-sky.com>
+ <c9f16143-4e9b-a3a8-ffd3-12d43fd2e343@c-sky.com>
+ <CAKmqyKM6rigjbDoFh0bfq8gJXJ=+H+onh=DXjCzhAijMCvR16Q@mail.gmail.com>
+ <ec0a7545-1793-d1a9-fccf-068496cf1f0a@c-sky.com>
+In-Reply-To: <ec0a7545-1793-d1a9-fccf-068496cf1f0a@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 3 Jun 2020 08:56:07 -0700
+Message-ID: <CAKmqyKOvv2HCpXoD+8E5q2S7JqSDfT7_z3+_=cKFLi+H92itjw@mail.gmail.com>
+Subject: Re: [PATCH v5 07/11] hw/char: Initial commit of Ibex UART
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.155.175;
- envelope-from=anthony.perard@citrix.com; helo=esa6.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 12:04:48
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,176 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org,
- Anthony PERARD <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Roger Pau Monne <roger.pau@citrix.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Bin Meng <bmeng.cn@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Roger Pau Monne <roger.pau@citrix.com>
+On Wed, Jun 3, 2020 at 3:33 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> On 2020/6/3 1:54, Alistair Francis wrote:
+> > On Tue, Jun 2, 2020 at 5:28 AM LIU Zhiwei<zhiwei_liu@c-sky.com>  wrote:
+> >> Hi Alistair,
+> >>
+> >> There are still some questions I don't understand.
+> >>
+> >> 1. Is the baud rate  or fifo a necessary feature to simulate?
+> >> As you can see, qemu_chr_fe_write will send the byte as soon as possible.
+> >> When you want to transmit a byte through WDATA,  you can call
+> >> qemu_chr_fe_write directly.
+> > So qemu_chr_fe_write() will send the data straight away. This doesn't
+> > match what teh hardware does though. So by modelling a FIFO and a
+> > delay in sending we can better match the hardware.
+> I see many UARTs have similar features. Does the software really care about
+> these features? Usually I just want to print something to the terminal
+> through UART.
 
-Xen PCI passthrough support may not be available and thus the global
-variable "has_igd_gfx_passthru" might be compiled out. Common code
-should not access it in that case.
+In this case Tock (which is the OS used for OpenTitan) does car about
+these features as it relies on interrupts generated by the HW to
+complete the serial send task. It also just makes the QEMU model more
+accurate.
 
-Unfortunately, we can't use CONFIG_XEN_PCI_PASSTHROUGH directly in
-xen-common.c so this patch instead move access to the
-has_igd_gfx_passthru variable via function and those functions are
-also implemented as stubs. The stubs will be used when QEMU is built
-without passthrough support.
+> Most simulation in QEMU is for running software, not exactly the details
+> of hardware.
+> For example, we will not simulate the 16x oversamples in this UART.
 
-Now, when one will want to enable igd-passthru via the -machine
-property, they will get an error message if QEMU is built without
-passthrough support.
+Agreed. Lots of UARTs don't bother modelling the delay from the
+hardware as generally it doesn't matter. In this case it does make a
+difference for the software and it makes the QEMU model more accurate,
+which is always a good thing.
 
-Fixes: 46472d82322d0 ('xen: convert "-machine igd-passthru" to an accelerator property')
-Reported-by: Roger Pau Monné <roger.pau@citrix.com>
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
+>
+> There is no error here. Personally I  think it is necessary to simulate
+> the FIFO and baud rate,
+> maybe for supporting some backends.
 
-Notes:
-    Changes in v3:
-    - reworked to use stubs instead of #ifdef CONFIG_XEN_PCI_PASSTHROUGH
-      CONFIG_XEN_PCI_PASSTHROUGH isn't available in xen-common.c
-    
-      moving CONFIG_XEN_PCI_PASSTHROUGH to be in config_host_mak isn't
-      really possible, or at least I didn't managed to make that work.
+So baud rate doesn't need to be modelled as we aren't actually sending
+UART data, just pretending and then printing it.
 
- hw/i386/pc_piix.c   |  2 +-
- hw/xen/xen-common.c |  4 ++--
- hw/xen/xen_pt.c     | 12 +++++++++++-
- hw/xen/xen_pt.h     |  6 ++++--
- stubs/Makefile.objs |  1 +
- stubs/xen-pt.c      | 22 ++++++++++++++++++++++
- 6 files changed, 41 insertions(+), 6 deletions(-)
- create mode 100644 stubs/xen-pt.c
+>
+> Can someone give a reasonable answer for this question?
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index f66e1d73ce0b..347fb8c6c807 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -375,7 +375,7 @@ static void pc_init_isa(MachineState *machine)
- #ifdef CONFIG_XEN
- static void pc_xen_hvm_init_pci(MachineState *machine)
- {
--    const char *pci_type = has_igd_gfx_passthru ?
-+    const char *pci_type = xen_igd_gfx_pt_enabled() ?
-                 TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE : TYPE_I440FX_PCI_DEVICE;
- 
-     pc_init1(machine,
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 70564cc952d5..dd2c22cc4c0b 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -129,12 +129,12 @@ static void xen_change_state_handler(void *opaque, int running,
- 
- static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
- {
--    return has_igd_gfx_passthru;
-+    return xen_igd_gfx_pt_enabled();
- }
- 
- static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
- {
--    has_igd_gfx_passthru = value;
-+    xen_igd_gfx_pt_set(value, errp);
- }
- 
- static void xen_setup_post(MachineState *ms, AccelState *accel)
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index 81d5ad8da7f0..ab84443d5ec8 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -65,7 +65,17 @@
- #include "qemu/range.h"
- #include "exec/address-spaces.h"
- 
--bool has_igd_gfx_passthru;
-+static bool has_igd_gfx_passthru;
-+
-+bool xen_igd_gfx_pt_enabled(void)
-+{
-+    return has_igd_gfx_passthru;
-+}
-+
-+void xen_igd_gfx_pt_set(bool value, Error **errp)
-+{
-+    has_igd_gfx_passthru = value;
-+}
- 
- #define XEN_PT_NR_IRQS (256)
- static uint8_t xen_pt_mapped_machine_irq[XEN_PT_NR_IRQS] = {0};
-diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
-index 179775db7b22..6e9cec95f3b7 100644
---- a/hw/xen/xen_pt.h
-+++ b/hw/xen/xen_pt.h
-@@ -5,6 +5,9 @@
- #include "hw/pci/pci.h"
- #include "xen-host-pci-device.h"
- 
-+bool xen_igd_gfx_pt_enabled(void);
-+void xen_igd_gfx_pt_set(bool value, Error **errp);
-+
- void xen_pt_log(const PCIDevice *d, const char *f, ...) GCC_FMT_ATTR(2, 3);
- 
- #define XEN_PT_ERR(d, _f, _a...) xen_pt_log(d, "%s: Error: "_f, __func__, ##_a)
-@@ -322,10 +325,9 @@ extern void *pci_assign_dev_load_option_rom(PCIDevice *dev,
-                                             unsigned int domain,
-                                             unsigned int bus, unsigned int slot,
-                                             unsigned int function);
--extern bool has_igd_gfx_passthru;
- static inline bool is_igd_vga_passthrough(XenHostPCIDevice *dev)
- {
--    return (has_igd_gfx_passthru
-+    return (xen_igd_gfx_pt_enabled()
-             && ((dev->class_code >> 0x8) == PCI_CLASS_DISPLAY_VGA));
- }
- int xen_pt_register_vga_regions(XenHostPCIDevice *dev);
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 6a9e3135e8f9..564527e00997 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -40,6 +40,7 @@ stub-obj-y += target-get-monitor-def.o
- stub-obj-y += vmgenid.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
-+stub-obj-y += xen-pt.o
- stub-obj-y += pci-host-piix.o
- stub-obj-y += ram-block.o
- stub-obj-y += ramfb.o
-diff --git a/stubs/xen-pt.c b/stubs/xen-pt.c
-new file mode 100644
-index 000000000000..2d8cac8d54b9
---- /dev/null
-+++ b/stubs/xen-pt.c
-@@ -0,0 +1,22 @@
-+/*
-+ * Copyright (C) 2020       Citrix Systems UK Ltd.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/xen/xen_pt.h"
-+#include "qapi/error.h"
-+
-+bool xen_igd_gfx_pt_enabled(void)
-+{
-+    return false;
-+}
-+
-+void xen_igd_gfx_pt_set(bool value, Error **errp)
-+{
-+    if (value) {
-+        error_setg(errp, "Xen PCI passthrough support not built in");
-+    }
-+}
--- 
-Anthony PERARD
+Which question?
 
+> >> 2.  The baud rate calculation method is not strictly right.
+> >> I think when a byte write to FIFO,  char_tx_time * 8 is the correct time
+> >> to send the byte instead of
+> >> char_tx_time * 4.
+> > Do you mind explaining why 8 is correct instead of 4?
+> Usually write a byte to WDATA will trigger a uart_write_tx_fifo.
+> Translate a bit will take
+> char_tx_time. So it will take char_tx_time * 8 to transmit a byte.
+
+I see your point. I just used the 4 as that is what the Cadence one
+does. I don't think it matters too much as it's just the delay for a
+timer (that isn't used as an accurate timer).
+
+> >> 3.  Why add a watch here?
+> > This is based on the Cadence UART implementation in QEMU (which does
+> > the same thing). This will trigger a callback when we can write more
+> > data or when the backend has hung up.
+> Many other serials do the same thing, like virtio-console and serial. So
+> it may be a common
+> interface here. I will try to understand it(Not yet).
+
+Yep, it's just a more complete model of that the HW does.
+
+Alistair
 
