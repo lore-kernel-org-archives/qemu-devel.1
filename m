@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 997BCC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C93C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2314E20663
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D575206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:19:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LTudRNbQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2314E20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s9ZCi8n7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D575206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgI3B-0004Y3-7d
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:18:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48590)
+	id 1jgI3g-0005nO-E8
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:19:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyE-0003ZJ-FL
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:30 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35105)
+ id 1jgHyV-00041g-RI
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:47 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:43232)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyD-0003XU-Cm
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:30 -0400
-Received: by mail-pf1-x443.google.com with SMTP id h185so429910pfg.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:28 -0700 (PDT)
+ id 1jgHyP-0003ZS-By
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:47 -0400
+Received: by mail-pl1-x633.google.com with SMTP id g12so191239pll.10
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=03LJNoH/ukVkl3mS8L9CmNVy1qT1M4Av2oRp35Y7po4=;
- b=LTudRNbQwV+6JZ3antNWvutWhJSI6eVhnwYj31lmyuO7qaDahrCHjRsv8sQY0CCW71
- iMxwHvcrv7F4lPWD/cpM8Qv7QVJznDNBmT0MkrAUm3PuwlsxpLhUrDJRdLEXP3ISoufr
- jNPX+x3aueQMhm60uQH6cKiNVFJuSDz9J98DDk/Zd5Nfwatzs/b9wTQ9Sfq9yWSrI93n
- 31fXyeYIxxIRPgkzVXgU0P87QNuXcyaqz4ECImFWBzpB9xPfJ+bccGvSqXYMmY7TTk8q
- UEqxd1kLGEjf1CUDjzXYB1L4PZs/HnUzCPaXdF7i9Z7xNILEVNZ9c+LunYc0YHvLbX35
- A2VA==
+ bh=iD1HCmE/mBT9UdzHtyaiNXiw6VvhW3BvWlEg2J8SAgE=;
+ b=s9ZCi8n7qawEHTJfszwHzAbPrF2DvVIASVDLbLnXzgdllqPe4dkuFBIlN+e39NCsP7
+ /LIf5r/0D0GUkKOkgA2BzyKw2UctGsfA6O+eIrPetSZNXFFF8mMDSSB69rC3AP8qtb+3
+ kOy0AnuisCA1pQAwwr/sakoioyBrPbr79PPbUxOiUuK7fp/jVHSau3q4w6vDFUg/7y45
+ a8IMjubzJTecYAksyLJvIcdJoYLMKDMgcMl0glsqxynVHKXMjIqn5YzIElLNfRmIaB9W
+ 7K83hKLMNtgdFu/ZiIOZxrsZQMUGbatj+T2JKLF2I5oWetxbpTjInipT6eaFd3ZFBFom
+ hVLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=03LJNoH/ukVkl3mS8L9CmNVy1qT1M4Av2oRp35Y7po4=;
- b=hA9624bx4QlQAQA6mtNQy78QVh5s5vTeTA4BBOA55oF0oSFc5FqIlZrntPay/WQ3RW
- DTFYVKhsTkI2iBOK4Nnl9kBONEWiBGa5MPRuvw4y+GiDtFJa99tmWCNjhjXM1wmSEMqL
- WvE571UfosYbxOv5nxJQb8s5ndRRJg8RgSFEhgMCo8+7wtXk6+vGWjR8Og8wQt1vtvpV
- 4PH6jG1Bnhx1OeKwG7RPLoVFLMTixtyWJzM41F/pBxF9QGCJsod3u5rPFCtIJ19c1ORj
- rvUjU2ogS6748WMP9MObmhvh8/snA1eC2tdegYPtj9dfxLeiYhHnbH9wA6QUMrIsZYiA
- Su2w==
-X-Gm-Message-State: AOAM530sIns2TyXJd/lgCEkwNwX8Fgp03KsPJjVwZ+Thal2rluZ3n0Av
- IwOAa0De84auYgUQLF+jcqwLxCJKEVw=
-X-Google-Smtp-Source: ABdhPJyR5ivYnMuVxYyO/VhO7EcwxYd7nTfdE042TjbmxSNp2o3yT67fBHhVuEWwHwCE7xOeKX3Aiw==
-X-Received: by 2002:a17:90a:950e:: with SMTP id
- t14mr2108841pjo.99.1591146807570; 
- Tue, 02 Jun 2020 18:13:27 -0700 (PDT)
+ bh=iD1HCmE/mBT9UdzHtyaiNXiw6VvhW3BvWlEg2J8SAgE=;
+ b=NtR93CEaesHYCB8dIJlAJQbrSfzjLHkeg4MHLB+swchs5vFV6OpihVJyXUc1c0ICNH
+ HF79VbkDkued6Wt6uciOKUEg5U2yrCZp9Q4quEyUeiWbxrqYoY8BqQS6wsJCQy5U5Q0Z
+ WNeHWWwLnQZs0qF0R34cMxI/DzM7atGALLXOROzo/I8b/lZKPK5gXvgvdviEXysqVyZD
+ 5laBwDo/KfXlZbVnpS9XlVa/LqnFP+sII7uQpz2C3eRDB6ybt0E5k2cacNIl7G/9f5ML
+ giMfqB+8B35Fd/hkg4IHp3LFJxlx9DGBfAGOGN5284rJGz3kTjG2fruvW2L0hIrDg4rm
+ HSnw==
+X-Gm-Message-State: AOAM530/8keImKFoVd29qvJUEhJ8/yII938AF36E0VsivtWl2wNsvZIX
+ /alpUJeX2kjPGI5fomGG6R8OQ6S78N0=
+X-Google-Smtp-Source: ABdhPJyu9BiI2JKsiJHHFL1bLVtthsHRnhMrE3jZAtZmatQxeasjRxke0LGYhhgOcEqjfL9cRsH56w==
+X-Received: by 2002:a17:902:b103:: with SMTP id
+ q3mr21208946plr.265.1591146818066; 
+ Tue, 02 Jun 2020 18:13:38 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.26
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:13:26 -0700 (PDT)
+ Tue, 02 Jun 2020 18:13:37 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 07/42] target/arm: Add MTE system registers
-Date: Tue,  2 Jun 2020 18:12:42 -0700
-Message-Id: <20200603011317.473934-8-richard.henderson@linaro.org>
+Subject: [PATCH v7 15/42] target/arm: Implement LDG, STG, ST2G instructions
+Date: Tue,  2 Jun 2020 18:12:50 -0700
+Message-Id: <20200603011317.473934-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::633;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x633.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,219 +106,421 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is TFSRE0_EL1, TFSR_EL1, TFSR_EL2, TFSR_EL3,
-RGSR_EL1, GCR_EL1, GMID_EL1, and PSTATE.TCO.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Add GMID; add access_mte.
-v4: Define only TCO at mte_insn_reg.
-v6: Define RAZ/WI version of TCO at mte_insn_reg;
-    honor TID5 for GMID_EL1; fix TFS crn/crm; recalc hflags after TCO.
+v2: Split out allocation_tag_mem.  Handle atomicity of stores.
+v3: Add X[t] input to these insns; require pre-cleaned addresses.
+v5: Fix !32-byte aligned operation of st2g.
+v6: Fix op2 extract, stg pre/post-index, stores vs sp, commentary;
+    use pre-computed ata.
+v7: Fix STZG iteration (stephen long)
 ---
- target/arm/cpu.h           |  4 ++
- target/arm/internals.h     |  9 ++++
- target/arm/helper.c        | 94 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 21 +++++++++
- 4 files changed, 128 insertions(+)
+ target/arm/helper-a64.h    |   7 ++
+ target/arm/mte_helper.c    | 194 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 158 +++++++++++++++++++++++++++++-
+ 3 files changed, 354 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index f8ac11e73b..49cf37d43b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -502,6 +502,9 @@ typedef struct CPUARMState {
-         uint64_t pmccfiltr_el0; /* Performance Monitor Filter Register */
-         uint64_t vpidr_el2; /* Virtualization Processor ID Register */
-         uint64_t vmpidr_el2; /* Virtualization Multiprocessor ID Register */
-+        uint64_t tfsr_el[4]; /* tfsre0_el1 is index 0.  */
-+        uint64_t gcr_el1;
-+        uint64_t rgsr_el1;
-     } cp15;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 6c116481e8..2fa61b86fa 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -106,3 +106,10 @@ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
  
-     struct {
-@@ -1282,6 +1285,7 @@ void pmu_init(ARMCPU *cpu);
- #define PSTATE_SS (1U << 21)
- #define PSTATE_PAN (1U << 22)
- #define PSTATE_UAO (1U << 23)
-+#define PSTATE_TCO (1U << 25)
- #define PSTATE_V (1U << 28)
- #define PSTATE_C (1U << 29)
- #define PSTATE_Z (1U << 30)
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 4bdbc3a8ac..56b4672685 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1159,6 +1159,9 @@ static inline uint32_t aarch64_pstate_valid_mask(const ARMISARegisters *id)
-     if (isar_feature_aa64_uao(id)) {
-         valid |= PSTATE_UAO;
-     }
-+    if (isar_feature_aa64_mte(id)) {
-+        valid |= PSTATE_TCO;
-+    }
- 
-     return valid;
+ DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_4(addsubg, TCG_CALL_NO_RWG_SE, i64, env, i64, s32, i32)
++DEF_HELPER_FLAGS_3(ldg, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(stg, TCG_CALL_NO_WG, void, env, i64, i64)
++DEF_HELPER_FLAGS_3(stg_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
++DEF_HELPER_FLAGS_2(stg_stub, TCG_CALL_NO_WG, void, env, i64)
++DEF_HELPER_FLAGS_3(st2g, TCG_CALL_NO_WG, void, env, i64, i64)
++DEF_HELPER_FLAGS_3(st2g_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
++DEF_HELPER_FLAGS_2(st2g_stub, TCG_CALL_NO_WG, void, env, i64)
+diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+index 9ab9ed749d..7ec7930dfc 100644
+--- a/target/arm/mte_helper.c
++++ b/target/arm/mte_helper.c
+@@ -44,6 +44,40 @@ static int choose_nonexcluded_tag(int tag, int offset, uint16_t exclude)
+     return tag;
  }
-@@ -1234,4 +1237,10 @@ void arm_log_exception(int idx);
  
- #endif /* !CONFIG_USER_ONLY */
- 
-+/*
-+ * The log2 of the words in the tag block, for GMID_EL1.BS.
-+ * The is the maximum, 256 bytes, which manipulates 64-bits of tags.
++/**
++ * allocation_tag_mem:
++ * @env: the cpu environment
++ * @ptr_mmu_idx: the addressing regime to use for the virtual address
++ * @ptr: the virtual address for which to look up tag memory
++ * @ptr_access: the access to use for the virtual address
++ * @ptr_size: the number of bytes in the normal memory access
++ * @tag_access: the access to use for the tag memory
++ * @tag_size: the number of bytes in the tag memory access
++ * @ra: the return address for exception handling
++ *
++ * Our tag memory is formatted as a sequence of little-endian nibbles.
++ * That is, the byte at (addr >> (LOG2_TAG_GRANULE + 1)) contains two
++ * tags, with the tag at [3:0] for the lower addr and the tag at [7:4]
++ * for the higher addr.
++ *
++ * Here, resolve the physical address from the virtual address, and return
++ * a pointer to the corresponding tag byte.  Exit with exception if the
++ * virtual address is not accessible for @ptr_access.
++ *
++ * The @ptr_size and @tag_size values may not have an obvious relation
++ * due to the alignment of @ptr, and the number of tag checks required.
++ *
++ * If there is no tag storage corresponding to @ptr, return NULL.
 + */
-+#define GMID_EL1_BS  6
-+
- #endif
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f2ead07ead..88ca07ad0f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5879,6 +5879,9 @@ static void define_arm_vh_e2h_redirects_aliases(ARMCPU *cpu)
-         { K(3, 0,  1, 2, 0), K(3, 4,  1, 2, 0), K(3, 5, 1, 2, 0),
-           "ZCR_EL1", "ZCR_EL2", "ZCR_EL12", isar_feature_aa64_sve },
- 
-+        { K(3, 0,  5, 6, 0), K(3, 4,  5, 6, 0), K(3, 5, 5, 6, 0),
-+          "TFSR_EL1", "TFSR_EL2", "TFSR_EL12", isar_feature_aa64_mte },
-+
-         /* TODO: ARMv8.2-SPE -- PMSCR_EL2 */
-         /* TODO: ARMv8.4-Trace -- TRFCR_EL2 */
-     };
-@@ -6853,6 +6856,86 @@ static const ARMCPRegInfo dcpodp_reg[] = {
- };
- #endif /*CONFIG_USER_ONLY*/
- 
-+static CPAccessResult access_aa64_tid5(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                       bool isread)
++static uint8_t *allocation_tag_mem(CPUARMState *env, int ptr_mmu_idx,
++                                   uint64_t ptr, MMUAccessType ptr_access,
++                                   int ptr_size, MMUAccessType tag_access,
++                                   int tag_size, uintptr_t ra)
 +{
-+    if ((arm_current_el(env) < 2) && (arm_hcr_el2_eff(env) & HCR_TID5)) {
-+        return CP_ACCESS_TRAP_EL2;
++    /* Tag storage not implemented.  */
++    return NULL;
++}
++
+ uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
+ {
+     int rtag;
+@@ -80,3 +114,163 @@ uint64_t HELPER(addsubg)(CPUARMState *env, uint64_t ptr,
+ 
+     return address_with_allocation_tag(ptr + offset, rtag);
+ }
++
++static int load_tag1(uint64_t ptr, uint8_t *mem)
++{
++    int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
++    return extract32(*mem, ofs, 4);
++}
++
++uint64_t HELPER(ldg)(CPUARMState *env, uint64_t ptr, uint64_t xt)
++{
++    int mmu_idx = cpu_mmu_index(env, false);
++    uint8_t *mem;
++    int rtag = 0;
++
++    /* Trap if accessing an invalid page.  */
++    mem = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_LOAD, 1,
++                             MMU_DATA_LOAD, 1, GETPC());
++
++    /* Load if page supports tags. */
++    if (mem) {
++        rtag = load_tag1(ptr, mem);
 +    }
 +
-+    return CP_ACCESS_OK;
++    return address_with_allocation_tag(xt, rtag);
 +}
 +
-+static CPAccessResult access_mte(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                 bool isread)
++static void check_tag_aligned(CPUARMState *env, uint64_t ptr, uintptr_t ra)
 +{
-+    int el = arm_current_el(env);
-+
-+    if (el < 2 &&
-+        arm_feature(env, ARM_FEATURE_EL2) &&
-+        !(arm_hcr_el2_eff(env) & HCR_ATA)) {
-+        return CP_ACCESS_TRAP_EL2;
++    if (unlikely(!QEMU_IS_ALIGNED(ptr, TAG_GRANULE))) {
++        arm_cpu_do_unaligned_access(env_cpu(env), ptr, MMU_DATA_STORE,
++                                    cpu_mmu_index(env, false), ra);
++        g_assert_not_reached();
 +    }
-+    if (el < 3 &&
-+        arm_feature(env, ARM_FEATURE_EL3) &&
-+        !(env->cp15.scr_el3 & SCR_ATA)) {
-+        return CP_ACCESS_TRAP_EL3;
++}
++
++/* For use in a non-parallel context, store to the given nibble.  */
++static void store_tag1(uint64_t ptr, uint8_t *mem, int tag)
++{
++    int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
++    *mem = deposit32(*mem, ofs, 4, tag);
++}
++
++/* For use in a parallel context, atomically store to the given nibble.  */
++static void store_tag1_parallel(uint64_t ptr, uint8_t *mem, int tag)
++{
++    int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
++    uint8_t old = atomic_read(mem);
++
++    while (1) {
++        uint8_t new = deposit32(old, ofs, 4, tag);
++        uint8_t cmp = atomic_cmpxchg(mem, old, new);
++        if (likely(cmp == old)) {
++            return;
++        }
++        old = cmp;
 +    }
-+    return CP_ACCESS_OK;
 +}
 +
-+static uint64_t tco_read(CPUARMState *env, const ARMCPRegInfo *ri)
++typedef void stg_store1(uint64_t, uint8_t *, int);
++
++static inline void do_stg(CPUARMState *env, uint64_t ptr, uint64_t xt,
++                          uintptr_t ra, stg_store1 store1)
 +{
-+    return env->pstate & PSTATE_TCO;
++    int mmu_idx = cpu_mmu_index(env, false);
++    uint8_t *mem;
++
++    check_tag_aligned(env, ptr, ra);
++
++    /* Trap if accessing an invalid page.  */
++    mem = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_STORE, TAG_GRANULE,
++                             MMU_DATA_STORE, 1, ra);
++
++    /* Store if page supports tags. */
++    if (mem) {
++        store1(ptr, mem, allocation_tag_from_addr(xt));
++    }
 +}
 +
-+static void tco_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t val)
++void HELPER(stg)(CPUARMState *env, uint64_t ptr, uint64_t xt)
 +{
-+    env->pstate = (env->pstate & ~PSTATE_TCO) | (val & PSTATE_TCO);
++    do_stg(env, ptr, xt, GETPC(), store_tag1);
 +}
 +
-+static const ARMCPRegInfo mte_reginfo[] = {
-+    { .name = "TFSRE0_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 0, .crn = 5, .crm = 6, .opc2 = 1,
-+      .access = PL1_RW, .accessfn = access_mte,
-+      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[0]) },
-+    { .name = "TFSR_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 0, .crn = 5, .crm = 6, .opc2 = 0,
-+      .access = PL1_RW, .accessfn = access_mte,
-+      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[1]) },
-+    { .name = "TFSR_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 4, .crn = 5, .crm = 6, .opc2 = 0,
-+      .access = PL2_RW, .accessfn = access_mte,
-+      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[2]) },
-+    { .name = "TFSR_EL3", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 6, .crn = 5, .crm = 6, .opc2 = 0,
-+      .access = PL3_RW,
-+      .fieldoffset = offsetof(CPUARMState, cp15.tfsr_el[3]) },
-+    { .name = "RGSR_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 5,
-+      .access = PL1_RW, .accessfn = access_mte,
-+      .fieldoffset = offsetof(CPUARMState, cp15.rgsr_el1) },
-+    { .name = "GCR_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 6,
-+      .access = PL1_RW, .accessfn = access_mte,
-+      .fieldoffset = offsetof(CPUARMState, cp15.gcr_el1) },
-+    { .name = "GMID_EL1", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 1, .crn = 0, .crm = 0, .opc2 = 4,
-+      .access = PL1_R, .accessfn = access_aa64_tid5,
-+      .type = ARM_CP_CONST, .resetvalue = GMID_EL1_BS },
-+    { .name = "TCO", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 3, .crn = 4, .crm = 2, .opc2 = 7,
-+      .type = ARM_CP_NO_RAW,
-+      .access = PL0_RW, .readfn = tco_read, .writefn = tco_write },
-+    REGINFO_SENTINEL
-+};
++void HELPER(stg_parallel)(CPUARMState *env, uint64_t ptr, uint64_t xt)
++{
++    do_stg(env, ptr, xt, GETPC(), store_tag1_parallel);
++}
 +
-+static const ARMCPRegInfo mte_tco_ro_reginfo[] = {
-+    { .name = "TCO", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 3, .crn = 4, .crm = 2, .opc2 = 7,
-+      .type = ARM_CP_CONST, .access = PL0_RW, },
-+    REGINFO_SENTINEL
-+};
- #endif
- 
- static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -7978,6 +8061,17 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         }
-     }
- #endif /*CONFIG_USER_ONLY*/
++void HELPER(stg_stub)(CPUARMState *env, uint64_t ptr)
++{
++    int mmu_idx = cpu_mmu_index(env, false);
++    uintptr_t ra = GETPC();
++
++    check_tag_aligned(env, ptr, ra);
++    probe_write(env, ptr, TAG_GRANULE, mmu_idx, ra);
++}
++
++static inline void do_st2g(CPUARMState *env, uint64_t ptr, uint64_t xt,
++                           uintptr_t ra, stg_store1 store1)
++{
++    int mmu_idx = cpu_mmu_index(env, false);
++    int tag = allocation_tag_from_addr(xt);
++    uint8_t *mem1, *mem2;
++
++    check_tag_aligned(env, ptr, ra);
 +
 +    /*
-+     * If full MTE is enabled, add all of the system registers.
-+     * If only "instructions available at EL0" are enabled,
-+     * then define only a RAZ/WI version of PSTATE.TCO.
++     * Trap if accessing an invalid page(s).
++     * This takes priority over !allocation_tag_access_enabled.
 +     */
-+    if (cpu_isar_feature(aa64_mte, cpu)) {
-+        define_arm_cp_regs(cpu, mte_reginfo);
-+    } else if (cpu_isar_feature(aa64_mte_insn_reg, cpu)) {
-+        define_arm_cp_regs(cpu, mte_tco_ro_reginfo);
++    if (ptr & TAG_GRANULE) {
++        /* Two stores unaligned mod TAG_GRANULE*2 -- modify two bytes. */
++        mem1 = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_STORE,
++                                  TAG_GRANULE, MMU_DATA_STORE, 1, ra);
++        mem2 = allocation_tag_mem(env, mmu_idx, ptr + TAG_GRANULE,
++                                  MMU_DATA_STORE, TAG_GRANULE,
++                                  MMU_DATA_STORE, 1, ra);
++
++        /* Store if page(s) support tags. */
++        if (mem1) {
++            store1(TAG_GRANULE, mem1, tag);
++        }
++        if (mem2) {
++            store1(0, mem2, tag);
++        }
++    } else {
++        /* Two stores aligned mod TAG_GRANULE*2 -- modify one byte. */
++        mem1 = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_STORE,
++                                  2 * TAG_GRANULE, MMU_DATA_STORE, 1, ra);
++        if (mem1) {
++            tag |= tag << 4;
++            atomic_set(mem1, tag);
++        }
 +    }
- #endif
- 
-     if (cpu_isar_feature(any_predinv, cpu)) {
++}
++
++void HELPER(st2g)(CPUARMState *env, uint64_t ptr, uint64_t xt)
++{
++    do_st2g(env, ptr, xt, GETPC(), store_tag1);
++}
++
++void HELPER(st2g_parallel)(CPUARMState *env, uint64_t ptr, uint64_t xt)
++{
++    do_st2g(env, ptr, xt, GETPC(), store_tag1_parallel);
++}
++
++void HELPER(st2g_stub)(CPUARMState *env, uint64_t ptr)
++{
++    int mmu_idx = cpu_mmu_index(env, false);
++    uintptr_t ra = GETPC();
++    int in_page = -(ptr | TARGET_PAGE_MASK);
++
++    check_tag_aligned(env, ptr, ra);
++
++    if (likely(in_page >= 2 * TAG_GRANULE)) {
++        probe_write(env, ptr, 2 * TAG_GRANULE, mmu_idx, ra);
++    } else {
++        probe_write(env, ptr, TAG_GRANULE, mmu_idx, ra);
++        probe_write(env, ptr + TAG_GRANULE, TAG_GRANULE, mmu_idx, ra);
++    }
++}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d4d2f69d87..284266be67 100644
+index b032829194..0725c2ca07 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1610,6 +1610,27 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         s->base.is_jmp = DISAS_UPDATE_EXIT;
-         break;
+@@ -3689,6 +3689,153 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     }
+ }
  
-+    case 0x1c: /* TCO */
-+        if (dc_isar_feature(aa64_mte, s)) {
-+            /* Full MTE is enabled -- set the TCO bit as directed. */
-+            if (crm & 1) {
-+                set_pstate_bits(PSTATE_TCO);
-+            } else {
-+                clear_pstate_bits(PSTATE_TCO);
-+            }
-+            t1 = tcg_const_i32(s->current_el);
-+            gen_helper_rebuild_hflags_a64(cpu_env, t1);
-+            tcg_temp_free_i32(t1);
-+            /* Many factors, including TCO, go into MTE_ACTIVE. */
-+            s->base.is_jmp = DISAS_UPDATE_NOCHAIN;
-+        } else if (dc_isar_feature(aa64_mte_insn_reg, s)) {
-+            /* Only "instructions accessible at EL0" -- PSTATE.TCO is WI.  */
-+            s->base.is_jmp = DISAS_NEXT;
++/*
++ * Load/Store memory tags
++ *
++ *  31 30 29         24     22  21     12    10      5      0
++ * +-----+-------------+-----+---+------+-----+------+------+
++ * | 1 1 | 0 1 1 0 0 1 | op1 | 1 | imm9 | op2 |  Rn  |  Rt  |
++ * +-----+-------------+-----+---+------+-----+------+------+
++ */
++static void disas_ldst_tag(DisasContext *s, uint32_t insn)
++{
++    int rt = extract32(insn, 0, 5);
++    int rn = extract32(insn, 5, 5);
++    uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
++    int op2 = extract32(insn, 10, 2);
++    int op1 = extract32(insn, 22, 2);
++    bool is_load = false, is_pair = false, is_zero = false;
++    int index = 0;
++    TCGv_i64 addr, clean_addr, tcg_rt;
++
++    /* We checked insn bits [29:24,21] in the caller.  */
++    if (extract32(insn, 30, 2) != 3) {
++        goto do_unallocated;
++    }
++
++    /*
++     * @index is a tri-state variable which has 3 states:
++     * < 0 : post-index, writeback
++     * = 0 : signed offset
++     * > 0 : pre-index, writeback
++     */
++    switch (op1) {
++    case 0: /* STG */
++        if (op2 != 0) {
++            /* STG */
++            index = op2 - 2;
++            break;
++        }
++        goto do_unallocated;
++    case 1:
++        if (op2 != 0) {
++            /* STZG */
++            is_zero = true;
++            index = op2 - 2;
 +        } else {
-+            goto do_unallocated;
++            /* LDG */
++            is_load = true;
 +        }
 +        break;
++    case 2:
++        if (op2 != 0) {
++            /* ST2G */
++            is_pair = true;
++            index = op2 - 2;
++            break;
++        }
++        goto do_unallocated;
++    case 3:
++        if (op2 != 0) {
++            /* STZ2G */
++            is_pair = is_zero = true;
++            index = op2 - 2;
++            break;
++        }
++        goto do_unallocated;
 +
++    default:
++    do_unallocated:
++        unallocated_encoding(s);
++        return;
++    }
++
++    if (!dc_isar_feature(aa64_mte_insn_reg, s)) {
++        goto do_unallocated;
++    }
++
++    if (rn == 31) {
++        gen_check_sp_alignment(s);
++    }
++
++    addr = read_cpu_reg_sp(s, rn, true);
++    if (index >= 0) {
++        /* pre-index or signed offset */
++        tcg_gen_addi_i64(addr, addr, offset);
++    }
++
++    if (is_load) {
++        tcg_rt = cpu_reg(s, rt);
++        if (s->ata) {
++            gen_helper_ldg(tcg_rt, cpu_env, addr, tcg_rt);
++        } else {
++            clean_addr = clean_data_tbi(s, addr);
++            gen_probe_access(s, clean_addr, MMU_DATA_LOAD, MO_8);
++            gen_address_with_allocation_tag0(tcg_rt, addr);
++        }
++    } else {
++        tcg_rt = cpu_reg_sp(s, rt);
++        if (!s->ata) {
++            /*
++             * For STG and ST2G, we need to check alignment and probe memory.
++             * TODO: For STZG and STZ2G, we could rely on the stores below,
++             * at least for system mode; user-only won't enforce alignment.
++             */
++            if (is_pair) {
++                gen_helper_st2g_stub(cpu_env, addr);
++            } else {
++                gen_helper_stg_stub(cpu_env, addr);
++            }
++        } else if (tb_cflags(s->base.tb) & CF_PARALLEL) {
++            if (is_pair) {
++                gen_helper_st2g_parallel(cpu_env, addr, tcg_rt);
++            } else {
++                gen_helper_stg_parallel(cpu_env, addr, tcg_rt);
++            }
++        } else {
++            if (is_pair) {
++                gen_helper_st2g(cpu_env, addr, tcg_rt);
++            } else {
++                gen_helper_stg(cpu_env, addr, tcg_rt);
++            }
++        }
++    }
++
++    if (is_zero) {
++        TCGv_i64 clean_addr = clean_data_tbi(s, addr);
++        TCGv_i64 tcg_zero = tcg_const_i64(0);
++        int mem_index = get_mem_index(s);
++        int i, n = (1 + is_pair) << LOG2_TAG_GRANULE;
++
++        tcg_gen_qemu_st_i64(tcg_zero, clean_addr, mem_index,
++                            MO_Q | MO_ALIGN_16);
++        for (i = 8; i < n; i += 8) {
++            tcg_gen_addi_i64(clean_addr, clean_addr, 8);
++            tcg_gen_qemu_st_i64(tcg_zero, clean_addr, mem_index, MO_Q);
++        }
++        tcg_temp_free_i64(tcg_zero);
++    }
++
++    if (index != 0) {
++        /* pre-index or post-index */
++        if (index < 0) {
++            /* post-index */
++            tcg_gen_addi_i64(addr, addr, offset);
++        }
++        tcg_gen_mov_i64(cpu_reg_sp(s, rn), addr);
++    }
++}
++
+ /* Loads and stores */
+ static void disas_ldst(DisasContext *s, uint32_t insn)
+ {
+@@ -3713,13 +3860,14 @@ static void disas_ldst(DisasContext *s, uint32_t insn)
+     case 0x0d: /* AdvSIMD load/store single structure */
+         disas_ldst_single_struct(s, insn);
+         break;
+-    case 0x19: /* LDAPR/STLR (unscaled immediate) */
+-        if (extract32(insn, 10, 2) != 0 ||
+-            extract32(insn, 21, 1) != 0) {
++    case 0x19:
++        if (extract32(insn, 21, 1) != 0) {
++            disas_ldst_tag(s, insn);
++        } else if (extract32(insn, 10, 2) == 0) {
++            disas_ldst_ldapr_stlr(s, insn);
++        } else {
+             unallocated_encoding(s);
+-            break;
+         }
+-        disas_ldst_ldapr_stlr(s, insn);
+         break;
      default:
-     do_unallocated:
          unallocated_encoding(s);
 -- 
 2.25.1
