@@ -2,73 +2,99 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE593C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 17:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC6FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B85382053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 17:45:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B85382053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id ABD062068D
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zO0FJSfr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD062068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgXSa-0000Q8-Ui
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 13:45:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55110)
+	id 1jgXir-0004JP-3T
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 14:02:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jgXRs-0008Ad-FO
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 13:45:08 -0400
-Resent-Date: Wed, 03 Jun 2020 13:45:08 -0400
-Resent-Message-Id: <E1jgXRs-0008Ad-FO@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21749)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jgXRr-0005D2-15
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 13:45:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591206280; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mf/5XO/WCJa1vO5yYUsqcbuRELmvxawB3oAlsgo1GFDLn3WYnL0zvpSyIQPCaYppY18vdtgomHWZZZG6qyKqfuIbZorQY24lB4SJjXMTZPSjH5cS6oKmysEXHsfvxGCSiyhiBfp5Y/2CYZERrVrzzGJBb2tovPGUnci4DDhN/Zc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591206280;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=aDOnCV6IQtXJX8qeg6Ku1tNLl+yTLwktKpyCW/ob1pM=; 
- b=mhR1GP5JJqctNZ2mdMFAeIgbG7IOWyxxVsAHd6Ax8xxJm/Xwy602ySHCplhJ4xCYv2fM3NirSJ4wv/oqoZDaHsbtgpdeNfW1/A6uacjxWN+XtdWQwufjtKCVsqm4z1H8I25LPgS4rvaardjeoHWKMxuSWmiuctnydlA23Xgcg4Q=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591206278372849.3348416366575;
- Wed, 3 Jun 2020 10:44:38 -0700 (PDT)
-Message-ID: <159120627656.23398.3742621530752770397@45ef0f9c86ae>
-In-Reply-To: <20200603160442.3151170-1-anthony.perard@citrix.com>
-Subject: Re: [PATCH v3] xen: fix build without pci passthrough
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgXhm-0003kX-7p
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 14:01:34 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37655)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgXhk-0007xY-Iu
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 14:01:33 -0400
+Received: by mail-pf1-x441.google.com with SMTP id j1so1947494pfe.4
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 11:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=42pG6IMp9bXf8qw+fOATEbO7Jl2jW+RQOk/P3q4RmJg=;
+ b=zO0FJSfrseL8bls8uqmpgwc6SdI7z7XAkXEkZIV/SoQTw1IpyQjQGc3vrKahQDhqHv
+ jtJTWblNi8ZvWzeByVk2o5wvg7H7os1XZL3sJ0qFGdMpzojri2IkWQkjsCUMuHI4yEfx
+ fv60j1nnuH8yzvS5ZCUr+WTuKUBSLVDvOAXnDRwa0Lr5+u6yXwXKqlih28ItjxBDLoJn
+ sGOrT6PZIGgaZk8yZdN0MokU4PIW+PLxcZeOkcuHBDoQhDoXrt823pwzLR/yvxZazj12
+ wYJq/YEDPGgKu+0UHUc5RT/vSZvyi8DgSO1RP0ReJ0xsebih+7038Plg2ND69B+vowsI
+ aaxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=42pG6IMp9bXf8qw+fOATEbO7Jl2jW+RQOk/P3q4RmJg=;
+ b=kZajbDHUvxUvMLEZeTXCx9i8jqutuMKOgOxd23ff/ZKGN6hI0i8V0IT/dv5qjugff9
+ Ucxs57UC2ShX6I8RYauxrOs0uSxNySk1+y8j9Xqxu/FWFLWRbf9D6s71eE8b6x3OCqF9
+ w0ZVimpauptRLt1Nj7dRQlJf+3sTi0vxkESPNOjncANgkJUMFcd2P4rgQ5bEvA3z5zCB
+ DvMBi8AU+RQHVWyJgqj+dsj23XrcDS/lTx5rEBzdOHdGLPnkwx4hcETNLo0V0TFQU5nu
+ m2LF06Mpbd9UYREDgWsz4Bj0nNhDe5zPppK/X/4/9MtHHVOZlcTOsXCnBnuWslB6EOX8
+ TvgQ==
+X-Gm-Message-State: AOAM532PPFIkgi35tyjmyiEHSXeBSok1ZVoUTDTxKKL2MLEi9ZfUlt5j
+ 4rFGJIW2kIJII7NlbROzo/KrOg==
+X-Google-Smtp-Source: ABdhPJybSg1RM2i+l2APF84h129M4wnC4EnavSuupW5T9WDk2bjHDOPV+AXy81Dqkehk529UisCVcA==
+X-Received: by 2002:a17:90a:7c07:: with SMTP id
+ v7mr1255592pjf.124.1591207290761; 
+ Wed, 03 Jun 2020 11:01:30 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id t17sm3009822pjo.19.2020.06.03.11.01.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 03 Jun 2020 11:01:30 -0700 (PDT)
+Subject: Re: [RFC PATCH 2/2] linux-user/mmap: Fix Clang 'type-limit-compare'
+ warning
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, qemu-devel@nongnu.org
+References: <20200503113220.30808-1-f4bug@amsat.org>
+ <20200503113220.30808-3-f4bug@amsat.org>
+ <7529763d-1f4a-5077-14ed-98753c8db288@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <555fa273-336a-1e46-77f6-e3057dea36ca@linaro.org>
+Date: Wed, 3 Jun 2020 11:01:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: anthony.perard@citrix.com
-Date: Wed, 3 Jun 2020 10:44:38 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 13:45:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <7529763d-1f4a-5077-14ed-98753c8db288@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,50 +107,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: sstabellini@kernel.org, ehabkost@redhat.com, paul@xen.org, mst@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, anthony.perard@citrix.com,
- xen-devel@lists.xenproject.org, rth@twiddle.net, roger.pau@citrix.com
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYwMzE2MDQ0Mi4zMTUx
-MTcwLTEtYW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
-IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtl
-IGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
-bWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIEND
-ICAgICAgaW8vY2hhbm5lbC1zb2NrZXQubwpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11
-LXRlc3Qvc3JjL2h3L3hlbi94ZW5fcHQuaDo0LAogICAgICAgICAgICAgICAgIGZyb20gL3RtcC9x
-ZW11LXRlc3Qvc3JjL3N0dWJzL3hlbi1wdC5jOjk6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRl
-L2h3L3hlbi94ZW5fY29tbW9uLmg6MTM6MTA6IGZhdGFsIGVycm9yOiB4ZW5jdHJsLmg6IE5vIHN1
-Y2ggZmlsZSBvciBkaXJlY3RvcnkKICNpbmNsdWRlIDx4ZW5jdHJsLmg+CiAgICAgICAgICBefn5+
-fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0
-L3NyYy9ydWxlcy5tYWs6Njk6IHN0dWJzL3hlbi1wdC5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgQ0MgICAgICBpby9jaGFubmVsLXRscy5vCiAg
-Q0MgICAgICBpby9jaGFubmVsLXdhdGNoLm8KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJy
-b3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAn
-WydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0
-YW5jZS51dWlkPWNkMDNlY2VhNGM0MzQ1Mjk4ODY0NTI5YzhiZDU2Y2MyJywgJy11JywgJzEwMDEn
-LCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAn
-VEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScs
-ICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAn
-Q0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUv
-cWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1mbXkzbWYxei9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTAzLTEzLjQy
-LjE5LjIyMDU5Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9x
-ZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIu
-CmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWNkMDNlY2VhNGM0
-MzQ1Mjk4ODY0NTI5YzhiZDU2Y2MyCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQpt
-YWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWZt
-eTNtZjF6L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJv
-ciAyCgpyZWFsICAgIDJtMTcuODAzcwp1c2VyICAgIDBtOS4xMDRzCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYwMzE2MDQ0Mi4zMTUx
-MTcwLTEtYW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRv
-cmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 6/3/20 9:06 AM, Eric Blake wrote:
+> Instead of using #if, the following suffices to shut up clang:
+> 
+> diff --git c/linux-user/mmap.c w/linux-user/mmap.c
+> index e37803379747..8d9ba201625d 100644
+> --- c/linux-user/mmap.c
+> +++ w/linux-user/mmap.c
+> @@ -715,7 +715,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+>              host_addr = MAP_FAILED;
+>          }
+>          /* Check if address fits target address space */
+> -        if ((unsigned long)host_addr + new_size > (abi_ulong)-1) {
+> +        if ((unsigned long)host_addr > (abi_ulong)-1 - new_size) {
+>              /* Revert mremap() changes */
+>              host_addr = mremap(g2h(old_addr), new_size, old_size, flags);
+>              errno = ENOMEM;
+> 
+> 
+> That is, it is no longer a tautological type compare if you commute the
+> operations so that neither side is a compile-time constant.
+
+To some extent the tautological compare is a hint to the compiler that the
+comparison may be optimized away.  If sizeof(abi_ulong) >= sizeof(unsigned
+long), then the host *cannot* produce an out-of-range target address.
+
+We could add the sizeof test to the if, to preserve the optimization, but that
+by itself doesn't prevent the clang warning.
+
+Which is why I have repeatedly suggested that we disable this warning globally.
+ Because every single instance so far has been of this form: where we are
+expecting the compiler to fold away the block of code protected by the
+tautological comparison.
+
+I will also note that there is an existing off-by-one problem wrt the final
+page: with a 12-bit page,
+
+  0xfffff000 + 0x1000 > 0xffffffff
+
+The proper test I think is
+
+  (uintptr_t)host_addr + new_size - 1 > (abi_ulong)-1
+
+If we're going to use your suggestion above, this becomes
+
+  (uintptr_t)host_addr > (abi_ulong)-new_size
+
+
+r~
 
