@@ -2,65 +2,64 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D9EC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9971BC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2333C20738
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A91E20772
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/NYHlms"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2333C20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtE41vho"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A91E20772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgUjq-0002Ju-BV
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:51:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35358)
+	id 1jgUk2-0002yi-JV
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:51:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgUis-0000RE-BD
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:50:30 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38864
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgUi7-0006xa-3U
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:49:43 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27666
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgUir-0008PN-2M
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:50:29 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jgUi5-0008HO-Sk
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:49:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591195828;
+ s=mimecast20190719; t=1591195781;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RDh+68qQb3rnMMpxI9okQiQxtobe2+vAmAT67u4Eh4A=;
- b=c/NYHlmsHNUxd+vYk/D7s7y0BpTz4gYcsAX9ZMx1oilFeFvnD5Uq47uVeIsbLGNVwUyhiO
- CrtbYTtK6LapPKk7UmHRBi+E0K3wwKg89D7tAQVmFQjY5zxq6xkF1Y78rto88k+JtaDZtH
- jn2WZlOPBcVordewCXtzvzKR3TEUm/M=
+ bh=1BbevjkskbYyrE6QMfKDlnrNUXXr2l9bYZtaGxMJ0i4=;
+ b=HtE41vhoyC3RhWGA2N2+v7L+e9s2Cqh+6FKXxpF0HjQBosyXsrYDq+ZLIy6dnW1aD8DssK
+ C2tVMZnozwOudEaWg1V0Id0hiB6jtFbfhvmA4uLkicrGG+jOuCSrUHbdqV7FhFTXT4pocR
+ HA37a/w48z+BxLi2azF9FDaefL0BCj4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-Qc2ND10XNAieU1mWkHdJhQ-1; Wed, 03 Jun 2020 10:50:26 -0400
-X-MC-Unique: Qc2ND10XNAieU1mWkHdJhQ-1
+ us-mta-380-Xy1OLwRYNimsE3GXCAjgZQ-1; Wed, 03 Jun 2020 10:49:37 -0400
+X-MC-Unique: Xy1OLwRYNimsE3GXCAjgZQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1010C107ACCD;
- Wed,  3 Jun 2020 14:50:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B54B19067E0;
+ Wed,  3 Jun 2020 14:49:36 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-192.ams2.redhat.com [10.36.113.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AAE2C5D9CD;
- Wed,  3 Jun 2020 14:50:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AACDB5D9CD;
+ Wed,  3 Jun 2020 14:49:32 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/20] MAINTAINERS: Add myself as virtio-mem maintainer
-Date: Wed,  3 Jun 2020 16:49:06 +0200
-Message-Id: <20200603144914.41645-13-david@redhat.com>
+Subject: [PATCH v3 02/20] vfio: Convert to ram_block_discard_disable()
+Date: Wed,  3 Jun 2020 16:48:56 +0200
+Message-Id: <20200603144914.41645-3-david@redhat.com>
 In-Reply-To: <20200603144914.41645-1-david@redhat.com>
 References: <20200603144914.41645-1-david@redhat.com>
 MIME-Version: 1.0
@@ -75,8 +74,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,46 +88,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's make sure patches/bug reports find the right person.
+VFIO is (except devices without a physical IOMMU or some mediated devices)
+incompatible with discarding of RAM. The kernel will pin basically all VM
+memory. Let's convert to ram_block_discard_disable(), which can now
+fail, in contrast to qemu_balloon_inhibit().
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>
+Leave "x-balloon-allowed" named as it is for now.
+
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/vfio/ap.c                  | 10 +++----
+ hw/vfio/ccw.c                 | 11 ++++----
+ hw/vfio/common.c              | 53 +++++++++++++++++++----------------
+ hw/vfio/pci.c                 |  6 ++--
+ include/hw/vfio/vfio-common.h |  4 +--
+ 5 files changed, 45 insertions(+), 39 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0944d9c731..b838e38b04 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1752,6 +1752,14 @@ F: hw/virtio/virtio-crypto.c
- F: hw/virtio/virtio-crypto-pci.c
- F: include/hw/virtio/virtio-crypto.h
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index 95564c17ed..d0b1bc7581 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -105,12 +105,12 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+     vapdev->vdev.dev = dev;
  
-+virtio-mem
-+M: David Hildenbrand <david@redhat.com>
-+S: Supported
-+F: hw/virtio/virtio-mem.c
-+F: hw/virtio/virtio-mem-pci.h
-+F: hw/virtio/virtio-mem-pci.c
-+F: include/hw/virtio/virtio-mem.h
-+
- nvme
- M: Keith Busch <kbusch@kernel.org>
- L: qemu-block@nongnu.org
+     /*
+-     * vfio-ap devices operate in a way compatible with
+-     * memory ballooning, as no pages are pinned in the host.
+-     * This needs to be set before vfio_get_device() for vfio common to
+-     * handle the balloon inhibitor.
++     * vfio-ap devices operate in a way compatible discarding of memory in
++     * RAM blocks, as no pages are pinned in the host. This needs to be
++     * set before vfio_get_device() for vfio common to handle
++     * ram_block_discard_disable().
+      */
+-    vapdev->vdev.balloon_allowed = true;
++    vapdev->vdev.ram_block_discard_allowed = true;
+ 
+     ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
+     if (ret) {
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index c8624943c1..12dd44da52 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -425,12 +425,13 @@ static void vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
+ 
+     /*
+      * All vfio-ccw devices are believed to operate in a way compatible with
+-     * memory ballooning, ie. pages pinned in the host are in the current
+-     * working set of the guest driver and therefore never overlap with pages
+-     * available to the guest balloon driver.  This needs to be set before
+-     * vfio_get_device() for vfio common to handle the balloon inhibitor.
++     * discarding of memory in RAM blocks, ie. pages pinned in the host are
++     * in the current working set of the guest driver and therefore never
++     * overlap e.g., with pages available to the guest balloon driver.  This
++     * needs to be set before vfio_get_device() for vfio common to handle
++     * ram_block_discard_disable().
+      */
+-    vcdev->vdev.balloon_allowed = true;
++    vcdev->vdev.ram_block_discard_allowed = true;
+ 
+     if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
+         goto out_err;
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 0b3593b3c0..33357140b8 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -33,7 +33,6 @@
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/range.h"
+-#include "sysemu/balloon.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/reset.h"
+ #include "trace.h"
+@@ -1215,31 +1214,36 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     space = vfio_get_address_space(as);
+ 
+     /*
+-     * VFIO is currently incompatible with memory ballooning insofar as the
++     * VFIO is currently incompatible with discarding of RAM insofar as the
+      * madvise to purge (zap) the page from QEMU's address space does not
+      * interact with the memory API and therefore leaves stale virtual to
+      * physical mappings in the IOMMU if the page was previously pinned.  We
+-     * therefore add a balloon inhibit for each group added to a container,
++     * therefore set discarding broken for each group added to a container,
+      * whether the container is used individually or shared.  This provides
+      * us with options to allow devices within a group to opt-in and allow
+-     * ballooning, so long as it is done consistently for a group (for instance
++     * discarding, so long as it is done consistently for a group (for instance
+      * if the device is an mdev device where it is known that the host vendor
+      * driver will never pin pages outside of the working set of the guest
+-     * driver, which would thus not be ballooning candidates).
++     * driver, which would thus not be discarding candidates).
+      *
+      * The first opportunity to induce pinning occurs here where we attempt to
+      * attach the group to existing containers within the AddressSpace.  If any
+-     * pages are already zapped from the virtual address space, such as from a
+-     * previous ballooning opt-in, new pinning will cause valid mappings to be
++     * pages are already zapped from the virtual address space, such as from
++     * previous discards, new pinning will cause valid mappings to be
+      * re-established.  Likewise, when the overall MemoryListener for a new
+      * container is registered, a replay of mappings within the AddressSpace
+      * will occur, re-establishing any previously zapped pages as well.
+      *
+-     * NB. Balloon inhibiting does not currently block operation of the
+-     * balloon driver or revoke previously pinned pages, it only prevents
+-     * calling madvise to modify the virtual mapping of ballooned pages.
++     * Especially virtio-balloon is currently only prevented from discarding
++     * new memory, it will not yet set ram_block_discard_set_required() and
++     * therefore, neither stops us here or deals with the sudden memory
++     * consumption of inflated memory.
+      */
+-    qemu_balloon_inhibit(true);
++    ret = ram_block_discard_disable(true);
++    if (ret) {
++        error_setg_errno(errp, -ret, "Cannot set discarding of RAM broken");
++        return ret;
++    }
+ 
+     QLIST_FOREACH(container, &space->containers, next) {
+         if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
+@@ -1405,7 +1409,7 @@ close_fd_exit:
+     close(fd);
+ 
+ put_space_exit:
+-    qemu_balloon_inhibit(false);
++    ram_block_discard_disable(false);
+     vfio_put_address_space(space);
+ 
+     return ret;
+@@ -1526,8 +1530,8 @@ void vfio_put_group(VFIOGroup *group)
+         return;
+     }
+ 
+-    if (!group->balloon_allowed) {
+-        qemu_balloon_inhibit(false);
++    if (!group->ram_block_discard_allowed) {
++        ram_block_discard_disable(false);
+     }
+     vfio_kvm_device_del_group(group);
+     vfio_disconnect_container(group);
+@@ -1565,22 +1569,23 @@ int vfio_get_device(VFIOGroup *group, const char *name,
+     }
+ 
+     /*
+-     * Clear the balloon inhibitor for this group if the driver knows the
+-     * device operates compatibly with ballooning.  Setting must be consistent
+-     * per group, but since compatibility is really only possible with mdev
+-     * currently, we expect singleton groups.
++     * Set discarding of RAM as not broken for this group if the driver knows
++     * the device operates compatibly with discarding.  Setting must be
++     * consistent per group, but since compatibility is really only possible
++     * with mdev currently, we expect singleton groups.
+      */
+-    if (vbasedev->balloon_allowed != group->balloon_allowed) {
++    if (vbasedev->ram_block_discard_allowed !=
++        group->ram_block_discard_allowed) {
+         if (!QLIST_EMPTY(&group->device_list)) {
+-            error_setg(errp,
+-                       "Inconsistent device balloon setting within group");
++            error_setg(errp, "Inconsistent setting of support for discarding "
++                       "RAM (e.g., balloon) within group");
+             close(fd);
+             return -1;
+         }
+ 
+-        if (!group->balloon_allowed) {
+-            group->balloon_allowed = true;
+-            qemu_balloon_inhibit(false);
++        if (!group->ram_block_discard_allowed) {
++            group->ram_block_discard_allowed = true;
++            ram_block_discard_disable(false);
+         }
+     }
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 342dd6b912..c33c11b7e4 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2796,7 +2796,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     }
+ 
+     /*
+-     * Mediated devices *might* operate compatibly with memory ballooning, but
++     * Mediated devices *might* operate compatibly with discarding of RAM, but
+      * we cannot know for certain, it depends on whether the mdev vendor driver
+      * stays in sync with the active working set of the guest driver.  Prevent
+      * the x-balloon-allowed option unless this is minimally an mdev device.
+@@ -2809,7 +2809,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ 
+     trace_vfio_mdev(vdev->vbasedev.name, is_mdev);
+ 
+-    if (vdev->vbasedev.balloon_allowed && !is_mdev) {
++    if (vdev->vbasedev.ram_block_discard_allowed && !is_mdev) {
+         error_setg(errp, "x-balloon-allowed only potentially compatible "
+                    "with mdev devices");
+         vfio_put_group(group);
+@@ -3163,7 +3163,7 @@ static Property vfio_pci_dev_properties[] = {
+                     VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+     DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+     DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
+-                     vbasedev.balloon_allowed, false),
++                     vbasedev.ram_block_discard_allowed, false),
+     DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index fd564209ac..c78f3ff559 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -108,7 +108,7 @@ typedef struct VFIODevice {
+     bool reset_works;
+     bool needs_reset;
+     bool no_mmap;
+-    bool balloon_allowed;
++    bool ram_block_discard_allowed;
+     VFIODeviceOps *ops;
+     unsigned int num_irqs;
+     unsigned int num_regions;
+@@ -128,7 +128,7 @@ typedef struct VFIOGroup {
+     QLIST_HEAD(, VFIODevice) device_list;
+     QLIST_ENTRY(VFIOGroup) next;
+     QLIST_ENTRY(VFIOGroup) container_next;
+-    bool balloon_allowed;
++    bool ram_block_discard_allowed;
+ } VFIOGroup;
+ 
+ typedef struct VFIODMABuf {
 -- 
 2.25.4
 
