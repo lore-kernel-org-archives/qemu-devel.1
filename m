@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80258C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:30:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B03A20659
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 481DA20659
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:30:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MCmdh6Wr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B03A20659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iXGSbqNP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481DA20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgWHg-0001vd-Et
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:30:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46972)
+	id 1jgWHm-00028W-H2
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:30:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=416cc4bc0=alistair.francis@wdc.com>)
- id 1jgWAG-0007hn-0m
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:52 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49270)
+ id 1jgWAI-0007mi-6z
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:54 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49275)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=416cc4bc0=alistair.francis@wdc.com>)
- id 1jgWAF-00060J-1D
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:51 -0400
+ id 1jgWAH-00060l-5T
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 12:22:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591201371; x=1622737371;
+ t=1591201373; x=1622737373;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=wwPImWk1wm0+wyKyb3GoOt99XLA5qpd/VeaKzQuuvmk=;
- b=MCmdh6WrmuP4LX/MAsNC4NnyBWOt12Yp3QPrtzkGJIKwlo3RasyzO9cT
- t9/G7+N5I5HHfm/1xykh5bpFgpZJ6Gav5jzuAedHP0YzoYYwmhtO4svZt
- /cgBWG2PzeFqXQNQHY3CP4zAl2j8K1Jd5zp7R2ZO5nYyvOtuzh5z9iHp8
- bYV/6k5EnXFJJfyHPlN8cpJNyIOVPR/6Zi2n5SRflGYG1rSpyRFj2erXE
- 9USGNPnlBsctHdtSqcIcEL+3mUoBlo3OLiCFg3T1UvM5LM67dNt2gCp2W
- Hfj99E2i6/+z70RFeDiywg5tyBO3DwDqu6KSXEMoAp0t97aTuVToYs3yc A==;
-IronPort-SDR: td39yrFRXqRDUDAZemdPvhUpc4hd94iwlZ3uvnniygqzhAtThFgpUc4Yun/YWoW7E4jdjZN/ut
- I69VUWdI7TrWDICtxLcoYPTKZ9ENRVAjkzTinqcKH0bGLpmZT7bW+cRFTHMU0GG24C/0KtA270
- oRux30GnT4okO5/cpMUv7XCqDB+RcUBzHCA6S6DEL9CMGlKpFD28wd+nTJytxkle+W/8ILGN8+
- 8sJH/2vDhlUCDe+Boe6YZjsQaTmCn6JU4XlImX7cJqebX3+T0s1ZBR1sMIDsJ9aFAsk5tbB6oJ
- iI4=
-X-IronPort-AV: E=Sophos;i="5.73,468,1583164800"; d="scan'208";a="143451362"
+ bh=orsSXLrSQIMi3TMC0jSYfH0EWLV9WQAZfn7IxsH8lEI=;
+ b=iXGSbqNPZYLr5Bo8FJ2nnHtSyFi1dTIg4Nh7QghToueE+A5K+QDA18/d
+ 4gnejhdEPvNPLODW962m11tfuaty28bX9VfCTxFkkNYH3qmEDKbKI5KYu
+ in5mHNvPy5BmTUhgCVR2ZC/H+VdXsoxsT6TLv2vy+N2U9si+078z5lzzk
+ R8QkzltygOkFnRPYWXhEpGDlIt3qjBPRQMAwXYH4sC5f5GrSkCL0jMuWS
+ v7adAR8TiFG5p1xv1qSZCQaxAvopVoz7RJIYB483PL2yT2t2XlIq90tiz
+ q2AJ/oFX4meeJdgqKI5Z9JCJt2kvhk9QaVU4fxanfoN9+f/mow58t4ZWY A==;
+IronPort-SDR: GiOIdaKP4sbgOBLAvzLb/PbW3KylqiDftXzXM82Ri08/GeYST4mckclgU8vfn8dQ9RrgRRqilX
+ EaDdEywoLlCAo9SUDHuL2tB1Qk64B10ZBCbqPTcowaK2Mbqswyabuomg5XMvSM8PNjCXpX5w48
+ 9sZuWnbDPv5Qu7xaL98oHFuJynHCssMu7tLGXPsPNl7O1d/3xwe4sYRiup/NJxDioqvIVkMMSB
+ W6cppjEUmjlReYSgp77X43BO3Eq2wENrhR+zNN10FFe30POc4KapdBQr2FcyjICB7mj+wGW33m
+ QE8=
+X-IronPort-AV: E=Sophos;i="5.73,468,1583164800"; d="scan'208";a="143451370"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 04 Jun 2020 00:22:41 +0800
-IronPort-SDR: NIXqGhn9H+dFo/A1LdAPFLopVQKPtzw68GN4nfb17ryiCM8LsyfrezRSIhm9q0S8Vz6PJV7kj5
- 2aQXusE/xoi7WF9iQuFdXkL3Zh6S560vc=
+ by ob1.hgst.iphmx.com with ESMTP; 04 Jun 2020 00:22:43 +0800
+IronPort-SDR: SVRO/mhh2FxdYEoRiRaLpCXhwLJ+lYO35+P7HqyvwC+SR9jgIxLjpwBQVq5RVCN82H9vOdx7eg
+ xdc36mgMXopyG8HQ1kT3dJEgrZaeGc87M=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Jun 2020 09:11:46 -0700
-IronPort-SDR: Xvzz8rb+vgMaP4LwuwdQzNnxyZ91NAt41mfJ7VRA2Zypq+df/wPBNOziWyvKJDVEdKewO/QIdk
- INoXBj8PnQYA==
+ 03 Jun 2020 09:11:47 -0700
+IronPort-SDR: mOn2pcKJxsmA1xzKaajakd2WOAxotvI8qvHqEPvDzJQT4NPh1KLf2vWEPKPzVb2L6QKi9AxYkt
+ YEIpUkqUwbkg==
 WDCIronportException: Internal
 Received: from cne220230.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.144])
- by uls-op-cesaip02.wdc.com with ESMTP; 03 Jun 2020 09:22:41 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 03 Jun 2020 09:22:42 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 04/15] hw/riscv: virt: Remove the riscv_ prefix of the machine*
- functions
-Date: Wed,  3 Jun 2020 09:13:47 -0700
-Message-Id: <20200603161352.744204-5-alistair.francis@wdc.com>
+Subject: [PULL 08/15] docs: deprecated: Update the -bios documentation
+Date: Wed,  3 Jun 2020 09:13:51 -0700
+Message-Id: <20200603161352.744204-9-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200603161352.744204-1-alistair.francis@wdc.com>
 References: <20200603161352.744204-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.153.141;
  envelope-from=prvs=416cc4bc0=alistair.francis@wdc.com;
@@ -106,81 +104,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+Update the -bios deprecation documentation to describe the new
+behaviour.
 
-Remove the riscv_ prefix of the machine* functions.
-
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1590072147-13035-2-git-send-email-bmeng.cn@gmail.com
-Message-Id: <1590072147-13035-2-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
 ---
- hw/riscv/virt.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ docs/system/deprecated.rst | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 7ce28895bc..4e4c494a70 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -471,7 +471,7 @@ static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
-     return dev;
- }
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index d177609cbc..544ece0a45 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -138,25 +138,23 @@ the backing storage specified with ``-mem-path`` can actually provide
+ the guest RAM configured with ``-m`` and QEMU will fail to start up if
+ RAM allocation is unsuccessful.
  
--static void riscv_virt_board_init(MachineState *machine)
-+static void virt_machine_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = virt_memmap;
-     RISCVVirtState *s = RISCV_VIRT_MACHINE(machine);
-@@ -632,32 +632,32 @@ static void riscv_virt_board_init(MachineState *machine)
-     g_free(plic_hart_config);
- }
+-RISC-V ``-bios`` (since 4.1)
++RISC-V ``-bios`` (since 5.1)
+ ''''''''''''''''''''''''''''
  
--static void riscv_virt_machine_instance_init(Object *obj)
-+static void virt_machine_instance_init(Object *obj)
- {
- }
+ QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for the
+-RISC-V virt machine and sifive_u machine.
+-
+-QEMU 4.1 has no changes to the default behaviour to avoid breakages. This
+-default will change in a future QEMU release, so please prepare now. All users
+-of the virt or sifive_u machine must change their command line usage.
+-
+-QEMU 4.1 has three options, please migrate to one of these three:
+- 1. ``-bios none`` - This is the current default behavior if no -bios option
+-      is included. QEMU will not automatically load any firmware. It is up
++RISC-V virt machine and sifive_u machine. QEMU 4.1 had no changes to the
++default behaviour to avoid breakages.
++
++QEMU 5.1 changes the default behaviour from ``-bios none`` to ``-bios default``.
++
++QEMU 5.1 has three options:
++ 1. ``-bios default`` - This is the current default behavior if no -bios option
++      is included. This option will load the default OpenSBI firmware automatically.
++      The firmware is included with the QEMU release and no user interaction is
++      required. All a user needs to do is specify the kernel they want to boot
++      with the -kernel option
++ 2. ``-bios none`` - QEMU will not automatically load any firmware. It is up
+       to the user to load all the images they need.
+- 2. ``-bios default`` - In a future QEMU release this will become the default
+-      behaviour if no -bios option is specified. This option will load the
+-      default OpenSBI firmware automatically. The firmware is included with
+-      the QEMU release and no user interaction is required. All a user needs
+-      to do is specify the kernel they want to boot with the -kernel option
+  3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
  
--static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
-+static void virt_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
- 
-     mc->desc = "RISC-V VirtIO board";
--    mc->init = riscv_virt_board_init;
-+    mc->init = virt_machine_init;
-     mc->max_cpus = 8;
-     mc->default_cpu_type = VIRT_CPU;
-     mc->pci_allow_0_address = true;
- }
- 
--static const TypeInfo riscv_virt_machine_typeinfo = {
-+static const TypeInfo virt_machine_typeinfo = {
-     .name       = MACHINE_TYPE_NAME("virt"),
-     .parent     = TYPE_MACHINE,
--    .class_init = riscv_virt_machine_class_init,
--    .instance_init = riscv_virt_machine_instance_init,
-+    .class_init = virt_machine_class_init,
-+    .instance_init = virt_machine_instance_init,
-     .instance_size = sizeof(RISCVVirtState),
- };
- 
--static void riscv_virt_machine_init_register_types(void)
-+static void virt_machine_init_register_types(void)
- {
--    type_register_static(&riscv_virt_machine_typeinfo);
-+    type_register_static(&virt_machine_typeinfo);
- }
- 
--type_init(riscv_virt_machine_init_register_types)
-+type_init(virt_machine_init_register_types)
+ ``-tb-size`` option (since 5.0)
 -- 
 2.26.2
 
