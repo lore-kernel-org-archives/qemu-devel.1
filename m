@@ -2,118 +2,88 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15294C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5221C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E24BE20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:24:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24BE20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 7939320678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:35:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffh3jVFe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7939320678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgUJp-0001IN-39
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:24:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60222)
+	id 1jgUUK-0006ek-E0
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:35:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jgUJ0-00082h-9k
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:23:46 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:35349)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jgUIy-0002Kk-QY
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:23:45 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N9dkB-1isbL443rp-015Yms; Wed, 03 Jun 2020 16:23:40 +0200
-Subject: Re: [PATCH 1/5] linux-user: Add strace support for a group of syscalls
-To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200602115331.1659-1-filip.bozuta@syrmia.com>
- <20200602115331.1659-2-filip.bozuta@syrmia.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <488cbeed-359d-cbcc-aece-f70a82d9fb0f@vivier.eu>
-Date: Wed, 3 Jun 2020 16:23:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jgUTO-0005ko-7q
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:34:30 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41937)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jgUTM-0004rH-FV
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 10:34:29 -0400
+Received: by mail-wr1-x444.google.com with SMTP id j10so2617122wrw.8
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 07:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iEk/VCyMATr9VzdvnTLjbD4xHhfC2aR23vezvXZc7ME=;
+ b=ffh3jVFeUP59EO1K0IkQdkDeDF1F2S9PwVtM0Ct/8WWzLz/n9g5Potww96gLepnVRf
+ O64yvjXHel7O3V47S0YoZ0wDEjE5LAD2Is8s2dnWYQi0UWK44wxigmkxWY5EVSO/m6ID
+ 1I9sTOyR1VafDvvN99GdS/fUAVYdH610K/yhjXzVDWg0pbb6AvkvXwTgYfsc1geJy5jN
+ gx2NZf3qO/mcxppz+zr+2VtbwlPszGYdie31edZvtp4c4CEpjTt55aeQ7PF1Seg2PJ6n
+ xH68ffmwk7Rn8jjJ49WeUcgwQTylepkIOHESMT41Yj8lUWzSLy8bBzmCcls9YhBqg068
+ 1NIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iEk/VCyMATr9VzdvnTLjbD4xHhfC2aR23vezvXZc7ME=;
+ b=IwDc4BQXh5GIt/p2k1uOdsL6vUi/Rmu9xGgI0LhboNHnRgrd9m+Jh6p/HBiXXgfb3V
+ DLSzux8d+9CZPabtP4pJSjQNptnTzafTmQHviRC+s7seAa03Z7JM8oMacs/8/AqtZABV
+ wQZVsUn7z5bZe6zApQXs78L2sPQ8sRhtxcEXIvhdiyyIa/uRsxkveZmiyTZn2911HNnx
+ G+QbAX3yZ1sHV8Z4EZLg/+pbmNaIIsJQKlJj+2oZGsfnJlRoZZUwrJ+OgaPjZJD/9OIK
+ BDhfgeNs591Pizeewg8K7HPhh09ajQzlhGBJHI14hKZNKdy98pYKqNV0+vPox9zcDoiB
+ Egjw==
+X-Gm-Message-State: AOAM532RFi/Q33DtA7b+EFQYpMxt7lz3D1vLDEwTMDuT3xupImGdQgNh
+ Q4QbIL9HFHn3OoIWY4zWoChGWYNovngGnQ0nX78=
+X-Google-Smtp-Source: ABdhPJy5SaIjWNiWO+NqHFeLml1pf6gCNuMSxqdSCQ0RQrkUxe3gC8XHztEpEOr2JxPMoi5JrYI32xmf8Vu4FRID0J8=
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr27755619wrv.162.1591194865176; 
+ Wed, 03 Jun 2020 07:34:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200602115331.1659-2-filip.bozuta@syrmia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:58g3DL6crqzO1DjuSFT6FNotU5R4umD9XOXvBrXba9l/arQX2oY
- u/tvR9AtQKut3K7gIu3tIdYdGlWF0hHsH5ai58Kx3ME4BiMPW5GJ9xme+XeKBnRMULirMuA
- Zm1ECfcklhdA2jTcn9CylPq+CAS43CHsdkIJg4E97xgygU7dnb/J4QmCmlAurRt+cC/YnTo
- pTMqYn2d83Evc9V7l6Ivw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uxXcZ27tTQE=:GhcdVCwx7yvLuppmEZtjpZ
- LgIRnAMg4uigeCKh2zLGop1rEw+mfjF327lXplY7mRBuRqo4v0tUfkMPtsq5r7oZjzF6t23Us
- qaBtWzrLwNiwvFCPTR1f3nTs2a0zx6Riw2UQO6SXWJ3Nd8ZIB6eV4R52+2xsgrNOiyOi8T6/x
- vT4ME6IaHzwVTwelRu/OIX4qNEC13fpbautmQVllfYjVAoWj9UHCdJjLZRrcu3jTuVwvci1B6
- yoJPflJ+YB89k1UO/to61cw66bBPaNjhPY0HQxGGuDOfD1wSb1GJA9rfzDrLtrS7IKPchq/lE
- GUI5ngAGK7poyVBgDaPX/vOoLhEZK3KnJxiF+JMj0TrtqhTJ3++sDmQnRXt2M6nW7JOP9zWRK
- 4cNnWPj4SWmY09Mdysdu3LvB7j8wYh7vwZovteWKetfrwOoNKzrY8VAPc87y3UVE4A8ZNyxfT
- PW1QcOQfmYQGssUSLJZMZ2Oid0fyIBVVs88hMYZpjmb8LP/KQAq/aIJW9twSQWbCOj5SixSoI
- To081VHUMXHa+EnKEyRuKwwlAh33pBUw3GkFkl8pFnNrM/uIwc1kz7PLCtFdIfxX5wkDsyhng
- E3FA+vI1UcG72hGFTGbEtAnQcwzXyQFwzktWv4vP5tL9poxNMBFF8MzwdoTj8MttxspQi+bag
- g4r4iVa3lO7nciPyS1ycrkU9V1V+DWTinwzUgSG7GDVwKGi3JXXkKKc7rx20XPf0UbTAkgs3L
- YrVqudZ6wcwjXBzzjjSkbEoJEl52OixUZ4ttcc53lrE0uv/KWWFQObYNwKrpzASx8CZycImk0
- lgm4ie4wC/08XJ7oAsrWLgqUII1l1HmyHEmDcV20DTWpi10GmaFU7gqNHTIDnnO4IYhcHTQ
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 10:23:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
+ <1591065557-9174-2-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1591065557-9174-2-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Wed, 3 Jun 2020 16:34:09 +0200
+Message-ID: <CAHiYmc7_yKHR4XMNyzYbERe7cqhyBYRt-sRwf=wtLuT=QoyRZA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
+ MachineClass
+To: Huacai Chen <zltjiangshi@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000b512dd05a72eec71"
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,119 +96,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/06/2020 à 13:53, Filip Bozuta a écrit :
-> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-> 
-> This patch implements strace argument printing functionality for following syscalls:
-> 
->     *acct - switch process accounting on or off
-> 
->         int acct(const char *filename)
->         man page: https://www.man7.org/linux/man-pages/man2/acct.2.html
-> 
->     *fsync, fdatasync - synchronize a file's in-core state with storage device
-> 
->         int fsync(int fd)
->         int fdatasync(int fd)
->         man page: https://www.man7.org/linux/man-pages/man2/fsync.2.html
-> 
->     *listen - listen for connections on a socket
-> 
->         int listen(int sockfd, int backlog)
->         man page: https://www.man7.org/linux/man-pages/man2/listen.2.html
-> 
-> Implementation notes:
-> 
->     Syscall acct() takes string as its only argument and thus a separate
->     print function "print_acct" is stated in file "strace.list". This
->     function is defined and implemented in "strace.c" by using an
->     existing function used to print string arguments: "print_string()".
->     All the other syscalls have only primitive argument types, so the
->     rest of the implementation was handled by stating an appropriate
->     printing format in file "strace.list".
-> 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-> ---
->  linux-user/strace.c    | 13 ++++++++++++-
->  linux-user/strace.list |  8 ++++----
->  2 files changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 0d9095c674..c578876d22 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -1353,6 +1353,18 @@ print_access(const struct syscallname *name,
->  }
->  #endif
->  
-> +#ifdef TARGET_NR_acct
-> +static void
-> +print_acct(const struct syscallname *name,
-> +    abi_long arg0, abi_long arg1, abi_long arg2,
-> +    abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_string(arg0, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#endif
-> +
->  #ifdef TARGET_NR_brk
->  static void
->  print_brk(const struct syscallname *name,
-> @@ -1617,7 +1629,6 @@ print_fcntl(const struct syscallname *name,
->  #define print_fcntl64   print_fcntl
->  #endif
->  
-> -
->  #ifdef TARGET_NR_futimesat
->  static void
->  print_futimesat(const struct syscallname *name,
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index d49a1e92a8..fb9799e7e6 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -13,7 +13,7 @@
->  { TARGET_NR_access, "access" , NULL, print_access, NULL },
->  #endif
->  #ifdef TARGET_NR_acct
-> -{ TARGET_NR_acct, "acct" , NULL, NULL, NULL },
-> +{ TARGET_NR_acct, "acct" , NULL, print_acct, NULL },
->  #endif
->  #ifdef TARGET_NR_add_key
->  { TARGET_NR_add_key, "add_key" , NULL, NULL, NULL },
-> @@ -215,7 +215,7 @@
->  { TARGET_NR_fcntl64, "fcntl64" , NULL, print_fcntl64, NULL },
->  #endif
->  #ifdef TARGET_NR_fdatasync
-> -{ TARGET_NR_fdatasync, "fdatasync" , NULL, NULL, NULL },
-> +{ TARGET_NR_fdatasync, "fdatasync" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fgetxattr
->  { TARGET_NR_fgetxattr, "fgetxattr" , NULL, NULL, NULL },
-> @@ -251,7 +251,7 @@
->  { TARGET_NR_fstatfs64, "fstatfs64" , "%s(%d,%p)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fsync
-> -{ TARGET_NR_fsync, "fsync" , NULL, NULL, NULL },
-> +{ TARGET_NR_fsync, "fsync" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_ftime
->  { TARGET_NR_ftime, "ftime" , NULL, NULL, NULL },
-> @@ -492,7 +492,7 @@
->  { TARGET_NR_Linux, "Linux" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_listen
-> -{ TARGET_NR_listen, "listen" , NULL, NULL, NULL },
-> +{ TARGET_NR_listen, "listen" , "%s(%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_listxattr
->  { TARGET_NR_listxattr, "listxattr" , NULL, NULL, NULL },
-> 
+--000000000000b512dd05a72eec71
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+=D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:38 Huacai Chen <z=
+ltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
+
+> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
+> can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
+> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
+> capability, so by default it will return "KVM not supported" on a VZ
+> platform. Thus, null-machine also need the kvm_type() hook.
+>
+> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>
+
+
+Hi, Huacai,
+
+For MIPS parts of QEMU, we prefer the following licence preamble:
+
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Do you agree with such preamble in hw/mips/common.c?
+
+(of course you name and email will stay intact)
+
+Regards,
+Aleksandar
+
+ hw/core/Makefile.objs  |  2 +-
+>  hw/core/null-machine.c |  4 ++++
+>  hw/mips/Makefile.objs  |  2 +-
+>  hw/mips/common.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/mips/mips.h |  3 +++
+>  5 files changed, 51 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/mips/common.c
+>
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index 1d540ed..b5672f4 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D
+> vm-change-state-handler.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
+> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
+>
+>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index cb47d9d..94a36f9 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -17,6 +17,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/core/cpu.h"
+> +#include "hw/mips/mips.h"
+>
+>  static void machine_none_init(MachineState *mch)
+>  {
+> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)
+>      mc->max_cpus =3D 1;
+>      mc->default_ram_size =3D 0;
+>      mc->default_ram_id =3D "ram";
+> +#ifdef TARGET_MIPS
+> +    mc->kvm_type =3D mips_kvm_type;
+> +#endif
+>  }
+>
+>  DEFINE_MACHINE("none", machine_none_machine_init)
+> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+> index 739e2b7..3b3e6ea 100644
+> --- a/hw/mips/Makefile.objs
+> +++ b/hw/mips/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -obj-y +=3D addr.o mips_int.o
+> +obj-y +=3D addr.o common.o mips_int.o
+>  obj-$(CONFIG_R4K) +=3D r4k.o
+>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o
+>  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
+> diff --git a/hw/mips/common.c b/hw/mips/common.c
+> new file mode 100644
+> index 0000000..4d8e141
+> --- /dev/null
+> +++ b/hw/mips/common.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Common MIPS routines
+> + *
+> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
+> + * This code is licensed under the GNU GPL v2.
+> + */
+> +
+> +#include <linux/kvm.h>
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "hw/boards.h"
+> +#include "hw/mips/mips.h"
+> +#include "sysemu/kvm_int.h"
+> +
+> +#ifndef CONFIG_KVM
+> +
+> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> +{
+> +    return 0;
+> +}
+> +
+> +#else
+> +
+> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> +{
+> +    int r;
+> +    KVMState *s =3D KVM_STATE(machine->accelerator);
+> +
+> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
+> +    if (r > 0) {
+> +        return KVM_VM_MIPS_VZ;
+> +    }
+> +
+> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
+> +    if (r > 0) {
+> +        return KVM_VM_MIPS_TE;
+> +    }
+> +
+> +    return -1;
+> +}
+> +
+> +#endif
+> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+> index 0af4c3d..2ac0580 100644
+> --- a/include/hw/mips/mips.h
+> +++ b/include/hw/mips/mips.h
+> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len)=
+;
+>
+>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
+>
+> +/* common.c */
+> +int mips_kvm_type(MachineState *machine, const char *vm_type);
+> +
+>  #endif
+> --
+> 2.7.0
+>
+>
+
+--000000000000b512dd05a72eec71
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">=D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=
+=D0=BD 2020. =D1=83 04:38 Huacai Chen &lt;<a href=3D"mailto:zltjiangshi@gma=
+il.com">zltjiangshi@gmail.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br></div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
+adding-left:1ex">MIPS has two types of KVM: TE &amp; VZ, and TE is the defa=
+ult type. Now we<br>
+can&#39;t create a VZ guest in QEMU because it lacks the kvm_type() hook in=
+<br>
+MachineClass. Besides, libvirt uses a null-machine to detect the kvm<br>
+capability, so by default it will return &quot;KVM not supported&quot; on a=
+ VZ<br>
+platform. Thus, null-machine also need the kvm_type() hook.<br>
+<br>
+Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.qemu.deve=
+l@gmail.com" target=3D"_blank">aleksandar.qemu.devel@gmail.com</a>&gt;<br>
+Signed-off-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com" target=
+=3D"_blank">chenhc@lemote.com</a>&gt;<br>
+Co-developed-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com"=
+ target=3D"_blank">jiaxun.yang@flygoat.com</a>&gt;<br>
+---<br></blockquote><div><br></div><div><br></div><div>Hi, Huacai,</div><di=
+v><br></div><div>For MIPS parts of QEMU, we prefer the following licence pr=
+eamble:</div><div><br></div><div>=C2=A0* =C2=A0This program is free softwar=
+e: you can redistribute it and/or modify<br>=C2=A0* =C2=A0it under the term=
+s of the GNU General Public License as published by<br>=C2=A0* =C2=A0the Fr=
+ee Software Foundation, either version 2 of the License, or<br>=C2=A0* =C2=
+=A0(at your option) any later version.<br>=C2=A0*<br>=C2=A0* =C2=A0This pro=
+gram is distributed in the hope that it will be useful,<br>=C2=A0* =C2=A0bu=
+t WITHOUT ANY WARRANTY; without even the implied warranty of<br>=C2=A0* =C2=
+=A0MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the<br>=
+=C2=A0* =C2=A0GNU General Public License for more details.<br>=C2=A0*<br>=
+=C2=A0* =C2=A0You should have received a copy of the GNU General Public Lic=
+ense<br>=C2=A0* =C2=A0along with this program.=C2=A0 If not, see &lt;<a hre=
+f=3D"https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>&gt;.<=
+/div><div><br></div><div>Do you agree with such preamble in hw/mips/common.=
+c?</div><div><br></div><div>(of course you name and email will stay intact)=
+</div><div><br></div><div>Regards,</div><div>Aleksandar<br></div><div> <br>=
+</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
+order-left:1px solid rgb(204,204,204);padding-left:1ex">
+=C2=A0hw/core/Makefile.objs=C2=A0 |=C2=A0 2 +-<br>
+=C2=A0hw/core/null-machine.c |=C2=A0 4 ++++<br>
+=C2=A0hw/mips/Makefile.objs=C2=A0 |=C2=A0 2 +-<br>
+=C2=A0hw/mips/common.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 42 +++++++++++++++++++++=
++++++++++++++++++++++<br>
+=C2=A0include/hw/mips/mips.h |=C2=A0 3 +++<br>
+=C2=A05 files changed, 51 insertions(+), 2 deletions(-)<br>
+=C2=A0create mode 100644 hw/mips/common.c<br>
+<br>
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs<br>
+index 1d540ed..b5672f4 100644<br>
+--- a/hw/core/Makefile.objs<br>
++++ b/hw/core/Makefile.objs<br>
+@@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-handl=
+er.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D machine.o<br>
+-common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D loader.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D numa.o<br>
+=C2=A0common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o<br>
++obj-$(CONFIG_SOFTMMU) +=3D null-machine.o<br>
+=C2=A0obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o<br>
+<br>
+=C2=A0common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o<br>
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c<br>
+index cb47d9d..94a36f9 100644<br>
+--- a/hw/core/null-machine.c<br>
++++ b/hw/core/null-machine.c<br>
+@@ -17,6 +17,7 @@<br>
+=C2=A0#include &quot;sysemu/sysemu.h&quot;<br>
+=C2=A0#include &quot;exec/address-spaces.h&quot;<br>
+=C2=A0#include &quot;hw/core/cpu.h&quot;<br>
++#include &quot;hw/mips/mips.h&quot;<br>
+<br>
+=C2=A0static void machine_none_init(MachineState *mch)<br>
+=C2=A0{<br>
+@@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)<b=
+r>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;max_cpus =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;default_ram_size =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;default_ram_id =3D &quot;ram&quot;;<br>
++#ifdef TARGET_MIPS<br>
++=C2=A0 =C2=A0 mc-&gt;kvm_type =3D mips_kvm_type;<br>
++#endif<br>
+=C2=A0}<br>
+<br>
+=C2=A0DEFINE_MACHINE(&quot;none&quot;, machine_none_machine_init)<br>
+diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs<br>
+index 739e2b7..3b3e6ea 100644<br>
+--- a/hw/mips/Makefile.objs<br>
++++ b/hw/mips/Makefile.objs<br>
+@@ -1,4 +1,4 @@<br>
+-obj-y +=3D addr.o mips_int.o<br>
++obj-y +=3D addr.o common.o mips_int.o<br>
+=C2=A0obj-$(CONFIG_R4K) +=3D r4k.o<br>
+=C2=A0obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o<br>
+=C2=A0obj-$(CONFIG_MIPSSIM) +=3D mipssim.o<br>
+diff --git a/hw/mips/common.c b/hw/mips/common.c<br>
+new file mode 100644<br>
+index 0000000..4d8e141<br>
+--- /dev/null<br>
++++ b/hw/mips/common.c<br>
+@@ -0,0 +1,42 @@<br>
++/*<br>
++ * Common MIPS routines<br>
++ *<br>
++ * Copyright (c) 2020 Huacai Chen (<a href=3D"mailto:chenhc@lemote.com" ta=
+rget=3D"_blank">chenhc@lemote.com</a>)<br>
++ * This code is licensed under the GNU GPL v2.<br>
++ */<br>
++<br>
++#include &lt;linux/kvm.h&gt;<br>
++#include &quot;qemu/osdep.h&quot;<br>
++#include &quot;qemu-common.h&quot;<br>
++#include &quot;hw/boards.h&quot;<br>
++#include &quot;hw/mips/mips.h&quot;<br>
++#include &quot;sysemu/kvm_int.h&quot;<br>
++<br>
++#ifndef CONFIG_KVM<br>
++<br>
++int mips_kvm_type(MachineState *machine, const char *vm_type)<br>
++{<br>
++=C2=A0 =C2=A0 return 0;<br>
++}<br>
++<br>
++#else<br>
++<br>
++int mips_kvm_type(MachineState *machine, const char *vm_type)<br>
++{<br>
++=C2=A0 =C2=A0 int r;<br>
++=C2=A0 =C2=A0 KVMState *s =3D KVM_STATE(machine-&gt;accelerator);<br>
++<br>
++=C2=A0 =C2=A0 r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);<br>
++=C2=A0 =C2=A0 if (r &gt; 0) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return KVM_VM_MIPS_VZ;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
++=C2=A0 =C2=A0 r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);<br>
++=C2=A0 =C2=A0 if (r &gt; 0) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return KVM_VM_MIPS_TE;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
++=C2=A0 =C2=A0 return -1;<br>
++}<br>
++<br>
++#endif<br>
+diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h<br>
+index 0af4c3d..2ac0580 100644<br>
+--- a/include/hw/mips/mips.h<br>
++++ b/include/hw/mips/mips.h<br>
+@@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len);<=
+br>
+<br>
+=C2=A0DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_m=
+r);<br>
+<br>
++/* common.c */<br>
++int mips_kvm_type(MachineState *machine, const char *vm_type);<br>
++<br>
+=C2=A0#endif<br>
+-- <br>
+2.7.0<br>
+<br>
+</blockquote></div></div>
+
+--000000000000b512dd05a72eec71--
 
