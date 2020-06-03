@@ -2,91 +2,77 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4088CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 576A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0152E20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 14:59:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTHGmDYx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0152E20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id 271E520679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:01:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271E520679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgUrv-0004X7-5U
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 10:59:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35740)
+	id 1jgUtJ-0006nb-AY
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 11:01:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgUlO-0007RQ-7c; Wed, 03 Jun 2020 10:53:06 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgUlN-0000XH-Bd; Wed, 03 Jun 2020 10:53:05 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d10so1924123pgn.4;
- Wed, 03 Jun 2020 07:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Kr3HUN5/YkECxPtjDxbpJDVaFQAB0Lcue4RVnkTaxI4=;
- b=FTHGmDYx15mPMYum2iUIhLJjAnlYqWq5IaLMBXrbMHu4Xm0PULiknnnuuR00P9+rsn
- iSUQhpn/6fLIsmSaH1nZMRACpDodQ6Y03AFKdqphOO8huPdzFom8ln6wjnWFW4FQKCfG
- jVQBCAo9ZbVrv6DkhG9t4sn2obDMFLcrnEGwhB0MxfsHAVIMICJXvVZMKi5ahvW/YXS1
- xpylBEvsnO544QxUxv95pIJ66tO+CKtIuQ1P5r9bNwypO4/yvs+6tOjP/IbLo1KUWygb
- awM9JtJXe35VAXOdfIqa0w3/hX/m5Izsomd6jpx9aycVapjlmvfGtirUZ2x596NLaBtJ
- ZNcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Kr3HUN5/YkECxPtjDxbpJDVaFQAB0Lcue4RVnkTaxI4=;
- b=JnwVObRdNTp7H9KlFJ5ABzOuVIHxi3ZwOCKWmlmDhCfd9L8/mh9VFenVtNsz+ZCeEK
- kMmIA0avn/N00R6AisbveBg2Ii2GnDPukorxjXA5SXR5vdTntvobCYyaRymLo+7vUxcM
- CInVPNXqiPnaJF/oCvo6BmvRcBNAVYwSbaaVrdKCEhKEbDlNoNmtq3zOCadvx02+0R4c
- XTjJzGve1DIlYl701B53XG0AFEn12aOaXYY8X+ffn8vHiJeth9mY8qx/9/UVgxkZ1eEL
- gxIXseBcmUuf4tjG9JV9uURbLPFjL4ihdQ7fGL5VJlSzezbtAagq8Rz3mSQCuqslycos
- muDg==
-X-Gm-Message-State: AOAM532DcgpMuxuxzE3bmTo2VYKKGWjFgdy0+xSMBum7SIBAUf+SmczR
- EQTpsweC8PmTYZTdINZyJHg=
-X-Google-Smtp-Source: ABdhPJx7dCZhPOf7/dogx3NdQyPWlsYb0KRH8Kg4gmXSsvNSgCbMfPnO+SFKuYP3dBkbkH3FypgTuA==
-X-Received: by 2002:a63:e454:: with SMTP id i20mr28733828pgk.440.1591195983522; 
- Wed, 03 Jun 2020 07:53:03 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id e124sm2141068pfh.140.2020.06.03.07.53.02
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 03 Jun 2020 07:53:03 -0700 (PDT)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 1/2] sd: sdhci: Implement basic vendor specific register
- support
-Date: Wed,  3 Jun 2020 07:52:57 -0700
-Message-Id: <20200603145258.195920-2-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200603145258.195920-1-linux@roeck-us.net>
-References: <20200603145258.195920-1-linux@roeck-us.net>
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1jgUlk-0008PH-OT; Wed, 03 Jun 2020 10:53:28 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2106 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1jgUlj-0000Z9-1B; Wed, 03 Jun 2020 10:53:28 -0400
+Received: from lhreml701-chm.china.huawei.com (unknown [172.18.7.108])
+ by Forcepoint Email with ESMTP id 123029BDA1E0E550BEA2;
+ Wed,  3 Jun 2020 15:53:22 +0100 (IST)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ lhreml701-chm.china.huawei.com (10.201.108.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Wed, 3 Jun 2020 15:53:21 +0100
+Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
+ lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
+ Wed, 3 Jun 2020 15:53:21 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: RE: [Question] Regarding PMU initialization within the QEMU for ARM
+ VCPUs
+Thread-Topic: [Question] Regarding PMU initialization within the QEMU for ARM
+ VCPUs
+Thread-Index: AdY3+/mIYt1+TQdDQmymnxAa7PkUWwBhkdKAAAS79tAAAMvMAAAC6ahgAAIBWIAAAj9tUA==
+Date: Wed, 3 Jun 2020 14:53:21 +0000
+Message-ID: <70ab2e21085844999f5f8615b32dde1d@huawei.com>
+References: <b2e401cd17fe49d792d09b31bd726e35@huawei.com>
+ <20200603093745.dwfb55ny34az7rez@kamzik.brq.redhat.com>
+ <6bacdd359e504ed8924e67ed125bf15d@huawei.com>
+ <20200603121606.bj3mjlqsstzbu7py@kamzik.brq.redhat.com>
+ <5cb329f13566411eadfeca7c9a1b4bf5@huawei.com>
+ <20200603143655.vk3uqw5lvgv6sm5p@kamzik.brq.redhat.com>
+In-Reply-To: <20200603143655.vk3uqw5lvgv6sm5p@kamzik.brq.redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.30.55]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=groeck7@gmail.com; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=185.176.76.210;
+ envelope-from=salil.mehta@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 07:45:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,132 +86,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Guenter Roeck <linux@roeck-us.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "gshan@redhat.com" <gshan@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Linux kernel's IMX code now uses vendor specific commands.
-This results in endless warnings when booting the Linux kernel.
 
-sdhci-esdhc-imx 2194000.usdhc: esdhc_wait_for_card_clock_gate_off:
-	card clock still not gate off in 100us!.
+> From: Qemu-arm [mailto:qemu-arm-bounces+salil.mehta=3Dhuawei.com@nongnu.o=
+rg]
+> On Behalf Of Andrew Jones
+> Sent: Wednesday, June 3, 2020 3:37 PM
+> To: Salil Mehta <salil.mehta@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>; mst@redhat.com;
+> qemu-devel@nongnu.org; eric.auger@redhat.com; qemu-arm@nongnu.org; Igor
+> Mammedov <imammedo@redhat.com>
+> Subject: Re: [Question] Regarding PMU initialization within the QEMU for =
+ARM
+> VCPUs
+>=20
+> On Wed, Jun 03, 2020 at 01:48:10PM +0000, Salil Mehta wrote:
+> > (Maybe I should float the ARM VCPU Hotplug patches and let this
+> >  discussion be held over there?)
+> >
+>=20
+> Yes, I think that would be best. Keep in mind that the 'pmu' CPU property
+> is just one CPU property that we require all CPUs to have, if any have it=
+.
+> 'aarch64' and 'sve' are two other examples. And, likely any CPU feature
+> that comes down the line that we want to use with KVM will fit that
+> pattern. I think the hotplug patch series will need to handle those
+> features in some way other than to push them all into machine properties.
 
-Implement support for the vendor specific command implemented in IMX hardware
-to be able to avoid this warning.
+Sure, I do have realization about that. I have for now used a per virt
+machine flag for PMU to do a workaround of the problem I discussed.
+Maybe once I float the patches further comments on the ways to improve
+the design would be very helpful. So for now I will keep the flag and
+use this approach and invite everyone for open discussion about this
+and we could evolve the design as we discuss there.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-v2: Added Philippe's Tested-by: and Reviewed-by: tags
 
- hw/sd/sdhci-internal.h |  5 +++++
- hw/sd/sdhci.c          | 18 +++++++++++++++++-
- include/hw/sd/sdhci.h  |  5 +++++
- 3 files changed, 27 insertions(+), 1 deletion(-)
-
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index e7c8a523b5..e8c753d6d1 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -75,6 +75,7 @@
- #define SDHC_CMD_INHIBIT               0x00000001
- #define SDHC_DATA_INHIBIT              0x00000002
- #define SDHC_DAT_LINE_ACTIVE           0x00000004
-+#define SDHC_IMX_CLOCK_GATE_OFF        0x00000080
- #define SDHC_DOING_WRITE               0x00000100
- #define SDHC_DOING_READ                0x00000200
- #define SDHC_SPACE_AVAILABLE           0x00000400
-@@ -289,7 +290,10 @@ extern const VMStateDescription sdhci_vmstate;
- 
- 
- #define ESDHC_MIX_CTRL                  0x48
-+
- #define ESDHC_VENDOR_SPEC               0xc0
-+#define ESDHC_IMX_FRC_SDCLK_ON          (1 << 8)
-+
- #define ESDHC_DLL_CTRL                  0x60
- 
- #define ESDHC_TUNING_CTRL               0xcc
-@@ -326,6 +330,7 @@ extern const VMStateDescription sdhci_vmstate;
- #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
-     DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
-     DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
-+    DEFINE_PROP_UINT8("vendor", _state, vendor, SDHCI_VENDOR_NONE), \
-     \
-     /* Capabilities registers provide information on supported
-      * features of this specific host controller implementation */ \
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 1b75d7bab9..eb2be6529e 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1569,11 +1569,13 @@ static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
-         }
-         break;
- 
-+    case ESDHC_VENDOR_SPEC:
-+        ret = s->vendor_spec;
-+        break;
-     case ESDHC_DLL_CTRL:
-     case ESDHC_TUNE_CTRL_STATUS:
-     case ESDHC_UNDOCUMENTED_REG27:
-     case ESDHC_TUNING_CTRL:
--    case ESDHC_VENDOR_SPEC:
-     case ESDHC_MIX_CTRL:
-     case ESDHC_WTMK_LVL:
-         ret = 0;
-@@ -1596,7 +1598,21 @@ usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-     case ESDHC_UNDOCUMENTED_REG27:
-     case ESDHC_TUNING_CTRL:
-     case ESDHC_WTMK_LVL:
-+        break;
-+
-     case ESDHC_VENDOR_SPEC:
-+        s->vendor_spec = value;
-+        switch (s->vendor) {
-+        case SDHCI_VENDOR_IMX:
-+            if (value & ESDHC_IMX_FRC_SDCLK_ON) {
-+                s->prnsts &= ~SDHC_IMX_CLOCK_GATE_OFF;
-+            } else {
-+                s->prnsts |= SDHC_IMX_CLOCK_GATE_OFF;
-+            }
-+            break;
-+        default:
-+            break;
-+        }
-         break;
- 
-     case SDHC_HOSTCTL:
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index c6868c9699..5d9275f3d6 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -74,6 +74,7 @@ typedef struct SDHCIState {
-     uint16_t acmd12errsts; /* Auto CMD12 error status register */
-     uint16_t hostctl2;     /* Host Control 2 */
-     uint64_t admasysaddr;  /* ADMA System Address Register */
-+    uint16_t vendor_spec;  /* Vendor specific register */
- 
-     /* Read-only registers */
-     uint64_t capareg;      /* Capabilities Register */
-@@ -96,8 +97,12 @@ typedef struct SDHCIState {
-     uint32_t quirks;
-     uint8_t sd_spec_version;
-     uint8_t uhs_mode;
-+    uint8_t vendor;        /* For vendor specific functionality */
- } SDHCIState;
- 
-+#define SDHCI_VENDOR_NONE       0
-+#define SDHCI_VENDOR_IMX        1
-+
- /*
-  * Controller does not provide transfer-complete interrupt when not
-  * busy.
--- 
-2.17.1
-
+Many thanks
+Salil.
 
