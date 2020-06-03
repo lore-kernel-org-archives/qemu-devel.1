@@ -2,82 +2,63 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB185C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73358C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:57:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8649C206A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:54:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hCF0BO14"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8649C206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E361207D5
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:57:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E361207D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgTqx-0003i1-Mk
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 09:54:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56212)
+	id 1jgTtp-0007CA-Ga
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 09:57:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jgTpZ-0002Mr-GC
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:53:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52735
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jgTpY-0003nI-Cf
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:53:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591192398;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=KSmhvyrUNPITZR71X8uXr+/WNZ47on5QwI4jFHkGKKM=;
- b=hCF0BO14eQuVO5UYKjZMkuYgvSBPQKZDffV952VKEQQsunkvP8adWKQMPNAdp60sqc33Pn
- 0N4CjigJFlEl04a5MjH9Nmf6ykztKu8v/peFrD3P2FBLH6vVsz6xF9IS+kcTfiqA71rF2X
- cXN011g8ki66OS5UiwQbxqJiVoLqopk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-AOecchZoO5K6dcDyYVZX9A-1; Wed, 03 Jun 2020 09:53:14 -0400
-X-MC-Unique: AOecchZoO5K6dcDyYVZX9A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AA5756B33;
- Wed,  3 Jun 2020 13:53:13 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-187.ams2.redhat.com [10.36.112.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B0487B5E1;
- Wed,  3 Jun 2020 13:53:09 +0000 (UTC)
-Date: Wed, 3 Jun 2020 15:53:07 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
-Subject: Re: [PATCH v4] icount: make dma reads deterministic
-Message-ID: <20200603135307.GD5127@linux.fritz.box>
-References: <159117972206.12193.12939621311413561779.stgit@pasha-ThinkPad-X280>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jgTt9-0006Gp-Pe
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:57:03 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:56510)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jgTt7-0004PU-4n
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:57:02 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id A5F84746335;
+ Wed,  3 Jun 2020 15:56:48 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 8BC8074632B; Wed,  3 Jun 2020 15:56:48 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 8A32C74594E;
+ Wed,  3 Jun 2020 15:56:48 +0200 (CEST)
+Date: Wed, 3 Jun 2020 15:56:48 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH] ati-vga: increment mm_index in ati_mm_read/write
+In-Reply-To: <20200603134404.xdb2koul7fatv4ez@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.22.395.2006031554560.9760@zero.eik.bme.hu>
+References: <20200603124732.1137892-1-ppandit@redhat.com>
+ <20200603134404.xdb2koul7fatv4ez@sirius.home.kraxel.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <159117972206.12193.12939621311413561779.stgit@pasha-ThinkPad-X280>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:04:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 09:56:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,68 +71,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, jsnow@redhat.com
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Ren Ding <rding@gatech.edu>, Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.06.2020 um 12:22 hat Pavel Dovgalyuk geschrieben:
-> From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-> 
-> Windows guest sometimes makes DMA requests with overlapping
-> target addresses. This leads to the following structure of iov for
-> the block driver:
-> 
-> addr size1
-> addr size2
-> addr size3
-> 
-> It means that three adjacent disk blocks should be read into the same
-> memory buffer. Windows does not expects anything from these bytes
-> (should it be data from the first block, or the last one, or some mix),
-> but uses them somehow. It leads to non-determinism of the guest execution,
-> because block driver does not preserve any order of reading.
-> 
-> This situation was discusses in the mailing list at least twice:
-> https://lists.gnu.org/archive/html/qemu-devel/2010-09/msg01996.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg05185.html
-> 
-> This patch makes such disk reads deterministic in icount mode.
-> It splits the whole request into several parts. Parts may overlap,
-> but SGs inside one part do not overlap.
-> Parts that are processed later overwrite the prior ones in case
-> of overlapping.
-> 
-> Examples for different SG part sequences:
-> 
-> 1)
-> A1 1000
-> A2 1000
-> A1 1000
-> A3 1000
-> ->
-> One request is split into two.
-> A1 1000
-> A2 1000
-> --
-> A1 1000
-> A3 1000
-> 
-> 2)
-> A1 800
-> A2 1000
-> A1 1000
-> ->
-> A1 800
-> A2 1000
-> --
-> A1 1000
-> 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Wed, 3 Jun 2020, Gerd Hoffmann wrote:
+> On Wed, Jun 03, 2020 at 06:17:32PM +0530, P J P wrote:
+>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>
+>> While accessing VGA registers via ati_mm_read/write routines,
+>> a guest may set 's->regs.mm_index' such that it leads to infinite
+>> recursion.
+>
+> Lovely.
+>
+>> Increment the mm_index value to avoid it.
+>
+> Hmm, why modify mm_index?  Shouldn't we just check it is non-zero
+> before calling ati_mm_read/ati_mm_write?
 
-Thanks, applied to the block branch.
+I haven't found any mention in any docs that say MM_INDEX should auto 
+increment so unless this is proven to do that on real hardware I also 
+think forbiding indexed access to index registers should be enough.
 
-Kevin
-
+Regards,
+BALATON Zoltan
 
