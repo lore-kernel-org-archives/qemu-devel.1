@@ -2,75 +2,110 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1212C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 693BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD49207D5
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:49:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD49207D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 36D62206A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 13:53:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKoDu0MN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D62206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgTlM-0000Ua-UB
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 09:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55584)
+	id 1jgTq7-0002iz-Dx
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 09:53:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jgTkf-0008Br-2I; Wed, 03 Jun 2020 09:48:17 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2105 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jgTkd-0002LI-HQ; Wed, 03 Jun 2020 09:48:16 -0400
-Received: from lhreml707-chm.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 638A09CB438B90F8D32B;
- Wed,  3 Jun 2020 14:48:11 +0100 (IST)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml707-chm.china.huawei.com (10.201.108.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 3 Jun 2020 14:48:10 +0100
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
- Wed, 3 Jun 2020 14:48:10 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: RE: [Question] Regarding PMU initialization within the QEMU for ARM
- VCPUs
-Thread-Topic: [Question] Regarding PMU initialization within the QEMU for ARM
- VCPUs
-Thread-Index: AdY3+/mIYt1+TQdDQmymnxAa7PkUWwBhkdKAAAS79tAAAMvMAAAC6ahg
-Date: Wed, 3 Jun 2020 13:48:10 +0000
-Message-ID: <5cb329f13566411eadfeca7c9a1b4bf5@huawei.com>
-References: <b2e401cd17fe49d792d09b31bd726e35@huawei.com>
- <20200603093745.dwfb55ny34az7rez@kamzik.brq.redhat.com>
- <6bacdd359e504ed8924e67ed125bf15d@huawei.com>
- <20200603121606.bj3mjlqsstzbu7py@kamzik.brq.redhat.com>
-In-Reply-To: <20200603121606.bj3mjlqsstzbu7py@kamzik.brq.redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.30.55]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jgTpT-0002CR-0m
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:53:15 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55580
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jgTpR-0003l6-J0
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 09:53:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591192392;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=j32L1MJsJGHQF1G5fr3J6Ak2AO2zgqbVM6B08avRVyY=;
+ b=YKoDu0MNINQ9nqRCwUo395QmJwlDKTOxtX+sxEHVFOePIcpr+22wYEu40+cITp61ZgF0kW
+ /DVPGUat8YWqwryfSmxdjss/bSrika3rgbWQLof33f9P4DP31qp53WVviLT86XOCs+I1q0
+ SCkhDjFvbT5ELOMCMXZKO7V1qAMlEvM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-73-18jGt9NIMrSkBXl-aeUqMw-1; Wed, 03 Jun 2020 09:53:09 -0400
+X-MC-Unique: 18jGt9NIMrSkBXl-aeUqMw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AD42800685;
+ Wed,  3 Jun 2020 13:53:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-115-6.ams2.redhat.com
+ [10.36.115.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA1385C3FD;
+ Wed,  3 Jun 2020 13:53:04 +0000 (UTC)
+Subject: Re: [PATCH for-5.1] qcow2: Don't open images with a backing file and
+ the data-file-raw bit
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200415190207.21118-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b0202150-5a43-18d5-3716-b758ab7e5824@redhat.com>
+Date: Wed, 3 Jun 2020 15:53:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=185.176.76.210;
- envelope-from=salil.mehta@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 07:45:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+In-Reply-To: <20200415190207.21118-1-berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mD9dXNkklsdNwPFjyXUM3m4dGCxGUin93"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,189 +119,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Andrew,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mD9dXNkklsdNwPFjyXUM3m4dGCxGUin93
+Content-Type: multipart/mixed; boundary="g5M6YifAmPM0VjThXhbEJ7FiLD78Tvf9G"
 
-> From: Andrew Jones [mailto:drjones@redhat.com]
-> Sent: Wednesday, June 3, 2020 1:16 PM
-> To: Salil Mehta <salil.mehta@huawei.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>; mst@redhat.com;
-> qemu-devel@nongnu.org; eric.auger@redhat.com; qemu-arm@nongnu.org; Igor
-> Mammedov <imammedo@redhat.com>
-> Subject: Re: [Question] Regarding PMU initialization within the QEMU for =
-ARM
-> VCPUs
+--g5M6YifAmPM0VjThXhbEJ7FiLD78Tvf9G
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 15.04.20 21:02, Alberto Garcia wrote:
+> Although we cannot create these images with qemu-img it is still
+> possible to do it using an external tool. QEMU should refuse to open
+> them until the data-file-raw bit is cleared with 'qemu-img check'.
 >=20
-> On Wed, Jun 03, 2020 at 11:45:22AM +0000, Salil Mehta wrote:
-> > Hi Andrew,
-> > Many thanks for the reply.
-> >
-> > > From: Andrew Jones [mailto:drjones@redhat.com]
-> > > Sent: Wednesday, June 3, 2020 10:38 AM
-> > > To: Salil Mehta <salil.mehta@huawei.com>
-> > > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org; Peter Maydell
-> > > <peter.maydell@linaro.org>; Igor Mammedov <imammedo@redhat.com>;
-> > > mst@redhat.com
-> > > Subject: Re: [Question] Regarding PMU initialization within the QEMU =
-for ARM
-> > > VCPUs
-> > >
-> > > On Mon, Jun 01, 2020 at 03:04:33PM +0000, Salil Mehta wrote:
-> > > > Hello,
-> > > > I could see below within function fdt_add_pmu_nodes() part of
-> > > > hw/arm/virt.c during virt machine initialization time:
-> > > >
-> > > > Observation:
-> > > > In below function, support of PMU feature is being checked for
-> > > > each vcpu and if the PMU is found part of the features then PMU
-> > > > is initialized with in the host/KVM. But if there is even one
-> > > > vcpu which is found to not support the PMU then loop is exited
-> > > > and PMU is not initialized for the rest of the vcpus as well.
-> > > >
-> > > > Questions:
-> > > > Q1. Not sure what is the logic of the premature exit and not
-> > > >     continuing with further checks and initialization of other
-> > > >     VCPU PMUs?
-> > >
-> > > KVM requires all VCPUs to have a PMU if one does. If the ARM ARM
-> > > says it's possible to have PMUs for only some CPUs, then, for TCG,
-> > > the restriction could be relaxed. I expect it will take more than
-> > > just removing the check for things to work though.
-> >
-> > Got it. Many thanks for this info.
-> >
-> > During virt machine init we take cpu type from (-cpu <cpu-type>)
-> > option and it should apply evenly to all of the vcpus. Therefore,
-> > I can assume all of the processors to be identical for now. This
-> > combined with the KVM restriction you mentioned above means for
-> > PMU we could only have Enable-for-All OR Enable-for-none config
-> > for all of the vcpus being booted even though we at different
-> > places do have per-vcpu specific check like below available
-> >
-> > /* MADT */
-> > static void
-> > build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vm=
-s)
-> > {
-> > [...]
-> >
-> >     for (i =3D 0; i < vms->smp_cpus; i++) {
-> >         AcpiMadtGenericCpuInterface *gicc =3D acpi_data_push(table_data=
-,
-> >                                                            sizeof(*gicc=
-));
-> >         [...]
-> >
-> >         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {---> This chec=
-k
-> >             gicc->performance_interrupt =3D
-> cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
-> >         }
-> >  [...]
-> > }
-> >
-> > Do per-vcpu feature check for PMU even makes sense till we allow
-> > heterogeneous support of processors or relax the PMU enablement
-> > on the per-vcpu basis within the KVM?
->=20
-> It may not be necessary now or ever to test more than one CPU for the
-> PMU feature, but without a good reason to change it to a machine
-> property then I'd prefer we always to the N-1 pointless checks. The
-> feature is a CPU feature, not a machine feature, so, IMO, it should
-> remain something configured and tested at the CPU level, not the machine
-> level.
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c              | 39 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/244     | 13 +++++++++++++
+>  tests/qemu-iotests/244.out | 14 ++++++++++++++
+>  3 files changed, 66 insertions(+)
+
+Sorry for the long delay. :/
+
+The patch itself looks good, but I=E2=80=99m not sure whether it is extensi=
+ve
+enough.  Let me just jump straight to the problem:
+
+$ ./qemu-img create -f qcow2 \
+    -o data_file=3Dfoo.qcow2.raw,data_file_raw=3Don \
+    foo.qcow2 64M
+(Create some file empty foo.qcow2 with external data file that=E2=80=99s ra=
+w)
+
+$ ./qemu-img create -f qcow2 backing.qcow2 64M
+$ ./qemu-io -c 'write -P 42 0 64M' backing.qcow2
+(Create some file filled with 42s)
+
+$ ./qemu-img compare foo.qcow2 foo.qcow2.raw
+Images are identical.
+(As expected, foo.qcow2 is identical to its raw data file)
+
+$ ./qemu-img compare --image-opts \
+    file.filename=3Dfoo.qcow2,backing.file.filename=3Dbacking.qcow2 \
+    file.filename=3Dfoo.qcow2.raw
+Content mismatch at offset 0!
+(Oops.)
+
+So when the user manually gives a backing file without one having been
+given by the image file, we run into the same problem.  Now I=E2=80=99m not
+quite sure what the problem is here.  We could make this patch more
+extensive and also forbid this case.
+
+But I think there actually shouldn=E2=80=99t be a problem.  The qcow2 drive=
+r
+shouldn=E2=80=99t fall back to a backing file for raw external data files. =
+ But
+how exactly should that be implemented?  I think the correct way would
+be to preallocate all metadata whenever data_file_raw=3Don =E2=80=93 the qc=
+ow2
+spec doesn=E2=80=99t say to ignore the metadata with data_file_raw=3Don, it=
+ just
+says that the data read from the qcow2 file must match that read from
+the external data file.
+(I seem to remember I proposed this before, but I don=E2=80=99t know exactl=
+y...)
+
+(In contrast, I don=E2=80=99t think it would be correct to just treat
+unallocated clusters as zero whenever data_file_raw=3Don.)
+
+What do you think?  Should we force preallocation with data_file_raw=3Don,
+and then just take this patch, even though it still lets users give
+backing files to a qcow2 file at runtime without error?  (Except the
+backing file wouldn=E2=80=99t have an effect, then.)
 
 
-I do understand this and all looks logical what you have said.
+--g5M6YifAmPM0VjThXhbEJ7FiLD78Tvf9G--
 
-Yes, there is a reason for this (but not sure if that is
-convincing enough) but having an added flag at per-machine level
-will help in supporting ARM VCPU Hotplug feature I am dealing with.
+--mD9dXNkklsdNwPFjyXUM3m4dGCxGUin93
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Just a summary to give you a context of vcpu hotplug design:
+-----BEGIN PGP SIGNATURE-----
 
-As per the design, at the time of machvirt_init() we pre-create
-the ARMCPU objects along with the corresponding KVM vcpus at the
-host. KVM vcpu initialized context(struct kvm_parked_vcpus) for the
-disabled vcpus is parked at per VM list kvm_parked_vcpus.=20
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7Xqz8ACgkQ9AfbAGHV
+z0CVmAf/eAOMi8itqrw/6Zw6+QA1P3bznHNiV9H1kqQGFGKZCG/ZM5tmde8Vzf1K
+BdL2Mt7yJb8SmWTRoVGZ3teElhQOvsBojZWy1Rd6smeGrIjTw4fZfJqWjs+EEpB/
+EpxnS/Peg1FDlvW5xhyEkz9926ml0YD3jBX8CCjZtzi/bofkvHuxOSjzF0cyiw1U
+eeQXlgX+Y5TOrkoLA2QShI3cfNvcPSjsp/grTWN+TEl34PFtTHiAKH15ortb449X
+r8kNryyYivg9kZRcz4ebRFMal0Csnrj8acYqn1ESTdWFDDuLupV+3xEgVBqonW2B
+PZMzMd2NvU8RcPniUICJUbWJEV5LZA==
+=CDT7
+-----END PGP SIGNATURE-----
 
-We create the ARMCPU objects(but these are not *realized* in qdev
-sense) to facilitate the GIC initialization (pre-sized with possible
-vcpus) with minimum change. After Initialization of the machine is
-complete we release the ARMCPU Objects for the disabled vcpus(which
-shall be re-created at the time when vcpu is hot plugged and
-at that time we re-attach this new ARMCPU object with already
-parked KVM VCPU context).=20
+--mD9dXNkklsdNwPFjyXUM3m4dGCxGUin93--
 
-So we have few options related to ARMCPU object release:
-1. The ARMCPU objects for the disabled vcpus are released in
-   context to the virt_machine_done() notifier.=20
-2. Defer release till a new vcpu object is hot plugged.
-3. Never release and keep on reusing them and release once
-   at VM exit.
-
-Each of the above approaches come with  their own pros and cons.
-(And I have prototyped each)
-
-1st case looks more cleaner but the only problem we are facing
-is after ARMCPUs are released and later during UEFI takes over,
-it could again call the QEMU virt_acpi_build_update() to update
-the ACPI tables(which UEFI has patched) which further ends up in
-build_dsdt()->build_madt() path and leads to a problem since
-disabled ARMCPU object are not available as they were released
-earlier in context of virt_machine_done().=20
-
-The problem happens in MADT which  needs per-vcpu PMU feature
-check  to decide whether to enable it in the GICC MDAT entry.
-
-Perhaps the problem is that maybe we are going against some
-design expectations and we should not be releasing the ARMCPU
-at all as firmware is dependent on it. And maybe UEFI and QEMU
-have some sort of coupled design which does not helps.
-
-
-
-> > > > Q2. Does it even makes sense to have PMUs initialized for some
-> > > >     vcpus and not for others unless we have heterogeneous system?
-> > >
-> > > I don't know, but it doesn't sound like a configuration I'd like
-> > > to see.
-> >
-> >
-> > sure. but in the existing code we do prematurely exit after we
-> > discover first vcpu amongst the possible vcpus not supporting
-> > PMU feature. This looks abnormal as well?
->=20
-> Are you trying to configure heterogeneous mach-virt machines? Or machines
-> that only provide PMUs to some CPUs?
-
-No, I am not rather assuming identical/homogenous processing.
-
- If not, then I'm not sure why this
-> would be a problem. Indeed it's likely a pointless check and, instead of
-> silently returning, it should output a warning or even assert. Otherwise,
-> I don't see a problem with it, since we want to be sure we're dealing wit=
-h
-> the type of configuration we expect, i.e. one where each CPU has a PMU if
-> any CPU has a PMU.
-
-It is not exactly a problem and as you said a rather pointless check
-present. But as explained I was trying to check if we could have
-a per-machine flag to devise a workaround for the PMU for now and have
-the design(above 3 approaches discussed) of the vcpu hotplug discussed
-as part of the patches which I have almost prepared.
-
-(Maybe I should float the ARM VCPU Hotplug patches and let this
- discussion be held over there?)
-
-Many thanks,
-Salil.
 
