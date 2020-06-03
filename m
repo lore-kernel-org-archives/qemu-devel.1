@@ -2,78 +2,84 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73270C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:18:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38AF5206E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AF5206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E615206E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 15:18:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqfuYkqr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E615206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgV6D-0003m1-F9
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 11:14:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38570)
+	id 1jgV9b-0007ER-TS
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 11:18:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jgV5C-0002cy-Cd; Wed, 03 Jun 2020 11:13:34 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2107 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jgV5A-000723-6N; Wed, 03 Jun 2020 11:13:33 -0400
-Received: from lhreml703-chm.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id DCA0DF28C3F27F1FD47F;
- Wed,  3 Jun 2020 16:13:26 +0100 (IST)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 3 Jun 2020 16:13:26 +0100
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
- Wed, 3 Jun 2020 16:13:26 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [Question] Regarding containers "unattached/peripheral/anonymous"
- - their relation with hot(un)plug of devices
-Thread-Topic: [Question] Regarding containers
- "unattached/peripheral/anonymous" - their relation with hot(un)plug of
- devices
-Thread-Index: AdXSpuyfn6DVS59zTi+rGkiX0i4oLAAFtBwAAADWJeAAA8wjgAACyCnAAJHlbgAAZ8bfMA==
-Date: Wed, 3 Jun 2020 15:13:26 +0000
-Message-ID: <ab94a6dec7b9435cbb36ca9d488a0daa@huawei.com>
-References: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
- <20200124145404.1d15209e@redhat.com>
- <77dbc712482545078986adcd72567630@huawei.com>
- <20200124170645.3d794ac6@redhat.com>
- <b8fccc99d7344b2485c0db76886af9c8@huawei.com>
- <20200127160352.54f95875@redhat.com>
-In-Reply-To: <20200127160352.54f95875@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.30.55]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgV7t-0005g1-CO
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 11:16:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53262
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgV7r-0007TX-3B
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 11:16:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591197377;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vpyY9p8AOxwPPLIrLPh3CRXe3/0oCjVevbVbZH4U6HY=;
+ b=JqfuYkqrH0iLVs4FDHvlN1FrhyGW8iwJtuq1kf3H7whWGOC/KgRbkSawWgpMY5j6jo+QC3
+ hB0fWXJhz2EDVqIBvB1kxp6oA2g++ePCvLY354hysRc5/nHOK/gxII47qlui6XNVV0ziZ5
+ 8C6ufVo6GUKsL/IRwHC+J9ZK3r10mqA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-IwXC8NdXMeSzOtTuJtrDYA-1; Wed, 03 Jun 2020 11:16:09 -0400
+X-MC-Unique: IwXC8NdXMeSzOtTuJtrDYA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBCB9107B7C3;
+ Wed,  3 Jun 2020 15:16:06 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E07E160C47;
+ Wed,  3 Jun 2020 15:15:55 +0000 (UTC)
+Subject: Re: [PATCH v3 00/20] virtio-mem: Paravirtualized memory hot(un)plug
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200603144914.41645-1-david@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <db32fec4-f758-50d2-185d-b865fe42fd6c@redhat.com>
+Date: Wed, 3 Jun 2020 10:15:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=185.176.76.210;
- envelope-from=salil.mehta@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 07:45:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+In-Reply-To: <20200603144914.41645-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:04:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,409 +93,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, "gshan@redhat.com" <gshan@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, pbonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, teawater <teawaterz@linux.alibaba.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Richard Henderson <rth@twiddle.net>, Eric Farman <farman@linux.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ Tony Krowiak <akrowiak@linux.ibm.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
-My sincere Apologies, I just realized that I missed to reply this mail.
-I was distracted to something else in  the month of the February and
-had only resumed working on hotplug in march. But will still reply to
-this mail. Also, I have incorporated most of the below points as in the
-vcpu hotplug patches as per your suggestions.
+On 6/3/20 9:48 AM, David Hildenbrand wrote:
+> This is the very basic, initial version of virtio-mem. More info on
+> virtio-mem in general can be found in the Linux kernel driver v2 posting
+> [1] and in patch #10. The latest Linux driver v4 can be found at [2].
+> 
+> This series is based on [3]:
+>      "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
+>       buses"
+> 
 
+Let's spell that in a form patchew can recognize:
 
-> From: Qemu-arm [mailto:qemu-arm-bounces+salil.mehta=3Dhuawei.com@nongnu.o=
-rg]
-> On Behalf Of Igor Mammedov
-> Sent: Monday, January 27, 2020 3:04 PM
-> To: Salil Mehta <salil.mehta@huawei.com>
->=20
-> On Fri, 24 Jan 2020 18:44:16 +0000
-> Salil Mehta <salil.mehta@huawei.com> wrote:
->=20
-> > > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > > Sent: Friday, January 24, 2020 4:07 PM
-> > >
-> > > On Fri, 24 Jan 2020 15:02:10 +0000
-> > > Salil Mehta <salil.mehta@huawei.com> wrote:
-> > >
-> > > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > > > > Sent: Friday, January 24, 2020 1:54 PM
-> > > > > To: Salil Mehta <salil.mehta@huawei.com>
-> > > > >
-> > > > > On Fri, 24 Jan 2020 11:20:15 +0000
-> > > > > Salil Mehta <salil.mehta@huawei.com> wrote:
-> > > > >
-> > > > > > Hello,
-> > > > > > I am working on vCPU Hotplug feature for ARM64 and I am in mid =
-of understanding
-> > > > > > some aspect of device_add/device_del interface of the QEMU.
-> > > > > >
-> > > > > > Observations:
-> > > > > > 1. Any object initialised by qmp_device_add() gets into /machin=
-e/unattached
-> > > > > > container. I traced the flow to code leg inside  device_set_rea=
-lized()
-> > > > > > 2. I could see the reverse qmp_device_del() expects the device =
-to be in
-> > > > > > /machine/peripheral container.
-> > > > > > 3. I could see any object initially added to unattached contain=
-er did not had
-> > > > > > their parents until object_add_property_child() was called furt=
-her in the leg.
-> > > > > > which effectively meant a new property was created and property=
- table
-> > > > > > populated and child was parented.
-> > > > > > 4. Generally, container  /machine/peripheral was being used whe=
-rever
-> > > > > > DEVICE(dev)->id was present and non-null.
-> > > > > >
-> > > > > > Question:
-> > > > > > 1. Wanted to confirm my understanding about the use of having s=
-eparate
-> > > > > > containers like unattached, peripheral and anonymous.
-> > > > >
-> > > > > > 2. At init time all the vcpus goes under *unattached* container=
-. Now,
-> > > > > > qmp_device_del() cannot be used to unplug them. I am wondering
-> > > > >
-> > > > > device is put into 'unattached' in case it wasn't assigned a pare=
-nt.
-> > > > > Usually it happens when board creates device directly.
-> > > >
-> > > >
-> > > > Sure, but if we decide that certain number(N) of vcpus are hotpluga=
-bble
-> > > > and certain subset of N (say 'n' < 'N') should be allowed to be pre=
-sent
-> > > > or cold-plugged at the init time then I wonder which of the followi=
-ng
-> > > > is correct approach:
-> > > >
-> > > > 1. Bring all of N vcpus at boot time under "peripheral" container
-> > > >                                    OR
-> > > > 2. Just bring subset 'n' of 'N' under "peripheral" container and re=
-st
-> > > >     under "unattached" container? And later as and when rest of the
-> > > >     vcpus are hotplugged they should be transferred from "unattache=
-d"
-> > > >     container to "peripheral" container?
-> > >
-> > > issue with that is that to put device into "peripheral" container,
-> > > 'the user' must provide 'id'. (currently QEMU isn't able to do it on =
-its own
-> > > [1])
-> > >
-> > > But it doesn't mean that cold-plugged CPUs can't be unpluged.
-> > > What current users could do is start QEMU like this (simplified versi=
-on):
-> > >
-> > >  $QEMU -smp 1,maxcpus=3DN -device foo-cpu-type,id=3DCPU00 -device
-> > > foo-cpu-type,id=3DCPU01 ...
-> > >
-> > > i.e. 1st CPU is not manageable due to lack if 'id' and is created by =
-board code,
-> > > the rest have 'id' and could be managed.
-> >
-> >
-> > I understand, that we can somehow assign ids from the QMP interface but
-> > above will not push vcpus into "peripheral" container. They will appear
-> > in "unattached" container but with specified names and as-far-as I can
-> > see in the code 'device_del' can only delete objects/devices from the
-> > 'peripheral' container?
->=20
-> qemu-system-x86_64 -monitor stdio \
->     -smp 1,maxcpus=3D3 \
->     -device qemu64-x86_64-cpu,id=3Dfoo,socket-id=3D1,core-id=3D0,thread-i=
-d=3D0 \
->     -device qemu64-x86_64-cpu,socket-id=3D2,core-id=3D0,thread-id=3D0
->=20
-> (qemu) info hotpluggable-cpus
-> Hotpluggable CPUs:
->   type: "qemu64-x86_64-cpu"
->   vcpus_count: "1"
->   qom_path: "/machine/peripheral-anon/device[0]"
->                       ^^^^^^^^^^^^^^^
->   CPUInstance Properties:
->     socket-id: "2"
->     core-id: "0"
->     thread-id: "0"
->   type: "qemu64-x86_64-cpu"
->   vcpus_count: "1"
->   qom_path: "/machine/peripheral/foo"
->                       ^^^^^^^^^^
->=20
-> in gist, if device is created with any variant of device_add,
-> it goes to "peripheral[-anon]" including cold-plugged one.
+Based-on: <20200525084511.51379-1-david@redhat.com>
 
-
-I am not sure why you said "including cold-plugged one"? I hope by
-cold-plug'ging you mean here are the CPUs which already exist at
-the boot time of the Guest VM and plugged using -device?
-
-
->   CPUInstance Properties:
->     socket-id: "1"
->     core-id: "0"
->     thread-id: "0"
->   type: "qemu64-x86_64-cpu"
->   vcpus_count: "1"
->   qom_path: "/machine/unattached/device[0]"
-                          ^^^^^^^^^^^^^
-
-Unless you have pasted wrongly here, above output also shows qom path
-as 'unattached' for cold-plugged CPUs. Am I missing something? :)
-
-
->   CPUInstance Properties:
->     socket-id: "0"
->     core-id: "0"
->     thread-id: "0"
-
-
-
-> > Plus, having those many ids specified for over large number of vcpus
-> > does not looks very practical solution. We need interface like auto
-> number of IDs is not a problem since it's usually handled by management
-> software just fine (ex: libvirt does it)
->=20
-> > Generation of ids even at the boot time. I could see from the link you
-> > have shared that it is already being used by ID_BLOCK subsystem. Can we
-> > create a new subsystem for cpus under this and do the auto Generation
-> > of vcpu ids as well?
->=20
-> I'm not sure that auto ids was actually merged.
-> (I thought it wasn't)
-
-
-Well if you were referring to below then it has been part of qemu for quite
-long now:
-
-Patch: util - add automated ID generation utility
-File: https://github.com/qemu/qemu/blob/master/util/id.c
-Commit-id: https://github.com/qemu/qemu/commit/a0f1913637e6
-
-
-> Anyway auto IDs are not directly related to enabling CPU hotplug for ARM,
-> if you feel they should be generated you can try to propose patches.
-
-Sure.=20
-
-
-> > Plus, there is another unique requirement specifically for realizing
-> > vcpu hotplug for ARM64.
-> >
-> > Summary:
-> > Right now ARM architecture does not allows reinitializing the GIC
-> > after VM has booted. Therefore, we are planning to pre-size the GIC
-> > interfaces at init time by initializing all of the possible vcpus
-> > and keep them in 'realized' but 'unavailable' state to the Guest
-> > VM. They shall be made available as-and-when vcpus are hot-plugged
-> > later-on. Therefore, current efforts are to be able to plug and
-> > unplug from the qemu QOM without destroying the existing state of
-> > the devices/objects representing vcpus. These all possible vcpus
-> > shall be created once at the boot time of the VM. The vcpus which
-> > are not available to the Guest VM can be Parked.
-> >
-> > Once the vcpus are hot-(un)plug'ged only the (pre-)plug/unplug(-request=
-)
-> > interfaces are used to convey this even information to the Guest
-> > VM.
-> >
-> > I have tested this solution and it works but I wanted to make sure
-> > that I am not doing anything which breaks any of the existing Qemu
-> > QOM interfaces and basic fundamental idea behind being able to attach
-> > and detach from the Qemu QOM is okay?
-> >
-> > Any suggestion are welcome in this regard?
->=20
-> From discussion with Drew [CCed], I got that kvm/arm isn't designed
-> to support vCPU hotplug (and it would require heavy refactoring to
-> separate GIC and VCPUs, which probably won't be welcomed by maintainers).
-
-Agreed. I have pre-sized GIC with possible vcpus. I think Marc did
-mention about this earlier.
-
->=20
-> But that's only KVM side of the equation. Assuming that we don't
-> touch KVM much, the only QEMU side is left.
->=20
-> Further lets call
->  * vCPU - a kvm's part of CPU
->  * CPU - QEMU object which is linked to vCPU via file descriptor.
->=20
-> In QEMU we have CPU devices which optionally might create vCPUs
-> during device realize time (if QEMU runs with KVM accelerator).
->=20
-> So from design point of view, I'd suggest to dynamically
-> create/remove CPU devices on demand using existing
->  -device/device_add/device_del interface
-> like we do for other architectures.
->=20
-> But in case of running with KVM accelerator, to accommodate
-> current non dynamic ARM/KVM, I'd move vCPU creation to "kvm_init()"
-> time or board init time, so it would pre-create vCPUs in
-> KVM early in parked state and put them in 'kvm_parked_vcpus' list
-> but won't create CPU devices for them.
-
-
-Something similar. But I am doing it from virt machine init.
-
-
-> Then later when management adds CPU device either with
-> '-device' or 'device_add', a new CPU device will pick up
-> pre-created parked vCPU file descriptor and re-use it.
->=20
-> Parked vCPU infrastructure is already exists in QEMU as we use it
-> for hot-unplugged CPUs for the same reasons (it needs too much
-> refactoring on KVM side to really remove vCPU).
-
-Agreed with respect to KVM change. I have added some new in qemu/kvm
-layer but some re-factoring might be needed later to extract common
-code. Also, ARM arch specific functions had to be introduced.
-
->=20
-> So when CPU is hot-unplugged, we put linked vCPU file descriptor
-> into kvm_parked_vcpus (see: kvm_destroy_vcpu) and completely delete
-> CPU device on QEMU side. Then when the same CPU is hot-plugged again,
-> we reuse previously parked vCPU file descriptor (see: kvm_get_vcpu).
-
-
-Yes, I have done exactly this and perhaps this approach was discussed
-in earlier mail-chains as well involving you. So taken your suggestion
-and many thanks for this :)
-
-
-> > NOTE: I plan to share the patches with the community which includes
-> > both the changes of the Linux Kernel and the QEMU in near future.
-
-
-Plan to share a RFC within a week for sure.=20
-
-
-> > > 1) here is what I could find on IDs topic
-> > >    https://lists.gnu.org/archive/html/qemu-block/2015-09/msg00011.htm=
-l
-> > >
-> > > > > >    if all the hotplug devices need to go under the *peripheral*=
- container while
-> > > > > > they are hotplugged and during object init time as well?
-> > > > >
-> > > > > theoretically device_del may use QOM path (the later users can ge=
-t with
-> > > > > query-hotpluggable-cpus),
-> > > > > but I think it's mostly debugging feature.
-> > > >
-> > > >
-> > > > Sure.
-> > > >
-> > > >
-> > > > > users are supposed to specify 'id' during -device/device_add if t=
-hey are going
-> > > > > to manage that device.
-> > > > > afterwards (like unplugging it). Then they could use that 'id' in=
- other commands
-> > > > > (including device_del)
-> > > > >
-> > > > > So 'id'-ed devices end up in 'peripheral' container.
-> > > >
-> > > >
-> > > > Sure, what if hotplugged device is removed and then added again? It=
- looks
-> > > > qmp_device_add() interface will again end up calling the device_set=
-_realized()
-> > > > which eventually would put hotplugged devices under "unattached" co=
-ntainer?
-> > >
-> > > it won't, see call chain:
-> > >
-> > >   qmp_device_add()
-> > >       -> qdev_device_add()
-> > >           -> qdev_set_id()
-> >
-> > Ok, sure. I did see the qdev_set_id() interface. Infact, earlier I was =
-actually
-> > trying to play with it by making it more generic and adding even the 'u=
-nattached'
-> > container handling to it(which is missing right now) and calling it ins=
-ide the
-> > device_set_realized()  instead of below code:
-> >
-> >         if (!obj->parent) {
-> >             gchar *name =3D g_strdup_printf("device[%d]", unattached_co=
-unt++);
-> >
-> >             object_property_add_child(container_get(qdev_get_machine(),
-> >                                                     "/unattached"),
-> >                                       name, obj, &error_abort);
-> >             unattached_parent =3D true;
-> >             g_free(name);
-> >         }
-> >
-> > Idea of above dabbling was to have common interface for 'unattached' co=
-ntainer
-> > and call it from virt.c from machvirt_init() where possible vcpus are b=
-eing
-> > created. Force them to be located either inside 'unttached' or 'periphe=
-ral'
-> > container akin to the example you had given.
-> >
-> > If we look at qdev_device_add() function, after setting dev->id using
-> > qdev_set_id() (which would also result in parenting of an object under
-> > 'peripheral' container), it calls the function to 'realize' the device/=
-object
-> > which would end up in hitting above shared code excerpt and now because
-> > it will have the parent already set, the object won't go into 'unattach=
-ed'
-> > container.
-> >
-> > Currently, later cannot be controlled for the cold-lugged vcpus. Theref=
-ore,
-> > before this discussion my initial thought process was to either make
-> > qdev_set_id() universal (i.e. include handling for all type of containe=
-rs
-> > unattached/peripheral/anonymous in qdev_set_id()). Then call it from
-> > machvirt_init() just before the vcpus have been 'realized' so that
-> > cold-plugged cpus could get into 'peripheral' container. This would hel=
-p
-> > in hot-unplugging using the standard 'device_del' interface.
->=20
-> I think we understand cold-plugged vcpus differently.
-> From QEMU point of view there are 2 kinds of cold-plugged CPU devices.
->=20
-> Ones that are currently created by board directly following pattern
->=20
->  object_new()
->  set properties
->  relalize
->=20
-> these are created (lets call them builtin) in amount specified by -smp X
-> and are not manageable by external applications.
->=20
-> The second kind of cold-plugged CPUs are the ones created on command
-> line with help of:
->=20
->  -device cpu-type-foo
->=20
-> these are created by management applications and could be hot-removed
-> if management supplied 'id'. For example libvirt starts qemu with 1
-> built-in cpu in paused mode (-s) QEMU, then it hotplugs via QMP N cpus
-> and lets VM run (it's essentially the same as using -device on CLI).
-> This way it can remove all CPUs except of 1st one which is good enough
-> in almost all the cases.
->=20
-
-Sure, I can see your point. I have tried to incorporate part of it.
-Maybe you would like to check the code which will be sent soon.
-
-
-Many thanks
-Salil
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
