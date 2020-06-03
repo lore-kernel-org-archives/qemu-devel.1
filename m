@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF437C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3502C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F5012072F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 705C12072F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:24:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sSjsr+lT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F5012072F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U/q0uTVo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705C12072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgI6z-0004tz-PD
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:22:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48890)
+	id 1jgI8k-0007s9-MG
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:24:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyf-0004Tq-CO
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:57 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39332)
+ id 1jgHyV-00040p-H2
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:47 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46895)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyc-0003dG-OR
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:57 -0400
-Received: by mail-pf1-x442.google.com with SMTP id d66so417483pfd.6
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:54 -0700 (PDT)
+ id 1jgHyP-0003Zm-CQ
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:47 -0400
+Received: by mail-pf1-x443.google.com with SMTP id b16so395832pfi.13
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+uzIV7dO8JDXOF8PjdnP8vAM1Vj2wACSpWbkwbf2z7U=;
- b=sSjsr+lTcFtP2ELmksFBwo00Fxek3vqLxh1hRKW31fRIIBna1iLOjNn9CWnIRBVu25
- c7LtCRvwypAzYdkL+bzzd/3znmTgxy9Jbiv3r6V0IJ7P71pEKWGWHKAy0L4ax1xY40YX
- Y7OjTX/qJnBAMcUx6U6v3pcGNkdqcUSn/kXnH+RfMgfqKIjcf54pe9EiR9dV/DDaaDfW
- F5O/JTWEGYMbqpGzBuhH/Fv+fQ9dtG6JRB3P67p1/TEGqQ2YTRN1qw6bIDCriP6kICY7
- nhp4Ldq4qEFhShN6fi3ziY9mshdehsodsgPUGQ939x0+xrRvqHdMQX7VzfVSk5aZBVS5
- k0Gg==
+ bh=lQUCdDSymie/7dQ1iavooQ03Mfu1YJhrKa9eVrF8VLk=;
+ b=U/q0uTVoFwQhjnL9XwKPSwInTYw7BqC/t+ZGwi4JRUW/sPbFLP5A5TDNoSz6MTkBvb
+ sgs0BUjzNzoB8LmB8YKm/6ZQJs/NGKZ+1R5pGrovVN+iMAKzyjFLFGDQaDlqEYiFZGj/
+ ib41y5livE10QOUJLkkGuFlUPOscTndPf6Povg7tGl03wj5imEdYaYEDAjwoa8/Qgs+c
+ ywnz91TtgvzVIDXjPaILVMYrIIfqIM66v3ycbganuzBIm/m2X3X7awbcqMbLf+Ltn8Kp
+ +6sFQz0G9xLrXbRou2x9BeEVGzd7+JK5o5und6fnd6pYbBljpg89+5FDDYmZDebydoQw
+ iRpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+uzIV7dO8JDXOF8PjdnP8vAM1Vj2wACSpWbkwbf2z7U=;
- b=uIRFeXYFGsvBO1DC5iANcVflbQ7rMOLF6Z+OE6VOHzkL6pJ2lyvTVEViYW9o3w+itT
- 5vJ+IWu9VFQEAHGFvfWEpRasUN/Eij4l/JZ3ydJFkobI9P4zjlYzS2Nq/PLzsfEGF1xN
- KYdIechOE2qsu4nW0FwajUwWL9PQeAAokhTrIcB5CPnys0eSKl5WUnHf1P4DojPvqUB8
- eauDdTdY6FlDYir7XMJmzwm5sp6czuCYp2MxQmhSuTHiXB+W3EzgOaDES41wrGzuy6gq
- +DXoqAIB07gAIeJYFeexv3DhDVEFNtZ7Uvg+EOnKiq4vIZ0vSEspTOVMmJsYP0dyl7LR
- 7hnw==
-X-Gm-Message-State: AOAM530SXatL49kvSrvU89Z4OzS6dC4+T8Sa85MvXOhVtA8rtYk0sCA+
- 61dgmmDm8+pi9L6v9jL+ZeuTeYwaFMc=
-X-Google-Smtp-Source: ABdhPJw7EuoPDnTMAlcxmOKy/BsjdsoZScM0PQCRs4+ybUSxmvYMyL2MIQ5VyQufH22UWsq3RRVSRQ==
-X-Received: by 2002:a65:5206:: with SMTP id o6mr25443433pgp.16.1591146832722; 
- Tue, 02 Jun 2020 18:13:52 -0700 (PDT)
+ bh=lQUCdDSymie/7dQ1iavooQ03Mfu1YJhrKa9eVrF8VLk=;
+ b=KvC7dZA5w1m+1HEk/jgqAuX6HwRz2GSFTJspohJmeDsWoAjb40Xxs9u4MY8HdcWVWC
+ 6CqenacNKxDnYw1lcfwT1S5sPq4InzHFZGaNcLK9ZyKEBdQ6OSWSJNO/D0KNEbzO1Xqp
+ EGYzvFdvMPHiQJtOeVeuUDdEK0Bvkbd6HFF5RfI6R/HpgSs2PR9kC8btS7IpMgtDG2p4
+ Ypz+JplCBmOXVM6rCl6NiazlrteGvnQa9pHmc/verMyF6GpUklsdNS77g1J1G9skd8qz
+ vahMLdJd61Brl7NEA3Dl1+HRv4wq1cYX+iclhs+arQKxkwr91FawVdH7XaevExd3p5xl
+ TRQg==
+X-Gm-Message-State: AOAM5315FxOSAl2DCmR30tKF9wt53iRvsL4ZuARW523Opl/Sm0kpYEZ1
+ X0kPOPBmKzwYgmI2A8tqmSQ6XP55aiY=
+X-Google-Smtp-Source: ABdhPJweJcy9L2BN2eJViQIUDofbMLQTfj5PsoTP+63f77NAOiimesWlL4yX+cYxsoe3QxzbXTcAsQ==
+X-Received: by 2002:a63:348:: with SMTP id 69mr25417768pgd.68.1591146819477;
+ Tue, 02 Jun 2020 18:13:39 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.51
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:13:52 -0700 (PDT)
+ Tue, 02 Jun 2020 18:13:38 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 26/42] target/arm: Implement helper_mte_checkN
-Date: Tue,  2 Jun 2020 18:13:01 -0700
-Message-Id: <20200603011317.473934-27-richard.henderson@linaro.org>
+Subject: [PATCH v7 16/42] target/arm: Implement the STGP instruction
+Date: Tue,  2 Jun 2020 18:12:51 -0700
+Message-Id: <20200603011317.473934-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,204 +105,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fill out the stub that was added earlier.
-
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v7: Fix page crossing test (szabolcs nagy).
+v3: Handle atomicity, require pre-cleaned address.
+v6: Fix constant offset shift, non-checked address, use pre-computed ata.
 ---
- target/arm/internals.h  |   1 +
- target/arm/mte_helper.c | 165 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 165 insertions(+), 1 deletion(-)
+ target/arm/translate-a64.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 8ae80f3945..cc485603a8 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1320,6 +1320,7 @@ FIELD(MTEDESC, TSIZE, 14, 10)  /* mte_checkN only */
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 0725c2ca07..2fc070ab90 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -2681,7 +2681,7 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
+  * +-----+-------+---+---+-------+---+-------+-------+------+------+
+  *
+  * opc: LDP/STP/LDNP/STNP        00 -> 32 bit, 10 -> 64 bit
+- *      LDPSW                    01
++ *      LDPSW/STGP               01
+  *      LDP/STP/LDNP/STNP (SIMD) 00 -> 32 bit, 01 -> 64 bit, 10 -> 128 bit
+  *   V: 0 -> GPR, 1 -> Vector
+  * idx: 00 -> signed offset with non-temporal hint, 01 -> post-index,
+@@ -2706,6 +2706,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     bool is_signed = false;
+     bool postindex = false;
+     bool wback = false;
++    bool set_tag = false;
  
- bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
- uint64_t mte_check1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
+     TCGv_i64 clean_addr, dirty_addr;
  
- static inline int allocation_tag_from_addr(uint64_t ptr)
- {
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 72ff5543cf..c8a523ed4e 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -494,7 +494,170 @@ uint64_t HELPER(mte_check1)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- /*
-  * Perform an MTE checked access for multiple logical accesses.
-  */
-+
-+/**
-+ * checkN:
-+ * @tag: tag memory to test
-+ * @odd: true to begin testing at tags at odd nibble
-+ * @cmp: the tag to compare against
-+ * @count: number of tags to test
-+ *
-+ * Return the number of successful tests.
-+ * Thus a return value < @count indicates a failure.
-+ *
-+ * A note about sizes: count is expected to be small.
-+ *
-+ * The most common use will be LDP/STP of two integer registers,
-+ * which means 16 bytes of memory touching at most 2 tags, but
-+ * often the access is aligned and thus just 1 tag.
-+ *
-+ * Using AdvSIMD LD/ST (multiple), one can access 64 bytes of memory,
-+ * touching at most 5 tags.  SVE LDR/STR (vector) with the default
-+ * vector length is also 64 bytes; the maximum architectural length
-+ * is 256 bytes touching at most 9 tags.
-+ *
-+ * The loop below uses 7 logical operations and 1 memory operation
-+ * per tag pair.  An implementation that loads an aligned word and
-+ * uses masking to ignore adjacent tags requires 18 logical operations
-+ * and thus does not begin to pay off until 6 tags.
-+ * Which, according to the survey above, is unlikely to be common.
-+ */
-+
-+static int checkN(uint8_t *mem, int odd, int cmp, int count)
-+{
-+    int n = 0, diff;
-+
-+    /* Replicate the test tag and compare.  */
-+    cmp *= 0x11;
-+    diff = *mem++ ^ cmp;
-+
-+    if (odd) {
-+        goto start_odd;
-+    }
-+
-+    while (1) {
-+        /* Test even tag. */
-+        if (unlikely((diff) & 0x0f)) {
-+            break;
+@@ -2718,6 +2719,14 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+ 
+     if (is_vector) {
+         size = 2 + opc;
++    } else if (opc == 1 && !is_load) {
++        /* STGP */
++        if (!dc_isar_feature(aa64_mte_insn_reg, s) || index == 0) {
++            unallocated_encoding(s);
++            return;
 +        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+    start_odd:
-+        /* Test odd tag. */
-+        if (unlikely((diff) & 0xf0)) {
-+            break;
-+        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+        diff = *mem++ ^ cmp;
-+    }
-+    return n;
-+}
-+
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra)
-+{
-+    int mmu_idx, ptr_tag, bit55;
-+    uint64_t ptr_last, ptr_end, prev_page, next_page;
-+    uint64_t tag_first, tag_end;
-+    uint64_t tag_byte_first, tag_byte_end;
-+    uint32_t esize, total, tag_count, tag_size, n, c;
-+    uint8_t *mem1, *mem2;
-+    MMUAccessType type;
-+
-+    bit55 = extract64(ptr, 55, 1);
-+
-+    /* If TBI is disabled, the access is unchecked, and ptr is not dirty. */
-+    if (unlikely(!tbi_check(desc, bit55))) {
-+        return ptr;
-+    }
-+
-+    ptr_tag = allocation_tag_from_addr(ptr);
-+
-+    if (tcma_check(desc, bit55, ptr_tag)) {
-+        goto done;
-+    }
-+
-+    mmu_idx = FIELD_EX32(desc, MTEDESC, MIDX);
-+    type = FIELD_EX32(desc, MTEDESC, WRITE) ? MMU_DATA_STORE : MMU_DATA_LOAD;
-+    esize = FIELD_EX32(desc, MTEDESC, ESIZE);
-+    total = FIELD_EX32(desc, MTEDESC, TSIZE);
-+
-+    /* Find the addr of the end of the access, and of the last element. */
-+    ptr_end = ptr + total;
-+    ptr_last = ptr_end - esize;
-+
-+    /* Round the bounds to the tag granule, and compute the number of tags. */
-+    tag_first = QEMU_ALIGN_DOWN(ptr, TAG_GRANULE);
-+    tag_end = QEMU_ALIGN_UP(ptr_last, TAG_GRANULE);
-+    tag_count = (tag_end - tag_first) / TAG_GRANULE;
-+
-+    /* Round the bounds to twice the tag granule, and compute the bytes. */
-+    tag_byte_first = QEMU_ALIGN_DOWN(ptr, 2 * TAG_GRANULE);
-+    tag_byte_end = QEMU_ALIGN_UP(ptr_last, 2 * TAG_GRANULE);
-+
-+    /* Locate the page boundaries. */
-+    prev_page = ptr & TARGET_PAGE_MASK;
-+    next_page = prev_page + TARGET_PAGE_SIZE;
-+
-+    if (likely(tag_end - prev_page <= TARGET_PAGE_SIZE)) {
-+        /* Memory access stays on one page. */
-+        tag_size = (tag_byte_end - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, total,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+        if (!mem1) {
-+            goto done;
-+        }
-+        /* Perform all of the comparisons. */
-+        n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, tag_count);
-+    } else {
-+        /* Memory access crosses to next page. */
-+        tag_size = (next_page - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, next_page - ptr,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        tag_size = (tag_byte_end - next_page) / (2 * TAG_GRANULE);
-+        mem2 = allocation_tag_mem(env, mmu_idx, next_page, type,
-+                                  ptr_end - next_page,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        /*
-+         * Perform all of the comparisons.
-+         * Note the possible but unlikely case of the operation spanning
-+         * two pages that do not both have tagging enabled.
-+         */
-+        n = c = (next_page - tag_first) / TAG_GRANULE;
-+        if (mem1) {
-+            n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, c);
-+        }
-+        if (n == c) {
-+            if (!mem2) {
-+                goto done;
-+            }
-+            n += checkN(mem2, 0, ptr_tag, tag_count - c);
++        size = 3;
++        set_tag = true;
+     } else {
+         size = 2 + extract32(opc, 1, 1);
+         is_signed = extract32(opc, 0, 1);
+@@ -2758,7 +2767,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    offset <<= size;
++    offset <<= (set_tag ? LOG2_TAG_GRANULE : size);
+ 
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+@@ -2768,8 +2777,22 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     if (!postindex) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr);
+ 
++    if (set_tag) {
++        if (!s->ata) {
++             /*
++              * TODO: We could rely on the stores below, at least for
++              * system mode, if we arrange to add MO_ALIGN_16.
++              */
++            gen_helper_stg_stub(cpu_env, dirty_addr);
++        } else if (tb_cflags(s->base.tb) & CF_PARALLEL) {
++            gen_helper_stg_parallel(cpu_env, dirty_addr, dirty_addr);
++        } else {
++            gen_helper_stg(cpu_env, dirty_addr, dirty_addr);
 +        }
 +    }
 +
-+    /*
-+     * If we failed, we know which granule.  Compute the element that
-+     * is first in that granule, and signal failure on that element.
-+     */
-+    if (unlikely(n < tag_count)) {
-+        uint64_t fail_ofs;
-+
-+        fail_ofs = tag_first + n * TAG_GRANULE - ptr;
-+        fail_ofs = ROUND_UP(fail_ofs, esize);
-+        mte_check_fail(env, mmu_idx, ptr + fail_ofs, ra);
-+    }
-+
-+ done:
-+    return useronly_clean_ptr(ptr);
-+}
-+
- uint64_t HELPER(mte_checkN)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- {
--    return ptr;
-+    return mte_checkN(env, desc, ptr, GETPC());
- }
++    clean_addr = clean_data_tbi(s, dirty_addr);
+     if (is_vector) {
+         if (is_load) {
+             do_fp_ld(s, rt, clean_addr, size);
 -- 
 2.25.1
 
