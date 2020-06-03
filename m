@@ -2,93 +2,80 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACDAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37003C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB4FC206A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:35:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01945206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:37:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W2VpHdhl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4FC206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HY8ue64q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01945206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgIJd-0003za-6A
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:35:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49048)
+	id 1jgIL1-0005rh-8X
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyt-0005AP-Bd
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:11 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39719)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHys-0003hK-JE
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:10 -0400
-Received: by mail-pl1-x644.google.com with SMTP id v24so199532plo.6
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=uaH1sngv9xlWH/X8rZjic7q7Jho9e1jf1ezwAdUAR9c=;
- b=W2VpHdhlmXjJWldCJJ/AWBtSxY3UTYaz44DqxLhKEiskonM1uXUpPuN29hCgBFhPvP
- gA7YjjtvTHhJ8fx92XaeSMXl0EFMTDiukC9LU3Yk9lybiGySoCD1FPyYl6zvjVsQjQ/1
- bQ2EaThf9TApdkDsf/53X/YavAdnEWivRfC/g5t8sKJoQ31aoYdEOBXNRTkUlsEOj/HF
- pEy7asfNnWtpbtpB+r/l0jBmQgdZTeeqoGSkuw3PxtzqKW4l1RH1ulpfwhNN323u4vCQ
- 18fu0Mjvz++aU6Vdi5E0zAATT6NdUkmOwx78uuxXr/TJyE2Pn5x+g6UZwh7ulqF3O9zU
- EG3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uaH1sngv9xlWH/X8rZjic7q7Jho9e1jf1ezwAdUAR9c=;
- b=iNPNSEr/nAz5FBq2KlQyYWCeL7FNzZx1c1toZhctfds+lBE7pvQ0QLf8rpeBKbqc4w
- y885PdDp2PO2Dy7zXb8j/BfuFPsIpqQIybwmm4IJBfHCcu9scbJhOnmrXPFsA6Czmj5T
- jLnHmfVZuBdZweEUWZdve1lWahpz1+HByT7koJg4u+jBmIbBeWLOA7DADh+ZRooTP3ZM
- FIRbToJQAJkD/N9aUZb1AL7XR2yCycraAvdcVG8k1VszUs6H+3wunhc00+gd491DT0zW
- cDOUycMtQ8LXz51jUtKBlLWsgXwj4qWVTD/otBGahvR8ph2uglQzy5t3zcOSuzbYC4Di
- K9Tg==
-X-Gm-Message-State: AOAM530swloX/ZJovSUyoEUyU1IGuG88WYwVpW+Tos02HvzVLz+0VfhQ
- nDk/dImhWe18qn+I+9hx37fVKyD57HE=
-X-Google-Smtp-Source: ABdhPJxlz0U+OGynw30ChSMQGFOTZv+xNdIiO/NkvaO1oF/jXC+QHVGJok/SKi6Wu0syZRMm+Lp/AA==
-X-Received: by 2002:a17:902:d711:: with SMTP id
- w17mr28235658ply.122.1591146848946; 
- Tue, 02 Jun 2020 18:14:08 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:14:08 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgIKJ-0004ql-5k
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:36:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgIKI-0000lB-1S
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:36:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591148176;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=1veI5xnM2dTEEXj3F0cjF4FRf/3dhkKuEXQdeTiERfE=;
+ b=HY8ue64qIo5mUuKfyivFaB4z+M71eOoqicbpcDqJH5d1M2w1Qp8zUD/soU2ceqVtF/qYlF
+ m/ujocgBc9C7/LeKEUoSleF6yPpeQHu3byQ1t3QM2xzKxqmE0snnnsUigU6p0eiiRY5tpS
+ RUEQa4n8p5/3W+ZmNKsoX5lmnqU+FQc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-DmFXEYoZMFK67BfeF-KuZg-1; Tue, 02 Jun 2020 21:36:12 -0400
+X-MC-Unique: DmFXEYoZMFK67BfeF-KuZg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EEF1107ACCA;
+ Wed,  3 Jun 2020 01:36:11 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 045AD6EA51;
+ Wed,  3 Jun 2020 01:36:07 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 38/42] target/arm: Set PSTATE.TCO on exception entry
-Date: Tue,  2 Jun 2020 18:13:13 -0700
-Message-Id: <20200603011317.473934-39-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
-References: <20200603011317.473934-1-richard.henderson@linaro.org>
+Subject: [PATCH v3] osdep: Make MIN/MAX evaluate arguments only once
+Date: Tue,  2 Jun 2020 20:36:03 -0500
+Message-Id: <20200603013603.2400199-1-eblake@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 20:15:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,36 +88,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, steplong@quicinc.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ crosthwaite.peter@gmail.com, quintela@redhat.com, f4bug@amsat.org,
+ dgilbert@redhat.com, kraxel@redhat.com, dirty.ice.hu@gmail.com,
+ pbonzini@redhat.com, Max Reitz <mreitz@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-D1.10 specifies that exception handlers begin with tag checks overridden.
+I'm not aware of any immediate bugs in qemu where a second runtime
+evalution of the arguments to MIN() or MAX() causes a problem, but
+proactively preventing such abuse is easier than falling prey to an
+unintended case down the road.  At any rate, here's the conversation
+that sparked the current patch:
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Only set if MTE feature present.
----
- target/arm/helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+Update the MIN/MAX macros to only evaluate their argument once at
+runtime; this uses typeof(1 ? (a) : (b)) to ensure that we are
+promoting the temporaries to the same type as the final comparison (we
+have to trigger type promotion, as typeof(bitfield) won't compile; and
+we can't use typeof((a) + (b)) or even typeof((a) + 0), as some of our
+uses of MAX are on void* pointers where such addition is undefined).
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3adafc07f0..50717afa4a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9702,6 +9702,9 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-             break;
-         }
-     }
-+    if (cpu_isar_feature(aa64_mte, cpu)) {
-+        new_mode |= PSTATE_TCO;
+However, we are unable to work around gcc refusing to compile ({}) in
+a constant context, even when only used in the dead branch of a
+__builtin_choose_expr(), so we have to provide a second macro pair
+MIN_CONST and MAX_CONST for use when both arguments are known to be
+compile-time constants and where the result must also be usable in
+constant contexts.
+
+Fix the resulting callsites that compute a compile-time constant min
+or max to use the new macros.  cpu-defs.h is interesting, as
+CPU_TLB_DYN_MAX_BITS is sometimes used as a constant and sometimes
+dynamic.  Furthermore, use of either macro in #if now fails.
+
+gcc makes it easy to know which macro to use, thanks to the following
+compiler errors (even if they are cryptic):
+
+Use of MIN when MIN_CONST is needed:
+
+In file included from /home/eblake/qemu/qemu-img.c:25:
+/home/eblake/qemu/include/qemu/osdep.h:249:5: error: braced-group within expression allowed only inside a function
+  249 |     ({                                                  \
+      |     ^
+/home/eblake/qemu/qemu-img.c:92:12: note: in expansion of macro ‘MIN’
+   92 | char array[MIN(1, 2)] = "";
+      |            ^~~
+
+Use of MIN_CONST when MIN is needed:
+
+/home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
+/home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as it ought to be
+ 1225 |             i = MIN_CONST(i, n);
+      |               ^
+
+Use of MIN in the preprocessor:
+
+In file included from /home/eblake/qemu/accel/tcg/translate-all.c:20:
+/home/eblake/qemu/accel/tcg/translate-all.c: In function ‘page_check_range’:
+/home/eblake/qemu/include/qemu/osdep.h:249:6: error: token "{" is not valid in preprocessor expressions
+  249 |     ({                                                  \
+      |      ^
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+
+---
+
+I was visiting an old branch, and thought this one is still worth salvaging.
+
+v2 was: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00727.html
+v3: avoid __auto_type [Richard], document other approaches that fail
+[Dave], rebase to master
+---
+ hw/usb/hcd-xhci.h         |  2 +-
+ include/block/block.h     |  4 ++--
+ include/exec/cpu-all.h    |  8 +++-----
+ include/exec/cpu-defs.h   |  7 ++++++-
+ include/qemu/osdep.h      | 43 +++++++++++++++++++++++++++++++--------
+ accel/tcg/translate-all.c |  6 +++---
+ migration/qemu-file.c     |  2 +-
+ 7 files changed, 51 insertions(+), 21 deletions(-)
+
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index 2fad4df2a704..946af51fc25d 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -214,7 +214,7 @@ struct XHCIState {
+     uint32_t dcbaap_high;
+     uint32_t config;
+
+-    USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
++    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
+     XHCIPort ports[MAXPORTS];
+     XHCISlot slots[MAXSLOTS];
+     uint32_t numports;
+diff --git a/include/block/block.h b/include/block/block.h
+index 25e299605e19..e8fc8149967f 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -133,8 +133,8 @@ typedef struct HDGeometry {
+ #define BDRV_SECTOR_BITS   9
+ #define BDRV_SECTOR_SIZE   (1ULL << BDRV_SECTOR_BITS)
+
+-#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
+-                                     INT_MAX >> BDRV_SECTOR_BITS)
++#define BDRV_REQUEST_MAX_SECTORS MIN_CONST(SIZE_MAX >> BDRV_SECTOR_BITS, \
++                                           INT_MAX >> BDRV_SECTOR_BITS)
+ #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
+
+ /*
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index d14374bdd499..291454fac12e 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -176,11 +176,9 @@ extern unsigned long reserved_va;
+  * avoid setting bits at the top of guest addresses that might need
+  * to be used for tags.
+  */
+-#if MIN(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32
+-# define GUEST_ADDR_MAX_  UINT32_MAX
+-#else
+-# define GUEST_ADDR_MAX_  (~0ul)
+-#endif
++#define GUEST_ADDR_MAX_                                                 \
++    ((MIN_CONST(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32) ?  \
++     UINT32_MAX : ~0ul)
+ #define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
+
+ #else
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index 8c44abefa22a..918563233797 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -102,8 +102,13 @@ typedef uint64_t target_ulong;
+  * Skylake's Level-2 STLB has 16 1G entries.
+  * Also, make sure we do not size the TLB past the guest's address space.
+  */
+-#  define CPU_TLB_DYN_MAX_BITS                                  \
++#  ifdef TARGET_PAGE_BITS_VARY
++#   define CPU_TLB_DYN_MAX_BITS                                  \
+     MIN(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
++#  else
++#   define CPU_TLB_DYN_MAX_BITS                                  \
++    MIN_CONST(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
++#  endif
+ # endif
+
+ typedef struct CPUTLBEntry {
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index ff7c17b85735..1f002f035279 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -236,18 +236,45 @@ extern int daemon(int, int);
+ #define SIZE_MAX ((size_t)-1)
+ #endif
+
+-#ifndef MIN
+-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+-#endif
+-#ifndef MAX
+-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+-#endif
++/*
++ * Two variations of MIN/MAX macros. The first is for runtime use, and
++ * evaluates arguments only once (so it is safe even with side
++ * effects), but will not work in constant contexts (such as array
++ * size declarations).  The second is for compile-time use, where
++ * evaluating arguments twice is safe because the result is going to
++ * be constant anyway.
++ */
++#undef MIN
++#define MIN(a, b)                                       \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a < _b ? _a : _b;                              \
++    })
++#define MIN_CONST(a, b)                                         \
++    __builtin_choose_expr(                                      \
++        __builtin_constant_p(a) && __builtin_constant_p(b),     \
++        (a) < (b) ? (a) : (b),                                  \
++        __builtin_unreachable())
++#undef MAX
++#define MAX(a, b)                                       \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a > _b ? _a : _b;                              \
++    })
++#define MAX_CONST(a, b)                                         \
++    __builtin_choose_expr(                                      \
++        __builtin_constant_p(a) && __builtin_constant_p(b),     \
++        (a) > (b) ? (a) : (b),                                  \
++        __builtin_unreachable())
+
+ /* Minimum function that returns zero only iff both values are zero.
+  * Intended for use with unsigned values only. */
+ #ifndef MIN_NON_ZERO
+-#define MIN_NON_ZERO(a, b) ((a) == 0 ? (b) : \
+-                                ((b) == 0 ? (a) : (MIN(a, b))))
++#define MIN_NON_ZERO(a, b)                              \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
++    })
+ #endif
+
+ /* Round number down to multiple */
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 42ce1dfcff77..d77add79b218 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2565,9 +2565,9 @@ int page_check_range(target_ulong start, target_ulong len, int flags)
+     /* This function should never be called with addresses outside the
+        guest address space.  If this assert fires, it probably indicates
+        a missing call to h2g_valid.  */
+-#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
+-    assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
+-#endif
++    if (TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS) {
++        assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
 +    }
- 
-     pstate_write(env, PSTATE_DAIF | new_mode);
-     env->aarch64 = 1;
+
+     if (len == 0) {
+         return 0;
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 1c3a358a140d..be21518c5708 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -31,7 +31,7 @@
+ #include "qapi/error.h"
+
+ #define IO_BUF_SIZE 32768
+-#define MAX_IOV_SIZE MIN(IOV_MAX, 64)
++#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
+
+ struct QEMUFile {
+     const QEMUFileOps *ops;
 -- 
-2.25.1
+2.27.0
 
 
