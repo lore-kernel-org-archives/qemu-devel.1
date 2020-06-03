@@ -2,68 +2,60 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:58:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 385982072F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:47:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 385982072F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28D0720678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 05:58:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D0720678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgMFB-0005K1-Fn
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 01:47:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55480)
+	id 1jgMQ7-000842-Ca
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 01:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jgMEZ-0004sk-PS; Wed, 03 Jun 2020 01:46:39 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49711)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jgMEX-0006Me-86; Wed, 03 Jun 2020 01:46:39 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.05565376|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.0631394-0.000127326-0.936733;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=7; RT=7; SR=0; TI=SMTPD_---.HhSgiM9_1591163185; 
-Received: from 30.225.208.46(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HhSgiM9_1591163185)
- by smtp.aliyun-inc.com(10.147.42.198);
- Wed, 03 Jun 2020 13:46:25 +0800
-Subject: Re: [PATCH v8 30/62] target/riscv: Update fp_status when float
- rounding mode changes
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
- <20200521094413.10425-31-zhiwei_liu@c-sky.com>
- <7cb2aa5d-833a-8544-dadc-5aabba06ecd2@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <ca1e71cd-c290-5fb9-e9bf-026c73e06560@c-sky.com>
-Date: Wed, 3 Jun 2020 13:46:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ (Exim 4.90_1) (envelope-from <dovgaluk@ispras.ru>)
+ id 1jgMPb-0007Rh-40
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 01:58:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47926)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <dovgaluk@ispras.ru>) id 1jgMPZ-0000Ws-G4
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 01:58:02 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 47993CD465;
+ Wed,  3 Jun 2020 08:57:57 +0300 (MSK)
+Subject: Re: [PATCH v2] icount: make dma reads deterministic
+To: Kevin Wolf <kwolf@redhat.com>, Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+References: <158823737122.27545.13132967751052120169.stgit@pasha-ThinkPad-X280>
+ <20200602155440.GK5940@linux.fritz.box>
+From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <ed02a968-88f1-edc4-46f9-1b69c1e06d70@ispras.ru>
+Date: Wed, 3 Jun 2020 08:57:56 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <7cb2aa5d-833a-8544-dadc-5aabba06ecd2@linaro.org>
+In-Reply-To: <20200602155440.GK5940@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:46:28
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=83.149.199.45; envelope-from=dovgaluk@ispras.ru;
+ helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:57:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9,
- UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,44 +68,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, alistair.francis@wdc.com,
- wxy194768@alibaba-inc.com
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ pavel.dovgaluk@ispras.ru, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 02.06.2020 18:54, Kevin Wolf wrote:
+> Am 30.04.2020 um 11:02 hat Pavel Dovgalyuk geschrieben:
+>> From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+>>
+>> Windows guest sometimes makes DMA requests with overlapping
+>> target addresses. This leads to the following structure of iov for
+>> the block driver:
+>>
+>> addr size1
+>> addr size2
+>> addr size3
+>>
+>> It means that three adjacent disk blocks should be read into the same
+>> memory buffer. Windows does not expects anything from these bytes
+>> (should it be data from the first block, or the last one, or some mix),
+>> but uses them somehow. It leads to non-determinism of the guest execution,
+>> because block driver does not preserve any order of reading.
+>>
+>> This situation was discusses in the mailing list at least twice:
+>> https://lists.gnu.org/archive/html/qemu-devel/2010-09/msg01996.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg05185.html
+>>
+>> This patch makes such disk reads deterministic in icount mode.
+>> It splits the whole request into several parts. Parts may overlap,
+>> but SGs inside one part do not overlap.
+>> Parts that are processed later overwrite the prior ones in case
+>> of overlapping.
+>>
+>> Examples for different SG part sequences:
+>>
+>> 1)
+>> A1 1000
+>> A2 1000
+>> A1 1000
+>> A3 1000
+>> ->
+>> One request is split into two.
+>> A1 1000
+>> A2 1000
+>> --
+>> A1 1000
+>> A3 1000
+>>
+>> 2)
+>> A1 800
+>> A2 1000
+>> A1 1000
+>> ->
+>> A1 800
+>> A2 1000
+>> --
+>> A1 1000
+>>
+>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>>
+>> --
+>>
+>> v2:
+>>   - Rewritten the loop to split the request instead of skipping the parts
+>>     (suggested by Kevin Wolf)
+>> ---
+>>   dma-helpers.c |   20 ++++++++++++++++++++
+>>   1 file changed, 20 insertions(+)
+>>
+>> diff --git a/dma-helpers.c b/dma-helpers.c
+>> index e8a26e81e1..a49f9a0e34 100644
+>> --- a/dma-helpers.c
+>> +++ b/dma-helpers.c
+>> @@ -13,6 +13,8 @@
+>>   #include "trace-root.h"
+>>   #include "qemu/thread.h"
+>>   #include "qemu/main-loop.h"
+>> +#include "sysemu/cpus.h"
+>> +#include "qemu/range.h"
+>>   
+>>   /* #define DEBUG_IOMMU */
+>>   
+>> @@ -142,6 +144,24 @@ static void dma_blk_cb(void *opaque, int ret)
+>>           cur_addr = dbs->sg->sg[dbs->sg_cur_index].base + dbs->sg_cur_byte;
+>>           cur_len = dbs->sg->sg[dbs->sg_cur_index].len - dbs->sg_cur_byte;
+>>           mem = dma_memory_map(dbs->sg->as, cur_addr, &cur_len, dbs->dir);
+>> +        /*
+>> +         * Make reads deterministic in icount mode. Windows sometimes issues
+>> +         * disk read requests with overlapping SGs. It leads
+>> +         * to non-determinism, because resulting buffer contents may be mixed
+>> +         * from several sectors. This code splits all SGs into several
+>> +         * groups. SGs in every group do not overlap.
+>> +         */
+>> +        if (use_icount && dbs->dir == DMA_DIRECTION_FROM_DEVICE) {
+>> +            int i;
+>> +            for (i = 0 ; i < dbs->iov.niov ; ++i) {
+>> +                if (ranges_overlap((intptr_t)dbs->iov.iov[i].iov_base,
+>> +                                   dbs->iov.iov[i].iov_len, (intptr_t)mem,
+>> +                                   cur_len)) {
+>> +                    mem = NULL;
+> Doesn't this leak mem, i.e. should we call dma_memory_unmap()?
 
-On 2020/6/3 12:27, Richard Henderson wrote:
-> On 5/21/20 2:43 AM, LIU Zhiwei wrote:
->> @@ -174,6 +175,9 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
->>       env->mstatus |= MSTATUS_FS;
->>   #endif
->>       env->frm = val & (FSR_RD >> FSR_RD_SHIFT);
->> +    if (!riscv_cpu_set_rounding_mode(env, env->frm)) {
->> +        return -1;
->> +    }
-> This will raise an exception immediately in helper_csrrw().
+Thanks, I missed, that the memory is unmapped on request finish.
+
+> Did you verify that it is guaranteed that mapping the same guest memory
+> twice results in the same host address? v1 compared the SG list (which
+> has guest addresses) rather than the resulting QEMUIOVector (which has
+> host addresses).
+
+We don't need the host addresses to be equivalent in different runs.
+
+The order of the SG list entries is deterministic. This is enough for 
+successful exclusion of the duplicate entries.
+
 >
-> According to Section 8.2, the no exception should occur until the next fp
-> operation that uses the invalid frm.
+>> +                    break;
+>> +                }
+>> +            }
+>> +        }
+>>           if (!mem)
+>>               break;
+>>           qemu_iovec_add(&dbs->iov, mem, cur_len);
+> Kevin
 >
-> You're doing this just fine in helper_set_rounding_mode(), which is sufficient
-> for scalar fp ops.  Without looking forward to later patches, I suppose we'll
-> need to do something else for vector fp ops.
-Hi Richard,
-
-I think you are right.  Maybe I should transmit frm to ctx->frm, and 
-check ctx->frm in vector fp ops.
-
-We can set ctx->frm = env->frm instead of ctx->frm = -1 in 
-riscv_tr_init_disas_context.
-And  remove the sentence ctx->frm = rm; from gen_set_rm.
-
-Is it right?
-
-Zhiwei
->
-> r~
-
 
