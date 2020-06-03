@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97317C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0700BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:20:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63B72206E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4AD720679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 16:20:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8Y1V9WH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B72206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPsiA8PU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4AD720679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgW6H-0004Aq-M8
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46188)
+	id 1jgW7z-0005Y3-30
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 12:20:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <rth7680@gmail.com>)
- id 1jgW5B-0003U4-1d; Wed, 03 Jun 2020 12:17:37 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38352)
+ id 1jgW6Z-0004SI-Ak; Wed, 03 Jun 2020 12:19:03 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45848)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <rth7680@gmail.com>)
- id 1jgW5A-0004b6-44; Wed, 03 Jun 2020 12:17:36 -0400
-Received: by mail-pl1-x642.google.com with SMTP id m7so982285plt.5;
- Wed, 03 Jun 2020 09:17:35 -0700 (PDT)
+ id 1jgW6X-00051v-Os; Wed, 03 Jun 2020 12:19:03 -0400
+Received: by mail-pf1-x441.google.com with SMTP id a127so1900846pfa.12;
+ Wed, 03 Jun 2020 09:19:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Drrk32y8x14jVg0GaRESLVADxAHMlh+c3pmDVB5HKF0=;
- b=V8Y1V9WHslrLv4qKh7dJQGYNEfCyQdj1wOihKFzP1sR7J8Uq6gU2cRjwrrHDzLxYOg
- ylEQbdTW0lXAgdvRwyPcLsxFwtutsW//dpkb5uzLe8uFGN31+yM+4QHuIK3upTIA480m
- 8lcUoYlobPnPWF0hZGUuRJjh4d5lV0V0imTz3/JdrBegOgDOc5r+bZSsXRzol0nWwOfG
- hWPNXoPzrrbEEaT457Ok1dvnM8ND75mNk1s+9tTOJoKq7NcJNwGrRDkAGrA/ggtq/pKj
- ooBJM2cgOM+zbU7ohTu+YRoYx+8gF3wTx1CTSkmjH4EUGxx1GkYoFBUKON2kUCuqa2KM
- Om9Q==
+ bh=u5XmidICyuDlrT/nwBEiPFYRisawezJfTuc0utWDk2A=;
+ b=IPsiA8PU4HdyBNXkRlzDrp003XV05gdMwCrD0nTf2FHz6hgCJnD1+tgLD8A7EzXJzf
+ Afsu8f8NITMq/DrHEP5OaHEtixWXW7QcxqPMu8fQWcy3tnHe0N3BCNF6LbSniB1Sr3VC
+ PeMPIOuSO5xDmLAnCxGUWdVx1m9Y5xmw0nr7qRCPLggzbTrSH+V/+EiS3Yf/9YI64zTh
+ CuHqegKqB1rzZ4ui8ZY1b0vANxd+eCIwFsh3yDfijwV1qP4RjeogPwYootbwwC1LmaCw
+ kct837LQwCPkvlC1dPwrI7myhKEn8gqOnhRC+JJKlo4XwpOb0QojtSfGpz7iRze4dxwR
+ 1HpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=Drrk32y8x14jVg0GaRESLVADxAHMlh+c3pmDVB5HKF0=;
- b=fPShnxI9c5jyjHX7anQ/LyAk/G9Ghz85nLQo758IqAdE0YQps2a0qDhPcQy28ONjKR
- +EK8LNBjTtGYE/gDxybUDcIX+Kzmw5WPIHrW/tKL6G9q+WHngd/BWbWESgQ5KJLYdpVU
- v4ceOAVsxq6y0UC2UXjYit0FVAFPBCmQ6o6IcgDmGpOZkF7AgtsCLyTwfTCCqhOe0O3x
- +0fYhyNLi2C/H0+nFRf9f7HBZnSNnJeVx8eou8XQ4TjO2rF0+EX2BJP0ck3c/BZjgWhJ
- 5XWMoMWhmk8sHyxbyJWjw/yrX8AvLdLCnAymSzyhJsCpH2Aadio3hBeR58Epquw8SyIh
- KuSA==
-X-Gm-Message-State: AOAM531mNTPO27o52F4/eYMdkezw0vaWKYRa8FClkLY/+FH4zU12z+6m
- A4jXS5QfTvxyMwFlVJJSyL8=
-X-Google-Smtp-Source: ABdhPJwlbmMpLCxB8jlsN4PZ6k3QFFwSrDIZ7CpKrY3qvOC7NpOD02a/wcmzRkiEiI62goPrVv8Hng==
-X-Received: by 2002:a17:902:7c8f:: with SMTP id
- y15mr619448pll.288.1591201054062; 
- Wed, 03 Jun 2020 09:17:34 -0700 (PDT)
+ bh=u5XmidICyuDlrT/nwBEiPFYRisawezJfTuc0utWDk2A=;
+ b=nDxgiPWmlzvf4d/dapxsI8WiZoYrNKTWUW3PV6b7i9lp+78Y/wRbVJh4qUjSfhdnRD
+ 66+7LmQFeCY3XvV4a2inid1h3ujNQqGL8EKtsSqHzFCq1jZVpffGcg3t0th/Q89LzVpY
+ A9gs2aShRmgFlCC5w1XULagDOz3+a1/6MenKl0aluQwJbMC9XDz118HdnY1MB2pX/YGm
+ eGOmKWoWTxUYT39aNmJbApXMN3KnjhcCeNoCWmU8XAm4mLT09ksPpVPzisaOdHYdtM0g
+ 2azdUDuQ5XQ6K2oZ77pq0BbjgBzUne1kQWVkMZFnAo930lPyq87EbvoLC7p6WgvJ6kTQ
+ 1m2Q==
+X-Gm-Message-State: AOAM5338RF+A7ehnuIIJGIGhaWUp9tlUwGqpMly6zDgpM0jPpFYijot7
+ taGsEGy2hs+Z59nUoyx++o0=
+X-Google-Smtp-Source: ABdhPJxRYJwcsIQVw5eg3Yyho4uUbJTABHzZOikk+u2mHZD1KgDaKy70LCWJLucm6P8tkYZ9GLU9bA==
+X-Received: by 2002:a17:90a:7107:: with SMTP id
+ h7mr573979pjk.210.1591201139905; 
+ Wed, 03 Jun 2020 09:18:59 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.googlemail.com with ESMTPSA id p14sm3206508pjf.32.2020.06.03.09.17.33
+ by smtp.googlemail.com with ESMTPSA id b15sm3441948pjb.18.2020.06.03.09.18.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 03 Jun 2020 09:17:33 -0700 (PDT)
-Subject: Re: [PATCH 2/3] target/unicore32: Replace DPRINTF() by
- qemu_log_mask(GUEST_ERROR)
+ Wed, 03 Jun 2020 09:18:59 -0700 (PDT)
+Subject: Re: [PATCH 3/3] target/unicore32: Prefer qemu_semihosting_log_out()
+ over curses
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200603123754.19059-1-f4bug@amsat.org>
- <20200603123754.19059-3-f4bug@amsat.org>
+ <20200603123754.19059-4-f4bug@amsat.org>
 From: Richard Henderson <rth@twiddle.net>
 Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
  mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
@@ -99,17 +99,17 @@ Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
  hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
  erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
  q9OBIdA=
-Message-ID: <b1d7e088-6bd9-ed9d-acc2-91648373c1a4@twiddle.net>
-Date: Wed, 3 Jun 2020 09:17:31 -0700
+Message-ID: <149b2e0c-00a2-0a14-f276-2da5a70edc1d@twiddle.net>
+Date: Wed, 3 Jun 2020 09:18:57 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200603123754.19059-3-f4bug@amsat.org>
+In-Reply-To: <20200603123754.19059-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=rth7680@gmail.com; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=rth7680@gmail.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -140,12 +140,13 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/3/20 5:37 AM, Philippe Mathieu-Daudé wrote:
-> Replace disabled DPRINTF() by qemu_log_mask(GUEST_ERROR).
+> Use the common API for semihosting logging.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  target/unicore32/helper.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+>  default-configs/unicore32-softmmu.mak |  1 +
+>  target/unicore32/helper.c             | 57 +++------------------------
+>  2 files changed, 6 insertions(+), 52 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
