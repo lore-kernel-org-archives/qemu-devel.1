@@ -2,92 +2,60 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAD_ENC_HEADER,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E12C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DA9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 02:03:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13C020663
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:54:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="D3K1l0Ns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13C020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=verbum.org
+	by mail.kernel.org (Postfix) with ESMTPS id 268BC20663
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 02:03:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 268BC20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgIbg-0002Ew-PG
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:54:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
+	id 1jgIkj-00056k-14
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 22:03:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walters@verbum.org>)
- id 1jgIb9-0001lU-Lg
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:53:43 -0400
-Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:33323)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgIk3-0004S2-0l; Tue, 02 Jun 2020 22:02:55 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3773 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walters@verbum.org>)
- id 1jgIb7-0004Ch-TL
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:53:43 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
- by mailout.west.internal (Postfix) with ESMTP id F2F335EE
- for <qemu-devel@nongnu.org>; Tue,  2 Jun 2020 21:53:38 -0400 (EDT)
-Received: from imap10 ([10.202.2.60])
- by compute1.internal (MEProxy); Tue, 02 Jun 2020 21:53:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=45wpVm
- AducafuvP7moSih2zvAnFcNTn7pXXDJ9prjjI=; b=D3K1l0NsBVQb6boocfZEHD
- 5iruxQJ3HayEco1ldUpwCVDadNdOqudVxu/D0p+zt70xd1nvds5clDUJbQZ5jyHH
- dRVGR8s7zPlDjn2p7nWERM44ATwMDCGhbCkeV+Em8JxOIQ1ZAJOMK73Kz+O39lpS
- G4bErQl3IzGeuktvHOga9FyAMRyFeT7f6/jZ7jgUKdn/8DiE1UgvORRYzD3MtZTy
- Xqc6lvJCnRIXBGA/MKWxy3184nmG36OrWA9K6VgCVsfHVj3/9G9F/J8FrsOTi9x+
- lmw/K0DFjTklFo5ZkIB9lWmqe/2Sg41aomLfTsCoVAidkQr0g0ABhwLYkK3GduUA
- ==
-X-ME-Sender: <xms:ogLXXktR_pLTzOtNMVbG_7mUZij3arlOkZ5XxXtN5sO17tyfD_NqGg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudefkedggeeiucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucenucfjughrpefofgggkfgjfhffhffvufgtsehttd
- ertderreejnecuhfhrohhmpedfveholhhinhcuhggrlhhtvghrshdfuceofigrlhhtvghr
- shesvhgvrhgsuhhmrdhorhhgqeenucggtffrrghtthgvrhhnpeeijeevieekfeeigeehve
- eiffelvefhjeektdevhedugffffffgtedtgeduffehvdenucevlhhushhtvghrufhiiigv
- pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeifrghlthgvrhhssehvvghrsghumhdroh
- hrgh
-X-ME-Proxy: <xmx:ogLXXhcbbFY-9gJG4RcL3P6jwvNkxJMw_x97St_So91XjmcKncMELA>
- <xmx:ogLXXvyK8s5-a36I6koZU_ilF0bnOD4I0B9dPkjgq2wliBjYe_APDA>
- <xmx:ogLXXnMBV_PQBU7L-_Ihw-P3rIwNLwcrx5okpef2QlzuJmEpCNEylw>
- <xmx:ogLXXtfWbDqYY57nJWE_QCo0NCVzDhhT8YxPtCjbzACUZndr4lQVjQ>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 4C5882005F; Tue,  2 Jun 2020 21:53:38 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-519-g0f677ba-fm-20200601.001-g0f677ba6
-Mime-Version: 1.0
-Message-Id: <7b355ffb-2b96-4984-a198-ac40a07c422e@www.fastmail.com>
-In-Reply-To: <20200602095547.GD9852@stefanha-x1.localdomain>
-References: <348d4774-bd5f-4832-bd7e-a21491fdac8d@www.fastmail.com>
- <20200602095547.GD9852@stefanha-x1.localdomain>
-Date: Tue, 02 Jun 2020 21:53:18 -0400
-From: "Colin Walters" <walters@verbum.org>
-To: qemu-devel@nongnu.org
-Subject: =?UTF-8?Q?Re:_[PATCH]_virtiofsd:_Use_clone()_and_not_unshare(),
- _support_?= =?UTF-8?Q?non-root?=
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgIjt-0006Ey-Fu; Tue, 02 Jun 2020 22:02:54 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 0069960ADA7C789BF84C;
+ Wed,  3 Jun 2020 10:02:37 +0800 (CST)
+Received: from localhost (10.173.222.233) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Wed, 3 Jun 2020
+ 10:02:29 +0800
+From: Ying Fang <fangying1@huawei.com>
+To: <drjones@redhat.com>, <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+Subject: [PATCH v2] target/arm/cpu: adjust virtual time for arm cpu
+Date: Wed, 3 Jun 2020 10:02:08 +0800
+Message-ID: <20200603020208.2089-1-fangying1@huawei.com>
+X-Mailer: git-send-email 2.26.0.windows.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: none client-ip=64.147.123.21; envelope-from=walters@verbum.org;
- helo=wout5-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 21:53:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Originating-IP: [10.173.222.233]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 22:02:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,95 +68,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ wu.wubin@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Virtual time adjustment was implemented for virt-5.0 machine type,
+but the cpu property was enabled only for host-passthrough and
+max cpu model. Let's add it for arm cpu which has the gernic
+timer feature enabled.
 
 
-On Tue, Jun 2, 2020, at 5:55 AM, Stefan Hajnoczi wrote:
-> 
-> Ping Colin. It would be great if you have time to share your thoughts on
-> this discussion and explain how you are using this patch.
+Signed-off-by: Ying Fang <fangying1@huawei.com>
 
-Yeah sorry about not replying in this thread earlier, this was just a quick Friday side project for me and the thread obviously exploded =)
+---
+v2:
+- move kvm_arm_add_vcpu_properties into arm_cpu_post_init
 
-Thinking about this more, probably what would be good enough for now is an option to just disable internal containerization/sandboxing.  In fact per the discussion our production pipeline runs inside OpenShift 4 and because Kubernetes doesn't support user namespaces yet it also doesn't support recursive containerization, so we need an option to turn off the internal containerization.
+v1:
+- initial commit
+- https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08518.html
 
-Our use case is somewhat specialized - for what we're doing we generally trust the guest.  We use VMs for operating system testing and development of content we trust, as opposed to e.g. something like kata.
+---
+ target/arm/cpu.c   | 3 +--
+ target/arm/cpu64.c | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-It's fine for us to run virtiofs as the same user/security context as qemu.
-
-So...something like this?  (Only compile tested)
-
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 1240828208..603773c505 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -51,6 +51,7 @@ struct fuse_session {
-     int fd;
-     int debug;
-     int deny_others;
-+    int no_namespaces;
-     struct fuse_lowlevel_ops op;
-     int got_init;
-     struct cuse_data *cuse_data;
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-index 2dd36ec03b..263134f792 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2522,6 +2522,7 @@ static const struct fuse_opt fuse_ll_opts[] = {
-     LL_OPTION("-d", debug, 1),
-     LL_OPTION("--debug", debug, 1),
-     LL_OPTION("allow_root", deny_others, 1),
-+    LL_OPTION("--no-namespaces", no_namespaces, 1),
-     LL_OPTION("--socket-path=%s", vu_socket_path, 0),
-     LL_OPTION("--fd=%d", vu_listen_fd, 0),
-     LL_OPTION("--thread-pool-size=%d", thread_pool_size, 0),
-@@ -2542,6 +2543,7 @@ void fuse_lowlevel_help(void)
-      */
-     printf(
-         "    -o allow_root              allow access by root\n"
-+        "    --no-namespaces            Disable internal use of unshare()/clone(UNSHARE)\n"
-         "    --socket-path=PATH         path for the vhost-user socket\n"
-         "    --fd=FDNUM                 fd number of vhost-user socket\n"
-         "    --thread-pool-size=NUM     thread pool size limit (default %d)\n",
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 3ba1d90984..7c54a9cde3 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2551,15 +2551,15 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
-     char *tmpdir;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 32bec156f2..1e9b7a51f2 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1244,6 +1244,7 @@ void arm_cpu_post_init(Object *obj)
  
-     /*
--     * Create a new pid namespace for *child* processes.  We'll have to
--     * fork in order to enter the new pid namespace.  A new mount namespace
--     * is also needed so that we can remount /proc for the new pid
--     * namespace.
--     *
--     * Our UNIX domain sockets have been created.  Now we can move to
--     * an empty network namespace to prevent TCP/IP and other network
--     * activity in case this process is compromised.
--     */
-+    * Create a new pid namespace for *child* processes.  We'll have to
-+    * fork in order to enter the new pid namespace.  A new mount namespace
-+    * is also needed so that we can remount /proc for the new pid
-+    * namespace.
-+    *
-+    * Our UNIX domain sockets have been created.  Now we can move to
-+    * an empty network namespace to prevent TCP/IP and other network
-+    * activity in case this process is compromised.
-+    */
-     if (unshare(CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET) != 0) {
-         fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n");
-         exit(1);
-@@ -2775,6 +2775,8 @@ static void setup_capabilities(void)
- static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
-                           bool enable_syslog)
- {
-+    if (se->no_namespaces)
-+        return;
-     setup_namespaces(lo, se);
-     setup_mounts(lo->source);
-     setup_seccomp(enable_syslog);
+     if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
+         qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
++        kvm_arm_add_vcpu_properties(obj);
+     }
+ }
+ 
+@@ -2029,7 +2030,6 @@ static void arm_max_initfn(Object *obj)
+ 
+     if (kvm_enabled()) {
+         kvm_arm_set_cpu_features_from_host(cpu);
+-        kvm_arm_add_vcpu_properties(obj);
+     } else {
+         cortex_a15_initfn(obj);
+ 
+@@ -2183,7 +2183,6 @@ static void arm_host_initfn(Object *obj)
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+         aarch64_add_sve_properties(obj);
+     }
+-    kvm_arm_add_vcpu_properties(obj);
+     arm_cpu_post_init(obj);
+ }
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index cbc5c3868f..778cecc2e6 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -592,7 +592,6 @@ static void aarch64_max_initfn(Object *obj)
+ 
+     if (kvm_enabled()) {
+         kvm_arm_set_cpu_features_from_host(cpu);
+-        kvm_arm_add_vcpu_properties(obj);
+     } else {
+         uint64_t t;
+         uint32_t u;
+-- 
+2.23.0
+
+
 
