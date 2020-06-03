@@ -1,143 +1,118 @@
 Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE70C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E67C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:08:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B983A20674
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:04:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mm4W6kEd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B983A20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id E9FD820679
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:08:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9FD820679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgNRS-00081x-Vp
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:04:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33660)
+	id 1jgNVp-0001oi-3V
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:08:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgNQS-0007X5-CC; Wed, 03 Jun 2020 03:03:00 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46437)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgNQR-0003wJ-FY; Wed, 03 Jun 2020 03:02:59 -0400
-Received: by mail-pf1-x441.google.com with SMTP id b16so968496pfi.13;
- Wed, 03 Jun 2020 00:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=W8gEcy6pzQDAPp2y85iZFtFSkLFAlCU0ZdRrzjgoa2Y=;
- b=Mm4W6kEdDGgCX4+IF148D/R42u+dsRyS2TB4pB3vPaT8JPghEyvDrkSx7XvbLKEaNx
- eUrFzoLDILoFfqirh6CwrtBnzlbM73aZMQ7r+0s0wLF2vnsvNgbsX498xxDCWHaKegPg
- nhnCa3zeVav6ADC2Tg3IjVsmsI4jxCf0LIvvc/6+Ccl5r4VScvmIQ9YufazXzq57RfNg
- NwfdVgXjnWWMafq9CGjj1WrCjJskB0/Bqks6N/gJB7KeTbhOD2WjTuoDr0NvpvCGLt0m
- ib8Rrfg8KkGgk7JxiZCP1O3kY4tjJoR9XLF34qwpA8izco4msNkjwC7s2M7bRQYzImeB
- mNsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=W8gEcy6pzQDAPp2y85iZFtFSkLFAlCU0ZdRrzjgoa2Y=;
- b=Q812Oce57ZMnQO6KNl+GBKxkDsdm22KK6xi2Ul1WOddhu/I1PCYUbuMgO+aH2eOobD
- W64/1AmWiTC3EXuS4hul7jIP3cFyhJU9TIWE9GJDg3ZUOpCnuS4/ATlimPdOCkZD7dnj
- 9AwnL0Uzn0P/qdomQLuXQhc6MFEa69CgaJpl59WPbZW1NNkRld2EoC2Xte+chhefhV5X
- UkbUyn1rdYccL3SNmGYm/LXXEg2Sc0D7j5sN3maQ7VkhYoT/rZXcfEhXz3WkOet3G6kl
- Ktns5I+CV2jcsdHnqBM81miWZx9x1Ghf/BHSTEjDDf9qN30siUQkYze0ur7DghNNy5Th
- iWJw==
-X-Gm-Message-State: AOAM532BKkgzEO7LbZ18DarWQV5INcgJAonJsUPaJTXJ/Ucn37TE4YVz
- uQ9qqnNj/R2n3WNRj55Wue6Nug1i
-X-Google-Smtp-Source: ABdhPJx6fH7nu99VJhoOpAnpKtjeePVp0wwcrPscI4SdFJcdNbI99vwip+dQnHux93N3fIx+b+wLyA==
-X-Received: by 2002:a65:5a01:: with SMTP id y1mr19269757pgs.233.1591167777586; 
- Wed, 03 Jun 2020 00:02:57 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id
- x11sm1008501pfm.196.2020.06.03.00.02.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 03 Jun 2020 00:02:57 -0700 (PDT)
-Subject: Re: [PATCH 2/2] hw: arm: Set vendor property for IMX SDHCI emulations
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200603052404.30788-1-linux@roeck-us.net>
- <20200603052404.30788-3-linux@roeck-us.net>
- <ccd8a8a5-0d40-2060-e9ea-c64c44a7d688@amsat.org>
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-Message-ID: <382362f4-fbdc-5756-bc01-272af9e99185@roeck-us.net>
-Date: Wed, 3 Jun 2020 00:02:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <ccd8a8a5-0d40-2060-e9ea-c64c44a7d688@amsat.org>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <LMa@suse.com>) id 1jgNVE-0001KI-Ne
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:07:56 -0400
+Received: from m9a0014g.houston.softwaregrp.com ([15.124.64.90]:48132)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <LMa@suse.com>) id 1jgNVC-0004gT-LY
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:07:55 -0400
+Received: FROM m9a0014g.houston.softwaregrp.com (15.121.0.191) BY
+ m9a0014g.houston.softwaregrp.com WITH ESMTP; 
+ Wed,  3 Jun 2020 07:07:01 +0000
+Received: from M9W0067.microfocus.com (2002:f79:be::f79:be) by
+ M9W0068.microfocus.com (2002:f79:bf::f79:bf) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Wed, 3 Jun 2020 07:04:56 +0000
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (15.124.72.10) by
+ M9W0067.microfocus.com (15.121.0.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Wed, 3 Jun 2020 07:04:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FeTi6635HizTg6V4EgAtVvXaJPLKltp2rQ37mgOvbrP1DAFvplt8R0ng6RUtrxv2xVMt5aya3Hg+TowiBXZrwuJozW0Xlxl+aGoqMDxrZISWyduuKLGW7PqPlvSo8Jr9iA/SQH4LqNr3LHY8u51P9qJoMhsIz3YRR5zYw1kfWw7O/RRE7RXjgPNtUCc2UG/A3i0rN7UWHGgmiTGHH9suq/6bnYhG7IYiLm2lHynTGgWVxU13RQtcRXOoRuXzZpIqJgUZk1FJ5C1TMpk/Ygehs8PIYAGcB2D8OOc4Y+rfOVBNPpvV0tQKi/kcH/Oj+7GNPnDjAd43p/yE7JhOUNG+0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wkWBLTUZLNCQhqEq0hle1SuTohxbLhXNHuNjmtsPhNw=;
+ b=gBojy4qvY2nFOF71QEDQYehvASR9yAcFD97RY9eBV6U3nYE0EyT/yOsvPgvzgHrw4eVfmRuimrnkyA/tYNBW7Kj8rMEQKP0CYSV2d5BTt6VDCxmYlvfLqe5WLFcnPGVC/C4Xr8oYHAyz3wuAngCbLHzQ+eFvWqUSxpb7J6XpwNtJ8TGNZ4WNMj3T1rlZ3IS4KZAsUN8PDrlieVQr9kQTidnyY+l/cFU7eM5aLstqIqpZ/bbuJWBjDzc/dBEWgl9xHgvJ+7kJK7G942DBVyN9NasTp+pqSFQv563+f+eAxiInUMAcord0gf4Gh55kjoAmeQVjLm3VfcKKaUaxrJzAtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Received: from BY5PR18MB3313.namprd18.prod.outlook.com (2603:10b6:a03:1a9::28)
+ by BY5PR18MB3378.namprd18.prod.outlook.com (2603:10b6:a03:195::33)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Wed, 3 Jun
+ 2020 07:04:55 +0000
+Received: from BY5PR18MB3313.namprd18.prod.outlook.com
+ ([fe80::e4f5:6729:fa11:1240]) by BY5PR18MB3313.namprd18.prod.outlook.com
+ ([fe80::e4f5:6729:fa11:1240%7]) with mapi id 15.20.3045.024; Wed, 3 Jun 2020
+ 07:04:55 +0000
+From: Lin Ma <LMa@suse.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [question] Partial sector issue while discard in qcow2 image
+Thread-Topic: [question] Partial sector issue while discard in qcow2 image
+Thread-Index: AQHWOK7m5N2XkTj0GUW+Cz5gfuCM5KjFKnMAgAFOT+s=
+Date: Wed, 3 Jun 2020 07:04:54 +0000
+Message-ID: <BY5PR18MB33139BC1147B5E1224A08874C5880@BY5PR18MB3313.namprd18.prod.outlook.com>
+References: <BY5PR18MB331316E948CB9AFDA33A6F6DC58B0@BY5PR18MB3313.namprd18.prod.outlook.com>,
+ <20200602110648.GE5940@linux.fritz.box>
+In-Reply-To: <20200602110648.GE5940@linux.fritz.box>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=groeck7@gmail.com; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=suse.com;
+x-originating-ip: [60.251.47.115]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: eea7dd7c-5942-4132-423b-08d8078c6b5d
+x-ms-traffictypediagnostic: BY5PR18MB3378:
+x-microsoft-antispam-prvs: <BY5PR18MB3378635D129880F8275D2C58C5880@BY5PR18MB3378.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:561;
+x-forefront-prvs: 04238CD941
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +5NKfJz1dBjc8qcbq4/MsWW0k4Q8CiSxKPChaTEJSo9H+0oOllfdtMDhW5yDBXM/qN/vbPgPEWuT+5qW19ft69H68Ko5RlQBbbN273X3i34IKtSkaIobjx7KvPGMs+K7grFUYKCsAEfQrlm1r2NfvoC3U8UiRkPUKkA4XWSt9QY3gfodYIx5VNOT8LbDmPfY1hhl8nU3AeeoCnbq9j1cBafhJgvuwR7KEhEwrgXicT+hgWtXXOyTBd5yl0GxNwwvu+y1nRYTamW5Tr4rT8Nx+NgYmCNL880cndHA/hN7S5MoBclffaGFhbmhS/n9J/wP
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BY5PR18MB3313.namprd18.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39860400002)(396003)(346002)(376002)(136003)(366004)(52536014)(53546011)(7696005)(71200400001)(64756008)(66946007)(55016002)(66556008)(66446008)(76116006)(8936002)(186003)(26005)(91956017)(5660300002)(9686003)(6506007)(8676002)(86362001)(6916009)(478600001)(4326008)(316002)(66476007)(83380400001)(19627405001)(2906002)(55236004)(33656002);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: NveAOT/nzpdgVDRVbSSGs2XN9LEFpJ1XmAGqtTCh25H9ZLDI780xaMFEw7h8GliISyyilWnsaRfaV++1ffwwydEsnO3e+41ZnsPWtVIg0JXA3C7biwJWPnb1fum4QQx9oKfGPeHKlAgzOIOaPyODDZOcMVM0FWeyqGoeVVjbymbCeE3Pr6j8I60LeARgXsJcLkOKB4upDKvmHCDmA4Dfzyo2WYJJ3iFX7u/B7QO+r4dhUQyiZ14mUCLXbbEXXWHyNZz8M4kLWly3Om9z+d6CdKcOj4FpRYwK0a96x57vRLx07BpGE33dojwgHGpm5Gv90AI7ltFRN+EOyerrm8/ECrwYOLIgFs/zHpVDs7n21Kji9xnL+MTTwJamkw4/vVBZGb4N4RZXip5VcNX2eUDv6Z1sHzed3AkWBc718xV0diUuWsCqIE39YHCVxyrP9K9ZDM7WTWMsw69CX4rJfRZz6zkXLeReXwGLH0FS4qOn4+o=
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_BY5PR18MB33139BC1147B5E1224A08874C5880BY5PR18MB3313namp_"
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: eea7dd7c-5942-4132-423b-08d8078c6b5d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2020 07:04:54.9036 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rDNY6IQzQSctzTalv0wRfbj+wE5wlan3yzUUL2xG+w7mGho0ZhGJQSzdops6LpoO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR18MB3378
+X-OriginatorOrg: suse.com
+Received-SPF: pass client-ip=15.124.64.90; envelope-from=LMa@suse.com;
+ helo=m9a0014g.houston.softwaregrp.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 03:07:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ UNPARSEABLE_RELAY=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -150,97 +125,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/2/20 11:35 PM, Philippe Mathieu-Daudé wrote:
-> Hi Guenter,
-> 
-> On 6/3/20 7:24 AM, Guenter Roeck wrote:
->> Set vendor property to IMX to enable IMX specific functionality
->> in sdhci code.
->>
->> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> ---
->>  hw/arm/fsl-imx25.c  | 2 ++
->>  hw/arm/fsl-imx6.c   | 2 ++
->>  hw/arm/fsl-imx6ul.c | 2 ++
->>  hw/arm/fsl-imx7.c   | 2 ++
->>  4 files changed, 8 insertions(+)
->>
->> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
->> index cdaa79c26b..2cbd985e93 100644
->> --- a/hw/arm/fsl-imx25.c
->> +++ b/hw/arm/fsl-imx25.c
->> @@ -274,6 +274,8 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
->>                                   &err);
->>          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
->>                                   "capareg", &err);
->> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
->> +                                 "vendor", &err);
-> 
-> Either check &err, or use &error_abort.
-> 
+--_000_BY5PR18MB33139BC1147B5E1224A08874C5880BY5PR18MB3313namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Ok, I'll follow the guidance from the patch pointed to below
-and add the error check.
+Hi Kevin,
 
-Thanks,
-Guenter
+Thanks for the explanation!
 
-> You can see a fix here:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg695544.html
-> 
-> Otherwise:
-> 
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
->>          object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
->>          if (err) {
->>              error_propagate(errp, err);
->> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
->> index f58c85aa8c..8e9a94e4d7 100644
->> --- a/hw/arm/fsl-imx6.c
->> +++ b/hw/arm/fsl-imx6.c
->> @@ -350,6 +350,8 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
->>                                   &err);
->>          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABILITIES,
->>                                   "capareg", &err);
->> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
->> +                                 "vendor", &err);
->>          object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
->>          if (err) {
->>              error_propagate(errp, err);
->> diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
->> index 3ecb212da6..ce1462927c 100644
->> --- a/hw/arm/fsl-imx6ul.c
->> +++ b/hw/arm/fsl-imx6ul.c
->> @@ -505,6 +505,8 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
->>              FSL_IMX6UL_USDHC2_IRQ,
->>          };
->>  
->> +        object_property_set_uint(OBJECT(&s->usdhc[i]), SDHCI_VENDOR_IMX,
->> +                                        "vendor", &error_abort);
->>          object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
->>                                   &error_abort);
->>  
->> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
->> index 89c3b64c06..dbf16b2814 100644
->> --- a/hw/arm/fsl-imx7.c
->> +++ b/hw/arm/fsl-imx7.c
->> @@ -416,6 +416,8 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
->>              FSL_IMX7_USDHC3_IRQ,
->>          };
->>  
->> +        object_property_set_uint(OBJECT(&s->usdhc[i]), SDHCI_VENDOR_IMX,
->> +                                 "vendor", &error_abort);
->>          object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
->>                                   &error_abort);
->>  
->>
-> 
+Lin
 
+________________________________
+From: Kevin Wolf <kwolf@redhat.com>
+Sent: Tuesday, June 2, 2020 7:06 PM
+To: Lin Ma <LMa@suse.com>
+Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; pbonzini@redhat.com <pbo=
+nzini@redhat.com>
+Subject: Re: [question] Partial sector issue while discard in qcow2 image
+
+Am 02.06.2020 um 09:45 hat Lin Ma geschrieben:
+> Hi all,
+>
+> During  woring to add GET LBA STATUS support in qemu scsi emulation
+> layer, I encountered an unmap issue with qcow2 image, It's likely
+> about how to unmap partial clusters. e.g.:
+>
+> With these default values:
+> * the default value of s->qdev.blocksize: 512
+> * the default value of s->cluster_size of qcow2 image: 65536
+>
+> Running 'sg_unmap -l 1024 -n 32 /dev/sda' hits the condition
+> 'if (!QEMU_IS_ALIGNED(offset | bytes, s->cluster_size))' in the
+> function qcow2_co_pdiscard, Then it won't perform
+> qcow2_cluster_discard(), So the corresponding clusters won't be
+> discard in this situation, Correct?
+
+Yes, this is correct. Discard is just a hint, so doing nothing is a
+perfectly valid implementation. In the case of qcow2, only full clusters
+are discarded.
+
+> Of cause, with the default blocksize and cluster_size, The below
+> examples won't hit the condition 'if (!QEMU_IS_ALIGNED...'.
+> sg_unmap -l 1024 -n 128 /dev/sda
+> or
+> sg_unmap -l 256 -n 128 /dev/sda
+
+Yes, and when discarding whole block devices (e.g. while creating a new
+filesystem on them) or large files, you'll probably get this case for
+most parts.
+
+Kevin
+
+
+--_000_BY5PR18MB33139BC1147B5E1224A08874C5880BY5PR18MB3313namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+Hi <font size=3D"2"><span style=3D"font-size:11pt">Kevin</span></font>,</di=
+v>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+Thanks for the explanation!</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+Lin<br>
+</div>
+<div>
+<div id=3D"appendonsend"></div>
+<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
+t; color:rgb(0,0,0)">
+<br>
+</div>
+<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font style=3D"font-size:11pt" face=
+=3D"Calibri, sans-serif" color=3D"#000000"><b>From:</b> Kevin Wolf &lt;kwol=
+f@redhat.com&gt;<br>
+<b>Sent:</b> Tuesday, June 2, 2020 7:06 PM<br>
+<b>To:</b> Lin Ma &lt;LMa@suse.com&gt;<br>
+<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; pbonzini@re=
+dhat.com &lt;pbonzini@redhat.com&gt;<br>
+<b>Subject:</b> Re: [question] Partial sector issue while discard in qcow2 =
+image</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
+>
+<div class=3D"PlainText">Am 02.06.2020 um 09:45 hat Lin Ma geschrieben:<br>
+&gt; Hi all,<br>
+&gt; <br>
+&gt; During&nbsp; woring to add GET LBA STATUS support in qemu scsi emulati=
+on<br>
+&gt; layer, I encountered an unmap issue with qcow2 image, It's likely<br>
+&gt; about how to unmap partial clusters. e.g.:<br>
+&gt; <br>
+&gt; With these default values:<br>
+&gt; * the default value of s-&gt;qdev.blocksize: 512<br>
+&gt; * the default value of s-&gt;cluster_size of qcow2 image: 65536<br>
+&gt; <br>
+&gt; Running 'sg_unmap -l 1024 -n 32 /dev/sda' hits the condition<br>
+&gt; 'if (!QEMU_IS_ALIGNED(offset | bytes, s-&gt;cluster_size))' in the<br>
+&gt; function qcow2_co_pdiscard, Then it won't perform<br>
+&gt; qcow2_cluster_discard(), So the corresponding clusters won't be<br>
+&gt; discard in this situation, Correct?<br>
+<br>
+Yes, this is correct. Discard is just a hint, so doing nothing is a<br>
+perfectly valid implementation. In the case of qcow2, only full clusters<br=
+>
+are discarded.<br>
+<br>
+&gt; Of cause, with the default blocksize and cluster_size, The below<br>
+&gt; examples won't hit the condition 'if (!QEMU_IS_ALIGNED...'.<br>
+&gt; sg_unmap -l 1024 -n 128 /dev/sda<br>
+&gt; or<br>
+&gt; sg_unmap -l 256 -n 128 /dev/sda<br>
+<br>
+Yes, and when discarding whole block devices (e.g. while creating a new<br>
+filesystem on them) or large files, you'll probably get this case for<br>
+most parts.<br>
+<br>
+Kevin<br>
+<br>
+</div>
+</span></font></div>
+</div>
+</body>
+</html>
+
+--_000_BY5PR18MB33139BC1147B5E1224A08874C5880BY5PR18MB3313namp_--
 
