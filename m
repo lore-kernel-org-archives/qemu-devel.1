@@ -2,85 +2,76 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D98C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D66C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:30:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFA3D204EF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:26:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KV9B9mO7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA3D204EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C0D120678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:30:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C0D120678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgOjW-0001w6-7m
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:26:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41544)
+	id 1jgOnQ-0003NN-Fj
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:30:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jgOiz-0001No-SJ
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:26:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30520
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jgOiy-00038w-Ls
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:26:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591172771;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=JTyxC46ik7vhHuCt2KXtszQJ1oeP0eS83+vIraiqcBc=;
- b=KV9B9mO7pbMyfxcLLPiaLIr0gF60ekfilflHCYLxics0r5lZerdCV7ECOIrFeXSz9JzNXy
- XFp83TxLCzOhD/GpGAqM5mx6u1oKojVQCUeIQzmUDioq3viWQMXYrRS9jXfm6MHOnHWu15
- qWRssbxOmwawHfCJd0aHHgsqTiMj2Fw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-0g0kpd6DMni7dOf3KKwfig-1; Wed, 03 Jun 2020 04:26:07 -0400
-X-MC-Unique: 0g0kpd6DMni7dOf3KKwfig-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74EEC835B41;
- Wed,  3 Jun 2020 08:26:06 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.141])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F3225C240;
- Wed,  3 Jun 2020 08:26:03 +0000 (UTC)
-Date: Wed, 3 Jun 2020 10:26:00 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Ying Fang <fangying1@huawei.com>
-Subject: Re: [PATCH v2] target/arm/cpu: adjust virtual time for arm cpu
-Message-ID: <20200603082600.efes4srlft3xv2tq@kamzik.brq.redhat.com>
-References: <20200603020208.2089-1-fangying1@huawei.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jgOmg-0002in-5p
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:30:02 -0400
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:45506)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jgOme-0004KI-B1
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:30:01 -0400
+Received: from player796.ha.ovh.net (unknown [10.110.171.238])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id C08762573E2
+ for <qemu-devel@nongnu.org>; Wed,  3 Jun 2020 10:29:56 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player796.ha.ovh.net (Postfix) with ESMTPSA id 14E2912EB2CBB;
+ Wed,  3 Jun 2020 08:29:46 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-101G004b42397c5-7f34-4704-a98e-0fa489fd73a2,C5A150AF1F13250A6CA48450E7A9998CD11FBF1B)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] ftgmac100: Implement variable descriptor size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Erik Smit <erik.lucas.smit@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joel Stanley <joel@jms.id.au>, Jason Wang <jasowang@redhat.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
+References: <CA+MHfov0TVbwjy8g_cHVa6Y-bMowCbsGLdt8uUhmcns0v_eVLw@mail.gmail.com>
+ <902ebbb5-3e9d-6720-745f-8535a5cd25e8@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <aae38f77-ebaa-9375-e59b-b78ea075325d@kaod.org>
+Date: Wed, 3 Jun 2020 10:29:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200603020208.2089-1-fangying1@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <902ebbb5-3e9d-6720-745f-8535a5cd25e8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 6882626132299189056
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudefledgtddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeekhfetudefffevvdeljeeggeehvdegueeiueefjeeuledtudegudehvdevlefgheenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.32.98.231; envelope-from=clg@kaod.org;
+ helo=19.mo3.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 04:29:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,171 +84,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- wu.wubin@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 03, 2020 at 10:02:08AM +0800, Ying Fang wrote:
-> Virtual time adjustment was implemented for virt-5.0 machine type,
-> but the cpu property was enabled only for host-passthrough and
-> max cpu model. Let's add it for arm cpu which has the gernic
-> timer feature enabled.
+On 6/3/20 9:08 AM, Philippe Mathieu-Daudé wrote:
+> On 6/2/20 6:47 PM, Erik Smit wrote:
+>> The hardware supports variable descriptor sizes, configured with the DBLAC
+>> register.
+>>
+>> Most drivers use the default 2*8, which is currently hardcoded in qemu, but
+>> the implementation of the driver in Supermicro BMC SMT_X11_158 uses 4*8.
+>>
+>> --
+>> The implementation of the driver in Supermicro BMC SMT_X11_158 adds 4 extra
+>> 4-bytes entries:
+>> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.h#L387-L391
+>>
+>> And sets DBLAC to 0x44f97:
+>> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.c#L449
+>>
+>> There's not a lot of public documentation on this hardware, but the
+>> current linux driver shows the meaning of these registers:
+>>
+>> https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/faraday/ftgmac100.c#L280-L281
+>>
+>>         iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX descs */
+>>                   FTGMAC100_DBLAC_TXDES_SIZE(2) |   /* 2*8 bytes TX descs */
+>>
+>> Without this patch, networking in SMT_X11_158 does not pass data.
 > 
+> Does it really 'pass' *all* the data?
 > 
-> Signed-off-by: Ying Fang <fangying1@huawei.com>
+> This patch seems incomplete...
 > 
-> ---
-> v2:
-> - move kvm_arm_add_vcpu_properties into arm_cpu_post_init
+> IMO you should 1/ declare FTGMAC100Desc as:
 > 
-> v1:
-> - initial commit
-> - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08518.html
-> 
-> ---
->  target/arm/cpu.c   | 3 +--
->  target/arm/cpu64.c | 1 -
->  2 files changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 32bec156f2..1e9b7a51f2 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1244,6 +1244,7 @@ void arm_cpu_post_init(Object *obj)
->  
->      if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
->          qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
-> +        kvm_arm_add_vcpu_properties(obj);
+> typedef struct {
+>     uint32_t        des0;
+>     uint32_t        des1;
+> } FTGMAC100Desc;
 
-The name 'kvm_arm_add_vcpu_properties' says nothing about being specific
-to the timer. So this is either the wrong place for this function, or the
-function is named wrong. I'd say it's the wrong place, because, as the
-comment above kvm_arm_add_vcpu_properties() implies, the function is
-for all 'kvm-*' prefixed properties, not just timer related ones. It's
-true we don't have any others yet, but we will. I have plans to post
-kvm-steal-time soon, and despite it also having 'time' in its name, it
-shouldn't depend on ARM_FEATURE_GENERIC_TIMER.
+The TX and RX descriptors have 4 words in the architecture which are
+used by HW but software can use bigger size for its own purpose. This 
+is what is doing the Aspeed SDK.
 
-How about the below [untested] patch instead?
-
-Thanks,
-drew
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 32bec156f2d4..e9084f98ef10 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1245,6 +1245,10 @@ void arm_cpu_post_init(Object *obj)
-     if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
-         qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
-     }
-+
-+    if (kvm_enabled()) {
-+        kvm_arm_add_vcpu_properties();
-+    }
- }
- 
- static void arm_cpu_finalizefn(Object *obj)
-@@ -2029,7 +2033,6 @@ static void arm_max_initfn(Object *obj)
- 
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
--        kvm_arm_add_vcpu_properties(obj);
-     } else {
-         cortex_a15_initfn(obj);
- 
-@@ -2183,7 +2186,6 @@ static void arm_host_initfn(Object *obj)
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-         aarch64_add_sve_properties(obj);
-     }
--    kvm_arm_add_vcpu_properties(obj);
-     arm_cpu_post_init(obj);
- }
- 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index cbc5c3868fce..778cecc2e6ca 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -592,7 +592,6 @@ static void aarch64_max_initfn(Object *obj)
- 
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
--        kvm_arm_add_vcpu_properties(obj);
-     } else {
-         uint64_t t;
-         uint32_t u;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 4bdbe6dcac07..eef3bbd1cc2c 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -194,17 +194,18 @@ static void kvm_no_adjvtime_set(Object *obj, bool value, Error **errp)
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(Object *obj)
- {
--    if (!kvm_enabled()) {
--        return;
--    }
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    CPUARMState *env = &cpu->env;
- 
--    ARM_CPU(obj)->kvm_adjvtime = true;
--    object_property_add_bool(obj, "kvm-no-adjvtime", kvm_no_adjvtime_get,
--                             kvm_no_adjvtime_set);
--    object_property_set_description(obj, "kvm-no-adjvtime",
--                                    "Set on to disable the adjustment of "
--                                    "the virtual counter. VM stopped time "
--                                    "will be counted.");
-+    if (arm_feature(env, ARM_FEATURE_GENERIC_TIMER)) {
-+        cpu->kvm_adjvtime = true;
-+        object_property_add_bool(obj, "kvm-no-adjvtime", kvm_no_adjvtime_get,
-+                                 kvm_no_adjvtime_set);
-+        object_property_set_description(obj, "kvm-no-adjvtime",
-+                                        "Set on to disable the adjustment of "
-+                                        "the virtual counter. VM stopped time "
-+                                        "will be counted.");
-+    }
- }
- 
- bool kvm_arm_pmu_supported(CPUState *cpu)
-
-
->      }
->  }
->  
-> @@ -2029,7 +2030,6 @@ static void arm_max_initfn(Object *obj)
->  
->      if (kvm_enabled()) {
->          kvm_arm_set_cpu_features_from_host(cpu);
-> -        kvm_arm_add_vcpu_properties(obj);
->      } else {
->          cortex_a15_initfn(obj);
->  
-> @@ -2183,7 +2183,6 @@ static void arm_host_initfn(Object *obj)
->      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
->          aarch64_add_sve_properties(obj);
->      }
-> -    kvm_arm_add_vcpu_properties(obj);
->      arm_cpu_post_init(obj);
->  }
->  
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index cbc5c3868f..778cecc2e6 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -592,7 +592,6 @@ static void aarch64_max_initfn(Object *obj)
->  
->      if (kvm_enabled()) {
->          kvm_arm_set_cpu_features_from_host(cpu);
-> -        kvm_arm_add_vcpu_properties(obj);
->      } else {
->          uint64_t t;
->          uint32_t u;
-> -- 
-> 2.23.0
+> 2/ Replace the code using static '2' by dynamic use of
+> FTGMAC100_DBLAC_xXDES_SIZE(dblac):
 > 
+>   static int ftgmac100_read_bd(FTGMAC100Desc **bd, dma_addr_t addr)
+>   {
+>       unsigned bd_idx;
 > 
+>       if (dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd))) {
+>           qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to read descriptor
+> @ 0x%"
+>                         HWADDR_PRIx "\n", __func__, addr);
+>           return -1;
+>       }
+>       for (bd_idx = 0; bd_idx< FTGMAC100_DBLAC_RXDES_SIZE(s->dblac);
+> bd_idx++) {
+>           bd[bd_idx]->des0 = le32_to_cpu(bd[bd_idx]->des0);
+>           bd[bd_idx]->des1 = le32_to_cpu(bd[bd_idx]->des1);
+>       }
+> 
+>       return 0;
+>   }
+> 
+> Etc...
+> 
+
+The current ftgmac100_read_bd() and ftgmac100_write_bd() routines model 
+the HW perspective and they are fine as they are I think.
+
+C.
+
+> Maybe worth introduce the bd_to_cpu()/cpu_to_bd() helpers too
+> (respectively calling le32_to_cpu & cpu_to_le32).
+>>
+>> Signed-off-by: Erik Smit <erik.lucas.smit@gmail.com
+>> <mailto:erik.lucas.smit@gmail.com>>
+>> ---
+>>  hw/net/ftgmac100.c | 17 +++++++++++++++--
+>>  1 file changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+>> index 25ebee7ec2..1640b24b23 100644
+>> --- a/hw/net/ftgmac100.c
+>> +++ b/hw/net/ftgmac100.c
+>> @@ -79,6 +79,19 @@
+>>  #define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
+>>  #define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
+>>
+>> +/*
+>> + * DMA burst length and arbitration control register
+>> + */
+>> +#define FTGMAC100_DBLAC_RXFIFO_LTHR(x)      (((x) >> 0) & 0x7)
+>> +#define FTGMAC100_DBLAC_RXFIFO_HTHR(x)      (((x) >> 3) & 0x7)
+>> +#define FTGMAC100_DBLAC_RX_THR_EN           (1 << 6)
+>> +#define FTGMAC100_DBLAC_RXBURST_SIZE(x)     (((x) >> 8) & 0x3)
+>> +#define FTGMAC100_DBLAC_TXBURST_SIZE(x)     (((x) >> 10) & 0x3)
+>> +#define FTGMAC100_DBLAC_RXDES_SIZE(x)       (((x) >> 12) & 0xf)
+>> +#define FTGMAC100_DBLAC_TXDES_SIZE(x)       (((x) >> 16) & 0xf)
+>> +#define FTGMAC100_DBLAC_IFG_CNT(x)          (((x) >> 20) & 0x7)
+>> +#define FTGMAC100_DBLAC_IFG_INC             (1 << 23)
+>> +
+>>  /*
+>>   * PHY control register
+>>   */
+>> @@ -553,7 +566,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s,
+>> uint32_t tx_ring,
+>>          if (bd.des0 & s->txdes0_edotr) {
+>>              addr = tx_ring;
+>>          } else {
+>> -            addr += sizeof(FTGMAC100Desc);
+>> +            addr += (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac)) * 8;
+> 
+> Extra parenthesis not needed.
+> 
+> After doing 1/ you can now replace '8' by sizeof(FTGMAC100Desc).
+> 
+>>          }
+>>      }
+>>
+>> @@ -982,7 +995,7 @@ static ssize_t ftgmac100_receive(NetClientState *nc,
+>> const uint8_t *buf,
+>>          if (bd.des0 & s->rxdes0_edorr) {
+>>              addr = s->rx_ring;
+>>          } else {
+>> -            addr += sizeof(FTGMAC100Desc);
+>> +            addr += (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac)) * 8;
+>>          }
+>>      }
+>>      s->rx_descriptor = addr;
+>> --
+>> 2.25.1
 > 
 
 
