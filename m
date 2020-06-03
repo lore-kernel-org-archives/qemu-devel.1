@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B783EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 968C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7686C2072F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 626492072F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:31:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GQ5fwHhf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7686C2072F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mmOMn8K6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626492072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgIEt-0003Y4-KQ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:30:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49018)
+	id 1jgIFP-0004Ok-K6
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyq-00052e-Kl
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:08 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40926)
+ id 1jgHyu-0005Dr-Go
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:12 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyp-0003gd-Ob
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:08 -0400
-Received: by mail-pf1-x430.google.com with SMTP id v2so415519pfv.7
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:07 -0700 (PDT)
+ id 1jgHyt-0003hd-QA
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:12 -0400
+Received: by mail-pl1-x644.google.com with SMTP id y18so202368plr.4
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L5HmehI0u6Wl5CalJmhYTRnudOl8IyN54sr+tdgMFy8=;
- b=GQ5fwHhfRmrfSQOiJOp+xitMa1bz0gG0vGhe8roDv+urgOknORAf0CBlXKE2xDBN/2
- ctgM53TJTuO+57u6u/KnPugD0jox3VSKKY798vuYy+GKSQz9lAM+d13vEba0ce1MXRaS
- L3mDKJezZ7ELO3jMVUC6jSU31XSO9edrSFAEzvwFczmAh1dRkCipTzPlnewuUbIN7rom
- 30RTmE3+U3198xpc5f+PSWwZrGltaJcBXvUEkFvwmOQRK1Dc2rqZB/s9NOM+zr+XwNNa
- x0CX/vcqmfs/Yj9IO4Md/AOjWWZ9vg1Z5Baa7gPxtbIVmnLh7HzmPcMsnGr8uIg2KzYn
- +51Q==
+ bh=DWHyTpGlKBuharmhIu7/0HNfc6hnYtHUc2NhnIgEMGo=;
+ b=mmOMn8K6m384XUfdOljdjRtVgurc7mmaDh4q5305ZT+DX+9zE7CHgUDWhfxAgu1War
+ oqTa5to9WH5JJAEL4i/7kpkHMLj6SDRxZcBpkyvBkQb3gUGRrVMD0my4Amkit+/nthO+
+ cqnOTIty9NPcoVZsoYNhBEUdMqwy9ccjOA0GfxYW3+0XY6aZXWd0WI57uBEwfbebLQ9y
+ 4DaUwiu77oIk32TL+3LhYo4lubrGSMZ401oIg3gS+I3IncQ3HNkE0XnfEtq8sa86cY/e
+ QAcnwujJCpxFOvYgg3LAKHzLc60+JVyRdkBGztARLLQiRb5qS8YKQSdOZjcORVxwVa9y
+ Sldw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=L5HmehI0u6Wl5CalJmhYTRnudOl8IyN54sr+tdgMFy8=;
- b=GOxZ/6rAmb4M2GEw65aRPFY0ItOyvgoQtYfJ4mCuBdDvb8+F3yrAkpV5dcFsNIw2ou
- s0BUQJM4r8etzXeu75lgDYEu161dSfh2PyGDPCy/1Wpea/7Wvj5OvZF8VRPRB4vb/pvF
- CoPKLP/ttfu0hg+RhSMKsFekKHT+LfKlt+QWXf9JK7ShoXV5MIuVx2/ZeRU+t1pn3Mq8
- LRwcTrrY0Uqq4Ry5e+N/QDu4c8f0rW/4ZU2ZcZK4zkZBV6kzAuzKa58iaXhyfusO0naV
- cVQBTlCOaaZtiCmn4dZckk1XSTOtnI6GgelDkqQYmRDpJaBUdw4JW9lu7Kag1N9eKAva
- tlmw==
-X-Gm-Message-State: AOAM533+aW23XH6dMZ8vlhiP3TMi512s747d2MYcVOSDUM67mvABmNAv
- k2wyZi4C8AHnssPQGTF9pHvGNi+IpJ0=
-X-Google-Smtp-Source: ABdhPJyfmLduQgzggUH523TkC4v3oN6n4zUSi9Hwu2kmLvGxxV3m2GYXJXTup3WDlrUPJ6r0eclAnQ==
-X-Received: by 2002:a62:7707:: with SMTP id s7mr28622157pfc.90.1591146845950; 
- Tue, 02 Jun 2020 18:14:05 -0700 (PDT)
+ bh=DWHyTpGlKBuharmhIu7/0HNfc6hnYtHUc2NhnIgEMGo=;
+ b=JozGNN9lAL8dwqvTya1Qnj5tbNM+8dSLmr2bZejZyKMDuxJQxnNV1hfJATQHxBWEtO
+ VZO9NBoaEdbTtVxdxwTXK3GXDcxL5+7oJs4kaVBLbqhTHhY5PfRYB3NrUIZ4tjyQhG3v
+ j/QwgqySZqAiLBoso7sVKo4ElBvP+8RX5yq2/NR0cDb4d2k3XB7su3UCO2QusjaiqOAU
+ FMdIuUZadBY0FDPQ2tscPKDLJvUTx2gNxj74/GWjC4Mwfay5mp6IViZhLpjv4pAmTSIG
+ pyxm0He1UsIXrX8qx0wCSZWw7DjmbAzVC4kx6LZtJm8CZpiymEXVBJfIUkExJkDZQX1X
+ d4mg==
+X-Gm-Message-State: AOAM532U0ePJ5VGdxsnmjt1VmDBnBtZXCi7n5DT5ewaTih1WuvoSuhZQ
+ sgKM5tOckoY+ySu96plBy8dnMv5L+YA=
+X-Google-Smtp-Source: ABdhPJyPPg3L9peo2OjUm0bp7zdJa1mdYObMtF/1QIr7uwb86yyLze80mNH5yEBkY5dSLypFG678dw==
+X-Received: by 2002:a17:902:6541:: with SMTP id
+ d1mr25523754pln.96.1591146850191; 
+ Tue, 02 Jun 2020 18:14:10 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.05
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:14:05 -0700 (PDT)
+ Tue, 02 Jun 2020 18:14:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 36/42] target/arm: Complete TBI clearing for user-only for
- SVE
-Date: Tue,  2 Jun 2020 18:13:11 -0700
-Message-Id: <20200603011317.473934-37-richard.henderson@linaro.org>
+Subject: [PATCH v7 39/42] target/arm: Enable MTE
+Date: Tue,  2 Jun 2020 18:13:14 -0700
+Message-Id: <20200603011317.473934-40-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::430;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x430.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,67 +106,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are a number of paths by which the TBI is still intact
-for user-only in the SVE helpers.
-
-Because we currently always set TBI for user-only, we do not
-need to pass down the actual TBI setting from above, and we
-can remove the top byte in the inner-most primitives, so that
-none are forgotten.  Moreover, this keeps the "dirty" pointer
-around at the higher levels, where we need it for any MTE checking.
-
-Since the normal case, especially for user-only, goes through
-RAM, this clearing merely adds two insns per page lookup, which
-will be completely in the noise.
+We now implement all of the components of MTE, without actually
+supporting any tagged memory.  All MTE instructions will work,
+trivially, so we can enable support.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve_helper.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+v6: Delay user-only cpu reset bits to the user-only patch set.
+---
+ target/arm/cpu64.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 2d2aa14b43..460a3e5937 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3966,14 +3966,16 @@ static void sve_##NAME##_host(void *vd, intptr_t reg_off, void *host)  \
- static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-                              target_ulong addr, uintptr_t ra)               \
- {                                                                           \
--    *(TYPEE *)(vd + H(reg_off)) = (TYPEM)TLB(env, addr, ra);                \
-+    *(TYPEE *)(vd + H(reg_off)) =                                           \
-+        (TYPEM)TLB(env, useronly_clean_ptr(addr), ra);	                    \
- }
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index cbc5c3868f..e4bce55c5f 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -655,6 +655,7 @@ static void aarch64_max_initfn(Object *obj)
  
- #define DO_ST_TLB(NAME, H, TYPEE, TYPEM, TLB) \
- static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-                              target_ulong addr, uintptr_t ra)               \
- {                                                                           \
--    TLB(env, addr, (TYPEM)*(TYPEE *)(vd + H(reg_off)), ra);                 \
-+    TLB(env, useronly_clean_ptr(addr),                                      \
-+        (TYPEM)*(TYPEE *)(vd + H(reg_off)), ra);                            \
- }
+         t = cpu->isar.id_aa64pfr1;
+         t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
++        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
+         cpu->isar.id_aa64pfr1 = t;
  
- #define DO_LD_PRIM_1(NAME, H, TE, TM)                   \
-@@ -4091,6 +4093,19 @@ static bool sve_probe_page(SVEHostPage *info, bool nofault,
-     int flags;
- 
-     addr += mem_off;
-+
-+    /*
-+     * User-only currently always issues with TBI.  See the comment
-+     * above useronly_clean_ptr.  Usually we clean this top byte away
-+     * during translation, but we can't do that for e.g. vector + imm
-+     * addressing modes.
-+     *
-+     * We currently always enable TBI for user-only, and do not provide
-+     * a way to turn it off.  So clean the pointer unconditionally here,
-+     * rather than look it up here, or pass it down from above.
-+     */
-+    addr = useronly_clean_ptr(addr);
-+
-     flags = probe_access_flags(env, addr, access_type, mmu_idx, nofault,
-                                &info->host, retaddr);
-     info->flags = flags;
+         t = cpu->isar.id_aa64mmfr1;
 -- 
 2.25.1
 
