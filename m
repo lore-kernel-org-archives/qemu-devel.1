@@ -2,113 +2,125 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEB4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6B9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:58:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9BFF2077D
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:45:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0312820658
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:58:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="KTYafo5K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9BFF2077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=apple.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="qfgAO3Ls"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0312820658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgd4C-0007gF-3L
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 19:45:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33044)
+	id 1jgdGi-0004Kx-6J
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 19:58:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgd3c-00079V-8S
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:44:28 -0400
-Received: from nwk-aaemail-lapp02.apple.com ([17.151.62.67]:56260)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1jgdG6-0003tt-Ks
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:57:22 -0400
+Received: from mail-bn8nam12on2047.outbound.protection.outlook.com
+ ([40.107.237.47]:6227 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgd3b-0006Ev-E4
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:44:27 -0400
-Received: from pps.filterd (nwk-aaemail-lapp02.apple.com [127.0.0.1])
- by nwk-aaemail-lapp02.apple.com (8.16.0.42/8.16.0.42) with SMTP id
- 053NcTGO064949; Wed, 3 Jun 2020 16:44:26 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=20180706;
- bh=8a9MOsw0W3skkvp5IbmUbGQ0EOAmesE+IZiebvqeFRw=;
- b=KTYafo5KDhywbEXYkQlC4dY47YmxN+1Ghu3OFtll+Wxgk/uS7hciLU9lwh7rC2IHqv1b
- 6k/RXa0ZchzlPEXtirbryCDcV/xFi5Ep3nWE4l9BBtsuvjCDw0nPtsl/TO/XycSqW7xE
- 1nfhFksdrVkCogz/MPrDUwTWGltTC/stqA3ofoZkpyM4EprVOSEtCwy+Ib24RY0G1Zx9
- rxENQDu0CDKLa8k9NE2FdQR63oBxcFkvTTZWndrvqHpdsmA+w7VvdjrbjTzUtersRZlt
- HR223zQJJ60V7oPyEcReKImhF6SvK1p4uVNvCi/FIy9PElgSC7AhMHJ7vKW/yMuRR+VK 2A== 
-Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
- (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
- by nwk-aaemail-lapp02.apple.com with ESMTP id 31bm2ha53s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Wed, 03 Jun 2020 16:44:26 -0700
-Received: from rn-mailsvcp-mmp-lapp02.rno.apple.com
- (rn-mailsvcp-mmp-lapp02.rno.apple.com [17.179.253.15])
- by rn-mailsvcp-mta-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0QBD007WQJA14M90@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
- Wed, 03 Jun 2020 16:44:25 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp02.rno.apple.com by
- rn-mailsvcp-mmp-lapp02.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0QBD00S00IYJEV00@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Wed,
- 03 Jun 2020 16:44:25 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: 46931e9116192002279dfee8d345dfa3
-X-Va-E-CD: 60a558adcae14311613a1773d174b849
-X-Va-R-CD: 3f9e7a567f249bdb29d0e39dccc2f261
-X-Va-CD: 0
-X-Va-ID: fa3c19e5-9835-459a-8f3c-66624e3b75ea
-X-V-A: 
-X-V-T-CD: 46931e9116192002279dfee8d345dfa3
-X-V-E-CD: 60a558adcae14311613a1773d174b849
-X-V-R-CD: 3f9e7a567f249bdb29d0e39dccc2f261
-X-V-CD: 0
-X-V-ID: 77d14f5c-cf2f-4ec3-8ae8-23e2999f2380
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received: from [17.234.60.254] (unknown [17.234.60.254])
- by rn-mailsvcp-mmp-lapp02.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0QBD0063ZJA08G00@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Wed,
- 03 Jun 2020 16:44:25 -0700 (PDT)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v5 03/15] acpi: rtc: use a single crs range
-From: Cameron Esfahani <dirty@apple.com>
-In-reply-to: <20200507131640.14041-4-kraxel@redhat.com>
-Date: Wed, 03 Jun 2020 16:44:23 -0700
-Cc: Cameron Esfahani via <qemu-devel@nongnu.org>
-Content-transfer-encoding: quoted-printable
-Message-id: <42136139-DA96-4774-A042-1D490054B0DF@apple.com>
-References: <20200507131640.14041-1-kraxel@redhat.com>
- <20200507131640.14041-4-kraxel@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received-SPF: pass client-ip=17.151.62.67; envelope-from=dirty@apple.com;
- helo=nwk-aaemail-lapp02.apple.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 19:35:42
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1jgdG4-0008Ev-O8
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:57:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eG5EPodUJlXmtwwzP1yzprvdIbNsN55edeJDLVB9XwYI1MBiVd7kXrm8/CaE94flmtXbep47JEI612XwWhc4G5AWIwi5VkqEL2O0ZKkBChe3HS2OMGDwZ21qXVzQwTZtPdhD0fdkeT7zYE9OtdNoQjT13TPpDzEUxGTsc36kTX6yQ/PdQeLGXe5H/1ePxfmbgJYg0sab4r0nL1d0XU9sEjzDl8jhtI5bWpt05uE0oQH5rKV0dhLorENdHe761CZGDpWvpPYcTNPqPx5FAT96QWqLIR3LmNeCv2z2LPfjJuKwkVuQH7UzYuZQf5QVeLWwqByDHtihhvm9ZNbrtXLMcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kwGPWYC9GcM64KFTGVuXYfHICdfdExVV8HgNefDSw4c=;
+ b=m3FEpkmY7BWLLj6N/4TaeZyprCPSe2YqtJlFETo26Bu1tvSVtnLYjD2BNten58aXBEWmhEvMwWgiUnnmWs2tK//BiZvs/sNleSUAz1JSgtJugH5u1J+u21REZDWCjmemjVHbpzKRCxXciRpejeaceR46d25TGhPPPlihtSqMzbWS46EcIZkATH968MEe8fAjhW5+UTNjtiQa8mIm/vi3s6YNrwselYvWXrULhf00T8PhWc98okOG9sqto+zgC4WlF9DPDMEMo+U7WSNY6N5DkFrCBXFCXSqg48BGwUR+emrtOLSCAK7UJxAkGhBlA263eNpKlyhv3PZ/X77tyCZ9/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kwGPWYC9GcM64KFTGVuXYfHICdfdExVV8HgNefDSw4c=;
+ b=qfgAO3Ls/Srft/otVXPU2NJH/P6aQuwRwsWEjR3emO47Bna/M7ztt2bKDrQDuJwwq/N2Cz+fz0aUmBrb2HQ9Kcc2j9zyEQxIqqTXkQ8AHe1/lGpY2E71ZQOW4rY0KgJmjOBdUZVnQxtw0EP0yYe4JwoqFRlCUFE8aGm6UYwYvlA=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2591.namprd12.prod.outlook.com (2603:10b6:802:30::32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Wed, 3 Jun
+ 2020 23:57:17 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3045.024; Wed, 3 Jun 2020
+ 23:57:17 +0000
+Subject: RE: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
+ <1528498581-131037-2-git-send-email-babu.moger@amd.com>
+ <20200602175212.GH577771@habkost.net>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <15422b3b-47ee-f293-b40a-d102aa8a89c0@amd.com>
+Date: Wed, 3 Jun 2020 18:57:15 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <20200602175212.GH577771@habkost.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0201CA0069.namprd02.prod.outlook.com
+ (2603:10b6:803:20::31) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.79] (165.204.77.1) by
+ SN4PR0201CA0069.namprd02.prod.outlook.com (2603:10b6:803:20::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.19 via Frontend
+ Transport; Wed, 3 Jun 2020 23:57:16 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 09cf5bda-4fad-4974-4725-08d80819d829
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2591:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2591FBF61D15614075B53F7295880@SN1PR12MB2591.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 04238CD941
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XicexYKArR9/DGkXIYyV2YcxOqB3sKXowZh1bmKlryWghm/dIkB/iH/m6kTSsmT5PrJqC8YO2Beze5IQkR4yWqKOFsNl0Ur1QHxv1ipwsNvRNEhGtuiWs7vha/UEjaD3dSitbVZA3cTpBmgDAHr8Nzjb3nehLkVFIYo2NUN0psELEXkPTsZj1USsblppfqE7J5trH0W+tLZkBfCIHIQmfkexC9oEC9hUXpC4BE6Fvi8O/sfdfnSu99HdnQMS5k6gq8xtFMbPUe7kU7yDSMy5ezhlMCIxuA4S6cgBkEl8MICqlH1kIU7j3SVwC0tGhjDdBYZopwzv2oPrBYFn8dwoi2YwCn/qI7CRnEgCpFcP6j5KwkQScGRMLeT+9znoiab5zknuqivmpEgIXHM4ajW6KdaxN0bAj05tUYDLUsneTMqeD6JH/XQUqVYnh3SYDXb1V0wneZMyynetJG//PGzhAg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39860400002)(366004)(346002)(376002)(396003)(136003)(31696002)(6486002)(478600001)(66946007)(45080400002)(16526019)(83080400001)(186003)(83380400001)(966005)(66556008)(2906002)(66476007)(36756003)(44832011)(4326008)(6916009)(316002)(26005)(2616005)(7416002)(54906003)(31686004)(8676002)(8936002)(52116002)(16576012)(86362001)(956004)(53546011)(5660300002)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: dLUCAjd6/P59r9+wkDYG397sWDNEcWWO79u1pY3l2yKeDcEbJFXFoToxMpKR9hVW9A8AK6V2/LBG5o11faDE1QlReIEbNeN/j9zPfQ4sEN3dvyT3hEuxck9vUWgdb1pwUBSkScngxViGciINKpTELgCpr/pF0m2fTOZ+UWzeRmdDaP+F1sZOg0Bs1dszXKufHyd8rTcipcdLlhtgGX3swbCBA9yhAKvWe128PpNl3D5F00MI8L50jbtiapp4CVN+j0sM2z7BXEbzL2gzOaZ0UzsRTw1slzWFEE7/dYKVvAfJ5pIlOjOzJIXBfFe5FtYZkYCIxtOYVSCWfidw7V4kG4t5Y0eOI27saKXY8aAad8fNU9wYT4wV5x2oJtD/FHX71rszu9vBt1AlZ/3u4svhXGI/A6KWJTH0Nay0mi7mwJ63LhLCTwZF2E4KStt3anUZwaOKd7xz4tlWD2SycEpWvouIoS/3obnp6fPY7m91sto=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09cf5bda-4fad-4974-4725-08d80819d829
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2020 23:57:17.0021 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Cx1q3zIaBmKfhZXszbX/aa53penKzpJUI4NC0Bd9a9+IGjv2ERlFO3wKUR6xwEyF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2591
+Received-SPF: none client-ip=40.107.237.47; envelope-from=Babu.Moger@amd.com;
+ helo=NAM12-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 19:57:18
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,58 +133,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "geoff@hostfission.com" <geoff@hostfission.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "kash@tripleback.net" <kash@tripleback.net>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Cameron Esfahani <dirty@apple.com>
+Started looking at this. Let me know if you have any ideas. Will respond
+with more details later this week.
 
-Cameron Esfahani
-dirty@apple.com
-
-"Americans are very skilled at creating a custom meaning from something =
-that's mass-produced."
-
-Ann Powers
-
-
-> On May 7, 2020, at 6:16 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
-> Use a single io range for _CRS instead of two,
-> following what real hardware does.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> hw/rtc/mc146818rtc.c | 8 +++++---
-> 1 file changed, 5 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-> index 2104e0aa3b14..ab0cc59973b3 100644
-> --- a/hw/rtc/mc146818rtc.c
-> +++ b/hw/rtc/mc146818rtc.c
-> @@ -1013,12 +1013,14 @@ static void rtc_build_aml(ISADevice *isadev, =
-Aml *scope)
->     Aml *dev;
->     Aml *crs;
->=20
-> +    /*
-> +     * Reserving 8 io ports here, following what physical hardware
-> +     * does, even though qemu only responds to the first two ports.
-> +     */
->     crs =3D aml_resource_template();
->     aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE, RTC_ISA_BASE,
-> -                           0x10, 0x02));
-> +                           0x01, 0x08));
->     aml_append(crs, aml_irq_no_flags(RTC_ISA_IRQ));
-> -    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE + 2, =
-RTC_ISA_BASE + 2,
-> -                           0x02, 0x06));
->=20
->     dev =3D aml_device("RTC");
->     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
-> --=20
-> 2.18.4
->=20
->=20
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: Tuesday, June 2, 2020 12:52 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Dr. David
+> Alan Gilbert <dgilbert@redhat.com>
+> Subject: Re: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
+> 
+> On Fri, Jun 08, 2018 at 06:56:17PM -0400, Babu Moger wrote:
+> > Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
+> > match the underlying hardware. Please refer to the Processor Programming
+> > Reference (PPR) for AMD Family 17h Model for more details.
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> [...]
+> > +    case 0x8000001E:
+> > +        assert(cpu->core_id <= 255);
+> 
+> It is possible to trigger this assert using:
+> 
+> $ qemu-system-x86_64 -machine q35,accel=kvm,kernel-irqchip=split -device
+> intel-iommu,intremap=on,eim=on -smp
+> 1,maxcpus=258,cores=258,threads=1,sockets=1 -cpu
+> qemu64,xlevel=0x8000001e -device qemu64-x86_64-cpu,apic-id=257
+> qemu-system-x86_64: warning: Number of hotpluggable cpus requested (258)
+> exceeds the recommended cpus supported by KVM (240)
+> qemu-system-x86_64:
+> /home/ehabkost/rh/proj/virt/qemu/target/i386/cpu.c:5888: cpu_x86_cpuid:
+> Assertion `cpu->core_id <= 255' failed.
+> Aborted (core dumped)
+> 
+> See bug report and discussion at
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
+> redhat.com%2Fshow_bug.cgi%3Fid%3D1834200&amp;data=02%7C01%7Cbabu.
+> moger%40amd.com%7C8a2724729b914bc9b53d08d8071db392%7C3dd8961fe4
+> 884e608e11a82d994e183d%7C0%7C0%7C637267171438806408&amp;sdata=ib
+> iGlF%2FF%2FVtYQLf7fe988kxFsLhj4GrRiTOq4LUuOT8%3D&amp;reserved=0
+> 
+> Also, it looks like encode_topo_cpuid8000001e() assumes core_id
+> has only 3 bits, so the existing assert() is not even sufficient.
+> We need to decide what to do if the user requests nr_cores > 8.
+> 
+> Probably omitting CPUID[0x8000001E] if the VCPU topology is
+> incompatible with encode_topo_cpuid8000001e() (and printing a
+> warning) is the safest thing to do right now.
+> 
+> 
+> 
+> > +        encode_topo_cpuid8000001e(cs, cpu,
+> > +                                  eax, ebx, ecx, edx);
+> > +        break;
+> >      case 0xC0000000:
+> >          *eax = env->cpuid_xlevel2;
+> >          *ebx = 0;
+> > --
+> > 1.8.3.1
+> >
+> 
+> --
+> Eduardo
 
 
