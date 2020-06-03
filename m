@@ -2,108 +2,95 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7547CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F3DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:54:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49A3420678
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:51:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A3420678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F19B320678
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:54:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ue6stcLR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F19B320678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgP7p-0004Qy-IJ
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:51:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
+	id 1jgPAZ-0005og-8o
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:54:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgP7G-00041O-R4
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:51:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45196)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgP7F-0008PH-6N
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:51:18 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jgP7D-0001dX-1x
- for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 08:51:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0DC832E806D
- for <qemu-devel@nongnu.org>; Wed,  3 Jun 2020 08:51:15 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jgPA0-0005IF-HN
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:54:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21578
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jgP9y-0000pa-5f
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:54:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591174445;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QWex8TjGTKA0jX7oHTGYYPKn0RoT8P7MfBM5P+sCLNQ=;
+ b=Ue6stcLRR13h6W4D2T93UOZuRQhPoXYUSaO30r1yovu3EPEL66YrFc1fTVOF9KeK5BpIHW
+ LkvMOF14yymQAOFHSj9pEzSWW88FVM7u55xhbSXm+QKQL0W1LL340sEJD64IxRKb8Zj5Mh
+ my48++aTgO1VSpGyVdlFJz+5okrmEw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-QxY7rB10MkCXIV5UbBeXBw-1; Wed, 03 Jun 2020 04:54:01 -0400
+X-MC-Unique: QxY7rB10MkCXIV5UbBeXBw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CCB6835B8C;
+ Wed,  3 Jun 2020 08:54:00 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C91FA5C290;
+ Wed,  3 Jun 2020 08:53:57 +0000 (UTC)
+Date: Wed, 3 Jun 2020 10:53:54 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Subject: Re: About the kvm-no-adjvtime CPU property
+Message-ID: <20200603085354.wcbhhuq3dhvi3moc@kamzik.brq.redhat.com>
+References: <b4389848-10fd-a906-9901-d1d354ce4842@huawei.com>
+ <20200601080718.jul5r4qebpeieyfl@kamzik.brq.redhat.com>
+ <3d8729db-067c-31f9-dd69-02a218f1b53e@huawei.com>
+ <20200601122917.fyp2kwqzsodahnzu@kamzik.brq.redhat.com>
+ <f994141f-0248-fd68-7cd5-9b948cfdbf8d@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Jun 2020 08:40:27 -0000
-From: Ubuntu SRU Bot <1805256@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=In Progress; importance=Undecided; 
- assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04;
- status=In Progress; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=In Progress; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10;
- status=In Progress; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04;
- status=In Progress; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Invalid; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Fix Committed; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: block-proposed-bionic block-proposed-eoan
- block-proposed-focal ikeradar patch qemu-img verification-done-bionic
- verification-done-eoan verification-done-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
- jan-glauber-i janitor jnsnow kongzizaixian lizhengui paelzer philmd
- rafaeldtinoco ubuntu-sru-bot ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Ubuntu SRU Bot (ubuntu-sru-bot)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <20200603084027.1036C2402B4@snakefruit.canonical.com>
-Subject: [Bug 1805256] Autopkgtest regression report (qemu/1:4.2-3ubuntu6.2)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="275d46a24253e557e4403d52832837e4bfa425b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 334eeee16d77a832e665e82209a64854d119194d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 04:51:15
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <f994141f-0248-fd68-7cd5-9b948cfdbf8d@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:04:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -112,217 +99,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wu.wubin@huawei.com,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All autopkgtests for the newly accepted qemu (1:4.2-3ubuntu6.2) for focal h=
-ave finished running.
-The following regressions have been reported in tests triggered by the pack=
-age:
+On Tue, Jun 02, 2020 at 03:47:22PM +0800, Ying Fang wrote:
+> 
+> 
+> On 2020/6/1 20:29, Andrew Jones wrote:
+> > On Mon, Jun 01, 2020 at 08:07:31PM +0800, Ying Fang wrote:
+> > > 
+> > > 
+> > > On 2020/6/1 16:07, Andrew Jones wrote:
+> > > > On Sat, May 30, 2020 at 04:56:26PM +0800, Ying Fang wrote:
+> > > > > About the kvm-no-adjvtime CPU property
+> > > > > 
+> > > > > Hi Andrew,
+> > > > > To adjust virutal time, a new kvm cpu property kvm-no-adjvtime
+> > > > > was introduced to 5.0 virt machine types. However the cpu
+> > > > > property was enabled only for host-passthrough and max cpu model.
+> > > > > As for other cpu model like cortex-a57, cortex-a53, cortex-a72,
+> > > > > this kvm-adjvtime is not enabled by default, which means the
+> > > > > virutal time can not be adjust for them.
+> > > > > 
+> > > > > Here, for example, if VM is configured with kvm enabled:
+> > > > > 
+> > > > >     <cpu mode='custom' match='exact' check='partial'>
+> > > > >       <model fallback='allow'>cortex-a72</model>
+> > > > >       <topology sockets='2' dies='1' cores='2' threads='1'/>
+> > > > >       <numa>
+> > > > >         <cell id='0' cpus='0-1' memory='16777216' unit='KiB'/>
+> > > > >         <cell id='1' cpus='2-3' memory='16777216' unit='KiB'/>
+> > > > >       </numa>
+> > > > >     </cpu>
+> > > > > 
+> > > > > We cannot adjust virtual time even if 5.0 virt machine is used.
+> > > > > So i'd like to add it to other cpu model, do you have any
+> > > > > suggestions here ?
+> > > > > 
+> > > > > 
+> > > > 
+> > > > Hi Fang,
+> > > > 
+> > > > The cpu feature only requires kvm.  If a cpu model may be used with kvm,
+> > > > then the feature can be allowed to be used with the model.  What I find
+> > > > interesting is that the cpu model is being used with kvm instead of 'host'
+> > > > or 'max'.  Can you explain the reasons for that?  Currently, when using
+> > > yes，the cpu model is indeed used with kvm.
+> > > 
+> > > There is a situation where the host cpu model is Cortex-A72 and
+> > > a 'custom' cpu mode is used to keep insrtuction set compatible between
+> > > the source and destination host machine when doing live migration.
+> > > So the host physical machine cpu model is Cortex-A72 but
+> > > host-passthrough model is mode used here.
+> I mean host-passthrough model is 'not' used here. Sorry to make it
+> confusing.
 
-systemd/245.4-4ubuntu3.1 (arm64)
+I guessed as much.
+
+> > 
+> > Are the source and destinations hosts used in the migration identical?
+> > If so, then the guest can use cpu 'host' and disable cpu features that
+> > should not be exposed (e.g. -cpu host,pmu=off).  If the source and
+> > destination hosts are not identical, then I'm curious what those exact
+> > differences are.  With the way AArch64 KVM works today, even using the
+> > Cortex-A72 cpu model should require identical hosts when migrating.  Or,
+> > at least both hosts must be compatible with Cortex-A72 and any difference
+> > in ID registers must be somehow getting hidden from the guest.
+> Yes, you are right.
+> We have AAarch64 server with cpu based on Cortex-A72 and some extra
+> instruction set added. Source host with cpu based on V1 and destination host
+> with cpu based on V2 and they are compatible with Cortex-A72. We want to use
+> a 'custom' cpu mode here to make it possible to do live migration between
+> them. This is the scenario where the 'host' cpu model is not used since a
+> 'custom' cpu model Cortex-A72 is used here .
+
+What you've described here is indeed the reason to use CPU models. I.e.
+enabling the migration from a host of one type to another by creating a
+guest that only enables the features contained in both hosts (as well as
+maintaining all state that describes the CPU type, e.g. MIDR).
+Unfortunately, unless your KVM has patches that aren't upstream, then that
+doesn't work on AArch64 KVM (more on that below). It may appear to be
+working for you, because your guest kernel and userspace don't mind the
+slight differences exposed to it between the hosts, or those differences
+are limited to explicitly disabled features. If that's the case, then I
+would guess that using '-cpu host' and disabling the same features would
+"work" as well.
+
+Here's some more details on why the Cortex-A72 CPU model doesn't matter
+with upstream KVM. First, upstream AArch64 KVM doesn't support CPU models,
+and it doesn't even have a Cortex-A72 preferred target. For Cortex-A72
+it will use "KVM_ARM_TARGET_GENERIC_V8", which is the same thing 'host'
+would do when running on a Cortex-A72. Second, if V2 of the Cortex-A72-
+based CPU you're using changed the revision of the MIDR, or any other
+state that gets passed directly through to the guest like the MIDR, then
+that state will change on migration. If a guest looks before migration and
+again after migration, then it could get confused. A guest kernel may only
+look once on boot and then not notice, but anything exposed to userspace
+is extra risky, as userspace may check more frequently.
+
+In short, without KVM patches that aren't upstream, then it's risky to
+migrate between machines with V1 and V2 of these CPUs. And, it doesn't
+help to use the Cortex-A72 CPU model.
+
+Thanks,
+drew
 
 
-Please visit the excuses page listed below and investigate the failures, pr=
-oceeding afterwards as per the StableReleaseUpdates policy regarding autopk=
-gtest regressions [1].
+> However the kvm-adjvtime
+> feature is also need. So I think we should move kvm_arm_add_vcpu_properties
+> to arm_cpu_post_init, instead of limited to 'host' and 'max' cpu model[1].
+> 
+> 1: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00091.html
+> > 
+> > Thanks,
+> > drew
+> > 
+> > 
+> > 
+> 
+> 
 
-https://people.canonical.com/~ubuntu-archive/proposed-
-migration/focal/update_excuses.html#qemu
-
-[1] https://wiki.ubuntu.com/StableReleaseUpdates#Autopkgtest_Regressions
-
-Thank you!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in kunpeng920:
-  In Progress
-Status in kunpeng920 ubuntu-18.04 series:
-  In Progress
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  In Progress
-Status in kunpeng920 ubuntu-19.10 series:
-  In Progress
-Status in kunpeng920 ubuntu-20.04 series:
-  In Progress
-Status in kunpeng920 upstream-kernel series:
-  Invalid
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Fix Committed
-Status in qemu source package in Eoan:
-  Fix Committed
-Status in qemu source package in Focal:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
-
-  [Test Case]
-
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
