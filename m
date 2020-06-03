@@ -2,68 +2,89 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF73C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17269C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:53:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C515D2068D
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:52:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C515D2068D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D53E9206E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:53:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQSgW+8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D53E9206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgOC3-0003Zi-UD
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:52:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37782)
+	id 1jgODP-0004b9-5H
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:53:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jgOBX-0003B6-3n
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:51:39 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3702 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jgOBV-0005OL-Qc
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:51:38 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id C75973C416CF64380153;
- Wed,  3 Jun 2020 15:51:30 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.206) with Microsoft SMTP Server (TLS) id 14.3.487.0; Wed, 3 Jun 2020
- 15:51:20 +0800
-Subject: Re: [PATCH] qom-hmp-cmds: fix a memleak in hmp_qom_get
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- <pbonzini@redhat.com>, <berrange@redhat.com>, <ehabkost@redhat.com>, "Dr.
- David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster
- <armbru@redhat.com>
-References: <20200603070338.7922-1-pannengyuan@huawei.com>
- <de3c8dc7-b039-71d7-6c33-5794a7ed9eb8@redhat.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <60fa4945-7227-36d3-6f13-24d58eb88b40@huawei.com>
-Date: Wed, 3 Jun 2020 15:51:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgOCc-00045O-3S
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:52:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46090
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgOCb-0005kA-0u
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 03:52:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591170763;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=nF1+IBQY/lh4zAodhDMnjO2PzVWLN3NiliMrN41jXwU=;
+ b=DQSgW+8Pav8TnMjKeYNVf69cZO2WY8DTd6l62d1973HjXYpfpgq3hObnbOuOSZa4o+9V2g
+ U1E2cRG5yuKy+PfpXLuLoRDae4U8C+6+aNHsqnOQreJ/R2knURvRoFXSM1wYUPTAVg0zRm
+ 21MuU1HqIugubk+VKxkjswB5hABixQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-mpLt--gXO96OFp0RSgUH7g-1; Wed, 03 Jun 2020 03:52:41 -0400
+X-MC-Unique: mpLt--gXO96OFp0RSgUH7g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31413872FE0;
+ Wed,  3 Jun 2020 07:52:40 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-155.ams2.redhat.com [10.36.114.155])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 07F6AD01F6;
+ Wed,  3 Jun 2020 07:52:33 +0000 (UTC)
+Subject: Re: [PATCH v4 4/6] iotests: 194: test also migration of dirty bitmap
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200521220648.3255-1-vsementsov@virtuozzo.com>
+ <20200521220648.3255-5-vsementsov@virtuozzo.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8954b780-614c-421a-cca3-992f68d24812@redhat.com>
+Date: Wed, 3 Jun 2020 09:52:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <de3c8dc7-b039-71d7-6c33-5794a7ed9eb8@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200521220648.3255-5-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=pannengyuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 02:17:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/02 23:55:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,72 +98,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/3/2020 2:51 PM, Philippe Mathieu-Daudé wrote:
-> Hi Pan,
+On 22/05/2020 00.06, Vladimir Sementsov-Ogievskiy wrote:
+> Test that dirty bitmap migration works when we deal with mirror.
 > 
-> On 6/3/20 9:03 AM, Pan Nengyuan wrote:
->> 'obj' forgot to free at the end of hmp_qom_get(). Fix that.
->>
->> The leak stack:
->> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->>     #0 0x7f4e3a779ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
->>     #1 0x7f4e398f91d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
->>     #2 0x55c9fd9a3999 in qstring_from_substr /build/qemu/src/qobject/qstring.c:45
->>     #3 0x55c9fd894bd3 in qobject_output_type_str /build/qemu/src/qapi/qobject-output-visitor.c:175
->>     #4 0x55c9fd894bd3 in qobject_output_type_str /build/qemu/src/qapi/qobject-output-visitor.c:168
->>     #5 0x55c9fd88b34d in visit_type_str /build/qemu/src/qapi/qapi-visit-core.c:308
->>     #6 0x55c9fd59aa6b in property_get_str /build/qemu/src/qom/object.c:2064
->>     #7 0x55c9fd5adb8a in object_property_get_qobject /build/qemu/src/qom/qom-qobject.c:38
->>     #8 0x55c9fd4a029d in hmp_qom_get /build/qemu/src/qom/qom-hmp-cmds.c:66
->>
->> Fixes: 89cf4fe34f4
-> 
-> When you fix a bug in a specific commit, please Cc the commit author and
-> the reviewers, so they have a chance to 1/ review your fix and 2/ learn
-> from their mistake.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/qemu-iotests/194     | 14 ++++++++++----
+>  tests/qemu-iotests/194.out |  6 ++++++
+>  2 files changed, 16 insertions(+), 4 deletions(-)
 
-Ok, I will do next time.
+ Hi!
 
-> 
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->>  qom/qom-hmp-cmds.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
->> index f704b6949a..3d2a23292d 100644
->> --- a/qom/qom-hmp-cmds.c
->> +++ b/qom/qom-hmp-cmds.c
->> @@ -71,6 +71,7 @@ void hmp_qom_get(Monitor *mon, const QDict *qdict)
->>          qobject_unref(str);
->>      }
->>  
->> +    qobject_unref(obj);
-> 
-> The object_resolve_path() documentation is not clear about that...
-> Can we get the documentation clarified?
+This test broke the iotest in the gitlab CI:
 
-I'm not sure why is object_resolve_path().
-In this case, 'obj' is returned from object_property_get_qobject() in qmp_qom_get().
-Do you mean document object_property_get_qobject() to make it more clear?
-Like:
-  - The returned object has a reference count of 1, and will be freed when the last reference is dropped.
+ https://gitlab.com/huth/qemu/-/jobs/578520599#L3780
 
-Thanks.
+it works again when I revert this commit.
 
-> 
->>      hmp_handle_error(mon, err);
->>  }
->>  
->>
-> 
+Could the test be reworked so that it works in CI pipelines, too?
+Otherwise, I think it's best if we disable it in the .gitlab-ci.yml file...
+
+ Thomas
+
 
