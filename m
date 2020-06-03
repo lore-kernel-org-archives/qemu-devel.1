@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEA2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F94FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F4112067B
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:15:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F4112067B
+	by mail.kernel.org (Postfix) with ESMTPS id 344962074B
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 08:16:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 344962074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgOY7-0000Mw-GG
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39572)
+	id 1jgOZB-0001Wo-DH
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 04:16:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <maozhongyi@cmss.chinamobile.com>)
- id 1jgOTU-00014e-QR
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:10:12 -0400
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:7103)
+ id 1jgOTV-000163-OV
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:10:13 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:7104)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jgOTT-0000Gz-87
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:10:12 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1jgOTU-0000H0-4q
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 04:10:13 -0400
 Received: from spf.mail.chinamobile.com (unknown[172.16.121.15]) by
- rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee45ed75ab47af-8b1ff;
- Wed, 03 Jun 2020 16:09:24 +0800 (CST)
-X-RM-TRANSID: 2ee45ed75ab47af-8b1ff
+ rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee45ed75ab67b4-8b204;
+ Wed, 03 Jun 2020 16:09:26 +0800 (CST)
+X-RM-TRANSID: 2ee45ed75ab67b4-8b204
 X-RM-TagInfo: emlType=0                                       
 X-RM-SPAM-FLAG: 00000000
 Received: from localhost.localdomain (unknown[112.25.154.146])
- by rmsmtp-syy-appsvr08-12008 (RichMail) with SMTP id 2ee85ed75aae43e-6101a;
- Wed, 03 Jun 2020 16:09:24 +0800 (CST)
-X-RM-TRANSID: 2ee85ed75aae43e-6101a
+ by rmsmtp-syy-appsvr08-12008 (RichMail) with SMTP id 2ee85ed75aae43e-61027;
+ Wed, 03 Jun 2020 16:09:26 +0800 (CST)
+X-RM-TRANSID: 2ee85ed75aae43e-61027
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/9] monitor/hmp-cmds: add units for migrate_parameters
-Date: Wed,  3 Jun 2020 16:08:58 +0800
-Message-Id: <20200603080904.997083-4-maozhongyi@cmss.chinamobile.com>
+Subject: [PATCH 8/9] docs/xbzrle: update 'cache miss rate' and 'encoding rate'
+ to docs
+Date: Wed,  3 Jun 2020 16:09:03 +0800
+Message-Id: <20200603080904.997083-9-maozhongyi@cmss.chinamobile.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200603080904.997083-1-maozhongyi@cmss.chinamobile.com>
 References: <20200603080904.997083-1-maozhongyi@cmss.chinamobile.com>
@@ -74,57 +75,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When running:
-(qemu) info migrate_parameters
-announce-initial: 50 ms
-announce-max: 550 ms
-announce-step: 100 ms
-compress-wait-thread: on
-...
-max-bandwidth: 33554432 bytes/second
-downtime-limit: 300 milliseconds
-x-checkpoint-delay: 20000
-...
-xbzrle-cache-size: 67108864
-
-add units for the parameters 'x-checkpoint-delay' and
-'xbzrle-cache-size', it's easier to read, also move
-milliseconds to ms to keep the same style.
-
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- monitor/hmp-cmds.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ docs/xbzrle.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 9c61e769ca..8c3e436b39 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -443,11 +443,11 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-             MigrationParameter_str(MIGRATION_PARAMETER_MAX_BANDWIDTH),
-             params->max_bandwidth);
-         assert(params->has_downtime_limit);
--        monitor_printf(mon, "%s: %" PRIu64 " milliseconds\n",
-+        monitor_printf(mon, "%s: %" PRIu64 " ms\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
-             params->downtime_limit);
-         assert(params->has_x_checkpoint_delay);
--        monitor_printf(mon, "%s: %u\n",
-+        monitor_printf(mon, "%s: %u ms\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELAY),
-             params->x_checkpoint_delay);
-         assert(params->has_block_incremental);
-@@ -460,7 +460,7 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %s\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESSION),
-             MultiFDCompression_str(params->multifd_compression));
--        monitor_printf(mon, "%s: %" PRIu64 "\n",
-+        monitor_printf(mon, "%s: %" PRIu64 " bytes\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
+diff --git a/docs/xbzrle.txt b/docs/xbzrle.txt
+index 385b4993f8..6bd1828f34 100644
+--- a/docs/xbzrle.txt
++++ b/docs/xbzrle.txt
+@@ -113,9 +113,11 @@ is recommended.
+     xbzrle transferred: I kbytes
+     xbzrle pages: J pages
+     xbzrle cache miss: K pages
+-    xbzrle overflow: L
++    xbzrle cache miss rate: L
++    xbzrle encoding rate: M
++    xbzrle overflow: N
+ 
+-xbzrle cache-miss: the number of cache misses to date - high cache-miss rate
++xbzrle cache miss: the number of cache misses to date - high cache-miss rate
+ indicates that the cache size is set too low.
+ xbzrle overflow: the number of overflows in the decoding which where the delta
+ could not be compressed. This can happen if the changes in the pages are too
 -- 
 2.17.1
 
