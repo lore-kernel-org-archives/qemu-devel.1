@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29D8C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9686C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 827D520734
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78A432072F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="svnfqhtt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 827D520734
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bQqRAbWM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A432072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgIDB-0007zX-Mu
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:28:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48808)
+	id 1jgIDC-000828-PH
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyZ-0004DE-Pk
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:51 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:36268)
+ id 1jgHyo-0004vP-7c
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:06 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35918)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHyX-0003bV-7H
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:51 -0400
-Received: by mail-pl1-x629.google.com with SMTP id bg4so205322plb.3
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:48 -0700 (PDT)
+ id 1jgHyn-0003fw-AW
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:14:05 -0400
+Received: by mail-pg1-x541.google.com with SMTP id t7so572871pgt.3
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:14:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xQv4B3bb36rbPBYcVwiFiacx7H8VsL7xVtsrr5uJK6w=;
- b=svnfqhttMHOAuUdKTBputqZVA2XoWk84Evd6xO2uOpVuJb39CqHBhz5AGXYlqySWu4
- qnP7DQSRNJA7OLbN32jGJMMXUAYuxGBLyXo8S3sJZI1m29I1uAAuzznQHGj4CrOfJzcJ
- liO22Tw/1WJJhzv3rflsFZaMxSuz2zmGWjcmMdD3Iveq+WywzDAS+m9FblI7CTqtVEIg
- Qt9oelXng+hVcdEntO1RP1VWHxjJ+9ICLYXjAIk0q/IZCSFI38RaOM+5FoxO53pZh1Al
- 8cmYKUXldeAXV61oefZN46Ddwf2vmm1d3Oh4sW6ghSft3mBZ1Wygp06lEWyqxKpZZy7+
- 9uog==
+ bh=Dm0P0EGuKeATfeCtNBK49sionbdZGtbXaMOAetX5rZs=;
+ b=bQqRAbWMVYn9fQvJ5IJIkMjuuJ0sEMoCMhU679pbtyLpBMtbafrB5d/aW0BJRyzqn5
+ hStVgnyCxQYrnwNY1ZZ6qgb6nBeVQW3dvHgboc19u7T7vyB86zRptt8Ew09ilzyX6ZrK
+ ZlQql5SFAs4OPiEYspvicmabBIxl55NyL2Qv1fmJ/WFrE+rBeKO2SB7iq0ZAOxKlxNID
+ 8EziWdMhA09LyMHZzCuc2wefDlfj5PbKOf/+DFpuwKqza6oIonvW1uiCEWJi3mcY8w8i
+ hEqMt1b4LllyATNYCBhHEO9k0wfW8M+KRmLyIr4z2dXbbkW3NnqdG9+dx2y35AIBHtxf
+ spCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xQv4B3bb36rbPBYcVwiFiacx7H8VsL7xVtsrr5uJK6w=;
- b=HmCdsmw/DVXrRQSbTrLt4y5nLsZ/T2gFoqyUvdrLzEfpJccR/4vXXrMerAP9RfPhYH
- 937eHzn3ppmGXMGtuAg0qXIYOhYPbquAQPaLaDLmH3N0xAiFeq1HLWzxkY33FapIMej0
- nyJ//zhlf2MnN60xeTVlqR+pB5pX6WtCB8Rs3Qy+fNu+0hWSs7AAJ75PD5LMLAhdz45x
- 0iPrERMzzXnA9X2tcnCdNc3RW2DHU5U6SyHyGlbJXK8g2H6XgErUitdT6XXoKsrxYam0
- xKq895HbVVBtwbg26242m/FPGzFA7aF3AFCVyHIrTRdqh0RgwABZRia5TGExjPOVnB/g
- h2Sg==
-X-Gm-Message-State: AOAM532HSW+LzZZBcin5U7jwk2prUmlBXLi4sIGkHV0BBX+6jllJ2DB9
- Yh3F5o+SvpqnRgpwbwEve0Koo7kjlW0=
-X-Google-Smtp-Source: ABdhPJwBZHbd1vd6VwCsbeX92n2P/hR/VZBCdkskQuLQ9DYiIaRkmYFF+sSySZQitL/wKsOU+ezE/Q==
-X-Received: by 2002:a17:902:ee93:: with SMTP id
- a19mr16191657pld.144.1591146827390; 
- Tue, 02 Jun 2020 18:13:47 -0700 (PDT)
+ bh=Dm0P0EGuKeATfeCtNBK49sionbdZGtbXaMOAetX5rZs=;
+ b=Wnm6Hor4DnfaapxsfjZqrsubBYgtFq89ziqO3PMurJDxxnWy1nBe548IlrfbSxdzs4
+ gEDhIS3ZuJEltt2zKf0/6EbFBQF2c1RtF94IgGYz6uZmcGnPR17UJdAfEk5TGJ7SK2l5
+ fftYnxdexxjyWU9f3NVUyWfNsAG8wzch+ye8s/UWxMSaGQa/FwdhtRGaKpd36VM7eCqt
+ NYZ3VpqRqrTPr5nCEW/kWIXrebXeu/nkUYqEwbAFgOW0fe6y2wETnSkEgJctPskYXyQs
+ C6KGHR4R2R0Lg4joODjd7mwPqpcofR6nR0dW3XmtPckibUDGLRVAV6+Q3/yZ3jbEatzf
+ svsA==
+X-Gm-Message-State: AOAM5300buVKFmup8xBkRJVkJCy8yBvjuZ6g/tJm1Urtdnb3o9wrpbaz
+ skS6bGmqfqaro8MdMtOirTL+iyEBMiU=
+X-Google-Smtp-Source: ABdhPJy7sELhfw/5ZZivzDLaVB/cXRw1I3XFT+xXa/Uq83LUB9B5YUHi2hcgWIfPYXTkU6Aot/DcgA==
+X-Received: by 2002:a17:90a:df16:: with SMTP id
+ gp22mr2330595pjb.6.1591146843684; 
+ Tue, 02 Jun 2020 18:14:03 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.46
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.14.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:13:46 -0700 (PDT)
+ Tue, 02 Jun 2020 18:14:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 22/42] target/arm: Move regime_tcr to internals.h
-Date: Tue,  2 Jun 2020 18:12:57 -0700
-Message-Id: <20200603011317.473934-23-richard.henderson@linaro.org>
+Subject: [PATCH v7 34/42] target/arm: Handle TBI for sve scalar + int memory
+ ops
+Date: Tue,  2 Jun 2020 18:13:09 -0700
+Message-Id: <20200603011317.473934-35-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,54 +107,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will shortly need this in mte_helper.c as well.
+We still need to handle tbi for user-only when mte is inactive.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h | 9 +++++++++
- target/arm/helper.c    | 9 ---------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ target/arm/translate-a64.h | 1 +
+ target/arm/translate-a64.c | 2 +-
+ target/arm/translate-sve.c | 6 ++++--
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index c36fcb151b..7c9abbabc9 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -949,6 +949,15 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+index d0f2e131b3..548414d09f 100644
+--- a/target/arm/translate-a64.h
++++ b/target/arm/translate-a64.h
+@@ -40,6 +40,7 @@ TCGv_ptr get_fpstatus_ptr(bool);
+ bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+                             unsigned int imms, unsigned int immr);
+ bool sve_access_check(DisasContext *s);
++TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr);
+ TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
+                         bool tag_checked, int log2_size);
+ TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c7deeca86a..394633babd 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -215,7 +215,7 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+  * of the write-back address.
+  */
+ 
+-static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
++TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
+ {
+     TCGv_i64 clean = new_tmp_a64(s);
+ #ifdef CONFIG_USER_ONLY
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index a1dc325104..e7ed48c418 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4534,9 +4534,8 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+      * For e.g. LD4, there are not enough arguments to pass all 4
+      * registers as pointers, so encode the regno into the data field.
+      * For consistency, do this even for LD1.
+-     * TODO: mte_n check here while callers are updated.
+      */
+-    if (mte_n && s->mte_active[0]) {
++    if (s->mte_active[0]) {
+         int msz = dtype_msz(dtype);
+ 
+         desc = FIELD_DP32(desc, MTEDESC, MIDX, get_mem_index(s));
+@@ -4546,7 +4545,10 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+         desc = FIELD_DP32(desc, MTEDESC, ESIZE, 1 << msz);
+         desc = FIELD_DP32(desc, MTEDESC, TSIZE, mte_n << msz);
+         desc <<= SVE_MTEDESC_SHIFT;
++    } else {
++        addr = clean_data_tbi(s, addr);
      }
- }
- 
-+/* Return the TCR controlling this translation regime */
-+static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
-+{
-+    if (mmu_idx == ARMMMUIdx_Stage2) {
-+        return &env->cp15.vtcr_el2;
-+    }
-+    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
-+}
 +
- /* Return the FSR value for a debug exception (watchpoint, hardware
-  * breakpoint or BKPT insn) targeting the specified exception level.
-  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index bad639e2a7..c56e8e500b 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9873,15 +9873,6 @@ static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
- 
- #endif /* !CONFIG_USER_ONLY */
- 
--/* Return the TCR controlling this translation regime */
--static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
--{
--    if (mmu_idx == ARMMMUIdx_Stage2) {
--        return &env->cp15.vtcr_el2;
--    }
--    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
--}
--
- /* Convert a possible stage1+2 MMU index into the appropriate
-  * stage 1 MMU index
-  */
+     desc = simd_desc(vsz, vsz, zt | desc);
+     t_desc = tcg_const_i32(desc);
+     t_pg = tcg_temp_new_ptr();
 -- 
 2.25.1
 
