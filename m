@@ -2,71 +2,90 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F55EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA35C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:00:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0741C206A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 648E8206A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 10:00:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="ijNi54RC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0741C206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWSWA6fu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 648E8206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgQ4r-00025R-8J
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 05:52:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51648)
+	id 1jgQC7-0004la-J5
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 06:00:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jgQ3m-0001WA-4v
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:51:46 -0400
-Received: from collins.uni-paderborn.de ([2001:638:502:c003::14]:60226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jgQ3k-0002ro-JY
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:51:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=mail.uni-paderborn.de; s=20170601; h=Content-Type:MIME-Version:Message-ID:
- Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=eKSHlqWcGPq1gHEbEHe4zHx5fs41/NXYqwx9e45V2MM=; b=ijNi54RCZA7cgUJ3eQ/UZjlFYb
- ZHJPH8MZJJ1pd4xXTQfVPr8Xn7u0mi4gHbqa0RC6RNlINdOilkiFpRKySdcSNk5iIFKf2rB8/o8NC
- kjO2+3xij41+FgGuiatz75pyjaKO4IpDXV8mKrp4LrxfcbIFJOV4CNIgvQuO6406xF2Y=;
-Date: Wed, 3 Jun 2020 11:51:37 +0200
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-To: qemu-devel@nongnu.org
-Subject: How do I add my tcg tests to check-tcg?
-Message-ID: <20200603095137.lt6dafpqpa4jzx2n@schnipp-desktop>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jgQBQ-0004Du-Cr
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:59:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57505
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jgQBO-00058A-Qh
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:59:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591178377;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y7HqFGk4q+sWGy8klh1Xa/5XHnHoqYEz82VFlHBwH2A=;
+ b=CWSWA6fuW536dwvZvt7PBeYMSPK8QX3sco6wBIqCZZ61kEWs6EGlnBvrrvuQRHpOF3S+eX
+ zk0C+1dWSbgoBOLIipfFBwDKjP7sjv8OFzuVlqa8Lb/Pj17kD3hk2bn++CGa9JeLTbo5ms
+ v3+q7viZqfaxkPkX1e32gSgmM4Y9Ka8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-dCqglwHDMKGG48U9-60jtw-1; Wed, 03 Jun 2020 05:59:35 -0400
+X-MC-Unique: dCqglwHDMKGG48U9-60jtw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B83B98018A5;
+ Wed,  3 Jun 2020 09:59:34 +0000 (UTC)
+Received: from [10.36.113.56] (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C379260BE1;
+ Wed,  3 Jun 2020 09:59:24 +0000 (UTC)
+Subject: Re: [Question] Regarding PMU initialization within the QEMU for ARM
+ VCPUs
+To: Andrew Jones <drjones@redhat.com>, Salil Mehta <salil.mehta@huawei.com>
+References: <b2e401cd17fe49d792d09b31bd726e35@huawei.com>
+ <20200603093745.dwfb55ny34az7rez@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fb9cf73c-e94b-b7f9-1d11-dc0353dd3996@redhat.com>
+Date: Wed, 3 Jun 2020 11:59:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-IMT-Spam-Score: 0.0 ()
-X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=6815282, da=78786963,
- mc=169, sc=3, hc=166, sp=1, fso=6815282, re=0, sd=0, hd=0
-X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2020.6.3.94518, AntiVirus-Engine: 5.74.0,
- AntiVirus-Data: 2020.6.3.5740001
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
-Received-SPF: pass client-ip=2001:638:502:c003::14;
- envelope-from=kbastian@mail.uni-paderborn.de; helo=collins.uni-paderborn.de
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+In-Reply-To: <20200603093745.dwfb55ny34az7rez@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:04:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,22 +98,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+Hi Drew,
 
-I have some time again to integrate my tcg tests patch for TriCore [1]. However,
-I'm struggeling a bit to get through the details of the Makefiles. I'm assuming
-the right rule to run is 'make check-tcg'. I tried running that for
-xtensa-softmmu, arm-softmmu, and aarch64-softmmu, but they are always skipped.
-Digging into the Makefiles I found that there is some way to use the dockerfiles
-to run the test. Can someone elighten me on how to properly use this?
+On 6/3/20 11:37 AM, Andrew Jones wrote:
+> On Mon, Jun 01, 2020 at 03:04:33PM +0000, Salil Mehta wrote:
+>> Hello,
+>> I could see below within function fdt_add_pmu_nodes() part of
+>> hw/arm/virt.c during virt machine initialization time:
+>>
+>> Observation:
+>> In below function, support of PMU feature is being checked for
+>> each vcpu and if the PMU is found part of the features then PMU
+>> is initialized with in the host/KVM. But if there is even one
+>> vcpu which is found to not support the PMU then loop is exited
+>> and PMU is not initialized for the rest of the vcpus as well.
+>>
+>> Questions:
+>> Q1. Not sure what is the logic of the premature exit and not
+>>     continuing with further checks and initialization of other
+>>     VCPU PMUs?
+> 
+> KVM requires all VCPUs to have a PMU if one does.
 
-Thanks and cheers,
-Bastian
+I fail to find where this is enforced? Do you know the place?
 
-[1] https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg00074.html
+ If the ARM ARM
+> says it's possible to have PMUs for only some CPUs, then, for TCG,
+> the restriction could be relaxed. I expect it will take more than
+> just removing the check for things to work though.>
+>> Q2. Does it even makes sense to have PMUs initialized for some
+>>     vcpus and not for others unless we have heterogeneous system? 
+> 
+> I don't know, but it doesn't sound like a configuration I'd like
+> to see.
+> 
+>> Q3. Also, there is a per virt machine knob of vcc->no_pmu.
+>>     This is something which user could specify at the init time
+>>     and perhaps only once but we don't use it for ARM. Perhaps
+>>     should have been used even before entering this function
+>>     to enable or disable the support as per user config?
+> 
+> It's purpose is to keep users from doing 'pmu=on' on 2.6 machine
+> types. On 2.7 and later machine types if you don't want a PMU
+> you should use 'pmu=off'.
+
+extra note:
+the cpu pmu property sets the feature at vcpu level. This is what is
+retrieved when (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) gets called.
+
+See the cpu option setter: arm_set_pmu in target/arm/cpu.c
+
+> 
+>> Q4. This function  fdt_* looks to be wrongly named. The info
+>>     being initialized here shall be used even when ACPI is
+>>     being used. Initialization part and FDT info looked
+>>     mixed up here if I am right?
+> 
+> Agreed. The function has the wrong name. mach-virt has many functions that
+> mix the initialization and fdt building together, but those functions are
+> named something like create_foo(). Patches welcome.
+agreed
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> drew
+> 
+> 
+
 
