@@ -2,93 +2,93 @@ Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75596C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4561AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AEDB2068D
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AEDB2068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 108132068D
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 09:17:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L6X1zNJc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108132068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgPR9-0003kR-JT
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 05:11:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46206)
+	id 1jgPWs-0005nI-9x
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 05:17:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jgPQa-0003Jn-Kg
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:11:16 -0400
-Received: from mga11.intel.com ([192.55.52.93]:9783)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jgPQY-0003pb-GI
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:11:15 -0400
-IronPort-SDR: o/9+Jy8pj7PRmCSNkK2dSZf2M7QZdYGn8UgvXBCsNItg22HJoK+lTnM/RvI9m2eVb0do9RnxNh
- 8TAwAIWtpwWg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Jun 2020 02:11:04 -0700
-IronPort-SDR: Ib9yhbxNQSolpBhUtr/s/IAdkLvNm8mfG7rMC0X8m/O4ww8ydPzRKIk86EVTkXMfB2rf832aGx
- OeRuH7Spj2gg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,467,1583222400"; d="scan'208";a="470982505"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga006.fm.intel.com with ESMTP; 03 Jun 2020 02:11:04 -0700
-Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 3 Jun 2020 02:11:04 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 3 Jun 2020 17:11:01 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 3 Jun 2020 17:11:01 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert"
- <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-dev
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint request into
- one.
-Thread-Topic: [PATCH 3/3] migration/colo: Merge multi checkpoint request into
- one.
-Thread-Index: AQHWKnK9gI6NuJvUXEqXViIblWhBYajEe6YAgAI8B/A=
-Date: Wed, 3 Jun 2020 09:11:01 +0000
-Message-ID: <ec06e82a5cf34545a332fe80fef0a94e@intel.com>
-References: <20200515042818.17908-1-chen.zhang@intel.com>
- <20200515042818.17908-4-chen.zhang@intel.com>
- <359be3274bdf4f0e87c6c45cdc05ae90@huawei.com>
-In-Reply-To: <359be3274bdf4f0e87c6c45cdc05ae90@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jgPWH-0005LM-9z
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:17:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59373
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jgPWF-0005Zh-VP
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 05:17:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591175825;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8qg+KPvkCIKOomnkRi2HlMFFRgSBsadgrgRW/W9Lubs=;
+ b=L6X1zNJcTT957l63FXZkAu+mhegJD3rcr2UB4AUwnneU9pLsGdAY8y9G0VrKHHyhOyccKD
+ 5ku+meb70qOwoYPs9Kld1LEg/sf9z1/INeRHKVnwJW0gBVSWFrAKgGrEAeB02iL3JVbSet
+ 2ZQLCMYfNVQS9bHpMY2tSoh4eOYSH4E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-Iq1SxgxyMAy057iVAOgKAw-1; Wed, 03 Jun 2020 05:17:01 -0400
+X-MC-Unique: Iq1SxgxyMAy057iVAOgKAw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBECE107ACCA;
+ Wed,  3 Jun 2020 09:17:00 +0000 (UTC)
+Received: from [10.40.193.222] (unknown [10.40.193.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B894460BE1;
+ Wed,  3 Jun 2020 09:16:59 +0000 (UTC)
+Subject: Re: [PATCH 3/3] numa: Initialize node initiator with respect to
+ .has_cpu
+To: Tao Xu <tao3.xu@intel.com>, Igor Mammedov <imammedo@redhat.com>
+References: <cover.1590753455.git.mprivozn@redhat.com>
+ <d3039c47e4ce1118bc7c4d4f51da6412c6669339.1590753455.git.mprivozn@redhat.com>
+ <20200529170948.5bdb3316@redhat.com>
+ <d6c8e7c5-62c5-5ac5-0941-d28867761014@redhat.com>
+ <4bde8796-7479-9fe0-20e4-6c173a865cec@intel.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <33014889-a70e-3d5d-3138-0e0f72553477@redhat.com>
+Date: Wed, 3 Jun 2020 11:16:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.93; envelope-from=chen.zhang@intel.com;
- helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 05:11:04
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <4bde8796-7479-9fe0-20e4-6c173a865cec@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 01:12:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,116 +101,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: "Liu, Jingqi" <jingqi.liu@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/2/20 10:00 AM, Tao Xu wrote:
+> 
+> On 6/1/2020 4:10 PM, Michal Privoznik wrote:
+>> On 5/29/20 5:09 PM, Igor Mammedov wrote:
+>>> On Fri, 29 May 2020 15:33:48 +0200
+>>> Michal Privoznik <mprivozn@redhat.com> wrote:
+>>>
+>>>> The initiator attribute of a NUMA node is documented as the 'NUMA
+>>>> node that has best performance to given NUMA node'. If a NUMA
+>>>> node has at least one CPU there can hardly be a different node
+>>>> with better performace and thus all NUMA nodes which have a CPU
+>>>> are initiators to themselves. Reflect this fact when initializing
+>>>> the attribute.
+>>>
+>>> It is not true in case of the node is memory-less
+>>
+>> Are you saying that if there's a memory-less NUMA node, then it needs to
+>> have initiator set too? Asking mostly out of curiosity because we don't
+>> allow memory-less NUMA nodes in Libvirt just yet. Nor cpu-less, but my
+>> patches that I'm referring to in cover letter will allow at least
+>> cpu-less nodes. Should I allow both?
+> QEMU now is not support memory-less NUMA node, but in hardware may be 
+> supported. So we reserve this type of NUMA node for future usage. And 
+> QEMU now can support cpu-less NUMA node, for emulating some "slow" 
+> memory(like some NVDIMM).
 
+Oh yeah, I understand that. But it doesn't explain why initiator needs 
+to be specified for NUMA nodes with cpus and memory, or does it? Maybe 
+I'm still misunderstanding what the initiator is.
 
-> -----Original Message-----
-> From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Sent: Tuesday, June 2, 2020 2:59 PM
-> To: Zhang, Chen <chen.zhang@intel.com>; Dr . David Alan Gilbert
-> <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; qemu-dev
-> <qemu-devel@nongnu.org>
-> Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> <jasowang@redhat.com>
-> Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint request
-> into one.
->=20
->=20
->=20
-> > -----Original Message-----
-> > From: Zhang Chen [mailto:chen.zhang@intel.com]
-> > Sent: Friday, May 15, 2020 12:28 PM
-> > To: Dr . David Alan Gilbert <dgilbert@redhat.com>; Juan Quintela
-> > <quintela@redhat.com>; Zhanghailiang
-> <zhang.zhanghailiang@huawei.com>;
-> > qemu-dev <qemu-devel@nongnu.org>
-> > Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> > <jasowang@redhat.com>; Zhang Chen <chen.zhang@intel.com>
-> > Subject: [PATCH 3/3] migration/colo: Merge multi checkpoint request
-> > into one.
-> >
-> > From: Zhang Chen <chen.zhang@intel.com>
-> >
-> > When COLO guest occur issues, COLO-compare will catch lots of
-> > different network packet and trigger notification multi times, force
-> > periodic may happen at the same time. So this can be efficient merge
-> > checkpoint request within COLO_CHECKPOINT_INTERVAL.
-> >
-> > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> > ---
-> >  migration/colo.c | 22 ++++++++++++++++------
-> >  1 file changed, 16 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/migration/colo.c b/migration/colo.c index
-> > d5bced22cb..e6a7d8c6e2 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -47,6 +47,9 @@ static COLOMode last_colo_mode;
-> >
-> >  #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
-> >
-> > +/* Default COLO_CHECKPOINT_INTERVAL is 1000 ms */ #define
-> > +COLO_CHECKPOINT_INTERVAL 1000
-> > +
-> >  bool migration_in_colo_state(void)
-> >  {
-> >      MigrationState *s =3D migrate_get_current(); @@ -651,13 +654,20 @@
-> > out:
-> >  void colo_checkpoint_notify(void *opaque)  {
-> >      MigrationState *s =3D opaque;
-> > -    int64_t next_notify_time;
-> > +    int64_t now =3D qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> >
-> > -    qemu_sem_post(&s->colo_checkpoint_sem);
-> > -    s->colo_checkpoint_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> > -    next_notify_time =3D s->colo_checkpoint_time +
-> > -                    s->parameters.x_checkpoint_delay;
-> > -    timer_mod(s->colo_delay_timer, next_notify_time);
-> > +    /*
-> > +     * When COLO guest occur issues, COLO-compare will catch lots of
-> > +     * different network packet and trigger notification multi times,
-> > +     * force periodic may happen at the same time. So this can be
-> > +     * efficient merge checkpoint request within
-> > COLO_CHECKPOINT_INTERVAL.
-> > +     */
-> > +    if (now > s->colo_checkpoint_time + COLO_CHECKPOINT_INTERVAL) {
-> > +        qemu_sem_post(&s->colo_checkpoint_sem);
->=20
-> It is not right here, this notification should not be controlled by the i=
-nterval
-> time, I got what happened here, when multiple checkpoint requires come,
-> this Colo_delay_time will be added every time and it will be a big value =
-which
-> is not what we want.
+> 
+>>
+>> Also, can you shed more light into why machine_set_cpu_numa_node() did
+>> not override the .initiator?
 
-Not just this, multi checkpoint will spend lots of resource to sync memory =
-from PVM to SVM,
-It will make VM stop/start multi times, but for the results are same with o=
-ne checkpoint.=20
-So in short time just need one checkpoint, because do checkpoint still need=
- some time...
+And this one is still unanswered too. Because from user's perspective, 
+initiator has to be set on all NUMA nodes (if HMAT is enabled) and it 
+seems like this auto assignment code is not run/not working.
 
-Thanks
-Zhang Chen
-
->=20
-> Besides, please update this patch based on [PATCH 0/6] colo: migration
-> related bugfixes series which Has modified the same place.
->=20
->=20
->=20
-> > +        timer_mod(s->colo_delay_timer, now +
-> > +                  s->parameters.x_checkpoint_delay);
-> > +        s->colo_checkpoint_time =3D now;
-> > +    }
-> >  }
-> >
-> >  void migrate_start_colo_process(MigrationState *s)
-> > --
-> > 2.17.1
+Michal
 
 
