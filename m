@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE645C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5176C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8219420663
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71F7E206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 01:16:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L87U40S6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8219420663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P7yUf7QQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F7E206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgI1O-0000p8-J6
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:16:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48536)
+	id 1jgI1S-000104-Lp
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jun 2020 21:16:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHy9-0003Lq-Ta
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:25 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41032)
+ id 1jgHyC-0003UP-PH
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:28 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36969)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jgHy9-0003WL-8I
- for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:25 -0400
-Received: by mail-pl1-x642.google.com with SMTP id y17so193179plb.8
- for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:24 -0700 (PDT)
+ id 1jgHyC-0003X4-1W
+ for qemu-devel@nongnu.org; Tue, 02 Jun 2020 21:13:28 -0400
+Received: by mail-pl1-x643.google.com with SMTP id y18so201724plr.4
+ for <qemu-devel@nongnu.org>; Tue, 02 Jun 2020 18:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ULSeXKjALQhZKETBeRDnYwgqeM3FCy75bsyu+BRJV8g=;
- b=L87U40S6DgDwLa4TQPLjCJMjehB3mpworJDCJbTwwqjBUFLMjbUyrT1SnPT5dPYnZO
- glUwErvnWjSn9RM94qL+KI2/zw7PCgtK3rf4g+HmsrmNa1z8uTUN5EvqBEYnkTJ3ljDr
- kBTRYFFsY/uKl3Gi/H5u+C/RO6sjAaoXwN/cWsTd+5EaE0B7FoCn9rPeYcQW6MmVBxJ+
- y5Xg2nPeAANL1vxAgCE5l4KWg/gIgkQi59BBfV8fO/c3PbxNHxEmT/9AmpKwJKW8qiqv
- k46SGHxBH2tPz29siOEL35jQFBVQdL6nz1Kda0PGFgvUuoA/dLW0dq++y+DqrAYh6hD2
- b67A==
+ bh=2dMQqpeyi0XKIpauyWT1oQVejUj1nmYGROEX25a4OR4=;
+ b=P7yUf7QQBE5+/vpm46q5Q4PrJEeyCCeg0Ufbn7DdA+si9Qoxr68iS2PL0j0ei/ftZC
+ iY/l9i84a4oJOxaSHwQIaQjot8cFBR2Z/zZXRKtbJ6+D8bNKKoaD91JYfzisB74MNwAR
+ 2ZAvKiYG4SF0H2WaMVyg0MC3EsgN8eR395IsckgidIoPo4jke2cWeDTDtbnQyYwMCRSp
+ IPv4dbhVsORCd8x1SovWN7d5IHLQSHzOMTCQQh59Z8Mm1T6UkIECXhPFlNh+BI9/X1zi
+ y6V1+t6id2EfsWXZ86bArKfdfVctHF9p3zFJT/GxzxQ99KQKIy1iJX4t2f1eHgKJD0EP
+ L+BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ULSeXKjALQhZKETBeRDnYwgqeM3FCy75bsyu+BRJV8g=;
- b=hiiaCFt2y6ga4HcanEEJ2olNMfYW2W662KIab3QQPebZsF2geZhwJmd+5Oj8mFTLdQ
- Wdr24EtbXi4c9nefJbNfKirlcwpO/DpdMxXeZ9BxVbo7S7D9/rwPJe1mfnnGqU49GAk+
- 3ktaH1oy6CjMrmeNrvRIjCAsJNtqW3HS3sLcrZis8O7QsGB3v1xSh52Lj31Pmr8Ka3Qv
- jmj7C94rq6yCOHgiF6P8lJMBCufPwprFwNAsuzmYAoikAFdRal7a341iK0pT31ojAQhU
- wNsTm1je8kbSJcvDmwQzXwFRdZjGL/POyRFuIZtQk2Hg6Fxt5nil7VNhYtUh60xlfHIJ
- 149Q==
-X-Gm-Message-State: AOAM530Q/DOSWmxtu3CtNIUz0ACmCcPfLwlCR+x6RDVSGKOh3NZEB5a1
- kBp9xiyAk/rWsuFVTv6WfGHI3hoPxrs=
-X-Google-Smtp-Source: ABdhPJwXNW1AxZXEoN3VjvivSU8p1ObKqNSNihIY4mSVJWwCT734nfuFQANhgj0GchQCzF8ZLelomw==
-X-Received: by 2002:a17:902:eb03:: with SMTP id
- l3mr25830622plb.49.1591146803556; 
- Tue, 02 Jun 2020 18:13:23 -0700 (PDT)
+ bh=2dMQqpeyi0XKIpauyWT1oQVejUj1nmYGROEX25a4OR4=;
+ b=CqAVvHnVbykRX00kQV/fsHGVXj9X0C+2Qv1OBUu62dGoKxc9Agef0bdn1ar8kn5p+z
+ 70PWcUB3K7hNYUStDFGnhPE10aC+29DaocBwGnplUsxjq9LKwhpImWao2L3t+DLYbfRw
+ RYEqunemEHvbC5ghehLaYleDpzONemhv3PgIsiMZDROqvLQGuo5xgjkLnbYJoxliGOmO
+ 5Y7SsW4r6CJ3H5To/uHbjha3zHu1khd8o92WDPxC/MSF4MV2/E7RdFgO2RCf0Vb6eiOu
+ jsEhA3Qb2C3Tl8GZKJJGrxmO8jg9C0hIvmB/Z4dVV5i2HpgBZpm39rCVcVP7T5bFMBSi
+ yOKA==
+X-Gm-Message-State: AOAM532npcO6BjR5nA5Nu9YavYpNtqgJxlelYSnVbJJUatPyu7bmDvrR
+ AsnODjElQHWe2fWlAlKh+YPGjnPM54s=
+X-Google-Smtp-Source: ABdhPJxH72F6TNjk5l8H88vQUdmMy9GKV8r98aIwQyED0zJTIuERXHq9fYKsGbyV66ib9HCL7bFqPA==
+X-Received: by 2002:a17:902:9f90:: with SMTP id
+ g16mr20197123plq.146.1591146806315; 
+ Tue, 02 Jun 2020 18:13:26 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.22
+ by smtp.gmail.com with ESMTPSA id 3sm290067pfe.85.2020.06.02.18.13.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 02 Jun 2020 18:13:22 -0700 (PDT)
+ Tue, 02 Jun 2020 18:13:25 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 04/42] target/arm: Add support for MTE to HCR_EL2 and
- SCR_EL3
-Date: Tue,  2 Jun 2020 18:12:39 -0700
-Message-Id: <20200603011317.473934-5-richard.henderson@linaro.org>
+Subject: [PATCH v7 06/42] target/arm: Add DISAS_UPDATE_NOCHAIN
+Date: Tue,  2 Jun 2020 18:12:41 -0700
+Message-Id: <20200603011317.473934-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603011317.473934-1-richard.henderson@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,35 +106,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add an option that writes back the PC, like DISAS_UPDATE_EXIT,
+but does not exit back to the main loop.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/arm/translate.h     | 2 ++
+ target/arm/translate-a64.c | 3 +++
+ target/arm/translate.c     | 4 ++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 7862bf502d..f2ead07ead 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -2021,6 +2021,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-         if (cpu_isar_feature(aa64_pauth, cpu)) {
-             valid_mask |= SCR_API | SCR_APK;
-         }
-+        if (cpu_isar_feature(aa64_mte, cpu)) {
-+            valid_mask |= SCR_ATA;
-+        }
-     } else {
-         valid_mask &= ~(SCR_RW | SCR_ST);
-     }
-@@ -5248,6 +5251,9 @@ static void do_hcr_write(CPUARMState *env, uint64_t value, uint64_t valid_mask)
-         if (cpu_isar_feature(aa64_pauth, cpu)) {
-             valid_mask |= HCR_API | HCR_APK;
-         }
-+        if (cpu_isar_feature(aa64_mte, cpu)) {
-+            valid_mask |= HCR_ATA | HCR_TID5;
-+        }
-     }
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 68a55251c3..81e47677c7 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -173,6 +173,8 @@ static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+  * return from cpu_tb_exec.
+  */
+ #define DISAS_EXIT      DISAS_TARGET_9
++/* CPU state was modified dynamically; no need to exit, but do not chain. */
++#define DISAS_UPDATE_NOCHAIN  DISAS_TARGET_10
  
-     /* Clear RES0 bits.  */
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 430f1867ab..d4d2f69d87 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14340,6 +14340,9 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_EXIT:
+             tcg_gen_exit_tb(NULL, 0);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_a64_set_pc_im(dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             tcg_gen_lookup_and_goto_ptr();
+             break;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 00a6fe6752..460be11f31 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11085,6 +11085,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_NEXT:
+         case DISAS_TOO_MANY:
+         case DISAS_UPDATE_EXIT:
++        case DISAS_UPDATE_NOCHAIN:
+             gen_set_pc_im(dc, dc->base.pc_next);
+             /* fall through */
+         default:
+@@ -11108,6 +11109,9 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 1, dc->base.pc_next);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_set_pc_im(dc, dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             gen_goto_ptr();
+             break;
 -- 
 2.25.1
 
