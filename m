@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B82C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE70C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 282E820674
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:00:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B983A20674
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 07:04:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILI4yRAO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 282E820674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mm4W6kEd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B983A20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgNNZ-0006Tx-D8
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:00:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33394)
+	id 1jgNRS-00081x-Vp
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 03:04:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgNMe-0005ue-09; Wed, 03 Jun 2020 02:59:04 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43010)
+ id 1jgNQS-0007X5-CC; Wed, 03 Jun 2020 03:03:00 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46437)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgNMc-0003Ca-J1; Wed, 03 Jun 2020 02:59:03 -0400
-Received: by mail-pf1-x444.google.com with SMTP id 23so90189pfw.10;
- Tue, 02 Jun 2020 23:59:01 -0700 (PDT)
+ id 1jgNQR-0003wJ-FY; Wed, 03 Jun 2020 03:02:59 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b16so968496pfi.13;
+ Wed, 03 Jun 2020 00:02:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hk02yA3AAIv20hnvc4goIAM8sloOroEwArDp7coBn9A=;
- b=ILI4yRAOQ2sN7rQHkaQvoVWcUBkF++tMBXEl3S6iKUn9tWAqPnOrM9C+rifYRT6Lkn
- xSsCozMI2flju+pkKa+CM07VRtPWpGOPUo5a3rHP93E4r4TWYbwV1953F1ZSxJmXRVc/
- oxknl2LaF43QhFRLXbnFuDCrBmrLqURl6WmxpRdmBUZdviLz2T7EfABUbkqlFuRccrLz
- yNShaT5vYq7CEiJoTwJb3GKm2wQsBcq7KWkEzrf40Sc2yC0ly3is6HpjnCbauNl9jR1a
- AFaepimptBUoupJrzQpJYO5VWhBV7dSgp3CPu07KtBpl1A8N6gEPmMagAt/c4ptGZsJ2
- iTiQ==
+ bh=W8gEcy6pzQDAPp2y85iZFtFSkLFAlCU0ZdRrzjgoa2Y=;
+ b=Mm4W6kEdDGgCX4+IF148D/R42u+dsRyS2TB4pB3vPaT8JPghEyvDrkSx7XvbLKEaNx
+ eUrFzoLDILoFfqirh6CwrtBnzlbM73aZMQ7r+0s0wLF2vnsvNgbsX498xxDCWHaKegPg
+ nhnCa3zeVav6ADC2Tg3IjVsmsI4jxCf0LIvvc/6+Ccl5r4VScvmIQ9YufazXzq57RfNg
+ NwfdVgXjnWWMafq9CGjj1WrCjJskB0/Bqks6N/gJB7KeTbhOD2WjTuoDr0NvpvCGLt0m
+ ib8Rrfg8KkGgk7JxiZCP1O3kY4tjJoR9XLF34qwpA8izco4msNkjwC7s2M7bRQYzImeB
+ mNsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=hk02yA3AAIv20hnvc4goIAM8sloOroEwArDp7coBn9A=;
- b=T0lXVEpwqSw2D0XsgxGnLd17rrfj+rQE9zpg7nwXitUreqdbbaieEXUytXRVHTULpg
- l29AsV8JzbgsXXC3VngFSO69QOPMgJ59S3V8pbkZZpF8B3UxesA3F1bMQQfknWJJVr4M
- Dyy8bLAL7FpY5bz1L/hB9s8T0xnn8guwVgecdjZGaIjSfhqK9NjC57GfQSJfhQSqhEAr
- vk2vjMPP4MBIFI9N1pcJ66whUpyNFk1B7LTXPjUDiA2/DiFHS9/cQr3vezP4La1oWdhS
- lyi2c5F84cHfou7WmEPjnxCHh7x+aJNHUiZrX/5hLJS6ygMVh3wULEjWWswJYrxXE7Tv
- 5Lww==
-X-Gm-Message-State: AOAM530EF5/8AxxDjfQxk0b4TPVRu3u+Yw5RR5rR3J0/Ex9/gdA8jRsp
- KJwNFBitw1fAlpb3C/1r95tXDlM0
-X-Google-Smtp-Source: ABdhPJzmr3tJuOTffgaE8iR1LhVtKsKVd1ppSA3KNqGI3zWnKnrJusO5p4bbZ1gY4r13XeraldFLaw==
-X-Received: by 2002:a17:90a:3669:: with SMTP id
- s96mr3944739pjb.149.1591167540430; 
- Tue, 02 Jun 2020 23:59:00 -0700 (PDT)
+ bh=W8gEcy6pzQDAPp2y85iZFtFSkLFAlCU0ZdRrzjgoa2Y=;
+ b=Q812Oce57ZMnQO6KNl+GBKxkDsdm22KK6xi2Ul1WOddhu/I1PCYUbuMgO+aH2eOobD
+ W64/1AmWiTC3EXuS4hul7jIP3cFyhJU9TIWE9GJDg3ZUOpCnuS4/ATlimPdOCkZD7dnj
+ 9AwnL0Uzn0P/qdomQLuXQhc6MFEa69CgaJpl59WPbZW1NNkRld2EoC2Xte+chhefhV5X
+ UkbUyn1rdYccL3SNmGYm/LXXEg2Sc0D7j5sN3maQ7VkhYoT/rZXcfEhXz3WkOet3G6kl
+ Ktns5I+CV2jcsdHnqBM81miWZx9x1Ghf/BHSTEjDDf9qN30siUQkYze0ur7DghNNy5Th
+ iWJw==
+X-Gm-Message-State: AOAM532BKkgzEO7LbZ18DarWQV5INcgJAonJsUPaJTXJ/Ucn37TE4YVz
+ uQ9qqnNj/R2n3WNRj55Wue6Nug1i
+X-Google-Smtp-Source: ABdhPJx6fH7nu99VJhoOpAnpKtjeePVp0wwcrPscI4SdFJcdNbI99vwip+dQnHux93N3fIx+b+wLyA==
+X-Received: by 2002:a65:5a01:: with SMTP id y1mr19269757pgs.233.1591167777586; 
+ Wed, 03 Jun 2020 00:02:57 -0700 (PDT)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id 9sm1275441pju.1.2020.06.02.23.58.59
+ by smtp.gmail.com with ESMTPSA id
+ x11sm1008501pfm.196.2020.06.03.00.02.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 02 Jun 2020 23:59:00 -0700 (PDT)
-Subject: Re: [PATCH 1/2] sd: sdhci: Implement basic vendor specific register
- support
+ Wed, 03 Jun 2020 00:02:57 -0700 (PDT)
+Subject: Re: [PATCH 2/2] hw: arm: Set vendor property for IMX SDHCI emulations
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Peter Maydell <peter.maydell@linaro.org>
 References: <20200603052404.30788-1-linux@roeck-us.net>
- <20200603052404.30788-2-linux@roeck-us.net>
- <bac1b68a-3cee-5e60-dd6e-a866b04d2226@amsat.org>
+ <20200603052404.30788-3-linux@roeck-us.net>
+ <ccd8a8a5-0d40-2060-e9ea-c64c44a7d688@amsat.org>
 From: Guenter Roeck <linux@roeck-us.net>
 Autocrypt: addr=linux@roeck-us.net; keydata=
  xsFNBE6H1WcBEACu6jIcw5kZ5dGeJ7E7B2uweQR/4FGxH10/H1O1+ApmcQ9i87XdZQiB9cpN
@@ -118,17 +117,17 @@ Autocrypt: addr=linux@roeck-us.net; keydata=
  WkRwrSuCn7UG+qVWZeKEsFKFOkynOs3pVbcbq1pxbhk3TRWCGRU5JolI4ohy/7JV1TVbjiDI
  HP/aVnm6NC8of26P40Pg8EdAhajZnHHjA7FrJXsy3cyIGqvg9os4rNkUWmrCfLLsZDHD8FnU
  mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-Message-ID: <081d1cc3-31d3-0144-8bc0-00105f810cdc@roeck-us.net>
-Date: Tue, 2 Jun 2020 23:58:58 -0700
+Message-ID: <382362f4-fbdc-5756-bc01-272af9e99185@roeck-us.net>
+Date: Wed, 3 Jun 2020 00:02:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <bac1b68a-3cee-5e60-dd6e-a866b04d2226@amsat.org>
+In-Reply-To: <ccd8a8a5-0d40-2060-e9ea-c64c44a7d688@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=groeck7@gmail.com; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=groeck7@gmail.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -157,142 +156,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/2/20 11:37 PM, Philippe Mathieu-Daudé wrote:
+On 6/2/20 11:35 PM, Philippe Mathieu-Daudé wrote:
 > Hi Guenter,
 > 
 > On 6/3/20 7:24 AM, Guenter Roeck wrote:
->> The Linux kernel's IMX code now uses vendor specific commands.
->> This results in endless warnings when booting the Linux kernel.
->>
->> sdhci-esdhc-imx 2194000.usdhc: esdhc_wait_for_card_clock_gate_off:
->> 	card clock still not gate off in 100us!.
->>
->> Implement support for the vendor specific command implemented in IMX hardware
->> to be able to avoid this warning.
+>> Set vendor property to IMX to enable IMX specific functionality
+>> in sdhci code.
 >>
 >> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 >> ---
->>  hw/sd/sdhci-internal.h |  5 +++++
->>  hw/sd/sdhci.c          | 18 +++++++++++++++++-
->>  include/hw/sd/sdhci.h  |  5 +++++
->>  3 files changed, 27 insertions(+), 1 deletion(-)
+>>  hw/arm/fsl-imx25.c  | 2 ++
+>>  hw/arm/fsl-imx6.c   | 2 ++
+>>  hw/arm/fsl-imx6ul.c | 2 ++
+>>  hw/arm/fsl-imx7.c   | 2 ++
+>>  4 files changed, 8 insertions(+)
 >>
->> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
->> index e7c8a523b5..e8c753d6d1 100644
->> --- a/hw/sd/sdhci-internal.h
->> +++ b/hw/sd/sdhci-internal.h
->> @@ -75,6 +75,7 @@
->>  #define SDHC_CMD_INHIBIT               0x00000001
->>  #define SDHC_DATA_INHIBIT              0x00000002
->>  #define SDHC_DAT_LINE_ACTIVE           0x00000004
->> +#define SDHC_IMX_CLOCK_GATE_OFF        0x00000080
->>  #define SDHC_DOING_WRITE               0x00000100
->>  #define SDHC_DOING_READ                0x00000200
->>  #define SDHC_SPACE_AVAILABLE           0x00000400
->> @@ -289,7 +290,10 @@ extern const VMStateDescription sdhci_vmstate;
->>  
->>  
->>  #define ESDHC_MIX_CTRL                  0x48
->> +
->>  #define ESDHC_VENDOR_SPEC               0xc0
->> +#define ESDHC_IMX_FRC_SDCLK_ON          (1 << 8)
+>> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
+>> index cdaa79c26b..2cbd985e93 100644
+>> --- a/hw/arm/fsl-imx25.c
+>> +++ b/hw/arm/fsl-imx25.c
+>> @@ -274,6 +274,8 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+>>                                   &err);
+>>          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
+>>                                   "capareg", &err);
+>> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
+>> +                                 "vendor", &err);
 > 
-> I searched for the datasheet but couldn't find any, so I suppose it is
-> only available under NDA. I can not review much (in particular I wanted
-> to check the register sizes), anyway the overall looks OK:
+> Either check &err, or use &error_abort.
 > 
 
-Actually, I only had to register an account to be able to download
-the datasheets from NXP. Register width is 32 bit.
+Ok, I'll follow the guidance from the patch pointed to below
+and add the error check.
 
-> Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Thanks,
+Guenter
+
+> You can see a fix here:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg695544.html
 > 
-> Also:
+> Otherwise:
 > 
 > Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > 
-Thanks!
-
-Guenter
-
->> +
->>  #define ESDHC_DLL_CTRL                  0x60
+>>          object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
+>>          if (err) {
+>>              error_propagate(errp, err);
+>> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+>> index f58c85aa8c..8e9a94e4d7 100644
+>> --- a/hw/arm/fsl-imx6.c
+>> +++ b/hw/arm/fsl-imx6.c
+>> @@ -350,6 +350,8 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+>>                                   &err);
+>>          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABILITIES,
+>>                                   "capareg", &err);
+>> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
+>> +                                 "vendor", &err);
+>>          object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
+>>          if (err) {
+>>              error_propagate(errp, err);
+>> diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+>> index 3ecb212da6..ce1462927c 100644
+>> --- a/hw/arm/fsl-imx6ul.c
+>> +++ b/hw/arm/fsl-imx6ul.c
+>> @@ -505,6 +505,8 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+>>              FSL_IMX6UL_USDHC2_IRQ,
+>>          };
 >>  
->>  #define ESDHC_TUNING_CTRL               0xcc
->> @@ -326,6 +330,7 @@ extern const VMStateDescription sdhci_vmstate;
->>  #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
->>      DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
->>      DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
->> +    DEFINE_PROP_UINT8("vendor", _state, vendor, SDHCI_VENDOR_NONE), \
->>      \
->>      /* Capabilities registers provide information on supported
->>       * features of this specific host controller implementation */ \
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index 1b75d7bab9..eb2be6529e 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -1569,11 +1569,13 @@ static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
->>          }
->>          break;
+>> +        object_property_set_uint(OBJECT(&s->usdhc[i]), SDHCI_VENDOR_IMX,
+>> +                                        "vendor", &error_abort);
+>>          object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
+>>                                   &error_abort);
 >>  
->> +    case ESDHC_VENDOR_SPEC:
->> +        ret = s->vendor_spec;
->> +        break;
->>      case ESDHC_DLL_CTRL:
->>      case ESDHC_TUNE_CTRL_STATUS:
->>      case ESDHC_UNDOCUMENTED_REG27:
->>      case ESDHC_TUNING_CTRL:
->> -    case ESDHC_VENDOR_SPEC:
->>      case ESDHC_MIX_CTRL:
->>      case ESDHC_WTMK_LVL:
->>          ret = 0;
->> @@ -1596,7 +1598,21 @@ usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
->>      case ESDHC_UNDOCUMENTED_REG27:
->>      case ESDHC_TUNING_CTRL:
->>      case ESDHC_WTMK_LVL:
->> +        break;
->> +
->>      case ESDHC_VENDOR_SPEC:
->> +        s->vendor_spec = value;
->> +        switch (s->vendor) {
->> +        case SDHCI_VENDOR_IMX:
->> +            if (value & ESDHC_IMX_FRC_SDCLK_ON) {
->> +                s->prnsts &= ~SDHC_IMX_CLOCK_GATE_OFF;
->> +            } else {
->> +                s->prnsts |= SDHC_IMX_CLOCK_GATE_OFF;
->> +            }
->> +            break;
->> +        default:
->> +            break;
->> +        }
->>          break;
+>> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+>> index 89c3b64c06..dbf16b2814 100644
+>> --- a/hw/arm/fsl-imx7.c
+>> +++ b/hw/arm/fsl-imx7.c
+>> @@ -416,6 +416,8 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+>>              FSL_IMX7_USDHC3_IRQ,
+>>          };
 >>  
->>      case SDHC_HOSTCTL:
->> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
->> index c6868c9699..5d9275f3d6 100644
->> --- a/include/hw/sd/sdhci.h
->> +++ b/include/hw/sd/sdhci.h
->> @@ -74,6 +74,7 @@ typedef struct SDHCIState {
->>      uint16_t acmd12errsts; /* Auto CMD12 error status register */
->>      uint16_t hostctl2;     /* Host Control 2 */
->>      uint64_t admasysaddr;  /* ADMA System Address Register */
->> +    uint16_t vendor_spec;  /* Vendor specific register */
+>> +        object_property_set_uint(OBJECT(&s->usdhc[i]), SDHCI_VENDOR_IMX,
+>> +                                 "vendor", &error_abort);
+>>          object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
+>>                                   &error_abort);
 >>  
->>      /* Read-only registers */
->>      uint64_t capareg;      /* Capabilities Register */
->> @@ -96,8 +97,12 @@ typedef struct SDHCIState {
->>      uint32_t quirks;
->>      uint8_t sd_spec_version;
->>      uint8_t uhs_mode;
->> +    uint8_t vendor;        /* For vendor specific functionality */
->>  } SDHCIState;
->>  
->> +#define SDHCI_VENDOR_NONE       0
->> +#define SDHCI_VENDOR_IMX        1
->> +
->>  /*
->>   * Controller does not provide transfer-complete interrupt when not
->>   * busy.
 >>
 > 
 
