@@ -6,79 +6,82 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E69AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB8042065C
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 377162074B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:14:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfioIc/+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB8042065C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIg0zLds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 377162074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jglw4-0001Ef-8t
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:13:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54046)
+	id 1jglxe-0002EU-F0
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jglvV-0000Z2-IR
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:12:41 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22676
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jglx3-0001nV-AB
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:14:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58781
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jglvU-0006Jh-UL
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:12:41 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jglx0-0006YO-PB
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:14:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591261960;
+ s=mimecast20190719; t=1591262053;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ExSsndOUj/BG2jD1BAlbGc6g2A9On/JvFj0Cg5WppYE=;
- b=CfioIc/+VBgdWknVsTT5bOg8dizCsX0W4v3gSgjHWA1VjWKKYMTI5eWgols4RCeVXsxP7C
- eT3i81NJ/Axv71aYhWtXFUhMBI972aAg4lB4datMPCe3ojkgqmnAM0PET8wc9kOb159bCX
- /YEJRXtCk9so3W5eENzOlhxY7UsMUoE=
+ bh=SEp4AxFdNSx2fFxAykJV6rTK3hg3WgVbGJvPRrKDxf0=;
+ b=gIg0zLds9nJLGbMls5hJwl8pqG84BsWVFwrLScLxmHreeA8z8c72C6Dn5rOBVBcu21K4h7
+ Z4dU7mTzkiOQNrB+oLg8wPCuQ0FfXdAMmyBlP5Hf0XPziGiYwS7+NWz26jJQvD7+6Rqwj/
+ SmHJdJW8dGHzmBtOpdvDA0/3Fc1Psco=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-iXxKy8UhMriY6YDmbvw2-A-1; Thu, 04 Jun 2020 05:12:36 -0400
-X-MC-Unique: iXxKy8UhMriY6YDmbvw2-A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-463-XfapHthxM_2TwdLiB_L4CQ-1; Thu, 04 Jun 2020 05:14:12 -0400
+X-MC-Unique: XfapHthxM_2TwdLiB_L4CQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45FD2464;
- Thu,  4 Jun 2020 09:12:35 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-65.ams2.redhat.com [10.36.112.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B2617CCC7;
- Thu,  4 Jun 2020 09:12:33 +0000 (UTC)
-Date: Thu, 4 Jun 2020 11:12:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH RFC v2 1/5] block: add bitmap-populate job
-Message-ID: <20200604091231.GC4512@linux.fritz.box>
-References: <20200514034922.24834-1-jsnow@redhat.com>
- <20200514034922.24834-2-jsnow@redhat.com>
- <e426d42a-e1f2-1e6b-f18e-92084bff61a1@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE75E872FE1;
+ Thu,  4 Jun 2020 09:14:10 +0000 (UTC)
+Received: from kaapi (ovpn-116-200.sin2.redhat.com [10.67.116.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 794EC2DE79;
+ Thu,  4 Jun 2020 09:14:05 +0000 (UTC)
+Date: Thu, 4 Jun 2020 14:44:02 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2] ati-vga: check mm_index before recursive call
+In-Reply-To: <20200604084536.GB3050580@redhat.com>
+Message-ID: <nycvar.YSQ.7.77.849.2006041441270.30592@xnncv>
+References: <20200603185522.1173354-1-ppandit@redhat.com>
+ <20200604084536.GB3050580@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e426d42a-e1f2-1e6b-f18e-92084bff61a1@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-ID: <nycvar.YSQ.7.77.849.2006041442290.30592@xnncv>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+Content-Type: multipart/mixed;
+ BOUNDARY="-1463811718-64378309-1591261911=:30592"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,49 +95,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, vsementsov@virtuozzo.com,
- Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Yi Ren <c4tren@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Ren Ding <rding@gatech.edu>,
+ Philippe Mathieu Daude <philmd@redhat.com>, Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.05.2020 um 22:49 hat Eric Blake geschrieben:
-> > +
-> > +    /* NB: new bitmap is anonymous and enabled */
-> > +    cluster_size = bdrv_dirty_bitmap_granularity(target_bitmap);
-> > +    new_bitmap = bdrv_create_dirty_bitmap(bs, cluster_size, NULL, errp);
-> > +    if (!new_bitmap) {
-> > +        return NULL;
-> > +    }
-> 
-> This means if the guest writes to the disk while the job is ongoing, the
-> bitmap will be updated to mark that portion of the bitmap as set, even if it
-> was not allocated at the time the job started.  But then again, the guest
-> writes are causing allocation, so this seems like the right thing to do.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463811718-64378309-1591261911=:30592
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: 8BIT
+Content-ID: <nycvar.YSQ.7.77.849.2006041442291.30592@xnncv>
 
-Is the target bitmap active at the same time, i.e. will it get the
-correct information only from new_bitmap or are the bits already set in
-it anyway?
++-- On Wed, 3 Jun 2020, Philippe Mathieu-Daudé wrote --+
+| > -        } else {
+| > +        } else if (s->regs.mm_index > MM_DATA + 3) {
+| >              val = ati_mm_read(s, s->regs.mm_index + addr - MM_DATA, size);
+| 
+| We usually log unexpected guest accesses with:
+| 
+|            } else {
+|                qemu_log_mask(LOG_GUEST_ERROR, ...
+| 
+| > -        } else {
+| > +        } else if (s->regs.mm_index > MM_DATA + 3) {
+| >              ati_mm_write(s, s->regs.mm_index + addr - MM_DATA, data, size);
+| 
+| Ditto:
+| 
+|            } else {
+|                qemu_log_mask(LOG_GUEST_ERROR, ...
 
-If it relies on new_bitmap, I think this deserves a comment here.
++-- On Thu, 4 Jun 2020, Daniel P. Berrangé wrote --+
+| On Thu, Jun 04, 2020 at 12:25:22AM +0530, P J P wrote:
+| > While accessing VGA registers via ati_mm_read/write routines,
+| > a guest may set 's->regs.mm_index' such that it leads to infinite
+| > recursion. Check mm_index value to avoid it.
+| 
+| So this is a denial of service security issue. Is there any CVE
+| assigned for this ?
 
-In the documentation of BitmapPattern and specifically @allocation-top,
-we should probably also be more explicit what this means for requests
-that the guest makes while the job is running.
+Yes, just sent a revised patch v3 with above changes and CVE-ID.
 
-> Do we need to worry about the converse case where the job started with
-> something allocated but runs in parallel with the guest trimming, such that
-> our bitmap marks something as set even though at the conclusion of our job
-> it is no longer allocated?
-
-Discard shouldn't make the backing file visible (didn't we fix this for
-qcow2 v2 only recently?), so in the sense of bdrv_is_allocated(), they
-will still be allocated, even though they are probably zero clusters
-now.
-
-Kevin
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463811718-64378309-1591261911=:30592--
 
 
