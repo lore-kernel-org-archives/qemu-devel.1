@@ -2,129 +2,87 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E88C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A25C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:01:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D111206A2
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E348D20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:01:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2GY/549"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D111206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DA0y86VT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E348D20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgsEc-00037h-Ev
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 11:56:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47988)
+	id 1jgsJ2-00056H-Te
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 12:01:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgsDn-0002Om-6o
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:55:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53518
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgsDl-00028c-Jy
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:55:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591286156;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ZSUs2UwiC2+LOzZWwH5AXKd5N12CAHgO7GcS0o20I9I=;
- b=D2GY/549nWyOZ8XJW8NOC6XxiP97IqLGFXEfJO+vPFutP6HIVY4FwP8+zj1+FrkM+d/pOB
- KB6alGTzYsOSNYNhcxQKSTAq4p1yAsHCk7ygspLGlzciXwwmkrlfXzUS5WtcwIjBEiIbLF
- Hdk4rreFID8xiAuw76f/IhkhsSIU+6w=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-hkr4dk-vNRqE3qbpZlPLxw-1; Thu, 04 Jun 2020 11:55:54 -0400
-X-MC-Unique: hkr4dk-vNRqE3qbpZlPLxw-1
-Received: by mail-wm1-f72.google.com with SMTP id 11so1911551wmj.6
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 08:55:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jgsHD-0004DB-A1
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:59:31 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43784)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jgsHC-0002UX-0N
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:59:30 -0400
+Received: by mail-oi1-x242.google.com with SMTP id j189so5495046oih.10
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 08:59:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5mnHsKgYgyPRbTKqgtT7/UZM0+pF2Q/0sYBJXit37Mo=;
+ b=DA0y86VTfMA7Ccq120t0nnCUtpKgjnpttBV62BElyhiG9Pxv+XeVVtCql1787LC5QG
+ DmtDEqSBZWc+TXsQESn8ytEcKhzX7bjIqASPuSeQ5hzn1J2VeLpQEU5tEE5eV3KoenQB
+ B8vwAIjjn/qrARHgxpw6y8Sjrh4wkIHLVUSIdLFwQa3noePPvgWEIWLsXqoj6VGiS7Ge
+ gZ+XT5kXsOivUzU4QwPArPqyFRft3oS9UmxYrkcIi/Y/SDBIWoesxH8+qJjTUZlPBfpe
+ bvOs/WQE/tDFfI9TgTmFeEWWq8noxvQ/fpaxRBmNGXM5ck6sTNy0mH2ZNnDed2LDopXA
+ prOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=ZSUs2UwiC2+LOzZWwH5AXKd5N12CAHgO7GcS0o20I9I=;
- b=sLJadVGYuaEZzXJBf5vXKWTmxXjs89HWstWbxa+fXgQ7ZzD6DHjLep1kVoo+q26k5s
- ooDmEI+1yqFOFeiqOtra1qOtPhXEw1u7w+a+WwmOXHP1TH+WBKtvtofu1W6SWSV0OxX/
- bbWrAohVrWfBg+MVqgVTVUxDMONHyhkFKIsCqcV1DwLb5RIUCTiIktv1lKv+LUm1wng5
- YSWwPkz6GF8sokJCThFpGxHyDGQZjFKpWfXeLTWf+1EW0upW0x86JqdVXVUe6msKZmZf
- NK5gfDJO3IOjnay/KlWdtMoXSxo7C+Y01Y201uwiXFCrtcDp1XSicEEu5Br4Fg+IbwBF
- DPMQ==
-X-Gm-Message-State: AOAM533EGmyPTjGHrrH06DvQptbOoTau0eEBzLvgxTo+3Bp4b0ywP/re
- QPXkqIP0SrXaM2kYoFw8xFt4xGYTGub1LNomI/1trLlWnHUixabPxSyWb4t7wGFdEO9m36mDlYx
- I/kIMpOy5jPuZSvE=
-X-Received: by 2002:a5d:6b81:: with SMTP id n1mr4981951wrx.411.1591286153283; 
- Thu, 04 Jun 2020 08:55:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyKP2wjhhIVqV/6/D0Xs5LdL450mpJdYCGyyN/mo8HkTCELdBs5tQoaUIlJIW1SwMVFLZi5Jg==
-X-Received: by 2002:a5d:6b81:: with SMTP id n1mr4981923wrx.411.1591286153056; 
- Thu, 04 Jun 2020 08:55:53 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id j68sm8973064wrj.28.2020.06.04.08.55.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 08:55:52 -0700 (PDT)
-Subject: Re: [PATCH] hw/block/pflash_cfi01: Limit maximum flash size to 256 MiB
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200525155826.11333-1-philmd@redhat.com>
- <CAFEAcA8UGjx5S+zVHX_Oon-ELaCRuLpXEDrjs0VoAwqJ7uPn3g@mail.gmail.com>
- <5dbecc86-f9df-249d-7439-36c358dc5aba@redhat.com>
- <CAFEAcA9qVBdLZMO4e+oSaL6kwpF9WS+RdeL3DxBNKVMPwnQ=TQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <918fedda-6966-9d67-b58e-a005cd28a2d1@redhat.com>
-Date: Thu, 4 Jun 2020 17:55:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5mnHsKgYgyPRbTKqgtT7/UZM0+pF2Q/0sYBJXit37Mo=;
+ b=F8mpUuZ7ybOhRZQ4WqLZUoNI4SYm9fOVcYxa2lq4THwWGjCOOwAzP475FqETzVIeOV
+ jqk88qKcRcw+K3W1jmshsl27sGFVu3epi9uIREdFV/16ZLPNhKDOgPnB0xdAvQxKQlbj
+ 1DSjwwcmcATxJzXQDRKZNODCeH2i/hKyporUYmWf6fCKE1i2qO125G0Z+PgZEzLo+aBv
+ //w9QtEMns/P+gUOo8/F8zX/r5XEE7b3l1MyiWJRrfjkVqMSTp7TiQnnLVjKbslNoFeS
+ h3Yk08a/qm2zlJ8Z3r+Il+abi1PdlBb2Cv9HRESFbY0bSsGavPINWPfdrTHF6oJTzkJQ
+ fXWw==
+X-Gm-Message-State: AOAM533Oy0hF9cOCgsMWy24/jW0iDENDPjNeN5f0H6AZKrJHH1sOaKUn
+ 71hHMCO19LnHeFDsuxeIP7obAsDqTeyhbatkTYUhfg==
+X-Google-Smtp-Source: ABdhPJzRr1gR0+PBoF2g2QdQz253XpCjPfcZYCJf7UST/SryLRh+njb0feZXzeAIdU879PCo8gHu/Zqah36YdKCizLo=
+X-Received: by 2002:a54:469a:: with SMTP id k26mr3579724oic.163.1591286368617; 
+ Thu, 04 Jun 2020 08:59:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9qVBdLZMO4e+oSaL6kwpF9WS+RdeL3DxBNKVMPwnQ=TQ@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200604125544.GW28566@vanye>
+ <CAFEAcA-ACvx19HZBk-nusMCOkr-D3KReUJRTouL02rLEXOUanQ@mail.gmail.com>
+ <20200604153846.GA28566@vanye>
+In-Reply-To: <20200604153846.GA28566@vanye>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 4 Jun 2020 16:59:17 +0100
+Message-ID: <CAFEAcA8QKfR_fb+evC3DkH_cqYK5oOemPxy8VgcaOdCnhfwzAw@mail.gmail.com>
+Subject: Re: kvm_target, QEMU_KVM_ARM_TARGET_GENERIC_V8 questions
+To: Leif Lindholm <leif@nuviainc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,61 +95,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Hongbo Zhang <hongbo.zhang@linaro.org>,
- Tanmay Jagdale <tanmay.jagdale@linaro.org>, Qemu-block <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Radoslaw Biernacki <radoslaw.biernacki@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Leif Lindholm <leif@nuviainc.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 5:30 PM, Peter Maydell wrote:
-> On Thu, 4 Jun 2020 at 16:16, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> On 5/25/20 10:59 PM, Peter Maydell wrote:
->>> What problem is this check solving? Is there some implementation
->>> imposed limitation or a limit within the flash header format
->>> that means larger sizes don't work? If so, what's the restriction?
->>
->> I am not confident maintaining virtual device with no specifications.
-> 
-> This isn't a virtual device, is it? The CFI spec exists and defines
-> what these flash devices behave like.
-> 
->> If someone come with a datasheet for a pflash > 256MB then we can add
->> another commit to relax this restriction.
->> If someone is forced to use a >256MB and such hardware does not exist,
->> I'd rather have a document in docs/specs/pflash_cfi01.rst describing the
->> CFI fields.
->>
->> IOW this is not a hardware limitation, but a maintenance protection.
->>
->> I am worried with the recent EDK2 activity with the SBSA-ref, and I
->> don't want to give false hope to developers that they can create any
->> kind of pflash with the current device model.
->>
->> If I reword this better in the commit description, is my argument
->> acceptable?
-> 
-> Not really; I think we should know what we're limiting against.
-> Currently you're checking total_len, but this is just sector_len * nb_blocs,
-> so if there's a problem with silly large values then it's probably
-> actually a problem with one of those being over-sized which would
-> still show up even if the total_len was less than 256MB.
-> (I suspect the underlying limit here is what the cfi_table entries
-> 0x2D..0x30 impose on blocks_per_device and sector_len_per_device.)
+On Thu, 4 Jun 2020 at 16:38, Leif Lindholm <leif@nuviainc.com> wrote:
+> On Thu, Jun 04, 2020 at 14:10:08 +0100, Peter Maydell wrote:
+> > On Thu, 4 Jun 2020 at 13:55, Leif Lindholm <leif@nuviainc.com> wrote:
+> > > So, then I decided to actually test things, and found that
+> > > (with -enable-kvm):
+> > > - on Cortex-A53 hardware
+> > >   - "max" kvm_target gets initialized to 4 (KVM_ARM_TARGET_CORTEX_A53)
+> > >     by kvm_arm_get_host_cpu_features (as returned from the kernel for
+> > >     vm_arm_create_scratch_host_vcpu)
+> > >   - cortex-A72 fails to start with "KVM is not supported for this guest
+> > >     CPU type"
+> > >   (fair enough, it's later than A53)
+> >
+> > Untested, but I assume that -cpu cortex-a53 works on the A53...
+>
+> Yes.
+>
+> > > - on Cortex-A72 hardware
+> > >   - "max" kvm_target gets initialized to 5 (KVM_ARM_TARGET_GENERIC_V8)
+> > >     by kvm_arm_get_host_cpu_features
+> > >   - "cortex-A72" fails to start (umm...)
+> >
+> > ...and fails on the A72 host.
+>
+> From an explicit software test. If I initialize kvm_target to
+> KVM_ARM_TARGET_GENERIC_V8, I can certainly run EDK2.
 
-What I'm working on is a whitelist of the few models our machines really
-use, but it is taking time. Meanwhile I wanted to at least limit the
-total size.
+That would be asking for a -cpu max, though, not for an A53.
 
-I'll try to finish my whitelist effort before someone try to use a
->256MB flash.
+> > > However ... if I haven't managed to confuse myself somewhere in here
+> > > (which is completely possible), would it be OK if I submitted a set of
+> > > patches that:
+> > > - add a QEMU_KVM_ARM_TARGET_GENERIC_V8 to match the kernel one
+> > > - set kvm_target for Cortex-A72 to QEMU_KVM_ARM_TARGET_GENERIC_V8
+> >
+> > This would be wrong -- it would mean that you could tell QEMU "give
+> > me a guest CPU that's a Cortex-A72" and it would not error on
+> > non-A72 hardware but not actually give a guest CPU that looks
+> > like a Cortex-A72.
+> >
+> >  * If what you want is "give me something that works" then that's
+> >    -cpu host or -cpu max.
+>
+> That's what I thought until I saw the manual A57/A53 setting of
+> kvm_target.
 
-> 
-> thanks
-> -- PMM
-> 
+> > >   - alternatively drop the explicit settings for A57/A53
+> >
+> > These explicit settings are correct, because for these CPUs
+> > the kernel does have a "give me what I want in particular"
+> > setting (which it will fail on the wrong h/w), and also as
+> > back-compat for older kernels that predate the GENERIC_V8
+> > define and only recognize the explicit "give me an A53" value.
+>
+> Right. But then I got somewhat confused also by how
+> https://git.qemu.org/?p=qemu.git;a=blob;f=target/arm/kvm64.c#l494
+> doesn't explicitly list KVM_ARM_TARGET_CORTEX_A53.
 
+That list is supposed to contain "all CPUs which might be
+present on a host kernel which doesn't support the
+PREFERRED_TARGET ioctl". That ioctl went in in Linux kernel
+commit 42c4e0c77ac91, and in a kernel source tree
+"git show 42c4e0c77ac91:arch/arm64/include/uapi/asm/kvm.h"
+tells us that indeed at that point the only 3 CPUs supported
+were AEM_V8, FOUNDATION_V8 and CORTEX_A57. Once the host
+kernel supported the PREFERRED_TARGET ioctl, we could query
+it to ask "what kind of CPU are you?" in that function rather
+than having to guess.
+
+> So ... the reason I care is because I'm adding a new cpu in my local
+> branch, figured cpu64.c was a good starting point, and then followed a
+> long string of repeating the questions "why?" and "why not?" while
+> trying to understand why things were set up the way they are.
+>
+> And I ended up in a state where it looks like we do some things for
+> A57 that we don't do for A53, and we do even fewer things for A72, but
+> then we do (end up doing) all of the A57 bits again for max (for TCG
+> only), and then overwriting them.
+
+(we don't overwrite them, we augment them.)
+
+> Then I tried to build some sort of consistent working model in my head
+> and send some questions off to the list rather than try to send out
+> patches straight away as I figured the likelihood was high I had
+> missed or misunderstood something.
+>
+> I guess what I'm really asking is if there is some legacy in here
+> that can be cleaned up to make the expected behaviour for a new CPU
+> more clear from looking at available code? And if there are specific
+> legacy things that need to be kept around for compatibility that
+> should not be implemented by new CPUs, if they could have some nice
+> warnings attached.
+
+At this point I'd take another step backwards and ask
+"why are you trying to add a new CPU?". Are you after a
+TCG emulation of it, or are you trying to use KVM? If you're
+using KVM, generally QEMU is set up so you don't need to tell
+it about new CPU types at all. Mostly the cpu definitions for
+specific CPUs in cpu64.c are there because we want them for TCG.
+
+thanks
+-- PMM
 
