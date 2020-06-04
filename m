@@ -2,111 +2,69 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F1FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 02:00:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE18720738
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:54:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="n6HmCwmb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE18720738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=apple.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BEDB20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 02:00:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEDB20772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgf5j-0007nS-9f
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 21:54:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42076)
+	id 1jgfBJ-0000ov-Jj
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 22:00:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgf50-0007Od-LE
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:54:02 -0400
-Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:51946)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jgfAO-0000LN-AR; Wed, 03 Jun 2020 21:59:36 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:58761)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgf4z-0004vO-6w
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:54:02 -0400
-Received: from pps.filterd (nwk-aaemail-lapp01.apple.com [127.0.0.1])
- by nwk-aaemail-lapp01.apple.com (8.16.0.42/8.16.0.42) with SMTP id
- 0541qouu018625; Wed, 3 Jun 2020 18:53:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=20180706;
- bh=67WU8PDEJ+mUSTs6NaMIr+chfbaqD8+8IVixeRUDC8k=;
- b=n6HmCwmbt4V5MQIE2WEFTnyl/VRoG8pYtyLvqNFnLGEGvUmFRVr4FA1THnXYVASWm9rX
- jwA0pYz9d072154ktKuJb4kfRZwvDA2zswX6UXiyb4Ube89mNGu9eGFCfX9dxdpkyOgt
- y1FUsP6PIfVKg7ktQCmmJOAgRynk4n4UfevxBEVtyBu0CBgYG4cVEofjMlOIQb31gtl0
- b7vRviPLNGOeFmp5+wSlb+dXU6XCc9a3YIJD20+6cUYdBhvIACi2WqsRRgzk2GJiJZtk
- 70hgIGfO3UzaAbAurp6ADVoIFrg8vBBFRhbpQKhlFoTavG2Zp1+TQbQ0Hd+pkwDN3pys Hg== 
-Received: from rn-mailsvcp-mta-lapp02.rno.apple.com
- (rn-mailsvcp-mta-lapp02.rno.apple.com [10.225.203.150])
- by nwk-aaemail-lapp01.apple.com with ESMTP id 31bpe153v3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Wed, 03 Jun 2020 18:53:59 -0700
-Received: from rn-mailsvcp-mmp-lapp04.rno.apple.com
- (rn-mailsvcp-mmp-lapp04.rno.apple.com [17.179.253.17])
- by rn-mailsvcp-mta-lapp02.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0QBD00ZWFP9ZIU10@rn-mailsvcp-mta-lapp02.rno.apple.com>; 
- Wed, 03 Jun 2020 18:53:59 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp04.rno.apple.com by
- rn-mailsvcp-mmp-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0QBD00C00P4SHY00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
- 03 Jun 2020 18:53:59 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-Va-E-CD: f2f4c490b283e0999592aef402d17e40
-X-Va-R-CD: 38c3c07246e21531e94ba00813ded620
-X-Va-CD: 0
-X-Va-ID: 8750a291-0b96-4813-8aed-8c6d5f6c13d6
-X-V-A: 
-X-V-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-V-E-CD: f2f4c490b283e0999592aef402d17e40
-X-V-R-CD: 38c3c07246e21531e94ba00813ded620
-X-V-CD: 0
-X-V-ID: 7dbb60df-57f5-412f-93b5-2c578903003b
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received: from [17.234.60.254] (unknown [17.234.60.254])
- by rn-mailsvcp-mmp-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0QBD00D4JP9ZNN00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
- 03 Jun 2020 18:53:59 -0700 (PDT)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 00/13] i386: hvf: Remove HVFX86EmulatorState
-From: Cameron Esfahani <dirty@apple.com>
-In-reply-to: <20200528193758.51454-1-r.bolshakov@yadro.com>
-Date: Wed, 03 Jun 2020 18:53:58 -0700
-Cc: qemu-devel@nongnu.org
-Content-transfer-encoding: quoted-printable
-Message-id: <71C3D499-BFE4-402B-9720-5F2246F94B4F@apple.com>
-References: <20200528193758.51454-1-r.bolshakov@yadro.com>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received-SPF: pass client-ip=17.151.62.66; envelope-from=dirty@apple.com;
- helo=nwk-aaemail-lapp01.apple.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 21:54:00
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jgfAJ-0005dc-HH; Wed, 03 Jun 2020 21:59:36 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.04436425|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.052064-0.000145801-0.94779;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03294; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=6; RT=6; SR=0; TI=SMTPD_---.Hhrg1Jt_1591235958; 
+Received: from 30.225.208.46(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hhrg1Jt_1591235958)
+ by smtp.aliyun-inc.com(10.147.41.187);
+ Thu, 04 Jun 2020 09:59:19 +0800
+Subject: Re: [PATCH v5 07/11] hw/char: Initial commit of Ibex UART
+To: Alistair Francis <alistair23@gmail.com>
+References: <cover.1590704015.git.alistair.francis@wdc.com>
+ <73cce2d0edd0d41ba15df403a2096bfa70bf0565.1590704015.git.alistair.francis@wdc.com>
+ <cc1a1671-b926-bb31-1ed2-d2920f0faf38@c-sky.com>
+ <c9f16143-4e9b-a3a8-ffd3-12d43fd2e343@c-sky.com>
+ <CAKmqyKM6rigjbDoFh0bfq8gJXJ=+H+onh=DXjCzhAijMCvR16Q@mail.gmail.com>
+ <ec0a7545-1793-d1a9-fccf-068496cf1f0a@c-sky.com>
+ <CAKmqyKOvv2HCpXoD+8E5q2S7JqSDfT7_z3+_=cKFLi+H92itjw@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <aa240d2d-42bb-b9dd-90f0-1a3051c2491f@c-sky.com>
+Date: Thu, 4 Jun 2020 09:59:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+MIME-Version: 1.0
+In-Reply-To: <CAKmqyKOvv2HCpXoD+8E5q2S7JqSDfT7_z3+_=cKFLi+H92itjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 21:59:21
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, UNPARSEABLE_RELAY=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,91 +78,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Bin Meng <bmeng.cn@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Cameron Esfahani <dirty@apple.com>=20
-
-Cameron Esfahani
-dirty@apple.com
-
-"The cake is a lie."
-
-Common wisdom
 
 
+On 2020/6/3 23:56, Alistair Francis wrote:
+> On Wed, Jun 3, 2020 at 3:33 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>> On 2020/6/3 1:54, Alistair Francis wrote:
+>>> On Tue, Jun 2, 2020 at 5:28 AM LIU Zhiwei<zhiwei_liu@c-sky.com>  wrote:
+>>>> Hi Alistair,
+>>>>
+>>>> There are still some questions I don't understand.
+>>>>
+>>>> 1. Is the baud rate  or fifo a necessary feature to simulate?
+>>>> As you can see, qemu_chr_fe_write will send the byte as soon as possible.
+>>>> When you want to transmit a byte through WDATA,  you can call
+>>>> qemu_chr_fe_write directly.
+>>> So qemu_chr_fe_write() will send the data straight away. This doesn't
+>>> match what teh hardware does though. So by modelling a FIFO and a
+>>> delay in sending we can better match the hardware.
+>> I see many UARTs have similar features. Does the software really care about
+>> these features? Usually I just want to print something to the terminal
+>> through UART.
+> In this case Tock (which is the OS used for OpenTitan) does car about
+> these features as it relies on interrupts generated by the HW to
+> complete the serial send task. It also just makes the QEMU model more
+> accurate.
 
-> On May 28, 2020, at 12:37 PM, Roman Bolshakov <r.bolshakov@yadro.com> =
-wrote:
->=20
-> Hi,
->=20
-> This is a cleanup series for HVF accel.
->=20
-> HVF is using two emulator states CPUX86State and HVFX86EmulatorState
-> simultaneously. HVFX86EmulatorState is used for instruction emulation.
-> CPUX86State is used in all other places. Sometimes the states are in
-> sync, sometimes they're not. It complicates reasoning about emulator
-> behaviour given that there's a third state - VMCS.
->=20
-> The series tries to leverage CPUX86State for instruction decoding and
-> removes HVFX86EmulatorState. I had to add two new hvf-specific fields =
-to
-> CPUX86State: lazy_flags and mmio_buf. It's likely that cc_op, cc_dst,
-> etc could be reused for lazy_flags but it'd require major rework of =
-flag
-> processing during instruction emulation. Hopefully that'll happen too =
-in
-> the future.
->=20
-> I tried to include sysemu/hvf.h into target/i386/cpu.h to add =
-definition
-> of hvf lazy flags but couldn't do that at first it because it =
-introduced
-> circular dependency between existing sysemu/hvf.h and cpu.h. The first
-> three patches untangle and prune sysemu/hvf.h to the bare minimum to
-> allow inclusion of sysemu/hvf.h into target/i386/cpu.h.
->=20
-> This might conflict with [1], but merge/rebase should be trivial.
->=20
-> 1. https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg07449.html
->=20
-> Thanks,
-> Roman
->=20
-> Roman Bolshakov (13):
->  i386: hvf: Move HVFState definition into hvf
->  i386: hvf: Drop useless declarations in sysemu
->  i386: hvf: Clean stray includes in sysemu
->  i386: hvf: Drop unused variable
->  i386: hvf: Use ins_len to advance IP
->  i386: hvf: Use IP from CPUX86State
->  i386: hvf: Drop fetch_rip from HVFX86EmulatorState
->  i386: hvf: Drop rflags from HVFX86EmulatorState
->  i386: hvf: Drop copy of RFLAGS defines
->  i386: hvf: Drop regs in HVFX86EmulatorState
->  i386: hvf: Move lazy_flags into CPUX86State
->  i386: hvf: Move mmio_buf into CPUX86State
->  i386: hvf: Drop HVFX86EmulatorState
->=20
-> include/qemu/typedefs.h      |   1 -
-> include/sysemu/hvf.h         |  73 ++-------------------
-> target/i386/cpu.h            |   4 +-
-> target/i386/hvf/hvf-i386.h   |  35 ++++++++++
-> target/i386/hvf/hvf.c        |  30 ++++-----
-> target/i386/hvf/x86.c        |   2 +-
-> target/i386/hvf/x86.h        |  89 ++-----------------------
-> target/i386/hvf/x86_decode.c |  25 ++++---
-> target/i386/hvf/x86_emu.c    | 122 +++++++++++++++++------------------
-> target/i386/hvf/x86_flags.c  |  81 ++++++++++++-----------
-> target/i386/hvf/x86_task.c   |  10 +--
-> target/i386/hvf/x86hvf.c     |   6 +-
-> 12 files changed, 186 insertions(+), 292 deletions(-)
->=20
-> --=20
-> 2.26.1
->=20
->=20
+Fair enough. I see the "tx_watermark" interrupt, which needs the FIFO. 
+At least,
+it can verify the ISP.
+>> Most simulation in QEMU is for running software, not exactly the details
+>> of hardware.
+>> For example, we will not simulate the 16x oversamples in this UART.
+> Agreed. Lots of UARTs don't bother modelling the delay from the
+> hardware as generally it doesn't matter. In this case it does make a
+> difference for the software and it makes the QEMU model more accurate,
+> which is always a good thing.
+>
+>> There is no error here. Personally I  think it is necessary to simulate
+>> the FIFO and baud rate,
+>> maybe for supporting some backends.
+> So baud rate doesn't need to be modelled as we aren't actually sending
+> UART data, just pretending and then printing it.
+>
+>> Can someone give a reasonable answer for this question?
+> Which question?
+I see  the UART can work with many  different backends,  such as pty , 
+file, socket and so on.
+I wonder if this a backend, which has some requirements on the baud 
+rate.  You can ignore it,
+as it doesn't matter.
+>
+>>>> 2.  The baud rate calculation method is not strictly right.
+>>>> I think when a byte write to FIFO,  char_tx_time * 8 is the correct time
+>>>> to send the byte instead of
+>>>> char_tx_time * 4.
+>>> Do you mind explaining why 8 is correct instead of 4?
+>> Usually write a byte to WDATA will trigger a uart_write_tx_fifo.
+>> Translate a bit will take
+>> char_tx_time. So it will take char_tx_time * 8 to transmit a byte.
+> I see your point. I just used the 4 as that is what the Cadence one
+> does. I don't think it matters too much as it's just the delay for a
+> timer (that isn't used as an accurate timer).
+Got it. Just a way to send the bytes at sometime later.
+>>>> 3.  Why add a watch here?
+>>> This is based on the Cadence UART implementation in QEMU (which does
+>>> the same thing). This will trigger a callback when we can write more
+>>> data or when the backend has hung up.
+>> Many other serials do the same thing, like virtio-console and serial. So
+>> it may be a common
+>> interface here. I will try to understand it(Not yet).
+> Yep, it's just a more complete model of that the HW does.
+I try to boot a RISC-V Linux, and set a breakpoint  to a watch callback 
+function.
+The breakpoint did't match.
+
+I just wonder if there is a case really need the callback function.
+
+Zhiwei
+>
+> Alistair
 
 
