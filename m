@@ -2,84 +2,98 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 20:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DFEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 20:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEEFD2067B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 20:33:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CC3A2067B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 20:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ewmvnt5Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEEFD2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DGM7KJcV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CC3A2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgwYJ-0004UN-6r
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 16:33:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49500)
+	id 1jgwYW-0004ps-Nx
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 16:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgwO6-0004Kf-Kk
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 16:22:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53657
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgwO3-0005WX-OQ
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 16:22:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591302171;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KLpOdLFRQ8+uXdCSQXpzvYPo1r1s8rRuu7oCr7CpY+0=;
- b=Ewmvnt5ZYjKlmXXpZ5ggr7+ia3bCh7+2a174K7RSl25Q4uLGUEKXI4BKewLX0B4WTPQPfE
- 49Oz+jryobsycpw8STRnAsxVwo0SDtvAZ7am+Jyiiy9MNZpRREWSLErpCEm2Ka2csLXjQE
- gpXJLgI/xLjK5gv9bNN/rbh1D7KiWAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-YG4j5GiXPdey1Urh2tqS0g-1; Thu, 04 Jun 2020 16:22:48 -0400
-X-MC-Unique: YG4j5GiXPdey1Urh2tqS0g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE1A719200C1;
- Thu,  4 Jun 2020 20:22:47 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D492B5D9D7;
- Thu,  4 Jun 2020 20:22:46 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/16] python/machine.py: Handle None events in events_wait
-Date: Thu,  4 Jun 2020 16:22:30 -0400
-Message-Id: <20200604202236.25039-11-jsnow@redhat.com>
-In-Reply-To: <20200604202236.25039-1-jsnow@redhat.com>
-References: <20200604202236.25039-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgwS1-00047e-0j
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 16:26:57 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39813)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jgwRz-0006Te-01
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 16:26:56 -0400
+Received: by mail-pf1-x443.google.com with SMTP id d66so3794014pfd.6
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 13:26:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wPHuLyhdI9K6tKUn0jL6BmlikqNCx/CY/2TYID7RL8w=;
+ b=DGM7KJcVIhzXTSNeUtiuZUnpQhnKtAJLHj7iNx4y9qBqkXj/dkevxdCKlRf254wykT
+ 30TGNNwtZsCKxvDdNw7V49cTcCKm6ioRXSlV5sGBl/X/skmv4zH8wrLKnfdvSjOa42Gg
+ BQG79Tbl7AbsIhwB2/abLxejm/847sfysY31Y7zOmLW1hEystTwT/4Prz7sfP6YgqFqj
+ an4NnZ/D7du/VYJktpxDBrUoFzQaZ3pXz1q0VuAmF32rOP+UKQMrt42PM7mkZnk961J5
+ BZNATQY5a+akAJPCKAVglzxy6lyJ55vJaReuXGvq/ZaSRGSa2f7HsbyBxHtHBgKk6ouC
+ lvVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wPHuLyhdI9K6tKUn0jL6BmlikqNCx/CY/2TYID7RL8w=;
+ b=ej/dVap05uPQ5VGWGxhC4lPtTvtL0BtTqpxMaRNTS9LaxozbBVLcc1BjZrX9yoRWE8
+ Q6SWaUcEQQW0v7zbMzNmaarO+IUpmUwLLdLql6iwCguRu0fPwfXFNhGuc5KN0BXeLfCN
+ GTAh/VI24mdt1lE/wdIXuwg0pmGh/3a7XHDooJBiFmf54R/zyR/mkBwc8ETqKREkozAW
+ EYdzbzNZRMBVKlNn+QYMAKn1qodW+DCmKNM0Tvctwmyg/kL1Pw7vX+xwej567T+QK8c+
+ DXnXvxV8LXi9/MAytvd+bcHbT/X2PHB7j7nPSFTkkR0mvWojhddb2E8PYiA4BH5n5ICZ
+ w7MA==
+X-Gm-Message-State: AOAM532qk7sfeOEgWFMxtGWecfrkldfAxRss/5siKGwzUaXhXioskBua
+ SrbBMNU614NG+AMJmiO1vjBQ2A==
+X-Google-Smtp-Source: ABdhPJw3wAaHI24KJWkDJrRh5zuQ1ebOSCJ56r6nBeOJaWBoWEIzG/cs7sRE0GaOU++jXmXAvvSjyg==
+X-Received: by 2002:aa7:9839:: with SMTP id q25mr5973957pfl.291.1591302413349; 
+ Thu, 04 Jun 2020 13:26:53 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id x8sm1895103pje.31.2020.06.04.13.26.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 04 Jun 2020 13:26:52 -0700 (PDT)
+Subject: Re: [PATCH v8 26/62] target/riscv: vector single-width fractional
+ multiply with rounding and saturation
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ <20200521094413.10425-27-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1b8dfb1c-a8b4-0d3c-b727-0a640e400c74@linaro.org>
+Date: Thu, 4 Jun 2020 13:26:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <20200521094413.10425-27-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,82 +106,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- philmd@redhat.com
+Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, alistair.francis@wdc.com,
+ wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the timeout is 0, we can get None back. Handle this explicitly.
+On 5/21/20 2:43 AM, LIU Zhiwei wrote:
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/helper.h                   |   9 ++
+>  target/riscv/insn32.decode              |   2 +
+>  target/riscv/insn_trans/trans_rvv.inc.c |   4 +
+>  target/riscv/vector_helper.c            | 107 ++++++++++++++++++++++++
+>  4 files changed, 122 insertions(+)
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- python/qemu/machine.py | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 92528a44097..4afd67a9351 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -33,7 +33,7 @@
- from types import TracebackType
- 
- from . import qmp
--from .qmp import SocketAddrT
-+from .qmp import SocketAddrT, QMPMessage
- 
- LOG = logging.getLogger(__name__)
- 
-@@ -544,13 +544,20 @@ def event_wait(self, name, timeout=60.0, match=None):
- 
-     def events_wait(self, events, timeout=60.0):
-         """
--        events_wait waits for and returns a named event
--        from QMP with a timeout.
-+        events_wait waits for and returns a single named event from QMP.
-+        In the case of multiple qualifying events, this function returns the
-+        first one.
- 
--        events: a sequence of (name, match_criteria) tuples.
--                The match criteria are optional and may be None.
--                See event_match for details.
--        timeout: QEMUMonitorProtocol.pull_event timeout parameter.
-+        :param events: A sequence of (name, match_criteria) tuples.
-+                       The match criteria are optional and may be None.
-+                       See event_match for details.
-+        :param timeout: Optional timeout, in seconds.
-+                        See QEMUMonitorProtocol.pull_event.
-+
-+        :raise QMPTimeoutError: If timeout was non-zero and no matching events
-+                                were found.
-+        :return: A QMP event matching the filter criteria.
-+                 If timeout was 0 and no event matched, None.
-         """
-         def _match(event):
-             for name, match in events:
-@@ -558,6 +565,8 @@ def _match(event):
-                     return True
-             return False
- 
-+        event: Optional[QMPMessage]
-+
-         # Search cached events
-         for event in self._events:
-             if _match(event):
-@@ -567,6 +576,10 @@ def _match(event):
-         # Poll for new events
-         while True:
-             event = self._qmp.pull_event(wait=timeout)
-+            if event is None:
-+                # NB: None is only returned when timeout is false-ish.
-+                # Timeouts raise QMPTimeoutError instead!
-+                break
-             if _match(event):
-                 return event
-             self._events.append(event)
--- 
-2.21.3
-
+r~
 
