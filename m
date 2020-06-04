@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03017C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3868C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D05862072E
+	by mail.kernel.org (Postfix) with ESMTPS id 350832072E
 	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D05862072E
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350832072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgrbi-0006f2-1P
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 11:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43606)
+	id 1jgrbh-0006di-5C
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 11:16:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgraH-0005e9-AY
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:15:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43824)
+ id 1jgraG-0005dy-9a
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:15:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgraG-0001il-Ib
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:15:09 -0400
+ id 1jgraF-0001ig-Bf
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:15:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jgraF-0003wV-53
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 15:15:07 +0000
+ id 1jgraD-0003v0-CU
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 15:15:05 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1F15A2E80E7
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 15:15:07 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 07E732E810A
+ for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 15:15:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Jun 2020 15:00:52 -0000
+Date: Thu, 04 Jun 2020 14:59:05 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <714629@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Reporter: Matthew Bloch (matthew-bytemark)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
 References: <20110207145820.11575.25260.malonedeb@soybean.canonical.com>
-Message-Id: <159128285290.32079.9039403829868678293.malone@gac.canonical.com>
+Message-Id: <159128274555.31406.6571417082542207594.malone@gac.canonical.com>
 Subject: [Bug 714629] Re: BIOS doesn't load when read() returns less than the
  full ROM length
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1732c9567bdd5c7e0242fd5ca819581dbb92deb8
+X-Launchpad-Hash: e0024cbfed2d9adada497bb19d6a543cfd27e642
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 10:55:42
@@ -93,10 +93,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix included in QEMU v4.0.0.
-
-** Changed in: qemu
-       Status: New =3D> Fix Released
+This seems to have been fixed by commit
+1f40547f5ce0c135faa7d14f066b97002fd8c204.
 
 -- =
 
