@@ -2,109 +2,99 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3458EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED95AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF2FE206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:16:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7C4A2077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CmcDyWXi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2FE206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7+F8I0V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7C4A2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jguPX-000497-9D
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36702)
+	id 1jguVn-0007OH-Rk
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:22:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jguOX-0003SD-Pr
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:15:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55241
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jguOW-0004RN-MJ
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:15:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591294512;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WfF+Xa5h14FzGsbBSZhnNx5t0QaPtmV2BjSeSWVfvFQ=;
- b=CmcDyWXiY++xLtoAtWRegVNJnVDlOu3HkqTS0+2z8kTWDZt0HeJJ1174koUtvRLnSlBIzb
- wENV1az8fqbRAMEj+zKccTAVPBx127nZWP+28rk9JfJmu9zOtEhOBheAP5wCVRA48aM+Jg
- VgS1MMFvqh7ZjbdAm5PrvUKv/S5CHmg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-kmOvRRsnMa6Y_v1PzwEwwA-1; Thu, 04 Jun 2020 14:15:09 -0400
-X-MC-Unique: kmOvRRsnMa6Y_v1PzwEwwA-1
-Received: by mail-wr1-f70.google.com with SMTP id f4so2736480wrp.21
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:15:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jguU5-0006Rj-3Q
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:20:57 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55684)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jguU4-0005ye-5x
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:20:56 -0400
+Received: by mail-wm1-x342.google.com with SMTP id c71so6153357wmd.5
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=NtU3cEk2spEp8traurmMOtrxP57QI7MwSlKjM/wspKQ=;
+ b=C7+F8I0V3NnVBQOsKNc+agmJYGSeqxZt537TWIGDlpggaJrd8lktstsJZbRsN7jOG5
+ mMluGJD51mVXhOlrBqzBTSNlQGRZVx6crvrLHsLCNDXhrO1RwRBnT0zZrUF0TyZ3YSr9
+ rXWwUfOwHvcTbPFB69AiHIJM6AiC7p+vMKa5IcuJXvxJiULTLTrcG0blEd9nyUIdhT/P
+ szSsDyKseUBSl3uxJQ1C90ct+JIddJ0e0ZfnSP5oF2YJKBvQUJ88C8T+I9fUZmZHO6N4
+ H9+72xuwuZXn5i7frPRA0ZBdVMa4HiqW9t86ZH+LM+RAROfrdQHs2y7rR5F5uxd2VU3Y
+ rKKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=WfF+Xa5h14FzGsbBSZhnNx5t0QaPtmV2BjSeSWVfvFQ=;
- b=t3Zdd4kpDGjeGVxdUUzDWI+Z4Lnqdc0CGMyDJYxtyR3LNBpHRGky70S/A07QE8UhV5
- PrOBjaJLS6TIV5UC9pCnJz6KBSQEKbW8q31/Zcbm5KdyEHgBWLgSYSW9XA61tiQ4st7I
- 79vdNRu8Q/7MdPGJ65TgUu43A3tsTVsEWLLQmwSXK9CGcBLTAtMNJc7JR9wi8zToTQfd
- ZSK6URugmNi0KAcc6AooDVj/NbLEHMzmcTgabEBz/AXKYoC/u4F8UChs7O9fKilgkUrH
- X347c9QER901xwLuSiofUd3JQNHeB+clVf7xITovujZaMW6Rujybf6TMoWk8SP6sJvDz
- D8Xg==
-X-Gm-Message-State: AOAM532BB4sR9IWNI1ijfhyWtn+G6nIt3MFfJ0ncXyWlX6+WePsngFne
- HWDg4TQe8zY5Lr/h3LDJYOm8ZDIyVNe77PXl3MfQzxxtElPNCIufGWvsOmHduFkj3INnJoqyMRe
- YS9Itni6xDTRUCRc=
-X-Received: by 2002:a5d:6b81:: with SMTP id n1mr5524267wrx.411.1591294508110; 
- Thu, 04 Jun 2020 11:15:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhlnqcxoAsAHQcRo1z/xrYBhD25SwWgISjl/tM8Kht+LLVr1VYbRV6BOLsz/g66yBmC+XAqQ==
-X-Received: by 2002:a5d:6b81:: with SMTP id n1mr5524249wrx.411.1591294507793; 
- Thu, 04 Jun 2020 11:15:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb?
- ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
- by smtp.gmail.com with ESMTPSA id t14sm9809856wrb.94.2020.06.04.11.15.06
+ bh=NtU3cEk2spEp8traurmMOtrxP57QI7MwSlKjM/wspKQ=;
+ b=YoTB7hW2JuCs2q5Ssq29KwFZzunnQUjsKSiEXcWEiURV2bz7T4Ql49WnnkQhOPNJSo
+ qgbeP62WuuI9ucyFun02WMV216ao3CvNc/+BWvArWix3AoYZ7hV6scBk3sj3ma7ZJLaT
+ MDzXjZ4dz7jhEPCR6AG+RxgL3y6SDEF+e3e0T82qFMXBoOcG8T4lT9o5/bdPSrdko+Cn
+ i1A2ajb+fu5/GWaUxcSb39WUZndl+1fwOts2mxT3K6ibOGz74OqhdgdX7cXfu0MTp/oD
+ 83NrmG0dfOryXd9/Rri+Y1GWKolW7c2+9qbLhYRV6m4Rci7RL2sBtDKlblPaTrni8Kn2
+ gBOw==
+X-Gm-Message-State: AOAM5314D3mmr2NIAVLFtwczLKf7AWiUONxuGVkd7/EUs9uvpMYIw/Is
+ SeNmupBT2fXJM1ExHoG6J6s=
+X-Google-Smtp-Source: ABdhPJyaELN0GF/bKZgtjpWgHyyNKH2FQ9AX0vP8TyYR1+yvyOCUGKC8EawpRsT1ArtF2i1aLjmyzQ==
+X-Received: by 2002:a05:600c:21d3:: with SMTP id
+ x19mr5605014wmj.137.1591294851800; 
+ Thu, 04 Jun 2020 11:20:51 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id e5sm8993555wrw.19.2020.06.04.11.20.50
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 11:15:07 -0700 (PDT)
-Subject: Re: [PATCH 05/13] i386: hvf: Use ins_len to advance IP
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
-References: <20200528193758.51454-1-r.bolshakov@yadro.com>
- <20200528193758.51454-6-r.bolshakov@yadro.com>
- <be9d6f5b-5297-459f-3192-26835fdac230@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ed29b528-17bd-c418-067c-7e68c93f53c6@redhat.com>
-Date: Thu, 4 Jun 2020 20:15:06 +0200
+ Thu, 04 Jun 2020 11:20:50 -0700 (PDT)
+Subject: Re: [PATCH] hw/sd/sdcard: Verify CMD24 (Block Write) address is valid
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200604173410.21074-1-f4bug@amsat.org>
+ <980fde76-8e26-c5bc-a708-317997f4e329@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <211a55bf-0d1b-31f4-995f-eca8608e9e6c@amsat.org>
+Date: Thu, 4 Jun 2020 20:20:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <be9d6f5b-5297-459f-3192-26835fdac230@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <980fde76-8e26-c5bc-a708-317997f4e329@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,22 +107,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, 1880822@bugs.launchpad.net,
+ Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/06/20 08:39, Philippe Mathieu-Daudé wrote:
->>                  simulate_wrmsr(cpu);
->>              }
->> -            RIP(env) += rvmcs(cpu->hvf_fd, VMCS_EXIT_INSTRUCTION_LENGTH);
->> +            RIP(env) += ins_len;
-> I'd feel safer if you change ins_len to uint64_t first.
+On 6/4/20 8:03 PM, Paolo Bonzini wrote:
+> On 04/06/20 19:34, Philippe Mathieu-Daudé wrote:
+>> Avoid OOB access by verifying the requested address belong to
+>> the actual card size. Return ADDRESS_ERROR when not in range.
+>>
+>>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>>
+>>   4.3.4 Data Write
+>>
+>>   * Block Write
+>>
+>>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>   occurred and no data transfer is performed.
+>>
+>> Fixes: CVE-2020-13253
+>> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>>  hw/sd/sd.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>> index 3c06a0ac6d..0ced3b5e14 100644
+>> --- a/hw/sd/sd.c
+>> +++ b/hw/sd/sd.c
+>> @@ -1211,6 +1211,10 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>              /* Writing in SPI mode not implemented.  */
+>>              if (sd->spi)
+>>                  break;
+>> +            if (addr >= sd->size) {
+>> +                sd->card_status |= ADDRESS_ERROR;
+>> +                return sd_r1;
+>> +            }
+>>              sd->state = sd_receivingdata_state;
+>>              sd->data_start = addr;
+>>              sd->data_offset = 0;
+>>
 > 
+> I'm not sure if you want me to queue it, but I did.
 
-Why?  It will never be more than 15 (it's also a 32-bit field in the VMCS).
+Hmm I guess I typed "^RPrasad" in my shell to have the last git-publish
+command with his email, and I didn't noticed you were also there...
 
-Paolo
+Anyway looking at it again, this patch is wrong because I should check
+for addr + blksize < sd_size instead. Can you drop it please?
 
+>  Probably we should
+> add qemu-block@nongnu.org to the hw/sd stanza.
+
+OK will do.
+
+> 
+> Paolo
+> 
 
