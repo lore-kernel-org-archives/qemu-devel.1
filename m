@@ -2,92 +2,90 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E012C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F51C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFDCF207F5
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:27:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDF37206DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:32:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="GW1Nt/7m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFDCF207F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZEISvtP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF37206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgsiQ-0006fW-8V
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 12:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51996)
+	id 1jgsnA-0000Mg-2T
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 12:32:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jgsh5-0005Tb-7x
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:26:15 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:38373)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jgsh2-0008Aj-5U
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:26:14 -0400
-Received: by mail-wr1-x430.google.com with SMTP id e1so6829600wrt.5
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 09:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=wPNOw/I3JlqrIBS08wbKJdDUrxe00vptH4YgEIKXUXo=;
- b=GW1Nt/7mRR+HXAVpKpab1YPXsp6jAhm5Tmuojf44O3zCZndJ2iRunuY8wxCyXmjnfV
- az/6GaLKnpl+lC283v35kVr4KQVxzAiEAJ0HJoKBrhmbMdLXSRoGnBmsf44EaUWhEPuF
- ButZb9uvSF8Tx9VgRxlOmr8A76gkTNrMsxmbmac6sOt1M6inDljTAtWmFt/xyEAUeNlr
- c6M4PlxJe27uKIp1KiXfClTOSzidiO8P71UiI1AgsldvtfuvelWi7ceHXcP8bKSRGFBA
- psxGmEmBhyl8qCYOdz/NwggtYiQMUriLJ6DHvFShiKRS+yrga/xvwObaf8MBvNr+iB1r
- 5UYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=wPNOw/I3JlqrIBS08wbKJdDUrxe00vptH4YgEIKXUXo=;
- b=lR0SgKRhPozg2TNQEQbfSSWY1wiCQ0P6LAmCVH/uqpko+BI3vVicipS0UGFwpdM2j9
- B6PBCCisvahUqYnSzikgSPN/j1xyESgCXvkgTx9vypgz5HKQzTq5CZwyCMERiFM/ufib
- hWcNieVw6Yy0ymdYRSb5h9Cy0LVoOEghNZnrzJHSAmyuqJ9M1SWXwqd7TyOJRexzbNo7
- LnW9Ir/ELJi6QjnNOR3y4CLZzu+DvuuNxJE4Os7CEpjKzDa5WWcKoRO1uEiX1phNbedF
- M1ZRrbp16IFXTjx0450RwpTxvtxsnZsQvpzS6RqQYvi0bf2vpMLoJW86rcEEejV1tQCT
- OjcQ==
-X-Gm-Message-State: AOAM532vLrmKD+lvNK7byA7/aXFxvwpuTSGrXPwiC177fUu44hAak7Av
- K7RYsJ1vuOIcILIOq4aNYUDxDA==
-X-Google-Smtp-Source: ABdhPJxReuTHWa4kGCayi9HnspEWzoDJ1VuQn72USC9K8my3P+q4NJZCAqH/6aBdvAvmzAl0T7o86w==
-X-Received: by 2002:adf:bbc5:: with SMTP id z5mr5262670wrg.269.1591287970196; 
- Thu, 04 Jun 2020 09:26:10 -0700 (PDT)
-Received: from vanye ([2001:470:1f09:12f0:b26e:bfff:fea9:f1b8])
- by smtp.gmail.com with ESMTPSA id c81sm8322311wmd.42.2020.06.04.09.26.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 09:26:09 -0700 (PDT)
-Date: Thu, 4 Jun 2020 17:26:07 +0100
-From: Leif Lindholm <leif@nuviainc.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: kvm_target, QEMU_KVM_ARM_TARGET_GENERIC_V8 questions
-Message-ID: <20200604162607.GC28566@vanye>
-References: <20200604125544.GW28566@vanye>
- <20200604131802.7w4hncgq2gopbw6z@kamzik.brq.redhat.com>
- <20200604160300.GB28566@vanye>
- <CAFEAcA8MTB5VQQbMuSfkGc9JcGeawL_GUY8Pcs3yxT9kdncZJw@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgsmS-00080o-D5
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:31:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59127
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgsmR-0000Pe-2P
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:31:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591288305;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VwR2i17AJE1XdoL3lGGiJkAxWVVGajg1WAaJZN6adqA=;
+ b=MZEISvtP0kCZ3SLd3s0ymEbyiUuaLJew+h5pjlNa7LCnnSjYcGtJYjCx09Sw7y18juOeca
+ bP6e9UG7W9OUEPPwyfFK4SlYPdL64q6nnUlix0e/kBomLJA405StwXyBpBPdDmEA7ybCNd
+ xTotSMgscRL+rWS+Qit+RPEaJgNWAvI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-kccEep4JOxunVBfYELQ6UQ-1; Thu, 04 Jun 2020 12:31:44 -0400
+X-MC-Unique: kccEep4JOxunVBfYELQ6UQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFA10107ACF2;
+ Thu,  4 Jun 2020 16:31:42 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B2C87A1EF;
+ Thu,  4 Jun 2020 16:31:42 +0000 (UTC)
+Subject: Re: [PATCH 2/2] lockable: do not rely on optimization for null
+ lockables
+To: Joe Slater <joe.slater@windriver.com>, qemu-devel@nongnu.org
+References: <20200603224903.26268-1-joe.slater@windriver.com>
+ <20200603224903.26268-3-joe.slater@windriver.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7db61e38-b9f1-80f4-15c1-fed43f0a939f@redhat.com>
+Date: Thu, 4 Jun 2020 11:31:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8MTB5VQQbMuSfkGc9JcGeawL_GUY8Pcs3yxT9kdncZJw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=leif@nuviainc.com; helo=mail-wr1-x430.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200603224903.26268-3-joe.slater@windriver.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,64 +98,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 04, 2020 at 17:09:30 +0100, Peter Maydell wrote:
-> On Thu, 4 Jun 2020 at 17:03, Leif Lindholm <leif@nuviainc.com> wrote:
-> > But there's also things like:
-> > - a57_initfn explicitly setting kvm_target, then only being called
-> >   from max_initfn for !kvm_enabled()
+On 6/3/20 5:49 PM, Joe Slater wrote:
+> If we use QLNULL for null lockables, we can always
+> use referencing unknown_lock_type as a link time
+> error indicator.
 > 
-> Expected -- a KVM 'max' is nothing to do with a TCG 'max':
->  * for KVM, -cpu max means "same as -cpu host"
->  * for TCG, -cpu max means "start with an A57, then add in all the
->    extra architectural features that have been added since then".
-
-Sure. But why are we setting the kvm_target at all for the
-!kvm_enabled() case?
-
-> kvm_target being set by a57_initfn is specifically for the case
-> where a KVM user is using "-cpu cortex-a57".
+> Signed-off-by: Joe Slater <joe.slater@windriver.com>
+> ---
+>   include/qemu/lockable.h | 19 ++++++-------------
+>   1 file changed, 6 insertions(+), 13 deletions(-)
 > 
-> > - a57_initfn setting cpu->dtb_compatible to "arm,cortex-a57"
-> 
-> What else would it set it to?
+> diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
+> index 7f7aebb..7fc5750 100644
+> --- a/include/qemu/lockable.h
+> +++ b/include/qemu/lockable.h
+> @@ -24,21 +24,14 @@ struct QemuLockable {
+>       QemuLockUnlockFunc *unlock;
+>   };
+>   
+> -#define QLNULL ((QemuLockable *)0)
+> -
+> -
+> -/* This function gives an error if an invalid, non-NULL pointer type is passed
+> - * to QEMU_MAKE_LOCKABLE.  For optimized builds, we can rely on dead-code elimination
+> - * from the compiler, and give the errors already at link time.
+> +/*
+> + *  If unknown_lock_type() is referenced, it means we have tried to passed something
+> + *  not recognized as lockable to the macros below.  Use QLNULL to intentionally pass
+> + *  a null lockable.
+>    */
+> -#if defined(__OPTIMIZE__) && !defined(__SANITIZE_ADDRESS__)
+> +#define QLNULL ((QemuLockable *)0)
 
-Hmm, I had been hoping there was a generic v8a one - kvm64.c kind of
-got my hopes up with "arm,arm-v8". Still, for "max", would it not be
-useful to update it to the track the most architecturally advanced cpu
-supported? At this point "arm,cortex-a72".
+Looks like a bit of churn (especially if you take my comment on 1/2 to 
+spell it NULL instead of 0).  Should these be combined into a single patch?
 
-> > - a57 initfn setting cpu->midr, max_initfn overwriting parts of it
-> 
-> Also expected, TCG's -cpu max is "A57 with lots of extras".
+>   void unknown_lock_type(void *);
+> -#else
+> -static inline void unknown_lock_type(void *unused)
+> -{
+> -    abort();
+> -}
+> -#endif
+> +
+>   
+>   static inline __attribute__((__always_inline__)) QemuLockable *
+>   qemu_make_lockable(void *x, QemuLockable *lockable)
 
-Maybe I'm being too rigid in my thinking here, but it does kind of jar
-to see code call a function called aarch64_a57_initfn to have it write
-a value where it then throws away the only thing in the value that
-made it a57.
 
-> The way we create a TCG -cpu max is a bit odd, as the code was
-> originally written in a situation where A57 was the most advanced
-> TCG CPU we had and there were no extra architectural features
-> supported by our CPU emulation. Today we have an A72 model as
-> well and a lot of extra architectural features, so the "code
-> borrowed" to "extras added" ratio looks a bit unbalanced.
-> Cleaning it up would not be a bad idea.
+Reading further in the file:
 
-I might start by doing that bit. It might make a lot of the above
-niggles simply disappear.
+/* Auxiliary macros to simplify QEMU_MAKE_LOCABLE.  */
 
-Not entirely unrelated question:
-Would you take added field definitions in target/arm/cpu.h for
-features not yet emulated in QEMU but defined in released versions of
-ARM ARM?
+We should fix that typo while improving things.
 
-Regards,
+/* QEMU_MAKE_LOCKABLE - Make a polymorphic QemuLockable
+  *
+  * @x: a lock object (currently one of QemuMutex, QemuRecMutex, 
+CoMutex, QemuSpin).
+  *
+  * Returns a QemuLockable object that can be passed around
+  * to a function that can operate with locks of any kind, or
+  * NULL if @x is %NULL.
 
-Leif
+Should this comment be tweaked to call out %QLNULL?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
