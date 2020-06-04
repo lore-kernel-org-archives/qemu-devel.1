@@ -2,88 +2,70 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B31FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 450D2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:15:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 430A4206E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:05:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jz1kPRL/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 430A4206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0F219206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:15:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F219206E6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgocz-0006LI-I8
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:05:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47990)
+	id 1jgomT-0001KJ-3v
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:15:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgocA-0005H7-E2
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:04:54 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20056
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgoc8-0001eW-TK
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:04:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591272292;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rl9+ikFJu0dGcOEeYN9Oj49ZutrG0D584XEtaFNMN54=;
- b=Jz1kPRL/DuazLmLuRVE5fVexcBkuKVC1Xhl0aI2rle6/XRLckUv9iPmcnDy29iFEPun8Fi
- kbf3bCzVjAeG8xQjoBZFKFCFV2M5X3jg7nIH/C55BNltYqzODDGl13Zr16RNxL4WicEoVf
- G0wdZJxSuuI5xg1mATL7jdkdMKaLpxo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-kZGKD6RINO-Eu5Sdo7RMoQ-1; Thu, 04 Jun 2020 08:04:48 -0400
-X-MC-Unique: kZGKD6RINO-Eu5Sdo7RMoQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64F051005512;
- Thu,  4 Jun 2020 12:04:46 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74B4E60BF4;
- Thu,  4 Jun 2020 12:04:40 +0000 (UTC)
-Subject: Re: [PATCH] iotests: 194: wait migration completion on target too
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200604083341.26978-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c6bbfbd1-4a57-15ea-bf80-0ea5a1d81c64@redhat.com>
-Date: Thu, 4 Jun 2020 07:04:39 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jgolr-0000lN-BP
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:14:55 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:63893)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jgoln-0003iB-TD
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:14:54 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 22E0974594E;
+ Thu,  4 Jun 2020 14:14:47 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id D47E0745712; Thu,  4 Jun 2020 14:14:46 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id D2E00745702;
+ Thu,  4 Jun 2020 14:14:46 +0200 (CEST)
+Date: Thu, 4 Jun 2020 14:14:46 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 2/2] pci: ensure configuration access is within bounds
+In-Reply-To: <20200604075613-mutt-send-email-mst@kernel.org>
+Message-ID: <alpine.BSF.2.22.395.2006041400540.54170@zero.eik.bme.hu>
+References: <20200603202251.1199170-1-ppandit@redhat.com>
+ <20200603202251.1199170-3-ppandit@redhat.com>
+ <alpine.BSF.2.22.395.2006040006520.56892@zero.eik.bme.hu>
+ <e1ccdf71-5069-fa95-3c90-de4f875b2706@redhat.com>
+ <20200604054043-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2006041335250.54170@zero.eik.bme.hu>
+ <20200604073753-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2006041342470.54170@zero.eik.bme.hu>
+ <20200604075613-mutt-send-email-mst@kernel.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200604083341.26978-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Type: multipart/mixed;
+ boundary="3866299591-1574175831-1591272886=:54170"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,58 +79,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, thuth@redhat.com, quintela@redhat.com,
- alex.bennee@linaro.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, dgilbert@redhat.com
+Cc: =?ISO-8859-15?Q?Daniel_P_=2E_Berrang=E9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Ren Ding <rding@gatech.edu>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 3:33 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It is possible, that shutdown on target occurs earlier than migration
-> finish. In this case we crash in bdrv_release_dirty_bitmap_locked()
-> on assertion "assert(!bdrv_dirty_bitmap_busy(bitmap));" as we do have
-> busy bitmap, as bitmap migration is ongoing.
-> 
-> We'll fix bitmap migration to gracefully cancel on early shutdown soon.
-> Now let's fix iotest 194 to wait migration completion before shutdown.
-> 
-> Note that in this test dest_vm.shutdown() is called implicitly, as vms
-> used as context-providers, see __exit__() method of QEMUMachine class.
-> 
-> Actually, not waiting migration finish is a wrong thing, but the test
-> started to crash after commit ae00aa239847682
-> "iotests: 194: test also migration of dirty bitmap", which added dirty
-> bitmaps here. So, Fixes: tag won't hurt.
-> 
-> Fixes: ae00aa2398476824f0eca80461da215e7cdc1c3b
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/194     | 10 ++++++++++
->   tests/qemu-iotests/194.out |  5 +++++
->   2 files changed, 15 insertions(+)
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+--3866299591-1574175831-1591272886=:54170
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-Will queue through my NBD tree.
+On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+> On Thu, Jun 04, 2020 at 01:49:53PM +0200, BALATON Zoltan wrote:
+>> On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+>>> On Thu, Jun 04, 2020 at 01:37:13PM +0200, BALATON Zoltan wrote:
+>>>> On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+>>>>> On Thu, Jun 04, 2020 at 08:07:52AM +0200, Philippe Mathieu-DaudÃƒÂ© wrote:
+>>>>>> On 6/4/20 12:13 AM, BALATON Zoltan wrote:
+>>>>>>> On Thu, 4 Jun 2020, P J P wrote:
+>>>>>>>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>>>>>>>
+>>>>>>>> While reading PCI configuration bytes, a guest may send an
+>>>>>>>> address towards the end of the configuration space. It may lead
+>>>>>>>> to an OOB access issue. Assert that 'address + len' is within
+>>>>>>>> PCI configuration space.
+>>>>>>>>
+>>>>>>>> Suggested-by: Philippe Mathieu-DaudÃƒÂ© <philmd@redhat.com>
+>>>>>>>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>>>>>>>> ---
+>>>>>>>> hw/pci/pci.c | 2 ++
+>>>>>>>> 1 file changed, 2 insertions(+)
+>>>>>>>>
+>>>>>>>> Update v2: assert PCI configuration access is within bounds
+>>>>>>>> Ã‚Â -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00711.html
+>>>>>>>>
+>>>>>>>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>>>>>>>> index 70c66965f5..173bec4fd5 100644
+>>>>>>>> --- a/hw/pci/pci.c
+>>>>>>>> +++ b/hw/pci/pci.c
+>>>>>>>> @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
+>>>>>>>> {
+>>>>>>>> Ã‚Â Ã‚Â Ã‚Â  uint32_t val = 0;
+>>>>>>>>
+>>>>>>>> +Ã‚Â Ã‚Â Ã‚Â  assert(address + len <= pci_config_size(d));
+>>>>>>>
+>>>>>>> Does this allow guest now to crash QEMU? I think it was suggested that
+>>>>>>> assert should only be used for cases that can only arise from a
+>>>>>>> programming error and not from values set by the guest. If this is
+>>>>>>> considered to be an error now to call this function with wrong
+>>>>>>> parameters did you check other callers? I've found a few such as:
+>>>>>>>
+>>>>>>> hw/scsi/esp-pci.c
+>>>>>>> hw/watchdog/wdt_i6300esb.c
+>>>>>>> hw/ide/cmd646.c
+>>>>>>> hw/vfio/pci.c
+>>>>>>>
+>>>>>>> and maybe others. Would it be better to not crash just log invalid
+>>>>>>> access and either fix up parameters or return some garbage like 0?
+>>>>>>
+>>>>>> Yes, maybe I was not clear while reviewing v1, we need to audit the
+>>>>>> callers and fix them first, then we can safely add the assert here.
+>>>>>
+>>>>> We can add assert here regardless of auditing callers. Doing that
+>>>>> will also make fuzzying easier. But the assert is unrelated to CVE imho.
+>>>>
+>>>> I wonder why isn't the check added to pci_default_read_config() right away?
+>>>> If we have an assert there the overhead is the same and adding the check
+>>>> there would make it unnecessary to patch all callers so it's just one patch
+>>>> instead of a whole series.
+>>>>
+>>>> Regards,
+>>>> BALATON Zoltan
+>>>
+>>> We need to return something, and we can't be sure that callers will
+>>> handle returning random stuff correctly. Callers know what
+>>> to do on errors, we don't.
+>>
+>> This is an invalid case where behaviour will be undefined anyway so
+>> returning anything such as 0 or -1 is probably OK (what do most hardware
+>> return in this case?).
+>
+> This is an internal detail of the API. It's not about what hardware
+> returns.  Look at the ati as an example.
 
-> 
-> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-> index 3fad7c6c1a..6dc2bc94d7 100755
-> --- a/tests/qemu-iotests/194
-> +++ b/tests/qemu-iotests/194
-> @@ -87,4 +87,14 @@ with iotests.FilePath('source.img') as source_img_path, \
->               iotests.log(dest_vm.qmp('nbd-server-stop'))
->               break
->   
-> +    iotests.log('Wait migration completion on target...')
+Considering that this function implements reading PCI config space its API 
+should aligh with what happens on hardware normally. You could make it 
+unrelated but that does not make much sense other than causing trouble for 
+callers.
 
-Do you mind if I s/Wait/Wait for/ here and in the .out?
+>> If callers need better error handling they can do a
+>> check before calling the function but for other (most) callers which will
+>> just return the same random value you would return from
+>> pci_default_read_config() having an assert instead makes it necessary to
+>> modify all of them one by one and doubles the check overhead by
+>> unnecessarily double checking. So I think having a default check and error
+>> handling in pci_default_read_config() would be better so callers who don't
+>> care would work and those few who might care could check before calling or
+>> actually implement their own callback (which I expect they already do as
+>> this is just the default implementation of this callback).
+>
+>
+> Basically if you look at the specific example, you will see that it
+> triggers because of a misaligned access which device code never
+> expected. Which memory core should not allow at all.
+> It will likely trigger other bugs, some of them could be
+> security related. assert is a reasonable way to help us catch them in
+> fuzzying.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+The specific example (ati-vga) does expect and should support unaligned 
+access. Not for all regs but for most registers, there's a table in docs 
+which says for PCI POS registers (whatever those are) unalligned access is 
+supported. This works now, if it should not work witout .impl.unaligned or 
+some other value set somewhere that should be patched instead.
 
+Regards,
+BALATON Zoltan
+--3866299591-1574175831-1591272886=:54170--
 
