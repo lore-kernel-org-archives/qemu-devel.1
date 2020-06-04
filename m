@@ -2,81 +2,84 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00698C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D3AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBF6C2075B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 705DB2075B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I0WozVzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF6C2075B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGj8hzJB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705DB2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgzPZ-00036r-2A
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 19:36:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48056)
+	id 1jgzPr-0003p8-Dr
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 19:36:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jgzOv-0002Jm-6r
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:35:57 -0400
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:54093)
+ id 1jgzP7-0002Wf-MY
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:36:09 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jgzOt-0004tS-96
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:35:56 -0400
-Received: by mail-pj1-x1036.google.com with SMTP id i12so1784391pju.3
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 16:35:54 -0700 (PDT)
+ id 1jgzP5-000514-U7
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:36:09 -0400
+Received: by mail-pg1-x542.google.com with SMTP id r10so4207434pgv.8
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 16:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=vfU+5soti4/GOU44IAzpfLG0Qw2ObTLZSwjYGjbQTMc=;
- b=I0WozVzY7snDC/Ql7+LPrOIo5rHd9tOWz6BmdYQLbQm3oJZaHhDUYwnCrrGmd2SDvx
- wtzbaPbeV/oNCsc7+57YB/kmxkHJUBxJ09qGD/buser7UjseHp4XzOFArgPGJ0MN3oc+
- XIgp6VpFnyjAk4tZI0+b8eIUKh8Mlm2z3YQslT2ecYxeL8H2K7LoZ0qyZ3GTMh/SZwKd
- 9Sb404iMI+X0i1Q8kpz84Leb33rpeH8Rcqc8mYSoBOrE7himh1d8OXMIBRrqdfEFBe4B
- 0JsaYO6Ldi5YhSg9GFEjk0VZEpaoWDJFswrMwFSLrdGGVTfFU2yongCKxJO0cLJTnR4p
- Y4XA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=eJfVkMSOd2rAt/mYEDG86M9fkbe8y+LyR/mkRJhKFjo=;
+ b=OGj8hzJBinzupQS204vtFacPwuNcCqStIIQT7vCyghsOhKqPeS1ilvcrqxe4teytt3
+ Z/zOK5oPGZyeRWJFg0HHHnOgIWsaQcv6EchHCJ3PXjo2/Q+VjCvFxLioGlFk5Y1nVtEE
+ q7zJpgZA5WTStOh8XJ5jxKXFp0O7CBFaHqAG5IbeBHO+eXZcq4Sx5NPkhOmgM8FtNTDn
+ H4uf0CtopS9ovlWlKLPsp96q9xMRiNs5gzvUEMQK2JTYYHRwkvYhTBnxOUyLHeJbd8Ah
+ +jF3M874YOIVdtzSlFX80KrmvddPdI582zfLnnM84KX0zYeQ8H1+YuIbyxJVQQXa1b3E
+ r6dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=vfU+5soti4/GOU44IAzpfLG0Qw2ObTLZSwjYGjbQTMc=;
- b=s1g/qvs3pMr1FfMhuekt68riYMjf1pmh5vdoNoom5npjHHng/TA3ZLVVFvdrM8DO99
- f94WiCMQM3wvo/rrSjqxsK6di+7gi0DF5GxkaLpGYqPyCvyPB5D4NS9hAn21PEAAh5zp
- zF+I+hd3YfF+/kFotMgggGbOoWDPVBWiBQsMs8hPwsCRwcf9T/9bcuCzHE0EkqkHUECS
- M2K5OgJX9ZmHFvOPpWqS4gupHQNM/nTDVftdORYjL8HUEFaHdsC1To0UstNMX1hmBijy
- 9E6GZm4ESQXbcG6lmGIBQMkPf6Ti0Vg4gxmrOq0Iti+kL/3Nd1wbKVWCxdmz3Z95vyiO
- WW0w==
-X-Gm-Message-State: AOAM531oy8o3ko//3UEctSsvBzVx/W92BNcmUnD+cdS9ilY7RZp+ykF3
- I6eHmA0vw4g+3tiC5YIRtl43FEdTu4GsY6hA
-X-Google-Smtp-Source: ABdhPJw04iTv6eFjzAvByCd+US7uW4VCVOoGLcRHnVL+XOHRtFHzsud2KWlmC4qmXXbsbLmTjzT2ow==
-X-Received: by 2002:a17:902:103:: with SMTP id 3mr7161489plb.325.1591313753469; 
- Thu, 04 Jun 2020 16:35:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=eJfVkMSOd2rAt/mYEDG86M9fkbe8y+LyR/mkRJhKFjo=;
+ b=LszhUqEHfcEFKK/wO49yBhDfE3qvlF3iG8sNVqo55w+ESO+O+aWIrLliA97/LGPfDy
+ 3x6lSuFB1QBz0z4ll4i/Olp4TGWv/M9Daj/zzBVHtJ/S7u28d9fcrbxDHYT+V0NJx9l0
+ yKc2SJdrBdUxLVSUgiOES1C2G+qgyUsrmm+pYFjUk18QXhGXf5qVFaFb2ByMRHEC7d5t
+ 4aOS7rzWLOd+76Lam2ye/Wm1pDzVGIhD75rvn/I3+uWDKd2ZaNc+Y6S9mu+OwDqM34QM
+ OGfr0BbeGeYpwLcesnif1S1NQRgRNoH+3AB05Md1jOycb5BMdQBmp2PKytKydKo357um
+ QEDA==
+X-Gm-Message-State: AOAM530amBU7kEzxLNWPQsgndoZYe0wV6d3yWNvF59+sfZCYBkr1S3mZ
+ 37ZVZfBlj7TdXsHqz9jxgd6/LA/Ryp2+6w2h
+X-Google-Smtp-Source: ABdhPJwp3S77pgv6Zu2fE8KxLQhQ599e43Ib8PPhOhDh4tQgYTtQB9uuOpRAIKjaKd9KxV62QJknsQ==
+X-Received: by 2002:a63:1c42:: with SMTP id c2mr6447454pgm.296.1591313766223; 
+ Thu, 04 Jun 2020 16:36:06 -0700 (PDT)
 Received: from localhost (tunnel570486-pt.tunnel.tserv25.sin1.ipv6.he.net.
  [2001:470:35:3d5::2])
- by smtp.gmail.com with ESMTPSA id l186sm5380754pfl.191.2020.06.04.16.35.52
+ by smtp.gmail.com with ESMTPSA id 140sm5460628pfy.95.2020.06.04.16.36.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 16:35:52 -0700 (PDT)
+ Thu, 04 Jun 2020 16:36:05 -0700 (PDT)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 0/4] vhost-user block device backend implementation
-Date: Fri,  5 Jun 2020 07:35:34 +0800
-Message-Id: <20200604233538.256325-1-coiby.xu@gmail.com>
+Subject: [PATCH v8 1/4] Allow vu_message_read to be replaced
+Date: Fri,  5 Jun 2020 07:35:35 +0800
+Message-Id: <20200604233538.256325-2-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200604233538.256325-1-coiby.xu@gmail.com>
+References: <20200604233538.256325-1-coiby.xu@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
- envelope-from=coiby.xu@gmail.com; helo=mail-pj1-x1036.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,106 +101,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
- stefanha@redhat.com
+ stefanha@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v8
- - re-try connecting to socket server to fix asan error
- - fix license naming issue
+Allow vu_message_read to be replaced by one which will make use of the
+QIOChannel functions. Thus reading vhost-user message won't stall the
+guest.
 
-v7
- - fix docker-test-debug@fedora errors by freeing malloced memory
+Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+---
+ contrib/libvhost-user/libvhost-user-glib.c |  2 +-
+ contrib/libvhost-user/libvhost-user.c      | 11 ++++++-----
+ contrib/libvhost-user/libvhost-user.h      | 21 +++++++++++++++++++++
+ tests/vhost-user-bridge.c                  |  2 ++
+ tools/virtiofsd/fuse_virtio.c              |  4 ++--
+ 5 files changed, 32 insertions(+), 8 deletions(-)
 
-v6
- - add missing license header and include guard
- - vhost-user server only serve one client one time
- - fix a bug in custom vu_message_read
- - using qemu-storage-daemon to start vhost-user-blk-server
- - a bug fix to pass docker-test-clang@ubuntu
-
-v5:
- * re-use vu_kick_cb in libvhost-user
- * keeping processing VhostUserMsg in the same coroutine until there is
-   detachment/attachment of AIOContext
- * Spawn separate coroutine for each VuVirtqElement
- * Other changes including relocating vhost-user-blk-server.c, coding
-   style etc.
-
-v4:
- * add object properties in class_init
- * relocate vhost-user-blk-test
- * other changes including using SocketAddress, coding style, etc.
-
-v3:
- * separate generic vhost-user-server code from vhost-user-blk-server
-   code
- * re-write vu_message_read and kick hander function as coroutines to
-   directly call blk_co_preadv, blk_co_pwritev, etc.
- * add aio_context notifier functions to support multi-threading model
- * other fixes regarding coding style, warning report, etc.
-
-v2:
- * Only enable this feature for Linux because eventfd is a Linux-specific
-   feature
-
-
-This patch series is an implementation of vhost-user block device
-backend server, thanks to Stefan and Kevin's guidance.
-
-Vhost-user block device backend server is a UserCreatable object and can be
-started using object_add,
-
- (qemu) object_add vhost-user-blk-server,id=ID,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
- (qemu) object_del ID
-
-or appending the "-object" option when starting QEMU,
-
-  $ -object vhost-user-blk-server,id=disk,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
-
-Then vhost-user client can connect to the server backend.
-For example, QEMU could act as a client,
-
-  $ -m 256 -object memory-backend-memfd,id=mem,size=256M,share=on -numa node,memdev=mem -chardev socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket -device vhost-user-blk-pci,id=blk0,chardev=char1
-
-And guest OS could access this vhost-user block device after mounting it.
-
-Coiby Xu (4):
-  Allow vu_message_read to be replaced
-  generic vhost user server
-  vhost-user block device backend server
-  new qTest case to test the vhost-user-blk-server
-
- block/Makefile.objs                        |   1 +
- block/export/vhost-user-blk-server.c       | 716 ++++++++++++++++++++
- block/export/vhost-user-blk-server.h       |  34 +
- contrib/libvhost-user/libvhost-user-glib.c |   2 +-
- contrib/libvhost-user/libvhost-user.c      |  11 +-
- contrib/libvhost-user/libvhost-user.h      |  21 +
- softmmu/vl.c                               |   4 +
- tests/Makefile.include                     |   3 +-
- tests/qtest/Makefile.include               |   2 +
- tests/qtest/libqos/vhost-user-blk.c        | 130 ++++
- tests/qtest/libqos/vhost-user-blk.h        |  44 ++
- tests/qtest/libqtest.c                     |  54 +-
- tests/qtest/libqtest.h                     |  38 ++
- tests/qtest/vhost-user-blk-test.c          | 737 +++++++++++++++++++++
- tests/vhost-user-bridge.c                  |   2 +
- tools/virtiofsd/fuse_virtio.c              |   4 +-
- util/Makefile.objs                         |   1 +
- util/vhost-user-server.c                   | 406 ++++++++++++
- util/vhost-user-server.h                   |  59 ++
- 19 files changed, 2229 insertions(+), 40 deletions(-)
- create mode 100644 block/export/vhost-user-blk-server.c
- create mode 100644 block/export/vhost-user-blk-server.h
- create mode 100644 tests/qtest/libqos/vhost-user-blk.c
- create mode 100644 tests/qtest/libqos/vhost-user-blk.h
- create mode 100644 tests/qtest/vhost-user-blk-test.c
- create mode 100644 util/vhost-user-server.c
- create mode 100644 util/vhost-user-server.h
-
---
+diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhost-user/libvhost-user-glib.c
+index 53f1ca4cdd..0df2ec9271 100644
+--- a/contrib/libvhost-user/libvhost-user-glib.c
++++ b/contrib/libvhost-user/libvhost-user-glib.c
+@@ -147,7 +147,7 @@ vug_init(VugDev *dev, uint16_t max_queues, int socket,
+     g_assert(dev);
+     g_assert(iface);
+ 
+-    if (!vu_init(&dev->parent, max_queues, socket, panic, set_watch,
++    if (!vu_init(&dev->parent, max_queues, socket, panic, NULL, set_watch,
+                  remove_watch, iface)) {
+         return false;
+     }
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 3bca996c62..0c7368baa2 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -67,8 +67,6 @@
+ /* The version of inflight buffer */
+ #define INFLIGHT_VERSION 1
+ 
+-#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+-
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION 1
+ #define LIBVHOST_USER_DEBUG 0
+@@ -412,7 +410,7 @@ vu_process_message_reply(VuDev *dev, const VhostUserMsg *vmsg)
+         goto out;
+     }
+ 
+-    if (!vu_message_read(dev, dev->slave_fd, &msg_reply)) {
++    if (!dev->read_msg(dev, dev->slave_fd, &msg_reply)) {
+         goto out;
+     }
+ 
+@@ -647,7 +645,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+     /* Wait for QEMU to confirm that it's registered the handler for the
+      * faults.
+      */
+-    if (!vu_message_read(dev, dev->sock, vmsg) ||
++    if (!dev->read_msg(dev, dev->sock, vmsg) ||
+         vmsg->size != sizeof(vmsg->payload.u64) ||
+         vmsg->payload.u64 != 0) {
+         vu_panic(dev, "failed to receive valid ack for postcopy set-mem-table");
+@@ -1653,7 +1651,7 @@ vu_dispatch(VuDev *dev)
+     int reply_requested;
+     bool need_reply, success = false;
+ 
+-    if (!vu_message_read(dev, dev->sock, &vmsg)) {
++    if (!dev->read_msg(dev, dev->sock, &vmsg)) {
+         goto end;
+     }
+ 
+@@ -1704,6 +1702,7 @@ vu_deinit(VuDev *dev)
+         }
+ 
+         if (vq->kick_fd != -1) {
++            dev->remove_watch(dev, vq->kick_fd);
+             close(vq->kick_fd);
+             vq->kick_fd = -1;
+         }
+@@ -1751,6 +1750,7 @@ vu_init(VuDev *dev,
+         uint16_t max_queues,
+         int socket,
+         vu_panic_cb panic,
++        vu_read_msg_cb read_msg,
+         vu_set_watch_cb set_watch,
+         vu_remove_watch_cb remove_watch,
+         const VuDevIface *iface)
+@@ -1768,6 +1768,7 @@ vu_init(VuDev *dev,
+ 
+     dev->sock = socket;
+     dev->panic = panic;
++    dev->read_msg = read_msg ? read_msg : vu_message_read;
+     dev->set_watch = set_watch;
+     dev->remove_watch = remove_watch;
+     dev->iface = iface;
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index f30394fab6..d756da8548 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -30,6 +30,8 @@
+ 
+ #define VHOST_MEMORY_MAX_NREGIONS 8
+ 
++#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
++
+ typedef enum VhostSetConfigType {
+     VHOST_SET_CONFIG_TYPE_MASTER = 0,
+     VHOST_SET_CONFIG_TYPE_MIGRATION = 1,
+@@ -205,6 +207,7 @@ typedef uint64_t (*vu_get_features_cb) (VuDev *dev);
+ typedef void (*vu_set_features_cb) (VuDev *dev, uint64_t features);
+ typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
+                                   int *do_reply);
++typedef bool (*vu_read_msg_cb) (VuDev *dev, int sock, VhostUserMsg *vmsg);
+ typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool started);
+ typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx);
+ typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t len);
+@@ -373,6 +376,23 @@ struct VuDev {
+     bool broken;
+     uint16_t max_queues;
+ 
++    /* @read_msg: custom method to read vhost-user message
++     *
++     * Read data from vhost_user socket fd and fill up
++     * the passed VhostUserMsg *vmsg struct.
++     *
++     * If reading fails, it should close the received set of file
++     * descriptors as socket message's auxiliary data.
++     *
++     * For the details, please refer to vu_message_read in libvhost-user.c
++     * which will be used by default if not custom method is provided when
++     * calling vu_init
++     *
++     * Returns: true if vhost-user message successfully received,
++     *          otherwise return false.
++     *
++     */
++    vu_read_msg_cb read_msg;
+     /* @set_watch: add or update the given fd to the watch set,
+      * call cb when condition is met */
+     vu_set_watch_cb set_watch;
+@@ -416,6 +436,7 @@ bool vu_init(VuDev *dev,
+              uint16_t max_queues,
+              int socket,
+              vu_panic_cb panic,
++             vu_read_msg_cb read_msg,
+              vu_set_watch_cb set_watch,
+              vu_remove_watch_cb remove_watch,
+              const VuDevIface *iface);
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 6c3d490611..bd43607a4d 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -520,6 +520,7 @@ vubr_accept_cb(int sock, void *ctx)
+                  VHOST_USER_BRIDGE_MAX_QUEUES,
+                  conn_fd,
+                  vubr_panic,
++                 NULL,
+                  vubr_set_watch,
+                  vubr_remove_watch,
+                  &vuiface)) {
+@@ -573,6 +574,7 @@ vubr_new(const char *path, bool client)
+                      VHOST_USER_BRIDGE_MAX_QUEUES,
+                      dev->sock,
+                      vubr_panic,
++                     NULL,
+                      vubr_set_watch,
+                      vubr_remove_watch,
+                      &vuiface)) {
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 3b6d16a041..666945c897 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -980,8 +980,8 @@ int virtio_session_mount(struct fuse_session *se)
+     se->vu_socketfd = data_sock;
+     se->virtio_dev->se = se;
+     pthread_rwlock_init(&se->virtio_dev->vu_dispatch_rwlock, NULL);
+-    vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, fv_set_watch,
+-            fv_remove_watch, &fv_iface);
++    vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, NULL,
++            fv_set_watch, fv_remove_watch, &fv_iface);
+ 
+     return 0;
+ }
+-- 
 2.26.2
 
 
