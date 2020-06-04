@@ -2,111 +2,84 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E76EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BFAC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:31:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F33620663
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:28:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5S0KJT9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F33620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC1A2077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:31:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC1A2077D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgubE-0003AL-MY
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:28:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37816)
+	id 1jgueP-0005Tc-MY
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:31:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jguag-0002k1-8c
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:27:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32392
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jguae-0006t2-0F
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:27:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591295262;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mT0NDhPocEvD5q0njxV/Om3384bNUNQf4XbE/+FTMPs=;
- b=M5S0KJT9zGy8dSyz7DTQdU+uqAX4aEO+sHRRzt60zxAgBoWzWMpLS+pP1inEQzb1u5E+I+
- 62d7h/CpXOYbz93iefL7sZxkliZJXBQHl+6IdCpVZ0XORQqSVCyp6hRShFqRIuoKpUdxTb
- qlJkvOs/JGDUaD+pOxklLQYK03d8Arw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-tefvYLzpMMOmqEcCPPnAwg-1; Thu, 04 Jun 2020 14:27:40 -0400
-X-MC-Unique: tefvYLzpMMOmqEcCPPnAwg-1
-Received: by mail-wr1-f70.google.com with SMTP id f4so2749805wrp.21
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:27:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mT0NDhPocEvD5q0njxV/Om3384bNUNQf4XbE/+FTMPs=;
- b=FGCWUXuvEBmZ9ogS/2F+36/2PXkkWahZbYWEwI2nGuybf6Bqp9qimdoAYqGnZDauOJ
- ED2nmoQjV5aaNF3gGj73PucF2304HeGpQKEbqGzsD69CcR1JCZx/u1esrsgt4p2y7vDN
- MXPjhi3ZpsCdQdP7d62tmzhmwDivekd5aIch8at8gB2ckkWPa8dw+/qJIWxW/Ubt1vyi
- 7eAgc8Lw+LY41DD4OU6J9/N5HR3Bkrmc6hYb/w04Bbtmu2zIMWeHaeK0ZDhnlf4RcKTO
- k5abIBDXysCXYzCxOzlgVunQtJ4KnP2wb9VNfs0gmD7l57wYSNci/DSViRgkyFQL0JNj
- YjsQ==
-X-Gm-Message-State: AOAM532Ty2c/7EpN+zqeLOXzGyQeTFeI688i+Nq4DhMOLVPgpVPvGiKU
- SV4/mDeZp5G3Jg711Hv66LLDLRaZEaVmFrxWJvoEB5rfd1RaUhuoLOSXR71MDoKImYAfzgUkKNV
- jQRyIXBvNKL2+L4U=
-X-Received: by 2002:adf:b34e:: with SMTP id k14mr5713204wrd.109.1591295259574; 
- Thu, 04 Jun 2020 11:27:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw3zJNTS56xC1E5EkdbzxTqqGSC9jvfo0HpAEjW59kzggkFMkLCFWdkCqzPzxN256hUU8Nueg==
-X-Received: by 2002:adf:b34e:: with SMTP id k14mr5713186wrd.109.1591295259283; 
- Thu, 04 Jun 2020 11:27:39 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb?
- ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
- by smtp.gmail.com with ESMTPSA id d17sm10163605wrg.75.2020.06.04.11.27.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 11:27:38 -0700 (PDT)
-Subject: Re: [PATCH 12/13] i386: hvf: Move mmio_buf into CPUX86State
-To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
-References: <20200528193758.51454-1-r.bolshakov@yadro.com>
- <20200528193758.51454-13-r.bolshakov@yadro.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d57e48c6-574e-471c-78be-1245d62bc908@redhat.com>
-Date: Thu, 4 Jun 2020 20:27:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jgudd-0004VG-ND
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:30:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58870)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jgudc-0007k5-Jo
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jgudb-0006VR-3Y
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 18:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 14BE72E8052
+ for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 18:30:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200528193758.51454-13-r.bolshakov@yadro.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 04 Jun 2020 18:20:50 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1880822@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: cve qemu security
+X-Launchpad-Bug-Information-Type: Public Security
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: yes
+X-Launchpad-Bug-Commenters: philmd pjps
+X-Launchpad-Bug-Reporter: P J P (pjps)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159056340380.1780.3709038768569765525.malonedeb@chaenomeles.canonical.com>
+Message-ID: <211a55bf-0d1b-31f4-995f-eca8608e9e6c@amsat.org>
+Subject: [Bug 1880822] Re: [PATCH] hw/sd/sdcard: Verify CMD24 (Block Write)
+ address is valid
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4c81a398d59f55198ca11a618dc895bfc8bd6ca2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 10:55:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -115,117 +88,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1880822 <1880822@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200604182050.ueT_1swW_TAPWUfEel21ono4I2wKACuWuZUSoNMFX40@z>
 
-On 28/05/20 21:37, Roman Bolshakov wrote:
-> There's no similar field in CPUX86State, but it's needed for MMIO traps.
-> 
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  target/i386/cpu.h         |  1 +
->  target/i386/hvf/hvf.c     |  5 +++++
->  target/i386/hvf/x86.h     |  1 -
->  target/i386/hvf/x86_emu.c | 12 ++++++------
->  4 files changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 7e6566565a..be44e19154 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1593,6 +1593,7 @@ typedef struct CPUX86State {
->  #endif
->  #if defined(CONFIG_HVF)
->      hvf_lazy_flags hvf_lflags;
-> +    void *hvf_mmio_buf;
->      HVFX86EmulatorState *hvf_emul;
->  #endif
->  
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 4cee496d71..57696c46c7 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -533,7 +533,11 @@ void hvf_reset_vcpu(CPUState *cpu) {
->  
->  void hvf_vcpu_destroy(CPUState *cpu)
->  {
-> +    X86CPU *x86_cpu = X86_CPU(cpu);
-> +    CPUX86State *env = &x86_cpu->env;
-> +
->      hv_return_t ret = hv_vcpu_destroy((hv_vcpuid_t)cpu->hvf_fd);
-> +    g_free(env->hvf_mmio_buf);
->      assert_hvf_ok(ret);
->  }
->  
-> @@ -563,6 +567,7 @@ int hvf_init_vcpu(CPUState *cpu)
->      init_decoder();
->  
->      hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
-> +    env->hvf_mmio_buf = g_new(char, 4096);
->      env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
->  
->      r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
-> diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
-> index 2363616c07..483fcea762 100644
-> --- a/target/i386/hvf/x86.h
-> +++ b/target/i386/hvf/x86.h
-> @@ -230,7 +230,6 @@ typedef struct x68_segment_selector {
->  
->  /* Definition of hvf_x86_state is here */
->  struct HVFX86EmulatorState {
-> -    uint8_t mmio_buf[4096];
->  };
->  
->  /* useful register access  macros */
-> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-> index 1ad2c30e16..d3e289ed87 100644
-> --- a/target/i386/hvf/x86_emu.c
-> +++ b/target/i386/hvf/x86_emu.c
-> @@ -187,8 +187,8 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
->  
->  uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
->  {
-> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
-> -    return env->hvf_emul->mmio_buf;
-> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, ptr, bytes);
-> +    return env->hvf_mmio_buf;
->  }
->  
->  
-> @@ -489,9 +489,9 @@ static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
->      target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
->                                           decode->addressing_size, R_ES);
->  
-> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
-> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 0,
->                    decode->operand_size, 1);
-> -    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
-> +    vmx_write_mem(env_cpu(env), addr, env->hvf_mmio_buf,
->                    decode->operand_size);
->  
->      string_increment_reg(env, R_EDI, decode);
-> @@ -512,9 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
->  {
->      target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
->  
-> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
-> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, addr,
->                   decode->operand_size);
-> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
-> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 1,
->                    decode->operand_size, 1);
->  
->      string_increment_reg(env, R_ESI, decode);
-> 
+On 6/4/20 8:03 PM, Paolo Bonzini wrote:
+> On 04/06/20 19:34, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Avoid OOB access by verifying the requested address belong to
+>> the actual card size. Return ADDRESS_ERROR when not in range.
+>>
+>>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>>
+>>   4.3.4 Data Write
+>>
+>>   * Block Write
+>>
+>>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>   occurred and no data transfer is performed.
+>>
+>> Fixes: CVE-2020-13253
+>> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>>  hw/sd/sd.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>> index 3c06a0ac6d..0ced3b5e14 100644
+>> --- a/hw/sd/sd.c
+>> +++ b/hw/sd/sd.c
+>> @@ -1211,6 +1211,10 @@ static sd_rsp_type_t sd_normal_command(SDState *s=
+d, SDRequest req)
+>>              /* Writing in SPI mode not implemented.  */
+>>              if (sd->spi)
+>>                  break;
+>> +            if (addr >=3D sd->size) {
+>> +                sd->card_status |=3D ADDRESS_ERROR;
+>> +                return sd_r1;
+>> +            }
+>>              sd->state =3D sd_receivingdata_state;
+>>              sd->data_start =3D addr;
+>>              sd->data_offset =3D 0;
+>>
+> =
 
-It should be possible to get rid of the buffer altogether, but it's ok
-to do it separately.
+> I'm not sure if you want me to queue it, but I did.
 
-I queued the series, thanks.
+Hmm I guess I typed "^RPrasad" in my shell to have the last git-publish
+command with his email, and I didn't noticed you were also there...
 
-Paolo
+Anyway looking at it again, this patch is wrong because I should check
+for addr + blksize < sd_size instead. Can you drop it please?
 
+>  Probably we should
+> add qemu-block@nongnu.org to the hw/sd stanza.
+
+OK will do.
+
+> =
+
+> Paolo
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880822
+
+Title:
+  CVE-2020-13253 QEMU: sd: OOB access could crash the guest resulting in
+  DoS
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  An out-of-bounds read access issue was found in the SD Memory Card
+  emulator of the QEMU. It occurs while performing block write commands
+  via sdhci_write(), if a guest user has sent 'address' which is OOB of
+  's->wp_groups'. A guest user/process may use this flaw to crash the
+  QEMU process resulting in DoS.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880822/+subscriptions
 
