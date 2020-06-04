@@ -2,84 +2,100 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E460EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D834C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:43:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA63D206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:42:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06F5D206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+RFbO1l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA63D206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DePSPU/Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F5D206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgoGC-0002ry-03
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44284)
+	id 1jgoHJ-0004IP-Ag
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:43:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgoFA-00021H-RG
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:41:09 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:33098)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgoF9-0004Tz-OU
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:41:08 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id i74so4801143oib.0
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 04:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pbu4IL52Qvx/60GgNc5nXA1qF20KysAQnKMWID8Syag=;
- b=F+RFbO1lJHXDoYuIEtSrpHiMUR18ix1+uxznRELhFq2xewZGhHpTXIflOiK9LkbJ9Z
- BflpNUSYw5/uqYfv8ZgRT1MUlOk1C2RfraUlqj0ygnnoMfzzC4pMfmQH9ev73IpoACte
- 9aaFD9u5IPlKE43xFYhFTZMSu7WSt63ANvYRxOXk0It0KvhJPBImdM93w6NqwmluMazG
- dXN7rmjj+JoeTcYUX0FfPVUKdNaoO+Jce/2B4UPkbtG9qft4uoxQnWnrwebvQ+SkMm1B
- dyMfVhRqhX2u5uK4NWhWrfYrT0cvAYcKptFPFPMl6VmRfn/erO8i5cwzJn2PT1/GGr76
- bcrw==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jgoFZ-0002SA-Kd
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:41:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29392
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jgoFX-0004Vn-Dn
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:41:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591270889;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SG+hBvXP6e9Y6/LrKmefUDXkEF9JFsqTDvpq8V98864=;
+ b=DePSPU/YnYyHTNrsahc5JmfhvWrAhS/D8QzABH6sZFip5AKBN4Blty9umjSvfwjuKah48Q
+ q6evFHMkCe0lMWnLGRj0VqtsElfzU6kfLomt1d9866uZSKxHkqBvShUEAkymD0IRVgMem+
+ IWT4OpLvFf5sgDyvnvyrG6DXkM0fO58=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-FkEMjKPJODiPWMCpYxzppw-1; Thu, 04 Jun 2020 07:41:27 -0400
+X-MC-Unique: FkEMjKPJODiPWMCpYxzppw-1
+Received: by mail-wr1-f70.google.com with SMTP id t5so2310685wro.20
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 04:41:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pbu4IL52Qvx/60GgNc5nXA1qF20KysAQnKMWID8Syag=;
- b=BtZEqi3QNG348/pqEVARJlXm3o+HyKdc5IAoKGBHtBA4SZ/bwhgR4QBWCySHG56OLZ
- m30TgR/hA0v1EhL5sePpARxU63zhZO2oHrEEpTiHqTSuVU2m4XMA0EAQhJmg53mM3pNF
- Cm38pZKaKq93/1e2BBm9UJ+LO0FD7uQ9Biq4Wm1L/hUnOIMFOkzG92AuFJo2UCNk6FdK
- 87SpSqdMdqt7W3LgweVlaNd/Uy8pWjVaL7AjjbyAA9j3HR6ZVxHl9+qdjVKl+u6GGKrl
- RyYZVnH6kmiCNF62Y5qkX/PBV2tMc1xCKJDKTNb77302c8diMd5yU1GygfyNSqNu+7uE
- igMw==
-X-Gm-Message-State: AOAM533lMDu4rWdFpwIE++puW0zsxlLEEBf79pwGJ6kPz9faNJeDqjFU
- 1g4fvSudcViN6ZNHyPAZD9ZyKgXEf2X/t8U2wHYeLw==
-X-Google-Smtp-Source: ABdhPJz71hdqULNcG2XnhQfv2khPh4ayscsbDN1Hz1KWFgjxlBTgeD6Y6XVI2dzzZanH6N/qn1cEnaL+4y2//xDB5qI=
-X-Received: by 2002:aca:5152:: with SMTP id f79mr2673140oib.146.1591270866079; 
- Thu, 04 Jun 2020 04:41:06 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=7lFGsZLk7z0NMynbSrbY7KEmq9EyQqcAVBnn/b0Nyd8=;
+ b=nRqh8jBonigZtdfQAqq1llsUbqyBB4cu91GftHE1icu6LBR7uokHC4HuGsHeBaZh6p
+ 8vcv4pGLdmOnt7WN0uwp+HQRsd/GmvTl/3GFIHsVcMmYzhlQTz7CiaGEl+79UQcNxzLs
+ SMPmHaEVmFe7gTkftrnEVxJ8LmUsECNXv3YcRhAFqYrM9xlDhTVhyw2Ov1qZBedyIV1E
+ DcmtA0bkaW3Axgl4asPDAms0S6qCmNjZOEC4rkESoHZjOQioRbQ2aZbLT+sx7FvUaepG
+ wCEpP4rBgi6ArGy7WBWsmQZup/sYPC6VmGF+HSVbs/j20a+8Ith6RKA9J9zkyvfC+LC2
+ MmYA==
+X-Gm-Message-State: AOAM531aeZDvvijT3Qr9PArlZJ90DPg2wW5q1RcJGoFMh3GzHu61Azmo
+ PCcQXt1blPSt0iL7xHJ3t94B64nlK3flF8z4YgyiluenQgKiaBzAX3RUgTeo6Wp0U7jZdo488Y5
+ Txtd82X2J6TOVDak=
+X-Received: by 2002:a5d:5261:: with SMTP id l1mr4169247wrc.246.1591270886596; 
+ Thu, 04 Jun 2020 04:41:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwZC2n2y2mjz3WFS/a9SJXabW78Tsd9MEbWeeV3m7b87x0lSGJFgQBpWyKtxjNUqyRwsFoapg==
+X-Received: by 2002:a5d:5261:: with SMTP id l1mr4169222wrc.246.1591270886415; 
+ Thu, 04 Jun 2020 04:41:26 -0700 (PDT)
+Received: from redhat.com ([2a00:a040:185:f65:9a3b:8fff:fed3:ad8d])
+ by smtp.gmail.com with ESMTPSA id b8sm7392683wrm.35.2020.06.04.04.41.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Jun 2020 04:41:25 -0700 (PDT)
+Date: Thu, 4 Jun 2020 07:41:22 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: P J P <ppandit@redhat.com>
+Subject: Re: [PATCH] pci: assert configuration access is within bounds
+Message-ID: <20200604074050-mutt-send-email-mst@kernel.org>
+References: <20200604113525.58898-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <20200603161352.744204-1-alistair.francis@wdc.com>
-In-Reply-To: <20200603161352.744204-1-alistair.francis@wdc.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Jun 2020 12:40:55 +0100
-Message-ID: <CAFEAcA9rwhZ-UNwYc6kDX3ZTqJEQ+k=wq6hBEfdWZhz24Vt_2w@mail.gmail.com>
-Subject: Re: [PULL 00/15] riscv-to-apply queue
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22d;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200604113525.58898-1-ppandit@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,37 +109,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 17:22, Alistair Francis <alistair.francis@wdc.com> wrote:
->
-> The following changes since commit 5cc7a54c2e91d82cb6a52e4921325c511fd90712:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20200602' into staging (2020-06-02 18:16:38 +0100)
->
-> are available in the Git repository at:
->
->   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200603
->
-> for you to fetch changes up to fe0fe4735e798578097758781166cc221319b93d:
->
->   riscv: Initial commit of OpenTitan machine (2020-06-03 09:11:51 -0700)
->
-> ----------------------------------------------------------------
-> This is a collection of RISC-V patches for 5.1.
->
-> This incldues removing deprecated features and part of the OpenTitan
-> support series.
+On Thu, Jun 04, 2020 at 05:05:25PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> While accessing PCI configuration bytes, assert that
+> 'address + len' is within PCI configuration space.
+> 
+> Generally it is within bounds. This is more of a defensive
+> assert, in case a buggy device was to send 'address' which
+> may go out of bounds.
+> 
+> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Applied, thanks.
+> ---
+>  hw/pci/pci.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> Update v1: defensive assert as separate patch
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00957.html
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00960.html
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 70c66965f5..7bf2ae6d92 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
+>  {
+>      uint32_t val = 0;
+>  
+> +    assert(address + len <= pci_config_size(d));
+> +
+>      if (pci_is_express_downstream_port(d) &&
+>          ranges_overlap(address, len, d->exp.exp_cap + PCI_EXP_LNKSTA, 2)) {
+>          pcie_sync_bridge_lnk(d);
+> @@ -1394,6 +1396,8 @@ void pci_default_write_config(PCIDevice *d, uint32_t addr, uint32_t val_in, int
+>      int i, was_irq_disabled = pci_irq_disabled(d);
+>      uint32_t val = val_in;
+>  
+> +    assert(addr + l <= pci_config_size(d));
+> +
+>      for (i = 0; i < l; val >>= 8, ++i) {
+>          uint8_t wmask = d->wmask[addr + i];
+>          uint8_t w1cmask = d->w1cmask[addr + i];
+> -- 
+> 2.26.2
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
 
