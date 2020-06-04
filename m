@@ -2,94 +2,129 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77918C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D81C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:36:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4ACB2206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:36:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ACB2206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A2E3D206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:36:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xt3lvzcH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E3D206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgjUT-0000jd-ET
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:36:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39296)
+	id 1jgjUV-0000mx-Q6
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:36:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jgjTB-0007wF-Vw
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:35:18 -0400
-Received: from mga05.intel.com ([192.55.52.43]:26402)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jgjT9-0007Ut-AA
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:35:17 -0400
-IronPort-SDR: U+Il4MOM7+59TG1Qq1p0wgfdhnpGoesS+tis2Q24TGZoKbfK4iogmTPyEDBaoEN7sPSYnTsauU
- PvaTEzgrD/RA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Jun 2020 23:35:10 -0700
-IronPort-SDR: gYb//LW/eRpxkgjXeabvZlG8k5ZFcT2N1T+7BSzNGDCMk4c7Abbaegq+hScy07sVvovCng5LnF
- JzZ04FFXlzsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,471,1583222400"; d="scan'208";a="471430473"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga005.fm.intel.com with ESMTP; 03 Jun 2020 23:35:10 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 3 Jun 2020 23:35:10 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX605.ccr.corp.intel.com (10.109.6.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 4 Jun 2020 14:35:08 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Thu, 4 Jun 2020 14:35:08 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert"
- <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-dev
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint request into
- one.
-Thread-Topic: [PATCH 3/3] migration/colo: Merge multi checkpoint request into
- one.
-Thread-Index: AQHWKnK9gI6NuJvUXEqXViIblWhBYajEe6YAgAI8B/D//4LMAIAB5LjQ
-Date: Thu, 4 Jun 2020 06:35:07 +0000
-Message-ID: <38c6ce6681a04bd28a81a21fd6489f98@intel.com>
-References: <20200515042818.17908-1-chen.zhang@intel.com>
- <20200515042818.17908-4-chen.zhang@intel.com>
- <359be3274bdf4f0e87c6c45cdc05ae90@huawei.com>
- <ec06e82a5cf34545a332fe80fef0a94e@intel.com>
- <2d33c10d444e4067b798413731dd231e@huawei.com>
-In-Reply-To: <2d33c10d444e4067b798413731dd231e@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgjTM-0008EB-Up
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:35:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59508
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgjTL-0007gj-CP
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:35:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591252525;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/QJ1B7gfT86Ixt/8saTMISjjPKCr+7drMZY6cgqVehA=;
+ b=Xt3lvzcHUGXoSB41/ZSWRKx1+4+bNWbDyi+Q1WJY5bgOX32IAM4yT85LZDF5smP43YNMcv
+ N4iUAvGGthKEthviQQ8ccPNjJbCukPROyW/3gerKNvVdeWeM0fGpgy8ylMY9qhALAVTgJd
+ moDRL2Ii8O5U5iMgIGtAKRJ3caYONbY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-lROUk0xoNtiWp1jnf_flLA-1; Thu, 04 Jun 2020 02:35:23 -0400
+X-MC-Unique: lROUk0xoNtiWp1jnf_flLA-1
+Received: by mail-wm1-f71.google.com with SMTP id f62so1438995wme.3
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 23:35:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=/QJ1B7gfT86Ixt/8saTMISjjPKCr+7drMZY6cgqVehA=;
+ b=RPXkZ9sQe+g+I8DkfWU65nNI1mvtNijAafY+a7iKQ5aL+TfXKXD41pQkzC5yAN2A3/
+ FM5/F23AkeVXcpcLgyMi5TCJFD9/ziYfseYGjO9TzIunxqeMvv6feMWwH3fdgL8HssLM
+ aivYB4sQKksAemunuabwpDecdeJpFnpdQ/+kVRPc/IAhkTDVkCLDgnTM3hP/hYQ1EriT
+ uXYbCawd8rWXRNY5nQUOKPuA5Ur0unIa6KGVhGK7162ZpCHlOO6dIiYgg2lFXNeOfJix
+ KeulNMzEXwHmMsh2EpE6BXp1muxgSKlsCpUUWdLh3ebyxe6a3oPtQlYKDHYzQEvsnLnD
+ +Ubw==
+X-Gm-Message-State: AOAM532g33NNycB7X/uOZVG/oh/ZE4bDuTqjJiAkfH8JL0ZR+dSlGPft
+ 9J6AATCYVIFArV4Q15gQLY1dqR5CyczQMBlGo/MKDEnTYYcwpkPw+VbEtoEGKQB5Il0408nsR4d
+ XerZqpTj5kU0EFwg=
+X-Received: by 2002:a05:6000:100e:: with SMTP id
+ a14mr2762556wrx.349.1591252522720; 
+ Wed, 03 Jun 2020 23:35:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyfbzLPLFbnOgMwTayLitznzlJzivgHFB1KqNGNOHlmlnwolVdWzluKnVpKWD6AT/M0b05INw==
+X-Received: by 2002:a05:6000:100e:: with SMTP id
+ a14mr2762537wrx.349.1591252522489; 
+ Wed, 03 Jun 2020 23:35:22 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id k64sm6067293wmf.34.2020.06.03.23.35.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 03 Jun 2020 23:35:21 -0700 (PDT)
+Subject: Re: [PATCH 04/13] i386: hvf: Drop unused variable
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200528193758.51454-1-r.bolshakov@yadro.com>
+ <20200528193758.51454-5-r.bolshakov@yadro.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <90100948-8120-ef8a-32e6-5ad9c638231d@redhat.com>
+Date: Thu, 4 Jun 2020 08:35:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.43; envelope-from=chen.zhang@intel.com;
- helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 02:35:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+In-Reply-To: <20200528193758.51454-5-r.bolshakov@yadro.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,158 +138,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cameron Esfahani <dirty@apple.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/28/20 9:37 PM, Roman Bolshakov wrote:
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  target/i386/hvf/x86.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+> index c95d5b2116..56fcde13c6 100644
+> --- a/target/i386/hvf/x86.h
+> +++ b/target/i386/hvf/x86.h
+> @@ -293,7 +293,6 @@ typedef struct lazy_flags {
+>  
+>  /* Definition of hvf_x86_state is here */
+>  struct HVFX86EmulatorState {
+> -    int interruptable;
+>      uint64_t fetch_rip;
+>      uint64_t rip;
+>      struct x86_register regs[16];
+> 
 
-
-> -----Original Message-----
-> From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Sent: Wednesday, June 3, 2020 5:39 PM
-> To: Zhang, Chen <chen.zhang@intel.com>; Dr . David Alan Gilbert
-> <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; qemu-dev
-> <qemu-devel@nongnu.org>
-> Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> <jasowang@redhat.com>
-> Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint request
-> into one.
->=20
-> > -----Original Message-----
-> > From: Zhang, Chen [mailto:chen.zhang@intel.com]
-> > Sent: Wednesday, June 3, 2020 5:11 PM
-> > To: Zhanghailiang <zhang.zhanghailiang@huawei.com>; Dr . David Alan
-> > Gilbert <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>;
-> > qemu-dev <qemu-devel@nongnu.org>
-> > Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> <jasowang@redhat.com>
-> > Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint
-> > request into one.
-> >
-> >
-> >
-> > > -----Original Message-----
-> > > From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > > Sent: Tuesday, June 2, 2020 2:59 PM
-> > > To: Zhang, Chen <chen.zhang@intel.com>; Dr . David Alan Gilbert
-> > > <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; qemu-
-> dev
-> > > <qemu-devel@nongnu.org>
-> > > Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> > <jasowang@redhat.com>
-> > > Subject: RE: [PATCH 3/3] migration/colo: Merge multi checkpoint
-> > > request into one.
-> > >
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Zhang Chen [mailto:chen.zhang@intel.com]
-> > > > Sent: Friday, May 15, 2020 12:28 PM
-> > > > To: Dr . David Alan Gilbert <dgilbert@redhat.com>; Juan Quintela
-> > > > <quintela@redhat.com>; Zhanghailiang
-> > > <zhang.zhanghailiang@huawei.com>;
-> > > > qemu-dev <qemu-devel@nongnu.org>
-> > > > Cc: Zhang Chen <zhangckid@gmail.com>; Jason Wang
-> > > > <jasowang@redhat.com>; Zhang Chen <chen.zhang@intel.com>
-> > > > Subject: [PATCH 3/3] migration/colo: Merge multi checkpoint
-> > > > request into one.
-> > > >
-> > > > From: Zhang Chen <chen.zhang@intel.com>
-> > > >
-> > > > When COLO guest occur issues, COLO-compare will catch lots of
-> > > > different network packet and trigger notification multi times,
-> > > > force periodic may happen at the same time. So this can be
-> > > > efficient merge checkpoint request within
-> COLO_CHECKPOINT_INTERVAL.
-> > > >
-> > > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> > > > ---
-> > > >  migration/colo.c | 22 ++++++++++++++++------
-> > > >  1 file changed, 16 insertions(+), 6 deletions(-)
-> > > >
-> > > > diff --git a/migration/colo.c b/migration/colo.c index
-> > > > d5bced22cb..e6a7d8c6e2 100644
-> > > > --- a/migration/colo.c
-> > > > +++ b/migration/colo.c
-> > > > @@ -47,6 +47,9 @@ static COLOMode last_colo_mode;
-> > > >
-> > > >  #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
-> > > >
-> > > > +/* Default COLO_CHECKPOINT_INTERVAL is 1000 ms */ #define
-> > > > +COLO_CHECKPOINT_INTERVAL 1000
-> > > > +
-> > > >  bool migration_in_colo_state(void)  {
-> > > >      MigrationState *s =3D migrate_get_current(); @@ -651,13 +654,2=
-0
-> > > > @@
-> > > > out:
-> > > >  void colo_checkpoint_notify(void *opaque)  {
-> > > >      MigrationState *s =3D opaque;
-> > > > -    int64_t next_notify_time;
-> > > > +    int64_t now =3D qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> > > >
-> > > > -    qemu_sem_post(&s->colo_checkpoint_sem);
-> > > > -    s->colo_checkpoint_time =3D
-> > qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> > > > -    next_notify_time =3D s->colo_checkpoint_time +
-> > > > -                    s->parameters.x_checkpoint_delay;
-> > > > -    timer_mod(s->colo_delay_timer, next_notify_time);
-> > > > +    /*
-> > > > +     * When COLO guest occur issues, COLO-compare will catch lots =
-of
-> > > > +     * different network packet and trigger notification multi tim=
-es,
-> > > > +     * force periodic may happen at the same time. So this can be
-> > > > +     * efficient merge checkpoint request within
-> > > > COLO_CHECKPOINT_INTERVAL.
-> > > > +     */
-> > > > +    if (now > s->colo_checkpoint_time + COLO_CHECKPOINT_INTERVAL)
-> > {
-> > > > +        qemu_sem_post(&s->colo_checkpoint_sem);
-> > >
-> > > It is not right here, this notification should not be controlled by
-> > > the interval time, I got what happened here, when multiple
-> > > checkpoint requires come, this Colo_delay_time will be added every
-> > > time and it will be a big value which is not what we want.
-> >
-> > Not just this, multi checkpoint will spend lots of resource to sync
-> > memory from PVM to SVM, It will make VM stop/start multi times, but
-> > for the results are same with one checkpoint.
-> > So in short time just need one checkpoint, because do checkpoint still
-> > need some time...
-> >
->=20
-> Yes, this because we use semaphore here, it will be increased multiple ti=
-mes,
-> And I think Lukas's patch 'migration/colo.c: Use event instead of semapho=
-re'
-> has fixed this problem.
-> Did you try the qemu upstream which has merged this patch ?
-
-Oh, Thanks reminder, I will drop this patch and rebase on upstream for V2.
-
-Thank
-Zhang Chen
-
->=20
-> > Thanks
-> > Zhang Chen
-> >
-> > >
-> > > Besides, please update this patch based on [PATCH 0/6] colo:
-> > > migration related bugfixes series which Has modified the same place.
-> > >
-> > >
-> > >
-> > > > +        timer_mod(s->colo_delay_timer, now +
-> > > > +                  s->parameters.x_checkpoint_delay);
-> > > > +        s->colo_checkpoint_time =3D now;
-> > > > +    }
-> > > >  }
-> > > >
-> > > >  void migrate_start_colo_process(MigrationState *s)
-> > > > --
-> > > > 2.17.1
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
