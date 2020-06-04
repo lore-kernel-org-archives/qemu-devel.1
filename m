@@ -2,113 +2,76 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDCEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13C8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8F6020679
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:25:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="gglpfg4N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F6020679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=apple.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81F7620657
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:46:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81F7620657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgedd-00027N-SV
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 21:25:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40574)
+	id 1jgexe-0005Iu-LH
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 21:46:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgecz-0001ie-BN
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:25:05 -0400
-Received: from ma1-aaemail-dr-lapp03.apple.com ([17.171.2.72]:52758)
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jgex2-0004tA-Ll
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:45:48 -0400
+Received: from lucky1.263xmail.com ([211.157.147.134]:33920)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgecy-0008GA-9V
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:25:05 -0400
-Received: from pps.filterd (ma1-aaemail-dr-lapp03.apple.com [127.0.0.1])
- by ma1-aaemail-dr-lapp03.apple.com (8.16.0.42/8.16.0.42) with SMTP id
- 0541Frxc025780; Wed, 3 Jun 2020 18:25:02 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=20180706;
- bh=KhJODEC5nbZxM8ascYpPNETvylJ2FSvjlVrKS85VGik=;
- b=gglpfg4NqvhcA/EOKzrdwoEq8HVkaVYMAysXiJSUZFJBEThmm7XwpYclfLtY1omQfQqK
- yZeTG5e0tqmybk2XeIYQv7AhkT0T/5BmMHOgIWt/eqTRXHjKs+c+1UZSPtoSE4yQ6twg
- EbzlSpXcKRMipbfKCLSWuvnah/WlZPsoZtAicUPl6N7f07Q9xR8M/WOb4kyicY0SVxtl
- GYOnS8Wh1huQqC6XO2ltUJMkbrkLarrPgUzAoIjjO62Jk0OIdB2xIJbc5p8WnoCGL3Np
- PjMROnN7LIEbU6wijZy0ageyZtxNHHmBUmW6tVzWBVE2BBoCwDaXEopeKfGYz2i0+tYJ WA== 
-Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
- (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
- by ma1-aaemail-dr-lapp03.apple.com with ESMTP id 31bpfuukmk-2
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Wed, 03 Jun 2020 18:25:02 -0700
-Received: from rn-mailsvcp-mmp-lapp04.rno.apple.com
- (rn-mailsvcp-mmp-lapp04.rno.apple.com [17.179.253.17])
- by rn-mailsvcp-mta-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0QBD00R30NXOBU50@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
- Wed, 03 Jun 2020 18:25:01 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp04.rno.apple.com by
- rn-mailsvcp-mmp-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0QBD00D00NUB6Y00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
- 03 Jun 2020 18:25:00 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-Va-E-CD: d5bc4848abf0cdd29451008d60d7e712
-X-Va-R-CD: 786c4deaabcbd7aec5837d95626d37ad
-X-Va-CD: 0
-X-Va-ID: 61838eab-12f1-4671-9d98-89f4c3b7fbda
-X-V-A: 
-X-V-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-V-E-CD: d5bc4848abf0cdd29451008d60d7e712
-X-V-R-CD: 786c4deaabcbd7aec5837d95626d37ad
-X-V-CD: 0
-X-V-ID: 717a6570-e202-490a-b8cc-f634a69b9274
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received: from [17.234.60.254] (unknown [17.234.60.254])
- by rn-mailsvcp-mmp-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0QBD0078CNXMTQ00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
- 03 Jun 2020 18:24:59 -0700 (PDT)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] configure: Don't warn about lack of PIE on macOS
-From: Cameron Esfahani <dirty@apple.com>
-In-reply-to: <20200601124257.32057-1-r.bolshakov@yadro.com>
-Date: Wed, 03 Jun 2020 18:24:58 -0700
-Cc: Cameron Esfahani via <qemu-devel@nongnu.org>
-Content-transfer-encoding: 7bit
-Message-id: <E59CA0DB-8844-47E2-B54B-61F35F1847D0@apple.com>
-References: <20200601124257.32057-1-r.bolshakov@yadro.com>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-03_13:2020-06-02,
- 2020-06-03 signatures=0
-Received-SPF: pass client-ip=17.171.2.72; envelope-from=dirty@apple.com;
- helo=ma1-aaemail-dr-lapp03.apple.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 21:25:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jgex0-0003yr-5x
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:45:48 -0400
+Received: from localhost (unknown [192.168.167.69])
+ by lucky1.263xmail.com (Postfix) with ESMTP id 4BFE1B7BF6;
+ Thu,  4 Jun 2020 09:45:37 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-ABS-CHECKED: 0
+Received: from localhost.localdomain (unknown [223.72.80.61])
+ by smtp.263.net (postfix) whith ESMTP id
+ P15430T140189064226560S1591235131586082_; 
+ Thu, 04 Jun 2020 09:45:37 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <8ec22f610cacebf1f7ec4070ab097226>
+X-RL-SENDER: chengang@emindsoft.com.cn
+X-SENDER: chengang@emindsoft.com.cn
+X-LOGIN-NAME: chengang@emindsoft.com.cn
+X-FST-TO: laurent@vivier.eu
+X-SENDER-IP: 223.72.80.61
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+From: chengang@emindsoft.com.cn
+To: laurent@vivier.eu,
+	riku.voipio@iki.fi
+Subject: [PATCH] [PATCH v6] linux-user: syscall: ioctls: support
+ DRM_IOCTL_VERSION
+Date: Thu,  4 Jun 2020 09:45:27 +0800
+Message-Id: <20200604014527.7795-1-chengang@emindsoft.com.cn>
+X-Mailer: git-send-email 2.24.0.308.g228f53135a
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=211.157.147.134;
+ envelope-from=chengang@emindsoft.com.cn; helo=lucky1.263xmail.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 21:45:40
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,47 +84,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: chengang@emindsoft.com.cn, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Cameron Esfahani <dirty@apple.com> 
+From: Chen Gang <chengang@emindsoft.com.cn>
 
-Cameron Esfahani
-dirty@apple.com
+Another DRM_IOCTL_* commands will be done later.
 
-"It is the spirit and not the form of law that keeps justice alive."
+Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+---
+ configure                  | 10 ++++
+ linux-user/ioctls.h        |  5 ++
+ linux-user/syscall.c       | 95 ++++++++++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h  | 15 ++++++
+ linux-user/syscall_types.h | 11 +++++
+ 5 files changed, 136 insertions(+)
 
-Earl Warren
+diff --git a/configure b/configure
+index f087d2bcd1..389dbb1d09 100755
+--- a/configure
++++ b/configure
+@@ -3136,6 +3136,13 @@ if ! check_include "ifaddrs.h" ; then
+   have_ifaddrs_h=no
+ fi
+ 
++#########################################
++# libdrm check
++have_drm_h=no
++if check_include "libdrm/drm.h" ; then
++    have_drm_h=yes
++fi
++
+ ##########################################
+ # VTE probe
+ 
+@@ -7127,6 +7134,9 @@ fi
+ if test "$have_ifaddrs_h" = "yes" ; then
+     echo "HAVE_IFADDRS_H=y" >> $config_host_mak
+ fi
++if test "$have_drm_h" = "yes" ; then
++  echo "HAVE_DRM_H=y" >> $config_host_mak
++fi
+ if test "$have_broken_size_max" = "yes" ; then
+     echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
+ fi
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 0defa1d8c1..f2e2fa9c87 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -574,6 +574,11 @@
+   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
+                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
+ 
++#ifdef HAVE_DRM_H
++  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
++                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
++#endif
++
+ #ifdef TARGET_TIOCSTART
+   IOCTL_IGNORE(TIOCSTART)
+   IOCTL_IGNORE(TIOCSTOP)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7f6700c54e..1744e7acc7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -112,6 +112,9 @@
+ #include <linux/if_alg.h>
+ #include <linux/rtc.h>
+ #include <sound/asound.h>
++#ifdef HAVE_DRM_H
++#include <libdrm/drm.h>
++#endif
+ #include "linux_loop.h"
+ #include "uname.h"
+ 
+@@ -5276,6 +5279,98 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+ }
+ #endif
+ 
++#ifdef HAVE_DRM_H
++
++static void unlock_drm_version(struct drm_version *host_ver)
++{
++    unlock_user(host_ver->name, 0UL, 0);
++    unlock_user(host_ver->date, 0UL, 0);
++    unlock_user(host_ver->desc, 0UL, 0);
++}
++
++static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
++                                          struct target_drm_version *target_ver)
++{
++    memset(host_ver, 0, sizeof(*host_ver));
++
++    __get_user(host_ver->name_len, &target_ver->name_len);
++    if (host_ver->name_len) {
++        host_ver->name = lock_user(VERIFY_WRITE, target_ver->name,
++                                   target_ver->name_len, 0);
++        if (!host_ver->name) {
++            goto err;
++        }
++    }
++
++    __get_user(host_ver->date_len, &target_ver->date_len);
++    if (host_ver->date_len) {
++        host_ver->date = lock_user(VERIFY_WRITE, target_ver->date,
++                                   target_ver->date_len, 0);
++        if (!host_ver->date) {
++            goto err;
++        }
++    }
++
++    __get_user(host_ver->desc_len, &target_ver->desc_len);
++    if (host_ver->desc_len) {
++        host_ver->desc = lock_user(VERIFY_WRITE, target_ver->desc,
++                                   target_ver->desc_len, 0);
++        if (!host_ver->desc) {
++            goto err;
++        }
++    }
++
++    return 0;
++err:
++    unlock_drm_version(host_ver);
++    return -EFAULT;
++}
++
++static inline abi_long host_to_target_drmversion(
++                                          struct target_drm_version *target_ver,
++                                          struct drm_version *host_ver)
++{
++    __put_user(host_ver->version_major, &target_ver->version_major);
++    __put_user(host_ver->version_minor, &target_ver->version_minor);
++    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
++    __put_user(host_ver->name_len, &target_ver->name_len);
++    __put_user(host_ver->date_len, &target_ver->date_len);
++    __put_user(host_ver->desc_len, &target_ver->desc_len);
++    unlock_user(host_ver->name, target_ver->name, host_ver->name_len);
++    unlock_user(host_ver->date, target_ver->date, host_ver->date_len);
++    unlock_user(host_ver->desc, target_ver->desc, host_ver->desc_len);
++    return 0;
++}
++
++static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
++                             int fd, int cmd, abi_long arg)
++{
++    struct drm_version *ver;
++    struct target_drm_version *target_ver;
++    abi_long ret;
++
++    switch (ie->host_cmd) {
++    case DRM_IOCTL_VERSION:
++        if (!lock_user_struct(VERIFY_WRITE, target_ver, arg, 0)) {
++            return -TARGET_EFAULT;
++        }
++        ver = (struct drm_version *)buf_temp;
++        ret = target_to_host_drmversion(ver, target_ver);
++        if (!is_error(ret)) {
++            ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
++            if (!is_error(ret)) {
++                ret = host_to_target_drmversion(target_ver, ver);
++            }
++            unlock_drm_version(ver);
++        }
++        unlock_user_struct(target_ver, arg, 0);
++        return ret;
++    }
++    return -TARGET_ENOSYS;
++}
++
++#endif
++
+ static IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 152ec637cb..3c261cff0e 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
+ #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
+ #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
+ 
++/* drm ioctls */
++#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
++
+ /* from asm/termbits.h */
+ 
+ #define TARGET_NCC 8
+@@ -2598,6 +2601,18 @@ struct target_mq_attr {
+     abi_long mq_curmsgs;
+ };
+ 
++struct target_drm_version {
++    int version_major;
++    int version_minor;
++    int version_patchlevel;
++    abi_ulong name_len;
++    abi_ulong name;
++    abi_ulong date_len;
++    abi_ulong date;
++    abi_ulong desc_len;
++    abi_ulong desc;
++};
++
+ #include "socket.h"
+ 
+ #include "errno_defs.h"
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e12c1661e..e2b0484f50 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
+ STRUCT(dm_target_msg,
+        TYPE_ULONGLONG) /* sector */
+ 
++STRUCT(drm_version,
++       TYPE_INT, /* version_major */
++       TYPE_INT, /* version_minor */
++       TYPE_INT, /* version_patchlevel */
++       TYPE_ULONG, /* name_len */
++       TYPE_PTRVOID, /* name */
++       TYPE_ULONG, /* date_len */
++       TYPE_PTRVOID, /* date */
++       TYPE_ULONG, /* desc_len */
++       TYPE_PTRVOID) /* desc */
++
+ STRUCT(file_clone_range,
+        TYPE_LONGLONG, /* src_fd */
+        TYPE_ULONGLONG, /* src_offset */
+-- 
+2.24.0.308.g228f53135a
 
 
-
-> On Jun 1, 2020, at 5:42 AM, Roman Bolshakov <r.bolshakov@yadro.com> wrote:
-> 
-> ld64 is making PIE executables for 10.7 and above by default, as
-> documented in ld(1).
-> 
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
-> configure | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index af2ba83f0e..6dddbca4b2 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2137,6 +2137,8 @@ elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
->   QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
->   QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
->   pie="yes"
-> +elif test "$darwin" = "yes"; then
-> +  pie="yes"
-> elif test "$pie" = "yes"; then
->   error_exit "PIE not available due to missing toolchain support"
-> else
-> -- 
-> 2.26.1
-> 
-> 
 
 
