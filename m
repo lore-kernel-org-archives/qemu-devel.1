@@ -2,94 +2,89 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F549C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FAEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:43:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE752206E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:41:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA6F6206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:43:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hZF1F4ys"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE752206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PM+L6gDZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6F6206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgq7H-0003Gk-77
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 09:41:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33068)
+	id 1jgq9V-0004N8-81
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 09:43:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jgq6h-0002kN-Hj
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:40:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46835)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jgq6g-00079D-IH
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:40:31 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x6so6107098wrm.13
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 06:40:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yYKjpgihVM7BIyrybHg74VcmdTrT1AUmeK/VFZsIFzI=;
- b=hZF1F4ysXVU2AugW0bO6FfwtcoS9YvDGxhRoGTw6O1GimdcfBNglpCQY0+VllMY6M1
- A9Fgir/DhqT30lRGFCct3sd+l150owQr8hJmgv/phqQ2N8pHzu84QtiNouCvOZK6VSG3
- JN+oIDjdp/b6OPFjwsWIVO0I+bjdhdaBG0RMAsLwB3Cq+FaY/GqVPNnvzqjvzrWVu8gJ
- i0M253KVoI25mvt4mnO9P4KhmT7U8MNMLhIRFkX4ZpZZq+cPGuLWCsCaEd9McmL5b+2Y
- xffLFo7BZgS5fUia0U/Dspfl9XpeiuVJNnr2crOGtCGUvIpMg8SJmKaw6eG+lHneLMp1
- 7qzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yYKjpgihVM7BIyrybHg74VcmdTrT1AUmeK/VFZsIFzI=;
- b=j3OMqrl0+CooA/s/1vfSI7b15Q2eX/dF+nsbvpa/JqpMylqtYfpQdUHVLbGEwmiAgm
- Y8veATZiKSUH6uXQlshIl2JB+CMMwOogwONQo19MT/CKZ6yS8If2oUXAgO1kEFA4Kxvr
- z1edsjPlGfxJee9MmrtXPlZUFpnT1t5TLMbSCbQErZSrywQ7or5mxPEyy9VRXXeJIHHL
- NSLEdra22qtr1kRH5sVjaoIoHuBVHEUCmu4yP8iVMm2mGrTQmQow0KLL2qzzROrXoVSN
- MOd0zfGzIf3t5kvVhcJeryaRIHnn9apwDp3X3gjXNZU/AOHJ4CDoU0HKduo+sFQu7ahg
- ST/g==
-X-Gm-Message-State: AOAM531SY7FQSISQPHpvKEiyLGRuk+SIlt/z3wbMizuCUg89npFp0bw0
- AMKJeidgbgH1F4qVjDV6FRoF4g==
-X-Google-Smtp-Source: ABdhPJxsQTJ/WIBkeiA9PCzRUl7fpj2pngBT4jenGnS88l551b7svJPTGB+gqvoy1LyEvR8gY5H9gA==
-X-Received: by 2002:adf:f512:: with SMTP id q18mr4903285wro.38.1591278029014; 
- Thu, 04 Jun 2020 06:40:29 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l17sm6935484wmi.3.2020.06.04.06.40.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 06:40:27 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id ECC1A1FF7E;
- Thu,  4 Jun 2020 14:40:26 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] hw/virtio/vhost: re-factor vhost-section and allow
- DIRTY_MEMORY_CODE
-Date: Thu,  4 Jun 2020 14:40:22 +0100
-Message-Id: <20200604134022.10564-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgq8f-0003vb-Pr
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:42:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43847
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgq8e-0007NB-2Z
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:42:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591278150;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=1T1XM9ifNxoJSzo7T6JwmmsPSsBaAK3KKlweP9rGUbQ=;
+ b=PM+L6gDZ3kxivI3TAmqN7nye3KHHN4ays3MLSunJBvQm32wnyQay8H9+A73sVqZWqlIh9B
+ i5Wj4TdrofWCy9uwXIijA2kR8B4mUSLBHjU0VbIG3TaHyaSsv9r7qdspc6FoOJRYfNmrNM
+ /Q9j7nek2VyTYqBOhsPsLovYIGNRkkI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-mBPBjJOpM_eOcHcIbBboBQ-1; Thu, 04 Jun 2020 09:42:27 -0400
+X-MC-Unique: mBPBjJOpM_eOcHcIbBboBQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46C1E80058E;
+ Thu,  4 Jun 2020 13:42:26 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-105.ams2.redhat.com [10.36.112.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 012467A1EF;
+ Thu,  4 Jun 2020 13:42:21 +0000 (UTC)
+Subject: Re: [PATCH v6 4/4] new qTest case to test the vhost-user-blk-server
+To: Coiby Xu <coiby.xu@gmail.com>, qemu-devel@nongnu.org
+References: <20200530171441.660814-1-coiby.xu@gmail.com>
+ <20200530171441.660814-5-coiby.xu@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e28c954b-3125-223a-441b-c713a7a6e644@redhat.com>
+Date: Thu, 4 Jun 2020 15:42:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200530171441.660814-5-coiby.xu@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,135 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The purpose of vhost_section is to identify RAM regions that need to
-be made available to a vhost client. However when running under TCG
-all RAM sections have DIRTY_MEMORY_CODE set which leads to problems
-down the line.
+On 30/05/2020 19.14, Coiby Xu wrote:
+> This test case has the same tests as tests/virtio-blk-test.c except for
+> tests have block_resize. Since vhost-user server can only server one
+> client one time, two instances of qemu-storage-daemon are launched
+> for the hotplug test.
+> 
+> In order to not block scripts/tap-driver.pl, vhost-user-blk-server will
+> send "quit" command to qemu-storage-daemon's QMP monitor. So a function
+> is added to libqtest.c to establish socket connection with socket
+> server.
+> 
+> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+> ---
+>  tests/Makefile.include              |   3 +-
+>  tests/qtest/Makefile.include        |   2 +
+>  tests/qtest/libqos/vhost-user-blk.c | 126 +++++
+>  tests/qtest/libqos/vhost-user-blk.h |  44 ++
+>  tests/qtest/libqtest.c              |  44 +-
+>  tests/qtest/libqtest.h              |  38 ++
+>  tests/qtest/vhost-user-blk-test.c   | 741 ++++++++++++++++++++++++++++
+>  7 files changed, 966 insertions(+), 32 deletions(-)
+>  create mode 100644 tests/qtest/libqos/vhost-user-blk.c
+>  create mode 100644 tests/qtest/libqos/vhost-user-blk.h
+>  create mode 100644 tests/qtest/vhost-user-blk-test.c
+[...]
+>  qos-test-obj-y += tests/qtest/virtio-scsi-test.o
+> diff --git a/tests/qtest/libqos/vhost-user-blk.c b/tests/qtest/libqos/vhost-user-blk.c
+> new file mode 100644
+> index 0000000000..ec46b7ddb4
+> --- /dev/null
+> +++ b/tests/qtest/libqos/vhost-user-blk.c
+> @@ -0,0 +1,126 @@
+> +/*
+> + * libqos driver framework
+> + *
+> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Re-factor the code so:
+Don't you want to add a remark here for you, too?
 
-  - steps are clearer to follow
-  - reason for rejection is recorded in the trace point
-  - we allow DIRTY_MEMORY_CODE when TCG is enabled
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License version 2 as published by the Free Software Foundation.
 
-We expand the comment to explain that kernel based vhost has specific
-support for migration tracking.
+Could you please change "version 2" into "verion 2.1" ? There never was
+a "version 2" of the LGPL, only version 2.1 (or 3.x).
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+(I know, we still got these wrong in a lot of other files, but at least
+we should try to get it right in new files..)
 
----
-v2
-  - drop enum, add trace_vhost_reject_section
-  - return false at any fail point
-  - unconditionally add DIRTY_MEMORY_CODE to handled cases
-  - slightly re-word the explanatory comment and commit message
----
- hw/virtio/vhost.c      | 55 ++++++++++++++++++++++++++++++------------
- hw/virtio/trace-events |  3 ++-
- 2 files changed, 41 insertions(+), 17 deletions(-)
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + */
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index aff98a0ede5..120c0cc747b 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -27,6 +27,7 @@
- #include "migration/blocker.h"
- #include "migration/qemu-file-types.h"
- #include "sysemu/dma.h"
-+#include "sysemu/tcg.h"
- #include "trace.h"
- 
- /* enabled until disconnected backend stabilizes */
-@@ -403,26 +404,48 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-     return r;
- }
- 
-+/*
-+ * vhost_section: identify sections needed for vhost access
-+ *
-+ * We only care about RAM sections here (where virtqueue can live). If
-+ * we find one we still allow the backend to potentially filter it out
-+ * of our list.
-+ */
- static bool vhost_section(struct vhost_dev *dev, MemoryRegionSection *section)
- {
--    bool result;
--    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
--                     ~(1 << DIRTY_MEMORY_MIGRATION);
--    result = memory_region_is_ram(section->mr) &&
--        !memory_region_is_rom(section->mr);
--
--    /* Vhost doesn't handle any block which is doing dirty-tracking other
--     * than migration; this typically fires on VGA areas.
--     */
--    result &= !log_dirty;
-+    MemoryRegion *mr = section->mr;
-+
-+    if (memory_region_is_ram(mr) && !memory_region_is_rom(mr)) {
-+        uint8_t dirty_mask = memory_region_get_dirty_log_mask(mr);
-+        uint8_t handled_dirty;
-+
-+        /*
-+         * Kernel based vhost doesn't handle any block which is doing
-+         * dirty-tracking other than migration for which it has
-+         * specific logging support. However for TCG the kernel never
-+         * gets involved anyway so we can also ignore it's
-+         * self-modiying code detection flags.
-+         */
-+        handled_dirty = (1 << DIRTY_MEMORY_MIGRATION);
-+        handled_dirty |= (1 << DIRTY_MEMORY_CODE);
- 
--    if (result && dev->vhost_ops->vhost_backend_mem_section_filter) {
--        result &=
--            dev->vhost_ops->vhost_backend_mem_section_filter(dev, section);
--    }
-+        if (dirty_mask & ~handled_dirty) {
-+            trace_vhost_reject_section(mr->name, 1);
-+            return false;
-+        }
-+
-+        if (dev->vhost_ops->vhost_backend_mem_section_filter &&
-+            !dev->vhost_ops->vhost_backend_mem_section_filter(dev, section)) {
-+            trace_vhost_reject_section(mr->name, 2);
-+            return false;
-+        }
- 
--    trace_vhost_section(section->mr->name, result);
--    return result;
-+        trace_vhost_section(mr->name);
-+        return true;
-+    } else {
-+        trace_vhost_reject_section(mr->name, 3);
-+        return false;
-+    }
- }
- 
- static void vhost_begin(MemoryListener *listener)
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 84ecb85d445..22427126b97 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -5,7 +5,8 @@ vhost_commit(bool started, bool changed) "Started: %d Changed: %d"
- vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
- vhost_region_add_section_merge(const char *name, uint64_t new_size, uint64_t gpa, uint64_t owr) "%s: size: 0x%"PRIx64 " gpa: 0x%"PRIx64 " owr: 0x%"PRIx64
- vhost_region_add_section_aligned(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
--vhost_section(const char *name, int r) "%s:%d"
-+vhost_section(const char *name) "%s"
-+vhost_reject_section(const char *name, int d) "%s:%d"
- vhost_iotlb_miss(void *dev, int step) "%p step %d"
- 
- # vhost-user.c
--- 
-2.20.1
+> diff --git a/tests/qtest/libqos/vhost-user-blk.h b/tests/qtest/libqos/vhost-user-blk.h
+> new file mode 100644
+> index 0000000000..ef4ef09cca
+> --- /dev/null
+> +++ b/tests/qtest/libqos/vhost-user-blk.h
+> @@ -0,0 +1,44 @@
+> +/*
+> + * libqos driver framework
+> + *
+> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License version 2 as published by the Free Software Foundation.
+
+dito.
+
+ Thanks,
+  Thomas
 
 
