@@ -1,129 +1,119 @@
 Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Level: **
+X-Spam-Status: No, score=2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13503C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DAF9206DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6ABB206DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:55:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aq9YONpV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAF9206DC
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="GOo+EblM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6ABB206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgkg9-0007LU-KL
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 03:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46256)
+	id 1jgkiS-0000ZI-1z
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 03:55:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jgkfZ-0006qP-7N; Thu, 04 Jun 2020 03:52:09 -0400
-Received: from mail-eopbgr50139.outbound.protection.outlook.com
- ([40.107.5.139]:9027 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jgkhg-0008TS-2k; Thu, 04 Jun 2020 03:54:20 -0400
+Received: from mail-eopbgr60104.outbound.protection.outlook.com
+ ([40.107.6.104]:26691 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jgkfX-0006Zq-36; Thu, 04 Jun 2020 03:52:07 -0400
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jgkhe-00070l-IT; Thu, 04 Jun 2020 03:54:19 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ODkRuXAvjqlR1JIIe01RZCsH3JjQVlGkESWzsSzHM2S28RCphDGs+Aa6cZ4NZS5GY+mIfELXHyQ8cGmwt0ZVWHe4DMvGEW9di0eucQGgj+zKlUaPBCbyHZH0h42W9gMIq3IYDbcY+nvXkWwoKJK/lIMz0KFhdE0YGUBRb3NEDvECs5topXz3rTg78PX6cI8X8aIOrGCn+4b3MRxGjCX4jCFGeM8kmUCLRWUrbOq9rodTIlrPqFAYLfOYWciwU64wJQXWRpDioC2urdy4N+J0LIlQ6uqK48FbkKULtFEQ1yQCJuJi1WOMNjCSKuGfT0+iEMwJORnaK5vn7j0kJ7mV5Q==
+ b=Uhu/XK52ReOxgZEtFq6QDFjxq6xkUEiXnq+pKCNbSadhjw4qHwCLY8vnc//optWhkBpNuLDVUOdcl9L36svASiWVfTmaMdjseaupMJn0Awh6bhrKQ1XeN4HquvjxtyjYaMKVWpw18PGj0dvKuIBYtisXA8e/bbfCViHrgTw8GqnSJ+OYLSVvmD2QkPewQ+abUqOK1QThFGw2SPpkJuFujLkQ3BkGGFsS0DYHNxLFBlxrHclb1bJwzttrhzi9ucmfVZQPjlEqimvVouZ/kGJh6OkquAxzCh7gOQfv3g5s0pwPWKFGxUEHOsXUFwCnDov97GNfbESFS3jg39m2N+U7AA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZV85FPsBlOIa7irfSrQrkkIu2z/C0LrG3OGxsICwulA=;
- b=kO4aRn7eunLl6ut5oRg8M4dWK7WJyBmwFwRJbBzuVKNRz2uY1Zs9JsKSR+vVaX+Fx7xIJ23PPGwmnVnDm6uh1t0cxGLxXvb8wv1a96ibD+Agr6fNNcH553a4KajirGKLnT2H0Qdrt6svsx0yIvGZz4GXN41T9kWW85CX3HmX4wIgGNDfKNgZyvrj6IeUoZeE4xFG7i9e8BvX2xZiTeRUYFaQjqFjrKiC/2w4LkEFtQe5cOwEzIU/X0VdnZHxYdcAU7yR1OPJ4aPJd5qUWHz5DYE6iyBhpm95Rd/zgInRu83s/DxgxcuUNv6w5SDxTy1gvjV5+AKsOi0bkVsE+98ucQ==
+ bh=/VlvT0hH3+iNmtzOytnGwCzosE0k1YjNPqtYcWTe/vw=;
+ b=IE8Pt/Qhyoig9FpTTpM2pLyYlsYqNI7hFIyiWZ3bLYU8x0d+B4P0hIvUAiN3BW7QBa192jA9xaw+PpkZ3dWe6byiR4djElGQT3yYJjMlnC6Uo3xXOahyf7mXdfaYiTw4ru7kEVOl8i+W1bc64c7wqdC9PBb+nWCodi+yswPAsCqDSQY3XLn9FDsTheQu7U7tpazBwC5eTnx/ctUAep1CyaVbkIHgJVve6pY74nFV+21Zj6SVck2i7wkH5JSZRmV/x/woSDL/uIxgOMXOvk9I+vOrrwCeZWwT6exPNZUuzefyocBUDkjduSgEkH/ghCSWBI+tcvBO/MF9RdL9XckSBA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZV85FPsBlOIa7irfSrQrkkIu2z/C0LrG3OGxsICwulA=;
- b=aq9YONpVVDksHi8rUYzKPUVFmXcbtedZsPkegxoV1OuO9CUQfiF4X7JvWIXxsKk2XtySntjgyaSdoVxe5fozAABeYuKIG99iIQb9QwqLT0tB26TIe6qjfT6oCSSodRLPwqQUGwErSe1vz6HQLBPU3Oef2/AhphEZ5igNivAUyaM=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5413.eurprd08.prod.outlook.com (2603:10a6:20b:10a::18)
+ bh=/VlvT0hH3+iNmtzOytnGwCzosE0k1YjNPqtYcWTe/vw=;
+ b=GOo+EblMjLjWHCdeM6XSWAX/tOYz6Cz5bvXNQjtIFu/rdoDdj3gzABHdJSuJyqkPDnMtgI+W2ZwGTYGQMmAxLQJvQoWymGKYS+Eo4KLevcBykrz3llnaiJKrBiqWyWNtK/Sx8YOCre6/V8td0ztDJ4LOVuKGU3Wy4Cvzi19p2GU=
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB4359.eurprd08.prod.outlook.com (2603:10a6:20b:b9::12)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Thu, 4 Jun
- 2020 07:52:02 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.018; Thu, 4 Jun 2020
- 07:52:02 +0000
-Subject: Re: [PATCH v4 4/6] iotests: 194: test also migration of dirty bitmap
-To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
-References: <20200521220648.3255-1-vsementsov@virtuozzo.com>
- <20200521220648.3255-5-vsementsov@virtuozzo.com>
- <8954b780-614c-421a-cca3-992f68d24812@redhat.com>
- <93c99c0a-2c79-c62f-4c38-50c5c23ea4eb@virtuozzo.com>
- <7a9d8094-574f-5622-0624-37982181d0a6@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ee39000a-8a35-04af-8e38-c6aeff59dbd6@virtuozzo.com>
-Date: Thu, 4 Jun 2020 10:51:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <7a9d8094-574f-5622-0624-37982181d0a6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ 2020 07:54:12 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae%3]) with mapi id 15.20.3066.018; Thu, 4 Jun 2020
+ 07:54:12 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metadata
+Thread-Topic: [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metadata
+Thread-Index: AQHWOBtRrDpZTXfVsU+t0QZof/ObYajETAmAgAPNnB0=
+Date: Thu, 4 Jun 2020 07:54:12 +0000
+Message-ID: <AM6PR08MB4070E6ECEBD6B855A92313E0F4890@AM6PR08MB4070.eurprd08.prod.outlook.com>
+References: <1591019293-211155-1-git-send-email-andrey.shinkevich@virtuozzo.com>,
+ <0df8d1a7-6f72-48a2-0433-cdf1c5e97492@redhat.com>
+In-Reply-To: <0df8d1a7-6f72-48a2-0433-cdf1c5e97492@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR10CA0034.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.190) by
- AM0PR10CA0034.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18 via Frontend
- Transport; Thu, 4 Jun 2020 07:52:01 +0000
-X-Originating-IP: [185.215.60.190]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 23735413-1552-46e9-94f3-08d8085c2a93
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5413:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5413D775F5E28CB44A3E8C69C1890@AM7PR08MB5413.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
-X-Forefront-PRVS: 04244E0DC5
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wiZMfJEXaM26NU7GCIIQYPBvYR6RuvGHl2ucUY0qby5bIADT31D+Irex6Bu0bW1SZYa68z1HJmfIc9zHYmgDIewdDqUBVaGhTqdZTKvxEhnJ6MPh7FdsNp8+fqj6zpZx+NXh6VcG07xRRIjM4yP2zubYfuHF4hf1r+YoN2r9oHiInZORceB6Li0fS/wR597paSfe3vlaS3Tysy5nhe773rKyRXjIeur0Juw6IpzbEPLekEXhtXU3XxbyzcIUZH/MRtwi0FnyCWvEGM3PBo7QGcprYSrgrSK+xaaEO1migDDHgNaYSjfzjWthNkGiHGlC+fe07RQBcDHCDkwsgRMbMdBRTivC07f9Raqglnb+VJhzRVtHKM8oQAoeau4UI4pb99lZggnWomXDzbixmzl/lLEQ/ECT0OmUapOtj0uAfVQw/63RtJBPysoKj65SDRBxR6IVdRxtm6OKSYRw1E/ysJjR2G+2h1CTKFnrbKaooBY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+x-originating-ip: [176.59.39.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 21d7dc99-d67b-4262-1bbd-08d8085c7899
+x-ms-traffictypediagnostic: AM6PR08MB4359:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB4359C90CB70A3C032FB69BC9F4890@AM6PR08MB4359.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 04244E0DC5
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5R2PSkIoi4LH0joJm9xC/g+pmERFPiYGWp95m/CPCvUYJAbjpH69h0v++Yjx5KXUyd4IHbCbpoWctQbH8mt0n61yJqjucmy/fpDuBXl6YYRTv8ecDK5Kdx2Yc/A7c1NtnhZ7EQwA1xGs70XiHeADnBdRcam4ebfvlKqM70vnMRDtIlTYJvM2sXCYHypv6/zthXz8krAfnMZjd54J3Ml39Nw90NwzPQXOmoIUPuNJnh27Ti6IrkZScejhxgLKrC6/b/W9Evez9WBMrQzeD4WaUp2+HvMEnpbIAr0e/C0I/NKCG402NFqUvrknZ/rsFvrruhsckNO06zBpcRd0cNdTx82WgVmb5jDz62+xXTmSWLMw5Nr1Jq9XseBcymk/2Fth
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(346002)(136003)(376002)(366004)(39840400004)(396003)(186003)(7416002)(966005)(52116002)(6486002)(478600001)(4326008)(2906002)(316002)(16576012)(5660300002)(36756003)(86362001)(83380400001)(31696002)(26005)(66556008)(16526019)(66946007)(31686004)(2616005)(8936002)(8676002)(956004)(66476007)(14143004)(43740500002);
+ SFS:(4636009)(366004)(396003)(346002)(39840400004)(136003)(376002)(83380400001)(53546011)(110136005)(107886003)(2906002)(44832011)(316002)(186003)(26005)(4326008)(52536014)(5660300002)(71200400001)(7696005)(9686003)(33656002)(54906003)(478600001)(66446008)(86362001)(6506007)(76116006)(55016002)(91956017)(66556008)(8676002)(64756008)(8936002)(66476007)(66946007)(14143004);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: x/eUei/eaPFgD42L0NnuQx1XOQrcP5O1tZbrR7aOA4WOvG4pplmHGvedZnk3DgtWFpA3FVSnp9wXegxco6d867ZBZgzlTx2/5pu21+bcR7WiA7/nbIP0W3HLit2FhBV4usMGHQZYlH5LiQBnO5EaZycFAUvs2pZWiF1pVJU/woYjf+ALy6uMFYPeO7vDJz5+fXZcEClapG566ynRhIu+PUH50CWjVZaYKJFEDHDo/XwpHmMvNY5TM2A1vO8W/N/rxi7WK/+KvP5qLausuhqyWKWHqG/mjW/LgiHZsK7Pw7+dHJYt6fSgVschfjRkP7EqxbciK0qFdIAttNc0the0To4n67I1bBQ3xEX0dDwdVd7rXN6GBWQ1y0c0eHqQ04dOTFvm9QUAnKvf34q+st9bIUYqbpWR8pFS6yTaeiXWOhz3xT/dmQ76ReTdsgSPi77Y6rIaAnKqdJfe5A5fpnY7dxQO2JJ1Oom/YrPJQ/b8RUsOHvgKfX6D3TwNM8l45ZhT
+x-ms-exchange-antispam-messagedata: +o4Af6ycKiGW2LdYlNfVGdsuay28Isn5L23Dh+tFZvQJ4WV61G0OceiwaUBRF+x4HOhyhcISMHScMMNyg2A1Hb7DhmF7q4Yt2KfJjz0Knj6GErzo0WGbCP51v9WVFy3xJOzTUP3eUEEdXXATjnYIWcuLKi7DsChj/kPa+g+0iV+QjuetQBtOgXODFgi0Xy1KufM/2N2JPlnWE3bdSF26w9VpfKbDlTEHxDac9s7YN/IW/gIbrSFPb1FcVXztWX7qvppT0CMFXTqD2qAtVpJZ1QMRxKQdO7ZVDT9WFE6Ow3Sosu+ffHpyz0y/DqqHN3VjTQZjr8LK0WYtQnnQ9FhWxZIrdxgYZZbw013HtSxMfJM3gTbjeMJAzdPw6oUdaNkIDKWMgLWFgn9yazY216iYDyVp9Emta0lmXdg96/HmDAEheokqi5fgXOG1OCeG23xu6Lg4THaDWjsnld+4stbKgnz39C+bQrp4eXnqKD3gc7Q=
+Content-Type: multipart/alternative;
+ boundary="_000_AM6PR08MB4070E6ECEBD6B855A92313E0F4890AM6PR08MB4070eurp_"
+MIME-Version: 1.0
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23735413-1552-46e9-94f3-08d8085c2a93
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2020 07:52:01.9533 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QxVPpcw/yNuJDqW2SsUjjX8HmOUL0kJVjRChxDBFmqpm3OZd+pAbA8I0lSI7TyXK2VTTz5FXQ/VDQKlwfCh466NebJRb/Q09ioAK5dG0D9o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5413
-Received-SPF: pass client-ip=40.107.5.139;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 03:52:03
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21d7dc99-d67b-4262-1bbd-08d8085c7899
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2020 07:54:12.4969 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Csu0BGt3tFTypIVhbjlikOICX/WwHjcP//vCQUFJV+jZvSX5QMVR5Ct+kDGxDfG969KQ6Hq5+0A8VLkbt7DEGIiO2aCYY9L0H6ORtuNsWYY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4359
+Received-SPF: pass client-ip=40.107.6.104;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 03:54:14
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 5
-X-Spam_score: 0.5
-X-Spam_bar: /
-X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, RCVD_IN_SBL_CSS=3.335,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,68 +126,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com,
- dgilbert@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-04.06.2020 10:21, Thomas Huth wrote:
-> On 03/06/2020 10.06, Vladimir Sementsov-Ogievskiy wrote:
->> 03.06.2020 10:52, Thomas Huth wrote:
->>> On 22/05/2020 00.06, Vladimir Sementsov-Ogievskiy wrote:
->>>> Test that dirty bitmap migration works when we deal with mirror.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>> ---
->>>>    tests/qemu-iotests/194     | 14 ++++++++++----
->>>>    tests/qemu-iotests/194.out |  6 ++++++
->>>>    2 files changed, 16 insertions(+), 4 deletions(-)
->>>
->>>    Hi!
->>>
->>> This test broke the iotest in the gitlab CI:
->>>
->>>    https://gitlab.com/huth/qemu/-/jobs/578520599#L3780
->>>
->>> it works again when I revert this commit.
->>>
->>> Could the test be reworked so that it works in CI pipelines, too?
->>> Otherwise, I think it's best if we disable it in the .gitlab-ci.yml
->>> file...
-> [...]
->> - Qemu aborted. Not good. Definitely is better to fix it than just
->> exclude the test.. I can't reproduce. Could you provide backtrace from
->> coredump?
-> 
-> It aborted in block/dirty-bitmap.c, line 295, that's the
-> "assert(!bdrv_dirty_bitmap_busy(bitmap));" if I got it right.
-> 
-> Full backtrace here:
-> 
->   https://gitlab.com/huth/qemu/-/jobs/580553686#L3638
-> 
+--_000_AM6PR08MB4070E6ECEBD6B855A92313E0F4890AM6PR08MB4070eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Aha, missed it, thanks.
+Thank you very much dear colleagues for your collaboration. Your reviews co=
+mments are well noted.
 
-Hm. in 194 iotest we wait for migration finish on source, but not on target. I can assume, that in your setup target shutdown occurs earlier than migration finish, so we have busy bitmap on shutdown.
-It's known bug (at least for me :), patch is in list:
-[PATCH v2 00/22] Fix error handling during bitmap postcopy
-   [..]
-   [PATCH v2 10/22] migration/block-dirty-bitmap: cancel migration on shutdown  (https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04288.html)
-      If target is turned of prior to postcopy finished, target crashes
-      because busy bitmaps are found at shutdown.
-      Canceling incoming migration helps, as it removes all unfinished (and
-      therefore busy) bitmaps.
-   [..]
+Andrey
+
+________________________________
+From: Eric Blake <eblake@redhat.com>
+Sent: Tuesday, June 2, 2020 12:46 AM
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>; qemu-block@nongnu.=
+org <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; kwolf@redhat.com <kwolf@=
+redhat.com>; mreitz@redhat.com <mreitz@redhat.com>; Denis Lunev <den@virtuo=
+zzo.com>; Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metadata
+
+On 6/1/20 8:48 AM, Andrey Shinkevich wrote:
+> Add dirty bitmap information to QCOW2 metadata dump in qcow2.py script.
+>
+> v3:
+>    01: JSON format output possibility added.
+
+Also, you split it into a series.  Thanks; this makes it easier to
+review each step :)
+
+>
+> v2:
+>    01: Refactoring of the Python code in the script qcow2.py.
+>        New methods were added. The bitmap dictionary was instantiated.
+>        The all of bitmaps information is read completely before
+>        printing the dictionary.
+>    02: The outputs of the tests 031, 036 and 061 were modified.
+>
+> Andrey Shinkevich (6):
+>    iotests: Add extension names to qcow2.py dump
+>    iotests: move check for printable data to QcowHeaderExtension class
+>    iotests: dump bitmap extension data with qcow2.py
+>    iotests: Dump bitmap directory info with qcow2.py
+>    iotests: Dump bitmap table entries serialized in QCOW2 image
+>    iotests: Dump QCOW2 image metadata in JSON format with qcow2.py
+>
+>   tests/qemu-iotests/031.out  |  22 +--
+>   tests/qemu-iotests/036.out  |   4 +-
+>   tests/qemu-iotests/061.out  |  18 +--
+>   tests/qemu-iotests/qcow2.py | 338 +++++++++++++++++++++++++++++++++++++=
++++++--
+>   4 files changed, 346 insertions(+), 36 deletions(-)
+>
+
+--
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-Still, of course iotest 194 should be fixed too, to wait for migration finish on target too, I'll send a patch.
+--_000_AM6PR08MB4070E6ECEBD6B855A92313E0F4890AM6PR08MB4070eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Vladimir
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+<div>Thank you very much dear colleagues for your collaboration. Your revie=
+ws comments are well noted.</div>
+<div><br>
+</div>
+<div>Andrey&nbsp;</div>
+<div><br>
+</div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Eric Blake &lt;eblake=
+@redhat.com&gt;<br>
+<b>Sent:</b> Tuesday, June 2, 2020 12:46 AM<br>
+<b>To:</b> Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;; qemu-=
+block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
+<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; kwolf@redha=
+t.com &lt;kwolf@redhat.com&gt;; mreitz@redhat.com &lt;mreitz@redhat.com&gt;=
+; Denis Lunev &lt;den@virtuozzo.com&gt;; Vladimir Sementsov-Ogievskiy &lt;v=
+sementsov@virtuozzo.com&gt;<br>
+<b>Subject:</b> Re: [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metada=
+ta</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
+">
+<div class=3D"PlainText">On 6/1/20 8:48 AM, Andrey Shinkevich wrote:<br>
+&gt; Add dirty bitmap information to QCOW2 metadata dump in qcow2.py script=
+.<br>
+&gt; <br>
+&gt; v3:<br>
+&gt;&nbsp;&nbsp;&nbsp; 01: JSON format output possibility added.<br>
+<br>
+Also, you split it into a series.&nbsp; Thanks; this makes it easier to <br=
+>
+review each step :)<br>
+<br>
+&gt; <br>
+&gt; v2:<br>
+&gt;&nbsp;&nbsp;&nbsp; 01: Refactoring of the Python code in the script qco=
+w2.py.<br>
+&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; New methods were added. The =
+bitmap dictionary was instantiated.<br>
+&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The all of bitmaps informati=
+on is read completely before<br>
+&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printing the dictionary.<br>
+&gt;&nbsp;&nbsp;&nbsp; 02: The outputs of the tests 031, 036 and 061 were m=
+odified.<br>
+&gt; <br>
+&gt; Andrey Shinkevich (6):<br>
+&gt;&nbsp;&nbsp;&nbsp; iotests: Add extension names to qcow2.py dump<br>
+&gt;&nbsp;&nbsp;&nbsp; iotests: move check for printable data to QcowHeader=
+Extension class<br>
+&gt;&nbsp;&nbsp;&nbsp; iotests: dump bitmap extension data with qcow2.py<br=
+>
+&gt;&nbsp;&nbsp;&nbsp; iotests: Dump bitmap directory info with qcow2.py<br=
+>
+&gt;&nbsp;&nbsp;&nbsp; iotests: Dump bitmap table entries serialized in QCO=
+W2 image<br>
+&gt;&nbsp;&nbsp;&nbsp; iotests: Dump QCOW2 image metadata in JSON format wi=
+th qcow2.py<br>
+&gt; <br>
+&gt;&nbsp;&nbsp; tests/qemu-iotests/031.out&nbsp; |&nbsp; 22 &#43;--<br>
+&gt;&nbsp;&nbsp; tests/qemu-iotests/036.out&nbsp; |&nbsp;&nbsp; 4 &#43;-<br=
+>
+&gt;&nbsp;&nbsp; tests/qemu-iotests/061.out&nbsp; |&nbsp; 18 &#43;--<br>
+&gt;&nbsp;&nbsp; tests/qemu-iotests/qcow2.py | 338 &#43;&#43;&#43;&#43;&#43=
+;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43=
+;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43=
+;&#43;&#43;&#43;&#43;&#43;&#43;&#43;--<br>
+&gt;&nbsp;&nbsp; 4 files changed, 346 insertions(&#43;), 36 deletions(-)<br=
+>
+&gt; <br>
+<br>
+-- <br>
+Eric Blake, Principal Software Engineer<br>
+Red Hat, Inc.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &=
+#43;1-919-301-3226<br>
+Virtualization:&nbsp; qemu.org | libvirt.org<br>
+<br>
+</div>
+</span></font></div>
+</body>
+</html>
+
+--_000_AM6PR08MB4070E6ECEBD6B855A92313E0F4890AM6PR08MB4070eurp_--
 
