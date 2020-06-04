@@ -2,81 +2,77 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B70F1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7803B206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 810A8206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:31:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftPloolK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7803B206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HlxscARC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 810A8206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgoug-0008Nn-P7
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50600)
+	id 1jgp1w-0003Fp-Md
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:31:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgots-0007SL-FJ
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:23:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30719
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jgp0G-0001ka-B2
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:29:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60547
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgotq-0005VE-R2
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:23:11 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jgp0F-0007DY-6W
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:29:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591273389;
+ s=mimecast20190719; t=1591273785;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xCVsOTyTmjwn1r1Pw3WS6t99ZT1GUWyeg/bdaIy3FhA=;
- b=ftPloolK18G6E5XNtObH58LApojBMPWdRm3eOklCRiUvlgV0nOGWGNHd7pIFt7zHdoDpT/
- 8PbJocqpLAmxB2PE3cdtjzSHJ+tSnaglfEJV+lvrw1dUbp9lYZTTV6tpwF7Ga4OldVnI79
- EzpOiQ0m4+yi1eqy3VLj0/rcNRyNPsE=
+ bh=s6zMEklvSraw6zjb6Wbefent434IoyEk2nOCGJvKIM0=;
+ b=HlxscARCwgk9aEBRmq5oBBI+M3kSF8Xhq4GGim5QhGiLpFD5Zc6CvwnVkXbPotwe47+q8P
+ fjMbCzecG6HIGrt2fb888iVkQDMC6qN09l7JSrH98e5luHHmOsRsM+juZqyStEkKWjNm+c
+ IV3Sj3U5h1skqbjj0H21jT2ebc3cY2o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-phIqliCWPzqaaNaKV37cVQ-1; Thu, 04 Jun 2020 08:23:08 -0400
-X-MC-Unique: phIqliCWPzqaaNaKV37cVQ-1
+ us-mta-458-5cAX0A7MPc2ggWhn4eKxoQ-1; Thu, 04 Jun 2020 08:29:43 -0400
+X-MC-Unique: 5cAX0A7MPc2ggWhn4eKxoQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64197100B79E;
- Thu,  4 Jun 2020 12:23:06 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F25B07CCC1;
- Thu,  4 Jun 2020 12:22:51 +0000 (UTC)
-Subject: Re: [PATCH] numa: forbid '-numa node, mem' for 5.1 and newer machine
- types
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200602084151.480567-1-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5a4a1b6b-694c-6814-2ab8-93ba6eaa4b2e@redhat.com>
-Date: Thu, 4 Jun 2020 07:22:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAE8F18A8229;
+ Thu,  4 Jun 2020 12:29:41 +0000 (UTC)
+Received: from gondolin (ovpn-112-76.ams2.redhat.com [10.36.112.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 249D3707B1;
+ Thu,  4 Jun 2020 12:29:36 +0000 (UTC)
+Date: Thu, 4 Jun 2020 14:29:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 0/7] exec/cpu: Cleanups around "exec/hwaddr.h"
+ (reserved to system-mode)
+Message-ID: <20200604142934.20925f34.cohuck@redhat.com>
+In-Reply-To: <20200526172427.17460-1-f4bug@amsat.org>
+References: <20200526172427.17460-1-f4bug@amsat.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200602084151.480567-1-imammedo@redhat.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,37 +93,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
- libvir-list@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/2/20 3:41 AM, Igor Mammedov wrote:
-> Deprecation period is run out and it's a time to flip the switch
-> introduced by cd5ff8333a.  Disable legacy option for new machine
-> types (since 5.1) and amend documentation.
-> 
-> '-numa node,memdev' shall be used instead of disabled option
-> with new machine types.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->   - rebased on top of current master
->   - move compat mode from 4.2 to 5.0
-> 
+On Tue, 26 May 2020 19:24:20 +0200
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
->   docs/system/deprecated.rst | 17 -----------------
+> The 'hwaddr' type declared in "exec/hwaddr.h" is meant for
+> system-mode emulation only.
+> This series is a preparatory cleanup to allow later poisoning
+> it in user-mode code.
+>=20
+> Missing review: patche 7
+> - target/s390x: Restrict system-mode declarations
+>=20
+> Maybe PPC/S390X maintainers can take their patches and let
+> the rest to Paolo, or he can take all the series. They are
+> not dependents.
 
-Lately, when we remove something, we've been moving the documentation 
-from 'will be deprecated' to a later section of the document 'has been 
-removed', so that the history is not lost.  But this diffstat says you 
-just deleted, rather than moved, that hunk.
+(...)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>   target/s390x: Only compile decode_basedisp() on system-mode
+>   target/s390x/helper: Clean ifdef'ry
+>   target/s390x: Restrict system-mode declarations
+
+(...)
+
+Ok, I went ahead and queued patches 5-7 to s390-next.
 
 
