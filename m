@@ -2,88 +2,86 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C37C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:59:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87FBE2075B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D65BA2075B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:59:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZE3Kn9Qw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87FBE2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvEtvVhp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D65BA2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgnXq-0004Uy-Oj
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:56:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39122)
+	id 1jgnaT-0006Os-4R
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:59:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <erik.lucas.smit@gmail.com>)
- id 1jgnWP-00034E-VM; Thu, 04 Jun 2020 06:54:53 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43841)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <erik.lucas.smit@gmail.com>)
- id 1jgnWO-0002Pf-UV; Thu, 04 Jun 2020 06:54:53 -0400
-Received: by mail-oi1-x243.google.com with SMTP id j189so4655452oih.10;
- Thu, 04 Jun 2020 03:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=SWXZ5ULvx5RiZpH9RT5nB6Ol1XPXt8/7tRPhi1veAFM=;
- b=ZE3Kn9QwGWXwjhO0uIkW3XvYZNu/ayyIRPmDZpjZEuG+j7/pUB8C66S3FBUH182/Da
- 71BU1WW2rGtTgjAozXr3ohGrqLOy7x9tp65QZ4uT0NwrGtSDuY1zPXjqo5CPRIwgr176
- 2S1oUek+gpjtxXn7vShi3Wn+h5UCrZV2sLSjGAuAO3eQln0CWgNJ1mDQkkilYAigxS6N
- JJGu7e1a3alkbuz5suDRfwPtdPLEf/4Lr/3Zw1mDvrmF6Ch/I9+Qfn+iFu1pvzRGHb/T
- +bRE8imm5Zb4bZ8oJo8XQOIs25COtD0BxZcD3LQeMwbKP0OtpqHalCEBBiSSN0hLjsI0
- RvAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SWXZ5ULvx5RiZpH9RT5nB6Ol1XPXt8/7tRPhi1veAFM=;
- b=uYmzFYPuZfwJQ6vy4NZ8lstmdL+BD8rz6CLnC6FXvrUXO83i+ynjuvzBnbRgwd/6+Q
- SnDYTIqeWRbOAkr2BQWCCMpeg47sUYo7dN833cDo2RmCItGbiFKQj1snCEqIEBKUhVmC
- UeRcikceLmYmmAb6vv97iNQOHemqFKg6M1KcljYrUMW52qVcalz52lTEH1gGdHDXfT/B
- 52Drqcuvp1ohiVQ3KGej9xJ9mO/Whdv7evFJMxnmb7Pg+KPYa59P3NJldy/Ka2PQKO7Y
- ui5vz0D8vKAm/yQZAkP1s+t1Rc0DGl3PasclL7/apJwnxn6Wcyn4U3zDRwhsoz48A1KB
- Y2Kw==
-X-Gm-Message-State: AOAM530ASzu0Q3tfPMz5MIQUyAS+sHlUI65UOBCVa6M0L8YO7t5/fAjS
- hRqIyBPzEhl3CDtiQPZsIiJPN/nHn3he/ZtVAGs=
-X-Google-Smtp-Source: ABdhPJy4sON0EMrWauQLHMt06m33TjXNPa9FbtkcK/HXVkWeym7pj2HkJgk2bb+XU//2n4yfP0Eycf9lQcDEkjTShZo=
-X-Received: by 2002:a05:6808:ab0:: with SMTP id
- r16mr2733069oij.24.1591268090545; 
- Thu, 04 Jun 2020 03:54:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jgnZb-0005rp-IH
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:58:11 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52738
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jgnZa-0003Kc-OG
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:58:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591268290;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=x61v8BL2rn2n2NvMG5XCrSCx80JZbq2ZYsYCyAZBfTY=;
+ b=YvEtvVhp6N6ILydm6aQaBSOHm9Te6qc9/4p4+s9lEw08UtFEZtygb8I3wBKf2eba1xWnw3
+ HWkVTvPvRN0252R5GET1Jsb3o8b/2sTeo5ES6o45Syn3roX+WVjchFORxcf+DA7/MveI4R
+ icSbo0viVlZenSCXI0aYxPt7RTuooZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-Zt5yf4k6P1CegT4HMYCyNA-1; Thu, 04 Jun 2020 06:58:08 -0400
+X-MC-Unique: Zt5yf4k6P1CegT4HMYCyNA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E8B91800D42
+ for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 10:58:07 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 037AF5C48E;
+ Thu,  4 Jun 2020 10:57:59 +0000 (UTC)
+Date: Thu, 4 Jun 2020 12:57:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [PATCH] hw/pci/pcie: Move hot plug capability check to pre_plug
+ callback
+Message-ID: <20200604125755.12944ac4@redhat.com>
+In-Reply-To: <20200601162934.842648-1-jusual@redhat.com>
+References: <20200601162934.842648-1-jusual@redhat.com>
 MIME-Version: 1.0
-References: <CA+MHfov0TVbwjy8g_cHVa6Y-bMowCbsGLdt8uUhmcns0v_eVLw@mail.gmail.com>
- <70cece8e-1caf-1387-25e7-971783817cc8@kaod.org>
-In-Reply-To: <70cece8e-1caf-1387-25e7-971783817cc8@kaod.org>
-From: Erik Smit <erik.lucas.smit@gmail.com>
-Date: Thu, 4 Jun 2020 12:54:39 +0200
-Message-ID: <CA+MHfovyMCjqwJ+G3XyRvr5fO60sGff7bwYqSa7a=mFo8CYoSw@mail.gmail.com>
-Subject: Re: [PATCH] ftgmac100: Implement variable descriptor size
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=erik.lucas.smit@gmail.com; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,173 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 10:16, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> On 6/2/20 6:47 PM, Erik Smit wrote:
-> > The hardware supports variable descriptor sizes, configured with the DB=
-LAC
-> > register.
->
-> yes.
->
-> The DBLAC default value is 0x00022F00 on AST2400 and 0x00022500 on AST250=
-0
-> and AST2600. The current reset handler needs a little fix btw.
->
-> This sets the TX and RX descriptor default size to 4 words (2 * 8bytes).
->
-> > Most drivers use the default 2*8, which is currently hardcoded in qemu,=
- but
-> > the implementation of the driver in Supermicro BMC SMT_X11_158 uses 4*8=
-.
->
-> The first 4 words are architected but the specs allows the descriptors
-> to be bigger which is what the Aspeed SDK is doing:
->
->         outl( 0x44f97, dev->base_addr + DBLAC_REG );
->
-> It's using 8 words ( 4 * 8bytes) to store some address in the fifth.
-> This is a waste btw.
->
->
-> Thanks for spotting this. I think the patch is correct but we need to
-> clarify a few things.
->
-> > --
-> > The implementation of the driver in Supermicro BMC SMT_X11_158 adds 4 e=
-xtra
-> > 4-bytes entries:
-> > https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/ne=
-t/ftgmac100_26.h#L387-L391
-> >
-> > And sets DBLAC to 0x44f97:
-> > https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/ne=
-t/ftgmac100_26.c#L449
-> >
-> > There's not a lot of public documentation on this hardware, but the
-> > current linux driver shows the meaning of these registers:
-> >
-> > https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/fara=
-day/ftgmac100.c#L280-L281
-> >
-> >         iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX des=
-cs */
-> >                   FTGMAC100_DBLAC_TXDES_SIZE(2) |   /* 2*8 bytes TX des=
-cs */
-> >
-> > Without this patch, networking in SMT_X11_158 does not pass data.
-> >
-> > Signed-off-by: Erik Smit <erik.lucas.smit@gmail.com <mailto:erik.lucas.=
-smit@gmail.com>>
-> > ---
-> >  hw/net/ftgmac100.c | 17 +++++++++++++++--
-> >  1 file changed, 15 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> > index 25ebee7ec2..1640b24b23 100644
-> > --- a/hw/net/ftgmac100.c
-> > +++ b/hw/net/ftgmac100.c
-> > @@ -79,6 +79,19 @@
-> >  #define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
-> >  #define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
-> >
-> > +/*
-> > + * DMA burst length and arbitration control register
-> > + */
-> > +#define FTGMAC100_DBLAC_RXFIFO_LTHR(x)      (((x) >> 0) & 0x7)
-> > +#define FTGMAC100_DBLAC_RXFIFO_HTHR(x)      (((x) >> 3) & 0x7)
-> > +#define FTGMAC100_DBLAC_RX_THR_EN           (1 << 6)
->
-> The above definitions are AST2400 only. We should say so or leave them ou=
-t
-> because the model does not use them any how.
+On Mon,  1 Jun 2020 18:29:34 +0200
+Julia Suvorova <jusual@redhat.com> wrote:
 
-Like so?
+> Check for hot plug capability earlier to avoid removing devices attached
+> during the initialization process.
+> 
+> Run qemu with an unattached drive:
+>   -drive file=$FILE,if=none,id=drive0 \
+>   -device pcie-root-port,id=rp0,slot=3,bus=pcie.0,hotplug=off
+> Hotplug a block device:
+>   device_add virtio-blk-pci,id=blk0,drive=drive0,bus=rp0
+> If hotplug fails on plug_cb, drive0 will be deleted.
+> 
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+> Hard to say if it's a bug or generally acceptable behaviour, but seems like
+> hotplug_handler_plug should never fail.
 
-#define FTGMAC100_DBLAC_RXFIFO_LTHR(x)      (((x) >> 0) & 0x7)  // AST2400-=
-only
-#define FTGMAC100_DBLAC_RXFIFO_HTHR(x)      (((x) >> 3) & 0x7)  // AST2400-=
-only
-#define FTGMAC100_DBLAC_RX_THR_EN           (1 << 6)            // AST2400-=
-only
+_unplug shouldn't fail the rest are allowed to, but it's hard to unwind
+intialization cleanly to _plug stage so if it's possible to do checks
+at _pre_plug time (i.e. before device's realize() is called) we should do so.
 
->
-> > +#define FTGMAC100_DBLAC_RXBURST_SIZE(x)     (((x) >> 8) & 0x3)
-> > +#define FTGMAC100_DBLAC_TXBURST_SIZE(x)     (((x) >> 10) & 0x3)
-> > +#define FTGMAC100_DBLAC_RXDES_SIZE(x)       (((x) >> 12) & 0xf)
-> > +#define FTGMAC100_DBLAC_TXDES_SIZE(x)       (((x) >> 16) & 0xf)
->
-> I would include '* 8' in the {R,T}XDES_SIZE macros
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-Agreed.
+> 
+>  hw/pci/pcie.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index f50e10b8fb..5b9c022d91 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -407,6 +407,17 @@ static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
+>  void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                 Error **errp)
+>  {
+> +    PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
+> +    uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
+> +    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
+> +
+> +    /* Check if hot-plug is disabled on the slot */
+> +    if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
+> +        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
+> +                         DEVICE(hotplug_pdev)->id);
+> +        return;
+> +    }
+> +
+>      pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
+>  }
+>  
+> @@ -415,7 +426,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  {
+>      PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
+>      uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
+> -    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
+>      PCIDevice *pci_dev = PCI_DEVICE(dev);
+>  
+>      /* Don't send event when device is enabled during qemu machine creation:
+> @@ -431,13 +441,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> -    /* Check if hot-plug is disabled on the slot */
+> -    if ((sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
+> -        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
+> -                         DEVICE(hotplug_pdev)->id);
+> -        return;
+> -    }
+> -
+>      /* To enable multifunction hot-plug, we just ensure the function
+>       * 0 added last. When function 0 is added, we set the sltsta and
+>       * inform OS via event notification.
 
-> > +#define FTGMAC100_DBLAC_IFG_CNT(x)          (((x) >> 20) & 0x7)
-> > +#define FTGMAC100_DBLAC_IFG_INC             (1 << 23)
-> > +
-> >  /*
-> >   * PHY control register
-> >   */
-> > @@ -553,7 +566,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint=
-32_t tx_ring,
-> >          if (bd.des0 & s->txdes0_edotr) {
-> >              addr =3D tx_ring;
-> >          } else {
-> > -            addr +=3D sizeof(FTGMAC100Desc);
-> > +            addr +=3D (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac)) * 8;
->
-> and remove the '* 8' here.
-
-Agreed.
-
-> >          }
-> >      }
-> >
-> > @@ -982,7 +995,7 @@ static ssize_t ftgmac100_receive(NetClientState *nc=
-, const uint8_t *buf,
-> >          if (bd.des0 & s->rxdes0_edorr) {
-> >              addr =3D s->rx_ring;
-> >          } else {
-> > -            addr +=3D sizeof(FTGMAC100Desc);
-> > +            addr +=3D (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac)) * 8;
-> >          }
-> >      }
-> >      s->rx_descriptor =3D addr;
->
->
-> and when the DBLAC register is set, we should check the size values to ma=
-ke
-> sure they are not under sizeof(FTGMAC100Desc), in which case we should
-> report an error.
-
-Like so?
-
-    case FTGMAC100_DBLAC: /* DMA Burst Length and Arbitration Control */
-        s->dblac =3D value;
-        if (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc))
-            qemu_log_mask(LOG_GUEST_ERROR, "%s: transmit descriptor
-too small : %d bytes\n",
-                              __func__, FTGMAC100_DBLAC_TXDES_SIZE(s->dblac=
-));
-        if (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc))
-            qemu_log_mask(LOG_GUEST_ERROR, "%s: receive descriptor too
-small : %d bytes\n",
-                              __func__, FTGMAC100_DBLAC_RXDES_SIZE(s->dblac=
-));
-        break;
-
-Also, I've not got experience submitting patches to Qemu. My next step
-would be to respin this patch and resend it to everybody as [PATCH
-v2]?
-
-Best regards,
-
-Erik Smit
 
