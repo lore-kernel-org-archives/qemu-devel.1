@@ -2,91 +2,111 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F26C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 304A2C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA20920738
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE18720738
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 01:54:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ae+NWKiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA20920738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="n6HmCwmb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE18720738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=apple.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgf2s-0006gR-0D
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 21:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41988)
+	id 1jgf5j-0007nS-9f
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 21:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
- id 1jgf21-0006FQ-I6
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:50:57 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:43655)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
- id 1jgf1z-0004kE-V0
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:50:57 -0400
-Received: by mail-qk1-x742.google.com with SMTP id v79so4473848qkb.10
- for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 18:50:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rGE0s6wPpiv3V360U0lLWlWSvw08ZPmcpzSrbnwG/Fg=;
- b=Ae+NWKiHDu/uEAKrOgRWnGPQrDaWYSTqZDYs6UOQwPZhB49RTXBJG3PfSusetr7fSW
- p55adj5TJp75kSv9D5+S/Xybq1JH0jm2xxCJVEkaEpILxSJPK4kf1seUZHntk7G8VNTM
- jqAcROQc5sA4uytZ3LGzBP8T51DkbI8Vt8dRPydFFxUd06P5nAG53NNEEXqoBScXioWC
- QeTBWg250MIL/dHZZm7DeLxFZhX38zT0VuRgW3CwsTnoIcmrCNbzxYmcb8gU4W472EJw
- sAbGbj+AULgOshUcjVylnhMuOq8MdaR9B3wt7nVtvtysvLjgXBN8tnAol6CyN1zePSiZ
- A15Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rGE0s6wPpiv3V360U0lLWlWSvw08ZPmcpzSrbnwG/Fg=;
- b=CxDbsSHKwesOJIY535H2uNWYdNDJx1UGjWaUZvx/lRuLQu0rZrNUIDy/oRorI14t3O
- p4W01AgimNhuJTXDOSuM8NcSsIClGOTroY1XMY2PZacEIHcsqKiVSDjkbG2jP/xaB1K2
- fEotGD1S1MBEhkqCa7Oeyl860Bbw59FMAHymw2J0WrhzwZXybBHxCnWCI0zDDnGlY1q7
- RXna8mWohhUpYh+5RgHb6P+70anr/UIUp0YyBu6HoZX19rqrcKGjdkJ2SyvO+G68E2HE
- Rj4O8/ieWIXPLqvpbDl9eiLzvEur3uOIdteZJkWxMJaVEQKX4f65GyL8ULzGM9WtcR8c
- 0VKA==
-X-Gm-Message-State: AOAM532NW/De4p7gWsahmyiuaKBSwwyYzW9X0ORzW9PEvp6YKQXpqLOI
- hzOfXN3p2JylVVUAJYPUpBa2rQ4oNkQ=
-X-Google-Smtp-Source: ABdhPJysUgkbm+Dx9Rt3OopQPsYs8IleLv3FfUoKQ3PT85Dh3K4VZSpJMxsCElxq91ZMhksmxlfhtA==
-X-Received: by 2002:a37:688c:: with SMTP id d134mr2685524qkc.492.1591235454406; 
- Wed, 03 Jun 2020 18:50:54 -0700 (PDT)
-Received: from localhost.localdomain ([2600:1700:3c90:1b60:f82d:3924:25c:6df5])
- by smtp.gmail.com with ESMTPSA id l188sm3009805qke.127.2020.06.03.18.50.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 03 Jun 2020 18:50:53 -0700 (PDT)
-From: agrecascino123@gmail.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4] tcg: Sanitize shift constants on ppc64le so that shift
- operations with large constants don't generate invalid instructions.
-Date: Wed,  3 Jun 2020 21:50:27 -0400
-Message-Id: <20200604015027.8075-1-agrecascino123@gmail.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=agrecascino123@gmail.com; helo=mail-qk1-x742.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgf50-0007Od-LE
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:54:02 -0400
+Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:51946)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dirty@apple.com>) id 1jgf4z-0004vO-6w
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 21:54:02 -0400
+Received: from pps.filterd (nwk-aaemail-lapp01.apple.com [127.0.0.1])
+ by nwk-aaemail-lapp01.apple.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0541qouu018625; Wed, 3 Jun 2020 18:53:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=67WU8PDEJ+mUSTs6NaMIr+chfbaqD8+8IVixeRUDC8k=;
+ b=n6HmCwmbt4V5MQIE2WEFTnyl/VRoG8pYtyLvqNFnLGEGvUmFRVr4FA1THnXYVASWm9rX
+ jwA0pYz9d072154ktKuJb4kfRZwvDA2zswX6UXiyb4Ube89mNGu9eGFCfX9dxdpkyOgt
+ y1FUsP6PIfVKg7ktQCmmJOAgRynk4n4UfevxBEVtyBu0CBgYG4cVEofjMlOIQb31gtl0
+ b7vRviPLNGOeFmp5+wSlb+dXU6XCc9a3YIJD20+6cUYdBhvIACi2WqsRRgzk2GJiJZtk
+ 70hgIGfO3UzaAbAurp6ADVoIFrg8vBBFRhbpQKhlFoTavG2Zp1+TQbQ0Hd+pkwDN3pys Hg== 
+Received: from rn-mailsvcp-mta-lapp02.rno.apple.com
+ (rn-mailsvcp-mta-lapp02.rno.apple.com [10.225.203.150])
+ by nwk-aaemail-lapp01.apple.com with ESMTP id 31bpe153v3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Wed, 03 Jun 2020 18:53:59 -0700
+Received: from rn-mailsvcp-mmp-lapp04.rno.apple.com
+ (rn-mailsvcp-mmp-lapp04.rno.apple.com [17.179.253.17])
+ by rn-mailsvcp-mta-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0QBD00ZWFP9ZIU10@rn-mailsvcp-mta-lapp02.rno.apple.com>; 
+ Wed, 03 Jun 2020 18:53:59 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp04.rno.apple.com by
+ rn-mailsvcp-mmp-lapp04.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0QBD00C00P4SHY00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
+ 03 Jun 2020 18:53:59 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: 99f89d79671c95ffdbff058802d4710e
+X-Va-E-CD: f2f4c490b283e0999592aef402d17e40
+X-Va-R-CD: 38c3c07246e21531e94ba00813ded620
+X-Va-CD: 0
+X-Va-ID: 8750a291-0b96-4813-8aed-8c6d5f6c13d6
+X-V-A: 
+X-V-T-CD: 99f89d79671c95ffdbff058802d4710e
+X-V-E-CD: f2f4c490b283e0999592aef402d17e40
+X-V-R-CD: 38c3c07246e21531e94ba00813ded620
+X-V-CD: 0
+X-V-ID: 7dbb60df-57f5-412f-93b5-2c578903003b
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-03_13:2020-06-02,
+ 2020-06-03 signatures=0
+Received: from [17.234.60.254] (unknown [17.234.60.254])
+ by rn-mailsvcp-mmp-lapp04.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0QBD00D4JP9ZNN00@rn-mailsvcp-mmp-lapp04.rno.apple.com>; Wed,
+ 03 Jun 2020 18:53:59 -0700 (PDT)
+Content-type: text/plain; charset=us-ascii
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 00/13] i386: hvf: Remove HVFX86EmulatorState
+From: Cameron Esfahani <dirty@apple.com>
+In-reply-to: <20200528193758.51454-1-r.bolshakov@yadro.com>
+Date: Wed, 03 Jun 2020 18:53:58 -0700
+Cc: qemu-devel@nongnu.org
+Content-transfer-encoding: quoted-printable
+Message-id: <71C3D499-BFE4-402B-9720-5F2246F94B4F@apple.com>
+References: <20200528193758.51454-1-r.bolshakov@yadro.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-03_13:2020-06-02,
+ 2020-06-03 signatures=0
+Received-SPF: pass client-ip=17.151.62.66; envelope-from=dirty@apple.com;
+ helo=nwk-aaemail-lapp01.apple.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 21:54:00
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,126 +120,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Catherine A. Frederick" <chocola@animebitch.es>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Catherine A. Frederick" <chocola@animebitch.es>
+Reviewed-by: Cameron Esfahani <dirty@apple.com>=20
 
-Signed-off-by: Catherine A. Frederick <chocola@animebitch.es>
----
-This should finally do it, sorry for the style issues on v3.
+Cameron Esfahani
+dirty@apple.com
 
- tcg/ppc/tcg-target.inc.c | 41 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+"The cake is a lie."
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 7da67086c6..5ed4e4c011 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -790,21 +790,25 @@ static inline void tcg_out_ext32u(TCGContext *s, TCGReg dst, TCGReg src)
- 
- static inline void tcg_out_shli32(TCGContext *s, TCGReg dst, TCGReg src, int c)
- {
-+    tcg_debug_assert((c < 32) && (c >= 0));
-     tcg_out_rlw(s, RLWINM, dst, src, c, 0, 31 - c);
- }
- 
- static inline void tcg_out_shli64(TCGContext *s, TCGReg dst, TCGReg src, int c)
- {
-+    tcg_debug_assert((c < 64) && (c >= 0));
-     tcg_out_rld(s, RLDICR, dst, src, c, 63 - c);
- }
- 
- static inline void tcg_out_shri32(TCGContext *s, TCGReg dst, TCGReg src, int c)
- {
-+    tcg_debug_assert((c < 32) && (c >= 0));
-     tcg_out_rlw(s, RLWINM, dst, src, 32 - c, c, 31);
- }
- 
- static inline void tcg_out_shri64(TCGContext *s, TCGReg dst, TCGReg src, int c)
- {
-+    tcg_debug_assert((c < 64) && (c >= 0));
-     tcg_out_rld(s, RLDICL, dst, src, 64 - c, c);
- }
- 
-@@ -2610,21 +2614,33 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- 
-     case INDEX_op_shl_i32:
-         if (const_args[2]) {
--            tcg_out_shli32(s, args[0], args[1], args[2]);
-+            /*
-+             * Limit shift immediate to prevent illegal instruction
-+             * from bitmask corruption
-+             */
-+            tcg_out_shli32(s, args[0], args[1], args[2] & 31);
-         } else {
-             tcg_out32(s, SLW | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_shr_i32:
-         if (const_args[2]) {
--            tcg_out_shri32(s, args[0], args[1], args[2]);
-+            /*
-+             * Both use RLWINM, which has a 5 bit field for the
-+             * shift mask.
-+             */
-+            tcg_out_shri32(s, args[0], args[1], args[2] & 31);
-         } else {
-             tcg_out32(s, SRW | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_sar_i32:
-         if (const_args[2]) {
--            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2]));
-+            /*
-+             * SRAWI has a 5 bit sized field for the shift mask
-+             * as well.
-+             */
-+            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2] & 31));
-         } else {
-             tcg_out32(s, SRAW | SAB(args[1], args[0], args[2]));
-         }
-@@ -2696,21 +2712,34 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- 
-     case INDEX_op_shl_i64:
-         if (const_args[2]) {
--            tcg_out_shli64(s, args[0], args[1], args[2]);
-+            /*
-+             * Limit shift immediate to prevent illegal instruction from
-+             * from bitmask corruption
-+             */
-+            tcg_out_shli64(s, args[0], args[1], args[2] & 63);
-         } else {
-             tcg_out32(s, SLD | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_shr_i64:
-         if (const_args[2]) {
--            tcg_out_shri64(s, args[0], args[1], args[2]);
-+            /*
-+             * Same applies here, as both RLDICL, and RLDICR have a
-+             * 6 bit large mask for the shift value
-+             */
-+            tcg_out_shri64(s, args[0], args[1], args[2] & 63);
-         } else {
-             tcg_out32(s, SRD | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_sar_i64:
-         if (const_args[2]) {
--            int sh = SH(args[2] & 0x1f) | (((args[2] >> 5) & 1) << 1);
-+            /*
-+             * Same for SRADI, except there's no function
-+             * to call into.
-+             */
-+            int sh = SH(((args[2] & 63) & 0x1f)
-+                        | ((((args[2] & 63) >> 5) & 1) << 1));
-             tcg_out32(s, SRADI | RA(args[0]) | RS(args[1]) | sh);
-         } else {
-             tcg_out32(s, SRAD | SAB(args[1], args[0], args[2]));
--- 
-2.26.2
+Common wisdom
+
+
+
+> On May 28, 2020, at 12:37 PM, Roman Bolshakov <r.bolshakov@yadro.com> =
+wrote:
+>=20
+> Hi,
+>=20
+> This is a cleanup series for HVF accel.
+>=20
+> HVF is using two emulator states CPUX86State and HVFX86EmulatorState
+> simultaneously. HVFX86EmulatorState is used for instruction emulation.
+> CPUX86State is used in all other places. Sometimes the states are in
+> sync, sometimes they're not. It complicates reasoning about emulator
+> behaviour given that there's a third state - VMCS.
+>=20
+> The series tries to leverage CPUX86State for instruction decoding and
+> removes HVFX86EmulatorState. I had to add two new hvf-specific fields =
+to
+> CPUX86State: lazy_flags and mmio_buf. It's likely that cc_op, cc_dst,
+> etc could be reused for lazy_flags but it'd require major rework of =
+flag
+> processing during instruction emulation. Hopefully that'll happen too =
+in
+> the future.
+>=20
+> I tried to include sysemu/hvf.h into target/i386/cpu.h to add =
+definition
+> of hvf lazy flags but couldn't do that at first it because it =
+introduced
+> circular dependency between existing sysemu/hvf.h and cpu.h. The first
+> three patches untangle and prune sysemu/hvf.h to the bare minimum to
+> allow inclusion of sysemu/hvf.h into target/i386/cpu.h.
+>=20
+> This might conflict with [1], but merge/rebase should be trivial.
+>=20
+> 1. https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg07449.html
+>=20
+> Thanks,
+> Roman
+>=20
+> Roman Bolshakov (13):
+>  i386: hvf: Move HVFState definition into hvf
+>  i386: hvf: Drop useless declarations in sysemu
+>  i386: hvf: Clean stray includes in sysemu
+>  i386: hvf: Drop unused variable
+>  i386: hvf: Use ins_len to advance IP
+>  i386: hvf: Use IP from CPUX86State
+>  i386: hvf: Drop fetch_rip from HVFX86EmulatorState
+>  i386: hvf: Drop rflags from HVFX86EmulatorState
+>  i386: hvf: Drop copy of RFLAGS defines
+>  i386: hvf: Drop regs in HVFX86EmulatorState
+>  i386: hvf: Move lazy_flags into CPUX86State
+>  i386: hvf: Move mmio_buf into CPUX86State
+>  i386: hvf: Drop HVFX86EmulatorState
+>=20
+> include/qemu/typedefs.h      |   1 -
+> include/sysemu/hvf.h         |  73 ++-------------------
+> target/i386/cpu.h            |   4 +-
+> target/i386/hvf/hvf-i386.h   |  35 ++++++++++
+> target/i386/hvf/hvf.c        |  30 ++++-----
+> target/i386/hvf/x86.c        |   2 +-
+> target/i386/hvf/x86.h        |  89 ++-----------------------
+> target/i386/hvf/x86_decode.c |  25 ++++---
+> target/i386/hvf/x86_emu.c    | 122 +++++++++++++++++------------------
+> target/i386/hvf/x86_flags.c  |  81 ++++++++++++-----------
+> target/i386/hvf/x86_task.c   |  10 +--
+> target/i386/hvf/x86hvf.c     |   6 +-
+> 12 files changed, 186 insertions(+), 292 deletions(-)
+>=20
+> --=20
+> 2.26.1
+>=20
+>=20
 
 
