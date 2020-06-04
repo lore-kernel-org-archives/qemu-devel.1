@@ -2,128 +2,64 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F374C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84C0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDEDA206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:53:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hxhy+UDq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDEDA206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC6B4206DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 07:18:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC6B4206DC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgjki-0004KR-9H
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40976)
+	id 1jgk92-0001go-UN
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 03:18:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgjk2-0003qg-B9
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:52:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28939
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgjk0-0002Hc-Te
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:52:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591253559;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KEL0yA6tnzflu3BRb5G//Jy1AvSu0jeBn74uDKB4n08=;
- b=Hxhy+UDqnflokd6zvlKClj5qYPRYKN3Xd2ahNN47oDKrh4jpgq8W5g09quaPI+B5x5hq8w
- SEA/RR8gNC0hQ8B7u1z8aaO1+xKjda31VZLirh3x1LciyPTa2NlbvECojDSoT2zxkxDusD
- k4rH0oJL9pc24/R6LREO7958w+nCRR8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-ZI4iwi2-MrmVZHKHbrhyxQ-1; Thu, 04 Jun 2020 02:52:37 -0400
-X-MC-Unique: ZI4iwi2-MrmVZHKHbrhyxQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 11so1446251wmj.6
- for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 23:52:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=KEL0yA6tnzflu3BRb5G//Jy1AvSu0jeBn74uDKB4n08=;
- b=FDwu2SiYj1jsmt68YqhoHxOF3TeMPv3OXeMeBh0g6uGNFkhlRX3YBMPpN2gol3p/JK
- 8nFDwM6b1X8AE4k/iGuFsDY7tDUHkaI3hrYcFJxtvBi8A0sFK/KCSJ0Fa6i8hhpUv5/C
- QIajGGCjNiNNCAT2IfFTqRyml4O8O5z02L2MTC2yeewK5mHOxrVho9JG8sUXeBiibA2f
- JhJmhgbY0V96lz7MyOgQ9QokR88J7HPCd+BkeGQLEeU+uoQ+t+UZop75j72wKyjOylbR
- VcIqtrbM+ttO5Z29cp6HCpMuLoZscJRpwoiMaFf73bnYMjEpGfiPIn2lDb504IccJUG5
- lJ3g==
-X-Gm-Message-State: AOAM531beSeUtDh7x4OAtSy4fQcjUFP245kyQqU23DUoU9GjxIo4fXo9
- m5dOHjrx8OmydQSAf7b9VqTykrNwX6GzHER0CS+ZnNIRzKyeeYjue7A9UMvtYALaifxy0ObN5wQ
- ZdkoeUC0YVO7tcXA=
-X-Received: by 2002:adf:e887:: with SMTP id d7mr2874008wrm.62.1591253556420;
- Wed, 03 Jun 2020 23:52:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxSqORaGTcteDKFiAR3wMEG+9PN6mQDX9VJIvGWQdKCgZ+s3JAGp/nkUfuFt2oozneGrf2Utg==
-X-Received: by 2002:adf:e887:: with SMTP id d7mr2873986wrm.62.1591253556179;
- Wed, 03 Jun 2020 23:52:36 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id z16sm6543674wrm.70.2020.06.03.23.52.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 03 Jun 2020 23:52:35 -0700 (PDT)
-Subject: Re: [PATCH 5/9] target/i386: sev: Partial cleanup to sev_state global
-To: David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net,
- pbonzini@redhat.com, ekabkost@redhat.com, qemu-devel@nongnu.org
-References: <20200604064219.436242-1-david@gibson.dropbear.id.au>
- <20200604064219.436242-6-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <32902884-75c1-7221-6dc7-012a9248ca21@redhat.com>
-Date: Thu, 4 Jun 2020 08:52:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgk7c-00017Q-IE; Thu, 04 Jun 2020 03:17:08 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:37960 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgk7Y-00087h-WA; Thu, 04 Jun 2020 03:17:04 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id BC146BB46B7E2D1EB7C8;
+ Thu,  4 Jun 2020 15:16:47 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.233) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0;
+ Thu, 4 Jun 2020 15:16:37 +0800
+Subject: Re: [PATCH v2] target/arm/cpu: adjust virtual time for arm cpu
+To: Andrew Jones <drjones@redhat.com>
+References: <20200603020208.2089-1-fangying1@huawei.com>
+ <20200603082600.efes4srlft3xv2tq@kamzik.brq.redhat.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <df1422fc-968c-bf38-48f2-8eb87d236b80@huawei.com>
+Date: Thu, 4 Jun 2020 15:16:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200604064219.436242-6-david@gibson.dropbear.id.au>
+In-Reply-To: <20200603082600.efes4srlft3xv2tq@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.233]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 03:16:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,25 +73,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, brijesh.singh@amd.com,
- dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ wu.wubin@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 8:42 AM, David Gibson wrote:
-> The SEV code uses a pretty ugly global to access its internal state.  Now
-> that SEVState is embedded in SevGuestState, we can avoid accessing it via
-> the global in some cases.  In the remaining cases use a new global
-> referencing the containing SevGuestState which will simplify some future
-> transformations.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/i386/sev.c | 92 ++++++++++++++++++++++++-----------------------
->  1 file changed, 48 insertions(+), 44 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+On 6/3/2020 4:26 PM, Andrew Jones wrote:
+> On Wed, Jun 03, 2020 at 10:02:08AM +0800, Ying Fang wrote:
+>> Virtual time adjustment was implemented for virt-5.0 machine type,
+>> but the cpu property was enabled only for host-passthrough and
+>> max cpu model. Let's add it for arm cpu which has the gernic
+>> timer feature enabled.
+>>
+>>
+>> Signed-off-by: Ying Fang <fangying1@huawei.com>
+>>
+>> ---
+>> v2:
+>> - move kvm_arm_add_vcpu_properties into arm_cpu_post_init
+>>
+>> v1:
+>> - initial commit
+>> - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08518.html
+>>
+>> ---
+>>   target/arm/cpu.c   | 3 +--
+>>   target/arm/cpu64.c | 1 -
+>>   2 files changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 32bec156f2..1e9b7a51f2 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1244,6 +1244,7 @@ void arm_cpu_post_init(Object *obj)
+>>   
+>>       if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
+>>           qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
+>> +        kvm_arm_add_vcpu_properties(obj);
+> 
+> The name 'kvm_arm_add_vcpu_properties' says nothing about being specific
+> to the timer. So this is either the wrong place for this function, or the
+> function is named wrong. I'd say it's the wrong place, because, as the
+> comment above kvm_arm_add_vcpu_properties() implies, the function is
+> for all 'kvm-*' prefixed properties, not just timer related ones. It's
+> true we don't have any others yet, but we will. I have plans to post
+can't agree more.
+
+> kvm-steal-time soon, and despite it also having 'time' in its name, it
+> shouldn't depend on ARM_FEATURE_GENERIC_TIMER.
+yes, that would be nice.
+
+> 
+> How about the below [untested] patch instead?
+this patch is much more reasonable for me, thanks for your help.
+I've tested it and it works fine.
+
+> 
+> Thanks,
+> drew
+> 
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 32bec156f2d4..e9084f98ef10 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1245,6 +1245,10 @@ void arm_cpu_post_init(Object *obj)
+>       if (arm_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER)) {
+>           qdev_property_add_static(DEVICE(cpu), &arm_cpu_gt_cntfrq_property);
+>       }
+> +
+> +    if (kvm_enabled()) {
+> +        kvm_arm_add_vcpu_properties()
+
+should be kvm_arm_add_vcpu_properties(obj);
+
+> +    }
+>   }
+>   
+>   static void arm_cpu_finalizefn(Object *obj)
+> @@ -2029,7 +2033,6 @@ static void arm_max_initfn(Object *obj)
+>   
+>       if (kvm_enabled()) {
+>           kvm_arm_set_cpu_features_from_host(cpu);
+> -        kvm_arm_add_vcpu_properties(obj);
+>       } else {
+>           cortex_a15_initfn(obj);
+>   
+> @@ -2183,7 +2186,6 @@ static void arm_host_initfn(Object *obj)
+>       if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>           aarch64_add_sve_properties(obj);
+>       }
+> -    kvm_arm_add_vcpu_properties(obj);
+>       arm_cpu_post_init(obj);
+>   }
+>   
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index cbc5c3868fce..778cecc2e6ca 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -592,7 +592,6 @@ static void aarch64_max_initfn(Object *obj)
+>   
+>       if (kvm_enabled()) {
+>           kvm_arm_set_cpu_features_from_host(cpu);
+> -        kvm_arm_add_vcpu_properties(obj);
+>       } else {
+>           uint64_t t;
+>           uint32_t u;
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 4bdbe6dcac07..eef3bbd1cc2c 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -194,17 +194,18 @@ static void kvm_no_adjvtime_set(Object *obj, bool value, Error **errp)
+>   /* KVM VCPU properties should be prefixed with "kvm-". */
+>   void kvm_arm_add_vcpu_properties(Object *obj)
+>   {
+> -    if (!kvm_enabled()) {
+> -        return;
+> -    }
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    CPUARMState *env = &cpu->env;
+>   
+> -    ARM_CPU(obj)->kvm_adjvtime = true;
+> -    object_property_add_bool(obj, "kvm-no-adjvtime", kvm_no_adjvtime_get,
+> -                             kvm_no_adjvtime_set);
+> -    object_property_set_description(obj, "kvm-no-adjvtime",
+> -                                    "Set on to disable the adjustment of "
+> -                                    "the virtual counter. VM stopped time "
+> -                                    "will be counted.");
+> +    if (arm_feature(env, ARM_FEATURE_GENERIC_TIMER)) {
+> +        cpu->kvm_adjvtime = true;
+> +        object_property_add_bool(obj, "kvm-no-adjvtime", kvm_no_adjvtime_get,
+> +                                 kvm_no_adjvtime_set);
+> +        object_property_set_description(obj, "kvm-no-adjvtime",
+> +                                        "Set on to disable the adjustment of "
+> +                                        "the virtual counter. VM stopped time "
+> +                                        "will be counted.");
+> +    }
+>   }
+>   
+>   bool kvm_arm_pmu_supported(CPUState *cpu)
+> 
+> 
+>>       }
+>>   }
+>>   
+>> @@ -2029,7 +2030,6 @@ static void arm_max_initfn(Object *obj)
+>>   
+>>       if (kvm_enabled()) {
+>>           kvm_arm_set_cpu_features_from_host(cpu);
+>> -        kvm_arm_add_vcpu_properties(obj);
+>>       } else {
+>>           cortex_a15_initfn(obj);
+>>   
+>> @@ -2183,7 +2183,6 @@ static void arm_host_initfn(Object *obj)
+>>       if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>>           aarch64_add_sve_properties(obj);
+>>       }
+>> -    kvm_arm_add_vcpu_properties(obj);
+>>       arm_cpu_post_init(obj);
+>>   }
+>>   
+>> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+>> index cbc5c3868f..778cecc2e6 100644
+>> --- a/target/arm/cpu64.c
+>> +++ b/target/arm/cpu64.c
+>> @@ -592,7 +592,6 @@ static void aarch64_max_initfn(Object *obj)
+>>   
+>>       if (kvm_enabled()) {
+>>           kvm_arm_set_cpu_features_from_host(cpu);
+>> -        kvm_arm_add_vcpu_properties(obj);
+>>       } else {
+>>           uint64_t t;
+>>           uint32_t u;
+>> -- 
+>> 2.23.0
+>>
+>>
+>>
+> 
+> 
+> .
+> 
 
 
