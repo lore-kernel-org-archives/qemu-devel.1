@@ -2,88 +2,67 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AD1C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7855C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61F7420738
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:21:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PAeGhu0v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F7420738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB34720738
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:24:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB34720738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgm3y-0007ZL-MP
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:21:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54938)
+	id 1jgm6y-0000j0-2t
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jgm1u-0005lV-Gd
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56928
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jgm1t-0007HA-IE
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591262356;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=D+fGyu3jxo5xAi67w0auVPn7NR2cXP8UOYn3Dt8dxpo=;
- b=PAeGhu0vW29bpNlT4yTSzOqvABn7qcwZUFlQ0tova3dikSqCz/YbrQ5XrP3B8JFSJIL5ev
- s99yxAGUde7UQIGK/rZ5E9bUHJgDaXWoXUFXGGizfp2byqhKeDbogr16unExFdhUR6fmkp
- 2hDUvXbDSn6xTwiakSe0hFnu80wPOd4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-tDZ6MXiiN9SP-1GbKd41sw-1; Thu, 04 Jun 2020 05:19:15 -0400
-X-MC-Unique: tDZ6MXiiN9SP-1GbKd41sw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D195B464;
- Thu,  4 Jun 2020 09:19:13 +0000 (UTC)
-Received: from kaapi (ovpn-116-200.sin2.redhat.com [10.67.116.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D30C199003;
- Thu,  4 Jun 2020 09:19:01 +0000 (UTC)
-Date: Thu, 4 Jun 2020 14:48:59 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v2 1/2] ait-vga: check address before reading configuration
- bytes
-In-Reply-To: <20200604084318.GA3050580@redhat.com>
-Message-ID: <nycvar.YSQ.7.77.849.2006041445530.30592@xnncv>
-References: <20200603202251.1199170-1-ppandit@redhat.com>
- <20200603202251.1199170-2-ppandit@redhat.com>
- <20200604084318.GA3050580@redhat.com>
+ (Exim 4.90_1) (envelope-from <jianjay.zhou@huawei.com>)
+ id 1jgm6Q-0000Hr-Qc
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:23:58 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:56260 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jianjay.zhou@huawei.com>)
+ id 1jgm6P-0007yM-KC
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:23:58 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
+ by Forcepoint Email with ESMTP id 76B69B36DD390EA3113D;
+ Thu,  4 Jun 2020 17:23:47 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.13]) by
+ DGGEMM404-HUB.china.huawei.com ([10.3.20.212]) with mapi id 14.03.0487.000;
+ Thu, 4 Jun 2020 17:23:38 +0800
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Question about vhost-user-gpu on Arm64
+Thread-Topic: Question about vhost-user-gpu on Arm64
+Thread-Index: AdY6UGJjuko3uLUgQD+BbQvmBeKUTQ==
+Date: Thu, 4 Jun 2020 09:23:37 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BCFF53A@DGGEMM528-MBX.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.93]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463811718-945283238-1591262353=:30592"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.255;
+ envelope-from=jianjay.zhou@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 05:23:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,48 +75,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Yi Ren <c4tren@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Ren Ding <rding@gatech.edu>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Hanqing Zhao <hanqing@gatech.edu>
+Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ "Huangweidong \(C\)" <weidong.huang@huawei.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "Zhoujian \(jay\)" <jianjay.zhou@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463811718-945283238-1591262353=:30592
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Hi,
 
-  Hello Phil,
+I want to test vhost-user-gpu on arm64 recently and follow the steps listed=
+ in
+section "vhost-user virtio gpu"[1].
+So I compiled the qemu with CONFIG_VIRTIO_VGA=3Dy and
+CONFIG_VHOST_USER_VGA=3Dy forcely, the vhost-user-gpu gpu emulation
+process and qemu process started successfully, but the qemu reported repeat=
+ly:
 
-+-- On Thu, 4 Jun 2020, Philippe Mathieu-Daudé wrote --+
-| >> @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
-| >> +    assert(address + len <= pci_config_size(d));
-| 
-| Yes, maybe I was not clear while reviewing v1, we need to audit the
-| callers and fix them first, then we can safely add the assert here.
+    "qemu-system-aarch64: console doesn't support GL!"
+	"qemu-system-aarch64: console doesn't support dmabuf!"
 
-That's an elaborate task. Could we please make that into another patch series?
+Something seems wrong. Reading the qemu source code, the parent of
+TYPE_VHOST_USER_VGA is TYPE_VIRTIO_VGA_BASE, which seems not to be
+supported by arm("On arm systems display devices with a pci memory bar
+do not work", also documented in [1]).
 
-+-- On Thu, 4 Jun 2020, Daniel P. Berrangé wrote --+
-| On Thu, Jun 04, 2020 at 01:52:50AM +0530, P J P wrote:
-| > While reading PCI configuration bytes, a guest may send an
-| > address towards the end of the configuration space. It may lead
-| > to an OOB access issue. Add check to ensure 'address + size' is
-| > within PCI configuration space.
-| 
-| Please include a CVE number for this security flaw if there is
-| one.
+I maybe missed something, may I ask that does vhost-user-gpu supported
+on arm64? Thanks,
 
-Yes. For now I'll send a revised patch to fix this ati-vga OOB access issue.
+Jay Zhou
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463811718-945283238-1591262353=:30592--
-
+[1] https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
 
