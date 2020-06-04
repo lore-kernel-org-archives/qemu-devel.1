@@ -2,128 +2,73 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8AFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC08C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A30A2067B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:20:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvPbh2Dz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A30A2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 204922067B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:24:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 204922067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgl6m-0000h4-Hg
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:20:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48302)
+	id 1jglAs-0002UD-DN
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgl6A-0008PL-B3
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:19:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56579
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jglAN-0001zb-B7
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:23:59 -0400
+Resent-Date: Thu, 04 Jun 2020 04:23:59 -0400
+Resent-Message-Id: <E1jglAN-0001zb-B7@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21770)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgl68-0003SH-F8
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:19:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591258775;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9D2vYb4INb/R/szgShFGar3EwwBkRx+/rRVH4eTILvk=;
- b=EvPbh2DzfT2iXuIeOevRMNkQ9jcbqolqAkp8Ux6LVeAsFbXlwGalPBWg23lVWAIFsOe51+
- hB/4s6Z6YCBvwrxgrtqTTyJnEhcO1FviTBYPhP7q74g3GpiXRP5RBynFJwQuCtUYjJxTd1
- WDWysJk6jGAqkH1jiQHMZLtKF5WWyLM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-PjH4ohrnO_CcAPxNVNn5Lw-1; Thu, 04 Jun 2020 04:19:33 -0400
-X-MC-Unique: PjH4ohrnO_CcAPxNVNn5Lw-1
-Received: by mail-wr1-f70.google.com with SMTP id t5so2092188wro.20
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 01:19:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=9D2vYb4INb/R/szgShFGar3EwwBkRx+/rRVH4eTILvk=;
- b=boN+sE/9WczTXekLDG3JxZxWtQs22wngC71FAReaFyIlA/tvnTJ5QP/7tAc8Dksqq4
- q47k72iwGX6WWYxQPL1SG+aP5Qhc10b1eo0VV7dfLRuQMK5j9eUK2JBH2fUG/7iPtA20
- v7Z01ZfEgm9AQTY8jFyszqpoi0u1a3av0Fe//Pn3nRX8jMNz1+uUV41WWfHdngxuH8kA
- wOvNzvKT4y2FBdKV6vlNO3aQ+T+z2pqKTXIC6TSUG2xLJDvgw5mFhaz7Obq5mLF+6cqm
- XJxuKEgkQtaXEo1NGO+bWeReitlOiYYVBdNJJQp4aPV5V1RukILlC7APP+1mRHXxoaD7
- 2ziw==
-X-Gm-Message-State: AOAM5322jv6p55ogdVJyCoMyxpp0VTd+DBliQlLtqVVjYxI4rEuUYk9b
- vq8JKV4G0iSXZrdg/OkX9XLQH7J5zgJbjVEORXXOa5vsi5qMPNo7zucrf1i3INp7/GW8YKClef1
- VQJXTYd6ciXaovXw=
-X-Received: by 2002:a5d:4705:: with SMTP id y5mr3031526wrq.98.1591258772206;
- Thu, 04 Jun 2020 01:19:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1BiBHHeI/LYSZMDwKozCWSN+w/vPPp967XTtvTkbE9sL2XIXhEAjqrABHd/iC4Hmk4vTCqw==
-X-Received: by 2002:a5d:4705:: with SMTP id y5mr3031496wrq.98.1591258771950;
- Thu, 04 Jun 2020 01:19:31 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id l1sm7947035wrb.31.2020.06.04.01.19.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 01:19:31 -0700 (PDT)
-Subject: python/qemu: Refactor QemuBinaryInfo
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- John Snow <jsnow@redhat.com>
-References: <20200129212345.20547-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <8be12c09-98c5-2169-c946-b8689a31c7cf@redhat.com>
-Date: Thu, 4 Jun 2020 10:19:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jglAL-0003xH-AW
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:23:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1591259026; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=NSHFAFZ4OJgAouq/aGuiE1Qr+s1NbLJcCUJiimWd087e/MeDNIgNYFRol8+/lp407xJwRd3WNJaLcqwccvuYsbsQ/s2koDn9ZyShuF7OX7fMcU/oAiAYqSTJ/PXPJm04fxuUmMj42xZPQ9ZlJQUaHMBCm0Qg7yYgHzxzFMCHCjs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1591259026;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=FbbhSIKdIs7xeW7e7g8TMpL1DzX6xm2buBbGA8gcONg=; 
+ b=KCy58fDWymWV5Xq2kdsAcKkv5ZdGSACgpCYusXZ78p9nEliFFNQJqyY35boBdQKzQ2qBo/1PRRr3Oolwmyd0mluQ2UHOyYHqBCQnlCm6Y6r+F8pV/8NEIpiVp+lzCv7SQYnW3mp4mrL6S29p5C7dfv5ExoADf3RG6HEVnl4lZqg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 159125902365185.96259505834348;
+ Thu, 4 Jun 2020 01:23:43 -0700 (PDT)
+Message-ID: <159125902214.7948.2165701083063353791@45ef0f9c86ae>
+In-Reply-To: <20200604075943.7001-1-kraxel@redhat.com>
+Subject: Re: [PATCH 0/2] build qxl as module
 MIME-Version: 1.0
-In-Reply-To: <20200129212345.20547-1-philmd@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kraxel@redhat.com
+Date: Thu, 4 Jun 2020 01:23:43 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 04:23:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,38 +81,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, dinechin@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/29/20 10:23 PM, Philippe Mathieu-Daudé wrote:
-[...]
->   accel/accel: Make TYPE_ACCEL abstract
->   python/qemu: Add binutils::binary_get_version()
->   tests/acceptance: Use 'version-min' tag to verify QEMU binary version
->   tests/acceptance: Restrict X86CPUModelAliases test to QEMU >= 4.1
->   python/qemu: Add binutils::binary_get_arch()
->   tests/acceptance: Use the 'arch' tag to verify QEMU binary target
->   python/qemu: Add binutils::binary_get_machines()
->   tests/acceptance: Use 'machine' tag to check if available in QEMU
->     binary
->   python/qemu: Add binutils::binary_get_qom_implementations()
->   python/qemu: Add binutils::binary_get_accels()
->   python/qemu/accel: Use binutils::binary_get_accels()
->   python/qemu: Add binutils::binary_get_devices()
-
-I just noticed various of these methods are already implemented in
-QemuBinaryInfo (see scripts/device-crash-test), so I guess it'd be
-better to start refactoring from there (to the recent QEMU package).
-
-> 
->  accel/accel.c                                 |   1 +
->  hw/core/machine.c                             |   3 +-
->  MAINTAINERS                                   |   6 +
->  python/qemu/accel.py                          |  26 +----
->  python/qemu/binutils.py                       | 107 ++++++++++++++++++
-[...]
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYwNDA3NTk0My43MDAx
+LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKTm90IHJ1bjogMjU5CkZhaWx1cmVz
+OiAxMjcgMjY3CkZhaWxlZCAyIG9mIDExOSBpb3Rlc3RzCm1ha2U6ICoqKiBbY2hlY2stdGVzdHMv
+Y2hlY2stYmxvY2suc2hdIEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3Qp
+OgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY1LCBpbiA8bW9kdWxl
+PgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihy
+ZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1
+ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNl
+LnV1aWQ9OTFhYTQ5MzU4YzhkNGNkZWI4ODQzYzY5ZGI1NmUxNzgnLCAnLXUnLCAnMTAwMycsICct
+LXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJH
+RVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1l
+JywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NB
+Q0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3Fl
+bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtcHFicmlyNzAvc3JjL2RvY2tlci1zcmMuMjAyMC0wNi0wNC0wNC4wNy4w
+My4yODg5ODovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3Fl
+bXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4K
+ZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9OTFhYTQ5MzU4Yzhk
+NGNkZWI4ODQzYzY5ZGI1NmUxNzgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1h
+a2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcHFi
+cmlyNzAvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJv
+ciAyCgpyZWFsICAgIDE2bTMzLjY1MnMKdXNlciAgICAwbTkuMDAxcwoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA2MDQwNzU5NDMuNzAw
+MS0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
 
