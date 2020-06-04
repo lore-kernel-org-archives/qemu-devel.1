@@ -2,84 +2,69 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B6B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0468C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:46:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E08F206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:45:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Po4ERa8j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E08F206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88D12206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:46:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D12206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgmRN-0007oK-9p
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:45:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57728)
+	id 1jgmSf-0001HI-SO
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:46:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jgmQP-0006kE-Gg
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:44:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20016
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jgmQO-0004Tr-QR
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:44:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591263874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=jOsEi/g7jTgDofbCy6CYq7qnzg2t9JhITnLHHzED3m8=;
- b=Po4ERa8jX8H+oN24/o14PlZ28AWYg/eY23iA2Ka4pbc8XoPHRdeQDbjXIOaAD1kuWoEKEX
- OBPlldPZTKLEgG8wZSfYBSAmsHQsfWxVbUuzTHwikyb2bD7+VtNm7yegJR0ZcXxeKa+N2E
- ihNyeK+DmjwVvvvgpibcb2ue/WIl3I4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-0cWiqBPdPGinVjsqvgPgkg-1; Thu, 04 Jun 2020 05:44:30 -0400
-X-MC-Unique: 0cWiqBPdPGinVjsqvgPgkg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3996800685;
- Thu,  4 Jun 2020 09:44:29 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.61])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90E01579A3;
- Thu,  4 Jun 2020 09:44:26 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] qga: fix assert regression on guest-shutdown
-Date: Thu,  4 Jun 2020 11:44:25 +0200
-Message-Id: <20200604094425.63020-1-marcandre.lureau@redhat.com>
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgmQq-0007Jm-Ds; Thu, 04 Jun 2020 05:45:04 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3704 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1jgmQn-0004VK-Kd; Thu, 04 Jun 2020 05:45:03 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id D4BAACFBCF918961D608;
+ Thu,  4 Jun 2020 17:44:51 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.233) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0;
+ Thu, 4 Jun 2020 17:44:45 +0800
+Subject: Re: About the kvm-no-adjvtime CPU property
+To: Andrew Jones <drjones@redhat.com>
+References: <b4389848-10fd-a906-9901-d1d354ce4842@huawei.com>
+ <20200601080718.jul5r4qebpeieyfl@kamzik.brq.redhat.com>
+ <3d8729db-067c-31f9-dd69-02a218f1b53e@huawei.com>
+ <20200601122917.fyp2kwqzsodahnzu@kamzik.brq.redhat.com>
+ <f994141f-0248-fd68-7cd5-9b948cfdbf8d@huawei.com>
+ <20200603085354.wcbhhuq3dhvi3moc@kamzik.brq.redhat.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <6287bc83-7a9e-005c-6807-5facfa0bef43@huawei.com>
+Date: Thu, 4 Jun 2020 17:44:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200603085354.wcbhhuq3dhvi3moc@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Originating-IP: [10.173.222.233]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 04:51:24
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,43 +77,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ wu.wubin@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 781f2b3d1e ("qga: process_event() simplification"),
-send_response() is called unconditionally, but will assert when "rsp" is
-NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as
-"guest-shutdown".
 
-Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- qga/main.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/qga/main.c b/qga/main.c
-index f0e454f28d3..3febf3b0fdf 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rsp)
-     QString *payload_qstr, *response_qstr;
-     GIOStatus status;
- 
--    g_assert(rsp && s->channel);
-+    g_assert(s->channel);
-+
-+    if (!rsp) {
-+        return 0;
-+    }
- 
-     payload_qstr = qobject_to_json(QOBJECT(rsp));
-     if (!payload_qstr) {
--- 
-2.26.2.561.g07d8ea56f2
+On 6/3/2020 4:53 PM, Andrew Jones wrote:
+> On Tue, Jun 02, 2020 at 03:47:22PM +0800, Ying Fang wrote:
+>>
+>>
+>> On 2020/6/1 20:29, Andrew Jones wrote:
+>>> On Mon, Jun 01, 2020 at 08:07:31PM +0800, Ying Fang wrote:
+>>>>
+>>>>
+>>>> On 2020/6/1 16:07, Andrew Jones wrote:
+>>>>> On Sat, May 30, 2020 at 04:56:26PM +0800, Ying Fang wrote:
+>>>>>> About the kvm-no-adjvtime CPU property
+>>>>>>
+>>>>>> Hi Andrew,
+>>>>>> To adjust virutal time, a new kvm cpu property kvm-no-adjvtime
+>>>>>> was introduced to 5.0 virt machine types. However the cpu
+>>>>>> property was enabled only for host-passthrough and max cpu model.
+>>>>>> As for other cpu model like cortex-a57, cortex-a53, cortex-a72,
+>>>>>> this kvm-adjvtime is not enabled by default, which means the
+>>>>>> virutal time can not be adjust for them.
+>>>>>>
+>>>>>> Here, for example, if VM is configured with kvm enabled:
+>>>>>>
+>>>>>>      <cpu mode='custom' match='exact' check='partial'>
+>>>>>>        <model fallback='allow'>cortex-a72</model>
+>>>>>>        <topology sockets='2' dies='1' cores='2' threads='1'/>
+>>>>>>        <numa>
+>>>>>>          <cell id='0' cpus='0-1' memory='16777216' unit='KiB'/>
+>>>>>>          <cell id='1' cpus='2-3' memory='16777216' unit='KiB'/>
+>>>>>>        </numa>
+>>>>>>      </cpu>
+>>>>>>
+>>>>>> We cannot adjust virtual time even if 5.0 virt machine is used.
+>>>>>> So i'd like to add it to other cpu model, do you have any
+>>>>>> suggestions here ?
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> Hi Fang,
+>>>>>
+>>>>> The cpu feature only requires kvm.  If a cpu model may be used with kvm,
+>>>>> then the feature can be allowed to be used with the model.  What I find
+>>>>> interesting is that the cpu model is being used with kvm instead of 'host'
+>>>>> or 'max'.  Can you explain the reasons for that?  Currently, when using
+>>>> yes，the cpu model is indeed used with kvm.
+>>>>
+>>>> There is a situation where the host cpu model is Cortex-A72 and
+>>>> a 'custom' cpu mode is used to keep insrtuction set compatible between
+>>>> the source and destination host machine when doing live migration.
+>>>> So the host physical machine cpu model is Cortex-A72 but
+>>>> host-passthrough model is mode used here.
+>> I mean host-passthrough model is 'not' used here. Sorry to make it
+>> confusing.
+> 
+> I guessed as much.
+> 
+>>>
+>>> Are the source and destinations hosts used in the migration identical?
+>>> If so, then the guest can use cpu 'host' and disable cpu features that
+>>> should not be exposed (e.g. -cpu host,pmu=off).  If the source and
+>>> destination hosts are not identical, then I'm curious what those exact
+>>> differences are.  With the way AArch64 KVM works today, even using the
+>>> Cortex-A72 cpu model should require identical hosts when migrating.  Or,
+>>> at least both hosts must be compatible with Cortex-A72 and any difference
+>>> in ID registers must be somehow getting hidden from the guest.
+>> Yes, you are right.
+>> We have AAarch64 server with cpu based on Cortex-A72 and some extra
+>> instruction set added. Source host with cpu based on V1 and destination host
+>> with cpu based on V2 and they are compatible with Cortex-A72. We want to use
+>> a 'custom' cpu mode here to make it possible to do live migration between
+>> them. This is the scenario where the 'host' cpu model is not used since a
+>> 'custom' cpu model Cortex-A72 is used here .
+> 
+> What you've described here is indeed the reason to use CPU models. I.e.
+> enabling the migration from a host of one type to another by creating a
+> guest that only enables the features contained in both hosts (as well as
+> maintaining all state that describes the CPU type, e.g. MIDR).
+> Unfortunately, unless your KVM has patches that aren't upstream, then that
+> doesn't work on AArch64 KVM (more on that below). It may appear to be
+> working for you, because your guest kernel and userspace don't mind the
+> slight differences exposed to it between the hosts, or those differences
+> are limited to explicitly disabled features. If that's the case, then I
+> would guess that using '-cpu host' and disabling the same features would
+> "work" as well.
+
+Yes, upstream KVM currently does not support it. We are planning to add
+support for the aarch64 platform since we have the situation where it is
+needed for our hardware.
+
+@Marc Zyngier, is there anyone who doing on this?
+> 
+> Here's some more details on why the Cortex-A72 CPU model doesn't matter
+> with upstream KVM. First, upstream AArch64 KVM doesn't support CPU models,
+> and it doesn't even have a Cortex-A72 preferred target. For Cortex-A72
+> it will use "KVM_ARM_TARGET_GENERIC_V8", which is the same thing 'host'
+> would do when running on a Cortex-A72. Second, if V2 of the Cortex-A72-
+> based CPU you're using changed the revision of the MIDR, or any other
+> state that gets passed directly through to the guest like the MIDR, then
+> that state will change on migration. If a guest looks before migration and
+> again after migration, then it could get confused. A guest kernel may only
+> look once on boot and then not notice, but anything exposed to userspace
+> is extra risky, as userspace may check more frequently.
+
+Yes, just as explained here.
+
+> 
+> In short, without KVM patches that aren't upstream, then it's risky to
+> migrate between machines with V1 and V2 of these CPUs. And, it doesn't
+> help to use the Cortex-A72 CPU model.
+Thanks for your detailed introduction.
+
+> 
+> Thanks,
+> drew
+> 
+> 
+>> However the kvm-adjvtime
+>> feature is also need. So I think we should move kvm_arm_add_vcpu_properties
+>> to arm_cpu_post_init, instead of limited to 'host' and 'max' cpu model[1].
+>>
+>> 1: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00091.html
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>>
+>>>
+>>
+>>
+> 
+> 
+> .
+> 
 
 
