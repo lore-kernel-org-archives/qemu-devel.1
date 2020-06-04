@@ -2,106 +2,89 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ADF4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00698C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E516206A2
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:32:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E516206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BBF6C2075B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 23:36:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I0WozVzY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF6C2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgzLC-00019D-Np
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 19:32:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47466)
+	id 1jgzPZ-00036r-2A
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 19:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jgzKT-0000MB-Du; Thu, 04 Jun 2020 19:31:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14760
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jgzKO-0003uT-JG; Thu, 04 Jun 2020 19:31:21 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 054N0WWo141828; Thu, 4 Jun 2020 19:31:09 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dqsuf5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 19:31:09 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 054N2x3E151416;
- Thu, 4 Jun 2020 19:31:08 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dqsuey-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 19:31:08 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 054NV6tH001464;
- Thu, 4 Jun 2020 23:31:08 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com
- (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
- by ppma03wdc.us.ibm.com with ESMTP id 31bf48yq5y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 23:31:08 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 054NV5KO30212604
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 4 Jun 2020 23:31:05 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C249BBE051;
- Thu,  4 Jun 2020 23:31:06 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A905FBE054;
- Thu,  4 Jun 2020 23:31:02 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.160.104.193])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Thu,  4 Jun 2020 23:31:02 +0000 (GMT)
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <87tuzr5ts5.fsf@morokweng.localdomain>
- <20200604062124.GG228651@umbus.fritz.box>
- <87r1uu1opr.fsf@morokweng.localdomain>
- <dc56f533-f095-c0c0-0fc6-d4c5af5e51a7@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-In-reply-to: <dc56f533-f095-c0c0-0fc6-d4c5af5e51a7@redhat.com>
-Date: Thu, 04 Jun 2020 20:30:58 -0300
-Message-ID: <87pnae1k99.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jgzOv-0002Jm-6r
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:35:57 -0400
+Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:54093)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jgzOt-0004tS-96
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 19:35:56 -0400
+Received: by mail-pj1-x1036.google.com with SMTP id i12so1784391pju.3
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 16:35:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vfU+5soti4/GOU44IAzpfLG0Qw2ObTLZSwjYGjbQTMc=;
+ b=I0WozVzY7snDC/Ql7+LPrOIo5rHd9tOWz6BmdYQLbQm3oJZaHhDUYwnCrrGmd2SDvx
+ wtzbaPbeV/oNCsc7+57YB/kmxkHJUBxJ09qGD/buser7UjseHp4XzOFArgPGJ0MN3oc+
+ XIgp6VpFnyjAk4tZI0+b8eIUKh8Mlm2z3YQslT2ecYxeL8H2K7LoZ0qyZ3GTMh/SZwKd
+ 9Sb404iMI+X0i1Q8kpz84Leb33rpeH8Rcqc8mYSoBOrE7himh1d8OXMIBRrqdfEFBe4B
+ 0JsaYO6Ldi5YhSg9GFEjk0VZEpaoWDJFswrMwFSLrdGGVTfFU2yongCKxJO0cLJTnR4p
+ Y4XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vfU+5soti4/GOU44IAzpfLG0Qw2ObTLZSwjYGjbQTMc=;
+ b=s1g/qvs3pMr1FfMhuekt68riYMjf1pmh5vdoNoom5npjHHng/TA3ZLVVFvdrM8DO99
+ f94WiCMQM3wvo/rrSjqxsK6di+7gi0DF5GxkaLpGYqPyCvyPB5D4NS9hAn21PEAAh5zp
+ zF+I+hd3YfF+/kFotMgggGbOoWDPVBWiBQsMs8hPwsCRwcf9T/9bcuCzHE0EkqkHUECS
+ M2K5OgJX9ZmHFvOPpWqS4gupHQNM/nTDVftdORYjL8HUEFaHdsC1To0UstNMX1hmBijy
+ 9E6GZm4ESQXbcG6lmGIBQMkPf6Ti0Vg4gxmrOq0Iti+kL/3Nd1wbKVWCxdmz3Z95vyiO
+ WW0w==
+X-Gm-Message-State: AOAM531oy8o3ko//3UEctSsvBzVx/W92BNcmUnD+cdS9ilY7RZp+ykF3
+ I6eHmA0vw4g+3tiC5YIRtl43FEdTu4GsY6hA
+X-Google-Smtp-Source: ABdhPJw04iTv6eFjzAvByCd+US7uW4VCVOoGLcRHnVL+XOHRtFHzsud2KWlmC4qmXXbsbLmTjzT2ow==
+X-Received: by 2002:a17:902:103:: with SMTP id 3mr7161489plb.325.1591313753469; 
+ Thu, 04 Jun 2020 16:35:53 -0700 (PDT)
+Received: from localhost (tunnel570486-pt.tunnel.tserv25.sin1.ipv6.he.net.
+ [2001:470:35:3d5::2])
+ by smtp.gmail.com with ESMTPSA id l186sm5380754pfl.191.2020.06.04.16.35.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Jun 2020 16:35:52 -0700 (PDT)
+From: Coiby Xu <coiby.xu@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 0/4] vhost-user block device backend implementation
+Date: Fri,  5 Jun 2020 07:35:34 +0800
+Message-Id: <20200604233538.256325-1-coiby.xu@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-04_13:2020-06-04,
- 2020-06-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=999
- clxscore=1015 lowpriorityscore=0 phishscore=0 priorityscore=1501
- mlxscore=0 spamscore=0 suspectscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006040157
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 19:31:15
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pj1-x1036.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,49 +97,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- dgilbert@redhat.com, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+v8
+ - re-try connecting to socket server to fix asan error
+ - fix license naming issue
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+v7
+ - fix docker-test-debug@fedora errors by freeing malloced memory
 
-> On 04/06/20 23:54, Thiago Jung Bauermann wrote:
->> QEMU could always create a PEF object, and if the command line defines
->> one, it will correspond to it. And if the command line doesn't define one,
->> then it would also work because the PEF object is already there.
->
-> How would you start a non-protected VM?
+v6
+ - add missing license header and include guard
+ - vhost-user server only serve one client one time
+ - fix a bug in custom vu_message_read
+ - using qemu-storage-daemon to start vhost-user-blk-server
+ - a bug fix to pass docker-test-clang@ubuntu
 
-In the case of POWER PEF even with the machine property and the
-pef-guest object it's not guaranteed that the VM will be protected. They
-allow the possibility of the VM being protected. The decision lies with
-the guest. The Linux kernel will request being moved to "secure memory"
-when the `svm=on` parameter is passed in the kernel command line.
+v5:
+ * re-use vu_kick_cb in libvhost-user
+ * keeping processing VhostUserMsg in the same coroutine until there is
+   detachment/attachment of AIOContext
+ * Spawn separate coroutine for each VuVirtqElement
+ * Other changes including relocating vhost-user-blk-server.c, coding
+   style etc.
 
-To start a VM that doesn't have the possibility of being protected, one
-would simply not use the guest-memory-protection property (or
-host-trust-limitation, if that ends up being its name). Regardless of
-whether there's a pef-guest object.
+v4:
+ * add object properties in class_init
+ * relocate vhost-user-blk-test
+ * other changes including using SocketAddress, coding style, etc.
 
-Sorry if the above is pedantic. I just want to make sure we're
-communicating clearly.
+v3:
+ * separate generic vhost-user-server code from vhost-user-blk-server
+   code
+ * re-write vu_message_read and kick hander function as coroutines to
+   directly call blk_co_preadv, blk_co_pwritev, etc.
+ * add aio_context notifier functions to support multi-threading model
+ * other fixes regarding coding style, warning report, etc.
 
-> Currently it's the "-machine"
-> property that decides that, and the argument requires an id
-> corresponding to "-object".
+v2:
+ * Only enable this feature for Linux because eventfd is a Linux-specific
+   feature
 
-If there's only one object, there's no need to specify its id.
 
-I have the feeling I didn't understand your point. I hope these answers
-clarify what I'm suggesting.
+This patch series is an implementation of vhost-user block device
+backend server, thanks to Stefan and Kevin's guidance.
+
+Vhost-user block device backend server is a UserCreatable object and can be
+started using object_add,
+
+ (qemu) object_add vhost-user-blk-server,id=ID,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
+ (qemu) object_del ID
+
+or appending the "-object" option when starting QEMU,
+
+  $ -object vhost-user-blk-server,id=disk,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
+
+Then vhost-user client can connect to the server backend.
+For example, QEMU could act as a client,
+
+  $ -m 256 -object memory-backend-memfd,id=mem,size=256M,share=on -numa node,memdev=mem -chardev socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket -device vhost-user-blk-pci,id=blk0,chardev=char1
+
+And guest OS could access this vhost-user block device after mounting it.
+
+Coiby Xu (4):
+  Allow vu_message_read to be replaced
+  generic vhost user server
+  vhost-user block device backend server
+  new qTest case to test the vhost-user-blk-server
+
+ block/Makefile.objs                        |   1 +
+ block/export/vhost-user-blk-server.c       | 716 ++++++++++++++++++++
+ block/export/vhost-user-blk-server.h       |  34 +
+ contrib/libvhost-user/libvhost-user-glib.c |   2 +-
+ contrib/libvhost-user/libvhost-user.c      |  11 +-
+ contrib/libvhost-user/libvhost-user.h      |  21 +
+ softmmu/vl.c                               |   4 +
+ tests/Makefile.include                     |   3 +-
+ tests/qtest/Makefile.include               |   2 +
+ tests/qtest/libqos/vhost-user-blk.c        | 130 ++++
+ tests/qtest/libqos/vhost-user-blk.h        |  44 ++
+ tests/qtest/libqtest.c                     |  54 +-
+ tests/qtest/libqtest.h                     |  38 ++
+ tests/qtest/vhost-user-blk-test.c          | 737 +++++++++++++++++++++
+ tests/vhost-user-bridge.c                  |   2 +
+ tools/virtiofsd/fuse_virtio.c              |   4 +-
+ util/Makefile.objs                         |   1 +
+ util/vhost-user-server.c                   | 406 ++++++++++++
+ util/vhost-user-server.h                   |  59 ++
+ 19 files changed, 2229 insertions(+), 40 deletions(-)
+ create mode 100644 block/export/vhost-user-blk-server.c
+ create mode 100644 block/export/vhost-user-blk-server.h
+ create mode 100644 tests/qtest/libqos/vhost-user-blk.c
+ create mode 100644 tests/qtest/libqos/vhost-user-blk.h
+ create mode 100644 tests/qtest/vhost-user-blk-test.c
+ create mode 100644 util/vhost-user-server.c
+ create mode 100644 util/vhost-user-server.h
 
 --
-Thiago Jung Bauermann
-IBM Linux Technology Center
+2.26.2
+
 
