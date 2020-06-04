@@ -2,70 +2,90 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77495C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 030B3C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:10:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 519EF2065C
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:09:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519EF2065C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5E602077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:10:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X3jyQOYo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E602077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jglsc-0004Sd-K2
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:09:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53702)
+	id 1jgltP-0005hL-43
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:10:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jgls2-0003uh-0B
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:09:06 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:34077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jgls0-0005nR-W0
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:09:05 -0400
-Received: from player711.ha.ovh.net (unknown [10.110.103.121])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 3876C16D247
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 11:08:53 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player711.ha.ovh.net (Postfix) with ESMTPSA id 7121712DFA0B3;
- Thu,  4 Jun 2020 09:08:31 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0053139fd52-1911-4642-b917-db792ecb09ea,0E78B47C015AB62E5F4E4B3B4EB6DB016BBCF3B5)
- smtp.auth=groug@kaod.org
-Date: Thu, 4 Jun 2020 11:08:21 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200604105228.2cb311d3@kaod.org>
-In-Reply-To: <20200604064414.GI228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <87tuzr5ts5.fsf@morokweng.localdomain>
- <20200604064414.GI228651@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jglsi-0004lp-6V
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:09:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23850
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jglsg-0005sD-OQ
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:09:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591261785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ahalv+0V/G1nISWzjqRyM11/DubG9KRM7EMm7qYESgs=;
+ b=X3jyQOYoHP8aX+xhhW0Y3WZdELYGus9vxxstKiT+NIaasM7+Yk5h16lhEpEg62z4vzTM9C
+ WPasTozNUJ2Mx349Y4A0ZUD3t7vbS2BU/nCYRcKUbogMr2q+PJBjvdZ2fafkNUMOD5NZU4
+ HXqTFZDGKunWoDxAWr6u0U7Ya1Q6h5c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-2QPCRuSnNWmU8EsGLgk2jw-1; Thu, 04 Jun 2020 05:09:44 -0400
+X-MC-Unique: 2QPCRuSnNWmU8EsGLgk2jw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3ACDF1902EA2;
+ Thu,  4 Jun 2020 09:09:42 +0000 (UTC)
+Received: from [10.40.193.170] (unknown [10.40.193.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5724A6AD0C;
+ Thu,  4 Jun 2020 09:09:33 +0000 (UTC)
+Subject: Re: [PATCH] numa: forbid '-numa node, mem' for 5.1 and newer machine
+ types
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200602084151.480567-1-imammedo@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <ac504671-b836-32f8-1231-0ff0724ca7c6@redhat.com>
+Date: Thu, 4 Jun 2020 11:09:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/T8M54mOA9k=ZBfZa=7RzYIy";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 13412845592681355750
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudeguddguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtsehgtderreertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeggfekuddvuddtgfekkeejleegjeffheduuefhledtteeftdfhffdtgfegiefhvdenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.33.250.45; envelope-from=groug@kaod.org;
- helo=2.mo179.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 05:08:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200602084151.480567-1-imammedo@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,111 +98,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael
- S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- mdroth@linux.vnet.ibm.com, Thiago Jung Bauermann <bauerman@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
+ libvir-list@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 6/2/20 10:41 AM, Igor Mammedov wrote:
+> Deprecation period is run out and it's a time to flip the switch
+> introduced by cd5ff8333a.  Disable legacy option for new machine
+> types (since 5.1) and amend documentation.
+> 
+> '-numa node,memdev' shall be used instead of disabled option
+> with new machine types.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>   - rebased on top of current master
+>   - move compat mode from 4.2 to 5.0
+> 
+> CC: peter.maydell@linaro.org
+> CC: ehabkost@redhat.com
+> CC: marcel.apfelbaum@gmail.com
+> CC: mst@redhat.com
+> CC: pbonzini@redhat.com
+> CC: rth@twiddle.net
+> CC: david@gibson.dropbear.id.au
+> CC: libvir-list@redhat.com
+> CC: qemu-arm@nongnu.org
+> CC: qemu-ppc@nongnu.org
+> ---
+>   docs/system/deprecated.rst | 17 -----------------
+>   hw/arm/virt.c              |  2 +-
+>   hw/core/numa.c             |  6 ++++++
+>   hw/i386/pc.c               |  1 -
+>   hw/i386/pc_piix.c          |  1 +
+>   hw/i386/pc_q35.c           |  1 +
+>   hw/ppc/spapr.c             |  2 +-
+>   qemu-options.hx            |  9 +++++----
+>   8 files changed, 15 insertions(+), 24 deletions(-)
 
-On Thu, 4 Jun 2020 16:44:14 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This works with libvirt perfectly.
 
-> On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
-> >=20
-> > Hello David,
-> >=20
-> > David Gibson <david@gibson.dropbear.id.au> writes:
-> >=20
-> > > A number of hardware platforms are implementing mechanisms whereby the
-> > > hypervisor does not have unfettered access to guest memory, in order
-> > > to mitigate the security impact of a compromised hypervisor.
-> > >
-> > > AMD's SEV implements this with in-cpu memory encryption, and Intel has
-> > > its own memory encryption mechanism.  POWER has an upcoming mechanism
-> > > to accomplish this in a different way, using a new memory protection
-> > > level plus a small trusted ultravisor.  s390 also has a protected
-> > > execution environment.
-> > >
-> > > The current code (committed or draft) for these features has each
-> > > platform's version configured entirely differently.  That doesn't seem
-> > > ideal for users, or particularly for management layers.
-> > >
-> > > AMD SEV introduces a notionally generic machine option
-> > > "machine-encryption", but it doesn't actually cover any cases other
-> > > than SEV.
-> > >
-> > > This series is a proposal to at least partially unify configuration
-> > > for these mechanisms, by renaming and generalizing AMD's
-> > > "memory-encryption" property.  It is replaced by a
-> > > "guest-memory-protection" property pointing to a platform specific
-> > > object which configures and manages the specific details.
-> > >
-> > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
-> >=20
-> > Thank you very much for this series! Using a machine property is a nice
-> > way of configuring this.
-> >=20
-> > >From an end-user perspective, `-M pseries,guest-memory-protection` in
-> > the command line already expresses everything that QEMU needs to know,
-> > so having to add `-object pef-guest,id=3Dpef0` seems a bit redundant. Is
-> > it possible to make QEMU create the pef-guest object behind the scenes
-> > when the guest-memory-protection property is specified?
-> >=20
-> > Regardless, I was able to successfuly launch POWER PEF guests using
-> > these patches:
-> >=20
-> > Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> >=20
-> > > can be extended to cover the Intel and s390 mechanisms as well,
-> > > though.
-> > >
-> > > Note: I'm using the term "guest memory protection" throughout to refer
-> > > to mechanisms like this.  I don't particular like the term, it's both
-> > > long and not really precise.  If someone can think of a succinct way
-> > > of saying "a means of protecting guest memory from a possibly
-> > > compromised hypervisor", I'd be grateful for the suggestion.
-> >=20
-> > Is "opaque guest memory" any better? It's slightly shorter, and slightly
-> > more precise about what the main characteristic this guest property con=
-veys.
->=20
-> That's not a bad one, but for now I'm going with "host trust
-> limitation", since this might end up covering things other than just
-> memory protection.
->=20
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
 
-Any idea what these other things might be ? It seems a bit hard to
-decide of a proper name without a broader picture at this point.
+Michal
 
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl7YugUACgkQcdTV5YIv
-c9YaHRAAsCGaQhAxkJQswzk2fB4NUMaNIjaDUka+MU/TxbgZuYyMNrvklAyPjG/a
-Rzr281IzBU907eLOuP3KM0jf3enSdU3DpfD1fll2Dzw9eSgNphvMrCf4xkD4wcad
-rSkID8GRegn4KbK7GL4xCFdvPE1egiAwVRjPMkJi9yVDdPgRkhufIlswWoN5Mhx/
-ydKcdmjbP9fbKu5d9y6aa0D9Uw/lt1PpIbU8yHJnOuRz9HBROCx5CJ8mD9IgSgd8
-IWums28UJKvVwq+zJojQButne51nVkHjn9yY2VxW3WAj7JpjHBdm4o3VdbeNFUTm
-MXaYmCBMcuwTxMrqxXvR32byRhRCHw/2q6PkEAUkxa0SHBIsqjhmU+mUU0hgqrYt
-lPynCReqrJ2M0JabdYfrpXQvCTp6L7LmHBmzR/4wfMvF1PI1oKe4cp7uvDDpfXql
-NHfckWS5V+QQYq87YmriFP56aVxRNx6lmSGk3mXS6ohn01GJ9z2O3/LQY5pIFCxb
-fnTh58xb4y05+/+cQa85CWEa+HuGNxXA7p0DecHE5gEeG8imrNH7vu4SzSwcD5qO
-WmgGCNF1qftUZDOzWUQuj1mjwaaW0mnIYseqb41mFxpg6vvKeebmhbgObUx2N1by
-AkEqzB8IaCxO7/b7yYPyhv1R1aWIxEmBTQhJvr53nzWmAWSgupQ=
-=zeHm
------END PGP SIGNATURE-----
-
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy--
 
