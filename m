@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B3FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 729C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75034206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F27C206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="oqwrVF33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75034206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="qh1rbLC8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F27C206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgln3-0005Ig-OB
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:03:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52128)
+	id 1jglnv-0006CG-Hr
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jgleX-0008Pf-R2
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:55:09 -0400
-Received: from shirlock.uni-paderborn.de ([2001:638:502:c003::15]:42388)
+ id 1jgleY-0008SO-Vc
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:55:10 -0400
+Received: from shirlock.uni-paderborn.de ([2001:638:502:c003::15]:42400)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jgleW-0002Ew-Rx
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:55:09 -0400
+ id 1jgleY-0002F6-3o
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:55:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:MIME-Version
  :References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
  Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
  Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
  List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=gO8bEj/mx5UuSUi4k2ZGG7ty4/X40ZTxcn3g0BboSJc=; b=oqwrVF33d3cFh4aSX/A1FfnWOZ
- cl3KIJaKvPaZtLl40zcA1gWGr4I2pzr7oRFOqRRknmAUFL4q8XLqtxHBC05q5WD7nkmcloORRs2VN
- yXaNkrCbOM+sNSnqvdpNYs/fkJiGYM/7PCXnZcq+T3gWVM9eFHkzPImItBz0mzzKsQAo=;
+ bh=j2ukeuYA7iCuxtom1vX5ewUizZEtWINzIDKjd4nG5KI=; b=qh1rbLC8TWntD09BzKTxdK29xy
+ TyNJjoJ0rf1F0LU1rGEYkXPLC08YBXzth8NEkFudFZOE4KOtyEo2mA+N/5tmMJk8pxlARb2TcIve3
+ +6mucCxH+SFIjQh8Ih6QoUAUHg9PHOYtrVX6uaiBVD3NG2GWeDxn5IITelMYCxp+O5rg=;
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/15] tests/tcg/tricore: Add dvstep test
-Date: Thu,  4 Jun 2020 10:54:35 +0200
-Message-Id: <20200604085441.103087-10-kbastian@mail.uni-paderborn.de>
+Subject: [PATCH v2 10/15] tests/tcg/tricore: Add fadd test
+Date: Thu,  4 Jun 2020 10:54:36 +0200
+Message-Id: <20200604085441.103087-11-kbastian@mail.uni-paderborn.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
 References: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-IMT-Spam-Score: 0.0 ()
-X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=6898290, da=78869971,
- mc=180, sc=3, hc=177, sp=1, fso=6898290, re=0, sd=0, hd=0
+X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=6898291, da=78869972,
+ mc=181, sc=3, hc=178, sp=1, fso=6898291, re=0, sd=0, hd=0
 X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
  Antispam-Data: 2020.6.4.84817, AntiVirus-Engine: 5.74.0,
  AntiVirus-Data: 2020.6.4.5740000
@@ -90,95 +90,41 @@ Sender: "Qemu-devel"
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
  tests/tcg/tricore/Makefile.softmmu-target |  1 +
- tests/tcg/tricore/macros.h                | 29 ++++++++++++++++++++++-
- tests/tcg/tricore/test_dvstep.S           | 15 ++++++++++++
- 3 files changed, 44 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/tricore/test_dvstep.S
+ tests/tcg/tricore/test_fadd.S             | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+)
+ create mode 100644 tests/tcg/tricore/test_fadd.S
 
 diff --git a/tests/tcg/tricore/Makefile.softmmu-target b/tests/tcg/tricore/Makefile.softmmu-target
-index 7a08b656a6..a70fa9643d 100644
+index a70fa9643d..3cbb1c8668 100644
 --- a/tests/tcg/tricore/Makefile.softmmu-target
 +++ b/tests/tcg/tricore/Makefile.softmmu-target
-@@ -10,6 +10,7 @@ QEMU_OPTS += -M tricore_testboard -nographic -kernel
- TESTS += test_abs.tst
+@@ -11,6 +11,7 @@ TESTS += test_abs.tst
  TESTS += test_bmerge.tst
  TESTS += test_clz.tst
-+TESTS += test_dvstep.tst
+ TESTS += test_dvstep.tst
++TESTS += test_fadd.tst
  
  %.pS: $(TESTS_PATH)/%.S
  	$(HOST_CC) -E -o $@ $<
-diff --git a/tests/tcg/tricore/macros.h b/tests/tcg/tricore/macros.h
-index 52aa936c56..59b4b9a352 100644
---- a/tests/tcg/tricore/macros.h
-+++ b/tests/tcg/tricore/macros.h
-@@ -19,6 +19,18 @@
- 
- #define DREG_DEV_ADDR %a15
- 
-+#define EREG_RS1 %e6
-+#define EREG_RS1_LO %d6
-+#define EREG_RS1_HI %d7
-+#define EREG_RS2 %e8
-+#define EREG_RS2_LO %d8
-+#define EREG_RS2_HI %d9
-+#define EREG_CALC_RESULT %e8
-+#define EREG_CALC_RESULT_HI %d9
-+#define EREG_CALC_RESULT_LO %d8
-+#define EREG_CORRECT_RESULT_LO %d0
-+#define EREG_CORRECT_RESULT_HI %d1
-+
- /* Test case wrappers */
- #define TEST_CASE(num, testreg, correct, code...) \
- test_ ## num:                                     \
-@@ -27,6 +39,15 @@ test_ ## num:                                     \
-     mov DREG_TEST_NUM, num;                       \
-     jne testreg, DREG_CORRECT_RESULT, fail        \
- 
-+#define TEST_CASE_E(num, correct_lo, correct_hi, code...)  \
-+test_ ## num:                                              \
-+    code;                                                  \
-+    mov DREG_TEST_NUM, num;                                \
-+    LI(EREG_CORRECT_RESULT_LO, correct_lo)                 \
-+    jne EREG_CALC_RESULT_LO, EREG_CORRECT_RESULT_LO, fail; \
-+    LI(EREG_CORRECT_RESULT_HI, correct_hi)                 \
-+    jne EREG_CALC_RESULT_HI, EREG_CORRECT_RESULT_HI, fail;
-+
- #define TEST_CASE_PSW(num, testreg, correct, correct_psw, code...) \
- test_ ## num:                                                      \
-     code;                                                          \
-@@ -57,7 +78,13 @@ test_ ## num:                                                      \
-     insn DREG_CALC_RESULT, DREG_RS1, DREG_RS2;          \
-     )
- 
--
-+#define TEST_E_ED(insn, num, res_hi, res_lo, rs1_hi, rs1_lo, rs2) \
-+    TEST_CASE_E(num, res_lo, res_hi,                              \
-+    LI(EREG_RS1_LO, rs1_lo);                                      \
-+    LI(EREG_RS1_HI, rs1_hi);                                      \
-+    LI(DREG_RS2, rs2);                                            \
-+    insn EREG_CALC_RESULT, EREG_RS1, DREG_RS2;                    \
-+    )
- 
- /* Pass/Fail handling part */
- #define TEST_PASSFAIL                       \
-diff --git a/tests/tcg/tricore/test_dvstep.S b/tests/tcg/tricore/test_dvstep.S
+diff --git a/tests/tcg/tricore/test_fadd.S b/tests/tcg/tricore/test_fadd.S
 new file mode 100644
-index 0000000000..858dbc62dd
+index 0000000000..1a65054803
 --- /dev/null
-+++ b/tests/tcg/tricore/test_dvstep.S
-@@ -0,0 +1,15 @@
++++ b/tests/tcg/tricore/test_fadd.S
+@@ -0,0 +1,16 @@
 +#include "macros.h"
 +.text
 +.global _start
 +_start:
-+    #                              Result                   RS1            RS2
-+    TEST_E_ED(dvstep,   1, 0x000001ff, 0xfffe5cff, 0x00000001, 0xfffffe5c, 0x0)
-+    TEST_E_ED(dvstep,   2, 0x00000000, 0x000000ff, 0x00000000, 0x00000000, 0x0)
-+    TEST_E_ED(dvstep,   3, 0x0000f000, 0x000000fd, 0x010000f0, 0x00000000, 0x0)
-+    TEST_E_ED(dvstep,   4, 0xfffff000, 0x00000000, 0x7ffffff0, 0x00000000, 0x0)
-+    TEST_E_ED(dvstep.u, 5, 0xffffff00, 0x100008ff, 0xffffffff, 0x00100008, 0x0)
-+    TEST_E_ED(dvstep.u, 6, 0x00000100, 0x00000000, 0x08000001, 0x00000000, \
-+                           0xffffff2d)
++    TEST_D_DD_PSW(add.f, 1, 0x7fc00000, 0x00000b80, 0xffffff85, 0x00001234)
++    TEST_D_DD_PSW(add.f, 2, 0xf9c00000, 0x00000b80, 0xf9400000, 0xf9400000)
++    TEST_D_DD_PSW(add.f, 3, 0x8bb858ca, 0x00000b80, 0x8b3858ca, 0x8b3858ca)
++    TEST_D_DD_PSW(add.f, 4, 0x00000000, 0x00000b80, 0x000000ff, 0x00000000)
++    TEST_D_DD_PSW(add.f, 5, 0x7fc00000, 0x00000b80, 0xfffffe52, 0x0a4cf70c)
++    TEST_D_DD_PSW(add.f, 6, 0x9e6d5076, 0x84000b80, 0x9ded50ec, 0x9ded4fff)
++    TEST_D_DD_PSW(add.f, 7, 0x00000000, 0x04000b80, 0x0000e8bd, 0x00000000)
++    TEST_D_DD_PSW(add.f, 8, 0x7fc00000, 0xc4000b80, 0xffad546e, 0xffad546e)
++    TEST_D_DD_PSW(add.f, 9, 0x7fc00000, 0x04000b80, 0xfffe0000, 0x08130000)
 +
 +    TEST_PASSFAIL
 +
