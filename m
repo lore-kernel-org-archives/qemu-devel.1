@@ -7,59 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3D9C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAD5C433E1
 	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:47:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35ADB207DA
+	by mail.kernel.org (Postfix) with ESMTPS id 8D9F3207DA
 	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="W8Kv2kcJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35ADB207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fYPgJp43"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9F3207DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgjei-00052p-Ds
+	id 1jgjei-00056O-RO
 	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:47:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39992)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jgjaG-00051E-Dn
+ id 1jgjaG-00050g-7E
  for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:42:36 -0400
-Received: from ozlabs.org ([203.11.71.1]:41657)
+Received: from ozlabs.org ([2401:3900:2:1::2]:51619)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jgjaF-0000nU-FC
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:42:36 -0400
+ id 1jgjaF-0000nX-Ab
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:42:35 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49cx6C5g18z9sTL; Thu,  4 Jun 2020 16:42:27 +1000 (AEST)
+ id 49cx6D0D02z9sTR; Thu,  4 Jun 2020 16:42:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1591252947;
- bh=GLsLYxc2PjN1+1LUp/caZlHg/ICb1byIBHQiQsQcEYs=;
+ d=gibson.dropbear.id.au; s=201602; t=1591252948;
+ bh=A3PAjiRQqKl9hfB8R8V83gpgLEOrxMNBxGAfULeW6JA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=W8Kv2kcJEBAFmJoDP+vTL9By+ABtQfLK6JmmGaHLX6tIzL5W2/9l/QRbfbhHOUbHP
- CTbYKe0Apa1qwVZvgTcbXrm2uuqkBArsHd6M9L45z4M54DtVXdZA6z9TSEsjVSSiIN
- jhOZjlTBJmXlJMHJGv1jmtHbwcFnnhmZObzyyYNY=
+ b=fYPgJp43wTfIc597kgX6lH5DcKQAUEWrazYjIpJWYcZY+fwqeVjf0AcF9Sk1V3JcU
+ blbJthmppYKSHOg96Q6A/jtWCslf90YrmM6xV/CYrGsc/OWSFjCUL+G40bhp3GNOUn
+ vF8BLW2l2+eviso+LX47IMPS7KaLNkrH05sHtN4A=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: rth@twiddle.net, pbonzini@redhat.com, ekabkost@redhat.com,
  qemu-devel@nongnu.org
-Subject: [PATCH 6/9] target/i386: sev: Remove redundant cbitpos and
- reduced_phys_bits fields
-Date: Thu,  4 Jun 2020 16:42:16 +1000
-Message-Id: <20200604064219.436242-7-david@gibson.dropbear.id.au>
+Subject: [PATCH 8/9] target/i386: sev: Remove redundant handle field
+Date: Thu,  4 Jun 2020 16:42:18 +1000
+Message-Id: <20200604064219.436242-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200604064219.436242-1-david@gibson.dropbear.id.au>
 References: <20200604064219.436242-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 02:12:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -86,75 +84,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The SEVState structure has cbitpos and reduced_phys_bits fields which are
-simply copied from the SevGuestState structure and never changed.  Now that
-SEVState is embedded in SevGuestState we can just access the original copy
-directly.
+The user can explicitly specify a handle via the "handle" property wired
+to SevGuestState::handle.  That gets passed to the KVM_SEV_LAUNCH_START
+ioctl() which may update it, the final value being copied back to both
+SevGuestState::handle and SEVState::handle.
+
+AFAICT, nothing will be looking SEVState::handle before it and
+SevGuestState::handle have been updated from the ioctl().  So, remove the
+field and just use SevGuestState::handle directly.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/i386/sev.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ target/i386/sev.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 9e8ab7b056..d25af37136 100644
+index 4b261beaa7..24e2dea9b8 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -41,8 +41,6 @@ struct SEVState {
+@@ -40,7 +40,6 @@ struct SEVState {
+     uint8_t api_minor;
      uint8_t build_id;
-     uint32_t policy;
      uint64_t me_mask;
--    uint32_t cbitpos;
--    uint32_t reduced_phys_bits;
-     uint32_t handle;
+-    uint32_t handle;
      int sev_fd;
      SevState state;
-@@ -378,13 +376,13 @@ sev_get_me_mask(void)
- uint32_t
- sev_get_cbit_position(void)
- {
--    return sev_guest ? sev_guest->state.cbitpos : 0;
-+    return sev_guest ? sev_guest->cbitpos : 0;
- }
+     gchar *measurement;
+@@ -64,13 +63,13 @@ struct SevGuestState {
+     /* configuration parameters */
+     char *sev_device;
+     uint32_t policy;
+-    uint32_t handle;
+     char *dh_cert_file;
+     char *session_file;
+     uint32_t cbitpos;
+     uint32_t reduced_phys_bits;
  
- uint32_t
- sev_get_reduced_phys_bits(void)
- {
--    return sev_guest ? sev_guest->state.reduced_phys_bits : 0;
-+    return sev_guest ? sev_guest->reduced_phys_bits : 0;
- }
+     /* runtime state */
++    uint32_t handle;
+     SEVState state;
+ };
  
- SevInfo *
-@@ -713,22 +711,19 @@ sev_guest_init(const char *id)
-     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-     host_cbitpos = ebx & 0x3f;
- 
--    s->cbitpos = object_property_get_int(OBJECT(sev), "cbitpos", NULL);
--    if (host_cbitpos != s->cbitpos) {
-+    if (host_cbitpos != sev->cbitpos) {
-         error_report("%s: cbitpos check failed, host '%d' requested '%d'",
--                     __func__, host_cbitpos, s->cbitpos);
-+                     __func__, host_cbitpos, sev->cbitpos);
-         goto err;
+@@ -398,7 +397,7 @@ sev_get_info(void)
+         info->build_id = sev_guest->state.build_id;
+         info->policy = sev_guest->policy;
+         info->state = sev_guest->state.state;
+-        info->handle = sev_guest->state.handle;
++        info->handle = sev_guest->handle;
      }
  
--    s->reduced_phys_bits = object_property_get_int(OBJECT(sev),
--                                        "reduced-phys-bits", NULL);
--    if (s->reduced_phys_bits < 1) {
-+    if (sev->reduced_phys_bits < 1) {
-         error_report("%s: reduced_phys_bits check failed, it should be >=1,"
--                     " requested '%d'", __func__, s->reduced_phys_bits);
-+                     " requested '%d'", __func__, sev->reduced_phys_bits);
-         goto err;
+     return info;
+@@ -517,8 +516,7 @@ sev_launch_start(SevGuestState *sev)
+ 
+     start = g_new0(struct kvm_sev_launch_start, 1);
+ 
+-    start->handle = object_property_get_int(OBJECT(sev), "handle",
+-                                            &error_abort);
++    start->handle = sev->handle;
+     start->policy = sev->policy;
+     if (sev->session_file) {
+         if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
+@@ -544,10 +542,8 @@ sev_launch_start(SevGuestState *sev)
+         goto out;
      }
  
--    s->me_mask = ~(1UL << s->cbitpos);
-+    s->me_mask = ~(1UL << sev->cbitpos);
+-    object_property_set_int(OBJECT(sev), start->handle, "handle",
+-                            &error_abort);
+     sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
+-    s->handle = start->handle;
++    sev->handle = start->handle;
+     ret = 0;
  
-     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
-     s->sev_fd = open(devname, O_RDWR);
+ out:
 -- 
 2.26.2
 
