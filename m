@@ -2,92 +2,89 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDD5C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF1A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C80E5206DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66A82206DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:07:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zr1A5edB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C80E5206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VACQIMn7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66A82206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgmkn-0001kd-4A
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:05:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60722)
+	id 1jgmmN-00036l-Lv
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:07:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jgmkC-0001KP-Et
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:05:04 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55071)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jgmkB-0000p1-Az
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:05:04 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g10so4628337wmh.4
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 03:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=NG8i3yuNACdh2YQJFJ7masm1x9oXpYP3QjaNcQd7TmQ=;
- b=Zr1A5edBxl9LsRT4osumqQrGZm2RcLDOXrp8asjA2Qc32scM7IcNQ5Sc1g9/4sjEZa
- 6zx5KG8HcOnxH03JvlPd/LxaexuuAlCKGVM1UmG3YzRZ+A/AIrKfdFckxTWK2rHXKsVo
- Z2PW0h2jlW5Ra78Pn1fsuFX0VwxWsjPMQnjE1YCzK2XLQaEbhtVhRbhCg5ZsRzLIRCJh
- eI1um+VSAbZZyB619Jlxn4VpGwRxN/YroP3yK72ungFO6IKh8kJ8UyXtY1RtpqyrqyB8
- 5LSuLzvN5qPZa+W/nxfOiIZXeAzXFGLP9m2ZFoZCBbyCGveJvqbwM6eubV4gELYMpQYC
- Abkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NG8i3yuNACdh2YQJFJ7masm1x9oXpYP3QjaNcQd7TmQ=;
- b=cJpjRMeVK+ActHlQR+sC6a3N5ilC2GbMFNdndSiJOP7+JaOfxtVQAxyEQJNvIWdpHJ
- aDBZ7MMQ/2HiWvb9TRU/BuSUfms14XA6iD3xu9Zx4zxxp//rAQJSuvM8UrGwtByjdbj0
- 0/87rOBAFcK+IIIt3s7BTcM68LCEbRaqg9mQ4NqFV4d9b7XKatcKJVGe3AJxPTLQMPnY
- QsOx1ZpmTLSVVkuNDGLW5DsKbpVsZsM8bVkgGsRCDJD49ODtoaQPEG/fic7P0TpL78n5
- 3+jEF9gC1+zzJpnwuoARFwN4kDieGk4OyFAJlNlDXHmeYk5WWEUfngmFQoysBrqTay25
- R/lg==
-X-Gm-Message-State: AOAM531yKq89yUR7k/GUVbd8XYuK+UCgvkMhQvRGXjhmUrL85JvWTmJ4
- tzMr3ZFn4D62Jwb+giuwfkxYseHljXqKZxSMj8o=
-X-Google-Smtp-Source: ABdhPJw2WK20ZbaPzTg/eQfHcuUvbsFRcZDttI3BzoHHZeTJJ2jPMHjFhxrTnQDvUQCgjyBHvf9I0VDgFtIlPvtUMAU=
-X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr3540855wmb.168.1591265101766; 
- Thu, 04 Jun 2020 03:05:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgmlR-0002PL-6M
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:06:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43885
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jgmlQ-00017d-9F
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:06:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591265179;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=mFo/T+rA1vQJVNmKMxcCi1+sXrz7Vt3b4atlrrfunOU=;
+ b=VACQIMn7+Bc3TzAjnuXEzMeKBGnvSxtQ37O5aDXaBiJObBaAUHMseuIR6V/AfjS48d5mtK
+ 46m0tIVuCp2OXN/4Cm65e7jP29Tz8BzShuJst/cTMDiKBkqX0+itWxXpOgi+yvUfJZK8KS
+ CoME/d4Nc1awHF87DjTL6eClzdT2JZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-CebjqwlIMPu20Dat1ofb4Q-1; Thu, 04 Jun 2020 06:06:15 -0400
+X-MC-Unique: CebjqwlIMPu20Dat1ofb4Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56B15C7441;
+ Thu,  4 Jun 2020 10:06:14 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-105.ams2.redhat.com [10.36.112.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 79D9C5D9D3;
+ Thu,  4 Jun 2020 10:06:08 +0000 (UTC)
+Subject: Re: [PATCH] iotests: 194: wait migration completion on target too
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200604083341.26978-1-vsementsov@virtuozzo.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3afa4d09-521c-2c3a-cfe4-d1440521f3ef@redhat.com>
+Date: Thu, 4 Jun 2020 12:06:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
- <1591065557-9174-2-git-send-email-chenhc@lemote.com>
- <CAHiYmc7_yKHR4XMNyzYbERe7cqhyBYRt-sRwf=wtLuT=QoyRZA@mail.gmail.com>
- <CAAhV-H4==t7_QRopu8=HkPbceF4GCx5RrdcW7nw88B6kExA4sA@mail.gmail.com>
-In-Reply-To: <CAAhV-H4==t7_QRopu8=HkPbceF4GCx5RrdcW7nw88B6kExA4sA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 4 Jun 2020 12:04:45 +0200
-Message-ID: <CAHiYmc5bg-XN3p4f-41WeWebd276+zNAQ8Cp2FdUkCmRQY-=mw@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
- MachineClass
-To: Huacai Chen <chenhuacai@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200604083341.26978-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:14:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,202 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ alex.bennee@linaro.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=87=D0=B5=D1=82, 4. =D1=98=D1=83=D0=BD 2020. =D1=83 02:57 Huacai Chen <c=
-henhuacai@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
->
-> Hi, Alexandar,
->
-> On Wed, Jun 3, 2020 at 10:34 PM Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> >
-> >
-> >
-> > =D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:38 Huacai Che=
-n <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
-=D0=BE/=D0=BB=D0=B0:
-> >>
-> >> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
-> >> can't create a VZ guest in QEMU because it lacks the kvm_type() hook i=
-n
-> >> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
-> >> capability, so by default it will return "KVM not supported" on a VZ
-> >> platform. Thus, null-machine also need the kvm_type() hook.
-> >>
-> >> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> >> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> >> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> >> ---
-> >
-> >
-> >
-> > Hi, Huacai,
-> >
-> > For MIPS parts of QEMU, we prefer the following licence preamble:
-> >
-> >  *  This program is free software: you can redistribute it and/or modif=
-y
-> >  *  it under the terms of the GNU General Public License as published b=
-y
-> >  *  the Free Software Foundation, either version 2 of the License, or
-> >  *  (at your option) any later version.
-> >  *
-> >  *  This program is distributed in the hope that it will be useful,
-> >  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >  *  GNU General Public License for more details.
-> >  *
-> >  *  You should have received a copy of the GNU General Public License
-> >  *  along with this program.  If not, see <https://www.gnu.org/licenses=
-/>.
-> >
-> > Do you agree with such preamble in hw/mips/common.c?
-> Yes, I agree.
->
+On 04/06/2020 10.33, Vladimir Sementsov-Ogievskiy wrote:
+> It is possible, that shutdown on target occurs earlier than migration
+> finish. In this case we crash in bdrv_release_dirty_bitmap_locked()
+> on assertion "assert(!bdrv_dirty_bitmap_busy(bitmap));" as we do have
+> busy bitmap, as bitmap migration is ongoing.
+> 
+> We'll fix bitmap migration to gracefully cancel on early shutdown soon.
+> Now let's fix iotest 194 to wait migration completion before shutdown.
+> 
+> Note that in this test dest_vm.shutdown() is called implicitly, as vms
+> used as context-providers, see __exit__() method of QEMUMachine class.
+> 
+> Actually, not waiting migration finish is a wrong thing, but the test
+> started to crash after commit ae00aa239847682
+> "iotests: 194: test also migration of dirty bitmap", which added dirty
+> bitmaps here. So, Fixes: tag won't hurt.
+> 
+> Fixes: ae00aa2398476824f0eca80461da215e7cdc1c3b
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/194     | 10 ++++++++++
+>  tests/qemu-iotests/194.out |  5 +++++
+>  2 files changed, 15 insertions(+)
 
-Thank you!
+Thanks, this fixes the issue in the gitlab CI:
 
-No further action is needed from your side, I can change the preamble
-while applying to mips queue.
+ https://gitlab.com/huth/qemu/-/jobs/580902477#L3780
 
-Aleksandar
-> >
-> > (of course you name and email will stay intact)
-> >
-> > Regards,
-> > Aleksandar
-> >
-> >>  hw/core/Makefile.objs  |  2 +-
-> >>  hw/core/null-machine.c |  4 ++++
-> >>  hw/mips/Makefile.objs  |  2 +-
-> >>  hw/mips/common.c       | 42 +++++++++++++++++++++++++++++++++++++++++=
-+
-> >>  include/hw/mips/mips.h |  3 +++
-> >>  5 files changed, 51 insertions(+), 2 deletions(-)
-> >>  create mode 100644 hw/mips/common.c
-> >>
-> >> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> >> index 1d540ed..b5672f4 100644
-> >> --- a/hw/core/Makefile.objs
-> >> +++ b/hw/core/Makefile.objs
-> >> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-=
-handler.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
-> >> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
-> >>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
-> >> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
-> >>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
-> >>
-> >>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
-> >> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> >> index cb47d9d..94a36f9 100644
-> >> --- a/hw/core/null-machine.c
-> >> +++ b/hw/core/null-machine.c
-> >> @@ -17,6 +17,7 @@
-> >>  #include "sysemu/sysemu.h"
-> >>  #include "exec/address-spaces.h"
-> >>  #include "hw/core/cpu.h"
-> >> +#include "hw/mips/mips.h"
-> >>
-> >>  static void machine_none_init(MachineState *mch)
-> >>  {
-> >> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *=
-mc)
-> >>      mc->max_cpus =3D 1;
-> >>      mc->default_ram_size =3D 0;
-> >>      mc->default_ram_id =3D "ram";
-> >> +#ifdef TARGET_MIPS
-> >> +    mc->kvm_type =3D mips_kvm_type;
-> >> +#endif
-> >>  }
-> >>
-> >>  DEFINE_MACHINE("none", machine_none_machine_init)
-> >> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-> >> index 739e2b7..3b3e6ea 100644
-> >> --- a/hw/mips/Makefile.objs
-> >> +++ b/hw/mips/Makefile.objs
-> >> @@ -1,4 +1,4 @@
-> >> -obj-y +=3D addr.o mips_int.o
-> >> +obj-y +=3D addr.o common.o mips_int.o
-> >>  obj-$(CONFIG_R4K) +=3D r4k.o
-> >>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o
-> >>  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
-> >> diff --git a/hw/mips/common.c b/hw/mips/common.c
-> >> new file mode 100644
-> >> index 0000000..4d8e141
-> >> --- /dev/null
-> >> +++ b/hw/mips/common.c
-> >> @@ -0,0 +1,42 @@
-> >> +/*
-> >> + * Common MIPS routines
-> >> + *
-> >> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
-> >> + * This code is licensed under the GNU GPL v2.
-> >> + */
-> >> +
-> >> +#include <linux/kvm.h>
-> >> +#include "qemu/osdep.h"
-> >> +#include "qemu-common.h"
-> >> +#include "hw/boards.h"
-> >> +#include "hw/mips/mips.h"
-> >> +#include "sysemu/kvm_int.h"
-> >> +
-> >> +#ifndef CONFIG_KVM
-> >> +
-> >> +int mips_kvm_type(MachineState *machine, const char *vm_type)
-> >> +{
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +#else
-> >> +
-> >> +int mips_kvm_type(MachineState *machine, const char *vm_type)
-> >> +{
-> >> +    int r;
-> >> +    KVMState *s =3D KVM_STATE(machine->accelerator);
-> >> +
-> >> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
-> >> +    if (r > 0) {
-> >> +        return KVM_VM_MIPS_VZ;
-> >> +    }
-> >> +
-> >> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
-> >> +    if (r > 0) {
-> >> +        return KVM_VM_MIPS_TE;
-> >> +    }
-> >> +
-> >> +    return -1;
-> >> +}
-> >> +
-> >> +#endif
-> >> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
-> >> index 0af4c3d..2ac0580 100644
-> >> --- a/include/hw/mips/mips.h
-> >> +++ b/include/hw/mips/mips.h
-> >> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int l=
-en);
-> >>
-> >>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_m=
-r);
-> >>
-> >> +/* common.c */
-> >> +int mips_kvm_type(MachineState *machine, const char *vm_type);
-> >> +
-> >>  #endif
-> >> --
-> >> 2.7.0
-> >>
+Tested-by: Thomas Huth <thuth@redhat.com>
+
 
