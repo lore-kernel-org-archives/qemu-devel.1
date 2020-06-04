@@ -6,63 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01406C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59342C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6B14207D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:02:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6B14207D8
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA1D206DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 15:11:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA1D206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgrNf-0007rM-3o
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 11:02:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41914)
+	id 1jgrWw-0003Ba-FK
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 11:11:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgrMa-0007IC-N3
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:01:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39856)
+ id 1jgrWE-0002fh-IF
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:10:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41740)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jgrMY-00066J-ED
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:01:00 -0400
+ id 1jgrWC-0000pc-PV
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 11:10:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jgrMV-0000yn-V4
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 15:00:55 +0000
+ id 1jgrWA-0002om-Qk
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 15:10:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E6D2D2E810B
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 15:00:55 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B0D502E810B
+ for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 15:10:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Jun 2020 14:55:00 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1777235@bugs.launchpad.net>
+Date: Thu, 04 Jun 2020 15:02:59 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1880822@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: cve qemu security
+X-Launchpad-Bug-Information-Type: Public Security
 X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gersner lorenz-x philmd
-X-Launchpad-Bug-Reporter: Shimi Gersner (gersner)
+X-Launchpad-Bug-Security-Vulnerability: yes
+X-Launchpad-Bug-Commenters: philmd pjps
+X-Launchpad-Bug-Reporter: P J P (pjps)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-References: <152914985958.7724.174010690226549747.malonedeb@wampee.canonical.com>
-Message-Id: <159128250018.32027.2591362708102690584.malone@gac.canonical.com>
-Subject: [Bug 1777235] Re: NVME is missing support for Get Log Page command
+References: <159056340380.1780.3709038768569765525.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159128297997.9600.6867211114404297753.malone@wampee.canonical.com>
+Subject: [Bug 1880822] Re: CVE-2020-13253 QEMU: sd: OOB access could crash the
+ guest resulting in DoS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ab8b6a4e1d758ebaf240ff3d648c1a5c9f002ecf
+X-Launchpad-Hash: cd4929b24fef6fd274db11dcca7121923ba028d8
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 10:55:42
@@ -85,32 +88,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1777235 <1777235@bugs.launchpad.net>
+Reply-To: Bug 1880822 <1880822@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Lorenz,
-Can you send your patch to the mailing list adding your Signed-off-by tag?
-See:
-https://wiki.qemu.org/Contribute/SubmitAPatch#Submitting_your_Patches
+Patch reducing the exposure to this bug:
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00823.html
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777235
+https://bugs.launchpad.net/bugs/1880822
 
 Title:
-  NVME is missing support for Get Log Page command
+  CVE-2020-13253 QEMU: sd: OOB access could crash the guest resulting in
+  DoS
 
 Status in QEMU:
-  New
+  Confirmed
 
 Bug description:
-  "Get Log Page" is a mandatory admin command by the specification (NVMe
-  1.2, Section 5, Figure 40) currently not implemented by device.
+  An out-of-bounds read access issue was found in the SD Memory Card
+  emulator of the QEMU. It occurs while performing block write commands
+  via sdhci_write(), if a guest user has sent 'address' which is OOB of
+  's->wp_groups'. A guest user/process may use this flaw to crash the
+  QEMU process resulting in DoS.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777235/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1880822/+subscriptions
 
