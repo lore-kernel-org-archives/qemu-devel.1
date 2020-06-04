@@ -2,78 +2,74 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA6CC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 022F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:56:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424E4206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:55:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424E4206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id C333F206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:56:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="m+3CCjSf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C333F206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jglek-0008Ba-ER
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:55:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52068)
+	id 1jglfU-0001Mp-Vm
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:56:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgle1-0007fl-Hi
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:37 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:42333)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgldz-0002B8-Va
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:37 -0400
-Received: from mail-vk1-f197.google.com ([209.85.221.197])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgldw-0008Lp-WF
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:54:33 +0000
-Received: by mail-vk1-f197.google.com with SMTP id s206so1361994vke.20
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 01:54:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=LlKt0iABwFApk3o8kenBWL6rdHReoMcLtx536GsSyV4=;
- b=Lh9j/2g/LKYUMuo5/P8NWrtRCLbXh2/ofOaXESgxSaGktn58p33+wcQBkdk2q/Ota9
- 4HX2jYEUaNMzjERxeUErHE6Nt+xkNHy7lqwKx5S7QqafGSmoxhvXda7zwFt5nZa66jvc
- n09nITaGXYdIHp+7y/FyjQ0sb+IWmFld4mAVk0MBWNWVr3Mex9YNNSgmy9EE6M5b43xN
- x3dJ4/IFRY4LnWpdxwNDyk8yVlxnR0XW4ovHgMGZwifngF15MGT02Q+XRqexcMhDHDG9
- bvO8jpbm2G9j5M+UUX2tKLnlJy9YV16He8YVPMQ8tBv8Hf8ha4ckhbMeLhPy6hxGzxWo
- 87lA==
-X-Gm-Message-State: AOAM532Ldr93Njr5BtQaMEweVr1cVL8bmSneCviDOPso2wFcnHFQRmX3
- Dh9ByQs23fdnuD/9Kj9FS5+reBs8fhiFhPZIp2fcCocAy49Qzl2BBOe0E+KkudU0ivK4xKSHoe+
- nvhGF3y6Vv2H5fMP+VniUKjUzUQo3VVAE4ERKzCypA2uV0hVe
-X-Received: by 2002:a67:c806:: with SMTP id u6mr2459537vsk.94.1591260872037;
- Thu, 04 Jun 2020 01:54:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxFZb0zIAgpssTGaK8S7bLCU1NbZuIGvD6H83HuANdH2KBcxg54jVXSkrs46Iwv2MDeDyduFg71lvGwicdWhOw=
-X-Received: by 2002:a67:c806:: with SMTP id u6mr2459531vsk.94.1591260871783;
- Thu, 04 Jun 2020 01:54:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jgleM-00081I-Py
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:58 -0400
+Received: from shirlock.uni-paderborn.de ([2001:638:502:c003::15]:42250)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jgleL-0002DH-DW
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type
+ :MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+ Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=nUSbl6/B4wKxrG9q03+aLAyJuI8ugX83LZNVy9GhyP8=; b=m+3CCjSffJ99fswlVw1g5Cy4Op
+ 5ImNfJj1A1dNk1C/MmfhF/y7cVUpY9lSyCCZV/0PfyAa+OG0RHF+cxI8ffHpiir0dRrEtBOot19pC
+ tTrl7UhpzWQqq2W9iNcTFkhkv+NqkH0LcuEGVQmFo90DGHIJN1U/gZOoJEHktgKvUCSA=;
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 01/15] docker/tricore: Use stretch-slim as a base image
+Date: Thu,  4 Jun 2020 10:54:27 +0200
+Message-Id: <20200604085441.103087-2-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
+References: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Thu, 4 Jun 2020 10:54:04 +0200
-Message-ID: <CAATJJ0+p2U8uf+Vq_sn=1agSYbZ1iQu_+La8QLCVhMVkK-SKtA@mail.gmail.com>
-Subject: qemu-guest agent asserts on shutdown
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Content-Type: multipart/alternative; boundary="000000000000020d7805a73e4b89"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 04:54:33
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-IMT-Spam-Score: 0.0 ()
+X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=6898277, da=78869958,
+ mc=172, sc=3, hc=169, sp=1, fso=6898277, re=0, sd=0, hd=0
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2020.6.4.84518, AntiVirus-Engine: 5.74.0,
+ AntiVirus-Data: 2020.6.3.5740001
+X-IMT-Authenticated-Sender: uid=kbastian,ou=People,o=upb,c=de
+Received-SPF: pass client-ip=2001:638:502:c003::15;
+ envelope-from=kbastian@mail.uni-paderborn.de; helo=shirlock.uni-paderborn.de
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,143 +83,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000020d7805a73e4b89
-Content-Type: text/plain; charset="UTF-8"
+we get an authentication errror when trying to pull qemu:debian9. Thus
+just start from a plain debian image.
 
-Hi,
-while debugging a report I got in Ubuntu I found that since qemu 4.0 the
-guest agent shutdown feature works (guest is shutting down) but crashes
-when doing so each time. This can be a big red herring when debugging other
-things as well as people start to get "an application crashed, do you want
-to report" pop-ups if they have set up automatic crash reports.
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+---
+ .../dockerfiles/debian-tricore-cross.docker      | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-If you boot the guest after starting it again and check the guest-agent
-status you will see in journal:
--- Logs begin at Tue 2020-06-02 07:41:32 UTC, end at Thu 2020-06-04
-08:07:37 UTC. --
-Jun 02 07:47:58 focal systemd[1]: Started QEMU Guest Agent.
-Jun 02 07:49:03 focal qemu-ga[1984]: info: guest-shutdown called, mode:
-(null)
-Jun 02 07:49:03 focal qemu-ga[1984]: **
-Jun 02 07:49:03 focal qemu-ga[1984]:
-ERROR:/build/qemu-7aKH5L/qemu-4.2/qga/main.c:532:send_response: assertion
-failed: (rsp && s->channel)
-Jun 02 07:49:03 focal qemu-ga[1984]: Bail out!
-ERROR:/build/qemu-7aKH5L/qemu-4.2/qga/main.c:532:send_response: assertion
-failed: (rsp && s->channel)
-Jun 02 07:49:04 focal systemd[1]: Stopping QEMU Guest Agent...
-Jun 02 07:49:04 focal systemd[1]: qemu-guest-agent.service: Succeeded.
-Jun 02 07:49:04 focal systemd[1]: Stopped QEMU Guest Agent.
-
-The actual assert is from "forever" [3] (v0.15) which is the initial
-addition of qemu guest agent in 2011. That was later restructured in [1]
-(v1.1) and [2] (v4.0).
-
-In a check through Ubuntu releases I got
-1) Host: Q 2.11 L 4.0 (Bionic) - G 2.11 (Bionic)
-2) Host: Q 4.0 L 5.4 (Eoan) - G 2.11 (Bionic)
-3) Host: Q 4.2 L 6.0 (Focal) - G 2.11 (Bionic)
-4) Host: Q 2.11 L 4.0 (Bionic) - G 4.0 (Eoan)
-5) Host: Q 4.0 L 5.4 (Eoan) - G 4.0 (Eoan)
-6) Host: Q 4.2 L 6.0 (Focal) - G 4.0 (Eoan)
-7) Host: Q 2.11 L 4.0 (Bionic) - G 4.2 (Focal)
-8) Host: Q 4.0 L 5.4 (Eoan) - G 4.2 (Focal)
-9) Host: Q 4.2 L 6.0 (Focal) - G 4.2 (Focal)
-
-So it seemed to be the qemu-guest-agent portion since >=4.0.
-I did a build with [2] reverted and the crash is gone.
-
-I see from the host:
-$ virsh qemu-agent-command focal '{"execute": "guest-shutdown"}'
-"error: Guest agent is not responding: Guest agent disappeared while
-executing command"
-
-I'm not sure which part of the communication breaks first, but it could try
-to send on a dying connection, the old code had:
-
-rsp = qmp_dispatch(&ga_commands, QOBJECT(req), false);
-    if (rsp) {
-        ret = send_response(s, rsp)
-
-While the new code is like:
-
-    rsp = qmp_dispatch(&ga_commands, obj, false);
-end:
-     ret = send_response(s, rsp);
-
-Maybe it runs send_response despite qmp_dispatch failing now?
-
-I didn't stare at it long enough to have a solution yet, but wanted to make
-the maintainer of qga and the Author aware.
-
-[1]: https://git.qemu.org/?p=qemu.git;a=commit;h=125b310e1d62
-[2]: https://git.qemu.org/?p=qemu.git;a=commit;h=781f2b3d1e5e
-[3]: https://git.qemu.org/?p=qemu.git;a=commit;h=48ff7a625b36
-
+diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/tests/docker/dockerfiles/debian-tricore-cross.docker
+index 4a0f7706a3..544d7814f8 100644
+--- a/tests/docker/dockerfiles/debian-tricore-cross.docker
++++ b/tests/docker/dockerfiles/debian-tricore-cross.docker
+@@ -7,10 +7,22 @@
+ #
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ #
+-FROM qemu:debian9
+-
++FROM debian:stretch-slim
+ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+ 
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
++    DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        curl \
++        flex \
++        gettext \
++        git \
++        python3-minimal
++
+ RUN git clone --single-branch \
+         https://github.com/bkoppelmann/tricore-binutils.git \
+         /usr/src/binutils && \
 -- 
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
+2.26.2
 
---000000000000020d7805a73e4b89
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hi,</div><div>while debugging=C2=A0a report I got in =
-Ubuntu I found that since qemu 4.0 the guest agent shutdown feature works (=
-guest is shutting down) but crashes when doing so each time. This can be a =
-big red herring when debugging other things as well as people start to get =
-&quot;an application crashed, do you want to report&quot; pop-ups if they h=
-ave set up automatic crash reports.</div><div><br></div><div>If you boot th=
-e guest after starting it again and check the guest-agent status you will s=
-ee in journal:</div><div>-- Logs begin at Tue 2020-06-02 07:41:32 UTC, end =
-at Thu 2020-06-04 08:07:37 UTC. --<br>Jun 02 07:47:58 focal systemd[1]: Sta=
-rted QEMU Guest Agent.<br>Jun 02 07:49:03 focal qemu-ga[1984]: info: guest-=
-shutdown called, mode: (null)<br>Jun 02 07:49:03 focal qemu-ga[1984]: **<br=
->Jun 02 07:49:03 focal qemu-ga[1984]: ERROR:/build/qemu-7aKH5L/qemu-4.2/qga=
-/main.c:532:send_response: assertion failed: (rsp &amp;&amp; s-&gt;channel)=
-<br>Jun 02 07:49:03 focal qemu-ga[1984]: Bail out! ERROR:/build/qemu-7aKH5L=
-/qemu-4.2/qga/main.c:532:send_response: assertion failed: (rsp &amp;&amp; s=
--&gt;channel)<br>Jun 02 07:49:04 focal systemd[1]: Stopping QEMU Guest Agen=
-t...<br>Jun 02 07:49:04 focal systemd[1]: qemu-guest-agent.service: Succeed=
-ed.<br>Jun 02 07:49:04 focal systemd[1]: Stopped QEMU Guest Agent.<br></div=
-><div><br></div><div>The actual assert is from &quot;forever&quot; [3] (v0.=
-15) which is the initial addition of qemu guest agent in 2011. That was lat=
-er restructured in [1] (v1.1) and [2] (v4.0).<br></div><div><br></div><div>=
-In a check through=C2=A0Ubuntu releases I got</div><div>1) Host: Q 2.11 L 4=
-.0 (Bionic) - G 2.11 (Bionic)<br>2) Host: Q 4.0 L 5.4 (Eoan) - G 2.11 (Bion=
-ic)<br>3) Host: Q 4.2 L 6.0 (Focal) - G 2.11 (Bionic)<br>4) Host: Q 2.11 L =
-4.0 (Bionic) - G 4.0 (Eoan)<br>5) Host: Q 4.0 L 5.4 (Eoan) - G 4.0 (Eoan)<b=
-r>6) Host: Q 4.2 L 6.0 (Focal) - G 4.0 (Eoan)<br>7) Host: Q 2.11 L 4.0 (Bio=
-nic) - G 4.2 (Focal)<br>8) Host: Q 4.0 L 5.4 (Eoan) - G 4.2 (Focal)<br>9) H=
-ost: Q 4.2 L 6.0 (Focal) - G 4.2 (Focal)<br></div><div><br></div><div>So it=
- seemed to be the qemu-guest-agent portion since &gt;=3D4.0.</div><div>I di=
-d a build with [2] reverted and the crash is gone.</div><div><br></div><div=
->I see from the host:<br>$ virsh qemu-agent-command focal &#39;{&quot;execu=
-te&quot;: &quot;guest-shutdown&quot;}&#39;<br>&quot;error: Guest agent is n=
-ot responding: Guest agent disappeared while executing command&quot;<br><br=
->I&#39;m not sure which part of the communication breaks first, but it coul=
-d try to send on a dying connection, the old code had:<br><br>rsp =3D qmp_d=
-ispatch(&amp;ga_commands, QOBJECT(req), false);<br>=C2=A0 =C2=A0 if (rsp) {=
-<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D send_response(s, rsp)<br><br>While =
-the new code is like:</div><div><br>=C2=A0 =C2=A0 rsp =3D qmp_dispatch(&amp=
-;ga_commands, obj, false);<br>end:<br>=C2=A0 =C2=A0 =C2=A0ret =3D send_resp=
-onse(s, rsp);<br><br>Maybe it runs send_response despite qmp_dispatch faili=
-ng now?<br></div><div><br></div><div>I didn&#39;t stare at it long enough t=
-o have a solution yet, but wanted to make the maintainer of qga and the Aut=
-hor aware.<br></div><br>[1]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
-a=3Dcommit;h=3D125b310e1d62">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
-h=3D125b310e1d62</a><br>[2]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
-a=3Dcommit;h=3D781f2b3d1e5e">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
-h=3D781f2b3d1e5e</a><br>[3]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
-a=3Dcommit;h=3D48ff7a625b36">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
-h=3D48ff7a625b36</a><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr=
-" class=3D"gmail_signature" data-smartmail=3D"gmail_signature">Christian Eh=
-rhardt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div></div>
-
---000000000000020d7805a73e4b89--
 
