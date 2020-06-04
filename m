@@ -2,127 +2,73 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC92C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C34FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:20:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86F9F2053B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:10:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7y6/fcG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F9F2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B18A206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B18A206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgmpH-0004ns-Oo
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:10:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32968)
+	id 1jgmzU-0007m5-MO
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:20:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgmoj-0004Nd-Oa
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:09:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25037
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgmoi-0001RH-Vz
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:09:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591265383;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=OWb86L5WPps7QigoTNsHKIqTAXNKuCACNlrGn8je7VQ=;
- b=Y7y6/fcGYiyQrdtrb5W9EZ01CBle8UT/Ad7QK2ANx0otq0kOMpGdvzkTdOlFOBwRtPBLav
- EEnHaaAv7uPj8gf+kqGIvy4wpytiQxGBidKClfGYZOyw2oSHAx+DUHrM83O3VZ/lwcNMKg
- nWAj0p6chstgB9JgB81dAVsa/v/xBlo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-jN3nL5GIMWK4HtTlMrVVkg-1; Thu, 04 Jun 2020 06:09:41 -0400
-X-MC-Unique: jN3nL5GIMWK4HtTlMrVVkg-1
-Received: by mail-wm1-f71.google.com with SMTP id h6so1630786wmb.7
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 03:09:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=OWb86L5WPps7QigoTNsHKIqTAXNKuCACNlrGn8je7VQ=;
- b=K3cegY0cvC6wOExxQYk791w8ldzgRooPTqk+ToXowwikDogPIXUaGw+R8YqHDkKHtg
- UboEnQtVp3Q1U28biJ2FqUvsCXsgXGJXdUTFrsFLYCPNgN4wAo+BDjAfBcSclt37tGEz
- rEKxwGsDg3HuUJgfHfYSoLNj8kuAaVUjY2+dP2fcsDrO1b0m2OX57CNWWOggyZX+6jqt
- AznAbFv74FllCN0mulTFHn1lN8bnW4T4r9cWwJP6ij7hDTFphF4ln9PYKy20fOxE2d6n
- gwmaFis3NJ31oL0M4dX6tChbYTWr8S5Rlu06PdRhf8St9feWCzh/InmQLD40HYUC/5La
- Jf6w==
-X-Gm-Message-State: AOAM530V9PSwnb+Z5H2Kejg5/5yTUecQl+FrXaCahAImFfzWcG8BZ4d5
- Tk3hIukIlJWVQwyHysYNmtrQ2OhbfGiLUnJRQ/JochOE8z9RlOaWRWtmZAyddR2OERxQN2I7q8o
- U1gIL9gV+fpFBNSo=
-X-Received: by 2002:a5d:4a43:: with SMTP id v3mr3883926wrs.115.1591265380652; 
- Thu, 04 Jun 2020 03:09:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyu13PPsjQJb54VLjrjnrW3TdAwOeb7rwNb+zbYqjZyu/ZARgOQk24wz+iHStRIL3u8haoyQg==
-X-Received: by 2002:a5d:4a43:: with SMTP id v3mr3883914wrs.115.1591265380421; 
- Thu, 04 Jun 2020 03:09:40 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id o15sm6555338wmm.31.2020.06.04.03.09.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 03:09:39 -0700 (PDT)
-Subject: Re: [PATCH] qga: fix assert regression on guest-shutdown
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200604094425.63020-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <48df1081-45ec-a5e4-7110-2a7ce027f831@redhat.com>
-Date: Thu, 4 Jun 2020 12:09:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <wei.w.wang@intel.com>)
+ id 1jgmym-0007G3-Gb
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:20:08 -0400
+Received: from mga06.intel.com ([134.134.136.31]:47774)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <wei.w.wang@intel.com>)
+ id 1jgmyj-0002yp-Kx
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:20:07 -0400
+IronPort-SDR: 8tJqMyp3Lz8hj0IZfoko4mJ3EOXg+riOs8DAHpoYofURebENnN9EarCzGDFQdIlSlHTkcJi/Q8
+ yvfEFp9M6v5g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Jun 2020 03:19:59 -0700
+IronPort-SDR: 7KWp6NUlgOKz4KYxZUP/4xVtQkCL9CRSp1ntSUXerrO3oceHHCdZTKojLYB4TVvF06DRGUKU4h
+ peZqn2HO4MSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; d="scan'208";a="258309044"
+Received: from unknown (HELO [10.239.13.113]) ([10.239.13.113])
+ by orsmga007.jf.intel.com with ESMTP; 04 Jun 2020 03:19:57 -0700
+Message-ID: <5ED8CC78.90006@intel.com>
+Date: Thu, 04 Jun 2020 18:27:04 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64;
+ rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200604094425.63020-1-marcandre.lureau@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, 
+ Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3] migration/xbzrle: add encoding rate
+References: <1588208375-19556-1-git-send-email-wei.w.wang@intel.com>
+ <CAFXwXrm4R5nxk6ruTJ2kP5dUnF7Qm3TfRRiKVAUDNA1uwYf65w@mail.gmail.com>
+ <5ED86344.4020505@intel.com>
+ <4b9cd244-0d96-d1c8-11ec-b61a6bc2bfaa@linaro.org>
+ <20200604093828.GB2851@work-vm>
+In-Reply-To: <20200604093828.GB2851@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=134.134.136.31; envelope-from=wei.w.wang@intel.com;
+ helo=mga06.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 05:06:26
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -136,48 +82,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: kevin.tian@intel.com, Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, gloryxiao@tencent.com, yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 11:44 AM, Marc-André Lureau wrote:
-> Since commit 781f2b3d1e ("qga: process_event() simplification"),
-> send_response() is called unconditionally, but will assert when "rsp" is
-> NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as
-> "guest-shutdown".
-> 
-> Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  qga/main.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qga/main.c b/qga/main.c
-> index f0e454f28d3..3febf3b0fdf 100644
-> --- a/qga/main.c
-> +++ b/qga/main.c
-> @@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rsp)
->      QString *payload_qstr, *response_qstr;
->      GIOStatus status;
->  
-> -    g_assert(rsp && s->channel);
-> +    g_assert(s->channel);
-> +
-> +    if (!rsp) {
-> +        return 0;
-> +    }
+On 06/04/2020 05:38 PM, Dr. David Alan Gilbert wrote:
+> * Richard Henderson (richard.henderson@linaro.org) wrote:
+>> On 6/3/20 7:58 PM, Wei Wang wrote:
+>>> It is possible that encoded_size==0, but unencoded_size !=0. For example,
+>>> a page is written with the same data that it already has.
+>> That really contains 0 bytes?
+>> Not even the ones that say "same data"?
+>>
+>> You certainly have a magical compression algorithm there.
+>> Or bad accounting.
+> We just don't bother sending the page at all in the case it's not
+> changed; no headers, no nothing:
+>
+>      if (encoded_len == 0) {
+>          trace_save_xbzrle_page_skipping();
+>          return 0;
+>
+> and that's xbzrle having correctly done it's job.
+>
+>
+>>> The encoding_rate is expected to reflect if the page is xbzrle encoding friendly.
+>>> The larger, the more friendly, so 0 might not be a good representation here.
+>>>
+>>> Maybe, we could change UINT64_MAX above to "~0ULL" to avoid the issue?
+>> ~0ull is no different than UINT64_MAX -- indeed, they are *exactly* the same
+>> value -- and is not an exactly representible floating-point value.
+>>
+>> If unencoded_size != 0, and (somehow) encoded_size == 0, then
+>>
+>>    unencoded_size / encoded_size = Inf
+>>
+>> which is indeed the limit of x -> 0, n / x.
+>>
+>> Which is *also* printable by %0.2f.
+>>
+>> I still contend that the middle if should be removed, and you should print out
+>> whatever's left.  Either NaN or Inf is instructive.  Certainly nothing in the
+>> middle cares about the actual value.
+> Hmm OK; I'll admit to not liking NaN/Inf in output.
+>
+> Dave
+>
 
-Why not assert after the check?
+OK. To deal with the reported issue, how about using FLT_MAX (as opposed 
+to UINT64_MAX or inf):
+xbzrle_counters.encoding_rate = FLT_MAX;
 
-Anyway:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
->  
->      payload_qstr = qobject_to_json(QOBJECT(rsp));
->      if (!payload_qstr) {
-> 
+Best,
+Wei
+
 
 
