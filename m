@@ -2,73 +2,70 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35354C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EBA8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0619F206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:41:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0619F206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1DF68206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:43:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QR2zh33q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DF68206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgjYq-00044G-34
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:41:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39744)
+	id 1jgjay-0006Lv-Bs
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:43:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wei.w.wang@intel.com>)
- id 1jgjXN-00031G-F3
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:39:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:14037)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jgjaD-0004yG-K8
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:42:33 -0400
+Received: from ozlabs.org ([203.11.71.1]:38327)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wei.w.wang@intel.com>)
- id 1jgjXM-0000DX-72
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:39:36 -0400
-IronPort-SDR: 9eoIggk7s3wMJXWeiR2/ze6MdENG3VtqI/s9or0enyTzTBcNragJU6iEfE4DVU+tde/2uB/mBq
- xA2scGM4uoxw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Jun 2020 23:39:34 -0700
-IronPort-SDR: JfGoEJlwwLFzzAFv/lpKDFsT0WE2gZ6vSYkpz1mLZzQv3Zj4gHNQG95XRQbqwSAJ1DE54SXgnf
- cEDTrmsDExmQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,471,1583222400"; d="scan'208";a="445396140"
-Received: from unknown (HELO [10.239.13.113]) ([10.239.13.113])
- by orsmga005.jf.intel.com with ESMTP; 03 Jun 2020 23:39:31 -0700
-Message-ID: <5ED898CE.9030305@intel.com>
-Date: Thu, 04 Jun 2020 14:46:38 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64;
- rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jgjaB-0000mq-GR
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:42:33 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49cx6C1TGJz9sSy; Thu,  4 Jun 2020 16:42:27 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1591252947;
+ bh=xkT1FQ1tlWIodI9BBRKL+4b/EXFmxDrPZ0u1FPIW7HI=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=QR2zh33qP7gj/TB0dA7oLnQ+vEpmbGqoA2wfiM0EiCBp41eF/iMONXw5vFsneh6sc
+ zYMWKWeBmbwk/ptAnuv+EfARjbItYcsmSUa15zgF7t+2HHmt8g/AAOVEpTWTKzGGU/
+ 9AXFAXt0P9pgskrcR63dWABn7OXHjD2eUB8Tx92A=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: rth@twiddle.net, pbonzini@redhat.com, ekabkost@redhat.com,
+ qemu-devel@nongnu.org
+Subject: [PATCH 1/9] target/i386: sev: Remove unused QSevGuestInfoClass
+Date: Thu,  4 Jun 2020 16:42:11 +1000
+Message-Id: <20200604064219.436242-2-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200604064219.436242-1-david@gibson.dropbear.id.au>
+References: <20200604064219.436242-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3] migration/xbzrle: add encoding rate
-References: <1588208375-19556-1-git-send-email-wei.w.wang@intel.com>
- <CAFXwXrm4R5nxk6ruTJ2kP5dUnF7Qm3TfRRiKVAUDNA1uwYf65w@mail.gmail.com>
- <5ED86344.4020505@intel.com>
- <4b9cd244-0d96-d1c8-11ec-b61a6bc2bfaa@linaro.org>
-In-Reply-To: <4b9cd244-0d96-d1c8-11ec-b61a6bc2bfaa@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=134.134.136.20; envelope-from=wei.w.wang@intel.com;
- helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 02:39:34
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 02:12:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,53 +78,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, Juan Quintela <quintela@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- gloryxiao@tencent.com, yi.y.sun@intel.com
+Cc: brijesh.singh@amd.com, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, dgilbert@redhat.com,
+ philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/04/2020 11:22 AM, Richard Henderson wrote:
-> On 6/3/20 7:58 PM, Wei Wang wrote:
->> It is possible that encoded_size==0, but unencoded_size !=0. For example,
->> a page is written with the same data that it already has.
-> That really contains 0 bytes?
-> Not even the ones that say "same data"?
+This structure is nothing but an empty wrapper around the parent class,
+which by QOM conventions means we don't need it at all.
 
-Yes. It's a just delta operation, the diff (encoded_size) is 0 in that case.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/i386/sev.c      | 1 -
+ target/i386/sev_i386.h | 5 -----
+ 2 files changed, 6 deletions(-)
 
->
-> You certainly have a magical compression algorithm there.
-> Or bad accounting.
->
->> The encoding_rate is expected to reflect if the page is xbzrle encoding friendly.
->> The larger, the more friendly, so 0 might not be a good representation here.
->>
->> Maybe, we could change UINT64_MAX above to "~0ULL" to avoid the issue?
-> ~0ull is no different than UINT64_MAX -- indeed, they are *exactly* the same
-> value -- and is not an exactly representible floating-point value.
->
-> If unencoded_size != 0, and (somehow) encoded_size == 0, then
->
->    unencoded_size / encoded_size = Inf
->
-> which is indeed the limit of x -> 0, n / x.
->
-> Which is *also* printable by %0.2f.
->
-> I still contend that the middle if should be removed, and you should print out
-> whatever's left.  Either NaN or Inf is instructive.  Certainly nothing in the
-> middle cares about the actual value.
->
-
-OK, leave it as "inf" looks good to me. Will send a patch to remove the 
-middle. Thanks!
-
-Best,
-Wei
-
-
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 51cdbe5496..2312510cf2 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -287,7 +287,6 @@ static const TypeInfo qsev_guest_info = {
+     .name = TYPE_QSEV_GUEST_INFO,
+     .instance_size = sizeof(QSevGuestInfo),
+     .instance_finalize = qsev_guest_finalize,
+-    .class_size = sizeof(QSevGuestInfoClass),
+     .class_init = qsev_guest_class_init,
+     .instance_init = qsev_guest_init,
+     .interfaces = (InterfaceInfo[]) {
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index 8ada9d385d..4f193642ac 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -41,7 +41,6 @@ extern char *sev_get_launch_measurement(void);
+ extern SevCapability *sev_get_capabilities(void);
+ 
+ typedef struct QSevGuestInfo QSevGuestInfo;
+-typedef struct QSevGuestInfoClass QSevGuestInfoClass;
+ 
+ /**
+  * QSevGuestInfo:
+@@ -64,10 +63,6 @@ struct QSevGuestInfo {
+     uint32_t reduced_phys_bits;
+ };
+ 
+-struct QSevGuestInfoClass {
+-    ObjectClass parent_class;
+-};
+-
+ struct SEVState {
+     QSevGuestInfo *sev_info;
+     uint8_t api_major;
+-- 
+2.26.2
 
 
