@@ -2,92 +2,128 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A30CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 05:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662DAC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:09:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 271A1206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 05:56:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 340BB2072E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 06:09:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="phMuAolX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271A1206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWSYwyXX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340BB2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgirE-0003JD-A5
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 01:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36070)
+	id 1jgj4T-0006dz-B2
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 02:09:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jgiqe-0002q3-K0; Thu, 04 Jun 2020 01:55:28 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36061)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jgiqb-0008BL-72; Thu, 04 Jun 2020 01:55:28 -0400
-Received: by mail-il1-x144.google.com with SMTP id a13so4936520ilh.3;
- Wed, 03 Jun 2020 22:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nQtjsjGPjwWyApFnJH5bDNHxhHOkFHccsYdGOx5Lu/E=;
- b=phMuAolXprKtdj6MkfF9qBtgoyKgtimeasHu41wVdRdy6MqeHlwbZ8I6tDWk0ldjDG
- 2JnFyh03hW8DPqyjE5ChZyVVUBgB6z+nvgXIe9PipdB6hs7qvpW2Q1DgcElKwm7sqf2t
- HGFF4XkMXc1cAAHUSMVkacmVbvu/SD5soDhfMYa9/mMy34cI3usdfVKy0CNE5tGqiM/t
- Jox5U/gmixTRJS+RGkqHq7Fg6aVevLqcR6XHnETvsVgfMaWr+omA3AaUMxxw+IRNTj+0
- HpPw+tdrTTVLwCZ2eYZbEXtFlF0Lb9O1dgofkjDE/U5MuzGioXMUGtrWrE0VGB/lGwfX
- AMeQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgj2q-0005ll-Dt
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:08:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53764
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jgj2o-0001ra-De
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 02:08:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591250880;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=wojn8eITTgy1cuO3BUYuxJeW0pjtVSY/eL3hBpA0tns=;
+ b=EWSYwyXXUzWl0ByWYIrBl9TAw4qUr9rmthYr/1WS6pFTBFOg/xT0YuSi8lHWQOLNfUy2Ip
+ mXyLcAcMVqh188Zyt2d3ErpbHbtpuJG6N1cqx53+1IGLAAN3MRZcMMghnP/mJBU1XgL0AC
+ JkTZgq97F2+6Wj4+yY18YiYVHzU+M1I=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-422-kBBW8EGwPUeQxIkkoWKC7A-1; Thu, 04 Jun 2020 02:07:56 -0400
+X-MC-Unique: kBBW8EGwPUeQxIkkoWKC7A-1
+Received: by mail-wr1-f70.google.com with SMTP id l18so1996080wrm.0
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 23:07:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nQtjsjGPjwWyApFnJH5bDNHxhHOkFHccsYdGOx5Lu/E=;
- b=Z0aKoNYf0x8DLppYD3VZiduPwqFjIEzmJo8d67gkfaOQAOPUy88TOqZ65C+WHqGrCp
- kSSMQFokfHIzHfrjeOWQGntWryEHPTK3xZc9fDiHAZ0d36s6EQDTOy6XAcSnCzkxLqCS
- nU4w7zNngpuV52Vy9tiqroUpRqY6ogbE88hDs51AzIbmu0AO+FU11h0089n96vcHp6dO
- 1D/ZKa76Ukc48X7779oyw3HEKqnuVXLxHMsZwseIxzBycn6Ua28+WWZONb3somPooKxP
- HyCgiRWu5GZ6BUa8mv0ky1C3xuto43FWPhjl2ILWJazH+jY+2MUF1NoWdX8QCcXQEm7A
- HSFQ==
-X-Gm-Message-State: AOAM5326nUzs1SjkXG8Rv2glkBOAX0OqHr4AhZbKeZqWLhmaupDvLKCQ
- 7YqaK9t+BLQxcrQPM1TR9eay/cNDaYbPLYpvcSw=
-X-Google-Smtp-Source: ABdhPJxIj71W3wWa2Z5glQzTcbXXv60/0IDJNERsLuSa+BVv7h0c3FmIF18Q6MA0ERam4L4vRY0OXjZFH8UxggrCduI=
-X-Received: by 2002:a92:c94b:: with SMTP id i11mr2789332ilq.177.1591250123750; 
- Wed, 03 Jun 2020 22:55:23 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=wojn8eITTgy1cuO3BUYuxJeW0pjtVSY/eL3hBpA0tns=;
+ b=k8aVrqY8nm1RL2dXAVk/yXXjKJvcha3oA9GYYI/csoDXeAyAtdJOSZjRyxjo5eHAPL
+ vGBz/oQnRmpV+8nqknXIx8UtsFyN8Ss47RDsQOhR8QBTr4prfu/HNEKHt1az3ghk49l1
+ pwjl3ktTlVArMYXU9WsqEK6538mX4Si2Yo+gJK3l2HAFxq4nIA/Yq/UAVVYUNuo51qum
+ UbutPYoaurE5JmgpsqRoof7LANYBCsVyIjLk1bCSNkv6aAWTk13o6lKmAujg6vGJyL40
+ 7ABKWqZjG3lFJ2QgsAY+0XkbB81dhoK0605SkmshqIV/LmUP7/Edgfbmb+gAHJ3vFZcD
+ bJjg==
+X-Gm-Message-State: AOAM5320W+HqttQxqaE0CoW5FBAIeedN9p5RX6kXxFfcP6OnXTvY8bDN
+ QgMw/qJ0lv6N6/By0iJfFMTQ5uYi1AIYDnx8n8W/Yscdldlv3Ykb1DSy/OsrhOamEGsAJEsLJko
+ xcicUToA81eRFP3M=
+X-Received: by 2002:adf:ed51:: with SMTP id u17mr2532737wro.285.1591250875394; 
+ Wed, 03 Jun 2020 23:07:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqj2W5+u+tCO6rsF6aicuyXSIz5maz9cNiiW0kI4sG0VMGXlzXR+2eet317oQwpHVFvkoKrw==
+X-Received: by 2002:adf:ed51:: with SMTP id u17mr2532714wro.285.1591250875083; 
+ Wed, 03 Jun 2020 23:07:55 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id e15sm6025145wme.9.2020.06.03.23.07.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 03 Jun 2020 23:07:54 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] pci: ensure configuration access is within bounds
+To: BALATON Zoltan <balaton@eik.bme.hu>, P J P <ppandit@redhat.com>
+References: <20200603202251.1199170-1-ppandit@redhat.com>
+ <20200603202251.1199170-3-ppandit@redhat.com>
+ <alpine.BSF.2.22.395.2006040006520.56892@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <e1ccdf71-5069-fa95-3c90-de4f875b2706@redhat.com>
+Date: Thu, 4 Jun 2020 08:07:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <cover.1590704015.git.alistair.francis@wdc.com>
- <73cce2d0edd0d41ba15df403a2096bfa70bf0565.1590704015.git.alistair.francis@wdc.com>
- <cc1a1671-b926-bb31-1ed2-d2920f0faf38@c-sky.com>
- <c9f16143-4e9b-a3a8-ffd3-12d43fd2e343@c-sky.com>
- <CAKmqyKM6rigjbDoFh0bfq8gJXJ=+H+onh=DXjCzhAijMCvR16Q@mail.gmail.com>
- <ec0a7545-1793-d1a9-fccf-068496cf1f0a@c-sky.com>
- <CAKmqyKOvv2HCpXoD+8E5q2S7JqSDfT7_z3+_=cKFLi+H92itjw@mail.gmail.com>
- <aa240d2d-42bb-b9dd-90f0-1a3051c2491f@c-sky.com>
- <CAKmqyKN3QBadrqzohWe0uwiCPcjU9WFHF_4j0dsKehszsZ4AWg@mail.gmail.com>
- <a56ffc6e-037b-5120-f22c-f18d98e8a382@163.com>
-In-Reply-To: <a56ffc6e-037b-5120-f22c-f18d98e8a382@163.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 3 Jun 2020 22:46:11 -0700
-Message-ID: <CAKmqyKOTiP_UcagHnnEVsaC1ogYMJZykn2MU=Gk125+DrrXrCg@mail.gmail.com>
-Subject: Re: [PATCH v5 07/11] hw/char: Initial commit of Ibex UART
-To: LIU Zhiwei <liuzwnan@163.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <alpine.BSF.2.22.395.2006040006520.56892@zero.eik.bme.hu>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,128 +137,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Ren Ding <rding@gatech.edu>, Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 3, 2020 at 10:06 PM LIU Zhiwei <liuzwnan@163.com> wrote:
->
->
->
-> On 2020/6/4 12:35, Alistair Francis wrote:
-> > On Wed, Jun 3, 2020 at 6:59 PM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
-> >>
-> >>
-> >> On 2020/6/3 23:56, Alistair Francis wrote:
-> >>> On Wed, Jun 3, 2020 at 3:33 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
-> >>>> On 2020/6/3 1:54, Alistair Francis wrote:
-> >>>>> On Tue, Jun 2, 2020 at 5:28 AM LIU Zhiwei<zhiwei_liu@c-sky.com>  wrote:
-> >>>>>> Hi Alistair,
-> >>>>>>
-> >>>>>> There are still some questions I don't understand.
-> >>>>>>
-> >>>>>> 1. Is the baud rate  or fifo a necessary feature to simulate?
-> >>>>>> As you can see, qemu_chr_fe_write will send the byte as soon as possible.
-> >>>>>> When you want to transmit a byte through WDATA,  you can call
-> >>>>>> qemu_chr_fe_write directly.
-> >>>>> So qemu_chr_fe_write() will send the data straight away. This doesn't
-> >>>>> match what teh hardware does though. So by modelling a FIFO and a
-> >>>>> delay in sending we can better match the hardware.
-> >>>> I see many UARTs have similar features. Does the software really care about
-> >>>> these features? Usually I just want to print something to the terminal
-> >>>> through UART.
-> >>> In this case Tock (which is the OS used for OpenTitan) does car about
-> >>> these features as it relies on interrupts generated by the HW to
-> >>> complete the serial send task. It also just makes the QEMU model more
-> >>> accurate.
-> >> Fair enough. I see the "tx_watermark" interrupt, which needs the FIFO.
-> >> At least,
-> >> it can verify the ISP.
-> > Exactly :)
-> >
-> >>>> Most simulation in QEMU is for running software, not exactly the details
-> >>>> of hardware.
-> >>>> For example, we will not simulate the 16x oversamples in this UART.
-> >>> Agreed. Lots of UARTs don't bother modelling the delay from the
-> >>> hardware as generally it doesn't matter. In this case it does make a
-> >>> difference for the software and it makes the QEMU model more accurate,
-> >>> which is always a good thing.
-> >>>
-> >>>> There is no error here. Personally I  think it is necessary to simulate
-> >>>> the FIFO and baud rate,
-> >>>> maybe for supporting some backends.
-> >>> So baud rate doesn't need to be modelled as we aren't actually sending
-> >>> UART data, just pretending and then printing it.
-> >>>
-> >>>> Can someone give a reasonable answer for this question?
-> >>> Which question?
-> >> I see  the UART can work with many  different backends,  such as pty ,
-> >> file, socket and so on.
-> >> I wonder if this a backend, which has some requirements on the baud
-> > The backend should be independent so it doesn't matter what baud rate
-> > we choose here.
-> >
-> >> rate.  You can ignore it,
-> >> as it doesn't matter.
-> >>>>>> 2.  The baud rate calculation method is not strictly right.
-> >>>>>> I think when a byte write to FIFO,  char_tx_time * 8 is the correct time
-> >>>>>> to send the byte instead of
-> >>>>>> char_tx_time * 4.
-> >>>>> Do you mind explaining why 8 is correct instead of 4?
-> >>>> Usually write a byte to WDATA will trigger a uart_write_tx_fifo.
-> >>>> Translate a bit will take
-> >>>> char_tx_time. So it will take char_tx_time * 8 to transmit a byte.
-> >>> I see your point. I just used the 4 as that is what the Cadence one
-> >>> does. I don't think it matters too much as it's just the delay for a
-> >>> timer (that isn't used as an accurate timer).
-> >> Got it. Just a way to send the bytes at sometime later.
-> >>>>>> 3.  Why add a watch here?
-> >>>>> This is based on the Cadence UART implementation in QEMU (which does
-> >>>>> the same thing). This will trigger a callback when we can write more
-> >>>>> data or when the backend has hung up.
-> >>>> Many other serials do the same thing, like virtio-console and serial. So
-> >>>> it may be a common
-> >>>> interface here. I will try to understand it(Not yet).
-> >>> Yep, it's just a more complete model of that the HW does.
-> >> I try to boot a RISC-V Linux, and set a breakpoint  to a watch callback
-> >> function.
-> >> The breakpoint did't match.
-> >>
-> >> I just wonder if there is a case really need the callback function.
-> > AFAIK Linux doesn't support the Ibex UART (or Ibex at all) so it
-> > shouldn't be triggered.
-> I tried with the UART in the virt board.  It also registers the watch
-> callback on
-> G_IO_HUP and G_IO_OUT.
->
-> However I will through the question alone in another mail.
+On 6/4/20 12:13 AM, BALATON Zoltan wrote:
+> On Thu, 4 Jun 2020, P J P wrote:
+>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>
+>> While reading PCI configuration bytes, a guest may send an
+>> address towards the end of the configuration space. It may lead
+>> to an OOB access issue. Assert that 'address + len' is within
+>> PCI configuration space.
+>>
+>> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>> hw/pci/pci.c | 2 ++
+>> 1 file changed, 2 insertions(+)
+>>
+>> Update v2: assert PCI configuration access is within bounds
+>>  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00711.html
+>>
+>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>> index 70c66965f5..173bec4fd5 100644
+>> --- a/hw/pci/pci.c
+>> +++ b/hw/pci/pci.c
+>> @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
+>> {
+>>     uint32_t val = 0;
+>>
+>> +    assert(address + len <= pci_config_size(d));
+> 
+> Does this allow guest now to crash QEMU? I think it was suggested that
+> assert should only be used for cases that can only arise from a
+> programming error and not from values set by the guest. If this is
+> considered to be an error now to call this function with wrong
+> parameters did you check other callers? I've found a few such as:
+> 
+> hw/scsi/esp-pci.c
+> hw/watchdog/wdt_i6300esb.c
+> hw/ide/cmd646.c
+> hw/vfio/pci.c
+> 
+> and maybe others. Would it be better to not crash just log invalid
+> access and either fix up parameters or return some garbage like 0?
 
-Ah, sorry I misunderstood what you meant.
+Yes, maybe I was not clear while reviewing v1, we need to audit the
+callers and fix them first, then we can safely add the assert here.
 
-I haven't looked at it, it's possible it's not enabled by Linux.
+> 
+> Regards,
+> BALATON Zoltan
+> 
+>> +
+>>     if (pci_is_express_downstream_port(d) &&
+>>         ranges_overlap(address, len, d->exp.exp_cap + PCI_EXP_LNKSTA,
+>> 2)) {
+>>         pcie_sync_bridge_lnk(d);
+>>
 
->
-> After the two points addressed,
->
-> Reviewed-by: LIU Zhiwei<zhiwei_liu@c-sky.com>
-
-Thanks!
-
-Alistair
-
->
-> Zhiwei
-> >
-> > Alistair
-> >
-> >> Zhiwei
-> >>> Alistair
->
->
->
 
