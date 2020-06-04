@@ -2,86 +2,83 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74494C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1408EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:02:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EAD5204EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:59:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXjJ46VX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EAD5204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD021204EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 10:02:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD021204EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgmeK-0007GY-E2
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:59:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59498)
+	id 1jgmhh-0000Dm-6y
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 06:02:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jgmda-0006OJ-92
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:58:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36545
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jgmdZ-0007aB-89
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:58:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591264692;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=W+UANcxtQ8/KjNOAJeWLi+6qqQRBUd7qdXr12xK65lU=;
- b=aXjJ46VXywc+q7HiRIDcuOdcNt+akYwzYvLPRCO/dcw2oS7LuIUrAkdfn2ctvnp9pa/KR6
- fFiH6Mxs4ELzBvNMxdsixqLiZ5d5AS2EfiUrJdzWzsadLE2q3yzfBZ7fpYh8hlB7wEwnpf
- v3YDoVcJdJKzHsXBNnvrfEfv72vQsT4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-x4Dy6cdlOPeloOjrcT814Q-1; Thu, 04 Jun 2020 05:58:10 -0400
-X-MC-Unique: x4Dy6cdlOPeloOjrcT814Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71AB8EC1AD;
- Thu,  4 Jun 2020 09:58:09 +0000 (UTC)
-Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D8DB6111F;
- Thu,  4 Jun 2020 09:58:02 +0000 (UTC)
-Date: Thu, 4 Jun 2020 10:57:59 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH] iotests: 194: wait migration completion on target too
-Message-ID: <20200604095759.GC2851@work-vm>
-References: <20200604083341.26978-1-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jgmgz-0008Az-1b
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:01:45 -0400
+Received: from regular1.263xmail.com ([211.150.70.201]:44018)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jgmgw-0000Nc-G9
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:01:44 -0400
+Received: from localhost (unknown [192.168.167.32])
+ by regular1.263xmail.com (Postfix) with ESMTP id 7B0C7932;
+ Thu,  4 Jun 2020 18:01:35 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-SKE-CHECKED: 1
+X-ABS-CHECKED: 1
+Received: from [192.168.1.3] (unknown [223.72.80.61])
+ by smtp.263.net (postfix) whith ESMTP id
+ P3330T139696696981248S1591264894501838_; 
+ Thu, 04 Jun 2020 18:01:35 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <ed0f8d72332072a991989fb7adf74ae5>
+X-RL-SENDER: chengang@emindsoft.com.cn
+X-SENDER: chengang@emindsoft.com.cn
+X-LOGIN-NAME: chengang@emindsoft.com.cn
+X-FST-TO: qemu-devel@nongnu.org
+X-SENDER-IP: 223.72.80.61
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+Subject: Re: [PATCH] [PATCH v6] linux-user: syscall: ioctls: support
+ DRM_IOCTL_VERSION
+To: Laurent Vivier <laurent@vivier.eu>, riku.voipio@iki.fi
+References: <20200604014527.7795-1-chengang@emindsoft.com.cn>
+ <30eeb463-42d8-5aaa-1741-1cc3bb885fdc@vivier.eu>
+From: Chen Gang <chengang@emindsoft.com.cn>
+Message-ID: <f01ce257-6f2b-782f-8e27-b5237bb7c627@emindsoft.com.cn>
+Date: Thu, 4 Jun 2020 18:01:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200604083341.26978-1-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <30eeb463-42d8-5aaa-1741-1cc3bb885fdc@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=211.150.70.201;
+ envelope-from=chengang@emindsoft.com.cn; helo=regular1.263xmail.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 06:01:36
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,81 +91,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, thuth@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> It is possible, that shutdown on target occurs earlier than migration
-> finish. In this case we crash in bdrv_release_dirty_bitmap_locked()
-> on assertion "assert(!bdrv_dirty_bitmap_busy(bitmap));" as we do have
-> busy bitmap, as bitmap migration is ongoing.
-> 
-> We'll fix bitmap migration to gracefully cancel on early shutdown soon.
-> Now let's fix iotest 194 to wait migration completion before shutdown.
-> 
-> Note that in this test dest_vm.shutdown() is called implicitly, as vms
-> used as context-providers, see __exit__() method of QEMUMachine class.
-> 
-> Actually, not waiting migration finish is a wrong thing, but the test
-> started to crash after commit ae00aa239847682
-> "iotests: 194: test also migration of dirty bitmap", which added dirty
-> bitmaps here. So, Fixes: tag won't hurt.
+That sounds good, I'll send patch v7, thanks.
 
-Without knowing the iotests framework, the actual problem sounds right;
-I just fixed a similar bug in the acceptance test migration code.
-Every migration test seems to make the same mistake!
-
-Dave
-
-> Fixes: ae00aa2398476824f0eca80461da215e7cdc1c3b
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/194     | 10 ++++++++++
->  tests/qemu-iotests/194.out |  5 +++++
->  2 files changed, 15 insertions(+)
+On 2020/6/4 下午5:10, Laurent Vivier wrote:
+> Le 04/06/2020 à 03:45, chengang@emindsoft.com.cn a écrit :
+>> From: Chen Gang <chengang@emindsoft.com.cn>
+>>
+>> Another DRM_IOCTL_* commands will be done later.
+>>
+>> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+>> ---
+>>  configure                  | 10 ++++
+>>  linux-user/ioctls.h        |  5 ++
+>>  linux-user/syscall.c       | 95 ++++++++++++++++++++++++++++++++++++++
+>>  linux-user/syscall_defs.h  | 15 ++++++
+>>  linux-user/syscall_types.h | 11 +++++
+>>  5 files changed, 136 insertions(+)
+>>
+>> diff --git a/configure b/configure
+>> index f087d2bcd1..389dbb1d09 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -3136,6 +3136,13 @@ if ! check_include "ifaddrs.h" ; then
+>>    have_ifaddrs_h=no
+>>  fi
+>>  
+>> +#########################################
+>> +# libdrm check
+>> +have_drm_h=no
+>> +if check_include "libdrm/drm.h" ; then
+>> +    have_drm_h=yes
+>> +fi
+>> +
+>>  ##########################################
+>>  # VTE probe
+>>  
+>> @@ -7127,6 +7134,9 @@ fi
+>>  if test "$have_ifaddrs_h" = "yes" ; then
+>>      echo "HAVE_IFADDRS_H=y" >> $config_host_mak
+>>  fi
+>> +if test "$have_drm_h" = "yes" ; then
+>> +  echo "HAVE_DRM_H=y" >> $config_host_mak
+>> +fi
+>>  if test "$have_broken_size_max" = "yes" ; then
+>>      echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
+>>  fi
+>> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+>> index 0defa1d8c1..f2e2fa9c87 100644
+>> --- a/linux-user/ioctls.h
+>> +++ b/linux-user/ioctls.h
+>> @@ -574,6 +574,11 @@
+>>    IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
+>>                  MK_PTR(MK_STRUCT(STRUCT_rtentry)))
+>>  
+>> +#ifdef HAVE_DRM_H
+>> +  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
+>> +                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
+>> +#endif
+>> +
+>>  #ifdef TARGET_TIOCSTART
+>>    IOCTL_IGNORE(TIOCSTART)
+>>    IOCTL_IGNORE(TIOCSTOP)
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 7f6700c54e..1744e7acc7 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -112,6 +112,9 @@
+>>  #include <linux/if_alg.h>
+>>  #include <linux/rtc.h>
+>>  #include <sound/asound.h>
+>> +#ifdef HAVE_DRM_H
+>> +#include <libdrm/drm.h>
+>> +#endif
+>>  #include "linux_loop.h"
+>>  #include "uname.h"
+>>  
+>> @@ -5276,6 +5279,98 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+>>  }
+>>  #endif
+>>  
+>> +#ifdef HAVE_DRM_H
+>> +
+>> +static void unlock_drm_version(struct drm_version *host_ver)
+>> +{
+>> +    unlock_user(host_ver->name, 0UL, 0);
+>> +    unlock_user(host_ver->date, 0UL, 0);
+>> +    unlock_user(host_ver->desc, 0UL, 0);
+>> +}
 > 
-> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-> index 3fad7c6c1a..6dc2bc94d7 100755
-> --- a/tests/qemu-iotests/194
-> +++ b/tests/qemu-iotests/194
-> @@ -87,4 +87,14 @@ with iotests.FilePath('source.img') as source_img_path, \
->              iotests.log(dest_vm.qmp('nbd-server-stop'))
->              break
->  
-> +    iotests.log('Wait migration completion on target...')
-> +    migr_events = (('MIGRATION', {'data': {'status': 'completed'}}),
-> +                   ('MIGRATION', {'data': {'status': 'failed'}}))
-> +    event = dest_vm.events_wait(migr_events)
-> +    iotests.log(event, filters=[iotests.filter_qmp_event])
-> +
-> +    iotests.log('Check bitmaps on source:')
->      iotests.log(source_vm.qmp('query-block')['return'][0]['dirty-bitmaps'])
-> +
-> +    iotests.log('Check bitmaps on target:')
-> +    iotests.log(dest_vm.qmp('query-block')['return'][0]['dirty-bitmaps'])
-> diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
-> index dd60dcc14f..f70cf7610e 100644
-> --- a/tests/qemu-iotests/194.out
-> +++ b/tests/qemu-iotests/194.out
-> @@ -21,4 +21,9 @@ Gracefully ending the `drive-mirror` job on source...
->  {"data": {"device": "mirror-job0", "len": 1073741824, "offset": 1073741824, "speed": 0, "type": "mirror"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
->  Stopping the NBD server on destination...
->  {"return": {}}
-> +Wait migration completion on target...
-> +{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-> +Check bitmaps on source:
-> +[{"busy": false, "count": 0, "granularity": 65536, "name": "bitmap0", "persistent": false, "recording": true, "status": "active"}]
-> +Check bitmaps on target:
->  [{"busy": false, "count": 0, "granularity": 65536, "name": "bitmap0", "persistent": false, "recording": true, "status": "active"}]
-> -- 
-> 2.21.0
+> This is correct but I would prefer to not have this kind of function
+> with 0UL parameter.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> You can use target_ver for the guest pointer and host_ver for the len,
+> guest pointer will be ignored if host pointer is NULL.
+> 
+> You can have a generic function that not copies data in case of error:
+> 
+> static void unlock_drm_strings(struct drm_version *host_ver,
+>                                struct target_drm_version *target_ver,
+>                                int copy)
+> {
+>     unlock_user(host_ver->name, target_ver->name,
+>                 copy ? host_ver->name_len : 0);
+> ...
+> 
+>> +
+>> +static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
+>> +                                          struct target_drm_version *target_ver)
+>> +{
+>> +    memset(host_ver, 0, sizeof(*host_ver));
+>> +
+>> +    __get_user(host_ver->name_len, &target_ver->name_len);
+>> +    if (host_ver->name_len) {
+>> +        host_ver->name = lock_user(VERIFY_WRITE, target_ver->name,
+>> +                                   target_ver->name_len, 0);
+>> +        if (!host_ver->name) {
+>> +            goto err;
+>> +        }
+>> +    }
+>> +
+>> +    __get_user(host_ver->date_len, &target_ver->date_len);
+>> +    if (host_ver->date_len) {
+>> +        host_ver->date = lock_user(VERIFY_WRITE, target_ver->date,
+>> +                                   target_ver->date_len, 0);
+>> +        if (!host_ver->date) {
+>> +            goto err;
+>> +        }
+>> +    }
+>> +
+>> +    __get_user(host_ver->desc_len, &target_ver->desc_len);
+>> +    if (host_ver->desc_len) {
+>> +        host_ver->desc = lock_user(VERIFY_WRITE, target_ver->desc,
+>> +                                   target_ver->desc_len, 0);
+>> +        if (!host_ver->desc) {
+>> +            goto err;
+>> +        }
+>> +    }
+>> +
+>> +    return 0;
+>> +err:
+>> +    unlock_drm_version(host_ver);
+> 
+> unlock_drm_strings(host_ver, target_ver, 0);
+> 
+>> +    return -EFAULT;
+>> +}
+>> +
+>> +static inline abi_long host_to_target_drmversion(
+>> +                                          struct target_drm_version *target_ver,
+>> +                                          struct drm_version *host_ver)
+>> +{
+>> +    __put_user(host_ver->version_major, &target_ver->version_major);
+>> +    __put_user(host_ver->version_minor, &target_ver->version_minor);
+>> +    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
+>> +    __put_user(host_ver->name_len, &target_ver->name_len);
+>> +    __put_user(host_ver->date_len, &target_ver->date_len);
+>> +    __put_user(host_ver->desc_len, &target_ver->desc_len);
+>> +    unlock_user(host_ver->name, target_ver->name, host_ver->name_len);
+>> +    unlock_user(host_ver->date, target_ver->date, host_ver->date_len);
+>> +    unlock_user(host_ver->desc, target_ver->desc, host_ver->desc_len);
+> 
+> unlock_drm_strings(host_ver, target_ver, 1);
+> 
+>> +    return 0;
+>> +}
+>> +
+>> +static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
+>> +                             int fd, int cmd, abi_long arg)
+>> +{
+>> +    struct drm_version *ver;
+>> +    struct target_drm_version *target_ver;
+>> +    abi_long ret;
+>> +
+>> +    switch (ie->host_cmd) {
+>> +    case DRM_IOCTL_VERSION:
+>> +        if (!lock_user_struct(VERIFY_WRITE, target_ver, arg, 0)) {
+>> +            return -TARGET_EFAULT;
+>> +        }
+>> +        ver = (struct drm_version *)buf_temp;
+>> +        ret = target_to_host_drmversion(ver, target_ver);
+>> +        if (!is_error(ret)) {
+>> +            ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
+>> +            if (!is_error(ret)) {
+>> +                ret = host_to_target_drmversion(target_ver, ver);
+>> +            }
+>> +            unlock_drm_version(ver);
+> 
+> } else {
+>     unlock_drm_strings(host_ver, target_ver, 0);
+> }
+> 
+> Thanks,
+> Laurent
+> 
+> 
+> 
+> 
+
 
 
