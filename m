@@ -2,155 +2,99 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58251C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E5DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:57:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27ACD2077D
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED99C206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5+b/eKG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27ACD2077D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQxxrW1v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED99C206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgv0N-0005Qq-Db
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:54:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40742)
+	id 1jgv3l-0007Ui-9H
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:57:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jguzo-0004wp-2N
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:53:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22788
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jgv3B-0006rI-M8
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:57:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53869
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jguzm-0003cx-PG
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:53:43 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jgv3A-00048Y-UI
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:57:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591296819;
+ s=mimecast20190719; t=1591297032;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qXUXi1s+o6Yd7t1bznRAlv1PkHVKa1hSykodwUNCOnk=;
- b=G5+b/eKGwU+23gTHVMfd07YNLIYCdh/RAgDndSFYuNXw3TqDQ4VpF3lLalrA5Tv//HcBS6
- mbTPNYV1ZQHmjn10G6hLpebMMBJjs0DRUORQYDzz/itz4dOekDm0S9HRHUhStgyrXuz9nL
- F96PP2psCTvp1/00Pi7g1pa6O0RLgB0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-QXe50u7pOP6kuVns718L8g-1; Thu, 04 Jun 2020 14:53:35 -0400
-X-MC-Unique: QXe50u7pOP6kuVns718L8g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DF5518A8226;
- Thu,  4 Jun 2020 18:53:34 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4AF567F4C6;
- Thu,  4 Jun 2020 18:53:33 +0000 (UTC)
-Subject: Re: [PATCH v2 16/16] python/qemu: Add mypy type annotations
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200602214528.12107-1-jsnow@redhat.com>
- <20200602214528.12107-17-jsnow@redhat.com>
- <20200604145023.GI4512@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d5440c16-4d1a-721c-5eb6-b65409d99f30@redhat.com>
-Date: Thu, 4 Jun 2020 14:53:32 -0400
+ in-reply-to:in-reply-to:references:references;
+ bh=vUBwtgqtS3fbGSHGtj76gaU04adG9cf7zkUg6v/29Lc=;
+ b=QQxxrW1vnCxTSGIJiyCx9nYvzOPehKQf4oESj2Zs4KcwCREToFe86IOYOFqwSOi3GlZBbh
+ rETjcNK8Kj+F7XUvRKNRuRP2alDVyvaofsj/IWXuusM30FmJHFImgmdy7suPO9sn1NDm8V
+ shNy+sYvF6MHZqkr24Zazjat1KTsI0I=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-81EeA4stPWSrVS0YWOfyGw-1; Thu, 04 Jun 2020 14:57:06 -0400
+X-MC-Unique: 81EeA4stPWSrVS0YWOfyGw-1
+Received: by mail-wm1-f72.google.com with SMTP id b65so2252577wmb.5
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:57:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vUBwtgqtS3fbGSHGtj76gaU04adG9cf7zkUg6v/29Lc=;
+ b=S3w/IVxHCihlgOq5vV5p/co4Is0SkPkBNxY84pcBIoKD7d1rEFXMRHukLGhRTnLOIg
+ ec+dDKcMh/7AHNcxKagrCNNzrRu8ancufc6Gf+ctLpk1wn9TsEFGzbKzmRCrzfz1v4Qd
+ txv5+MC92IiFSEHsfjAFNYF/ZXHCouHLLBYSg7GSrFW/d99b6UIpiUXPmgkZSwjIkBQE
+ 8v3UCea8aIFsWH/mJoOp2Q8sY0LVcDYr6X/ZzhdSkjTtDO9IAglrShCgvjBeySZll5ig
+ VWT+TWDweIQxjD/u+XINDZSDr8owYUxCDUkXMJTJljmHE3f5TycB4aiGoJdiOW/aGtMJ
+ 9sYA==
+X-Gm-Message-State: AOAM531HzZjXLhXMxFg93+6mUpdTxF0Af1m8D63qG0GIxCHW1Wc9uJ5Z
+ HZPP//ljZRT+g+r7EWbw0gem2N90coMIqeu9UMUY1tszDIqUQDCnEV5O9Sk38lQ61b6jqlO0rI7
+ Ww1zeMPw0bobEWPM=
+X-Received: by 2002:a1c:4143:: with SMTP id o64mr5159421wma.157.1591297025770; 
+ Thu, 04 Jun 2020 11:57:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoKfoQba/VQvR4huvN5rVgbFJj5e20KDK0NPjqekWvwEBWEYyK/nbkp5uCfIyCna6UpiJxhw==
+X-Received: by 2002:a1c:4143:: with SMTP id o64mr5159401wma.157.1591297025548; 
+ Thu, 04 Jun 2020 11:57:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb?
+ ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
+ by smtp.gmail.com with ESMTPSA id p9sm8307588wma.48.2020.06.04.11.57.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 04 Jun 2020 11:57:04 -0700 (PDT)
+Subject: Re: [PATCH v2 0/3] exec: Kill CPUReadMemoryFunc/CPUWriteMemoryFunc
+ typedefs
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200601141536.15192-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3e07baa2-59d0-1960-8037-8054396920a5@redhat.com>
+Date: Thu, 4 Jun 2020 20:57:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200604145023.GI4512@linux.fritz.box>
+In-Reply-To: <20200601141536.15192-1-f4bug@amsat.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -171,50 +115,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, philmd@redhat.com
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/4/20 10:50 AM, Kevin Wolf wrote:
-> Am 02.06.2020 um 23:45 hat John Snow geschrieben:
->> These should all be purely annotations with no changes in behavior at
->> all. You need to be in the python folder, but you should be able to
->> confirm that these annotations are correct (or at least self-consistent)
->> by running `mypy --strict qemu`.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
+On 01/06/20 16:15, Philippe Mathieu-Daudé wrote:
+> Followed Peter's suggestions [1]:
 > 
->> diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
->> index ae4661d4d3e..df6300cd4f7 100644
->> --- a/python/qemu/qtest.py
->> +++ b/python/qemu/qtest.py
->> @@ -24,6 +24,8 @@
->>      Optional,
->>      Sequence,
->>      TextIO,
->> +    Tuple,
->> +    Union,
->>  )
->>  
->>  from .machine import QEMUMachine
->> @@ -43,7 +45,8 @@ class QEMUQtestProtocol:
->>         No conection is estabalished by __init__(), this is done
->>         by the connect() or accept() methods.
->>      """
->> -    def __init__(self, address, server=False):
->> +    def __init__(self, address: Union[Tuple[str, str], str],
->> +                 server: bool = False):
+>  * delete the unused MmeoryRegionMmio
+>  * move these typedefs into include/hw/usb.h and rename them
+>    to MUSBReadFunc and MUSBWriteFunc, since that's all they're
+>    used for now
 > 
-> Shouldn't this be SocketAddrT now?
+> Since v1 [2], addressed Peter review:
+> - Renamed include/hw/usb/musb.h -> include/hw/usb/hcd-musb.h
+> - Added Peter's R-b tags
 > 
-> Kevin
+> Series fully reviewed.
+> 
+> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708165.html
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708194.html
+> 
+> Philippe Mathieu-Daudé (3):
+>   exec/memory: Remove unused MemoryRegionMmio type
+>   hw/usb: Move device-specific declarations to new 'hcd-musb.h' header
+>   exec/cpu-common: Move MUSB specific typedefs to 'hw/usb/hcd-musb.h'
+> 
+>  include/exec/cpu-common.h |  3 ---
+>  include/exec/memory.h     |  6 -----
+>  include/hw/usb.h          | 30 -------------------------
+>  include/hw/usb/hcd-musb.h | 47 +++++++++++++++++++++++++++++++++++++++
+>  hw/usb/hcd-musb.c         |  5 +++--
+>  hw/usb/tusb6010.c         |  1 +
+>  6 files changed, 51 insertions(+), 41 deletions(-)
+>  create mode 100644 include/hw/usb/hcd-musb.h
 > 
 
-Ah, yeah. I had intended it for QMP, but it obviously works here, too.
+Queued, thanks.
+
+Paolo
 
 
