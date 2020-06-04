@@ -2,83 +2,80 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B9DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396B0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFE962067B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:40:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5F992067B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:53:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJAAoL5S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFE962067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igha1YKA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F992067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgxah-0003RU-Pg
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 17:39:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33938)
+	id 1jgxnv-0000QB-56
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 17:53:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgxZV-0002PO-56; Thu, 04 Jun 2020 17:38:45 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:40577)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jgxZT-00063B-Ux; Thu, 04 Jun 2020 17:38:44 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id s23so2544709pfh.7;
- Thu, 04 Jun 2020 14:38:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=CuW4J63C8BE1JA91uC4evX8zCx4/g3WjkquVO9xdzLM=;
- b=eJAAoL5S8gfag7rC9agZ2y4rcL4mvCDEQZudHIKYhAU+BZG2zgvVZeaAfUV9kSJTj5
- 40nPsypJfpQdzs1PvVD8xLwmk/oAtynCsAenR9z/UQyvsRGgwmdn7lv+R+Wpr9bd8QFe
- TpLDw+J0rNVTsPUOCk81lgUIycoONNDcJf5jmahiIfe+x6nBe8lUqAKquTvQtug6MSU6
- 3mt2uiaMsWHD3UrMZaCv2w4HS3D12QmlPP3ClPnxw7RzwF6YFZv50Z6oWPFK7zN3kiem
- COj4RtcQqK24/bUrE1NXK97yHGaebqOAqJBKIQZx2Gn9nIhz0VYP0x7yck4bYZaaN/+2
- Nhgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=CuW4J63C8BE1JA91uC4evX8zCx4/g3WjkquVO9xdzLM=;
- b=dadPoFmXlygzUFiYQQuo6FSkHX38uXfsAurrGuwHRsaXspEK5Jvwb+n7nSid0NHv3m
- eYYK8KkfLGXrby/Xm0FqSlZlzkEC/x6WriCv1EMjdAyYZ6ahzKAjlVnZrffXXCklWsHe
- Q7gscACyYCsxDxkaQ4qPDxPuZxh8Lb88ba27DwYYPUHN3jWc3JUw+arZ5EHJzr2aqars
- wn74poRrrWHeaBsxdUsc6DFp8Eq+gTOVdciAVRhgEZl+5BVhEWZbl5kZ5u+De2oTZiNa
- ilBnae1s6d+2IyWCvi9zGMRA2BRBwBFdY7A2qEZnDNMvtllKRUbnqAPNwH6CmwSsRfYX
- n9sQ==
-X-Gm-Message-State: AOAM530oAZgFwwyZxu3s3YP3C34aaKmbzMZ34LMv0G3F5T3LTyMtEpRf
- HXWMgXJ0XzR8SpN5boDp5Cc=
-X-Google-Smtp-Source: ABdhPJy5udfh9qxLr2hOs0PQUMx15wqEQ8S3Zs/FMS7dCEkz/DyOMUbOIcv9oB99u9c5m8gT3h3s6A==
-X-Received: by 2002:a63:f101:: with SMTP id f1mr6225985pgi.172.1591306721680; 
- Thu, 04 Jun 2020 14:38:41 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id ev20sm6636337pjb.8.2020.06.04.14.38.40
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 04 Jun 2020 14:38:40 -0700 (PDT)
-From: Guenter Roeck <linux@roeck-us.net>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH] pflash: cfi02: Convert debug log to tracing
-Date: Thu,  4 Jun 2020 14:38:38 -0700
-Message-Id: <20200604213838.232682-1-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
- envelope-from=groeck7@gmail.com; helo=mail-pf1-x42b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgxnE-0008KR-8V
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 17:52:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57227
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgxnB-0000Gf-Sh
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 17:52:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591307571;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=u0bqvBe1Nj+aj4zaqAwv3Jd6U6omEW++eLQkYnpmUfA=;
+ b=igha1YKASkqzBeZeTghOmC1JNlXgicQmzFrUHLhb2IWV4mtnR8U4IKLczf6UWsXfzywssa
+ CRtDRIr/pi4j6Pq2W4pmPlMIxz700WCWgIItSK0Q8woyC4xsv6GcHXGMlbocb2nKFLIEkA
+ mm96f6oBnYsM00o9vF3QxepidkQP5/k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-lvZ1tovkMKumb8vAg889dw-1; Thu, 04 Jun 2020 17:52:48 -0400
+X-MC-Unique: lvZ1tovkMKumb8vAg889dw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDBCB1005512;
+ Thu,  4 Jun 2020 21:52:46 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 913015D9CD;
+ Thu,  4 Jun 2020 21:52:40 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4] osdep: Make MIN/MAX evaluate arguments only once
+Date: Thu,  4 Jun 2020 16:52:36 -0500
+Message-Id: <20200604215236.2798244-1-eblake@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,246 +89,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Guenter Roeck <linux@roeck-us.net>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ crosthwaite.peter@gmail.com, quintela@redhat.com, f4bug@amsat.org,
+ dgilbert@redhat.com, kraxel@redhat.com, dirty.ice.hu@gmail.com,
+ pbonzini@redhat.com, Max Reitz <mreitz@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When trying to track down problems such as failing unlock sequences
-it is essential to have a complete trace log. Having part of it as debug
-output and the rest as trace output is counter-productive. Convert all
-debug logs to tracing.
+I'm not aware of any immediate bugs in qemu where a second runtime
+evalution of the arguments to MIN() or MAX() causes a problem, but
+proactively preventing such abuse is easier than falling prey to an
+unintended case down the road.  At any rate, here's the conversation
+that sparked the current patch:
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Update the MIN/MAX macros to only evaluate their argument once at
+runtime; this uses typeof(1 ? (a) : (b)) to ensure that we are
+promoting the temporaries to the same type as the final comparison (we
+have to trigger type promotion, as typeof(bitfield) won't compile; and
+we can't use typeof((a) + (b)) or even typeof((a) + 0), as some of our
+uses of MAX are on void* pointers where such addition is undefined).
+
+However, we are unable to work around gcc refusing to compile ({}) in
+a constant context (such as the array length of a static variable),
+even when only used in the dead branch of a __builtin_choose_expr(),
+so we have to provide a second macro pair MIN_CONST and MAX_CONST for
+use when both arguments are known to be compile-time constants and
+where the result must also be usable as a constant; this second form
+evaluates arguments multiple times but that doesn't matter for
+constants.  By using a void expression as the expansion if a
+non-constant is presented to this second form, we can enlist the
+compiler to ensure the double evaluation is not attempted on
+non-constants.
+
+Alas, as both macros now rely on compiler intrinsics, they are no
+longer usable in preprocessor #if conditions; those will just have to
+be open-coded or the logic rewritten into #define or runtime 'if'
+conditions (but where the compiler dead-code-elimination will probably
+still apply).
+
+I tested that both gcc 10.1.1 and clang 10.0.0 produce errors for all
+forms of macro mis-use.  As the errors can sometimes be cryptic, I'm
+demonstrating the gcc output:
+
+Use of MIN when MIN_CONST is needed:
+
+In file included from /home/eblake/qemu/qemu-img.c:25:
+/home/eblake/qemu/include/qemu/osdep.h:249:5: error: braced-group within expression allowed only inside a function
+  249 |     ({                                                  \
+      |     ^
+/home/eblake/qemu/qemu-img.c:92:12: note: in expansion of macro ‘MIN’
+   92 | char array[MIN(1, 2)] = "";
+      |            ^~~
+
+Use of MIN_CONST when MIN is needed:
+
+/home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
+/home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as it ought to be
+ 1225 |             i = MIN_CONST(i, n);
+      |               ^
+
+Use of MIN in the preprocessor:
+
+In file included from /home/eblake/qemu/accel/tcg/translate-all.c:20:
+/home/eblake/qemu/accel/tcg/translate-all.c: In function ‘page_check_range’:
+/home/eblake/qemu/include/qemu/osdep.h:249:6: error: token "{" is not valid in preprocessor expressions
+  249 |     ({                                                  \
+      |      ^
+
+Fix the resulting callsites that used #if or computed a compile-time
+constant min or max to use the new macros.  cpu-defs.h is interesting,
+as CPU_TLB_DYN_MAX_BITS is sometimes used as a constant and sometimes
+dynamic.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+
 ---
- hw/block/pflash_cfi02.c | 62 +++++++++++++++--------------------------
- hw/block/trace-events   | 18 ++++++++++++
- 2 files changed, 40 insertions(+), 40 deletions(-)
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index ac7e34ecbf..4c6e8e3b9b 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -47,14 +47,6 @@
- #include "migration/vmstate.h"
- #include "trace.h"
- 
--#define PFLASH_DEBUG false
--#define DPRINTF(fmt, ...)                                  \
--do {                                                       \
--    if (PFLASH_DEBUG) {                                    \
--        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
--    }                                                      \
--} while (0)
--
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
- 
+v2 was: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00727.html
+v3: avoid __auto_type [Richard], document other approaches that fail
+[Dave], rebase to master
+v4: use ((void)0) instead of __builtin_unreachable [Dave], update comments
+---
+ hw/usb/hcd-xhci.h         |  2 +-
+ include/block/block.h     |  4 +--
+ include/exec/cpu-all.h    |  8 +++---
+ include/exec/cpu-defs.h   |  7 +++++-
+ include/qemu/osdep.h      | 51 +++++++++++++++++++++++++++++++++------
+ accel/tcg/translate-all.c |  6 ++---
+ migration/qemu-file.c     |  2 +-
+ 7 files changed, 59 insertions(+), 21 deletions(-)
+
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index 2fad4df2a704..946af51fc25d 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -214,7 +214,7 @@ struct XHCIState {
+     uint32_t dcbaap_high;
+     uint32_t config;
+
+-    USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
++    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
+     XHCIPort ports[MAXPORTS];
+     XHCISlot slots[MAXSLOTS];
+     uint32_t numports;
+diff --git a/include/block/block.h b/include/block/block.h
+index 25e299605e19..e8fc8149967f 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -133,8 +133,8 @@ typedef struct HDGeometry {
+ #define BDRV_SECTOR_BITS   9
+ #define BDRV_SECTOR_SIZE   (1ULL << BDRV_SECTOR_BITS)
+
+-#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
+-                                     INT_MAX >> BDRV_SECTOR_BITS)
++#define BDRV_REQUEST_MAX_SECTORS MIN_CONST(SIZE_MAX >> BDRV_SECTOR_BITS, \
++                                           INT_MAX >> BDRV_SECTOR_BITS)
+ #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
+
  /*
-@@ -232,11 +224,10 @@ static void pflash_timer(void *opaque)
-             uint64_t timeout = pflash_erase_time(pfl);
-             timer_mod(&pfl->timer,
-                       qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + timeout);
--            DPRINTF("%s: erase timeout fired; erasing %d sectors\n",
--                    __func__, pfl->sectors_to_erase);
-+            trace_pflash_sector_erase_timeout(pfl->sectors_to_erase);
-             return;
-         }
--        DPRINTF("%s: sector erase complete\n", __func__);
-+        trace_pflash_sector_erase_complete();
-         bitmap_zero(pfl->sector_erase_map, pfl->total_sectors);
-         pfl->sectors_to_erase = 0;
-         reset_dq3(pfl);
-@@ -324,7 +315,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-     switch (pfl->cmd) {
-     default:
-         /* This should never happen : reset state & treat it as a read*/
--        DPRINTF("%s: unknown command state: %x\n", __func__, pfl->cmd);
-+        trace_pflash_unknown_command_state(pfl->cmd);
-         pfl->wcycle = 0;
-         pfl->cmd = 0;
-         /* fall through to the read code */
-@@ -337,7 +328,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-             toggle_dq2(pfl);
-             /* Status register read */
-             ret = pfl->status;
--            DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-+            trace_pflash_status(ret);
-             break;
-         }
-         /* Flash area read */
-@@ -362,7 +353,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-         default:
-             ret = pflash_data_read(pfl, offset, width);
-         }
--        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
-+        trace_pflash_flash_id(boff, ret);
-         break;
-     case 0x10: /* Chip Erase */
-     case 0x30: /* Sector Erase */
-@@ -374,7 +365,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-         toggle_dq6(pfl);
-         /* Status register read */
-         ret = pfl->status;
--        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-+        trace_pflash_status(ret);
-         break;
-     case 0x98:
-         /* CFI query mode */
-@@ -414,9 +405,7 @@ static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
-     SectorInfo sector_info = pflash_sector_info(pfl, offset);
-     uint64_t sector_len = sector_info.len;
-     offset &= ~(sector_len - 1);
--    DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
--            __func__, pfl->width * 2, offset,
--            pfl->width * 2, offset + sector_len - 1);
-+    trace_pflash_sector_erase_start(offset, offset + sector_len - 1);
-     if (!pfl->ro) {
-         uint8_t *p = pfl->storage;
-         memset(p + offset, 0xff, sector_len);
-@@ -495,27 +484,24 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             return;
-         }
-         if (boff != pfl->unlock_addr0 || cmd != 0xAA) {
--            DPRINTF("%s: unlock0 failed " TARGET_FMT_plx " %02x %04x\n",
--                    __func__, boff, cmd, pfl->unlock_addr0);
-+            trace_pflash_unlock0_failed(boff, cmd, pfl->unlock_addr0);
-             goto reset_flash;
-         }
--        DPRINTF("%s: unlock sequence started\n", __func__);
-+        trace_pflash_unlock_sequence_started();
-         break;
-     case 1:
-         /* We started an unlock sequence */
-     check_unlock1:
-         if (boff != pfl->unlock_addr1 || cmd != 0x55) {
--            DPRINTF("%s: unlock1 failed " TARGET_FMT_plx " %02x\n", __func__,
--                    boff, cmd);
-+            trace_pflash_unlock1_failed(boff, cmd, pfl->unlock_addr1);
-             goto reset_flash;
-         }
--        DPRINTF("%s: unlock sequence done\n", __func__);
-+        trace_pflash_unlock_sequence_done();
-         break;
-     case 2:
-         /* We finished an unlock sequence */
-         if (!pfl->bypass && boff != pfl->unlock_addr0) {
--            DPRINTF("%s: command failed " TARGET_FMT_plx " %02x\n", __func__,
--                    boff, cmd);
-+            trace_pflash_command_failed(boff, cmd);
-             goto reset_flash;
-         }
-         switch (cmd) {
-@@ -526,10 +512,10 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-         case 0x90: /* Autoselect */
-         case 0xA0: /* Program */
-             pfl->cmd = cmd;
--            DPRINTF("%s: starting command %02x\n", __func__, cmd);
-+            trace_pflash_command_starting(cmd);
-             break;
-         default:
--            DPRINTF("%s: unknown command %02x\n", __func__, cmd);
-+            trace_pflash_command_unknown(cmd);
-             goto reset_flash;
-         }
-         break;
-@@ -585,8 +571,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             }
-             /* fall through */
-         default:
--            DPRINTF("%s: invalid write for command %02x\n",
--                    __func__, pfl->cmd);
-+            trace_pflash_invalid_write_state(pfl->cmd, 3);
-             goto reset_flash;
-         }
-     case 4:
-@@ -599,8 +584,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             goto check_unlock1;
-         default:
-             /* Should never happen */
--            DPRINTF("%s: invalid command state %02x (wc 4)\n",
--                    __func__, pfl->cmd);
-+            trace_pflash_invalid_command_state(pfl->cmd, 4);
-             goto reset_flash;
-         }
-         break;
-@@ -612,12 +596,11 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-         switch (cmd) {
-         case 0x10: /* Chip Erase */
-             if (boff != pfl->unlock_addr0) {
--                DPRINTF("%s: chip erase: invalid address " TARGET_FMT_plx "\n",
--                        __func__, offset);
-+                trace_pflash_invalid_erase_adddress(offset);
-                 goto reset_flash;
-             }
-             /* Chip erase */
--            DPRINTF("%s: start chip erase\n", __func__);
-+            trace_pflash_chip_erase_start();
-             if (!pfl->ro) {
-                 memset(pfl->storage, 0xff, pfl->chip_len);
-                 pflash_update(pfl, 0, pfl->chip_len);
-@@ -631,7 +614,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             pflash_sector_erase(pfl, offset);
-             break;
-         default:
--            DPRINTF("%s: invalid command %02x (wc 5)\n", __func__, cmd);
-+            trace_pflash_invalid_command_state(pfl->cmd, 5);
-             goto reset_flash;
-         }
-         pfl->cmd = cmd;
-@@ -682,19 +665,18 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             return;
-         default:
-             /* Should never happen */
--            DPRINTF("%s: invalid command state %02x (wc 6)\n",
--                    __func__, pfl->cmd);
-+            trace_pflash_invalid_command_state(pfl->cmd, 6);
-             goto reset_flash;
-         }
-         break;
-     /* Special values for CFI queries */
-     case WCYCLE_CFI:
-     case WCYCLE_AUTOSELECT_CFI:
--        DPRINTF("%s: invalid write in CFI query mode\n", __func__);
-+        trace_pflash_invalid_write_query();
-         goto reset_flash;
-     default:
-         /* Should never happen */
--        DPRINTF("%s: invalid write state (wc 7)\n",  __func__);
-+        trace_pflash_invalid_write_state(pfl->cmd, pfl->wcycle);
-         goto reset_flash;
-     }
-     pfl->wcycle++;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index aca54bda14..46885c2047 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -15,6 +15,24 @@ pflash_data_write(uint64_t offset, unsigned size, uint32_t value, uint64_t count
- pflash_manufacturer_id(uint16_t id) "Read Manufacturer ID: 0x%04x"
- pflash_device_id(uint16_t id) "Read Device ID: 0x%04x"
- pflash_device_info(uint64_t offset) "Read Device Information offset:0x%04"PRIx64
-+pflash_sector_erase_timeout(int sectors) "sector erase timeout fired; erasing %d sectors"
-+pflash_sector_erase_complete(void) "sector erase complete"
-+pflash_unknown_command_state(uint8_t cmd) "unknown command state: 0x%02x"
-+pflash_status(uint64_t status) "status 0x%" PRIx64
-+pflash_flash_id(uint64_t boff, uint64_t id) "ID 0x%" PRIx64 " 0x%" PRIx64
-+pflash_sector_erase_start(uint64_t start, uint64_t end) "start sector erase at 0x%"PRIx64"-0x%"PRIx64
-+pflash_unlock0_failed(uint64_t addr, uint8_t cmd, uint16_t expected) "unlock0 failed 0x%" PRIx64 " %02x %04x"
-+pflash_unlock_sequence_started(void) "unlock sequence started"
-+pflash_unlock1_failed(uint64_t addr, uint8_t cmd, uint16_t expected) "unlock0 failed 0x%" PRIx64 " %02x %04x"
-+pflash_unlock_sequence_done(void) "unlock sequence done"
-+pflash_command_failed(uint64_t addr, uint8_t cmd) "command failed addr 0x%" PRIx64 " cmd 0x%02x"
-+pflash_command_starting(uint8_t cmd) "starting command 0x%02x"
-+pflash_command_unknown(uint8_t cmd) "unknown command 0x%02x"
-+pflash_invalid_write_state(uint8_t cmd, int state) "invalid write for command 0x%02x (wc %d)"
-+pflash_invalid_command_state(uint8_t cmd, int state) "invalid command state 0x%02x (wc %d)"
-+pflash_invalid_erase_adddress(uint64_t addr) "chip erase: invalid address 0x%" PRIx64
-+pflash_chip_erase_start(void) "start chip erase"
-+pflash_invalid_write_query(void) "invalid write in CFI query mode"
- 
- # virtio-blk.c
- virtio_blk_req_complete(void *vdev, void *req, int status) "vdev %p req %p status %d"
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index d14374bdd499..291454fac12e 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -176,11 +176,9 @@ extern unsigned long reserved_va;
+  * avoid setting bits at the top of guest addresses that might need
+  * to be used for tags.
+  */
+-#if MIN(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32
+-# define GUEST_ADDR_MAX_  UINT32_MAX
+-#else
+-# define GUEST_ADDR_MAX_  (~0ul)
+-#endif
++#define GUEST_ADDR_MAX_                                                 \
++    ((MIN_CONST(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32) ?  \
++     UINT32_MAX : ~0ul)
+ #define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
+
+ #else
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index 8c44abefa22a..918563233797 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -102,8 +102,13 @@ typedef uint64_t target_ulong;
+  * Skylake's Level-2 STLB has 16 1G entries.
+  * Also, make sure we do not size the TLB past the guest's address space.
+  */
+-#  define CPU_TLB_DYN_MAX_BITS                                  \
++#  ifdef TARGET_PAGE_BITS_VARY
++#   define CPU_TLB_DYN_MAX_BITS                                  \
+     MIN(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
++#  else
++#   define CPU_TLB_DYN_MAX_BITS                                  \
++    MIN_CONST(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
++#  endif
+ # endif
+
+ typedef struct CPUTLBEntry {
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index ff7c17b85735..b18584f32ff6 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -236,18 +236,53 @@ extern int daemon(int, int);
+ #define SIZE_MAX ((size_t)-1)
+ #endif
+
+-#ifndef MIN
+-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+-#endif
+-#ifndef MAX
+-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+-#endif
++/*
++ * Two variations of MIN/MAX macros. The first is for runtime use, and
++ * evaluates arguments only once (so it is safe even with side
++ * effects), but will not work in constant contexts (such as array
++ * size declarations) because of the '{}'.  The second is for constant
++ * expression use, where evaluating arguments twice is safe because
++ * the result is going to be constant anyway, but will not work in a
++ * runtime context because of a void expression where a value is
++ * expected.  Thus, both gcc and clang will fail to compile if you use
++ * the wrong macro (even if the error may seem a bit cryptic).
++ *
++ * Note that neither form is usable as an #if condition; if you truly
++ * need to write conditional code that depends on a minimum or maximum
++ * determined by the pre-processor instead of the compiler, you'll
++ * have to open-code it.
++ */
++#undef MIN
++#define MIN(a, b)                                       \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a < _b ? _a : _b;                              \
++    })
++#define MIN_CONST(a, b)                                         \
++    __builtin_choose_expr(                                      \
++        __builtin_constant_p(a) && __builtin_constant_p(b),     \
++        (a) < (b) ? (a) : (b),                                  \
++        ((void)0))
++#undef MAX
++#define MAX(a, b)                                       \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a > _b ? _a : _b;                              \
++    })
++#define MAX_CONST(a, b)                                         \
++    __builtin_choose_expr(                                      \
++        __builtin_constant_p(a) && __builtin_constant_p(b),     \
++        (a) > (b) ? (a) : (b),                                  \
++        __builtin_unreachable())
+
+ /* Minimum function that returns zero only iff both values are zero.
+  * Intended for use with unsigned values only. */
+ #ifndef MIN_NON_ZERO
+-#define MIN_NON_ZERO(a, b) ((a) == 0 ? (b) : \
+-                                ((b) == 0 ? (a) : (MIN(a, b))))
++#define MIN_NON_ZERO(a, b)                              \
++    ({                                                  \
++        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
++        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
++    })
+ #endif
+
+ /* Round number down to multiple */
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 42ce1dfcff77..d77add79b218 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2565,9 +2565,9 @@ int page_check_range(target_ulong start, target_ulong len, int flags)
+     /* This function should never be called with addresses outside the
+        guest address space.  If this assert fires, it probably indicates
+        a missing call to h2g_valid.  */
+-#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
+-    assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
+-#endif
++    if (TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS) {
++        assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
++    }
+
+     if (len == 0) {
+         return 0;
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 1c3a358a140d..be21518c5708 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -31,7 +31,7 @@
+ #include "qapi/error.h"
+
+ #define IO_BUF_SIZE 32768
+-#define MAX_IOV_SIZE MIN(IOV_MAX, 64)
++#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
+
+ struct QEMUFile {
+     const QEMUFileOps *ops;
 -- 
-2.17.1
+2.27.0
 
 
