@@ -2,81 +2,86 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC6AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDBCC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1345206E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:44:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1345206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9B08206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 13:48:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OBHEaW05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B08206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgqAi-0005MR-0k
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 09:44:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33412)
+	id 1jgqED-0001Df-OQ
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 09:48:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgq9r-0004p6-IA
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:43:47 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:51435)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgq9p-0007Sr-JN
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:43:47 -0400
-Received: from mail-ua1-f72.google.com ([209.85.222.72])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jgq9n-0003vL-C7
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 13:43:43 +0000
-Received: by mail-ua1-f72.google.com with SMTP id f26so2055665uao.1
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 06:43:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=osY920AbIM7l5qzygeE9P3bU93KOTBCqMrMRZpDWXrM=;
- b=W9HZr0/vZkXr+aEU1g5S/MwHh1/wq5uRICVKYF4GNNrbePvaGnBe0apaQSHibEcr04
- 6U0SdFPJoYvA+6Oq3aYGD9QHmMzm3xJ1NF/74Fwdx9fit0+cumdf88ix5f4lUAS6kVfj
- szWH3upUV5cD4chFgzrxPcgGQy9GYneAWzMTxyy2mSEC+xueuV3zSiZ8VEqzOmB2+L8v
- 1g7s2Jjaj/v4wPI644yVDyNsJdmVkwmWmDsrwUCDQAr7PzEuQ2eCP/rBde/24aKenS7s
- xzSAbBhN4t/gpeia9pSW5pvUtUmoVMCnUHda7EJFNFLjsNo57a5H5ETSmGKL8xGxng6u
- qZuA==
-X-Gm-Message-State: AOAM530ao+swXIXvYTiIIyo488PzFXk4WPa+1huSa08HP+fKoJ+s9pZK
- J4T7v5LVulxnGeUFq5jYtGDfxrek2mjRi453wWQoF3m7v8boWnBvOPES6MZynE8C1CcAHvNamfp
- uBlYtlHMSz0hG6OsADvAFcy5BXOyIgvTaNTgZMHekL0utZex9
-X-Received: by 2002:a67:c806:: with SMTP id u6mr3282377vsk.94.1591278222501;
- Thu, 04 Jun 2020 06:43:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMkEguD5AkybfTMkO205saesFLLTO/70L6IKTO3GJeX6bAaNLesDsj6VJpc8S7ulpJ5Xa+64kCs/Vm+iztI2Q=
-X-Received: by 2002:a67:c806:: with SMTP id u6mr3282356vsk.94.1591278222186;
- Thu, 04 Jun 2020 06:43:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jgqDX-0000Gy-66
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:47:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55404
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jgqDW-00087Q-7r
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 09:47:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591278452;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=xELz4FTUptSgDa2akUNMYdCBT5cnitKGu8hW+k/NUiU=;
+ b=OBHEaW05ayjRlozz7Y48r62PLMZ0+WgfvoHtftvfjZBRPjLDMtJB5tEnvjVeHTduV9eH8Y
+ e1fpk1y1GO/6PSZolI+qOzAr3upFFdQznVBUKgY0m1f3VvWwYwe9KR2g701/JlW5P2wHmo
+ w/j/15vioIf5agMwOFIY6qtiSWfdXhw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-4f78I-x4OPaMP_7VFT7j4A-1; Thu, 04 Jun 2020 09:47:30 -0400
+X-MC-Unique: 4f78I-x4OPaMP_7VFT7j4A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 576121005512;
+ Thu,  4 Jun 2020 13:47:29 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
+ [10.36.113.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0437E10013C3;
+ Thu,  4 Jun 2020 13:47:28 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0071916E16; Thu,  4 Jun 2020 15:47:27 +0200 (CEST)
+Date: Thu, 4 Jun 2020 15:47:27 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: P J P <ppandit@redhat.com>
+Subject: Re: [PATCH v3] ati-vga: check mm_index before recursive call
+ (CVE-2020-13800)
+Message-ID: <20200604134727.h7z6lfqvlawofpfi@sirius.home.kraxel.org>
+References: <20200604090830.33885-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <20200604094425.63020-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20200604094425.63020-1-marcandre.lureau@redhat.com>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Thu, 4 Jun 2020 15:43:16 +0200
-Message-ID: <CAATJJ0KpmbbdojFy5uHyh01VdidBEBMBtcmqrKnMyhzASrN2hw@mail.gmail.com>
-Subject: Re: [PATCH] qga: fix assert regression on guest-shutdown
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000002c34e005a7425586"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 09:43:43
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200604090830.33885-1-ppandit@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:14:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,110 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Ren Ding <rding@gatech.edu>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002c34e005a7425586
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> +        } else if (s->regs.mm_index > MM_DATA + 3) {
+>              val = ati_mm_read(s, s->regs.mm_index + addr - MM_DATA, size);
 
-On Thu, Jun 4, 2020 at 11:46 AM Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
+MM_INDEX is 0
+MM_DATA  is 4
+"normal" registers start at 8.
 
-> Since commit 781f2b3d1e ("qga: process_event() simplification"),
-> send_response() is called unconditionally, but will assert when "rsp" is
-> NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as
-> "guest-shutdown".
->
-> Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qga/main.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/qga/main.c b/qga/main.c
-> index f0e454f28d3..3febf3b0fdf 100644
-> --- a/qga/main.c
-> +++ b/qga/main.c
-> @@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rs=
-p)
->      QString *payload_qstr, *response_qstr;
->      GIOStatus status;
->
-> -    g_assert(rsp && s->channel);
-> +    g_assert(s->channel);
-> +
-> +    if (!rsp) {
-> +        return 0;
-> +    }
->
->
->
-Thanks Marc-Andr=C3=A9,
-LGTM and should fix the issues I was seeing.
+So we want allow indirect access for offset 8 and above and deny offsets
+0-7.  mm_index is interpreted with an offset, see "- MM_DATA" in the
+call above.
 
-Reviewed-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Not clear to me why this offset is 4, that doesn't make sense to me.
+I'd expect either no offset or offset being 8.  BALATON, can you
+double-check that with the specs?
 
+Assuming offset 4 is correct we must require mm_index being larger than
+MM_DATA + MM_DATA + 3 ( == 11) to compensate for the offset.
 
---=20
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
+take care,
+  Gerd
 
---0000000000002c34e005a7425586
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jun 4, 2020 at 11:46 AM Marc-=
-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcan=
-dre.lureau@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_qu=
-ote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,20=
-4);padding-left:1ex">Since commit 781f2b3d1e (&quot;qga: process_event() si=
-mplification&quot;),<br>
-send_response() is called unconditionally, but will assert when &quot;rsp&q=
-uot; is<br>
-NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as<br>
-&quot;guest-shutdown&quot;.<br>
-<br>
-Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35<br>
-Cc: Michael Roth &lt;<a href=3D"mailto:mdroth@linux.vnet.ibm.com" target=3D=
-"_blank">mdroth@linux.vnet.ibm.com</a>&gt;<br>
-Reported-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@ca=
-nonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
-Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
-u@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
----<br>
-=C2=A0qga/main.c | 6 +++++-<br>
-=C2=A01 file changed, 5 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/qga/main.c b/qga/main.c<br>
-index f0e454f28d3..3febf3b0fdf 100644<br>
---- a/qga/main.c<br>
-+++ b/qga/main.c<br>
-@@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rsp)=
-<br>
-=C2=A0 =C2=A0 =C2=A0QString *payload_qstr, *response_qstr;<br>
-=C2=A0 =C2=A0 =C2=A0GIOStatus status;<br>
-<br>
--=C2=A0 =C2=A0 g_assert(rsp &amp;&amp; s-&gt;channel);<br>
-+=C2=A0 =C2=A0 g_assert(s-&gt;channel);<br>
-+<br>
-+=C2=A0 =C2=A0 if (!rsp) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-+=C2=A0 =C2=A0 }<br>
-<br><br>
-</blockquote></div><div><br></div><div>Thanks Marc-Andr=C3=A9,</div><div>LG=
-TM and should fix the issues I was seeing.</div><br clear=3D"all"><div>Revi=
-ewed-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canoni=
-cal.com">christian.ehrhardt@canonical.com</a>&gt;</div><div><br></div><div>=
-<br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature">Christian Ehrha=
-rdt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div></div>
-
---0000000000002c34e005a7425586--
 
