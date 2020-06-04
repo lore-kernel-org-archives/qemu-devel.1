@@ -2,85 +2,81 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD29C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3892DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:09:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46937206E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:03:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MceMJLPb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46937206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE638206A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:09:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE638206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgneF-0008Nl-JU
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39498)
+	id 1jgnkg-0001rh-5q
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:09:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jgnZB-0005f3-9C
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:57:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30391
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jgnZ9-00039N-Fe
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 06:57:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591268261;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=1zPM2PKgSEf9ui2KnXlcervnxLv540QvKlbqjUv8V3Q=;
- b=MceMJLPbu19dGKqDNvWbgz8dKzEuyIfN5PzwhsWnX4lNbUFE5dFD7CY/2aR6+xs3B2M/pi
- /o1R5QpJnM1v1SDunkv0Smlyel7NQCgE+8wb1C+nkN4br7hKPxwHFTln0yk/Kz3tS2Ik5j
- Xp/ysgShVg7GwdtbUAQU6rz5dIAbn2U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-uiLsLrFMNdqlvAfQfiMuWg-1; Thu, 04 Jun 2020 06:57:37 -0400
-X-MC-Unique: uiLsLrFMNdqlvAfQfiMuWg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A6F7100726F;
- Thu,  4 Jun 2020 10:57:36 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-200.sin2.redhat.com
- [10.67.116.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D1420610F2;
- Thu,  4 Jun 2020 10:57:26 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v3] ati-vga: check address before reading configuration bytes
- (CVE-2020-13791)
-Date: Thu,  4 Jun 2020 16:25:24 +0530
-Message-Id: <20200604105524.46158-1-ppandit@redhat.com>
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1jgnk7-0001Kr-Pz; Thu, 04 Jun 2020 07:09:03 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2108 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1jgnk6-0005Wb-GC; Thu, 04 Jun 2020 07:09:03 -0400
+Received: from lhreml709-chm.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id 2540E5A64331AD41AF6C;
+ Thu,  4 Jun 2020 12:08:53 +0100 (IST)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ lhreml709-chm.china.huawei.com (10.201.108.58) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Thu, 4 Jun 2020 12:08:52 +0100
+Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
+ lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
+ Thu, 4 Jun 2020 12:08:52 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: RE: [Question] Regarding containers "unattached/peripheral/anonymous"
+ - their relation with hot(un)plug of devices
+Thread-Topic: [Question] Regarding containers
+ "unattached/peripheral/anonymous" - their relation with hot(un)plug of
+ devices
+Thread-Index: AdXSpuyfn6DVS59zTi+rGkiX0i4oLAAFtBwAAADWJeAAA8wjgAACyCnAAJHlbgAAZ8bfMBji6o4AAARuM+A=
+Date: Thu, 4 Jun 2020 11:08:52 +0000
+Message-ID: <207c66e7e2224e9888973ed5ba1fcfb4@huawei.com>
+References: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
+ <20200124145404.1d15209e@redhat.com>
+ <77dbc712482545078986adcd72567630@huawei.com>
+ <20200124170645.3d794ac6@redhat.com>
+ <b8fccc99d7344b2485c0db76886af9c8@huawei.com>
+ <20200127160352.54f95875@redhat.com>
+ <ab94a6dec7b9435cbb36ca9d488a0daa@huawei.com>
+ <20200604115430.029c488a@redhat.com>
+In-Reply-To: <20200604115430.029c488a@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.68.203]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=185.176.76.210;
+ envelope-from=salil.mehta@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 07:08:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,51 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, Yi Ren <c4tren@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Ren Ding <rding@gatech.edu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Hanqing Zhao <hanqing@gatech.edu>
+Cc: Andrew Jones <drjones@redhat.com>, "gshan@redhat.com" <gshan@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, pbonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: Thursday, June 4, 2020 10:55 AM
+> To: Salil Mehta <salil.mehta@huawei.com>
+> Cc: Andrew Jones <drjones@redhat.com>; gshan@redhat.com; mst@redhat.com;
+> qemu-devel@nongnu.org; eric.auger@redhat.com; qemu-arm@nongnu.org; pbonzi=
+ni
+> <pbonzini@redhat.com>
+> Subject: Re: [Question] Regarding containers "unattached/peripheral/anony=
+mous"
+> - their relation with hot(un)plug of devices
+>=20
+> On Wed, 3 Jun 2020 15:13:26 +0000
+> Salil Mehta <salil.mehta@huawei.com> wrote:
+>=20
 
-While reading PCI configuration bytes, a guest may send an
-address towards the end of the configuration space. It may lead
-to an OOB access issue. Add check to ensure 'address + size' is
-within PCI configuration space.
+[...]
 
-Reported-by: Ren Ding <rding@gatech.edu>
-Reported-by: Hanqing Zhao <hanqing@gatech.edu>
-Reported-by: Yi Ren <c4tren@gmail.com>
-Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/display/ati.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > I am not sure why you said "including cold-plugged one"? I hope by
+> > cold-plug'ging you mean here are the CPUs which already exist at
+> > the boot time of the Guest VM and plugged using -device?
+>=20
+> yes, it's about a plugged one with  '-device'
 
-Update v3: avoid modifying 'addr' variable
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00834.html
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 67604e68de..b4d0fd88b7 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -387,7 +387,9 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
-         val = s->regs.crtc_pitch;
-         break;
-     case 0xf00 ... 0xfff:
--        val = pci_default_read_config(&s->dev, addr - 0xf00, size);
-+        if ((addr - 0xf00) + size <= pci_config_size(&s->dev)) {
-+            val = pci_default_read_config(&s->dev, addr - 0xf00, size);
-+        }
-         break;
-     case CUR_OFFSET:
-         val = s->regs.cur_offset;
--- 
-2.26.2
+Sure, thank you.
 
+Salil.
 
