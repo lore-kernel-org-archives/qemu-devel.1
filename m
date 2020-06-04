@@ -2,104 +2,87 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C165DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC0BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:56:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E2382067B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:56:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E2382067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25E112067B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 21:56:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddG2CJL8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25E112067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgxqM-00027D-Rw
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 17:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36028)
+	id 1jgxqY-0002Q8-Ed
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 17:56:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jgxpE-00015E-13; Thu, 04 Jun 2020 17:55:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41412)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jgxpC-0000kf-GY; Thu, 04 Jun 2020 17:54:59 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 054LXdn1100432; Thu, 4 Jun 2020 17:54:52 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31f8yvgfww-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 17:54:51 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 054LXhoL100532;
- Thu, 4 Jun 2020 17:54:51 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31f8yvgfwf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 17:54:51 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 054Lo2XF030098;
- Thu, 4 Jun 2020 21:54:50 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com
- (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
- by ppma04dal.us.ibm.com with ESMTP id 31bf4b2q8v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 04 Jun 2020 21:54:49 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 054LskPr29622772
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 4 Jun 2020 21:54:46 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2961BC6057;
- Thu,  4 Jun 2020 21:54:48 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 972BAC605A;
- Thu,  4 Jun 2020 21:54:44 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.160.104.193])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Thu,  4 Jun 2020 21:54:44 +0000 (GMT)
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <87tuzr5ts5.fsf@morokweng.localdomain>
- <20200604062124.GG228651@umbus.fritz.box>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-In-reply-to: <20200604062124.GG228651@umbus.fritz.box>
-Date: Thu, 04 Jun 2020 18:54:40 -0300
-Message-ID: <87r1uu1opr.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgxpX-0001Mc-Je
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 17:55:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26739
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jgxpU-0000ta-13
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 17:55:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591307714;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sdXXWjoY5/iTvsd9MYNX1eirF9T4vt02eSPP3jxJc/w=;
+ b=ddG2CJL8+7OOwRLF2nMe9lSwYFOQ4XaSaCJSWdFFk2U4t2bWSUOr2f+qEamRy5yuq5YdFb
+ VbS37azbwhcJA1Y/fEh87fIbP6lmDoJoOdP+bP3Lj+ZQCN0dLTdwvDm+gmV3pDLeOwF1mP
+ Bgw3dnSSVmjnGEa5CfOZzQCg6jfBRDY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-JIPMmbwbPzWkpj4HQTSATw-1; Thu, 04 Jun 2020 17:55:07 -0400
+X-MC-Unique: JIPMmbwbPzWkpj4HQTSATw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 637E2835B40;
+ Thu,  4 Jun 2020 21:55:06 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6056810013D7;
+ Thu,  4 Jun 2020 21:55:02 +0000 (UTC)
+Subject: Re: [PATCH v4] osdep: Make MIN/MAX evaluate arguments only once
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+References: <20200604215236.2798244-1-eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7233fccd-aaff-d705-0746-99648c61a15c@redhat.com>
+Date: Thu, 4 Jun 2020 16:55:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-04_13:2020-06-04,
- 2020-06-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 mlxscore=0
- malwarescore=0 suspectscore=0 phishscore=0 spamscore=0 adultscore=0
- clxscore=1015 bulkscore=0 lowpriorityscore=0 impostorscore=0
- cotscore=-2147483648 priorityscore=1501 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006040152
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 17:54:56
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+In-Reply-To: <20200604215236.2798244-1-eblake@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,84 +95,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>, quintela@redhat.com,
+ crosthwaite.peter@gmail.com, dgilbert@redhat.com, f4bug@amsat.org,
+ kraxel@redhat.com, dirty.ice.hu@gmail.com, pbonzini@redhat.com,
+ Max Reitz <mreitz@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/4/20 4:52 PM, Eric Blake wrote:
+> I'm not aware of any immediate bugs in qemu where a second runtime
+> evalution of the arguments to MIN() or MAX() causes a problem, but
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+evaluation
 
-> On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
->> 
->> Hello David,
->> 
->> David Gibson <david@gibson.dropbear.id.au> writes:
->> 
->> > A number of hardware platforms are implementing mechanisms whereby the
->> > hypervisor does not have unfettered access to guest memory, in order
->> > to mitigate the security impact of a compromised hypervisor.
->> >
->> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
->> > its own memory encryption mechanism.  POWER has an upcoming mechanism
->> > to accomplish this in a different way, using a new memory protection
->> > level plus a small trusted ultravisor.  s390 also has a protected
->> > execution environment.
->> >
->> > The current code (committed or draft) for these features has each
->> > platform's version configured entirely differently.  That doesn't seem
->> > ideal for users, or particularly for management layers.
->> >
->> > AMD SEV introduces a notionally generic machine option
->> > "machine-encryption", but it doesn't actually cover any cases other
->> > than SEV.
->> >
->> > This series is a proposal to at least partially unify configuration
->> > for these mechanisms, by renaming and generalizing AMD's
->> > "memory-encryption" property.  It is replaced by a
->> > "guest-memory-protection" property pointing to a platform specific
->> > object which configures and manages the specific details.
->> >
->> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
->> 
->> Thank you very much for this series! Using a machine property is a nice
->> way of configuring this.
->> 
->> >From an end-user perspective, `-M pseries,guest-memory-protection` in
->> the command line already expresses everything that QEMU needs to know,
->> so having to add `-object pef-guest,id=pef0` seems a bit redundant. Is
->> it possible to make QEMU create the pef-guest object behind the scenes
->> when the guest-memory-protection property is specified?
->
-> Not exactly - the object needs to exist for the QOM core to resolve it
-> before we'd have a chance to look at the value to conditionally create
-> the object.
->
-> What we could do, however, is always create a PEF object in the
-> machine, and it would just have no effect if the machine parameter
-> wasn't specified.
->
-> I did consider that option, but left it this way for greater
-> consistency with AMD SEV - there the object can't be auto-created,
-> since it has mandatory parameters needed to configure the encryption.
->
-> I'm open to persuasion about changing that, though.
-
-What about having it both ways?
-
-QEMU could always create a PEF object, and if the command line defines
-one, it will correspond to it. And if the command line doesn't define one,
-then it would also work because the PEF object is already there.
-
-That way, compatibility with AMD SEV is preserved but we also get
-command line simplicity where it is not needed.
-
+> proactively preventing such abuse is easier than falling prey to an
+> unintended case down the road.  At any rate, here's the conversation
+> that sparked the current patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
+> 
 
 -- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
