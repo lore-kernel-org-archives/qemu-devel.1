@@ -2,62 +2,79 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 424E7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA6CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:55:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 119AD206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:52:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 119AD206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 424E4206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 08:55:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424E4206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jglbb-0006s7-Bz
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51758)
+	id 1jglek-0008Ba-ER
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 04:55:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1jglb2-0006KA-J3; Thu, 04 Jun 2020 04:51:32 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3703 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1jglb0-0001PU-TN; Thu, 04 Jun 2020 04:51:32 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 9830EDD242F64A754FA2;
- Thu,  4 Jun 2020 16:51:22 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.233) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0;
- Thu, 4 Jun 2020 16:51:15 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <richard.henderson@linaro.org>
-Subject: Forward migration broken down since virt-4.2 machine type
-Message-ID: <36de6085-86e1-f240-38f6-6e8582c2c68b@huawei.com>
-Date: Thu, 4 Jun 2020 16:51:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jgle1-0007fl-Hi
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:37 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:42333)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jgldz-0002B8-Va
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 04:54:37 -0400
+Received: from mail-vk1-f197.google.com ([209.85.221.197])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jgldw-0008Lp-WF
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:54:33 +0000
+Received: by mail-vk1-f197.google.com with SMTP id s206so1361994vke.20
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 01:54:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=LlKt0iABwFApk3o8kenBWL6rdHReoMcLtx536GsSyV4=;
+ b=Lh9j/2g/LKYUMuo5/P8NWrtRCLbXh2/ofOaXESgxSaGktn58p33+wcQBkdk2q/Ota9
+ 4HX2jYEUaNMzjERxeUErHE6Nt+xkNHy7lqwKx5S7QqafGSmoxhvXda7zwFt5nZa66jvc
+ n09nITaGXYdIHp+7y/FyjQ0sb+IWmFld4mAVk0MBWNWVr3Mex9YNNSgmy9EE6M5b43xN
+ x3dJ4/IFRY4LnWpdxwNDyk8yVlxnR0XW4ovHgMGZwifngF15MGT02Q+XRqexcMhDHDG9
+ bvO8jpbm2G9j5M+UUX2tKLnlJy9YV16He8YVPMQ8tBv8Hf8ha4ckhbMeLhPy6hxGzxWo
+ 87lA==
+X-Gm-Message-State: AOAM532Ldr93Njr5BtQaMEweVr1cVL8bmSneCviDOPso2wFcnHFQRmX3
+ Dh9ByQs23fdnuD/9Kj9FS5+reBs8fhiFhPZIp2fcCocAy49Qzl2BBOe0E+KkudU0ivK4xKSHoe+
+ nvhGF3y6Vv2H5fMP+VniUKjUzUQo3VVAE4ERKzCypA2uV0hVe
+X-Received: by 2002:a67:c806:: with SMTP id u6mr2459537vsk.94.1591260872037;
+ Thu, 04 Jun 2020 01:54:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFZb0zIAgpssTGaK8S7bLCU1NbZuIGvD6H83HuANdH2KBcxg54jVXSkrs46Iwv2MDeDyduFg71lvGwicdWhOw=
+X-Received: by 2002:a67:c806:: with SMTP id u6mr2459531vsk.94.1591260871783;
+ Thu, 04 Jun 2020 01:54:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.233]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=fangying1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 04:51:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Thu, 4 Jun 2020 10:54:04 +0200
+Message-ID: <CAATJJ0+p2U8uf+Vq_sn=1agSYbZ1iQu_+La8QLCVhMVkK-SKtA@mail.gmail.com>
+Subject: qemu-guest agent asserts on shutdown
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+ qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Content-Type: multipart/alternative; boundary="000000000000020d7805a73e4b89"
+Received-SPF: none client-ip=91.189.89.112;
+ envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 04:54:33
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,71 +87,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, wu.wubin@huawei.com,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
+--000000000000020d7805a73e4b89
+Content-Type: text/plain; charset="UTF-8"
 
-Recently we are doing some tests on forward migration based on
-arm virt machine. And we found the patch below breaks forward
-migration compatibility from virt-4.2 to virt-5.0 above machine
-type. The patch which breaks this down given by git bisect is
+Hi,
+while debugging a report I got in Ubuntu I found that since qemu 4.0 the
+guest agent shutdown feature works (guest is shutting down) but crashes
+when doing so each time. This can be a big red herring when debugging other
+things as well as people start to get "an application crashed, do you want
+to report" pop-ups if they have set up automatic crash reports.
 
-commit f9506e162c33e87b609549157dd8431fcc732085
-target/arm: Remove ARM_FEATURE_VFP*
+If you boot the guest after starting it again and check the guest-agent
+status you will see in journal:
+-- Logs begin at Tue 2020-06-02 07:41:32 UTC, end at Thu 2020-06-04
+08:07:37 UTC. --
+Jun 02 07:47:58 focal systemd[1]: Started QEMU Guest Agent.
+Jun 02 07:49:03 focal qemu-ga[1984]: info: guest-shutdown called, mode:
+(null)
+Jun 02 07:49:03 focal qemu-ga[1984]: **
+Jun 02 07:49:03 focal qemu-ga[1984]:
+ERROR:/build/qemu-7aKH5L/qemu-4.2/qga/main.c:532:send_response: assertion
+failed: (rsp && s->channel)
+Jun 02 07:49:03 focal qemu-ga[1984]: Bail out!
+ERROR:/build/qemu-7aKH5L/qemu-4.2/qga/main.c:532:send_response: assertion
+failed: (rsp && s->channel)
+Jun 02 07:49:04 focal systemd[1]: Stopping QEMU Guest Agent...
+Jun 02 07:49:04 focal systemd[1]: qemu-guest-agent.service: Succeeded.
+Jun 02 07:49:04 focal systemd[1]: Stopped QEMU Guest Agent.
 
-QEMU may get crashed on the destination host loading cpu state.
-Here goes my question since I am not familiar with the VFP feature.
-1: Should we keep the forward migration compatibility here ?
-2: If so how can we fixed it ?
+The actual assert is from "forever" [3] (v0.15) which is the initial
+addition of qemu guest agent in 2011. That was later restructured in [1]
+(v1.1) and [2] (v4.0).
 
-Below is the crash stack:
-Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-[Switching to LWP 712330]
-armv7m_nvic_neg_prio_requested (opaque=0x0, secure=secure@entry=false) 
-at  qemu/hw/intc/armv7m_nvic.c:391
-391	    if (s->cpu->env.v7m.faultmask[secure]) {
-#0  armv7m_nvic_neg_prio_requested (opaque=0x0, 
-secure=secure@entry=false) at  qemu/hw/intc/armv7m_nvic.c:391
-#1  0x0000aaae6f766510 in arm_v7m_mmu_idx_for_secstate_and_priv 
-(env=0xaaae73456780, secstate=false, priv=true) at 
-qemu/target/arm/m_helper.c:2711
-#2  0x0000aaae6f7163f0 in arm_mmu_idx_el (env=env@entry=0xaaae73456780, 
-el=el@entry=1) at  qemu/target/arm/helper.c:12386
-#3  0x0000aaae6f717000 in rebuild_hflags_internal (env=0xaaae73456780) 
-at  qemu/target/arm/helper.c:12611
-#4  arm_rebuild_hflags (env=env@entry=0xaaae73456780) at 
-qemu/target/arm/helper.c:12624
-#5  0x0000aaae6f722940 in cpu_post_load (opaque=0xaaae7344ceb0, 
-version_id=<optimized out>) at  qemu/target/arm/machine.c:767
-#6  0x0000aaae6f9e0e78 in vmstate_load_state (f=f@entry=0xaaae73020260, 
-vmsd=0xaaae6fe93178 <vmstate_arm_cpu>, opaque=0xaaae7344ceb0, 
-version_id=22) at migration/vmstate.c:168
-#7  0x0000aaae6f9d9858 in vmstate_load (f=f@entry=0xaaae73020260, 
-se=se@entry=0xaaae7302f750) at migration/savevm.c:885
-#8  0x0000aaae6f9dab90 in qemu_loadvm_section_start_full 
-(f=f@entry=0xaaae73020260, mis=0xaaae72fb88a0) at migration/savevm.c:2302
-#9  0x0000aaae6f9dd248 in qemu_loadvm_state_main 
-(f=f@entry=0xaaae73020260, mis=mis@entry=0xaaae72fb88a0) at 
-migration/savevm.c:2486
-#10 0x0000aaae6f9de3bc in qemu_loadvm_state (f=0xaaae73020260) at 
-migration/savevm.c:2560
-#11 0x0000aaae6f9d489c in process_incoming_migration_co 
-(opaque=<optimized out>) at migration/migration.c:461
-#12 0x0000aaae6fb59850 in coroutine_trampoline (i0=<optimized out>, 
-i1=<optimized out>) at util/coroutine-ucontext.c:115
-#13 0x0000fffdd6c16030 in ?? () from target:/usr/lib64/libc.so.6
+In a check through Ubuntu releases I got
+1) Host: Q 2.11 L 4.0 (Bionic) - G 2.11 (Bionic)
+2) Host: Q 4.0 L 5.4 (Eoan) - G 2.11 (Bionic)
+3) Host: Q 4.2 L 6.0 (Focal) - G 2.11 (Bionic)
+4) Host: Q 2.11 L 4.0 (Bionic) - G 4.0 (Eoan)
+5) Host: Q 4.0 L 5.4 (Eoan) - G 4.0 (Eoan)
+6) Host: Q 4.2 L 6.0 (Focal) - G 4.0 (Eoan)
+7) Host: Q 2.11 L 4.0 (Bionic) - G 4.2 (Focal)
+8) Host: Q 4.0 L 5.4 (Eoan) - G 4.2 (Focal)
+9) Host: Q 4.2 L 6.0 (Focal) - G 4.2 (Focal)
 
-#0  armv7m_nvic_neg_prio_requested (opaque=0x0, 
-secure=secure@entry=false) at  qemu/hw/intc/armv7m_nvic.c:391
-(gdb) p	s
-$4 = (NVICState *) 0x0
+So it seemed to be the qemu-guest-agent portion since >=4.0.
+I did a build with [2] reverted and the crash is gone.
 
-Thanks.
-Ying
+I see from the host:
+$ virsh qemu-agent-command focal '{"execute": "guest-shutdown"}'
+"error: Guest agent is not responding: Guest agent disappeared while
+executing command"
 
+I'm not sure which part of the communication breaks first, but it could try
+to send on a dying connection, the old code had:
+
+rsp = qmp_dispatch(&ga_commands, QOBJECT(req), false);
+    if (rsp) {
+        ret = send_response(s, rsp)
+
+While the new code is like:
+
+    rsp = qmp_dispatch(&ga_commands, obj, false);
+end:
+     ret = send_response(s, rsp);
+
+Maybe it runs send_response despite qmp_dispatch failing now?
+
+I didn't stare at it long enough to have a solution yet, but wanted to make
+the maintainer of qga and the Author aware.
+
+[1]: https://git.qemu.org/?p=qemu.git;a=commit;h=125b310e1d62
+[2]: https://git.qemu.org/?p=qemu.git;a=commit;h=781f2b3d1e5e
+[3]: https://git.qemu.org/?p=qemu.git;a=commit;h=48ff7a625b36
+
+-- 
+Christian Ehrhardt
+Staff Engineer, Ubuntu Server
+Canonical Ltd
+
+--000000000000020d7805a73e4b89
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi,</div><div>while debugging=C2=A0a report I got in =
+Ubuntu I found that since qemu 4.0 the guest agent shutdown feature works (=
+guest is shutting down) but crashes when doing so each time. This can be a =
+big red herring when debugging other things as well as people start to get =
+&quot;an application crashed, do you want to report&quot; pop-ups if they h=
+ave set up automatic crash reports.</div><div><br></div><div>If you boot th=
+e guest after starting it again and check the guest-agent status you will s=
+ee in journal:</div><div>-- Logs begin at Tue 2020-06-02 07:41:32 UTC, end =
+at Thu 2020-06-04 08:07:37 UTC. --<br>Jun 02 07:47:58 focal systemd[1]: Sta=
+rted QEMU Guest Agent.<br>Jun 02 07:49:03 focal qemu-ga[1984]: info: guest-=
+shutdown called, mode: (null)<br>Jun 02 07:49:03 focal qemu-ga[1984]: **<br=
+>Jun 02 07:49:03 focal qemu-ga[1984]: ERROR:/build/qemu-7aKH5L/qemu-4.2/qga=
+/main.c:532:send_response: assertion failed: (rsp &amp;&amp; s-&gt;channel)=
+<br>Jun 02 07:49:03 focal qemu-ga[1984]: Bail out! ERROR:/build/qemu-7aKH5L=
+/qemu-4.2/qga/main.c:532:send_response: assertion failed: (rsp &amp;&amp; s=
+-&gt;channel)<br>Jun 02 07:49:04 focal systemd[1]: Stopping QEMU Guest Agen=
+t...<br>Jun 02 07:49:04 focal systemd[1]: qemu-guest-agent.service: Succeed=
+ed.<br>Jun 02 07:49:04 focal systemd[1]: Stopped QEMU Guest Agent.<br></div=
+><div><br></div><div>The actual assert is from &quot;forever&quot; [3] (v0.=
+15) which is the initial addition of qemu guest agent in 2011. That was lat=
+er restructured in [1] (v1.1) and [2] (v4.0).<br></div><div><br></div><div>=
+In a check through=C2=A0Ubuntu releases I got</div><div>1) Host: Q 2.11 L 4=
+.0 (Bionic) - G 2.11 (Bionic)<br>2) Host: Q 4.0 L 5.4 (Eoan) - G 2.11 (Bion=
+ic)<br>3) Host: Q 4.2 L 6.0 (Focal) - G 2.11 (Bionic)<br>4) Host: Q 2.11 L =
+4.0 (Bionic) - G 4.0 (Eoan)<br>5) Host: Q 4.0 L 5.4 (Eoan) - G 4.0 (Eoan)<b=
+r>6) Host: Q 4.2 L 6.0 (Focal) - G 4.0 (Eoan)<br>7) Host: Q 2.11 L 4.0 (Bio=
+nic) - G 4.2 (Focal)<br>8) Host: Q 4.0 L 5.4 (Eoan) - G 4.2 (Focal)<br>9) H=
+ost: Q 4.2 L 6.0 (Focal) - G 4.2 (Focal)<br></div><div><br></div><div>So it=
+ seemed to be the qemu-guest-agent portion since &gt;=3D4.0.</div><div>I di=
+d a build with [2] reverted and the crash is gone.</div><div><br></div><div=
+>I see from the host:<br>$ virsh qemu-agent-command focal &#39;{&quot;execu=
+te&quot;: &quot;guest-shutdown&quot;}&#39;<br>&quot;error: Guest agent is n=
+ot responding: Guest agent disappeared while executing command&quot;<br><br=
+>I&#39;m not sure which part of the communication breaks first, but it coul=
+d try to send on a dying connection, the old code had:<br><br>rsp =3D qmp_d=
+ispatch(&amp;ga_commands, QOBJECT(req), false);<br>=C2=A0 =C2=A0 if (rsp) {=
+<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D send_response(s, rsp)<br><br>While =
+the new code is like:</div><div><br>=C2=A0 =C2=A0 rsp =3D qmp_dispatch(&amp=
+;ga_commands, obj, false);<br>end:<br>=C2=A0 =C2=A0 =C2=A0ret =3D send_resp=
+onse(s, rsp);<br><br>Maybe it runs send_response despite qmp_dispatch faili=
+ng now?<br></div><div><br></div><div>I didn&#39;t stare at it long enough t=
+o have a solution yet, but wanted to make the maintainer of qga and the Aut=
+hor aware.<br></div><br>[1]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
+a=3Dcommit;h=3D125b310e1d62">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
+h=3D125b310e1d62</a><br>[2]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
+a=3Dcommit;h=3D781f2b3d1e5e">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
+h=3D781f2b3d1e5e</a><br>[3]: <a href=3D"https://git.qemu.org/?p=3Dqemu.git;=
+a=3Dcommit;h=3D48ff7a625b36">https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;=
+h=3D48ff7a625b36</a><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr=
+" class=3D"gmail_signature" data-smartmail=3D"gmail_signature">Christian Eh=
+rhardt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div></div>
+
+--000000000000020d7805a73e4b89--
 
