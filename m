@@ -2,110 +2,88 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5ADC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FACFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB1C6206E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:40:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EE04206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 18:43:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPQFUAlV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB1C6206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JqgYANN6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE04206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgumz-0005KQ-Vs
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38988)
+	id 1jguqL-0007RW-PD
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 14:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jgum9-0004pK-1C
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:39:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49545
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jgum8-0000wQ-EB
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:39:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591295975;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UfO6aDpSvHidv2vAiv2vDdV46Jwm8PNc5DIkLubz3Co=;
- b=WPQFUAlVST4y9wbyj/UthMDMvegMcc4IMwAVZ++0luVJUmDF8xpuIUaF/y0j/9XTZKY7iw
- LgLM5erR9qJw43pJwVYLmziFKwex3uIBTr7xctaN3MY9jcZgW1M31ir1n6xi0N89jyJ3AP
- SjUyCrBNWcci2uDOXeEj/MgYI5tSFkw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-XldwZL8jPzC8tytroIUBiA-1; Thu, 04 Jun 2020 14:39:31 -0400
-X-MC-Unique: XldwZL8jPzC8tytroIUBiA-1
-Received: by mail-wm1-f70.google.com with SMTP id b63so3059548wme.1
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:39:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jgupk-0006uy-Qz
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:43:20 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45864)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jgupj-0001p4-Pu
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 14:43:20 -0400
+Received: by mail-ot1-x342.google.com with SMTP id m2so5566873otr.12
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 11:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=V+tqJ4we1CwKNF7vfPzsSSNsnmnzFHhUB3cgyBqkxgk=;
+ b=JqgYANN6wCRpfWlLBsko7YwgwNfwEaWNit+i2c5alu3KgyDbJVujVZkxQFwQkH46Wf
+ 7OVXpwcwfGe/EcYpm0heZcAtrB636jHZz3jtv5xdDxNtG8xoVrDASEVXZrWkRMgSo9lN
+ YMJIoJUT+PA0WAKUR723LbTufO6g7MUD6Ea5tvU5vli1KhV5ddWMe518xwMxwsrnz8Mk
+ fE3NjREHwI0OJjuY0tE7L573hdV3H94jcczLbleQlC/I6+hlHyv5vwycstK4ZWTGPqcX
+ ar3SsGoapFv2eqcfhNECk+JtIp+PZtrG+7DA2aFTbeZjcXWQ5VOjwtcEtAsEsz9F1hje
+ 4y8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UfO6aDpSvHidv2vAiv2vDdV46Jwm8PNc5DIkLubz3Co=;
- b=WNXFcYz0Cdsvnlnspz3HxzY4bdOJ9LhfvwjgFj01rUYXWfU62GWv+zq/tzA+Te5WiG
- ooUgbt5YRL7rgcj7fhhO+dva33qL8yypv9qNR46M7oHIigXUDk/Fz2YhZp00089qN8ad
- EHXTeyLD2/IkeltJLYR2HX9+evgOCmW7krNCXo3y6nxvyrIk2hQZuizsdXVaojpHz0bi
- Egap77foMVi3f+R5AgJqN4lyBVcQ6bvZZ+kQQrzS0zZ1ZvAmzclKVjUYp5cn3Magf9uT
- gQTpgnjQYRC13+6FHTY+Sk7vVXGdNqHBHjeNq2L9YeXKAmtq35P2/ll0HtHGIOeP668e
- mf0g==
-X-Gm-Message-State: AOAM533Uhz+AXVyEJhLGEryN3pOeeLMsjMXPWlv0iDPQ2FOaX7QQGYQ2
- 7XtuNEEgqmUXjZfmtEUdZ6n9V54rJ1mq4KltTZV+I7J7hOYGtQe91LGF//MZVP6vmhUzxC/C60Y
- GnvWrUgnLvphuKaI=
-X-Received: by 2002:a5d:6085:: with SMTP id w5mr5637840wrt.322.1591295970270; 
- Thu, 04 Jun 2020 11:39:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx15DJV6nOGxCJLklNxJxUTov4icbMCkAVCIp9gU1Xrs8NtnWrm5jucept/RHTHgI7PAlwUcQ==
-X-Received: by 2002:a5d:6085:: with SMTP id w5mr5637815wrt.322.1591295970066; 
- Thu, 04 Jun 2020 11:39:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb?
- ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
- by smtp.gmail.com with ESMTPSA id a1sm8290262wmj.29.2020.06.04.11.39.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 04 Jun 2020 11:39:29 -0700 (PDT)
-Subject: Re: [PATCH v3] osdep: Make MIN/MAX evaluate arguments only once
-To: Eric Blake <eblake@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200603013603.2400199-1-eblake@redhat.com>
- <03a13d47-fe7d-88e5-b92e-3c396591f9c7@linaro.org>
- <ecef14ce-47ca-749e-25b4-8e3ee378bd34@redhat.com>
- <2e894b8d-a510-0689-83dc-f6c8da16410e@linaro.org>
- <b4edd86c-a4cc-0b1d-ae28-009fe0a471e1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ed75afd-1b82-de22-0d35-23808669ee03@redhat.com>
-Date: Thu, 4 Jun 2020 20:39:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=V+tqJ4we1CwKNF7vfPzsSSNsnmnzFHhUB3cgyBqkxgk=;
+ b=hNtBg0oNBXvQO1p4O7xA6A6NXxuawHL4cFH0iTWPKBkSMhEuQPalOhpRaHRHI5ALQr
+ yhf2wDe3A1FZn6nSI+LdD13Sco5EKArp+wwPdi4sQcsy25pDSTmlqMcuNOtZ4qjosk1r
+ rMSrhOB+7hM1fUI3Wr8Iv5DqMx8n3pmWkNJNFBSrYereU8illJEyYxH0vgJ0TXLEorJb
+ wanMGte4NNNZSSx9OJvu+ASWeUjpIXpOQV5+O8Cti8ocY9Ir1pLLtOd3UnT4kLaNpqpz
+ BDodAwStu8T//8FU1pCBY+A0Fem6T4ahKku1kVG2HVjkRNZfYducvTdNC2boqY8tfe4D
+ uCmA==
+X-Gm-Message-State: AOAM533ASY2cmMy4pc5ultXr3PV1t7o573rkhBpqT0XfB/FXsrouCFN1
+ ULRX7mKxFudT9TKrwU0kF3A+P2gw+paog7l/fKOHfg==
+X-Google-Smtp-Source: ABdhPJzggb5WUf1cNMSoUQ6SGQdBpjYQ57LzrsgBqMUD5mPPkWKFtZd7PEnRXVX8xT4+od4o78BlELhc9OFUKlvGyug=
+X-Received: by 2002:a9d:b82:: with SMTP id 2mr4528725oth.221.1591296197806;
+ Thu, 04 Jun 2020 11:43:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b4edd86c-a4cc-0b1d-ae28-009fe0a471e1@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200604125544.GW28566@vanye>
+ <20200604131802.7w4hncgq2gopbw6z@kamzik.brq.redhat.com>
+ <20200604160300.GB28566@vanye>
+ <CAFEAcA8MTB5VQQbMuSfkGc9JcGeawL_GUY8Pcs3yxT9kdncZJw@mail.gmail.com>
+ <20200604162607.GC28566@vanye>
+In-Reply-To: <20200604162607.GC28566@vanye>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 4 Jun 2020 19:43:06 +0100
+Message-ID: <CAFEAcA-wX-vKek_Zt5hmjiQNP1utCO7yGJQPcuny1M7xncYsQg@mail.gmail.com>
+Subject: Re: kvm_target, QEMU_KVM_ARM_TARGET_GENERIC_V8 questions
+To: Leif Lindholm <leif@nuviainc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,42 +96,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>, quintela@redhat.com,
- crosthwaite.peter@gmail.com, f4bug@amsat.org, dgilbert@redhat.com,
- kraxel@redhat.com, dirty.ice.hu@gmail.com, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/06/20 21:26, Eric Blake wrote:
-> 
-> Yes, I just tested; using "((void)0)" in place of
-> "__builtin_unreachable()" has the same effect (no change to valid use,
-> and still a compiler error on misuse). gcc:
-> 
-> /home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
-> /home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as
-> it ought to be
->  1225 |             i = MIN_CONST(i, n);
->       |               ^
-> 
-> clang:
-> 
-> /home/eblake/qemu/qemu-img.c:1225:15: error: assigning to 'int' from
-> incompatible type 'void'
->             i = MIN_CONST(i, n);
->               ^ ~~~~~~~~~~~~~~~
-> 
-> 
-> Of course, a comment explaining the intent can't hurt either.  I'll wait
-> to see if this gathers any other comments before spinning a v4 with that
-> change.
+On Thu, 4 Jun 2020 at 17:26, Leif Lindholm <leif@nuviainc.com> wrote:
+>
+> On Thu, Jun 04, 2020 at 17:09:30 +0100, Peter Maydell wrote:
+> > On Thu, 4 Jun 2020 at 17:03, Leif Lindholm <leif@nuviainc.com> wrote:
+> > > But there's also things like:
+> > > - a57_initfn explicitly setting kvm_target, then only being called
+> > >   from max_initfn for !kvm_enabled()
+> >
+> > Expected -- a KVM 'max' is nothing to do with a TCG 'max':
+> >  * for KVM, -cpu max means "same as -cpu host"
+> >  * for TCG, -cpu max means "start with an A57, then add in all the
+> >    extra architectural features that have been added since then".
+>
+> Sure. But why are we setting the kvm_target at all for the
+> !kvm_enabled() case?
 
-Please go ahead and send v4.
+Because it happens to be set in the a57 initfn, and it's harmless
+if we're not using TCG. I feel like some of your take on this set of
+functions comes from thinking of max_initfn as in some sense the
+'primary' function here, when it's the other way around : a57_initfn
+is the standard kind of CPU initfn (behaving in and written the same
+way as a53_initfn and a72_initfn), whereas max_initfn is an odd
+special case which happens for convenience-of-implementation
+to piggyback on the a57 implementation.
 
-Thanks,
+> > kvm_target being set by a57_initfn is specifically for the case
+> > where a KVM user is using "-cpu cortex-a57".
+> >
+> > > - a57_initfn setting cpu->dtb_compatible to "arm,cortex-a57"
+> >
+> > What else would it set it to?
+>
+> Hmm, I had been hoping there was a generic v8a one - kvm64.c kind of
+> got my hopes up with "arm,arm-v8".
 
-Paolo
+Ah, that's the other way around -- yes, for 'max' we should be using a
+more generic value, not accidentally using 'cortex-a57'. (Linux doesn't
+in practice care IIRC, which is why this bug hasn't been noticed.) But
+for an actual cortex-a57 model we should report as arm,cortex-a57.
 
+https://www.kernel.org/doc/Documentation/devicetree/bindings/arm/cpus.yaml
+is the official list of permitted strings, incidentally.
+
+> > > - a57 initfn setting cpu->midr, max_initfn overwriting parts of it
+> >
+> > Also expected, TCG's -cpu max is "A57 with lots of extras".
+>
+> Maybe I'm being too rigid in my thinking here, but it does kind of jar
+> to see code call a function called aarch64_a57_initfn to have it write
+> a value where it then throws away the only thing in the value that
+> made it a57.
+
+The things that make it an A57 are all the feature flag and ID
+register values (which is is what tells the TCG implementation
+how the CPU should behave). The MIDR value is the least interesting
+bit of the a57_initfn in some ways: it doesn't change the QEMU
+emulation's behaviour and mostly guests don't care what the value
+is except for purposes of installing errata workarounds that don't
+matter for QEMU: your average guest would work just as well with
+any MIDR...
+
+> Not entirely unrelated question:
+> Would you take added field definitions in target/arm/cpu.h for
+> features not yet emulated in QEMU but defined in released versions of
+> ARM ARM?
+
+Yes in theory (you'll see that we have a bunch of field definitions already
+which we don't yet implement, because we tend to define all the fields
+for an ID register at the point where we want to access one field), but
+on the other hand there's usually no need to actually use them unless
+we're adding the emulation for the feature, so the question is: what would
+you do with them if you added them?
+
+thanks
+-- PMM
 
