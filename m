@@ -2,76 +2,84 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9FBC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 944FEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91D5720663
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:16:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91D5720663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5FAF0206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:21:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqysOS1N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FAF0206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgqfr-0004Db-SQ
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 10:16:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37612)
+	id 1jgqkK-000607-NJ
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 10:21:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jgqf0-0003mq-Bu
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:15:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:44605)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jgqey-0005oY-SG
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:15:58 -0400
-Received: from [192.168.100.43] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.168]) with ESMTPSA (Nemesis) id
- 1MRCFw-1jM2Y34AYG-00NA19; Thu, 04 Jun 2020 16:15:48 +0200
-Subject: Re: [PULL v2 05/13] accel/tcg: Relax va restrictions on 64-bit guests
-References: <20200515144405.20580-1-alex.bennee@linaro.org>
- <20200515144405.20580-6-alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <843d72a9-22a7-b0b5-0a92-edf1dcd290d2@vivier.eu>
-Date: Thu, 4 Jun 2020 16:15:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jgqjl-0005Z3-BJ
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:20:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33885
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jgqjj-0006Un-PN
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:20:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591280449;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zWwxtoDxsWyfMnOAoxMaltgrCfi4eRLL7Y8KVNIOw/I=;
+ b=RqysOS1NFEQcooXKpT8RvqIKIFhRoQ1079GMuWAj1N29o0WfzoL/mi46EOJfYNAklcPTB7
+ FeszXTWfIvBy/EZ+9tR9wFgNfERrPSz04XIqs3C5sPt1So+7QnACFxItuklMkiyT+ifTyl
+ sC6XLFWZZQaXMsDtnVUMD7TDcy6NTTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-FgkUDjQ_O5emukfHTzZ-2g-1; Thu, 04 Jun 2020 10:20:47 -0400
+X-MC-Unique: FgkUDjQ_O5emukfHTzZ-2g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A36D41800D42;
+ Thu,  4 Jun 2020 14:20:46 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-65.ams2.redhat.com [10.36.112.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 07899100164C;
+ Thu,  4 Jun 2020 14:20:44 +0000 (UTC)
+Date: Thu, 4 Jun 2020 16:20:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v2 10/16] python/machine.py: Handle None events in
+ event_wait
+Message-ID: <20200604142043.GH4512@linux.fritz.box>
+References: <20200602214528.12107-1-jsnow@redhat.com>
+ <20200602214528.12107-11-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515144405.20580-6-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VW8k9MVw41SUXcmp9JXUiYtBrOE6MqZkMpAhQhCpeumhfuts1Oc
- qVfUg9tQiGvveSxW121w25qheusX4+iI72bgaC38uOLPbN/QXezAcUw8yN0pLILnEvCSEmn
- H+zkzQF34TKe9Ovan4lLyt3Cs+YIDsCc1soy3WIV5lVIhi9/czSHLxcYtUAg5HWm3hfYpyD
- syVfN+fQttJezN/6o4Dwg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sfZWit8fPIc=:mTFTeummY+78C44Es8aeZl
- vGQ9qqLW35zIXULsk6G2UIb7EwItG9EqypvPnUZYl1RUhQ030c1rZiUYNcRTFQctjzwiCnsD9
- QD2gKUv5mHVvi280CPcQ1bC8a2suUZraNHBfcniVxwfFJxzq30ivPipAUaumcuRD9nGJIMuXP
- ojjHbxd6jQYcbq4pdgu6sksVvXC5aakNILWNdxzi8fQpP7yD/TPWeZH4FdmUyQQfQWH2hSMle
- JNExR4ly6CbdW9pLLz8eCU4EvfwZWAlMWsPXYU1w4uwY3tOHNAxNf5AUoCAm96a1KNMbYNrmZ
- tXa4wl6j8F9LRj8lFwUhX0ZmevXhesCf8ePx1bRe0m8k7LUdoOI1sJKJgnMS7pvdgarabYQYY
- LMK1B9Ms2GHsVFzs99ojCtbpReNOCZ6Nqo2tQMen9KpNiEOA0dt7G907Y2yatAa5YVRmy1Ttg
- /MR0TR3/z+GXG3TZWx/imvp8Kq6Mb1ES7ImTNzdVjN93F4IkSzAXmJYGcBU7X9hJzxg9mbyAE
- D6Y1CpozrF+h8oY/4CuSZw2/AFsiR61pt5ykDV4HkyxP4G2jr3V5qS59NZVYNeKiPXYuQ22Fs
- xNFo7u8cVSiOCin8lgLUy33C/OLCsyJMsIJ2IqSgxR1ef+jmkqKBY+39NejHCQka1ylcuKEYX
- Fk4kHrc2uI4gx+GjkkQ1UcXIDB77SOHfQJBsbbgOhtHJiFzJQoMY6neVI+2LB38M2SWPObg1C
- AMBh8bb787001vicq9j25OopjaBiwwb05/sjGndX4ZO+4gGsVHETOLs8DMVpnxc4iPLAtlLjV
- 5RHwFTX713TySPCCLn9+7Hq/9JxKqK9R9XNHEWlXE3D6xBTvtC9vnAAfG+MC5SZhpXZgfBU
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 10:15:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200602214528.12107-11-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,46 +92,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/05/2020 16:43, Alex Bennée wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
+Am 02.06.2020 um 23:45 hat John Snow geschrieben:
+> If the timeout is 0, we can get None back. Handle this explicitly.
 > 
-> We cannot at present limit a 64-bit guest to a virtual address
-> space smaller than the host.  It will mostly work to ignore this
-> limitation, except if the guest uses high bits of the address
-> space for tags.  But it will certainly work better, as presently
-> we can wind up failing to allocate the guest stack.
-> 
-> Widen our user-only page tree to the host or abi pointer width.
-> Remove the workaround for this problem from target/alpha.
-> Always validate guest addresses vs reserved_va, as there we
-> control allocation ourselves.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> Message-Id: <20200513175134.19619-7-alex.bennee@linaro.org>
-> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-This patch breaks a test case in LTP with 64bit targets on x86_64 host:
+Subject line: This is events_wait(), not event_wait(). Both functions
+exist.
 
-sudo linux-user/mips64el-linux-user/qemu-mips64el \
--L chroot/mips64el/stretch/ \
-chroot/mips64el/stretch/opt/ltp/testcases/bin/mmap15
+> @@ -562,6 +564,8 @@ def _match(event):
+>          # Poll for new events
+>          while True:
+>              event = self._qmp.pull_event(wait=timeout)
+> +            if event is None:
+> +                break
+>              if _match(event):
+>                  return event
+>              self._events.append(event)
 
-qemu-mips64el: accel/tcg/translate-all.c:2533: page_set_flags: Assertion
-`start < end' failed.
-qemu:handle_cpu_signal received signal outside vCPU context @
-pc=0x7f0015f6e7cb
+Hm... How could this ever work? I guess we just never really tested
+whether timeouts actually time out?
 
-Could you have a look?
+(It's still somewhat unintuitive that receiving an unrelated event
+resets the timeout, but not the problem of this series...)
 
-Thanks,
-Laurent
+Kevin
+
 
