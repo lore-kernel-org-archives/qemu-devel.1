@@ -2,58 +2,98 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F0AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8666BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC03C207D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:43:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC03C207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
+	by mail.kernel.org (Postfix) with ESMTPS id 527E2207D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 12:43:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SZO8cWG0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527E2207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgpDN-0005B5-1L
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53004)
+	id 1jgpDb-0005pC-I8
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 08:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
- id 1jgp9g-00085b-Qm; Thu, 04 Jun 2020 08:39:32 -0400
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:55553)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
- id 1jgp9f-0001i1-Lk; Thu, 04 Jun 2020 08:39:32 -0400
-X-Originating-IP: 82.252.130.88
-Received: from localhost.localdomain (lns-bzn-59-82-252-130-88.adsl.proxad.net
- [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
- by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 4A988E0018;
- Thu,  4 Jun 2020 12:39:28 +0000 (UTC)
-From: Jean-Christophe Dubois <jcd@tribudubois.net>
-To: qemu-arm@nongnu.org
-Subject: [PATCH v5 3/3] hw/net/imx_fec: improve PHY implementation.
-Date: Thu,  4 Jun 2020 14:39:10 +0200
-Message-Id: <cbafa49a59659051387e43b7b35d8f280e59f1a3.1591272275.git.jcd@tribudubois.net>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1591272275.git.jcd@tribudubois.net>
-References: <cover.1591272275.git.jcd@tribudubois.net>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgpA4-0000CG-Mt
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:39:56 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36470)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgpA3-0001mC-7f
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 08:39:56 -0400
+Received: by mail-wm1-x344.google.com with SMTP id d128so5458260wmc.1
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 05:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=I2wUcuGnnpxSNhMK2HDZKzcqf7rViADS4Ulwk8BlJho=;
+ b=SZO8cWG0DubpEVpdmaYhtnfwihRBEmG2NSqM5ROubn5kIfegeJpSoJHbBIdfxtYtLD
+ Iim799lU8K8j8O6+FH6KSsVBjtIX6f5KZVTmAnxnsCPJcE1hkYCLuG3sOcBXFiC89myx
+ EXMUfRt+63myc5eeM9hp1Z/zx10ubrG/QW2NdzdWB6p/KR/zw0ELH5XZK7kXAxxTLpzH
+ Cvx/REuYej7PcAsin7o9MW9WO4Jai3/27OfBCKv/Q83DQicwFjIt8rPDxOOa2C1UfVFj
+ +NbJs6BQv8sfl9hamQ++99V3SEW+yuosS/y8aocgA88MfCf4FTwfLoe67T/DRR/3z5pg
+ xmlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=I2wUcuGnnpxSNhMK2HDZKzcqf7rViADS4Ulwk8BlJho=;
+ b=CDhrjO12VImzncP9O4ceRMlUjoAJ8yWwIo4ON5pHR0P6j37bGHr5sPe+pc1TGgPS8U
+ oK3r4jYYpHnwwrAoKUz/5Tpa66BdC5dn+n7g/kNpF6a64wXm7zpZaWrio1Lvs5pAxuPr
+ cDQviqcr6f0MPGp5Vw2DWbwVYSYyuPJ2mo0qp/Yk99M/KeUjYZnQ6Fa0KFNYXhIZWfQ8
+ 7BjuCFygMS41rHUXw+SwTVrgBTAqU1RpFuwz5PfF7IiCJr56zVvVlO2/TgOWsFjmzE3L
+ XFD6Z086hQagWCHs5GbiHcBnBUb6H08tbi9qNLtXpzOOQzFNOg6OhmOoSDEkEGUdH9SU
+ 6yLg==
+X-Gm-Message-State: AOAM531TBZeSIA2ULAiCPjqJgsCTO8++XuHnUysZ0rLxHojtywSM+IAX
+ HsvMXEg5dKKM8Ps8w/SkEyIsaWFxkjg=
+X-Google-Smtp-Source: ABdhPJxXfw80HHyYpXjX5Y3Ci4BGVbaihjY1gDICoO6zU2qdQ4MkMffGezGv3MD2zU7v2BEQO2aPNA==
+X-Received: by 2002:a7b:c212:: with SMTP id x18mr3811212wmi.119.1591274392416; 
+ Thu, 04 Jun 2020 05:39:52 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 5sm10679516wrr.5.2020.06.04.05.39.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Jun 2020 05:39:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 38C651FF7E;
+ Thu,  4 Jun 2020 13:39:50 +0100 (BST)
+References: <20200604111323.7458-1-alex.bennee@linaro.org>
+ <20200604071504-mutt-send-email-mst@kernel.org>
+ <87ftbb59vm.fsf@linaro.org>
+ <20200604075020-mutt-send-email-mst@kernel.org>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RFC PATCH] hw/virtio/vhost: re-factor vhost-section and allow
+ DIRTY_MEMORY_CODE
+In-reply-to: <20200604075020-mutt-send-email-mst@kernel.org>
+Date: Thu, 04 Jun 2020 13:39:50 +0100
+Message-ID: <87d06f57jd.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=217.70.183.196; envelope-from=jcd@tribudubois.net;
- helo=relay4-d.mail.gandi.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 08:39:21
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,193 +107,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, f4bug@amsat.org, peter.chubb@nicta.com.au,
- qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-improve the PHY implementation with more generic code.
 
-This patch remove a lot of harcoded values to replace them with
-generic symbols from header files.
+Michael S. Tsirkin <mst@redhat.com> writes:
 
-Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
----
- v2: Not present
- v3: Not present
- v4: Not present
- v5: improve PHY implementation.
+> On Thu, Jun 04, 2020 at 12:49:17PM +0100, Alex Benn=C3=83=C2=A9e wrote:
+>>=20
+>> Michael S. Tsirkin <mst@redhat.com> writes:
+>>=20
+>> > On Thu, Jun 04, 2020 at 12:13:23PM +0100, Alex Benn=C3=83=C2=83=C3=82=
+=C2=A9e wrote:
+>> >> The purpose of vhost_section is to identify RAM regions that need to
+>> >> be made available to a vhost client. However when running under TCG
+>> >> all RAM sections have DIRTY_MEMORY_CODE set which leads to problems
+>> >> down the line. The original comment implies VGA regions are a problem
+>> >> but doesn't explain why vhost has a problem with it.
+>> >>=20
+>> >> Re-factor the code so:
+>> >>=20
+>> >>   - steps are clearer to follow
+>> >>   - reason for rejection is recorded in the trace point
+>> >>   - we allow DIRTY_MEMORY_CODE when TCG is enabled
+>> >>=20
+>> >> Signed-off-by: Alex Benn=C3=83=C2=83=C3=82=C2=A9e <alex.bennee@linaro=
+.org>
+>> >> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> >> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> >> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>> >> ---
+>> >>  hw/virtio/vhost.c | 46 ++++++++++++++++++++++++++++++++--------------
+>> >>  1 file changed, 32 insertions(+), 14 deletions(-)
+>> >>=20
+>> >> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>> >> index aff98a0ede5..f81fc87e74c 100644
+>> >> --- a/hw/virtio/vhost.c
+>> >> +++ b/hw/virtio/vhost.c
+>> >> @@ -27,6 +27,7 @@
+>> >>  #include "migration/blocker.h"
+>> >>  #include "migration/qemu-file-types.h"
+>> >>  #include "sysemu/dma.h"
+>> >> +#include "sysemu/tcg.h"
+>> >>  #include "trace.h"
+>> >>=20=20
+>> >>  /* enabled until disconnected backend stabilizes */
+>> >> @@ -403,26 +404,43 @@ static int vhost_verify_ring_mappings(struct vh=
+ost_dev *dev,
+>> >>      return r;
+>> >>  }
+>> >>=20=20
+>> >> +/*
+>> >> + * vhost_section: identify sections needed for vhost access
+>> >> + *
+>> >> + * We only care about RAM sections here (where virtqueue can live). =
+If
+>> >> + * we find one we still allow the backend to potentially filter it o=
+ut
+>> >> + * of our list.
+>> >> + */
+>> >>  static bool vhost_section(struct vhost_dev *dev, MemoryRegionSection=
+ *section)
+>> >>  {
+>> >> -    bool result;
+>> >> -    bool log_dirty =3D memory_region_get_dirty_log_mask(section->mr)=
+ &
+>> >> -                     ~(1 << DIRTY_MEMORY_MIGRATION);
+>> >> -    result =3D memory_region_is_ram(section->mr) &&
+>> >> -        !memory_region_is_rom(section->mr);
+>> >> -
+>> >> -    /* Vhost doesn't handle any block which is doing dirty-tracking =
+other
+>> >> -     * than migration; this typically fires on VGA areas.
+>> >> -     */
+>> >> -    result &=3D !log_dirty;
+>> >> +    enum { OK =3D 0, NOT_RAM, DIRTY, FILTERED } result =3D NOT_RAM;
+>> >
+>> > I'm not sure what does this enum buy us as compared to bool.
+>>=20
+>> The only real point of the enum is to give a little more detailed
+>> information to the trace point to expose why a section wasn't included.
+>> In a previous iteration I just had the tracepoint at the bottom before a
+>> return true where all other legs had returned false. We could switch to
+>> just having the tracepoint hit for explicit inclusions?
+>
+> I didn't notice.  Yes, ok more tracepoints IMHO.
 
- hw/net/imx_fec.c     | 76 +++++++++++++++++++++++++++-----------------
- include/hw/net/mii.h |  4 +++
- 2 files changed, 50 insertions(+), 30 deletions(-)
+I can simplify to two:
 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 29e613699ee..bf9583a93f4 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -24,6 +24,7 @@
- #include "qemu/osdep.h"
- #include "hw/irq.h"
- #include "hw/net/imx_fec.h"
-+#include "hw/net/mii.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "sysemu/dma.h"
-@@ -231,6 +232,9 @@ static const VMStateDescription vmstate_imx_eth = {
- #define PHY_INT_PARFAULT            (1 << 2)
- #define PHY_INT_AUTONEG_PAGE        (1 << 1)
- 
-+#define MII_SMC911X_ISF             29
-+#define MII_SMC911X_IM              30
-+
- static void imx_eth_update(IMXFECState *s);
- 
- /*
-@@ -249,11 +253,11 @@ static void imx_phy_update_link(IMXFECState *s)
-     /* Autonegotiation status mirrors link status.  */
-     if (qemu_get_queue(s->nic)->link_down) {
-         trace_imx_phy_update_link("down");
--        s->phy_status &= ~0x0024;
-+        s->phy_status &= ~(MII_BMSR_LINK_ST | MII_BMSR_AN_COMP);
-         s->phy_int |= PHY_INT_DOWN;
-     } else {
-         trace_imx_phy_update_link("up");
--        s->phy_status |= 0x0024;
-+        s->phy_status |= MII_BMSR_LINK_ST | MII_BMSR_AN_COMP;
-         s->phy_int |= PHY_INT_ENERGYON;
-         s->phy_int |= PHY_INT_AUTONEG_COMPLETE;
-     }
-@@ -269,9 +273,11 @@ static void imx_phy_reset(IMXFECState *s)
- {
-     trace_imx_phy_reset();
- 
--    s->phy_status = 0x7809;
--    s->phy_control = 0x3000;
--    s->phy_advertise = 0x01e1;
-+    s->phy_status = MII_BMSR_100TX_FD | MII_BMSR_100TX_HD | MII_BMSR_10T_FD |
-+                    MII_BMSR_10T_HD | MII_BMSR_AUTONEG | MII_BMSR_EXTCAP;
-+    s->phy_control = MII_BMCR_AUTOEN | MII_BMCR_SPEED100;
-+    s->phy_advertise = MII_ANAR_CSMACD | MII_ANAR_TX | MII_ANAR_10FD |
-+                       MII_ANAR_10 | MII_ANAR_TXFD;
-     s->phy_int_mask = 0;
-     s->phy_int = 0;
-     imx_phy_update_link(s);
-@@ -285,37 +291,42 @@ static uint32_t imx_phy_read(IMXFECState *s, int reg)
-     reg %= 32;
- 
-     switch (reg) {
--    case 0:     /* Basic Control */
-+    case MII_BMCR:     /* Basic Control */
-         val = s->phy_control;
-         break;
--    case 1:     /* Basic Status */
-+    case MII_BMSR:     /* Basic Status */
-         val = s->phy_status;
-         break;
--    case 2:     /* ID1 */
--        val = 0x0007;
-+    case MII_PHYID1:     /* ID1 */
-+        val = LAN911x_PHYID1;
-         break;
--    case 3:     /* ID2 */
--        val = 0xc0d1;
-+    case MII_PHYID2:     /* ID2 */
-+        val = LAN911x_PHYID2;
-         break;
--    case 4:     /* Auto-neg advertisement */
-+    case MII_ANAR:     /* Auto-neg advertisement */
-         val = s->phy_advertise;
-         break;
--    case 5:     /* Auto-neg Link Partner Ability */
--        val = 0x0f71;
-+    case MII_ANLPAR:     /* Auto-neg Link Partner Ability */
-+        val = MII_ANLPAR_CSMACD | MII_ANLPAR_10 | MII_ANLPAR_10FD |
-+              MII_ANLPAR_TX | MII_ANLPAR_TXFD | MII_ANLPAR_PAUSE |
-+              MII_ANLPAR_PAUSEASY;
-         break;
--    case 6:     /* Auto-neg Expansion */
--        val = 1;
-+    case MII_ANER:     /* Auto-neg Expansion */
-+        val = MII_ANER_NWAY;
-         break;
--    case 29:    /* Interrupt source.  */
-+    case MII_SMC911X_ISF:    /* Interrupt source.  */
-         val = s->phy_int;
-         s->phy_int = 0;
-         imx_phy_update_irq(s);
-         break;
--    case 30:    /* Interrupt mask */
-+    case MII_SMC911X_IM:    /* Interrupt mask */
-         val = s->phy_int_mask;
-         break;
--    case 17:
--    case 18:
-+    case MII_NSR:
-+        val = 1 << 6;
-+        break;
-+    case MII_LBREMR:
-+    case MII_REC:
-     case 27:
-     case 31:
-         qemu_log_mask(LOG_UNIMP, "[%s.phy]%s: reg %d not implemented\n",
-@@ -343,26 +354,31 @@ static void imx_phy_write(IMXFECState *s, int reg, uint32_t val)
-     trace_imx_phy_write(val, phy, reg);
- 
-     switch (reg) {
--    case 0:     /* Basic Control */
--        if (val & 0x8000) {
-+    case MII_BMCR:     /* Basic Control */
-+        if (val & MII_BMCR_RESET) {
-             imx_phy_reset(s);
-         } else {
--            s->phy_control = val & 0x7980;
-+            s->phy_control = val & (MII_BMCR_LOOPBACK | MII_BMCR_SPEED100 |
-+                                    MII_BMCR_AUTOEN | MII_BMCR_PDOWN |
-+                                    MII_BMCR_FD | MII_BMCR_CTST);
-             /* Complete autonegotiation immediately.  */
--            if (val & 0x1000) {
--                s->phy_status |= 0x0020;
-+            if (val & MII_BMCR_AUTOEN) {
-+                s->phy_status |= MII_BMSR_AN_COMP;
-             }
-         }
-         break;
--    case 4:     /* Auto-neg advertisement */
--        s->phy_advertise = (val & 0x2d7f) | 0x80;
-+    case MII_ANAR:     /* Auto-neg advertisement */
-+        s->phy_advertise = (val & (MII_ANAR_PAUSE_ASYM | MII_ANAR_PAUSE |
-+                                   MII_ANAR_TXFD | MII_ANAR_TX |
-+                                   MII_ANAR_10FD | MII_ANAR_10 | 0x1f)) |
-+                                   MII_ANAR_TX;
-         break;
--    case 30:    /* Interrupt mask */
-+    case MII_SMC911X_IM:    /* Interrupt mask */
-         s->phy_int_mask = val & 0xff;
-         imx_phy_update_irq(s);
-         break;
--    case 17:
--    case 18:
-+    case MII_LBREMR:
-+    case MII_REC:
-     case 27:
-     case 31:
-         qemu_log_mask(LOG_UNIMP, "[%s.phy)%s: reg %d not implemented\n",
-diff --git a/include/hw/net/mii.h b/include/hw/net/mii.h
-index 4ae4dcce7e3..d2001bd859b 100644
---- a/include/hw/net/mii.h
-+++ b/include/hw/net/mii.h
-@@ -112,4 +112,8 @@
- #define DP83848_PHYID1      0x2000
- #define DP83848_PHYID2      0x5c90
- 
-+/* SMSC LAN911x Internal PHY */
-+#define LAN911x_PHYID1      0x0007
-+#define LAN911x_PHYID2      0xc0d1
-+
- #endif /* MII_H */
--- 
-2.25.1
+  trace_vhost_section(mr->name)
+  trace_vhost_reject_section(mr->name, int reason)
 
+Not sure if it's worth defining a enum outside just for the purposes of
+the trace though. Do we have the concept of per-trace event enum codes?
+
+>> > Also why force OK to 0?
+>>=20
+>> Personal preference where 0 indicates success and !0 indicates failure
+>> of various kinds. Again we can drop if we don't want the information in
+>> the tracepoint.
+>
+> So in that case we need to set all values so people can decode them
+> from the trace. But I think it's best to just have more trace points
+> or drop it from the trace.
+>
+>> > And I prefer an explicit "else result =3D NOT_RAM" below
+>> > instead of initializing it here.
+>>=20
+>> Ok.
+>>=20
+>> >
+>> >> +
+>> >> +    if (memory_region_is_ram(section->mr) && !memory_region_is_rom(s=
+ection->mr)) {
+>> >> +        uint8_t dirty_mask =3D memory_region_get_dirty_log_mask(sect=
+ion->mr);
+>> >> +        uint8_t handled_dirty;
+>> >>=20=20
+>> >> -    if (result && dev->vhost_ops->vhost_backend_mem_section_filter) {
+>> >> -        result &=3D
+>> >> -            dev->vhost_ops->vhost_backend_mem_section_filter(dev, se=
+ction);
+>> >> +        /*
+>> >> +         * Vhost doesn't handle any block which is doing dirty-track=
+ing other
+>> >> +         * than migration; this typically fires on VGA areas. However
+>> >> +         * for TCG we also do dirty code page tracking which shouldn=
+'t
+>> >> +         * get in the way.
+>> >> +         */
+>> >> +        handled_dirty =3D (1 << DIRTY_MEMORY_MIGRATION);
+>> >> +        if (tcg_enabled()) {
+>> >> +            handled_dirty |=3D (1 << DIRTY_MEMORY_CODE);
+>> >> +        }
+>> >
+>> > So DIRTY_MEMORY_CODE is only set by TCG right? Thus I'm guessing
+>> > we can just allow this unconditionally.
+>>=20
+>> Which actually makes the test:
+>>=20
+>>   if (dirty_mask & DIRTY_MEMORY_VGA) {
+>>      .. fail ..
+>>   }
+>>=20
+>> which is more in line with the comment although wouldn't fail if we
+>> added additional DIRTY_MEMORY flags. This leads to the question what
+>> exactly is it about DIRTY tracking that vhost doesn't like.
+>
+> vhost does not know how to track writes to specific regions. It can either
+> track all writes to memory (which slows it down quite a bit)
+> or no writes.
+
+So can vhost interfere with dirty tracking itself in the kernel by
+trapping the writes? I guess there is no way this can happen with
+vhost-user?
+
+(I wonder what would happen if a vhost-user daemon did an mprotect() on
+RAM from it's shared view?)
+
+> It never actually *needs* to write to VGA,
+> so we do a hack and just skip these and then if that's the
+> only thing we need to track then we don't need to enable
+> its dirty tracking.
+>
+> I don't really know what is DIRTY_MEMORY_CODE and when it's set.
+
+We use it softmmu do any pages that have code in them always force the
+slow-path into cputlb for writes to those pages. This allows us to
+detect self-modifying code. The kernel would never get involved but I
+don't think vhost and TCG is compatible anyway. I'm only really
+interested in vhost-user and it's interaction with TCG.
+
+I'll spin a v2 now.
+
+--=20
+Alex Benn=C3=A9e
 
