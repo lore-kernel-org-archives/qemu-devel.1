@@ -2,124 +2,111 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDD5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0356AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A20C207D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF008207D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 14:12:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="JVZNkNhY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A20C207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQ5XnLdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF008207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgqWe-000670-Ha
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 10:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36438)
+	id 1jgqbW-0001b9-2n
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 10:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgqVw-00059K-8C
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:06:36 -0400
-Received: from mail-mw2nam10on2054.outbound.protection.outlook.com
- ([40.107.94.54]:17259 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgqVu-0004PB-NJ
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:06:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RU6ZKindQdzybwN2IpY27RP0CoODdQk5f716Dt7xE7yJoGbh2QLbW3rYY0nitFY4wej8hN2sDZm7q4joyuFeAZq3p9nGSpr1MiWlH2jwXqDF8Nj3V6lScvlzseJfaU4ZXx8XM27NeYq+WzxgsTfdy805mhCvdPzmrcHHOygajeh4UYs6H/NggX2PpEN5BPbReZwu3xQcnHWJ0dItH0zfEXG84SJF1Dp/jtZwFZxF6HtDkSEBEFnSEammohyUbJ3IWVNPast1XA4KmquTLMr6uS8SlZYtaybCWp9BadgpHHwyv353qNcr1HyDObDYOb4Iop31adgylUp/V7somuQM4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TSQBy4TLgJqLp8WgUlCWZeNv3FsNxIHx9Ewi7NkIt/A=;
- b=TFnBo4Qvcs6ImuzOzo1FCPicOABoAp4+qtVRg1XAFJkcX/OcMKY6ZS4frgMV2Ge+5PGo/nM0KoVZ4PFmm9aVlEsqDjgT590q8VUnIR41u0tLR49TMYZnJatQwJR7XEZ3tFlWscM3rMLvfb/1qwPiiTfYApQQMjFnIo/+IoFUSxgZjBBAOepWVH9h6GBrWBJyBXtYLH1Lr5LwX+NXEQzs3Cj9q8308f4z2Xm3ESpx9oyC6fYX7Vj2C3XDCsPCcVprxOPOhfHE802X1y+Mjmf1VkL4BdCav0A64ZmG2Fv25eUR8vQjBEqGYEgDDcRZPqc+8VpJ+0s0m7s9jj1wyZQJoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TSQBy4TLgJqLp8WgUlCWZeNv3FsNxIHx9Ewi7NkIt/A=;
- b=JVZNkNhYr1vvwo000Yq3VaGcylNKwsrkDLD21+YKA3EyZPIiVeNRaVz5Zl51B2Jc+ABy8bTVp1Z49hPkhlS0KBojyS344mc9F2h5X5n35aDVIGv7dJohu7MxLhbs0Hw4XgGve4nFM+5HHiFpIZNbmE/sDkmx+QOPsR/saG/ya5k=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2415.namprd12.prod.outlook.com (2603:10b6:802:26::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Thu, 4 Jun
- 2020 14:06:30 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3045.024; Thu, 4 Jun 2020
- 14:06:30 +0000
-Subject: RE: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
- <1528498581-131037-2-git-send-email-babu.moger@amd.com>
- <20200602175212.GH577771@habkost.net>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <b6e22360-5fa0-9ade-624d-9de1f76b360b@amd.com>
-Date: Thu, 4 Jun 2020 09:06:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200602175212.GH577771@habkost.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR03CA0008.namprd03.prod.outlook.com
- (2603:10b6:5:40::21) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jgqam-00012D-1r
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:11:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20643
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jgqak-0005EM-3I
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 10:11:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591279892;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E7b30PipvqV+rAgp1aIU72tGJoNESNLFlFjbbXxWJTs=;
+ b=jQ5XnLdnuDUEOtXxdfhhA3r0MoWCF2eB8B5mAIEnYwNpnhxQh1f4Db6LGcAzYSPR14P/pb
+ r66cy2Q1jkT9JH77c6MSouPNrNDM0ziAN/Mto565uKtrQEQcZ3wT2AtG7j/nkE1jlFRfIX
+ DByGAfRbaYQPYPrJw7AZsSXh60cD+iU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-S35GDk0uPbGi17JiGc2mow-1; Thu, 04 Jun 2020 10:11:28 -0400
+X-MC-Unique: S35GDk0uPbGi17JiGc2mow-1
+Received: by mail-wr1-f72.google.com with SMTP id d6so2485726wrn.1
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 07:11:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=E7b30PipvqV+rAgp1aIU72tGJoNESNLFlFjbbXxWJTs=;
+ b=YNnm2iweGIidH6h0tTfZuHK4KC1CMbhwBn2B4GQI90oF0wWDlwOPNN1uHG5uDOindG
+ aT4YGYVqsRqte34GKM9N0ZWfGWdhxa/u49vph9vqntJ98ZQ2WkLcOeWuOTTfT6KEE4ez
+ lHLKbBaL0EQZ3FDCUU1ZyE6p7yqKng6hwhWt0pXqyi5Q3A2XHW0fYbn8NbLJ2oUxMjcN
+ PvKM02B4MXZreUyZ4ZAk+dHA/1y/45LNIirPdrP+/l+rReI9wtYm6yuhzkP+FuQcP0Zw
+ CIityS6hAxL8qKiUMxV5JYMRLyVespDs65OImW465+opTHEJflPhBXGKwsCsR7WjCpc5
+ FbiQ==
+X-Gm-Message-State: AOAM532vYZ26B4m84w1ndOj/NriRo0bKUAYcekumnnzi5eF2v7G9ukPS
+ b7Safyl/nCFTvGwOSEXNjfsi7yv0s9PGIYj5KBmhL0BXCaLOvvgd7dPmF3Ys2J9zEwR80Ss3tpC
+ i7ScakuQxWVWlk7E=
+X-Received: by 2002:a5d:4d0d:: with SMTP id z13mr5000325wrt.220.1591279886910; 
+ Thu, 04 Jun 2020 07:11:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx44YUHtLMOokJYaZsxs+0OmwGkLy6LeA0UiWlQTWimQ6cRQFmXgFMhJ78zqjZ4aoMoIqqejQ==
+X-Received: by 2002:a5d:4d0d:: with SMTP id z13mr5000285wrt.220.1591279886573; 
+ Thu, 04 Jun 2020 07:11:26 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+ by smtp.gmail.com with ESMTPSA id
+ 88sm8941915wre.45.2020.06.04.07.11.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Jun 2020 07:11:25 -0700 (PDT)
+Date: Thu, 4 Jun 2020 10:11:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH v2 2/2] pci: ensure configuration access is within bounds
+Message-ID: <20200604100800-mutt-send-email-mst@kernel.org>
+References: <20200603202251.1199170-1-ppandit@redhat.com>
+ <20200603202251.1199170-3-ppandit@redhat.com>
+ <alpine.BSF.2.22.395.2006040006520.56892@zero.eik.bme.hu>
+ <e1ccdf71-5069-fa95-3c90-de4f875b2706@redhat.com>
+ <20200604054043-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2006041335250.54170@zero.eik.bme.hu>
+ <20200604073753-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2006041342470.54170@zero.eik.bme.hu>
+ <20200604075613-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2006041400540.54170@zero.eik.bme.hu>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.79] (165.204.77.1) by
- DM6PR03CA0008.namprd03.prod.outlook.com (2603:10b6:5:40::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Thu, 4 Jun 2020 14:06:29 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 50d40944-cefd-4b8b-943d-08d808907adc
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2415:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB24152C4571D35B8026B1BACD95890@SN1PR12MB2415.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 04244E0DC5
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I/vyKHzbiA3auMil/zvCF8A+QzawA/h00yOFpXoUMf5k2bOMrCh1EcjHIPzwVpGu4724e79XinLFn/j8iQY8QtW0CfEbbBWFKuFZuypxIZjLBM805vkQmpn3WadlIuneyQ7Xr7XSbRPkSzaFx4jJyAr1Y8vPV/nqF78/juYeQUystK7YcMt35gzAOvcDSgpXBmHLbu/94rKL6Ayp+kDsPEG88I+ECjutWWM0MntZieQDgx1Kahdf+y0ruFEIwJyM0CrHSe/uB0jnElfjQM/2zBkyQbWFgkzey1Wzv55d8/UlN4QJUuGA2Cs+OzA988r1n8zhAjhloq6V9A5ktBZXg8g//eFH9N6E+Bw+xvDC3q4vkFGJsNQoDGzmQvl1gomr6vrpfJIX55Xg7LF28/dmFeShtHjAinZGvPtawAeh7GiJQaHLs3RZ7LMH7vDayoAg57q7N4jj0mgPijbRsjttTg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(376002)(366004)(39860400002)(396003)(136003)(16526019)(44832011)(2616005)(186003)(316002)(7416002)(956004)(86362001)(478600001)(83380400001)(16576012)(54906003)(45080400002)(53546011)(52116002)(26005)(83080400001)(5660300002)(8676002)(6916009)(6486002)(8936002)(966005)(66946007)(4326008)(36756003)(31686004)(2906002)(66556008)(66476007)(31696002)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: 8NeOchgu8QNviIVL1e6vy/a4IlJIkVdVt32ELT+yKQnLl/GEOnV/pSfYGyS67Ilt+DI5uNqruCW2y2103QN/7qZ7Xltd11ZeDo1IuY97qSW1BRQs0eno/KbjEq75gy2qR4BAKvPd6T3Z1/c464l8zJJJ8idU5RasgHHn1Ty0kGYk0srq+BWid82z0FCMKVFgrsqC7IJhjON8e/DERs0Y6792IEEEulpkuFkLFi1whhJyBT+BcYhLOBzRCM7rkNMf9usoohRB7+0ZbYmtFnaABdoyaRXqPCsYK/fwnTkeBiVIzcwSwbzoZFVhGqKo8PG2+qCnStjmq7tqIwYPs1sSd24RhU/gAruiwTUg32XVA4oziNwN9CSxjCk7QD4FZEaRthNFpyGeKTY3mdJa6qghs9k02EPzeugdl075Ndvth25fO2803MBYPOFSXM69Ld0RLkUIWbJzOPKgy8cuuUW1IoGsTuPi3JRxy7dkGTA7pi4=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50d40944-cefd-4b8b-943d-08d808907adc
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2020 14:06:30.7421 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S/KbzSYIvdakFbvHAt9HqDImqyur0tU8vqoEjnjMy4vmnpuJw19k6vuisQ0cOB5+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2415
-Received-SPF: none client-ip=40.107.94.54; envelope-from=Babu.Moger@amd.com;
- helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 10:06:32
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <alpine.BSF.2.22.395.2006041400540.54170@zero.eik.bme.hu>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:12:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,91 +119,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "geoff@hostfission.com" <geoff@hostfission.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "kash@tripleback.net" <kash@tripleback.net>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Ren Ding <rding@gatech.edu>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Jun 04, 2020 at 02:14:46PM +0200, BALATON Zoltan wrote:
+> On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+> > On Thu, Jun 04, 2020 at 01:49:53PM +0200, BALATON Zoltan wrote:
+> > > On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+> > > > On Thu, Jun 04, 2020 at 01:37:13PM +0200, BALATON Zoltan wrote:
+> > > > > On Thu, 4 Jun 2020, Michael S. Tsirkin wrote:
+> > > > > > On Thu, Jun 04, 2020 at 08:07:52AM +0200, Philippe Mathieu-DaudÃƒÂ© wrote:
+> > > > > > > On 6/4/20 12:13 AM, BALATON Zoltan wrote:
+> > > > > > > > On Thu, 4 Jun 2020, P J P wrote:
+> > > > > > > > > From: Prasad J Pandit <pjp@fedoraproject.org>
+> > > > > > > > > 
+> > > > > > > > > While reading PCI configuration bytes, a guest may send an
+> > > > > > > > > address towards the end of the configuration space. It may lead
+> > > > > > > > > to an OOB access issue. Assert that 'address + len' is within
+> > > > > > > > > PCI configuration space.
+> > > > > > > > > 
+> > > > > > > > > Suggested-by: Philippe Mathieu-DaudÃƒÂ© <philmd@redhat.com>
+> > > > > > > > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> > > > > > > > > ---
+> > > > > > > > > hw/pci/pci.c | 2 ++
+> > > > > > > > > 1 file changed, 2 insertions(+)
+> > > > > > > > > 
+> > > > > > > > > Update v2: assert PCI configuration access is within bounds
+> > > > > > > > > Ã‚Â -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00711.html
+> > > > > > > > > 
+> > > > > > > > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > > > > > > > > index 70c66965f5..173bec4fd5 100644
+> > > > > > > > > --- a/hw/pci/pci.c
+> > > > > > > > > +++ b/hw/pci/pci.c
+> > > > > > > > > @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
+> > > > > > > > > {
+> > > > > > > > > Ã‚Â Ã‚Â Ã‚Â  uint32_t val = 0;
+> > > > > > > > > 
+> > > > > > > > > +Ã‚Â Ã‚Â Ã‚Â  assert(address + len <= pci_config_size(d));
+> > > > > > > > 
+> > > > > > > > Does this allow guest now to crash QEMU? I think it was suggested that
+> > > > > > > > assert should only be used for cases that can only arise from a
+> > > > > > > > programming error and not from values set by the guest. If this is
+> > > > > > > > considered to be an error now to call this function with wrong
+> > > > > > > > parameters did you check other callers? I've found a few such as:
+> > > > > > > > 
+> > > > > > > > hw/scsi/esp-pci.c
+> > > > > > > > hw/watchdog/wdt_i6300esb.c
+> > > > > > > > hw/ide/cmd646.c
+> > > > > > > > hw/vfio/pci.c
+> > > > > > > > 
+> > > > > > > > and maybe others. Would it be better to not crash just log invalid
+> > > > > > > > access and either fix up parameters or return some garbage like 0?
+> > > > > > > 
+> > > > > > > Yes, maybe I was not clear while reviewing v1, we need to audit the
+> > > > > > > callers and fix them first, then we can safely add the assert here.
+> > > > > > 
+> > > > > > We can add assert here regardless of auditing callers. Doing that
+> > > > > > will also make fuzzying easier. But the assert is unrelated to CVE imho.
+> > > > > 
+> > > > > I wonder why isn't the check added to pci_default_read_config() right away?
+> > > > > If we have an assert there the overhead is the same and adding the check
+> > > > > there would make it unnecessary to patch all callers so it's just one patch
+> > > > > instead of a whole series.
+> > > > > 
+> > > > > Regards,
+> > > > > BALATON Zoltan
+> > > > 
+> > > > We need to return something, and we can't be sure that callers will
+> > > > handle returning random stuff correctly. Callers know what
+> > > > to do on errors, we don't.
+> > > 
+> > > This is an invalid case where behaviour will be undefined anyway so
+> > > returning anything such as 0 or -1 is probably OK (what do most hardware
+> > > return in this case?).
+> > 
+> > This is an internal detail of the API. It's not about what hardware
+> > returns.  Look at the ati as an example.
+> 
+> Considering that this function implements reading PCI config space its API
+> should aligh with what happens on hardware normally. You could make it
+> unrelated but that does not make much sense other than causing trouble for
+> callers.
+
+What happens on hardware is that there's no way to send to
+device a transaction that is out of range: on pci
+offset is 8 bit so <= 0xff, and on express 12 bit so <= 4K.
+
+So this handles something that never happens on real hardware
+and it happens because of a bug elsewhere in QEMU.
+assert seems appropriate.
 
 
-> -----Original Message-----
-> From: Eduardo Habkost <ehabkost@redhat.com>
-> Sent: Tuesday, June 2, 2020 12:52 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Dr. David
-> Alan Gilbert <dgilbert@redhat.com>
-> Subject: Re: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
+> > > If callers need better error handling they can do a
+> > > check before calling the function but for other (most) callers which will
+> > > just return the same random value you would return from
+> > > pci_default_read_config() having an assert instead makes it necessary to
+> > > modify all of them one by one and doubles the check overhead by
+> > > unnecessarily double checking. So I think having a default check and error
+> > > handling in pci_default_read_config() would be better so callers who don't
+> > > care would work and those few who might care could check before calling or
+> > > actually implement their own callback (which I expect they already do as
+> > > this is just the default implementation of this callback).
+> > 
+> > 
+> > Basically if you look at the specific example, you will see that it
+> > triggers because of a misaligned access which device code never
+> > expected. Which memory core should not allow at all.
+> > It will likely trigger other bugs, some of them could be
+> > security related. assert is a reasonable way to help us catch them in
+> > fuzzying.
 > 
-> On Fri, Jun 08, 2018 at 06:56:17PM -0400, Babu Moger wrote:
-> > Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
-> > match the underlying hardware. Please refer to the Processor Programming
-> > Reference (PPR) for AMD Family 17h Model for more details.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> [...]
-> > +    case 0x8000001E:
-> > +        assert(cpu->core_id <= 255);
-> 
-> It is possible to trigger this assert using:
-> 
-> $ qemu-system-x86_64 -machine q35,accel=kvm,kernel-irqchip=split -device
-> intel-iommu,intremap=on,eim=on -smp
-> 1,maxcpus=258,cores=258,threads=1,sockets=1 -cpu
-> qemu64,xlevel=0x8000001e -device qemu64-x86_64-cpu,apic-id=257
-> qemu-system-x86_64: warning: Number of hotpluggable cpus requested (258)
-> exceeds the recommended cpus supported by KVM (240)
-> qemu-system-x86_64:
-> /home/ehabkost/rh/proj/virt/qemu/target/i386/cpu.c:5888: cpu_x86_cpuid:
-> Assertion `cpu->core_id <= 255' failed.
-> Aborted (core dumped)
-> 
-> See bug report and discussion at
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
-> redhat.com%2Fshow_bug.cgi%3Fid%3D1834200&amp;data=02%7C01%7Cbabu.
-> moger%40amd.com%7C8a2724729b914bc9b53d08d8071db392%7C3dd8961fe4
-> 884e608e11a82d994e183d%7C0%7C0%7C637267171438806408&amp;sdata=ib
-> iGlF%2FF%2FVtYQLf7fe988kxFsLhj4GrRiTOq4LUuOT8%3D&amp;reserved=0
-> 
-> Also, it looks like encode_topo_cpuid8000001e() assumes core_id
-> has only 3 bits, so the existing assert() is not even sufficient.
-> We need to decide what to do if the user requests nr_cores > 8.
-> 
-> Probably omitting CPUID[0x8000001E] if the VCPU topology is
-> incompatible with encode_topo_cpuid8000001e() (and printing a
-> warning) is the safest thing to do right now.
+> The specific example (ati-vga) does expect and should support unaligned
+> access.
 
-Eduardo,  We need to generalize the encode_topo_cpuid8000001e decoding.
-We will have to remove 3 bit limitation there. It will not scale with
-latest configurations. I will take a look that.
+Then it should set "unaligned = true". It does not seem to do so.
 
-For now, best option I think is to(like you mentioned in bug 1834200),
-declaring nr_cores > 256 as never supported (or deprecated); and throw
-warning.
+> Not for all regs but for most registers, there's a table in docs
+> which says for PCI POS registers (whatever those are) unalligned access is
+> supported. This works now, if it should not work witout .impl.unaligned or
+> some other value set somewhere that should be patched instead.
 
-What do you think?
+Argue with the docs/devel/memory.rst about this please, that's not
+what it says.
+
+
 > 
-> 
-> 
-> > +        encode_topo_cpuid8000001e(cs, cpu,
-> > +                                  eax, ebx, ecx, edx);
-> > +        break;
-> >      case 0xC0000000:
-> >          *eax = env->cpuid_xlevel2;
-> >          *ebx = 0;
-> > --
-> > 1.8.3.1
-> >
-> 
-> --
-> Eduardo
+> Regards,
+> BALATON Zoltan
 
 
