@@ -6,83 +6,83 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46816C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AD1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F3B62074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:20:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61F7420738
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 09:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MT1UUezK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3B62074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PAeGhu0v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F7420738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgm2j-0006Fd-Br
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:20:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54920)
+	id 1jgm3y-0007ZL-MP
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 05:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jgm1i-0005Zq-LI
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39303
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jgm1u-0005lV-Gd
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56928
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jgm1i-0007GN-1U
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:06 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jgm1t-0007HA-IE
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 05:19:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591262345;
+ s=mimecast20190719; t=1591262356;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gVUat8NNxLpyOnOOuRO3dgLPTgtAbe0TrVxk955AWD8=;
- b=MT1UUezK7aOWJBgLWZ7Uj51oq4lnFwhX6uBv4nKQZcE+mSuUEGYPoXbkIWDbkypvtlYmbZ
- ia/zBbhnvPFCBhoe6awUKrkjTppFbNmh+3tkLecF+9/VzVbDmRuWwcoY5RuljbIPdTDH95
- Q+bMB9ZOQU7NTZ5KTOJp6lqmBo9pmEU=
+ bh=D+fGyu3jxo5xAi67w0auVPn7NR2cXP8UOYn3Dt8dxpo=;
+ b=PAeGhu0vW29bpNlT4yTSzOqvABn7qcwZUFlQ0tova3dikSqCz/YbrQ5XrP3B8JFSJIL5ev
+ s99yxAGUde7UQIGK/rZ5E9bUHJgDaXWoXUFXGGizfp2byqhKeDbogr16unExFdhUR6fmkp
+ 2hDUvXbDSn6xTwiakSe0hFnu80wPOd4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-QKx97aKGPOmasRRDU_GZSA-1; Thu, 04 Jun 2020 05:19:02 -0400
-X-MC-Unique: QKx97aKGPOmasRRDU_GZSA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-244-tDZ6MXiiN9SP-1GbKd41sw-1; Thu, 04 Jun 2020 05:19:15 -0400
+X-MC-Unique: tDZ6MXiiN9SP-1GbKd41sw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CD6F18A822B
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 09:19:01 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 572A86AD0C;
- Thu,  4 Jun 2020 09:18:58 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6A6BC16E16; Thu,  4 Jun 2020 11:18:57 +0200 (CEST)
-Date: Thu, 4 Jun 2020 11:18:57 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Subject: Re: [PATCH 0/2] build qxl as module
-Message-ID: <20200604091857.ibu36f7ynjk75eel@sirius.home.kraxel.org>
-References: <20200604075943.7001-1-kraxel@redhat.com>
- <20200604084820.GC3050580@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D195B464;
+ Thu,  4 Jun 2020 09:19:13 +0000 (UTC)
+Received: from kaapi (ovpn-116-200.sin2.redhat.com [10.67.116.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D30C199003;
+ Thu,  4 Jun 2020 09:19:01 +0000 (UTC)
+Date: Thu, 4 Jun 2020 14:48:59 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2 1/2] ait-vga: check address before reading configuration
+ bytes
+In-Reply-To: <20200604084318.GA3050580@redhat.com>
+Message-ID: <nycvar.YSQ.7.77.849.2006041445530.30592@xnncv>
+References: <20200603202251.1199170-1-ppandit@redhat.com>
+ <20200603202251.1199170-2-ppandit@redhat.com>
+ <20200604084318.GA3050580@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200604084820.GC3050580@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:14:08
+Content-Type: multipart/mixed;
+ boundary="-1463811718-945283238-1591262353=:30592"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 01:08:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,30 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dinechin@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Yi Ren <c4tren@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Ren Ding <rding@gatech.edu>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 04, 2020 at 09:48:20AM +0100, Daniel P. Berrangé wrote:
-> On Thu, Jun 04, 2020 at 09:59:41AM +0200, Gerd Hoffmann wrote:
-> >
-> 
-> There's no info here, or in the commit message about the
-> intended goal of this modularization ? If we're modularizing
-> devices, why only qxl and not other devices too ?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463811718-945283238-1591262353=:30592
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-Same reason we created all the other modules:  Reduce shared library
-dependencies of core qemu.  In this case: spice.  This mini-series
-alone isn't enough for that, but it should make it easier to make qemu
-spice support modular (Christophe looks into that).
+  Hello Phil,
 
-Other candidates:
-  * virtio-gpu (libvirglrenderer.so).
-  * ccid-card-emulated (libcacard.so).
++-- On Thu, 4 Jun 2020, Philippe Mathieu-Daudé wrote --+
+| >> @@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
+| >> +    assert(address + len <= pci_config_size(d));
+| 
+| Yes, maybe I was not clear while reviewing v1, we need to audit the
+| callers and fix them first, then we can safely add the assert here.
 
-cheers,
-  Gerd
+That's an elaborate task. Could we please make that into another patch series?
+
++-- On Thu, 4 Jun 2020, Daniel P. Berrangé wrote --+
+| On Thu, Jun 04, 2020 at 01:52:50AM +0530, P J P wrote:
+| > While reading PCI configuration bytes, a guest may send an
+| > address towards the end of the configuration space. It may lead
+| > to an OOB access issue. Add check to ensure 'address + size' is
+| > within PCI configuration space.
+| 
+| Please include a CVE number for this security flaw if there is
+| one.
+
+Yes. For now I'll send a revised patch to fix this ati-vga OOB access issue.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463811718-945283238-1591262353=:30592--
 
 
