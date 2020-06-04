@@ -2,87 +2,92 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2069FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20639C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DACAB20738
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:10:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E09A12053B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 16:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z7oOFFjv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DACAB20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haShpZTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E09A12053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgsRi-0005c1-4n
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 12:10:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
+	id 1jgsed-0002G8-4u
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 12:23:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgsR6-000563-CB
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:09:44 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:43972)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jgsR4-000405-Mv
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:09:43 -0400
-Received: by mail-ot1-x333.google.com with SMTP id u23so5168620otq.10
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 09:09:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VBs6iE9+n8Kqp1wKypzu3gJAncF/teohACQrm2k8vFY=;
- b=Z7oOFFjvippx3Wxho5UoW9OupQbElYrQsGc+kzcQHHCvEbXd2DaE8lF/YQvF0XUpmB
- QWtTXIoeKRh7ciR+Fm9MzREgxylWffAJ9rHd1aA16cebqAwTU18jOQJR+jAEoLXaqY2Z
- 0lBQNgl1DegMbqFASDA0QzMsUEP/KBgb3Y8MF68HepBd8BRkIp8yK6/EvYmAj4uY0Y0U
- uFmmdGzpNYhDdYYBT+s391PeIh90tvfkydr+jrmRJCOcwSH0LRxyj/EF4V8ovG6Plo7d
- gMA8BMY0m5seMBA7H7c8n262aILYdyGxt4kHVcJxyDCakVsE0/2/hyw+vVm180BX8Dpk
- 50kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VBs6iE9+n8Kqp1wKypzu3gJAncF/teohACQrm2k8vFY=;
- b=R9DBBOVHhCzema1uSZgYs26IOAyF7Bx5kkyzqhk5gTGJL3uyc2jgwOu6DH/iaCTy62
- 9n1d9z2EDnCExPP+2pJkQDwMTECIBmSzLCN4/YpK943qote1mtZ//cMURucAH0dwLfQM
- 5fiuQKnugGbZkxppRVhY4TOwFEwNi51p63QC3nj+XrdFVZtR7LEVrU9fibPxzon8AJuU
- 7ymaChj6Bo3a83LJnovTDYJxHClHHni7LzBLeItENLPBVhU4/lX0mkGJ3nqi0TgXL0gD
- 4y03mrsFjOMpmHuq/lNDpYHNkpuacKUmrk6HTLYiTHjXPNv6MU989e7VZwt5bVud0lh6
- uKZw==
-X-Gm-Message-State: AOAM530AAAxQhWGflP9hQiNKVIk9P9/ABSkhqCddCyl1vg4da7Maenko
- 3GPZ0oRCbB5srfiecpUlMGI3DGSNd0D31YY5dTb4hQ==
-X-Google-Smtp-Source: ABdhPJyZM09oWZUP3UWjYQpBSJ8Ro5Yyneq/K6M6P0yAKoFcyRiWxB1WZcT5AN9W5h8rZMRnAL3VgCRebgzMjRIh6Ic=
-X-Received: by 2002:a05:6830:18da:: with SMTP id
- v26mr4387698ote.135.1591286981629; 
- Thu, 04 Jun 2020 09:09:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jgsdk-0001Gr-UC
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:22:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42142
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jgsdk-0007fz-5L
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 12:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591287767;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ig/KAw4RfoUZf3xPFk976FQcb+AA3/zexhCp+5YqAFU=;
+ b=haShpZTIWXnp9uTZgGCIVhD0ch5yTzpTqoNzEqj9b0FiXv/UzpGMXyNO7QzsO7E1vv/UHg
+ jZl5V6tPK9I6EkCmnRAOjo+B+xX5BNcW/FII1Wej4SR/mMMABBLW57acT4i9vg9JfBsihi
+ AEXJ55vSl3VEHJjAGO71r3+QP+TtCHg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-HeEIsPu9N_-L-EXux8svcA-1; Thu, 04 Jun 2020 12:22:45 -0400
+X-MC-Unique: HeEIsPu9N_-L-EXux8svcA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C5DB18FE866;
+ Thu,  4 Jun 2020 16:22:44 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A574478F1B;
+ Thu,  4 Jun 2020 16:22:40 +0000 (UTC)
+Date: Thu, 4 Jun 2020 18:22:37 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH RFC v2 1/5] block: add bitmap-populate job
+Message-ID: <20200604162237.GA22354@angien.pipo.sk>
+References: <20200514034922.24834-1-jsnow@redhat.com>
+ <20200514034922.24834-2-jsnow@redhat.com>
+ <e426d42a-e1f2-1e6b-f18e-92084bff61a1@redhat.com>
+ <20200604091231.GC4512@linux.fritz.box>
+ <20200604091651.GF2995787@angien.pipo.sk>
+ <20200604113145.GE4512@linux.fritz.box>
 MIME-Version: 1.0
-References: <20200604125544.GW28566@vanye>
- <20200604131802.7w4hncgq2gopbw6z@kamzik.brq.redhat.com>
- <20200604160300.GB28566@vanye>
-In-Reply-To: <20200604160300.GB28566@vanye>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Jun 2020 17:09:30 +0100
-Message-ID: <CAFEAcA8MTB5VQQbMuSfkGc9JcGeawL_GUY8Pcs3yxT9kdncZJw@mail.gmail.com>
-Subject: Re: kvm_target, QEMU_KVM_ARM_TARGET_GENERIC_V8 questions
-To: Leif Lindholm <leif@nuviainc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200604113145.GE4512@linux.fritz.box>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pkrempa@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 12:22:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,41 +100,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: vsementsov@virtuozzo.com, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 4 Jun 2020 at 17:03, Leif Lindholm <leif@nuviainc.com> wrote:
-> But there's also things like:
-> - a57_initfn explicitly setting kvm_target, then only being called
->   from max_initfn for !kvm_enabled()
+On Thu, Jun 04, 2020 at 13:31:45 +0200, Kevin Wolf wrote:
+> Am 04.06.2020 um 11:16 hat Peter Krempa geschrieben:
+> > On Thu, Jun 04, 2020 at 11:12:31 +0200, Kevin Wolf wrote:
+> > > Am 18.05.2020 um 22:49 hat Eric Blake geschrieben:
+> > > > > +
+> > > > > +    /* NB: new bitmap is anonymous and enabled */
+> > > > > +    cluster_size = bdrv_dirty_bitmap_granularity(target_bitmap);
+> > > > > +    new_bitmap = bdrv_create_dirty_bitmap(bs, cluster_size, NULL, errp);
+> > > > > +    if (!new_bitmap) {
+> > > > > +        return NULL;
+> > > > > +    }
+> > > > 
+> > > > This means if the guest writes to the disk while the job is ongoing, the
+> > > > bitmap will be updated to mark that portion of the bitmap as set, even if it
+> > > > was not allocated at the time the job started.  But then again, the guest
+> > > > writes are causing allocation, so this seems like the right thing to do.
+> > > 
+> > > Is the target bitmap active at the same time, i.e. will it get the
+> > > correct information only from new_bitmap or are the bits already set in
+> > > it anyway?
+> > 
+> > Yes, libvirt plans to use it with an active non-persistent bitmap which
+> > will in subsequent steps be merged into others. The bitmap is added in
+> > the same transaction. The bitmap must be active, because we need to wait
+> > for the block jobs to finish before it becomes usable and thus can't
+> > sequence in other operations until later.
+> 
+> A lot of bitmap merging then, because the block job in this series
+> already creates a temporary internal bitmap that is merged into the
+> target bitmap on completion. But if the target bitmap is only libvirt's
+> temporary bitmap to be merged to yet another bitmap, I wonder if this
+> process shouldn't be simplified.
 
-Expected -- a KVM 'max' is nothing to do with a TCG 'max':
- * for KVM, -cpu max means "same as -cpu host"
- * for TCG, -cpu max means "start with an A57, then add in all the
-   extra architectural features that have been added since then".
+Possibly yes, but I'll leave that for later. All of this is done when
+executin very expensive operations anyways so for our first
+implementation it IMO won't matter that much.
 
-kvm_target being set by a57_initfn is specifically for the case
-where a KVM user is using "-cpu cortex-a57".
-
-> - a57_initfn setting cpu->dtb_compatible to "arm,cortex-a57"
-
-What else would it set it to?
-
-> - a57 initfn setting cpu->midr, max_initfn overwriting parts of it
-
-Also expected, TCG's -cpu max is "A57 with lots of extras".
-
-The way we create a TCG -cpu max is a bit odd, as the code was
-originally written in a situation where A57 was the most advanced
-TCG CPU we had and there were no extra architectural features
-supported by our CPU emulation. Today we have an A72 model as
-well and a lot of extra architectural features, so the "code
-borrowed" to "extras added" ratio looks a bit unbalanced.
-Cleaning it up would not be a bad idea.
-
-thanks
--- PMM
 
