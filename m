@@ -2,72 +2,97 @@ Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637E8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B64C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:50:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3317B206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:43:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3317B206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB6B206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 11:50:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BI1UJDUU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB6B206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgoHP-0004Tk-DW
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44434)
+	id 1jgoNr-0007HX-Rm
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 07:50:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jgoGZ-0003Yn-PM
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:42:35 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:38198)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jgoGY-0004fc-Ag
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:42:35 -0400
-Received: from player774.ha.ovh.net (unknown [10.108.57.16])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id AF5B9A490B
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 13:42:24 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player774.ha.ovh.net (Postfix) with ESMTPSA id 408631319B8C5;
- Thu,  4 Jun 2020 11:42:16 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G0064213cf25-7820-44ec-a7b8-4b27e9d6576f,
- 2E0AA79A099E542C5FE1C9A79F210F9E9C727315) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] ftgmac100: Implement variable descriptor size
-To: Erik Smit <erik.lucas.smit@gmail.com>
-References: <CA+MHfov0TVbwjy8g_cHVa6Y-bMowCbsGLdt8uUhmcns0v_eVLw@mail.gmail.com>
- <70cece8e-1caf-1387-25e7-971783817cc8@kaod.org>
- <CA+MHfovyMCjqwJ+G3XyRvr5fO60sGff7bwYqSa7a=mFo8CYoSw@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7ad445ed-d737-2966-953c-30ab2cca5c51@kaod.org>
-Date: Thu, 4 Jun 2020 13:42:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgoNC-0006jH-Eo
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:49:26 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54985)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jgoN8-0005f0-5L
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 07:49:26 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g10so4923497wmh.4
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 04:49:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=eWK2chz0WmAxCaSMc+5F4+nAL3q+XGqzQz5okdK6lJg=;
+ b=BI1UJDUUu8HyE6sIjqtfwJgBr0DjDY84SjzBi2pigJs/5cF18yK0X7T4U+X5KzLTv/
+ tGkd2BeRq3TvZ5G/gBNA7LkvK0EcjD+t0IJwRkHQTPZteRtdhidVV2ErmmgwdZI49PfX
+ 1J1Wrz/ixGawZBbE5eydEX90mP26op93BhUP7QmLS0i0dycZYwovWjXXxk4rZy4O5Fgw
+ E2EjmW4k9eSIhzV39u3bXWDdbwmCN6wuqwIq/VYEcG79HYt9KvLFWan80Ax3BtlJIA9L
+ 9Wp0VJR6i5UFTjRozVnRBCnpmM6NKiiRqyczYUo2a3k3Yrbandvw7a9kmuLjyxjzmYB7
+ 7JQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=eWK2chz0WmAxCaSMc+5F4+nAL3q+XGqzQz5okdK6lJg=;
+ b=aD/KKWwzixjeESHit/O6+ZhLd8kAzbO6qL7BxkOlMNHA/99Wt2jh29NlJjd2JGJEiR
+ QsWfTkj45A3v6B9fwSY4wruLuWMYaojh5OGGMzgNuneeaGsPc//n0TQ29CNgMz/2inqe
+ tZw9xClJbPlXTNdyY/uK0Fr+fbiagC7L+6OMOIw7bxSNx+OvDEdPgfSzXg8Qfbem1GVd
+ BHCJacjp6gtEfBywC4YY6/zA3w+4F+qguvsCtLeB4psxnLlDDy2xJKTQhY9TrI8x3jWQ
+ r6wlA4bMemg+C0HYsm+FKVwd7WKp6C0NaCPfWfMmUCNRLa14OFLf7P1yGTegv7vtPXnk
+ mLig==
+X-Gm-Message-State: AOAM532spclEaM2crJczyw0AMpVxI2o/S4fDvkjRco0Ij2kNhTQXSIa/
+ WHYWMRyTu8xdO0jm/cZHDGAmN4f7vd4=
+X-Google-Smtp-Source: ABdhPJz4uvYGZp/nF3jqQPAC3YUvAy9joOgSnA4VWfYy4JLld2xBQiPebJipl2BQ8K+NtdU06+jZGw==
+X-Received: by 2002:a05:600c:10cf:: with SMTP id
+ l15mr3691807wmd.10.1591271359515; 
+ Thu, 04 Jun 2020 04:49:19 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g3sm8611829wrb.46.2020.06.04.04.49.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Jun 2020 04:49:18 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5AF2E1FF7E;
+ Thu,  4 Jun 2020 12:49:17 +0100 (BST)
+References: <20200604111323.7458-1-alex.bennee@linaro.org>
+ <20200604071504-mutt-send-email-mst@kernel.org>
+User-agent: mu4e 1.5.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RFC PATCH] hw/virtio/vhost: re-factor vhost-section and allow
+ DIRTY_MEMORY_CODE
+In-reply-to: <20200604071504-mutt-send-email-mst@kernel.org>
+Date: Thu, 04 Jun 2020 12:49:17 +0100
+Message-ID: <87ftbb59vm.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+MHfovyMCjqwJ+G3XyRvr5fO60sGff7bwYqSa7a=mFo8CYoSw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 16005793079041362723
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudeguddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeduvdelheeitdduvdektdehfefhvedtvdevvdduffeiffehtdekuddtffffledtjeenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjeegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.44.197; envelope-from=clg@kaod.org;
- helo=3.mo178.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 07:42:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,184 +106,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 12:54 PM, Erik Smit wrote:
-> On Wed, 3 Jun 2020 at 10:16, Cédric Le Goater <clg@kaod.org> wrote:
->>
->> On 6/2/20 6:47 PM, Erik Smit wrote:
->>> The hardware supports variable descriptor sizes, configured with the DBLAC
->>> register.
->>
->> yes.
->>
->> The DBLAC default value is 0x00022F00 on AST2400 and 0x00022500 on AST2500
->> and AST2600. The current reset handler needs a little fix btw.
->>
->> This sets the TX and RX descriptor default size to 4 words (2 * 8bytes).
->>
->>> Most drivers use the default 2*8, which is currently hardcoded in qemu, but
->>> the implementation of the driver in Supermicro BMC SMT_X11_158 uses 4*8.
->>
->> The first 4 words are architected but the specs allows the descriptors
->> to be bigger which is what the Aspeed SDK is doing:
->>
->>         outl( 0x44f97, dev->base_addr + DBLAC_REG );
->>
->> It's using 8 words ( 4 * 8bytes) to store some address in the fifth.
->> This is a waste btw.
->>
->>
->> Thanks for spotting this. I think the patch is correct but we need to
->> clarify a few things.
->>
->>> --
->>> The implementation of the driver in Supermicro BMC SMT_X11_158 adds 4 extra
->>> 4-bytes entries:
->>> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.h#L387-L391
->>>
->>> And sets DBLAC to 0x44f97:
->>> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.c#L449
->>>
->>> There's not a lot of public documentation on this hardware, but the
->>> current linux driver shows the meaning of these registers:
->>>
->>> https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/faraday/ftgmac100.c#L280-L281
->>>
->>>         iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX descs */
->>>                   FTGMAC100_DBLAC_TXDES_SIZE(2) |   /* 2*8 bytes TX descs */
->>>
->>> Without this patch, networking in SMT_X11_158 does not pass data.
->>>
->>> Signed-off-by: Erik Smit <erik.lucas.smit@gmail.com <mailto:erik.lucas.smit@gmail.com>>
->>> ---
->>>  hw/net/ftgmac100.c | 17 +++++++++++++++--
->>>  1 file changed, 15 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
->>> index 25ebee7ec2..1640b24b23 100644
->>> --- a/hw/net/ftgmac100.c
->>> +++ b/hw/net/ftgmac100.c
->>> @@ -79,6 +79,19 @@
->>>  #define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
->>>  #define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
->>>
->>> +/*
->>> + * DMA burst length and arbitration control register
->>> + */
->>> +#define FTGMAC100_DBLAC_RXFIFO_LTHR(x)      (((x) >> 0) & 0x7)
->>> +#define FTGMAC100_DBLAC_RXFIFO_HTHR(x)      (((x) >> 3) & 0x7)
->>> +#define FTGMAC100_DBLAC_RX_THR_EN           (1 << 6)
->>
->> The above definitions are AST2400 only. We should say so or leave them out
->> because the model does not use them any how.
-> 
-> Like so?
-> 
-> #define FTGMAC100_DBLAC_RXFIFO_LTHR(x)      (((x) >> 0) & 0x7)  // AST2400-only
-> #define FTGMAC100_DBLAC_RXFIFO_HTHR(x)      (((x) >> 3) & 0x7)  // AST2400-only
-> #define FTGMAC100_DBLAC_RX_THR_EN           (1 << 6)            // AST2400-only
 
-yes, but without the C++ comments. Keep the number of chars below 
-80 also.
+Michael S. Tsirkin <mst@redhat.com> writes:
 
->>
->>> +#define FTGMAC100_DBLAC_RXBURST_SIZE(x)     (((x) >> 8) & 0x3)
->>> +#define FTGMAC100_DBLAC_TXBURST_SIZE(x)     (((x) >> 10) & 0x3)
->>> +#define FTGMAC100_DBLAC_RXDES_SIZE(x)       (((x) >> 12) & 0xf)
->>> +#define FTGMAC100_DBLAC_TXDES_SIZE(x)       (((x) >> 16) & 0xf)
->>
->> I would include '* 8' in the {R,T}XDES_SIZE macros
-> 
-> Agreed.
-> 
->>> +#define FTGMAC100_DBLAC_IFG_CNT(x)          (((x) >> 20) & 0x7)
->>> +#define FTGMAC100_DBLAC_IFG_INC             (1 << 23)
->>> +
->>>  /*
->>>   * PHY control register
->>>   */
->>> @@ -553,7 +566,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
->>>          if (bd.des0 & s->txdes0_edotr) {
->>>              addr = tx_ring;
->>>          } else {
->>> -            addr += sizeof(FTGMAC100Desc);
->>> +            addr += (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac)) * 8;
->>
->> and remove the '* 8' here.
-> 
-> Agreed.
-> 
->>>          }
->>>      }
->>>
->>> @@ -982,7 +995,7 @@ static ssize_t ftgmac100_receive(NetClientState *nc, const uint8_t *buf,
->>>          if (bd.des0 & s->rxdes0_edorr) {
->>>              addr = s->rx_ring;
->>>          } else {
->>> -            addr += sizeof(FTGMAC100Desc);
->>> +            addr += (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac)) * 8;
->>>          }
->>>      }
->>>      s->rx_descriptor = addr;
->>
->>
->> and when the DBLAC register is set, we should check the size values to make
->> sure they are not under sizeof(FTGMAC100Desc), in which case we should
->> report an error.
-> 
-> Like so?
+> On Thu, Jun 04, 2020 at 12:13:23PM +0100, Alex Benn=C3=83=C2=A9e wrote:
+>> The purpose of vhost_section is to identify RAM regions that need to
+>> be made available to a vhost client. However when running under TCG
+>> all RAM sections have DIRTY_MEMORY_CODE set which leads to problems
+>> down the line. The original comment implies VGA regions are a problem
+>> but doesn't explain why vhost has a problem with it.
+>>=20
+>> Re-factor the code so:
+>>=20
+>>   - steps are clearer to follow
+>>   - reason for rejection is recorded in the trace point
+>>   - we allow DIRTY_MEMORY_CODE when TCG is enabled
+>>=20
+>> Signed-off-by: Alex Benn=C3=83=C2=A9e <alex.bennee@linaro.org>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  hw/virtio/vhost.c | 46 ++++++++++++++++++++++++++++++++--------------
+>>  1 file changed, 32 insertions(+), 14 deletions(-)
+>>=20
+>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>> index aff98a0ede5..f81fc87e74c 100644
+>> --- a/hw/virtio/vhost.c
+>> +++ b/hw/virtio/vhost.c
+>> @@ -27,6 +27,7 @@
+>>  #include "migration/blocker.h"
+>>  #include "migration/qemu-file-types.h"
+>>  #include "sysemu/dma.h"
+>> +#include "sysemu/tcg.h"
+>>  #include "trace.h"
+>>=20=20
+>>  /* enabled until disconnected backend stabilizes */
+>> @@ -403,26 +404,43 @@ static int vhost_verify_ring_mappings(struct vhost=
+_dev *dev,
+>>      return r;
+>>  }
+>>=20=20
+>> +/*
+>> + * vhost_section: identify sections needed for vhost access
+>> + *
+>> + * We only care about RAM sections here (where virtqueue can live). If
+>> + * we find one we still allow the backend to potentially filter it out
+>> + * of our list.
+>> + */
+>>  static bool vhost_section(struct vhost_dev *dev, MemoryRegionSection *s=
+ection)
+>>  {
+>> -    bool result;
+>> -    bool log_dirty =3D memory_region_get_dirty_log_mask(section->mr) &
+>> -                     ~(1 << DIRTY_MEMORY_MIGRATION);
+>> -    result =3D memory_region_is_ram(section->mr) &&
+>> -        !memory_region_is_rom(section->mr);
+>> -
+>> -    /* Vhost doesn't handle any block which is doing dirty-tracking oth=
+er
+>> -     * than migration; this typically fires on VGA areas.
+>> -     */
+>> -    result &=3D !log_dirty;
+>> +    enum { OK =3D 0, NOT_RAM, DIRTY, FILTERED } result =3D NOT_RAM;
+>
+> I'm not sure what does this enum buy us as compared to bool.
 
-yes.
+The only real point of the enum is to give a little more detailed
+information to the trace point to expose why a section wasn't included.
+In a previous iteration I just had the tracepoint at the bottom before a
+return true where all other legs had returned false. We could switch to
+just having the tracepoint hit for explicit inclusions?
 
-To be precise, according to the specs :
+> Also why force OK to 0?
 
-    Writing 0 to this field is illegal.
+Personal preference where 0 indicates success and !0 indicates failure
+of various kinds. Again we can drop if we don't want the information in
+the tracepoint.
 
-which means that the HW can survive with only 2 words in the TX and RX 
-descriptors, word0 and word1. word2 is reserved and word3 is architected 
-to point to the TX and RX buffers. Without word3, the HW is dropping all
-send and received data, which is a bit useless and the receive part in 
-the model doesn't support that case. 
+> And I prefer an explicit "else result =3D NOT_RAM" below
+> instead of initializing it here.
 
-I think testing against sizeof(FTGMAC100Desc) is safer for the time being,
+Ok.
 
-> 
->     case FTGMAC100_DBLAC: /* DMA Burst Length and Arbitration Control */
->         s->dblac = value;
+>
+>> +
+>> +    if (memory_region_is_ram(section->mr) && !memory_region_is_rom(sect=
+ion->mr)) {
+>> +        uint8_t dirty_mask =3D memory_region_get_dirty_log_mask(section=
+->mr);
+>> +        uint8_t handled_dirty;
+>>=20=20
+>> -    if (result && dev->vhost_ops->vhost_backend_mem_section_filter) {
+>> -        result &=3D
+>> -            dev->vhost_ops->vhost_backend_mem_section_filter(dev, secti=
+on);
+>> +        /*
+>> +         * Vhost doesn't handle any block which is doing dirty-tracking=
+ other
+>> +         * than migration; this typically fires on VGA areas. However
+>> +         * for TCG we also do dirty code page tracking which shouldn't
+>> +         * get in the way.
+>> +         */
+>> +        handled_dirty =3D (1 << DIRTY_MEMORY_MIGRATION);
+>> +        if (tcg_enabled()) {
+>> +            handled_dirty |=3D (1 << DIRTY_MEMORY_CODE);
+>> +        }
+>
+> So DIRTY_MEMORY_CODE is only set by TCG right? Thus I'm guessing
+> we can just allow this unconditionally.
 
-I would move the assignment after the tests. 
+Which actually makes the test:
 
->         if (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc))
->             qemu_log_mask(LOG_GUEST_ERROR, "%s: transmit descriptor
-> too small : %d bytes\n",
->                               __func__, FTGMAC100_DBLAC_TXDES_SIZE(s->dblac));
->         if (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc))
->             qemu_log_mask(LOG_GUEST_ERROR, "%s: receive descriptor too
-> small : %d bytes\n",
->                               __func__, FTGMAC100_DBLAC_RXDES_SIZE(s->dblac));
->         break;
-you need opening and closing braces and to break out from the switch 
-statement in case of error.
+  if (dirty_mask & DIRTY_MEMORY_VGA) {
+     .. fail ..
+  }
 
-> Also, I've not got experience submitting patches to Qemu. My next step
-> would be to respin this patch and resend it to everybody as [PATCH
-> v2]?
+which is more in line with the comment although wouldn't fail if we
+added additional DIRTY_MEMORY flags. This leads to the question what
+exactly is it about DIRTY tracking that vhost doesn't like. Is it really
+only avoiding having virtqueue in video RAM? Does this ever actually
+happen?
 
-yes. Take a look at : 
+I assume boards with unified memory models where video ram is shared
+with system ram just end up partitioning the memory regions?
 
-	https://wiki.qemu.org/Contribute/SubmitAPatch
-
-The minimum is to run ./scripts/checkpatch.pl before sending any patch. 
-The script will tell you what's wrong.
-
-Thanks,
-
-C.
+--=20
+Alex Benn=C3=A9e
 
