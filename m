@@ -1,125 +1,91 @@
-Return-Path: <SRS0=6rdr=7Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=1Qun=7R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A91C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 00:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0312820658
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jun 2020 23:58:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCF0D20674
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 00:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="qfgAO3Ls"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0312820658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XiHZVEAy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF0D20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgdGi-0004Kx-6J
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 19:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33770)
+	id 1jgeD3-0002yJ-UH
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jun 2020 20:58:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgdG6-0003tt-Ks
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:57:22 -0400
-Received: from mail-bn8nam12on2047.outbound.protection.outlook.com
- ([40.107.237.47]:6227 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jgdG4-0008Ev-O8
- for qemu-devel@nongnu.org; Wed, 03 Jun 2020 19:57:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eG5EPodUJlXmtwwzP1yzprvdIbNsN55edeJDLVB9XwYI1MBiVd7kXrm8/CaE94flmtXbep47JEI612XwWhc4G5AWIwi5VkqEL2O0ZKkBChe3HS2OMGDwZ21qXVzQwTZtPdhD0fdkeT7zYE9OtdNoQjT13TPpDzEUxGTsc36kTX6yQ/PdQeLGXe5H/1ePxfmbgJYg0sab4r0nL1d0XU9sEjzDl8jhtI5bWpt05uE0oQH5rKV0dhLorENdHe761CZGDpWvpPYcTNPqPx5FAT96QWqLIR3LmNeCv2z2LPfjJuKwkVuQH7UzYuZQf5QVeLWwqByDHtihhvm9ZNbrtXLMcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kwGPWYC9GcM64KFTGVuXYfHICdfdExVV8HgNefDSw4c=;
- b=m3FEpkmY7BWLLj6N/4TaeZyprCPSe2YqtJlFETo26Bu1tvSVtnLYjD2BNten58aXBEWmhEvMwWgiUnnmWs2tK//BiZvs/sNleSUAz1JSgtJugH5u1J+u21REZDWCjmemjVHbpzKRCxXciRpejeaceR46d25TGhPPPlihtSqMzbWS46EcIZkATH968MEe8fAjhW5+UTNjtiQa8mIm/vi3s6YNrwselYvWXrULhf00T8PhWc98okOG9sqto+zgC4WlF9DPDMEMo+U7WSNY6N5DkFrCBXFCXSqg48BGwUR+emrtOLSCAK7UJxAkGhBlA263eNpKlyhv3PZ/X77tyCZ9/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kwGPWYC9GcM64KFTGVuXYfHICdfdExVV8HgNefDSw4c=;
- b=qfgAO3Ls/Srft/otVXPU2NJH/P6aQuwRwsWEjR3emO47Bna/M7ztt2bKDrQDuJwwq/N2Cz+fz0aUmBrb2HQ9Kcc2j9zyEQxIqqTXkQ8AHe1/lGpY2E71ZQOW4rY0KgJmjOBdUZVnQxtw0EP0yYe4JwoqFRlCUFE8aGm6UYwYvlA=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2591.namprd12.prod.outlook.com (2603:10b6:802:30::32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Wed, 3 Jun
- 2020 23:57:17 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3045.024; Wed, 3 Jun 2020
- 23:57:17 +0000
-Subject: RE: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
- <1528498581-131037-2-git-send-email-babu.moger@amd.com>
- <20200602175212.GH577771@habkost.net>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <15422b3b-47ee-f293-b40a-d102aa8a89c0@amd.com>
-Date: Wed, 3 Jun 2020 18:57:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200602175212.GH577771@habkost.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0069.namprd02.prod.outlook.com
- (2603:10b6:803:20::31) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1jgeCN-0002Bk-2X
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 20:57:35 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:44318)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1jgeCL-00039a-VY
+ for qemu-devel@nongnu.org; Wed, 03 Jun 2020 20:57:34 -0400
+Received: by mail-il1-x143.google.com with SMTP id i1so3237273ils.11
+ for <qemu-devel@nongnu.org>; Wed, 03 Jun 2020 17:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VecJ7k/Somv9ppmsAqna89OAXiaHQToi7dYQq/sfM7k=;
+ b=XiHZVEAycCZobjpBEGdS3iIpstyuguNtO6KewHzZIK/9FEHEgAeT+JGpisiHkPGZRD
+ 57epMg/a1elHuJYYndI8/zbUD/YZWpNhkt+1u32jP3xAwB7FU3qOc/EHYZ9EMdOunBvn
+ B2wnMBMHtFg/uOOhc0wAn4knFmnuVVTM4jprSIxvR3wzCn8SXpCVbG5xLm+MBCGW/hc5
+ Ub6CjFrWsqvt1R2QcDQF7gQdEu9d8OrLY/rsCHahjN4IxJRuWp7bMNckbjUs7c84UdgH
+ 3YLIMkJQH74QF7J0UIlsI5yx+R+VrupEstV7IDIJRGOILqNUmH4parjsde8oHRihRAz4
+ dzUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VecJ7k/Somv9ppmsAqna89OAXiaHQToi7dYQq/sfM7k=;
+ b=ncNRX6Nln9BM/9TQXpDT+XK8ES2v/Rii4d8UKMDiGvWnfP5aWFET87h0POmp1d12eM
+ 6v/cmrBvGLJPd7DhgkY2uqPjDFvs2K3I/0Ojk6aoOxpkbtHhX/FpTdzGXI04JlC39ww0
+ qpeg3LOgM4GlZ7ts2/phqc9DtC369mjEF2sVFXG1a/DnVQddjkm4ZrNpblDGYvl09awA
+ weFP01ywgUOxp88NpBo8XlWgveTK/qzMUj+Yw3hvSy6gyGWtIlA0VsX32nse7GG7ezLv
+ eyUKEBVjTUqHK4XTmadkJ/x6gnaApf4tFAv5Ktq+YZqnuJ0ZBvu0Xs/U9EuzL1oBwdXu
+ L70A==
+X-Gm-Message-State: AOAM530tkHut0MDPg8o66+CQtEUyKX/jHQaeQ+7TsdH810xqBOKhRJYG
+ fAv56/PxRluKkMlYiUcre79JkHMxK+iBmgn4DtY=
+X-Google-Smtp-Source: ABdhPJx6Kx+U0ZCFpo+nJFQvemIor+/hv7FWIUcWJLAjtuS+kWOWIc9bWVuBgpqsFbjPhktaIVYlGHZFOm0SUNEkJEQ=
+X-Received: by 2002:a92:980f:: with SMTP id l15mr1956270ili.251.1591232252274; 
+ Wed, 03 Jun 2020 17:57:32 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.79] (165.204.77.1) by
- SN4PR0201CA0069.namprd02.prod.outlook.com (2603:10b6:803:20::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.19 via Frontend
- Transport; Wed, 3 Jun 2020 23:57:16 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 09cf5bda-4fad-4974-4725-08d80819d829
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2591:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2591FBF61D15614075B53F7295880@SN1PR12MB2591.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 04238CD941
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XicexYKArR9/DGkXIYyV2YcxOqB3sKXowZh1bmKlryWghm/dIkB/iH/m6kTSsmT5PrJqC8YO2Beze5IQkR4yWqKOFsNl0Ur1QHxv1ipwsNvRNEhGtuiWs7vha/UEjaD3dSitbVZA3cTpBmgDAHr8Nzjb3nehLkVFIYo2NUN0psELEXkPTsZj1USsblppfqE7J5trH0W+tLZkBfCIHIQmfkexC9oEC9hUXpC4BE6Fvi8O/sfdfnSu99HdnQMS5k6gq8xtFMbPUe7kU7yDSMy5ezhlMCIxuA4S6cgBkEl8MICqlH1kIU7j3SVwC0tGhjDdBYZopwzv2oPrBYFn8dwoi2YwCn/qI7CRnEgCpFcP6j5KwkQScGRMLeT+9znoiab5zknuqivmpEgIXHM4ajW6KdaxN0bAj05tUYDLUsneTMqeD6JH/XQUqVYnh3SYDXb1V0wneZMyynetJG//PGzhAg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(366004)(346002)(376002)(396003)(136003)(31696002)(6486002)(478600001)(66946007)(45080400002)(16526019)(83080400001)(186003)(83380400001)(966005)(66556008)(2906002)(66476007)(36756003)(44832011)(4326008)(6916009)(316002)(26005)(2616005)(7416002)(54906003)(31686004)(8676002)(8936002)(52116002)(16576012)(86362001)(956004)(53546011)(5660300002)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: dLUCAjd6/P59r9+wkDYG397sWDNEcWWO79u1pY3l2yKeDcEbJFXFoToxMpKR9hVW9A8AK6V2/LBG5o11faDE1QlReIEbNeN/j9zPfQ4sEN3dvyT3hEuxck9vUWgdb1pwUBSkScngxViGciINKpTELgCpr/pF0m2fTOZ+UWzeRmdDaP+F1sZOg0Bs1dszXKufHyd8rTcipcdLlhtgGX3swbCBA9yhAKvWe128PpNl3D5F00MI8L50jbtiapp4CVN+j0sM2z7BXEbzL2gzOaZ0UzsRTw1slzWFEE7/dYKVvAfJ5pIlOjOzJIXBfFe5FtYZkYCIxtOYVSCWfidw7V4kG4t5Y0eOI27saKXY8aAad8fNU9wYT4wV5x2oJtD/FHX71rszu9vBt1AlZ/3u4svhXGI/A6KWJTH0Nay0mi7mwJ63LhLCTwZF2E4KStt3anUZwaOKd7xz4tlWD2SycEpWvouIoS/3obnp6fPY7m91sto=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09cf5bda-4fad-4974-4725-08d80819d829
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2020 23:57:17.0021 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cx1q3zIaBmKfhZXszbX/aa53penKzpJUI4NC0Bd9a9+IGjv2ERlFO3wKUR6xwEyF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2591
-Received-SPF: none client-ip=40.107.237.47; envelope-from=Babu.Moger@amd.com;
- helo=NAM12-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/03 19:57:18
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
+ <1591065557-9174-2-git-send-email-chenhc@lemote.com>
+ <CAHiYmc7_yKHR4XMNyzYbERe7cqhyBYRt-sRwf=wtLuT=QoyRZA@mail.gmail.com>
+In-Reply-To: <CAHiYmc7_yKHR4XMNyzYbERe7cqhyBYRt-sRwf=wtLuT=QoyRZA@mail.gmail.com>
+From: Huacai Chen <chenhuacai@gmail.com>
+Date: Thu, 4 Jun 2020 08:57:20 +0800
+Message-ID: <CAAhV-H4==t7_QRopu8=HkPbceF4GCx5RrdcW7nw88B6kExA4sA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
+ MachineClass
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=chenhuacai@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -133,82 +99,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "geoff@hostfission.com" <geoff@hostfission.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "kash@tripleback.net" <kash@tripleback.net>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Started looking at this. Let me know if you have any ideas. Will respond
-with more details later this week.
+Hi, Alexandar,
 
-> -----Original Message-----
-> From: Eduardo Habkost <ehabkost@redhat.com>
-> Sent: Tuesday, June 2, 2020 12:52 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Dr. David
-> Alan Gilbert <dgilbert@redhat.com>
-> Subject: Re: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
-> 
-> On Fri, Jun 08, 2018 at 06:56:17PM -0400, Babu Moger wrote:
-> > Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
-> > match the underlying hardware. Please refer to the Processor Programming
-> > Reference (PPR) for AMD Family 17h Model for more details.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> [...]
-> > +    case 0x8000001E:
-> > +        assert(cpu->core_id <= 255);
-> 
-> It is possible to trigger this assert using:
-> 
-> $ qemu-system-x86_64 -machine q35,accel=kvm,kernel-irqchip=split -device
-> intel-iommu,intremap=on,eim=on -smp
-> 1,maxcpus=258,cores=258,threads=1,sockets=1 -cpu
-> qemu64,xlevel=0x8000001e -device qemu64-x86_64-cpu,apic-id=257
-> qemu-system-x86_64: warning: Number of hotpluggable cpus requested (258)
-> exceeds the recommended cpus supported by KVM (240)
-> qemu-system-x86_64:
-> /home/ehabkost/rh/proj/virt/qemu/target/i386/cpu.c:5888: cpu_x86_cpuid:
-> Assertion `cpu->core_id <= 255' failed.
-> Aborted (core dumped)
-> 
-> See bug report and discussion at
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
-> redhat.com%2Fshow_bug.cgi%3Fid%3D1834200&amp;data=02%7C01%7Cbabu.
-> moger%40amd.com%7C8a2724729b914bc9b53d08d8071db392%7C3dd8961fe4
-> 884e608e11a82d994e183d%7C0%7C0%7C637267171438806408&amp;sdata=ib
-> iGlF%2FF%2FVtYQLf7fe988kxFsLhj4GrRiTOq4LUuOT8%3D&amp;reserved=0
-> 
-> Also, it looks like encode_topo_cpuid8000001e() assumes core_id
-> has only 3 bits, so the existing assert() is not even sufficient.
-> We need to decide what to do if the user requests nr_cores > 8.
-> 
-> Probably omitting CPUID[0x8000001E] if the VCPU topology is
-> incompatible with encode_topo_cpuid8000001e() (and printing a
-> warning) is the safest thing to do right now.
-> 
-> 
-> 
-> > +        encode_topo_cpuid8000001e(cs, cpu,
-> > +                                  eax, ebx, ecx, edx);
-> > +        break;
-> >      case 0xC0000000:
-> >          *eax = env->cpuid_xlevel2;
-> >          *ebx = 0;
-> > --
-> > 1.8.3.1
-> >
-> 
-> --
-> Eduardo
+On Wed, Jun 3, 2020 at 10:34 PM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+>
+>
+> =D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:38 Huacai Chen =
+<zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
+=D0=BE/=D0=BB=D0=B0:
+>>
+>> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
+>> can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
+>> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
+>> capability, so by default it will return "KVM not supported" on a VZ
+>> platform. Thus, null-machine also need the kvm_type() hook.
+>>
+>> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+>> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>> ---
+>
+>
+>
+> Hi, Huacai,
+>
+> For MIPS parts of QEMU, we prefer the following licence preamble:
+>
+>  *  This program is free software: you can redistribute it and/or modify
+>  *  it under the terms of the GNU General Public License as published by
+>  *  the Free Software Foundation, either version 2 of the License, or
+>  *  (at your option) any later version.
+>  *
+>  *  This program is distributed in the hope that it will be useful,
+>  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>  *  GNU General Public License for more details.
+>  *
+>  *  You should have received a copy of the GNU General Public License
+>  *  along with this program.  If not, see <https://www.gnu.org/licenses/>=
+.
+>
+> Do you agree with such preamble in hw/mips/common.c?
+Yes, I agree.
 
+>
+> (of course you name and email will stay intact)
+>
+> Regards,
+> Aleksandar
+>
+>>  hw/core/Makefile.objs  |  2 +-
+>>  hw/core/null-machine.c |  4 ++++
+>>  hw/mips/Makefile.objs  |  2 +-
+>>  hw/mips/common.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>  include/hw/mips/mips.h |  3 +++
+>>  5 files changed, 51 insertions(+), 2 deletions(-)
+>>  create mode 100644 hw/mips/common.c
+>>
+>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+>> index 1d540ed..b5672f4 100644
+>> --- a/hw/core/Makefile.objs
+>> +++ b/hw/core/Makefile.objs
+>> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-ha=
+ndler.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
+>> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
+>>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+>> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
+>>
+>>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+>> index cb47d9d..94a36f9 100644
+>> --- a/hw/core/null-machine.c
+>> +++ b/hw/core/null-machine.c
+>> @@ -17,6 +17,7 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "exec/address-spaces.h"
+>>  #include "hw/core/cpu.h"
+>> +#include "hw/mips/mips.h"
+>>
+>>  static void machine_none_init(MachineState *mch)
+>>  {
+>> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc=
+)
+>>      mc->max_cpus =3D 1;
+>>      mc->default_ram_size =3D 0;
+>>      mc->default_ram_id =3D "ram";
+>> +#ifdef TARGET_MIPS
+>> +    mc->kvm_type =3D mips_kvm_type;
+>> +#endif
+>>  }
+>>
+>>  DEFINE_MACHINE("none", machine_none_machine_init)
+>> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+>> index 739e2b7..3b3e6ea 100644
+>> --- a/hw/mips/Makefile.objs
+>> +++ b/hw/mips/Makefile.objs
+>> @@ -1,4 +1,4 @@
+>> -obj-y +=3D addr.o mips_int.o
+>> +obj-y +=3D addr.o common.o mips_int.o
+>>  obj-$(CONFIG_R4K) +=3D r4k.o
+>>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o
+>>  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
+>> diff --git a/hw/mips/common.c b/hw/mips/common.c
+>> new file mode 100644
+>> index 0000000..4d8e141
+>> --- /dev/null
+>> +++ b/hw/mips/common.c
+>> @@ -0,0 +1,42 @@
+>> +/*
+>> + * Common MIPS routines
+>> + *
+>> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
+>> + * This code is licensed under the GNU GPL v2.
+>> + */
+>> +
+>> +#include <linux/kvm.h>
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "hw/boards.h"
+>> +#include "hw/mips/mips.h"
+>> +#include "sysemu/kvm_int.h"
+>> +
+>> +#ifndef CONFIG_KVM
+>> +
+>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+>> +{
+>> +    return 0;
+>> +}
+>> +
+>> +#else
+>> +
+>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+>> +{
+>> +    int r;
+>> +    KVMState *s =3D KVM_STATE(machine->accelerator);
+>> +
+>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
+>> +    if (r > 0) {
+>> +        return KVM_VM_MIPS_VZ;
+>> +    }
+>> +
+>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
+>> +    if (r > 0) {
+>> +        return KVM_VM_MIPS_TE;
+>> +    }
+>> +
+>> +    return -1;
+>> +}
+>> +
+>> +#endif
+>> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+>> index 0af4c3d..2ac0580 100644
+>> --- a/include/hw/mips/mips.h
+>> +++ b/include/hw/mips/mips.h
+>> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len=
+);
+>>
+>>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr)=
+;
+>>
+>> +/* common.c */
+>> +int mips_kvm_type(MachineState *machine, const char *vm_type);
+>> +
+>>  #endif
+>> --
+>> 2.7.0
+>>
 
