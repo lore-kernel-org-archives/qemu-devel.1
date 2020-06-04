@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB274C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 19:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C63BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 19:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98E90206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 19:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC0BF2064C
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jun 2020 19:55:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R933rOlQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98E90206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCrE8Prd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0BF2064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jgvwG-0001o1-Hy
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 15:54:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46708)
+	id 1jgvxN-0003n5-8E
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 15:55:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgvvB-0000Ts-HB
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 15:53:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36955
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgvvA-0000Sc-3d
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 15:53:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50655
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgvvA-0008QT-QO
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 15:53:01 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jgvv9-0008Q7-9n
+ for qemu-devel@nongnu.org; Thu, 04 Jun 2020 15:52:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591300380;
+ s=mimecast20190719; t=1591300377;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gLqubNkTzAVF+ZRyry1ntH7wP+KHNAFbKjinvGwumGE=;
- b=R933rOlQXYMY+wssWRuqMqJDRSaxvGTYo8xvk9U5qQlUbUQgEYr3DczluN1DB51NJgxmWf
- Yvjq8EtpoAguynNbFmJxlQuKcuVzCBYdqsTMzFF2e40uiWKGDkY5PbHoBfuu2Tw/X39dZS
- UaST3vzxDawT+JyIn562n6fu+OTHxY8=
+ bh=WkgYV73SwEqOVTSg7oHM8v1ADKka98e3owF8nW59fAM=;
+ b=fCrE8PrdajXRwmF6Ga1fc2p/zT/MnmSyQ+hPlvBnhsv08z3R/1lTKbHKWl0CAV8VjWdzT8
+ vda9w9lDCv3OnbUkNPyiXigVrPs64arPbfdl5PBWkkSeGm6FFtl/QPPBVpUFcZ8+h6ghoa
+ 8lkVKjRIHti98mtHV9qKaOQlB0t4FNs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-hfi549JvPKCMhCa4Q_oKFw-1; Thu, 04 Jun 2020 15:52:58 -0400
-X-MC-Unique: hfi549JvPKCMhCa4Q_oKFw-1
+ us-mta-61-xAfhCCWINby_I0fl_EEe5Q-1; Thu, 04 Jun 2020 15:52:56 -0400
+X-MC-Unique: xAfhCCWINby_I0fl_EEe5Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 784AA107ACCD
- for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 19:52:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 305C5835B40
+ for <qemu-devel@nongnu.org>; Thu,  4 Jun 2020 19:52:55 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CC7B78F1B;
- Thu,  4 Jun 2020 19:52:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5109A6ACF6;
+ Thu,  4 Jun 2020 19:52:54 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/3] python/machine.py: re-add sigkill warning suppression
-Date: Thu,  4 Jun 2020 15:52:52 -0400
-Message-Id: <20200604195252.20739-4-jsnow@redhat.com>
+Subject: [PATCH v3 1/3] python/machine.py: consolidate _post_shutdown()
+Date: Thu,  4 Jun 2020 15:52:50 -0400
+Message-Id: <20200604195252.20739-2-jsnow@redhat.com>
 In-Reply-To: <20200604195252.20739-1-jsnow@redhat.com>
 References: <20200604195252.20739-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -99,69 +99,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the user kills QEMU on purpose, we don't need to warn them about that
-having happened: they know already.
+Move more cleanup actions into _post_shutdown. As a change, if QEMU
+should so happen to be terminated during a call to wait(), that event
+will now be logged.
+
+This is not likely to occur during normative use.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/machine.py | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ python/qemu/machine.py | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index a2abd2c35e3..99bcb499878 100644
+index 041c615052e..f7e68191c28 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -22,6 +22,7 @@
- import os
- import subprocess
- import shutil
-+import signal
- import socket
- import tempfile
- from typing import Optional, Type
-@@ -122,6 +123,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         self._console_address = None
-         self._console_socket = None
-         self._remove_files = []
-+        self._killed = False
- 
-     def __enter__(self):
-         return self
-@@ -282,7 +284,7 @@ def _post_launch(self):
-         if self._qmp:
+@@ -283,6 +283,8 @@ def _post_launch(self):
              self._qmp.accept()
  
--    def _post_shutdown(self):
-+    def _post_shutdown(self) -> None:
-         self._load_io_log()
- 
+     def _post_shutdown(self):
++        self._load_io_log()
++
          if self._qemu_log_file is not None:
-@@ -299,7 +301,8 @@ def _post_shutdown(self):
+             self._qemu_log_file.close()
+             self._qemu_log_file = None
+@@ -296,6 +298,17 @@ def _post_shutdown(self):
+         while len(self._remove_files) > 0:
              self._remove_if_exists(self._remove_files.pop())
  
-         exitcode = self.exitcode()
--        if exitcode is not None and exitcode < 0:
-+        if (exitcode is not None and exitcode < 0
-+                and not (self._killed and exitcode == -signal.SIGKILL)):
-             msg = 'qemu received signal %i; command: "%s"'
-             if self._qemu_full_args:
-                 command = ' '.join(self._qemu_full_args)
-@@ -307,6 +310,7 @@ def _post_shutdown(self):
-                 command = ''
-             LOG.warning(msg, -int(exitcode), command)
- 
-+        self._killed = False
-         self._launched = False
- 
++        exitcode = self.exitcode()
++        if exitcode is not None and exitcode < 0:
++            msg = 'qemu received signal %i; command: "%s"'
++            if self._qemu_full_args:
++                command = ' '.join(self._qemu_full_args)
++            else:
++                command = ''
++            LOG.warning(msg, -int(exitcode), command)
++
++        self._launched = False
++
      def launch(self):
-@@ -414,6 +418,7 @@ def shutdown(self, has_quit: bool = False, hard: bool = False) -> None:
+         """
+         Launch the VM and make sure we cleanup and expose the
+@@ -344,7 +357,6 @@ def wait(self):
+         self._popen.wait()
+         if self._qmp:
+             self._qmp.close()
+-        self._load_io_log()
+         self._post_shutdown()
  
-         try:
-             if hard:
-+                self._killed = True
-                 self._hard_shutdown()
-             else:
-                 self._do_shutdown(has_quit)
+     def shutdown(self, has_quit=False, hard=False):
+@@ -371,21 +383,8 @@ def shutdown(self, has_quit=False, hard=False):
+                     self._popen.kill()
+             self._popen.wait()
+ 
+-        self._load_io_log()
+         self._post_shutdown()
+ 
+-        exitcode = self.exitcode()
+-        if exitcode is not None and exitcode < 0 and \
+-                not (exitcode == -9 and hard):
+-            msg = 'qemu received signal %i: %s'
+-            if self._qemu_full_args:
+-                command = ' '.join(self._qemu_full_args)
+-            else:
+-                command = ''
+-            LOG.warning(msg, -int(exitcode), command)
+-
+-        self._launched = False
+-
+     def kill(self):
+         self.shutdown(hard=True)
+ 
 -- 
 2.21.3
 
