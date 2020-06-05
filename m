@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8D5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDB5C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 514102063A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514102063A
+	by mail.kernel.org (Postfix) with ESMTPS id A73DE2063A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73DE2063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhAro-00050l-Fb
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:50:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54822)
+	id 1jhArr-0005GA-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:50:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoh-0008EY-AG
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoh-0008EO-AC
  for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:19 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:43681)
+Received: from mout.kundenserver.de ([217.72.192.74]:47031)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoe-0006iN-15
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:19 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoc-0006hs-6t
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:16 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MBDzc-1joItq02H8-00Cgsz; Fri, 05 Jun 2020 13:47:12 +0200
+ id 1N9M1q-1iw2E70Wd2-015Mnb; Fri, 05 Jun 2020 13:47:03 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/19] stubs/Makefile: Reduce the user-mode object list
-Date: Fri,  5 Jun 2020 13:46:53 +0200
-Message-Id: <20200605114700.1052050-13-laurent@vivier.eu>
+Subject: [PULL 03/19] linux-user: Add support for /proc/cpuinfo on hppa
+ platform
+Date: Fri,  5 Jun 2020 13:46:44 +0200
+Message-Id: <20200605114700.1052050-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200605114700.1052050-1-laurent@vivier.eu>
 References: <20200605114700.1052050-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:o6yxUzAJ+EbUPUl5mF2vB1ArVVZM207EPI0BqVf5XnDMEkm9I4C
- qvSDy/HlxrFqUbybUOQ+I+GegQqmGfWb7AsrXxoW9eq8YHVYhKNiMeAA/UHI0I1g/aaUMIo
- KTCJJW25sBXA+/Hj7PTcOIVRkWbchRool2Nj785WYQDNBt2oLqbrfHdoFLx7nlc1o0dx2W4
- sTUJthEluVDfzF+95HUWA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wPCU3FBInFE=:s2Qz8gE8GHwzhdjvbr1xge
- 4ZR8kzfY30DbI0Xs6f/khNUBgkacxu/eRimsLgH/HYw4uqQaYyg53bV04ZLoq6EDykdruHGdi
- bmQ2hfquLRw0+QuKHPpnaTKXs8GzpJ/21x9thTAJ99p7Tj+7CZjccZrQnvAzNy4YwnmdBCqvt
- FEyIvNsuIy3WSZrElARpChQwbEqfK0qe2PoTBa5/G2zFbD4tdm9NACEu1uSgYw/VsDK7YZe5e
- +5duwGEr2WjsdOfSM3fk50qzTiV8X7y+qGcoA4BfRmPn+9kOJ9SY2joYnk1Et81z4XG7Yk+gQ
- OoM0MDZa3txG7uRWi4gI/49ZBAWcBcqx/NVHxTMuKl6QmzFO4YfKnoNuWLYI9H8wh39Gxyd9M
- wGka8AgURKykeioPmMT/nOszNAXmywdbCFEemDcLyVOZv09GkfRZD373hixOY1WvOIDHmKINr
- uWdae7b8NL87TD/QoKl0nY0efOU6wEXkuu5HZf1m5K2LsEiIne1vEFU32b3mkgtssChkcgp3K
- 4oi0huHncpiewVHzOJHOqGuCGRK60O5DgRjODgYl3uUOZagrqZBmh9hQB05WEV0wmiUzviP9v
- aP3pTOilNmtzbnIGEbURh+WnzLOoycJhXiFrzo58mKlYmkvHEmZzrkjRX1eWZYeZXB83afB89
- QGo9grGzXJweCU8hlQXmIpWUkLaz5D1SI09vZ/ZY507pTHR5mmWTUACD5jniciz89hl8qyl+C
- dGxNYuNRlTq/rqYBkCgsbw1ePRJ7pfFVEi7rjcnaofqacLMsHFMQNP52s9c7KtqzkY+nI9T9Y
- Mg/GM+9LQPIVmc5VbM8CLtFG598YMhIQkJzfQhMlI4A64RuaIeRtqlTNZRM0heK1/rrujAL
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:6FKR7BFmLWvONieLKooI/cFR3vSkQZjLovPt6wp+OvviqGHwlwg
+ mxipksbbzyxPoxGkJ9oJV3UZ3xOgh1K+GhlJdSbho2Id4JZr9bcCzGvMN+NK+WfF7qA1Dkq
+ rQJ6XEWPJUtQfb0HvF1SCGfVrbCNrJvLmHgJs4m5zjhzteevdSKVPKEizlHlcQEm3vOC0JM
+ ZfipMMOtIAdRpj5ibDs1w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:yYrgXEeJ9NI=:9tMpixFJ2/l3b+fM3lay8L
+ JOovTyrm+c0HbhiVAv4/nzGO8jnH0UMmd+pMCC3liovQqrig/OrLYbMlSshYKbq/80Mtw8fHm
+ 3N4iZCM2SngmpOmTm+l9IpaiA4qvK2oQ4H8pM2RwIG7xV/7yCQUwCuqEjfqKsjkK2NaLXUjMH
+ Q2mVxbnCAc2hItcVHBenxm5AZpmrmCjPrf81NovZeU0J93H2tUr4gzpe4bZRpoCkHhXUNK/FV
+ Iv2A/khK2LiRIxLq426qWSmjTikrUJkQpkV5cJJG5ThAZHQzBD/VxSmdrSNgPzQyZS3LlxSt+
+ to+RVJq9WNtWwZ77jS4pOiQ/4W1DPVWzZ4FDX1UYJTu4waW+PJnI4UjP1NvSa2jt+FU+MyjDg
+ JkH8DbOy6sAMj/DcLY9veL4uxNRul6QTpx6IUbnL/TiWxItU/ivotuXKIJSGsgSH7rUN/3wlU
+ GADgG20/CbW8rAU++PwsO1KCxXUg2fOhJmJCmD9SEoThRfNVvu5OBdXb/CPAa0iAawVLb5j2n
+ kbTVhFLOavko9k+TL0ovUckEa3IMQAHs2Uy4+5TZ8XxkAcBJCqmOQykyVyRgHOSwXykhm5klB
+ SHOfMiYFKut7soDDO93RKpHDd0C6V/4XCVCPScbotGmYdYwkbPs/PwS5XCwbk8T1NfaDFkEXC
+ Ys6r0ePcjm/QplPMQR6fPcVE1++hUD3bOV7sIxPbF4sv9O1IYI7b37hNV38ujr2V/eDDRQWh2
+ F1wOtDIB5UDsHm5N/MxLXeUZxWioiHcXobDDlTUcfv36CzbaSJBAvUeyhQhChYdbCnbekEQ3o
+ ioMeZqZrW2eo4cQ8Hbv0HiqM8McyaItEkFWeDzfz+0b4CRHXsEKh5rZ4rRBvexZuZG39V8s
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:47:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:47:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,109 +81,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Helge Deller <deller@gmx.de>
 
-These stubs are not required when configured with --disable-system.
+Provide our own /proc/cpuinfo file for the hppa (parisc) platform.
 
+Signed-off-by: Helge Deller <deller@gmx.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200522172510.25784-7-philmd@redhat.com>
+Message-Id: <20200424210648.GA26715@ls3530.fritz.box>
+[lv: s/an/our/]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- stubs/Makefile.objs | 50 ++++++++++++++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 21 deletions(-)
+ linux-user/syscall.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 6a9e3135e8f9..f54125de317d 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,47 +1,55 @@
--stub-obj-y += arch_type.o
--stub-obj-y += bdrv-next-monitor-owned.o
- stub-obj-y += blk-commit-all.o
--stub-obj-y += blockdev-close-all-bdrv-states.o
--stub-obj-y += clock-warp.o
- stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
- stub-obj-y += dump.o
- stub-obj-y += error-printf.o
- stub-obj-y += fdset.o
- stub-obj-y += gdbstub.o
--stub-obj-y += get-vm-name.o
--stub-obj-y += iothread.o
- stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
- stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- stub-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
--stub-obj-y += machine-init-done.o
--stub-obj-y += migr-blocker.o
--stub-obj-y += change-state-handler.o
--stub-obj-y += monitor.o
- stub-obj-y += monitor-core.o
- stub-obj-y += notify-event.o
-+stub-obj-y += qmp_memory_device.o
- stub-obj-y += qtest.o
-+stub-obj-y += ramfb.o
- stub-obj-y += replay.o
--stub-obj-y += replay-user.o
- stub-obj-y += runstate-check.o
-+stub-obj-$(CONFIG_SOFTMMU) += semihost.o
- stub-obj-y += set-fd-handler.o
-+stub-obj-y += vmgenid.o
- stub-obj-y += sysbus.o
- stub-obj-y += tpm.o
- stub-obj-y += trace-control.o
--stub-obj-y += uuid.o
--stub-obj-y += vm-stop.o
- stub-obj-y += vmstate.o
- stub-obj-y += win32-kbd-hook.o
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index fd5c4f1d73e6..63c40c48e31f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7438,6 +7438,18 @@ static int open_cpuinfo(void *cpu_env, int fd)
+ }
+ #endif
+ 
++#if defined(TARGET_HPPA)
++static int open_cpuinfo(void *cpu_env, int fd)
++{
++    dprintf(fd, "cpu family\t: PA-RISC 1.1e\n");
++    dprintf(fd, "cpu\t\t: PA7300LC (PCX-L2)\n");
++    dprintf(fd, "capabilities\t: os32\n");
++    dprintf(fd, "model\t\t: 9000/778/B160L\n");
++    dprintf(fd, "model name\t: Merlin L2 160 QEMU (9000/778/B160L)\n");
++    return 0;
++}
++#endif
 +
-+#######################################################################
-+# code used by both qemu system emulation and qemu-img
-+
-+ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
-+
-+stub-obj-y += arch_type.o
-+stub-obj-y += bdrv-next-monitor-owned.o
-+stub-obj-y += blockdev-close-all-bdrv-states.o
-+stub-obj-y += change-state-handler.o
-+stub-obj-y += clock-warp.o
- stub-obj-y += fd-register.o
--stub-obj-y += qmp_memory_device.o
--stub-obj-y += target-monitor-defs.o
-+stub-obj-y += fw_cfg.o
-+stub-obj-y += get-vm-name.o
-+stub-obj-y += iothread.o
-+stub-obj-y += machine-init-done.o
-+stub-obj-y += migr-blocker.o
-+stub-obj-y += monitor.o
-+stub-obj-y += pci-host-piix.o
-+stub-obj-y += ram-block.o
-+stub-obj-y += replay-user.o
- stub-obj-y += target-get-monitor-def.o
--stub-obj-y += vmgenid.o
-+stub-obj-y += target-monitor-defs.o
-+stub-obj-y += uuid.o
-+stub-obj-y += vm-stop.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
--stub-obj-y += pci-host-piix.o
--stub-obj-y += ram-block.o
--stub-obj-y += ramfb.o
--stub-obj-y += fw_cfg.o
--stub-obj-$(CONFIG_SOFTMMU) += semihost.o
-+
-+endif # CONFIG_SOFTMMU || CONFIG_TOOLS
+ #if defined(TARGET_M68K)
+ static int open_hardware(void *cpu_env, int fd)
+ {
+@@ -7462,7 +7474,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+         { "/proc/net/route", open_net_route, is_proc },
+ #endif
+-#if defined(TARGET_SPARC)
++#if defined(TARGET_SPARC) || defined(TARGET_HPPA)
+         { "/proc/cpuinfo", open_cpuinfo, is_proc },
+ #endif
+ #if defined(TARGET_M68K)
 -- 
 2.26.2
 
