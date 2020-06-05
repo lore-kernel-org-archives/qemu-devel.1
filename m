@@ -2,82 +2,84 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C720C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C99CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E611207D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 497BB207D3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AatOKgix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E611207D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vik2TrY3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497BB207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh3oW-000607-BV
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:18:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39430)
+	id 1jh3oa-000676-Jk
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nX-00049h-Mm
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:39 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43598)
+ id 1jh3nZ-0004Ct-G6
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:41 -0400
+Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:35313)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nV-0000hU-9Z
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:39 -0400
-Received: by mail-pl1-x644.google.com with SMTP id g12so3109656pll.10
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:36 -0700 (PDT)
+ id 1jh3nY-0000jE-QU
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:41 -0400
+Received: by mail-pl1-x630.google.com with SMTP id q16so3121335plr.2
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0A6sysLQGM7PIUVrKKD2e+tjvdFPeywZ4FvTVenRjO8=;
- b=AatOKgixysqnlj2TGrVJ0nCU68wFlF3Fp8Y63O30I1vUZQkHWtmryWadpHTaHNUk9Q
- b6ndXLc5yqWpXjb2Q4UDAHrE7JIWRiEkKuNNl+n+lT9O/Zs0PuUxeuyrmld80hNlo8aI
- LXHKcuXdm00gJJl9V/1BJsVz59VEaBlxbM8W4kISkJOLU0FonhzN2wEBgfXuaPo9l5LN
- HBzkm9Dcy9d8LSfzgaJ51l4Jcwkx772EybKo6/Jlvw3DUrPPqMDR6eAaQXpVyFxcs39c
- fOotfj4vQ69agrw9zsuZNqfFv7o75eNq+IyNqjgbGlec3+WySne/6zAY9BlTk4/1NQcZ
- qbog==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZRhkmFyLy+CEyb6J1D7iziceaKpzHBPMdBM2JQyWlqQ=;
+ b=Vik2TrY3sbDhCQs1uBFALhsFBWnCSqhMTMGUe8vIHSiasqnFFjmoYlnOhCNyvtquBC
+ 6juohJ7GcuV4bxqiP07vD8fDhV2lTtf0Kcma4nHAB2TsSnD9FdskV68LR7tZmRTlf7s4
+ coy0I9HR1cslWBpgA6D2J3CXk9KmceJI2BqdsQgA77T6hLP+LWhaheywD+RmQhyZVu1v
+ HuadP5c0poLmf++YdVB6aogMIa9HI5MKsjqCj3AjqI18afaKUE4KgOt5WXK68M0egpD8
+ JODNzDJMG9ZDB11/1StKL6Ay/wnEH9RIgQUZAMbaENF1NWZ995nrvZQ2juvAQtSspVc4
+ uCCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0A6sysLQGM7PIUVrKKD2e+tjvdFPeywZ4FvTVenRjO8=;
- b=MS9AkhBBa5GYk/rkygkMCsjFLUKdToE+4As4fc/oKDuLxoOQ60Q8V/E0c6WdVBPw1w
- S3nLZFRgbYTG6qjTa3IwPSYi3fyICEOw7IqyE7o6qvOOWRqwinJxIbjBM9zVo7GbGkR0
- tHl/kVOR9SbumHDketBziLr5DQGJq2WkgQIwIOYB30T9mUeIjUMZyTcfTDiImP/bWsiF
- W8ToSt/cHxe0AK0lKIntRFxKwKKgGPoDNRvnEKJ89Hfq0+czfhu0mbM+FdRXn7iizZ4l
- juDtsvgLHZSJcj4EYI73Tl2hm/W5nb75ORR8s8alYtdhqu2H93NNHlehzvCPwu9mAjZa
- FeEw==
-X-Gm-Message-State: AOAM531Tujw6wywYK3iQnDYB+UOg6cpX+pGUqp/eyMSKLDnZCn9Et6HA
- TJOEmmh+A/WOgo5dJ9W5PnlUuz2qb5w=
-X-Google-Smtp-Source: ABdhPJz0subGX6n0v4ONO86mJNJH3U5Ck3fd9ZDSo+5ejKlVHCJxsMb8guEOkNtXDolAcwCV0yF1CA==
-X-Received: by 2002:a17:90b:1244:: with SMTP id
- gx4mr779943pjb.136.1591330655275; 
- Thu, 04 Jun 2020 21:17:35 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZRhkmFyLy+CEyb6J1D7iziceaKpzHBPMdBM2JQyWlqQ=;
+ b=Fjc9NYrmSIOgfMM6PnMtq5ndImetSFw+/3CREPRhBsY49ATmZJm2P82djQCB7w2aVN
+ 3ansqDIpX5ZOJG6+fx8oXx/Pbc1A6/z58Myp7EDVeTdMwv+OHCioYfhErwelRSaegaaN
+ /b5jLjhSUpxWeXPmUg84RzgD3WpDVpe4oB366DFOh4OmqYvUix3BVRYjgJwxNoaFTIvi
+ 0muSDJ/1MCpi+MgpakWNp5KgRk1KDHzsdl6X/cVHIH/PE46bT32R9Y+qHlR96WSovPmt
+ 0rQSNnEP3kQaInFSg8wM+Yk75ENIpneKZzRTvyNyZ8vKEqPT4xN6AX6kxF+v0CsJANdk
+ 4giA==
+X-Gm-Message-State: AOAM531VlNeNmCRR2xIXhhwsQNXQcl7EzJJsGa7VMhJQex/yQmZVzjhi
+ P5rFG8GeNTOZzWGGEaBwWdTQQgKN9Gc=
+X-Google-Smtp-Source: ABdhPJyli7hHRAflUuzYSn+oNzwISJOrnmSwDDnh6TBBuYBLrsBTHl4raY1YQ00q0Bt/lKIIll4Jwg==
+X-Received: by 2002:a17:902:9889:: with SMTP id
+ s9mr7367283plp.299.1591330659134; 
+ Thu, 04 Jun 2020 21:17:39 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.33
+ by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 21:17:34 -0700 (PDT)
+ Thu, 04 Jun 2020 21:17:38 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 00/17] target-arm: Implement ARMv8.5-MemTag, user mode
-Date: Thu,  4 Jun 2020 21:17:16 -0700
-Message-Id: <20200605041733.415188-1-richard.henderson@linaro.org>
+Subject: [PATCH v2 03/17] linux-user: Check for overflow in access_ok
+Date: Thu,  4 Jun 2020 21:17:19 -0700
+Message-Id: <20200605041733.415188-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200605041733.415188-1-richard.henderson@linaro.org>
+References: <20200605041733.415188-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x630.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,76 +106,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Version 1 was back in October:
-https://patchew.org/QEMU/20191015163254.12041-1-richard.henderson@linaro.org/
+Verify that addr + size - 1 does not wrap around.
 
-Although that post claims there was an actual v1 in March 2019,
-I can't locate it, so... whatever.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/qemu.h | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-This version -- call it 2 -- is the first attempt to implement the
-actual in-progress kernel abi, rather than making up a private abi:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=devel/mte-v4
-
-Based-on: 20200603011317.473934-1-richard.henderson@linaro.org
-("target/arm: Implement ARMv8.5-MemTag, system mode")
-Based-on: 20200520172800.8499-1-richard.henderson@linaro.org
-("linux-user: User support for AArch64 BTI")
-
-The full tree is available at:
-https://github.com/rth7680/qemu/tree/tgt-arm-mte-user
-
-
-r~
-
-
-Richard Henderson (17):
-  tcg: Introduce target-specific page data for user-only
-  linux-user: Introduce PAGE_ANON
-  linux-user: Check for overflow in access_ok
-  linux-user: Tidy VERIFY_READ/VERIFY_WRITE
-  bsd-user: Tidy VERIFY_READ/VERIFY_WRITE
-  linux-user: Do not use guest_addr_valid for h2g_valid
-  linux-user: Fix guest_addr_valid vs reserved_va
-  exec: Add support for TARGET_TAGGED_ADDRESSES
-  linux-user/aarch64: Implement PR_TAGGED_ADDR_ENABLE
-  linux-user/aarch64: Implement PR_MTE_TCF and PR_MTE_TAG
-  linux-user/aarch64: Implement PROT_MTE
-  linux-user/aarch64: Pass syndrome to EXC_*_ABORT
-  linux-user/aarch64: Signal SEGV_MTESERR for sync tag check fault
-  linux-user/aarch64: Signal SEGV_MTEAERR for async tag check error
-  target/arm: Add allocation tag storage for user mode
-  target/arm: Enable MTE for user-only
-  tests/tcg/aarch64: Add mte smoke tests
-
- bsd-user/qemu.h                     |  9 ++--
- include/exec/cpu-all.h              | 23 ++++++---
- include/exec/cpu_ldst.h             | 40 +++++++++++-----
- linux-user/aarch64/target_signal.h  |  3 ++
- linux-user/aarch64/target_syscall.h | 13 +++++
- linux-user/qemu.h                   | 19 +++++---
- linux-user/syscall_defs.h           |  1 +
- target/arm/cpu-param.h              |  3 ++
- tests/tcg/aarch64/mte.h             | 54 +++++++++++++++++++++
- accel/tcg/translate-all.c           | 28 +++++++++++
- bsd-user/main.c                     |  5 ++
- linux-user/aarch64/cpu_loop.c       | 60 +++++++++++++++++++-----
- linux-user/main.c                   |  5 ++
- linux-user/mmap.c                   | 28 +++++++----
- linux-user/syscall.c                | 73 ++++++++++++++++++++++++++++-
- target/arm/cpu.c                    | 17 +++++++
- target/arm/mte_helper.c             | 39 ++++++++++++++-
- target/arm/tlb_helper.c             | 27 ++++++++---
- tests/tcg/aarch64/mte-1.c           | 25 ++++++++++
- tests/tcg/aarch64/mte-2.c           | 42 +++++++++++++++++
- tests/tcg/aarch64/mte-3.c           | 47 +++++++++++++++++++
- tests/tcg/aarch64/Makefile.target   |  4 ++
- 22 files changed, 502 insertions(+), 63 deletions(-)
- create mode 100644 tests/tcg/aarch64/mte.h
- create mode 100644 tests/tcg/aarch64/mte-1.c
- create mode 100644 tests/tcg/aarch64/mte-2.c
- create mode 100644 tests/tcg/aarch64/mte-3.c
-
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index d36b18b678..2bf35e66ac 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -467,12 +467,19 @@ extern unsigned long guest_stack_size;
+ #define VERIFY_READ 0
+ #define VERIFY_WRITE 1 /* implies read access */
+ 
+-static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
++static inline bool access_ok(int type, abi_ulong addr, abi_ulong size)
+ {
+-    return guest_addr_valid(addr) &&
+-           (size == 0 || guest_addr_valid(addr + size - 1)) &&
+-           page_check_range((target_ulong)addr, size,
+-                            (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
++    if (!guest_addr_valid(addr)) {
++        return false;
++    }
++    if (size != 0 &&
++        (addr + size - 1 < addr ||
++         !guest_addr_valid(addr + size - 1))) {
++        return false;
++    }
++    return page_check_range((target_ulong)addr, size,
++                            (type == VERIFY_READ) ? PAGE_READ :
++                            (PAGE_READ | PAGE_WRITE)) == 0;
+ }
+ 
+ /* NOTE __get_user and __put_user use host pointers and don't check access.
 -- 
 2.25.1
 
