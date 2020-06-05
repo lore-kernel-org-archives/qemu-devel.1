@@ -2,97 +2,72 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4447C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB166C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:57:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73E59206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:53:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yzaKLTax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E59206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 76A0D206FA
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:57:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76A0D206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhKHP-0004fb-Pa
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 17:53:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50464)
+	id 1jhKKl-0007YR-QT
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 17:57:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhKG4-0002pi-6O
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:52:12 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46237)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhKG3-0003fx-Bl
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:52:11 -0400
-Received: by mail-pl1-x642.google.com with SMTP id n2so4201472pld.13
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 14:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=hw0sxcsgGJAm4C7/HVjWZij3aE9QrBGSh2yyjifznPA=;
- b=yzaKLTaxAFGZBSet8gYR6KCoQjnKfjDmAatcNflWqGOz05CdhFM3uduXgql1abeNMR
- v/Zo6W2dInLOzzGh39HOBBff6YbAmddqm6ZRPCrdVIOIc2lVe9GLmxfSPUqHLyTa1uko
- aUtykRPIT99D6rgSfBjk7TxrYrtHHgCX0FImFEL0TkDnjFGL+JABTkjZ+Q2JsiHFrOZE
- 2NAvhqmegebBEVeKdbVf5DMCJP217ary3BTVht+PF/amf9kndGERLNO/PWp8luK0Rd1L
- lydXBK19+Vjz01Oa2ie5H/j3BS0maShqFs50jYr/+7qNCNBlI8FNpajT3abAtVlNNc+t
- Va1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hw0sxcsgGJAm4C7/HVjWZij3aE9QrBGSh2yyjifznPA=;
- b=rv1WXZEl6srgnBlWZJYmsawNs7ghQR3uHjY6BO7OsXbpRy3speiAko22N+MWqN6AL0
- 4WCTaPUDGfVL6YOrPNt5N1L+8epsCnlC9NaVo/xo9rgt50s4ZAIBvWMXKXKmymLxDZGz
- FYjvBKqV3E/kqWt/YZB86ZwZffictMJHzYXpAs98vAcwqhw7+Tj2dnGzg6AytxL2ppaa
- r8VE0jq9eaSUd3ZjS+xRNtnvUZzEvDQM1z1b6hvxYj84zfulFXSvqpLSZolYgSLq9UNW
- Cn4maBZz0cVNQKuYxSimIiDrVaHtcz+HVJ5i9q1p5HQI3f2oOG17e8HlU9y5/Yi07U9w
- H4pw==
-X-Gm-Message-State: AOAM531GFWxoDI/cx38+wmNvDDO1eBjiVM5KbfY/5WfmWHF7gKMYBr+0
- unYlAzG177Psls2kBjiQVemXxA==
-X-Google-Smtp-Source: ABdhPJxr+cxe+S+lJg9yUaKQFlhkNN0wdvCxrFEZu3NW0NUsSAxVlIKkd6J8kcDEBD0X3YE3UOiJSA==
-X-Received: by 2002:a17:90b:3005:: with SMTP id
- hg5mr5073677pjb.215.1591393930037; 
- Fri, 05 Jun 2020 14:52:10 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id i191sm500862pfe.99.2020.06.05.14.52.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 05 Jun 2020 14:52:09 -0700 (PDT)
-Subject: Re: [PATCH v7 05/11] rules.mak: Add base-arch() rule
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200605175821.20926-1-philmd@redhat.com>
- <20200605175821.20926-6-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <aaf04dd1-507d-d7d9-80cc-90002762677e@linaro.org>
-Date: Fri, 5 Jun 2020 14:52:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jhKIn-0006BD-DA
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:55:01 -0400
+Resent-Date: Fri, 05 Jun 2020 17:55:01 -0400
+Resent-Message-Id: <E1jhKIn-0006BD-DA@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21776)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jhKIl-00044y-GE
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:55:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1591394086; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=beO2pELw0hiTujNnim9Br3zbgNfidhKBtBk/yNc9w4h/4/HWfEqK7+3Fo/AQsolxbF1nS5+Hx+9OTSr9NlbNNaFFXnb2gvn86oHXnW4E0tkLENB6FQqvZVTnxaNrEPwHysMEpmObQQso4hwV6IQBwfvb1Pd7nhQFN+RGOPJiBHQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1591394086;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=HH3P+Ed2GiftF8bi6rK3JYELNS5QsPYkfVVKhhlTfRQ=; 
+ b=ILxcOOyZQEaKFX1W8sF72m9MhC9nAhNf86yQuVz+MluCY4vEvlKVwIHJFZc8u39zh3WvzLB7MbjgHDxsYs9Okg2nPpFF7wq3pV+A7bp3djNWygmDLBPFPQGKzF9X8AXvED98hEtdBgI1O2Y9DTK+Jv6Je+tQtfdmD1gyjwY+piM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1591394085133982.622363862526;
+ Fri, 5 Jun 2020 14:54:45 -0700 (PDT)
+Message-ID: <159139408374.19958.6107322213398196074@45ef0f9c86ae>
+In-Reply-To: <20200605175028.5626-1-alxndr@bu.edu>
+Subject: Re: [PATCH v2] fuzz: add oss-fuzz build.sh script
 MIME-Version: 1.0
-In-Reply-To: <20200605175821.20926-6-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alxndr@bu.edu
+Date: Fri, 5 Jun 2020 14:54:45 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 16:47:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,54 +81,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: darren.kenny@oracle.com, qemu-devel@nongnu.org, f4bug@amsat.org,
+ alxndr@bu.edu, bsd@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/5/20 10:58 AM, Philippe Mathieu-Daudé wrote:
-> Add a rule to return the base architecture for a QEMU target.
-> 
-> The current list of TARGET_BASE_ARCH is:
-> 
->   $ git grep  TARGET_BASE_ARCH configure
->   configure:7785:TARGET_BASE_ARCH=""
->   configure:7795:    TARGET_BASE_ARCH=i386
->   configure:7813:    TARGET_BASE_ARCH=arm
->   configure:7846:    TARGET_BASE_ARCH=mips
->   configure:7854:    TARGET_BASE_ARCH=mips
->   configure:7864:    TARGET_BASE_ARCH=openrisc
->   configure:7871:    TARGET_BASE_ARCH=ppc
->   configure:7879:    TARGET_BASE_ARCH=ppc
->   configure:7887:    TARGET_BASE_ARCH=ppc
->   configure:7894:    TARGET_BASE_ARCH=riscv
->   configure:7900:    TARGET_BASE_ARCH=riscv
->   configure:7920:    TARGET_BASE_ARCH=sparc
->   configure:7925:    TARGET_BASE_ARCH=sparc
-> 
-> The rule can be tested calling 'print-base-arch-$TARGET':
-> 
->   $ make \
->       print-base-arch-openrisc \
->       print-base-arch-aarch64_be \
->       print-base-arch-x86_64 \
->       print-base-arch-mips64el \
->       print-base-arch-ppc64 \
->       print-base-arch-riscv64
->   openrisc=openrisc
->   aarch64_be=arm
->   x86_64=i386
->   mips64el=mips
->   ppc64=ppc
->   riscv64=riscv
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  rules.mak | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYwNTE3NTAyOC41NjI2
+LTEtYWx4bmRyQGJ1LmVkdS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUg
+Y29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0
+aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA2MDUxNzUwMjguNTYyNi0xLWFseG5kckBidS5lZHUKU3Vi
+amVjdDogW1BBVENIIHYyXSBmdXp6OiBhZGQgb3NzLWZ1enogYnVpbGQuc2ggc2NyaXB0ClR5cGU6
+IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBh
+cnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwpjOWFkYTY3IGZ1eno6IGFkZCBvc3MtZnV6eiBidWlsZC5zaCBzY3JpcHQK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE2OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA3NTUKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0OTogRklMRTogc2NyaXB0cy9v
+c3MtZnV6ei9idWlsZC5zaDoyOToKK2ZvciBpIGluICQobGRkIC4vaTM4Ni1zb2Z0bW11L3FlbXUt
+ZnV6ei1pMzg2ICB8IGN1dCAtZjMgLWQnICcpOyBkbyAkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDUwIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBjOWFkYTY3MzgzMjUgKGZ1eno6IGFkZCBv
+c3MtZnV6eiBidWlsZC5zaCBzY3JpcHQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjA1MTc1
+MDI4LjU2MjYtMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
