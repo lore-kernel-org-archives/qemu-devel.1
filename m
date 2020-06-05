@@ -2,79 +2,105 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A5BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F25C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFE61206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DDBA206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VOJH/7Sr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFE61206DC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQQuw0Ko"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DDBA206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhDU7-0007Wc-Uz
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:38:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48486)
+	id 1jhDVa-0000L5-9g
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDSy-0006x4-5M
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:37:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46874
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jhDUW-000866-7N
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:38:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29232
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDSw-0003As-OL
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:37:03 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jhDUU-0003LF-I8
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:38:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591367821;
+ s=mimecast20190719; t=1591367917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mWE7JRPnTebQVv8JyEjQxh91MMiLpVPY/+Mm78x8OGo=;
- b=VOJH/7SrYKqOeztts5my3YySXS+C50mWL7kGx0hnmKFWxq33xO5EmbnLf1zxu+ZE/ZTXWI
- fbHatulAQjXHlVFzq4thLNOepYjJnY3D5g73SrQHoD4UOIRep10s9SJ+XmaeujYyDZpMtR
- VgTQ+udPWxhiUOeZWulfhGkCd4pQzrg=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TaDxdcYNbXM3gOr+hYwGXZmJPe+5nI0OSXgBkxoA91k=;
+ b=IQQuw0Kod/p/nD98l5HQqxjkQ1XTnbvRsAcFcVvZmzWjru/a3TIKKsGx4uA7a8Py7mnpjY
+ q8GwK/Jz/zkgoNv6VillGEzNcdI5gyD896CAOG71pOFYpeqsUHjsYQsCNVck59+TGWZkZh
+ NggvL0h/A2NXCz6ydqHhDuOcJXXDf6Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-4D0q-uzLMRGF-gQ71mcCAA-1; Fri, 05 Jun 2020 10:37:00 -0400
-X-MC-Unique: 4D0q-uzLMRGF-gQ71mcCAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-495-N7K8Rwt8OOaZyhDk43xpAA-1; Fri, 05 Jun 2020 10:38:34 -0400
+X-MC-Unique: N7K8Rwt8OOaZyhDk43xpAA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C4B31883610;
- Fri,  5 Jun 2020 14:36:58 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4FE02619C0;
- Fri,  5 Jun 2020 14:36:47 +0000 (UTC)
-Date: Fri, 5 Jun 2020 16:36:44 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v3 1/4] acpi: Convert build_tpm2() to build_append* API
-Message-ID: <20200605163644.6e5d6717@redhat.com>
-In-Reply-To: <a85cc67e-2d8a-2034-3b85-6e8c8d7dcad6@linux.ibm.com>
-References: <20200601095737.32671-1-eric.auger@redhat.com>
- <20200601095737.32671-2-eric.auger@redhat.com>
- <46c71777-b588-ce1f-eb8d-de1c5b3e2186@linux.ibm.com>
- <6bd7f3a0-5a40-823e-bf67-309c9995e18e@redhat.com>
- <a85cc67e-2d8a-2034-3b85-6e8c8d7dcad6@linux.ibm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FDAA835B43;
+ Fri,  5 Jun 2020 14:38:33 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-76.ams2.redhat.com
+ [10.36.114.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20CBF5C660;
+ Fri,  5 Jun 2020 14:38:31 +0000 (UTC)
+Subject: Re: [PATCH for-5.1] qcow2: Don't open images with a backing file and
+ the data-file-raw bit
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200415190207.21118-1-berto@igalia.com>
+ <b0202150-5a43-18d5-3716-b758ab7e5824@redhat.com>
+ <20200605111431.GI5869@linux.fritz.box>
+ <89f29fa3-d5e4-fd9f-5d51-0b2ffce82ade@redhat.com>
+ <20200605130042.GK5869@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <59c2f3e0-dfc2-404c-ba68-408593022ed3@redhat.com>
+Date: Fri, 5 Jun 2020 16:38:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200605130042.GK5869@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="oj8Xbc10TWUgVW7s0mq4oZhZo3I1uY6F4"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:40:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,166 +123,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
- eric.auger.pro@gmail.com
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jun 2020 10:24:03 -0400
-Stefan Berger <stefanb@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oj8Xbc10TWUgVW7s0mq4oZhZo3I1uY6F4
+Content-Type: multipart/mixed; boundary="7q5h6BvoHoo2NE2a73vKHXlfQGtbohyGM"
 
-> On 6/2/20 9:55 AM, Auger Eric wrote:
-> > Hi Stefan,
-> > On 6/2/20 3:30 PM, Stefan Berger wrote: =20
-> >> On 6/1/20 5:57 AM, Eric Auger wrote: =20
-> >>> In preparation of its move to the generic acpi code,
-> >>> let's convert build_tpm2() to use build_append API. This
-> >>> latter now is prefered in place of direct ACPI struct field
-> >>> settings with manual endianness conversion.
-> >>>
-> >>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>> ---
-> >>>  =C2=A0 hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
-> >>>  =C2=A0 1 file changed, 19 insertions(+), 9 deletions(-)
-> >>>
-> >>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >>> index b5669d6c65..f0d35d7b17 100644
-> >>> --- a/hw/i386/acpi-build.c
-> >>> +++ b/hw/i386/acpi-build.c
-> >>> @@ -2298,30 +2298,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker
-> >>> *linker, GArray *tcpalog)
-> >>>  =C2=A0 static void
-> >>>  =C2=A0 build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tc=
-palog)
-> >>>  =C2=A0 {
-> >>> -=C2=A0=C2=A0=C2=A0 Acpi20TPM2 *tpm2_ptr =3D acpi_data_push(table_dat=
-a, sizeof *tpm2_ptr);
-> >>> +=C2=A0=C2=A0=C2=A0 Acpi20TPM2 *tpm2_ptr =3D acpi_data_push(table_dat=
-a,
-> >>> sizeof(AcpiTableHeader)); =20
-> >> And now you want to build the data structure by pushing fields? I woul=
-d
-> >> definitely NOT do this. =20
-> > If I didn't misinterpret things, this was recommended by Drew and Igor
-> > as buid_append* API avoids to take care of endianness and this is the
-> > API now used in the generic ACPI code. Besides I also think that in tha=
-t
-> > case it does not simplify things but maybe I did that the wrong way? Or
-> > maybe I didn't understand your remark? =20
->=20
->=20
-> If that's what they are saying... I would prefer filling out data=20
-> structures with functions like cpu_to_acpi16() because that seems to be=
-=20
-> less error prone.
+--7q5h6BvoHoo2NE2a73vKHXlfQGtbohyGM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-practice showed it was opposite, it was easy to forget about cpu_to_le
-build_append_int_noprefix() API we don't have to care about endiannes
-issues anymore at places where API is used.
-Another reasons for using build_append_int_noprefix() is that one doesn't
-have to define packed structures, work around unaligned access and bit plus=
- is
-when I review patch it boiles down to comparing it with table in a spec
-row by row as API enforces the same order as in spec, which makes reviews
-much easier.
+On 05.06.20 15:00, Kevin Wolf wrote:
 
->=20
-> >> =20
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned log_addr_size =3D sizeof(tpm=
-2_ptr->log_area_start_address);
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned log_addr_offset =3D
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (char *)&tpm2=
-_ptr->log_area_start_address - table_data->data;
-> >>> +=C2=A0=C2=A0=C2=A0 uint8_t start_method_params[12] =3D {};
-> >>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 tpm2_ptr->platform_class =3D cpu_to_le16(=
-TPM2_ACPI_CLASS_CLIENT);
-> >>> +=C2=A0=C2=A0=C2=A0 /* platform class */
-> >>> +=C2=A0=C2=A0=C2=A0 build_append_int_noprefix(table_data, TPM2_ACPI_C=
-LASS_CLIENT, 2);
-> >>> +=C2=A0=C2=A0=C2=A0 /* reserved */
-> >>> +=C2=A0=C2=A0=C2=A0 build_append_int_noprefix(table_data, 0, 2);
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS_ISA(tpm_find())) {
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->control_area_ad=
-dress =3D cpu_to_le64(0);
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->start_method =
-=3D cpu_to_le32(TPM2_START_METHOD_MMIO);
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* address of control are=
-a */
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 build_append_int_noprefix=
-(table_data, 0, 8);
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* start method */
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 build_append_int_noprefix=
-(table_data, TPM2_START_METHOD_MMIO,
-> >>> 4);
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (TPM_IS_CRB(tpm_find())) {
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->control_area_ad=
-dress =3D cpu_to_le64(TPM_CRB_ADDR_CTRL);
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->start_method =
-=3D cpu_to_le32(TPM2_START_METHOD_CRB);
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 build_append_int_noprefix=
-(table_data, TPM_CRB_ADDR_CTRL, 8);
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 build_append_int_noprefix=
-(table_data, TPM2_START_METHOD_CRB, 4);
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_warn_if_rea=
-ched();
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 tpm2_ptr->log_area_minimum_length =3D
-> >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpu_to_le32(TPM_LOG_AREA_=
-MINIMUM_SIZE);
-> >>> +=C2=A0=C2=A0=C2=A0 /* platform specific parameters */
-> >>> +=C2=A0=C2=A0=C2=A0 g_array_append_vals(table_data, &start_method_par=
-ams, 12); =20
->=20
-> Maybe this should be wrapped in an inline function like=20
-> build_append_array() or so.
-I guss I'm just used to g_array_append_vals() but build_append_array() look=
-s nicer
-and consistent with build_append_foo API
+[...]
 
->=20
->=20
-> >>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 acpi_data_push(tcpalog,
-> >>> le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-> >>> +=C2=A0=C2=A0=C2=A0 /* log area minimum length */
-> >>> +=C2=A0=C2=A0=C2=A0 build_append_int_noprefix(table_data, TPM_LOG_ARE=
-A_MINIMUM_SIZE, 4);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0 acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE=
-); =20
->=20
->=20
-> At this point we have a double-allocation of log memory on x86_64. You'd=
-=20
-> need the patch I posted to create the TCPA table only for TPM 1.2.
->=20
->=20
->=20
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bios_linker_loader_alloc(linker, ACPI=
-_BUILD_TPMLOG_FILE,
-> >>> tcpalog, 1,
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false);
-> >>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* log area start address to b=
-e filled by Guest linker */
-> >>> +=C2=A0=C2=A0=C2=A0 build_append_int_noprefix(table_data, 0, 8);
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bios_linker_loader_add_pointer(linker=
-, ACPI_BUILD_TABLE_FILE,
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- log_addr_offset, log_addr_size,
-> >>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- ACPI_BUILD_TPMLOG_FILE, 0); =20
-> >> =20
->=20
->=20
->=20
+> Makes sense. I'm not against preallocation during image creation. I just
+> think it shouldn't play a role in deciding whether an image is valid or
+> not.
+
+Oh, no.  I wouldn=E2=80=99t consider it corrupted just because some cluster=
+s are
+not allocated.  I=E2=80=99d just say any program that handles qcow2 files i=
+s
+responsible to ensure that images with the data-file-raw flag actually
+fulfill the flag=E2=80=99s promise.  So if a cluster isn=E2=80=99t allocate=
+d in qcow2,
+it must read as zeroes in the data file (because the spec disallows
+backing files with data-file-raw anyway[1]).
+
+It=E2=80=99s just my impression that qemu currently doesn=E2=80=99t always =
+ensure this,
+and the easiest way to do so would be to enforce metadata preallocation
+for such images.
+
+Max
+
+[1] Such images are indeed corrupt, hence this patch here from Berto.
+
+
+--7q5h6BvoHoo2NE2a73vKHXlfQGtbohyGM--
+
+--oj8Xbc10TWUgVW7s0mq4oZhZo3I1uY6F4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7aWOYACgkQ9AfbAGHV
+z0DepggAv31gI6sNQGH87FJJ4UFkoTB6PdyMa7KWoteFg2S8RENj82iRPz3UXqZr
+ZTW94lVw0WknSwo/VrknkWfWB+0CexbBg3hTSpG/odnSbD3n6UCWX/W+IVqqykNM
+fYhy+TFQiaouNcS7ahqL6jCqLf2+J0RQQZmPQouvzQ3XE0USsUBKWW7jRcH8dtyV
+a78bBUncMe+sJN3pJZlFTj1t7ERaIHzfPJwD1NhGShIXNDYMhxD8Bk8aUP4BlZ30
+6S3fL0cAcnvHg0jGj/HUaON7s0peRs2ACS+Q9WAVHC5DR9KZhtkmG3EPlIG+rYmE
+0Iosp6Qp7c5pwRGK4SI1G0ckV+joog==
+=71Cm
+-----END PGP SIGNATURE-----
+
+--oj8Xbc10TWUgVW7s0mq4oZhZo3I1uY6F4--
 
 
