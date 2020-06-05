@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D456C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36714C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BB4520663
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E455120663
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ahq6G8Ow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB4520663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gGLHlNcr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E455120663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1Gb-0001sp-9k
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55690)
+	id 1jh1Ge-00021o-2c
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BZ-0002Xk-OD; Thu, 04 Jun 2020 21:30:17 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22008)
+ id 1jh1BO-00027S-KV; Thu, 04 Jun 2020 21:30:06 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:2761)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BY-00009e-3L; Thu, 04 Jun 2020 21:30:17 -0400
+ id 1jh1BM-00008B-O4; Thu, 04 Jun 2020 21:30:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591320617; x=1622856617;
+ t=1591320605; x=1622856605;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=cXuY4R2iUhKB0c3QoY7e2kDEz+l0l5YvpJtrzSp+Dmo=;
- b=Ahq6G8OwcE+DjhnA0UHjxawxAQD2THqjp3RXgPKEQ+uM86nF/9uXx8h2
- jhkGZHJ2uaeeMAppivW7gR9JQy73VQ+ybcWr6k7kdSWFOa/TW9h5hVhr7
- Zxjk9fzsNBlpKEVTQcn6a0kxbNgje/YvcLDxsngwkDgRcUy65QMMV3K2K
- dLOgb4jPsFgeAVzG+BmJsBgdZB+MBZzcZkhbQln3TBBe1wMcYHWtK0rXM
- VlXJMM0Y5gSLlHfVlZ31BPbwrfvS3qFOA11VNDpTFjMMlr+h5N+3esNPj
- OEUuuMcZ5Z7samOeH0ZRPXZTGhynY13RDgUM5mGVFvfDNwWi7qjkuTqIG w==;
-IronPort-SDR: yJhNQEm1APh4Tqzx90lqFUUVKRSKPLRgLbaKrOOiOUvvHDyJRXacUq5GJQLRF/s3TcmjSSSRGj
- 7J7m8cd4XBq1fPRZzbYf+sJzUO1+NjE9BggjU5q4t8nV/TzhaPrJ5OSBAkZ3Dbek54EogHZAkb
- vGMO/eF89wdWLFAGpzjE/mcmlO769OqhPk83kOCym3/ks7VW/SBEh3AAb7mh5RZHxaM1PaFz9V
- 9Rk3928gVAmsEwapcVoUYAkM+l9IPrg/7umMlFAV7Q4tb1OzvXc4OdZOGuas0KIHZwdqsk3Et9
- rqk=
-X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="242127071"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:30:17 +0800
-IronPort-SDR: N2nRLyvfz4dqizsYgN7Q7rVCwGCNtBINMOlmrXavUxMuUCRTxfK//PO/7V3YZ3VLbfa8Io9oam
- 2iJQVcOwTlfZaBZFaMWhTBCO69hqYRdlw=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2020 18:19:50 -0700
-IronPort-SDR: 5NSR7Cz/Tq5FBjEijCh2GBmxmFurVGGKJ5gynlyQDbAce7c44dkJ7FGajbUTJ2QG37Gl0Bn+rq
- YpifhsXL2MLA==
+ bh=+Z1fyhpNGKbfEY7kkVfU0DyC1iUdA0aXbiyt7TAYHVo=;
+ b=gGLHlNcrbWInMsgJFBFrJqJNpyObnPOZdicq9J8uzJHGV89VNLD2M0VJ
+ CMZu5LlZ0kYL1me+XszWS4qjlNOcDs0L12gH35PLjV6d6RNBf3ZjWmDQY
+ 36pERbuymp6x07+me73fTfH7zatnsSKjzTJMBYb4tGWY537lkQzrFirNt
+ zqElgDVeVL1Enjuc2mIc5fcb8y8HLNRHaN2UiLr5+whXjHMxJ+TaJvvVC
+ nuEYEN9WuC15NhpQAhZuvgOU6IEaMnZwz9m2hhFJVXg3zWH9yKiE17Pib
+ VSuCGbfX2s6aZ5W3q22aOG55zG1rGgH9R1qfCIwLYUndHMxrzf8KvlhJs A==;
+IronPort-SDR: c2ojfkz6QjfLyVmircO25kkqXhrxrd2X4nbsmfzAYouXeVzEhW17JFf7LghaurEfgVekZzixna
+ jJHswu/hAjSeyAWICXxTamTpCBLS+U9aME4ztnOod5iUunM3wyCGKxlZ05HcOxLxjO1jwUUOmt
+ LgeeaPPA1uBpNEekBaaI23nw9i8M4yN42yuqzlzgOeknIs6pKPup0QfIpysnwdNMr309UFCkEY
+ OTYFbvs0VpehdrGg0IUT674d71Hq6gMqL72BdEI+dJ5p8yIX0ea1t4kgx0hD2RkJhd1zXzjVoj
+ piA=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="143573561"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:47 +0800
+IronPort-SDR: SCgFgQVu3SlH1x6jhq8ZsNDxnsTcEqA3N0pi42+nt5veoh6DiA/oYIV92IZr6qDhbcpL8ZyqUV
+ R4JbZtDxG3VYahOgZ/6GWqx1Wmp2hzf/I=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Jun 2020 18:18:49 -0700
+IronPort-SDR: ZwkMYAcvMBJGqu5VSKqN/+beDgtrQNg02RUSr/75kzxchXqpPUbFEGDoXUXSR0kI3uDRyWYjNd
+ A1Va6TkUsUng==
 WDCIronportException: Internal
 Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.233])
- by uls-op-cesaip02.wdc.com with ESMTP; 04 Jun 2020 18:30:14 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:47 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 16/17] target/riscv: Return the exception from invalid CSR
- accesses
-Date: Thu,  4 Jun 2020 18:21:27 -0700
-Message-Id: <d616a44645811854db7ada768c179ad8f2532158.1591319882.git.alistair@alistair23.me>
+Subject: [PATCH v2 06/17] target/riscv: Allow generating hlv/hlvx/hsv
+ instructions
+Date: Thu,  4 Jun 2020 18:20:58 -0700
+Message-Id: <61fa0cec8db659c1de3de872351d96ba33e452ae.1591319882.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
 References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
+Received-SPF: pass client-ip=216.71.153.141;
  envelope-from=prvs=4185f83b6=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:30:00
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:29:41
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -108,265 +108,555 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When performing a CSR access let's return a negative exception value on
-an error instead of -1. This will allow us to specify the exception in
-future patches.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/csr.c       | 46 ++++++++++++++++++++--------------------
- target/riscv/op_helper.c | 18 ++++++++++------
- 2 files changed, 35 insertions(+), 29 deletions(-)
+ target/riscv/cpu_bits.h                 |   1 +
+ target/riscv/helper.h                   |   3 +
+ target/riscv/insn32-64.decode           |   5 +
+ target/riscv/insn32.decode              |  11 +
+ target/riscv/insn_trans/trans_rvh.inc.c | 340 ++++++++++++++++++++++++
+ target/riscv/op_helper.c                | 114 ++++++++
+ 6 files changed, 474 insertions(+)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 9990a0dd09..0c53438605 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -47,7 +47,7 @@ static int fs(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index f52711ac32..bb4ee3fc35 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -428,6 +428,7 @@
+ #define HSTATUS_SP2V         0x00000200
+ #define HSTATUS_VTVM         0x00100000
+ #define HSTATUS_VTSR         0x00400000
++#define HSTATUS_HU           0x00000200
+ 
+ #define HSTATUS32_WPRI       0xFF8FF87E
+ #define HSTATUS64_WPRI       0xFFFFFFFFFF8FF87EULL
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index b36be978d5..d020d1459c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -80,4 +80,7 @@ DEF_HELPER_1(tlb_flush, void, env)
+ /* Hypervisor functions */
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_1(hyp_tlb_flush, void, env)
++DEF_HELPER_4(hyp_load, tl, env, tl, tl, tl)
++DEF_HELPER_5(hyp_store, void, env, tl, tl, tl, tl)
++DEF_HELPER_4(hyp_x_load, tl, env, tl, tl, tl)
  #endif
-     return 0;
-@@ -61,7 +61,7 @@ static int ctr(CPURISCVState *env, int csrno)
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 380bf791bc..24feef4e0f 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -70,3 +70,8 @@ fmv_x_d    1110001  00000 ..... 000 ..... 1010011 @r2
+ fcvt_d_l   1101001  00010 ..... ... ..... 1010011 @r2_rm
+ fcvt_d_lu  1101001  00011 ..... ... ..... 1010011 @r2_rm
+ fmv_d_x    1111001  00000 ..... 000 ..... 1010011 @r2
++
++# *** RV32H Base Instruction Set ***
++hlv_wu    0110100  00001   ..... 100 ..... 1110011 @r2
++hlv_d     0110110  00000   ..... 100 ..... 1110011 @r2
++hsv_d     0110111  .....   ..... 100 00000 1110011 @r2_s
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 4c8d1215ce..18bbe08ebb 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -62,6 +62,7 @@
+ @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
+ @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
++@r2_s    .......   ..... ..... ... ..... ....... %rs2 %rs1
  
-     if (!cpu->cfg.ext_counters) {
-         /* The Counters extensions is not enabled */
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- #endif
-     return 0;
-@@ -89,7 +89,7 @@ static int hmode(CPURISCVState *env, int csrno)
-         }
-     }
+ @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+ @hfence_vvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+@@ -207,5 +208,15 @@ fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
+ fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
  
--    return -1;
-+    return -RISCV_EXCP_ILLEGAL_INST;
- }
+ # *** RV32H Base Instruction Set ***
++hlv_b       0110000  00000  ..... 100 ..... 1110011 @r2
++hlv_bu      0110000  00001  ..... 100 ..... 1110011 @r2
++hlv_h       0110010  00000  ..... 100 ..... 1110011 @r2
++hlv_hu      0110010  00001  ..... 100 ..... 1110011 @r2
++hlvx_hu     0110010  00011  ..... 100 ..... 1110011 @r2
++hlv_w       0110100  00000  ..... 100 ..... 1110011 @r2
++hlvx_wu     0110100  00011  ..... 100 ..... 1110011 @r2
++hsv_b       0110001  .....  ..... 100 00000 1110011 @r2_s
++hsv_h       0110011  .....  ..... 100 00000 1110011 @r2_s
++hsv_w       0110101  .....  ..... 100 00000 1110011 @r2_s
+ hfence_gvma 0110001  .....  ..... 000 00000 1110011 @hfence_gvma
+ hfence_vvma 0010001  .....  ..... 000 00000 1110011 @hfence_vvma
+diff --git a/target/riscv/insn_trans/trans_rvh.inc.c b/target/riscv/insn_trans/trans_rvh.inc.c
+index 263b652d90..db650ae62a 100644
+--- a/target/riscv/insn_trans/trans_rvh.inc.c
++++ b/target/riscv/insn_trans/trans_rvh.inc.c
+@@ -16,6 +16,346 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
  
- static int pmp(CPURISCVState *env, int csrno)
-@@ -103,7 +103,7 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
++static bool trans_hlv_b(DisasContext *ctx, arg_hlv_b *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_SB);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlv_h(DisasContext *ctx, arg_hlv_h *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TESW);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlv_w(DisasContext *ctx, arg_hlv_w *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TESL);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlv_bu(DisasContext *ctx, arg_hlv_bu *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_UB);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlv_hu(DisasContext *ctx, arg_hlv_hu *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEUW);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hsv_b(DisasContext *ctx, arg_hsv_b *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    gen_get_gpr(dat, a->rs2);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_SB);
++
++    gen_helper_hyp_store(cpu_env, t0, dat, mem_idx, memop);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(dat);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hsv_h(DisasContext *ctx, arg_hsv_h *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    gen_get_gpr(dat, a->rs2);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TESW);
++
++    gen_helper_hyp_store(cpu_env, t0, dat, mem_idx, memop);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(dat);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hsv_w(DisasContext *ctx, arg_hsv_w *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    gen_get_gpr(dat, a->rs2);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TESL);
++
++    gen_helper_hyp_store(cpu_env, t0, dat, mem_idx, memop);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(dat);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++#ifdef TARGET_RISCV64
++static bool trans_hlv_wu(DisasContext *ctx, arg_hlv_wu *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEUL);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlv_d(DisasContext *ctx, arg_hlv_d *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEQ);
++
++    gen_helper_hyp_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hsv_d(DisasContext *ctx, arg_hsv_d *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv dat = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    gen_get_gpr(dat, a->rs2);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEQ);
++
++    gen_helper_hyp_store(cpu_env, t0, dat, mem_idx, memop);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(dat);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++#endif
++
++static bool trans_hlvx_hu(DisasContext *ctx, arg_hlvx_hu *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEUW);
++
++    gen_helper_hyp_x_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
++static bool trans_hlvx_wu(DisasContext *ctx, arg_hlvx_wu *a)
++{
++    REQUIRE_EXT(ctx, RVH);
++#ifndef CONFIG_USER_ONLY
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    TCGv mem_idx = tcg_temp_new();
++    TCGv memop = tcg_temp_new();
++
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
++    tcg_gen_movi_tl(memop, MO_TEUL);
++
++    gen_helper_hyp_x_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(mem_idx);
++    tcg_temp_free(memop);
++    return true;
++#else
++    return false;
++#endif
++}
++
+ static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
  {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- #endif
-     *val = riscv_cpu_get_fflags(env);
-@@ -114,7 +114,7 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
-     env->mstatus |= MSTATUS_FS;
- #endif
-@@ -126,7 +126,7 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- #endif
-     *val = env->frm;
-@@ -137,7 +137,7 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
-     env->mstatus |= MSTATUS_FS;
- #endif
-@@ -149,7 +149,7 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- #endif
-     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
-@@ -161,7 +161,7 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
-     env->mstatus |= MSTATUS_FS;
- #endif
-@@ -223,7 +223,7 @@ static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
-     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
- 
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     *val = env->rdtime_fn() + delta;
-@@ -236,7 +236,7 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
-     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
- 
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     *val = (env->rdtime_fn() + delta) >> 32;
-@@ -502,7 +502,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
- static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     if (env->priv_ver < PRIV_VERSION_1_11_0) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
-     *val = env->mcounteren;
-     return 0;
-@@ -512,7 +512,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
-     if (env->priv_ver < PRIV_VERSION_1_11_0) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
-     env->mcounteren = val;
-     return 0;
-@@ -736,7 +736,7 @@ static int read_satp(CPURISCVState *env, int csrno, target_ulong *val)
-     }
- 
-     if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     } else {
-         *val = env->satp;
-     }
-@@ -753,7 +753,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
-         ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
-     {
-         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
--            return -1;
-+            return -RISCV_EXCP_ILLEGAL_INST;
-         } else {
-             if((val ^ env->satp) & SATP_ASID) {
-                 tlb_flush(env_cpu(env));
-@@ -923,7 +923,7 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
- static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
- #if defined(TARGET_RISCV32)
-@@ -937,7 +937,7 @@ static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
- static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
- {
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
- #if defined(TARGET_RISCV32)
-@@ -952,7 +952,7 @@ static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
- static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     *val = env->htimedelta >> 32;
-@@ -962,7 +962,7 @@ static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
- static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong val)
- {
-     if (!env->rdtime_fn) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     env->htimedelta = deposit64(env->htimedelta, 32, 32, (uint64_t)val);
-@@ -1160,18 +1160,18 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
- 
-     if ((write_mask && read_only) ||
-         (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- #endif
- 
-     /* ensure the CSR extension is enabled. */
-     if (!cpu->cfg.ext_icsr) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     /* check predicate */
-     if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     /* execute combined read/write operation if it exists */
-@@ -1181,7 +1181,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
- 
-     /* if no accessor exists then return failure */
-     if (!csr_ops[csrno].read) {
--        return -1;
-+        return -RISCV_EXCP_ILLEGAL_INST;
-     }
- 
-     /* read old value */
+     REQUIRE_EXT(ctx, RVH);
 diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index efc2d854eb..80d632777b 100644
+index 7cccd42a1e..e0053699cc 100644
 --- a/target/riscv/op_helper.c
 +++ b/target/riscv/op_helper.c
-@@ -43,8 +43,10 @@ target_ulong helper_csrrw(CPURISCVState *env, target_ulong src,
-         target_ulong csr)
- {
-     target_ulong val = 0;
--    if (riscv_csrrw(env, csr, &val, src, -1) < 0) {
--        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+    int ret = riscv_csrrw(env, csr, &val, src, -1);
-+
-+    if (ret < 0) {
-+        riscv_raise_exception(env, -ret, GETPC());
-     }
-     return val;
+@@ -207,4 +207,118 @@ void helper_hyp_tlb_flush(CPURISCVState *env)
+     riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
  }
-@@ -53,8 +55,10 @@ target_ulong helper_csrrs(CPURISCVState *env, target_ulong src,
-         target_ulong csr, target_ulong rs1_pass)
- {
-     target_ulong val = 0;
--    if (riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0) < 0) {
--        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+    int ret = riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0);
+ 
++target_ulong helper_hyp_load(CPURISCVState *env, target_ulong address,
++                             target_ulong attrs, target_ulong memop)
++{
++    if (env->priv == PRV_M ||
++        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
++        (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
++            get_field(env->hstatus, HSTATUS_HU))) {
++        target_ulong pte;
 +
-+    if (ret < 0) {
-+        riscv_raise_exception(env, -ret, GETPC());
-     }
-     return val;
- }
-@@ -63,8 +67,10 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
-         target_ulong csr, target_ulong rs1_pass)
- {
-     target_ulong val = 0;
--    if (riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0) < 0) {
--        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+    int ret = riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0);
++        riscv_cpu_set_two_stage_lookup(env, true);
 +
-+    if (ret < 0) {
-+        riscv_raise_exception(env, -ret, GETPC());
-     }
-     return val;
- }
++        switch (memop) {
++        case MO_SB:
++            pte = cpu_ldsb_data(env, address);
++            break;
++        case MO_UB:
++            pte = cpu_ldub_data(env, address);
++            break;
++        case MO_TESW:
++            pte = cpu_ldsw_data(env, address);
++            break;
++        case MO_TEUW:
++            pte = cpu_lduw_data(env, address);
++            break;
++        case MO_TESL:
++            pte = cpu_ldl_data(env, address);
++            break;
++        case MO_TEUL:
++            pte = cpu_ldl_data(env, address);
++            break;
++        case MO_TEQ:
++            pte = cpu_ldq_data(env, address);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        riscv_cpu_set_two_stage_lookup(env, false);
++
++        return pte;
++    }
++
++    riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    return 0;
++}
++
++void helper_hyp_store(CPURISCVState *env, target_ulong address,
++                      target_ulong val, target_ulong attrs, target_ulong memop)
++{
++    if (env->priv == PRV_M ||
++        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
++        (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
++            get_field(env->hstatus, HSTATUS_HU))) {
++        riscv_cpu_set_two_stage_lookup(env, true);
++
++        switch (memop) {
++        case MO_SB:
++        case MO_UB:
++            cpu_stb_data(env, address, val);
++            break;
++        case MO_TESW:
++        case MO_TEUW:
++            cpu_stw_data(env, address, val);
++            break;
++        case MO_TESL:
++        case MO_TEUL:
++            cpu_stl_data(env, address, val);
++            break;
++        case MO_TEQ:
++            cpu_stq_data(env, address, val);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        riscv_cpu_set_two_stage_lookup(env, false);
++
++        return;
++    }
++
++    riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++}
++
++target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
++                               target_ulong attrs, target_ulong memop)
++{
++    if (env->priv == PRV_M ||
++        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
++        (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
++            get_field(env->hstatus, HSTATUS_HU))) {
++        target_ulong pte;
++
++        riscv_cpu_set_two_stage_lookup(env, true);
++
++        switch (memop) {
++        case MO_TEUL:
++            pte = cpu_ldub_data(env, address);
++            break;
++        case MO_TEUW:
++            pte = cpu_lduw_data(env, address);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        riscv_cpu_set_two_stage_lookup(env, false);
++
++        return pte;
++    }
++
++    riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    return 0;
++}
++
+ #endif /* !CONFIG_USER_ONLY */
 -- 
 2.26.2
 
