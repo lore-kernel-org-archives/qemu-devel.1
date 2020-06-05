@@ -2,122 +2,121 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17725C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8123EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBA59206DC
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:41:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AEA9206DC
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:43:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LlxwE4ns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA59206DC
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vgxiwNpl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AEA9206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhDXd-0002wO-6N
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:41:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48936)
+	id 1jhDZc-0004ph-KR
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:43:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhDWb-0001Pu-FB; Fri, 05 Jun 2020 10:40:49 -0400
-Received: from mail-eopbgr20097.outbound.protection.outlook.com
- ([40.107.2.97]:16053 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jhDYy-0004IA-6l; Fri, 05 Jun 2020 10:43:16 -0400
+Received: from mail-eopbgr40132.outbound.protection.outlook.com
+ ([40.107.4.132]:42370 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhDWY-0003k7-Jg; Fri, 05 Jun 2020 10:40:48 -0400
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jhDYw-0004Cq-V9; Fri, 05 Jun 2020 10:43:15 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GFSlHbNV0C8XRmeMNPWFc+4LajzVBTPVl/1dZk3kg0ps2IFIjrf1LzZtitBf2OIs9AANP8yLVRd1AwiUaPQg4tuE2j9XzHLMkZVDrBQje2KyFkpbB5hw/95iQflbF7d3YFvfXfYTkGdFmbrbKBWXxAWmYer5JfeqVswbVyyvJAUjf4lv6O+TIDlYV+7oqlRqkNhfZ0pW1Q3kKU933UYUM3XkNKJombNAeExzTUGPUmXofJBo9w/sZQn0N8pffzw0ai6Yo3eShQ9Pc4lA40O2ODc1zB0ryW8COW96Ewl2Et4bXB7Sla9gTtDpN9JHn6AsKMd7FRJ4Vzy0GiX+BqaFxA==
+ b=JxX0/eo03rS7kmQoCPYLIxXDYSxGqratYnF0mQReaPDd/rlALhfuu5kp+NKLYowxPEDj/9ZPZOl/wJOVfPWlAy+3JwWtcUbZcx67rXAg7Qd3zsdabpe6p1gaTgFynDcDNYozYyV9/k1zGZeI/K6H4GI2YTzgfV52c1jCK18cJPLb6+2BdritpNkRFVIZIYZwCDs9RjeMQGDvxBVSqvsdPt+6lgIWxAGc6umHzBeEfTjJXAyeOVxWSi18/GVTMGLCreHUL7jcTu+G81vNf4VIxEbgcMIbPEfc5mV47eSbx/qzm7YprLRCWD7SOshQgGT3m2XcLgzb1xAASd/fxU4hjA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GEuFaPpZdWVbKpFhdFCfeDiabEfcQGgu2LuWl4Wm7fw=;
- b=e2kfn8GPMztfLhWIlMuOE5fgzGEkiQiQNrDnUldiX3na8xQWlCjKmggYc2EBLtXd3eamFqOqnq9Wh3wxkruq43BogEZ8qiDzCgb6VCPU3K0ZMh419fuiTUemwsF/cAw5R7EL1kn1F90NGWyRGDB+imRjrT1wvC1JTTS2qQNC8Y8JcJK/v9kW88acK7A0MpWBYpcm5ulXs49PYzQnbDxyakRaUyA3sFQNsBzxsIIpqiuXbwFy9+5Z0uwCKlyGxlTcYM/lT8qSwQ/TrDSMo6V9ewfl/DRwvwNLPZluH5d2KRpr/HF1b1rjaaNx9wXuMo6O3hojVYPjaJzrX9xv3CPzTg==
+ bh=b90YXvVFMQgCBbmW35vhDSALf/FPXweo3cj1pB0t5y0=;
+ b=d7Ca4vRN6RlYNSAudP3kMa+yVIlc+v+1Or4iCLmcLLLpErQSG3K77FNVnvJdAHZ1t8CI2ILrY478X3aSAorzOT+bSvYrTPksjKrQFxHXt28TMB2RBVpUPOgKiy0zOUgFKF3lNlYIZGhv9KaSx9alHdurADXcHSOZxy3bU2OPdOVJvjBzbenGb5GPQFGdGuJ3UWoCxz5V74VqRp5JaMbKDFDG2Uc3JzVHENdtnRBbqQe01audnj8IULmvqwp2JtRIpmhzINwnLqRTNlQ3kYNa3/QwQhi6b+h2k+wMqd4Im4yaxN9RxQRNdA3gg4BaKHRQPiXIWNmx3prZ7msOYDmvYA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GEuFaPpZdWVbKpFhdFCfeDiabEfcQGgu2LuWl4Wm7fw=;
- b=LlxwE4nsNvW+lIyzr8aLdJ8L71EaR9WJBlkEb8N8ztrOhVLo7AV5aO0bSweNv7DhcwHObDnWwv2OOowowwCLcU4T4ZjpkSNtyj+a3rRw6ezDbQvBTMf4hWK/TcE5xB0Bh9LEGvW/oFtSYeJDFmYkoQ71+2yV9AmerXBctBZAtCE=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5399.eurprd08.prod.outlook.com (2603:10a6:20b:104::22)
+ bh=b90YXvVFMQgCBbmW35vhDSALf/FPXweo3cj1pB0t5y0=;
+ b=vgxiwNplxzccOcDnBV7KTEfNWfLe5lilrzqpviIN+FvtOasTfZq0lyY2Z7NdIaSZax9/F8K4C4WDEHVSTg0N5g72NS/ofJY6ZUymzCs6A+wyV+vReYQZh/V/JqS0eu41LzEPSJeVJQuqXtAUC14ZHBv1k1AdJNIvdjoLeZan0Tw=
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB4616.eurprd08.prod.outlook.com (2603:10a6:20b:6f::14)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Fri, 5 Jun
- 2020 14:40:43 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.018; Fri, 5 Jun 2020
- 14:40:43 +0000
-Subject: Re: [PATCH 2/7] python/qemu: formalize as package
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200603001523.18085-1-jsnow@redhat.com>
- <20200603001523.18085-3-jsnow@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <543575b7-44be-37e6-a82b-9299b637ef78@virtuozzo.com>
-Date: Fri, 5 Jun 2020 17:40:40 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <20200603001523.18085-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.20; Fri, 5 Jun
+ 2020 14:43:11 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae%3]) with mapi id 15.20.3066.022; Fri, 5 Jun 2020
+ 14:43:11 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v4 09/12] qcow2_format.py: QcowHeaderExtension: add dump
+ method
+Thread-Topic: [PATCH v4 09/12] qcow2_format.py: QcowHeaderExtension: add dump
+ method
+Thread-Index: AQHWOpdx7MokZqJTmku39GpZW1X9IajKGcPr
+Date: Fri, 5 Jun 2020 14:43:11 +0000
+Message-ID: <AM6PR08MB40708B2DF8DB9CD602BCE40FF4860@AM6PR08MB4070.eurprd08.prod.outlook.com>
+References: <20200604174135.11042-1-vsementsov@virtuozzo.com>,
+ <20200604174135.11042-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20200604174135.11042-10-vsementsov@virtuozzo.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR04CA0146.eurprd04.prod.outlook.com (2603:10a6:207::30)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM3PR04CA0146.eurprd04.prod.outlook.com (2603:10a6:207::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.20 via Frontend Transport; Fri, 5 Jun 2020 14:40:42 +0000
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 75abf588-0a81-49af-ced0-08d8095e6ca9
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5399:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53992313B295A195E6540D23C1860@AM7PR08MB5399.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-Forefront-PRVS: 0425A67DEF
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y18Qx8d9Q7MurEVfclSsXDuyq3oQC3U94BDJ3UpLQ3jGk2i7EesoFYCgrSnghrfPFola0uoefcB5cDb2gRVwWegrx6wIt6tnMMA5HM+Yg3LvFj0TRrX1ZulGqnJW+fTYX8RbFCbtS43yVg+xS1AiXzQzXmXpOocKXOmWwNBEZvmxoRe7fzY3eEZo1eP7EUjaGUpS6IN9IaHaDJaPX8IytD9GUpH118Ib9CDew+exwAf2vW9sGvIf//0Vx5tTVKzkg30FF+IkSSzYC1w8xQmzkFQKctYr3GGR7akdpW/8xT2YjTneWIQ7CbkNc9oUWtFwoBxy/lIXn9Tr+z4Ujq+VT8RToHSuJtEtcBTBoNTfRBdAMUa5M8+AyIMelK6pxj2Lxv1EWz2+8gs8Kz63g/P2K8FkRMaOy3aDMBZgSCKI80Vu5qegVd3ogI0/s4ogxsro4iO/ypUEiGtKcyD3iLYbGg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+x-originating-ip: [109.252.114.191]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 82e48d5e-3d8c-429c-202a-08d8095ec539
+x-ms-traffictypediagnostic: AM6PR08MB4616:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB46160533BE89C10CD4D72C95F4860@AM6PR08MB4616.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2657;
+x-forefront-prvs: 0425A67DEF
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: rr85iHHGq33Tb+7oVCMNyKFnYQpV2XSA4k2/BdiDyot6bvLc14kp+Vb4Cr39zQKYrpbm+QUj9pQPjX1TWZIbQU1P+9qclWUTsJ76lQo0jpl302z/7TWE37GkjUjFnWCeb0ZnzjRFzHOHq4K5krOA+FDxOtVUXeh8GNyItULX1NZ/3jr/uwpiZjFk8bamUnylXSqikz9uNjB0aBOQ+oHMDD24JPzOFX8p+RrSSBJFfYXXt62shTBj3M2EvmhocG4jP4oSop7N74NR223/uOiUBj3bbYmzqR2bRaAq8MdvSxtxOjRNSlPJkT/gEvBaOPy79Idp1n5CSCOgZcIqe252Rg==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39840400004)(136003)(366004)(396003)(346002)(376002)(186003)(36756003)(16526019)(26005)(31696002)(86362001)(66476007)(66556008)(478600001)(5660300002)(16576012)(54906003)(66946007)(316002)(52116002)(2906002)(8936002)(31686004)(8676002)(6486002)(4326008)(956004)(83380400001)(7416002)(2616005)(43740500002);
+ SFS:(4636009)(376002)(346002)(39840400004)(366004)(136003)(396003)(54906003)(8936002)(66556008)(110136005)(316002)(44832011)(55016002)(26005)(107886003)(7696005)(9686003)(4326008)(83380400001)(478600001)(8676002)(2906002)(33656002)(6506007)(4744005)(86362001)(66476007)(5660300002)(76116006)(66446008)(64756008)(66946007)(52536014)(53546011)(186003)(71200400001)(91956017);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: d66uw31JhaTTeIuwXRveyDP2yjuKDmV08fekVv3yG6hXFtv3Z2uhDV2UG007K4I2EiZ/3/4QJ3/BvoRgW5Aa6sdvgvadtPl6oqNmeEUz30mSOyyZh87DLf+3+ZVm6aGlHAqpd1nz7Ao5y86sJcRV2dlI3MYog1lowLzpjDO4UDM2tU/EFIFd7DCwaRf8m6Vsy2iO/uxhiy4GqTPc9WEp009cBTr9iXupt7xKrELtpjj5JB2Mk5FMr/dUs7d+qZR2+OHiG6c+H2pGnKeffiwZeyiwe26Y3ba3K5eJW9d9fuQqf8Fj4OFuPjt/KoQ6CMzlTv+iQTdGmcNHrarhfj/F36zqZhU2qldCH5ZxmO1B9gGmG9E7KSxAnslrbJ9zuZSFpQlAR9aFh95loRTM3bST757cgVMWyXbGSqgcXbfGYlZFCwUS7Ph5zjwDotSyf7k7IKstigAvZGLz3SaJYiieu8WyfRtKilBl9lUDGlGdg+oY/w8YznG4zdbNlUUTiav7
+x-ms-exchange-antispam-messagedata: GsKzp0GBQ4pFB5ugO472EA1T5xz8pZvnDpYrJfUyGQdF9MuMBV4cIg4Zas2weyOrItHwqGJu61Pt0szk7DOmUeSaVhyxAiL4UR1W0KKuyxJlxcJku5NIOFIAzGD9BVtzeyQSf0uWmJ58ncnGKsx2wZbCJyZUiNbH6hEHzD3qXPHmiHST5boS36QhTNLSe6YPLjHiJCYv8Tu2Ge+PoW6p1GkOcHBh1DzU/AGh/3D9d7u2hgwekgCZRJuk2oumTGKXIGt5CgTmxGpgzAhVXvy2tFTDc1SkH8tu/F9lC4AZeOP0AmgyImRhXqfR3mosGeF5VF6ZTUzXfnTpG1BNQ7UecJxVdcQ9K5I/Vh9oUo6kNn2MwAfZ/toSPA28VR6JUY1mG80tpRIPKMLyTRKkDBv9kB9SfgJX7uM7wHAv3dWUIbtDxViLHgYG9RAcz00oB1oW6I3MQkBkIBqcnhUsarS4Zey7K1OfNwwS71EDas0uLSB3a3KEj7XFlAaPISud0Dmm
+Content-Type: multipart/alternative;
+ boundary="_000_AM6PR08MB40708B2DF8DB9CD602BCE40FF4860AM6PR08MB4070eurp_"
+MIME-Version: 1.0
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75abf588-0a81-49af-ced0-08d8095e6ca9
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2020 14:40:43.0824 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qr2Stgu9scKcgnIDcuXhpUnLhvzwXDNEyF2If7mjgIn1rB9Jmjp3y70gGVHx1dfugLT+aLU7dLlR+BJQpO5+LtX8Hc0WBtIOTN23L1OhnnU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5399
-Received-SPF: pass client-ip=40.107.2.97;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 10:40:44
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82e48d5e-3d8c-429c-202a-08d8095ec539
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2020 14:43:11.2926 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ry5kbaxhXjHdQZG1B5ASvCLNKmWu0nV9RyKLTxJ7uSmyf79GXzlGHOh2lrOiL7lIai8eOH9P2jWwYbnEv/v95OrEV0yc2mOZ+rNg0g0xao8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4616
+Received-SPF: pass client-ip=40.107.4.132;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 10:43:12
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,168 +129,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-03.06.2020 03:15, John Snow wrote:
-> NB: I am choosing Python 3.6 here. Although our minimum requirement is
-> 3.5, this code is used only by iotests (so far) under which we have been
-> using a minimum version of 3.6.
-> 
-> 3.6 is being preferred here for variable type hint capability, which
-> enables us to use mypy for this package.
-> 
-> RFC: This uses the version tags of the parent tree here, so packages
-> will be installed as e.g. 5.0.0, 5.1.0-rc0, etc.
-> 
-> Pros:
->   - Easy to tell which versions of QEMU it supports
->   - Simple
-> 
-> Cons:
->   - Implies semver, which we do NOT follow for QEMU releases
->   - Implies the package is in a stable state
+--_000_AM6PR08MB40708B2DF8DB9CD602BCE40FF4860AM6PR08MB4070eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Necessarily? Couldn't we state Development Status: Alpha, even with version 5.1.0 ?
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-> 
-> 
-> We could also start a separate versioning for just the Python SDK at
-> e.g. 0.1;
-> 
-> Pros:
->   - We can use semver, which is expected of Python packaging
->   - Allows us to break compatibility for 0.x releases
-> 
-> Cons:
->   - More complex, the mapping from SDK version to QEMU version
->     is less obvious
->   - Requires someone to manage a secondary version commit for
->     the Python SDK.
-> 
-> Or, perhaps, we could start versioning with 0.5.0.0, 0.5.1.0, etc to
-> combine a bit of both flavors; bumping the major version number only
-> when incompatible changes to the Python interface itself are made,
-> treating the major version number more like an epoch.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   python/README.rst |  6 ++++++
->   python/setup.py   | 50 +++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 56 insertions(+)
->   create mode 100644 python/README.rst
->   create mode 100755 python/setup.py
-> 
-> diff --git a/python/README.rst b/python/README.rst
-> new file mode 100644
-> index 00000000000..25f6d93fd5f
-> --- /dev/null
-> +++ b/python/README.rst
-> @@ -0,0 +1,6 @@
-> +QEMU Python Tooling
-> +-------------------
-> +
-> +This package provides QEMU tooling used by the QEMU project to build,
-> +configure, and test QEMU. It is not a fully-fledged SDK and it is subject
-> +to change at any time.
-> diff --git a/python/setup.py b/python/setup.py
-> new file mode 100755
-> index 00000000000..f897ceac970
-> --- /dev/null
-> +++ b/python/setup.py
-> @@ -0,0 +1,50 @@
-> +#!/usr/bin/env3 python
+________________________________
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Sent: Thursday, June 4, 2020 8:41 PM
+To: qemu-block@nongnu.org <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; mreitz@redhat.com <mreit=
+z@redhat.com>; kwolf@redhat.com <kwolf@redhat.com>; eblake@redhat.com <ebla=
+ke@redhat.com>; Denis Lunev <den@virtuozzo.com>; Vladimir Sementsov-Ogievsk=
+iy <vsementsov@virtuozzo.com>; Andrey Shinkevich <andrey.shinkevich@virtuoz=
+zo.com>
+Subject: [PATCH v4 09/12] qcow2_format.py: QcowHeaderExtension: add dump me=
+thod
 
-env python3 you mean
+Obviously, for-loop body in dump_extensions should be the dump method
+of extension.
 
-with it fixed:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-> +"""
-> +QEMU tooling installer script
-> +Copyright (c) 2020 John Snow for Red Hat, Inc.
-> +"""
-> +
-> +import setuptools
-> +
-> +def main():
-> +    """
-> +    QEMU tooling installer
-> +    """
-> +
-> +    kwargs = {
-> +        'name': 'qemu',
-> +        'use_scm_version': {
-> +            'root': '..',
-> +            'relative_to': __file__,
-> +        },
-> +        'maintainer': 'QEMU Developer Team',
-> +        'maintainer_email': 'qemu-devel@nongnu.org',
-> +        'url': 'https://www.qemu.org/',
-> +        'download_url': 'https://www.qemu.org/download/',
-> +        'packages': setuptools.find_namespace_packages(),
-> +        'description': 'QEMU Python Build, Debug and SDK tooling.',
-> +        'classifiers': [
-> +            'Development Status :: 5 - Production/Stable',
+--_000_AM6PR08MB40708B2DF8DB9CD602BCE40FF4860AM6PR08MB4070eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Could we use "3 - Alpha" ?
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
+tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
+ize: 14.67px; font-style: normal; font-variant-ligatures: normal; font-vari=
+ant-caps: normal; font-weight: 400;">Reviewed-by: Andrey
+ Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;</span><br>
+</div>
+<div><br>
+</div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Vladimir Sementsov-Og=
+ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
+<b>Sent:</b> Thursday, June 4, 2020 8:41 PM<br>
+<b>To:</b> qemu-block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
+<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; mreitz@redh=
+at.com &lt;mreitz@redhat.com&gt;; kwolf@redhat.com &lt;kwolf@redhat.com&gt;=
+; eblake@redhat.com &lt;eblake@redhat.com&gt;; Denis Lunev &lt;den@virtuozz=
+o.com&gt;; Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt;;
+ Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;<br>
+<b>Subject:</b> [PATCH v4 09/12] qcow2_format.py: QcowHeaderExtension: add =
+dump method</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
+">
+<div class=3D"PlainText">Obviously, for-loop body in dump_extensions should=
+ be the dump method<br>
+of extension.<br>
+<br>
+Signed-off-by: Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt=
+;<br>
+---<br>
+&nbsp;tests/qemu-iotests/qcow2_format.py | 22 &#43;&#43;&#43;&#43;&#43;&#43=
+;&#43;&#43;&#43;&#43;&#43;&#43;----------<br>
+&nbsp;1 file changed, 12 insertions(&#43;), 10 deletions(-)<br>
+</div>
+</span></font></div>
+</body>
+</html>
 
-> +            'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-> +            'Natural Language :: English',
-> +            'Operating System :: OS Independent',
-> +        ],
-> +        'platforms': [],
-> +        'keywords': [],
-> +        'setup_requires': [
-> +            'setuptools',
-> +            'setuptools_scm',
-> +        ],
-
-Hmm, documentation says:
-
-    Warning Using setup_requires is discouraged in favor of PEP-518
-
-did you consider this thing?
-
-> +        'install_requires': [
-> +        ],
-> +        'python_requires': '>=3.6',
-> +        'long_description_content_type': 'text/x-rst',
-> +    }
-> +
-> +    with open("README.rst", "r") as fh:
-
-You use '' for all other strings (except for doc-strings) in this file. Maybe use '' here too?
-
-> +        kwargs['long_description'] = fh.read()
-> +
-> +    setuptools.setup(**kwargs)
-> +
-> +if __name__ == '__main__':
-> +    main()
-> 
-
-Hmm in examples in documentations I always see something like this:
-
-> from setuptools import setup, find_namespace_packages
-> 
-> setup(
->     name='mynamespace-subpackage-a',
->     ...
->     packages=find_namespace_packages(include=['mynamespace.*'])
-> )
-
-How much is it better (or popular) to use __name__ == __main__ style for setup.py?
-We are not going to use it as module to import main somewhere...
-
--- 
-Best regards,
-Vladimir
+--_000_AM6PR08MB40708B2DF8DB9CD602BCE40FF4860AM6PR08MB4070eurp_--
 
