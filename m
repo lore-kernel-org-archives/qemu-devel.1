@@ -2,84 +2,80 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F5FC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C16C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04C76206DB
+	by mail.kernel.org (Postfix) with ESMTPS id CA941206DB
 	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OVmbaf93"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04C76206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FW7YwxTb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA941206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhGK0-0000ZZ-8Y
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:40:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48144)
+	id 1jhGK0-0000Zx-Vx
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHk-0003PX-0i
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:40 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42956)
+ id 1jhGI0-00046j-He
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:56 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44918)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHj-0003q9-5m
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:39 -0400
-Received: by mail-pg1-x541.google.com with SMTP id e9so5493054pgo.9
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:38 -0700 (PDT)
+ id 1jhGHz-00041E-Gn
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:56 -0400
+Received: by mail-pf1-x444.google.com with SMTP id f3so5263606pfd.11
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=hi7LUnC/2Vxc6CG4AyW71h/9KhgELUl20yMZDhooBMo=;
- b=OVmbaf933xh3+YjoGnMzeKhaIMEES9/YNzfNkwU4WoU4wV4VsD72CXkV5csQ8rH96p
- SGNxx/1QpdRtfP/na6jfrSOPETR6s177Pkw0UB4llk/Tps/G1R/L8c/i8zvVNy8d1poT
- tuonWtc7WTRAqnf4JXd/6DGK989PV/wzRqN32OIJ5Sze5eE58MXE6nvxBQ00FtSC9gIv
- 4rMSDCIkQ3j13V7fkocxbt5BObP5bz1G44RJIerfaEjbfDD1GTSEfHAlGMlsXm12vD1o
- mEmx49o84FE5doG3phUctcF0FnNWq12omdU6IK4vcaS90OVik1nAzJvqhA9VHsODQJe9
- 771w==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=AOzUAJyFNQB4L+phqsSsfzj9Z8OtZxOrajLi9NoXesk=;
+ b=FW7YwxTbepxVhFcuU9CLDUQXHRQgNNhdh8JqqkQIeqt8MwWClu34MgBwJ4+2PjfIY5
+ Slxua9esPHR2CdKte+EkY7Y8+JVr3WstzJ2fv+Ths7xFB+aIumtnRJjIFnP9Y4FK7o8D
+ 4TzTOMP0C1sOWR0W39VYJ0NsJiI5vQVdRID/ZXrKlDEfBRSrosHqWzqPj7Ya8w416WFR
+ rpp9MPXK7YRxFKLZvZeU32myI2Jnw2MYtF9MbyTjrsFkKk9FAR0tdfCx3ss10D1cvYQa
+ IGPaG05pC9diurhxuoyamTYWF3VeSihWekNYxAdwZdhGPZJYO4MKtz7c4yMnIvV4bwRW
+ Q6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=hi7LUnC/2Vxc6CG4AyW71h/9KhgELUl20yMZDhooBMo=;
- b=DfZ7TeFVfNqy6bCvsILBS9RDdqU4hm5iopQr8L1SLxwIQNg6JBdMNV6YqaIiNiNYIk
- mUVacYHx5SMig6kD9c8WwQetlVs4x7Eo76quld0+kDg4r1ZQhovYIwGGY+n0F49OTyNA
- vQp56J4/0bhr1YP5AU6dIRZkerb5VevZJyp7DkSkWlw85I0vdXX5dFeqvEnEEqnDO1Gw
- Fl8Xmd3li5u1PngCFRC/58smGz+OIbab6lQ8Pj8wsT//nKOWsU2jffUV+8A4ynJWXxdT
- nF4uZsGreYeV5ay/LCaUzVFQiUw+zaocdjuDPZnTfbM5qFK/X41ECqmuS0+Bj3NAsKpZ
- mybQ==
-X-Gm-Message-State: AOAM530oO5RcoJXCeIxUyiQvVffE4slqlfG6Qwl3x+zTTku/lmiu+z6x
- A7iV6aB3U/N/UZqM8EkI34E286CZSh8HOw==
-X-Google-Smtp-Source: ABdhPJy7FYzw8hFdsg5vb8oQ23ByADcRJvmYYPWoQ6JjCeTdFWmdyoxSvQBO9775/oGkiNO5JmcNhg==
-X-Received: by 2002:a65:568d:: with SMTP id v13mr10411043pgs.436.1591378657135; 
- Fri, 05 Jun 2020 10:37:37 -0700 (PDT)
+ :references;
+ bh=AOzUAJyFNQB4L+phqsSsfzj9Z8OtZxOrajLi9NoXesk=;
+ b=TQAxa6uESLq+LP4ktYNCInb6tN3wUcwKaLGvY7p3W0bjGQ5cLBn+Wdv8xHsHbjr8Ib
+ 878GK53yOgjWnSBak5XXABir/ElgYNNQu9aIJbRBTwiPE3N9QYVVLKXDhRGAlQhF3vTh
+ gagyoI/9ZXnp75bB4/zeazZSvdJXwfNvqLvnDF633rf94arocE7f42aV0J6FHfaMtVdt
+ OfN6Kk/nkXqz1KILxEeEs5nTc8egk5GSU/LEI/QRSVLjewHatThOj0ZZdFkWBrj6VEm3
+ BzsDRF5XNkSnJY50DWozweBcPut5oLEZo4fX4SYaJZTt6R/AcQwMZ84vZrx2GDTGy+Pe
+ 0KbQ==
+X-Gm-Message-State: AOAM531699BHk1Uysz2KIbe3CZT9EXqVpSkSYm2ylrhGAJBK3TuJr9O3
+ l4MKDU6T/2RYJ0YSGhwIv62SgAx+Tz72dw==
+X-Google-Smtp-Source: ABdhPJy5T/ARc5bVKkXU2KWFcWu4tQW877DdB0Q/siz4xIdOCz9KIrJW38ZyX5+X7C6hOw80U6KK7g==
+X-Received: by 2002:a63:1d02:: with SMTP id d2mr10615845pgd.206.1591378673552; 
+ Fri, 05 Jun 2020 10:37:53 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
- by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.35
+ by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 10:37:36 -0700 (PDT)
+ Fri, 05 Jun 2020 10:37:52 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/13] thread: add qemu_spin_destroy
-Date: Fri,  5 Jun 2020 13:34:12 -0400
-Message-Id: <20200605173422.1490-4-robert.foley@linaro.org>
+Subject: [PATCH v2 10/13] include/qemu: Added tsan.h for annotations.
+Date: Fri,  5 Jun 2020 13:34:19 -0400
+Message-Id: <20200605173422.1490-11-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200605173422.1490-1-robert.foley@linaro.org>
 References: <20200605173422.1490-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=robert.foley@linaro.org; helo=mail-pg1-x541.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=robert.foley@linaro.org; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,31 +103,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+These annotations will allow us to give tsan
+additional hints.  For example, we can inform
+tsan about reads/writes to ignore to silence certain
+classes of warnings.
+We can also annotate threads so that the proper thread
+naming shows up in tsan warning results.
 
-It will be used for TSAN annotations.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qemu/thread.h | 3 +++
- 1 file changed, 3 insertions(+)
+ include/qemu/tsan.h | 71 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
+ create mode 100644 include/qemu/tsan.h
 
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index d22848138e..e50a073889 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -215,6 +215,9 @@ static inline void qemu_spin_init(QemuSpin *spin)
-     __sync_lock_release(&spin->value);
- }
- 
-+static inline void qemu_spin_destroy(QemuSpin *spin)
-+{ }
+diff --git a/include/qemu/tsan.h b/include/qemu/tsan.h
+new file mode 100644
+index 0000000000..09cc665f91
+--- /dev/null
++++ b/include/qemu/tsan.h
+@@ -0,0 +1,71 @@
++#ifndef QEMU_TSAN_H
++#define QEMU_TSAN_H
++/*
++ * tsan.h
++ *
++ * This file defines macros used to give ThreadSanitizer
++ * additional information to help suppress warnings.
++ * This is necessary since TSan does not provide a header file
++ * for these annotations.  The standard way to include these
++ * is via the below macros.
++ *
++ * Annotation examples can be found here:
++ *  https://github.com/llvm/llvm-project/tree/master/compiler-rt/test/tsan
++ * annotate_happens_before.cpp or ignore_race.cpp are good places to start.
++ *
++ * The full set of annotations can be found here in tsan_interface_ann.cpp.
++ *  https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
- static inline void qemu_spin_lock(QemuSpin *spin)
- {
-     while (unlikely(__sync_lock_test_and_set(&spin->value, true))) {
++#ifdef CONFIG_TSAN
++/*
++ * Informs TSan of a happens before/after relationship.
++ */
++#define QEMU_TSAN_ANNOTATE_HAPPENS_BEFORE(addr) \
++    AnnotateHappensBefore(__FILE__, __LINE__, (void *)(addr))
++#define QEMU_TSAN_ANNOTATE_HAPPENS_AFTER(addr) \
++    AnnotateHappensAfter(__FILE__, __LINE__, (void *)(addr))
++/*
++ * Gives TSan more information about thread names it can report the
++ * name of the thread in the warning report.
++ */
++#define QEMU_TSAN_ANNOTATE_THREAD_NAME(name) \
++    AnnotateThreadName(__FILE__, __LINE__, (void *)(name))
++/*
++ * Allows defining a region of code on which TSan will not record memory READS.
++ * This has the effect of disabling race detection for this section of code.
++ */
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_BEGIN() \
++    AnnotateIgnoreReadsBegin(__FILE__, __LINE__)
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_END() \
++    AnnotateIgnoreReadsEnd(__FILE__, __LINE__)
++/*
++ * Allows defining a region of code on which TSan will not record memory
++ * WRITES.  This has the effect of disabling race detection for this
++ * section of code.
++ */
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_BEGIN() \
++    AnnotateIgnoreWritesBegin(__FILE__, __LINE__)
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_END() \
++    AnnotateIgnoreWritesEnd(__FILE__, __LINE__)
++#else
++#define QEMU_TSAN_ANNOTATE_HAPPENS_BEFORE(addr)
++#define QEMU_TSAN_ANNOTATE_HAPPENS_AFTER(addr)
++#define QEMU_TSAN_ANNOTATE_THREAD_NAME(name)
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_BEGIN()
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_END()
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_BEGIN()
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_END()
++#endif
++
++void AnnotateHappensBefore(const char *f, int l, void *addr);
++void AnnotateHappensAfter(const char *f, int l, void *addr);
++void AnnotateThreadName(const char *f, int l, char *name);
++void AnnotateIgnoreReadsBegin(const char *f, int l);
++void AnnotateIgnoreReadsEnd(const char *f, int l);
++void AnnotateIgnoreWritesBegin(const char *f, int l);
++void AnnotateIgnoreWritesEnd(const char *f, int l);
++#endif
 -- 
 2.17.1
 
