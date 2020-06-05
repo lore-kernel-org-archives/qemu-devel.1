@@ -7,81 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85BBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E88D207D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5048F2077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:56:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mfm1DtyJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E88D207D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dNtWGwv2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5048F2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhFdP-00051z-Dy
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40542)
+	id 1jhFdn-00064I-Fe
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhFY2-0001ar-V2
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:27 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:56203)
+ id 1jhFY8-0001oE-NC
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:32 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:37689)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhFY0-0001fq-Eh
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:26 -0400
-Received: by mail-wm1-x334.google.com with SMTP id c71so9036371wmd.5
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 09:50:23 -0700 (PDT)
+ id 1jhFY7-0001gz-PZ
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:32 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id y20so2052047wmi.2
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 09:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=2yUBQIbu54pdqWo2t660udQ3QOPVJ1+0t/Js/DFf5WY=;
- b=Mfm1DtyJP9bL42gpn1BC/vmnFWfQMarR1tubE2Af3D/iDs9IdgFPifOyn2lvNaOYGZ
- 6sTmRVram6tEc4Zrf5HXDYQmo0TRMIZF8LIgxWYX3aNTFAdDcgDE4p0Lo4BvDC5q5tYT
- 9QmpFh6bNBkHaY+4wc+lP60QSaeB13UVEjnkVzchj1Yg3WgZyRsOSDfrbnyD1/rfzAe1
- bmC4uMOIhCQcNcU8c6GINNPDYKwKQKv3PmrEtxKrjrZeQwMR8E1Shj41bJY9Gnmi5RNg
- 5oic9wR53pc7nWY9FauAbiRgs1vNiKuSD718RxY1AMA8RgyPhndhN067RpJCSOAs6knP
- lbGA==
+ bh=HjYqSzvHtl5IkDZCqrdUA6rE1xLPxwurQ8ThMttAuSk=;
+ b=dNtWGwv2LFkot0wFJqToTlE/YJmpYC7aXQLsdqA06TqMXvjccOybvKOI60pBmJeuoF
+ 28deD0ebYz9Jm3TknnDqajIuxtRm7ZIs5abgR7w7dwjzXHJ3yftU/rqOAJicF/Dg3edd
+ Hdc3QUEmK+8YF1+vTMHjNpCUnwRO+RXR9y+aHP4DUQwMv3R1reNWmKMCP4r1czbe8VH2
+ wKcm6ien0sTJ5i7VTY+wIR2RHvN8zZ6XgwpcpfCmTXYjX2lUEhGU2h8lNMQqHD+mHtMn
+ RjfSXmDvZDfgkmIf57UrVkU+7zYtWh8ge4l7tj7OF4XE4w5s0Mr9X/zUfgVdmixYE7OJ
+ 2K5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2yUBQIbu54pdqWo2t660udQ3QOPVJ1+0t/Js/DFf5WY=;
- b=Fpzksox3RxH6lbB3rYwAzWWNH/F4aeHC/BwhgpVfRBDXPYmyJPzfOqpthotyXAhwh4
- Kpv0xs7/291DQLq/RTZzyuciF3pQ1088ED6kYMkVZU1e5gpjFAMZAOikbiSzNSaRPNqP
- 80BHYYZbIWlbyDSZTpCgiGwQdzM6s5PGLRZBgqk3tOl1iL1Z46Zrjm0xU7BO/9YcaTkJ
- 1l+Tk1w2PxAWLoDjzoAn9biJuwd6nW2iLawyxJ9sMhCcSVu4wgouFduu3tJKB5s3uL0l
- M75ll5bB9NGJJOazlk78RVRcZ53Wa/T0LKbIw+nHM3cOHHf/BNWEZgVaxHQo2ZV+ecdv
- wLog==
-X-Gm-Message-State: AOAM533IQl7IWOmZckI/KbjwFaCEUg4g0NuA3rQmnMS4apc0eZsQ8D6N
- 16Qpjk8Qwm3y6259d+g/tyc7Ryoqz7kXAQ==
-X-Google-Smtp-Source: ABdhPJynlFiHTl4y8f4T3SRN1BMp6l5TAQRUGwwwmdV6ShPXkSWs1dbLooKJCigfcDoDJ9CaVlPFRQ==
-X-Received: by 2002:a05:600c:1146:: with SMTP id
- z6mr3531259wmz.179.1591375822819; 
- Fri, 05 Jun 2020 09:50:22 -0700 (PDT)
+ bh=HjYqSzvHtl5IkDZCqrdUA6rE1xLPxwurQ8ThMttAuSk=;
+ b=JfV6gQEeB3jBYx/rfZrE/Fq6Zepi7139RmORwBliAP98eSmPhIJq7bJhYt01V+UJR9
+ l0Yqa+R3FlNjJKDkvIKd++1ro7oyhhX1IhTvvppvknX/DgbKTJXYdQ0v4L5mZiKNUmYe
+ ArzXvGC3gvtiW2VFcaqmrbFPWp/1zH0Z452nfYBVDliwohjOO8Vrz82VMqv4qAOAPpSo
+ uqUcgVL8x5zsCc4IllF1qYMH03ogwqJ+0xyG/J+f3XIz1huEVc8+bZjdqquxn0Da/Wj8
+ DxeaAfk7ov9sa7TOaQKY1RmSQymqeU3pT2UoYerpc162AXyRpk1qaFWlI1W63l959TrS
+ Cncw==
+X-Gm-Message-State: AOAM531EorsWg5F38iDmZLiB9abiKbM5cV2VBMJXFGUISQCx14pMnrvB
+ +pgfU4bz+ZPkJhYnPkREivcNdl9hywYq3g==
+X-Google-Smtp-Source: ABdhPJymlXPMMN7WmDMAcWndhiPJx1njmLtHIEUPaQxTDn2LsViPfLFa7iLzaSWjADCA9bVTT3yMBA==
+X-Received: by 2002:a1c:2082:: with SMTP id g124mr3746058wmg.21.1591375830120; 
+ Fri, 05 Jun 2020 09:50:30 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c140sm12272724wmd.18.2020.06.05.09.50.21
+ by smtp.gmail.com with ESMTPSA id c140sm12272724wmd.18.2020.06.05.09.50.29
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 09:50:22 -0700 (PDT)
+ Fri, 05 Jun 2020 09:50:29 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/29] tests/acceptance: Add a boot test for the
- xlnx-versal-virt machine
-Date: Fri,  5 Jun 2020 17:49:50 +0100
-Message-Id: <20200605165007.12095-13-peter.maydell@linaro.org>
+Subject: [PULL 18/29] usb: add short-packet handling to usb-storage driver
+Date: Fri,  5 Jun 2020 17:49:56 +0100
+Message-Id: <20200605165007.12095-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200605165007.12095-1-peter.maydell@linaro.org>
 References: <20200605165007.12095-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,63 +104,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Paul Zimmerman <pauldzim@gmail.com>
 
-As described by Edgar here:
+The dwc-hsotg (dwc2) USB host depends on a short packet to
+indicate the end of an IN transfer. The usb-storage driver
+currently doesn't provide this, so fix it.
 
- https://www.mail-archive.com/qemu-devel@nongnu.org/msg605124.html
+I have tested this change rather extensively using a PC
+emulation with xhci, ehci, and uhci controllers, and have
+not observed any regressions.
 
-we can use the Ubuntu kernel for testing the xlnx-versal-virt machine.
-So let's add a boot test for this now.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200525141237.15243-1-thuth@redhat.com
+Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
+Message-id: 20200520235349.21215-6-pauldzim@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tests/acceptance/boot_linux_console.py | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ hw/usb/dev-storage.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 12725d45290..bbbbd30e48d 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -308,6 +308,32 @@ class BootLinuxConsole(LinuxKernelTest):
-         console_pattern = 'Kernel command line: %s' % kernel_command_line
-         self.wait_for_console_pattern(console_pattern)
- 
-+    def test_aarch64_xlnx_versal_virt(self):
-+        """
-+        :avocado: tags=arch:aarch64
-+        :avocado: tags=machine:xlnx-versal-virt
-+        :avocado: tags=device:pl011
-+        :avocado: tags=device:arm_gicv3
-+        """
-+        kernel_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-+                      'bionic-updates/main/installer-arm64/current/images/'
-+                      'netboot/ubuntu-installer/arm64/linux')
-+        kernel_hash = '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
-+        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-+
-+        initrd_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
-+                      'bionic-updates/main/installer-arm64/current/images/'
-+                      'netboot/ubuntu-installer/arm64/initrd.gz')
-+        initrd_hash = 'd385d3e88d53e2004c5d43cbe668b458a094f772'
-+        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-+
-+        self.vm.set_console()
-+        self.vm.add_args('-m', '2G',
-+                         '-kernel', kernel_path,
-+                         '-initrd', initrd_path)
-+        self.vm.launch()
-+        self.wait_for_console_pattern('Checked W+X mappings: passed')
-+
-     def test_arm_virt(self):
-         """
-         :avocado: tags=arch:arm
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 4eba47538d8..a5204b6f2a3 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -229,6 +229,9 @@ static void usb_msd_copy_data(MSDState *s, USBPacket *p)
+     usb_packet_copy(p, scsi_req_get_buf(s->req) + s->scsi_off, len);
+     s->scsi_len -= len;
+     s->scsi_off += len;
++    if (len > s->data_len) {
++        len = s->data_len;
++    }
+     s->data_len -= len;
+     if (s->scsi_len == 0 || s->data_len == 0) {
+         scsi_req_continue(s->req);
+@@ -303,6 +306,9 @@ static void usb_msd_command_complete(SCSIRequest *req, uint32_t status, size_t r
+             if (s->data_len) {
+                 int len = (p->iov.size - p->actual_length);
+                 usb_packet_skip(p, len);
++                if (len > s->data_len) {
++                    len = s->data_len;
++                }
+                 s->data_len -= len;
+             }
+             if (s->data_len == 0) {
+@@ -469,6 +475,9 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
+                 int len = p->iov.size - p->actual_length;
+                 if (len) {
+                     usb_packet_skip(p, len);
++                    if (len > s->data_len) {
++                        len = s->data_len;
++                    }
+                     s->data_len -= len;
+                     if (s->data_len == 0) {
+                         s->mode = USB_MSDM_CSW;
+@@ -528,13 +537,17 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
+                 int len = p->iov.size - p->actual_length;
+                 if (len) {
+                     usb_packet_skip(p, len);
++                    if (len > s->data_len) {
++                        len = s->data_len;
++                    }
+                     s->data_len -= len;
+                     if (s->data_len == 0) {
+                         s->mode = USB_MSDM_CSW;
+                     }
+                 }
+             }
+-            if (p->actual_length < p->iov.size) {
++            if (p->actual_length < p->iov.size && (p->short_not_ok ||
++                    s->scsi_len >= p->ep->max_packet_size)) {
+                 DPRINTF("Deferring packet %p [wait data-in]\n", p);
+                 s->packet = p;
+                 p->status = USB_RET_ASYNC;
 -- 
 2.20.1
 
