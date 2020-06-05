@@ -2,96 +2,87 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C30B8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8601CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:53:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9096F206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 509BD206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 21:53:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Osz5kDSG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9096F206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EnYexZk2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509BD206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhKFk-0002NU-So
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 17:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50348)
+	id 1jhKH8-0004CK-Iu
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 17:53:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhKEs-0001on-HX
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:50:58 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40652)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhKEr-0003Uq-Pk
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:50:58 -0400
-Received: by mail-pg1-x544.google.com with SMTP id o8so5776247pgm.7
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 14:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9OV9OAscxuTsjxbuT4Qg6j2sOXUOYfZroOrORki3r5g=;
- b=Osz5kDSGr4mWhGDgmXpE5BchahKld2jMb+L5OCKtP+NB7+Pz3HDjMrOiUA2Qn1KV+S
- hJfl12NZ+ThS/eTMhQbvbPRp/5mruSDC1Nd8jObTOPedS265SDoZSb8FN6jKi6ZsL2bO
- aXElHS6YJx2Ly882zBuaFaKppmfJidBD4XkiNXprEvGEH1UXTvGB8+1tdlKMV5Pb03eI
- cpiNl+9w9sz+cgXUGlCp1h9WXqq72Edf3QkpMYkZzo7eOzQuDKKOhCsvHk3p8kVWfsG6
- 15OUuzUwiYKXypN+OwV4yVLI1Fb1+OpK1U5o++bXt2dWang6rP5Sjp2TNHncFB08YsHY
- xJsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9OV9OAscxuTsjxbuT4Qg6j2sOXUOYfZroOrORki3r5g=;
- b=Gc9hq6cpqNlknNJI9RORovViYP9txmdDLBWAidOBEd7tIqcowuot582dcIrAs8ecKh
- qiRAGLHqZUr3zC58zdIoHciPSm+HeoiW3t/Lr3d5N5xyKEhPmwUF0YW34bWaJYcchmSl
- POp7KAfwLGNokvDzPocHmWwY7CQLPCpUi6X9cnsrcU/qmVMa0Yp+hgM7D0tL8qoo3vXA
- RBf7niwhll8THjFJ1n4JtqPJ8WIV2uczUNFmuKuKWpOqGYwH94wWQaNkDJErBEh4At/+
- bWsoXxGF0fS3w7wSN7/wJP/WyVz6tAWEsDxq1KOjeo9hRszVgMqmTAoX+MPmRDCUU6YE
- kpxA==
-X-Gm-Message-State: AOAM5319K3ftVu1HTcppQ9ZKmyoX60l1ptgvrOQ07CabAxnz9aPObspz
- DL6ajQ5DhROnMR5UpomeUIpk5g==
-X-Google-Smtp-Source: ABdhPJxZuTBaZ0aDMHA6Uuu10lI2QwJkMhPTXBaa7vMRFK8p1YENVHCF9H2jHE3IRHU6i5ky/iJd0Q==
-X-Received: by 2002:a62:ac0a:: with SMTP id v10mr11898516pfe.27.1591393856228; 
- Fri, 05 Jun 2020 14:50:56 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id t2sm485464pfb.64.2020.06.05.14.50.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 05 Jun 2020 14:50:55 -0700 (PDT)
-Subject: Re: [PATCH v7 04/11] rules.mak: Add strequal() and startswith() rules
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200605175821.20926-1-philmd@redhat.com>
- <20200605175821.20926-5-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <719e7bef-10dc-dac9-ff90-eb944903cc36@linaro.org>
-Date: Fri, 5 Jun 2020 14:50:53 -0700
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jhKG2-0002mM-Vd
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:52:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47265
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jhKG0-0003fa-Sk
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 17:52:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591393927;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z5dMG9qIndKHUEPY36afaIz6UnK796I7mplnX5vGor4=;
+ b=EnYexZk2wbfc2vnN8BD/fovCsjqeNpciv750niUhCFewgRol+s1rwvADrH1AqJ+KeE/GYS
+ EriX0eQmpYAmmDTjEOMohzteO5lMj71KimRfoo8L4mPZbwpmeFgxUx6HXvrWxcqH8z2QFf
+ a3ZptLyiq9Vz61ixPKhCrbC6r1Rr9K0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-lyk5S5TPMjiBkRJ277rwxw-1; Fri, 05 Jun 2020 17:51:41 -0400
+X-MC-Unique: lyk5S5TPMjiBkRJ277rwxw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E862A8018AB;
+ Fri,  5 Jun 2020 21:51:40 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 74BE419C58;
+ Fri,  5 Jun 2020 21:51:34 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 0/5] block: add block-dirty-bitmap-populate job
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200514034922.24834-1-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d36e7081-4de9-4f35-d1f1-b780e75739c9@redhat.com>
+Date: Fri, 5 Jun 2020 16:51:33 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200605175821.20926-5-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200514034922.24834-1-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 16:19:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,21 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ vsementsov@virtuozzo.com, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/5/20 10:58 AM, Philippe Mathieu-Daudé wrote:
-> Add a rule to test if two strings are equal,
-> and another to test if a string starts with a substring.
+On 5/13/20 10:49 PM, John Snow wrote:
+> Hi,
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  rules.mak | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> This is a new (very small) block job that writes a pattern into a
+> bitmap. The only pattern implemented is the top allocation information.
+> 
+> This can be used to "recover" an incremental bitmap chain if an external
+> snapshot was taken without creating a new bitmap first: any writes made
+> to the image will be reflected by the allocation status and can be
+> written back into a bitmap.
+> 
+> This is useful for e.g. libvirt managing backup chains if a user creates
+> an external snapshot outside of libvirt.
+> 
+> v2:
+>   - Addressed some, but not all feedback
+>   - Rebased on latest 'job-runner' series; but it's not clear if it
+>     should be kept.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id for that series? I'm not finding a message with a subject 
+containing a literal 'job-runner', but am not sure which subject to look 
+for instead.
 
-r~
+I also couldn't find an obvious tag or branch at 
+https://github.com/jnsnow/qemu/branches where you might have stashed 
+this including prerequisites.
+
+>   - This version doesn't address all of the feedback from v1,
+>     but I am posting it to the list as an RFC.
+
+I'm happy to try and take over these patches to prepare a v3, but only 
+if I can get them to build by finding the prerequisites :)
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
