@@ -2,85 +2,88 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC408C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DC7C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:48:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B77142075B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:46:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CE532075B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:48:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvP6qJzL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77142075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=adacore-com.20150623.gappssmtp.com header.i=@adacore-com.20150623.gappssmtp.com header.b="XMWEhuhD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE532075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh9s7-0006LJ-WB
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47224)
+	id 1jh9u1-0007fq-Fr
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jh9rJ-0005jX-Lt
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:45:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41807
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jh9rH-0002dv-IZ
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:45:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591353954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7hLX+smFqjRmInxpv6d4VgabW9wxZU/3OZ9hKNSHEAM=;
- b=JvP6qJzLZjY4klJAUuq+oMrhnw0TxELDGTG+MqGzgVGx53mb9+xrXYCYQ0HtsdPi4gyxXZ
- zhX5C4t23s4Quiyqb2HW9K6dzPl4hahUH5NDYLHij4tq+YCargOoG0Noy43kIleo3KUYrJ
- DADE+QQJo6gEsF9QlXkLormg1yuKJBQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-jjy1j_gmMnG9cF878LPTDA-1; Fri, 05 Jun 2020 06:45:52 -0400
-X-MC-Unique: jjy1j_gmMnG9cF878LPTDA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38E8619057BA;
- Fri,  5 Jun 2020 10:45:50 +0000 (UTC)
-Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 453B95C661;
- Fri,  5 Jun 2020 10:45:38 +0000 (UTC)
-Date: Fri, 5 Jun 2020 12:45:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200605124535.12e8c96e.cohuck@redhat.com>
-In-Reply-To: <20200521034304.340040-19-david@gibson.dropbear.id.au>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <chouteau@adacore.com>)
+ id 1jh9tR-0007Ez-53
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:48:09 -0400
+Received: from mail-io1-xd2d.google.com ([2607:f8b0:4864:20::d2d]:46643)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chouteau@adacore.com>)
+ id 1jh9tP-0002sl-3s
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:48:08 -0400
+Received: by mail-io1-xd2d.google.com with SMTP id j8so9724326iog.13
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 03:48:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=adacore-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9+vqBaiHLseC0o8afzLevdr9E593kvR5e3ZXbdnI9YI=;
+ b=XMWEhuhDhgmTjJroADqNCPnlm+oFFG55eJ7wV87Ntdbb0J5ax6Qox/gZIF+friUklW
+ NYEevc790Z+qsaEuy2K7XYLRq+C3f9vPB/6xP4W0WE03ntkaxUEe/+XICsA9UrRhxM3x
+ rW/p9Hfevay/5zO1rB7Eh5x2/Fri51QCxCBG22WjmhYrJiooqs/lUVaWpx9IRMf10DfE
+ 17oQEK/UbMx/PyYQOwnXiAqWgw5yoJZW7DzPhetI8/t5+IaxFKjJa8KUKD5/yFC+Nb9B
+ vKfIPX+eEjK65JNFgzjQnq0LDpeCngNVSS7ITYkado30XtM+kDMsQsbFbaTs54PUxwgZ
+ 75fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9+vqBaiHLseC0o8afzLevdr9E593kvR5e3ZXbdnI9YI=;
+ b=FXI9GyUpGHdrWRusmvPXVyeyyB0jfOyvyrOFMJe8LRlr92bn3GHs67huW79nchWtpb
+ U+EuB5lWgrSWfKExHJeSJzEVkY35QtUc8jnBzUXUk52vXOkRMgCJG2qgnv+ewBcN42si
+ OoOMMm5sjcf86sn41GcDRCAcwjpkqLAyfcizjpYS6/X2i7CWuERbbWELIUKDYpAo1bH7
+ W5to7cuWYm32xf4eJ17mOpEJTdhtT7pxqV3bBLNv/zRcshuVkX+DYHuwQ+SmhCQO5TKb
+ t+Ynw5ptpKfdNHSDLOqT26RMJSTzgoIpWpPFRMLsqWPq6E5X4j8uY/e6TmBhQkjiScUf
+ kmOA==
+X-Gm-Message-State: AOAM532RlmGm0H5rlz3CDm9X3qapGkXlcniPaDuWCS0Alcr/iiqFvngp
+ EV/WmJkDF/PT7OrH73uCeQqxL0lpdu+42XNGNPh2+A==
+X-Google-Smtp-Source: ABdhPJzIE9cQeuDg/MOTB67O8AYH8l2g+3znNr675zrnPcnYTcnQP9I++sbXJDN3Ei/hGU11rOrzaycYd2D4qr2EqX8=
+X-Received: by 2002:a05:6602:2c45:: with SMTP id
+ x5mr7569755iov.80.1591354085440; 
+ Fri, 05 Jun 2020 03:48:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:40:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CALQG_Wh7eMt9U3gWkZZGDq0RFvWfuSVoiNBRNnPS_cDVfUc30w@mail.gmail.com>
+ <CAFEAcA_1+rDcjD7Lyk9ESSkPAKmJwF=0ZdwkgQYUDp8Gtn6jHA@mail.gmail.com>
+ <CALQG_WgP=ZebEMrXh_EpQJXqJPi48i6nwZU_yWq7VqhV_=eTVQ@mail.gmail.com>
+ <CAFEAcA_iW_0jTk=9hCh+UatyhY_HFgzmZeSxqqyUCH19Vv1jCA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_iW_0jTk=9hCh+UatyhY_HFgzmZeSxqqyUCH19Vv1jCA@mail.gmail.com>
+From: Fabien Chouteau <chouteau@adacore.com>
+Date: Fri, 5 Jun 2020 12:47:54 +0200
+Message-ID: <CALQG_WipfD4YMCccBnrT3GaFZ7wkvDtSHPg0Tg73-y5w+rbpsw@mail.gmail.com>
+Subject: Re: gdbstub.c CPU clusters not handled for ThreadInfo packets
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d2d;
+ envelope-from=chouteau@adacore.com; helo=mail-io1-xd2d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,69 +96,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael
- S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
- Halil Pasic <pasic@linux.ibm.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, mdroth@linux.vnet.ibm.com,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 May 2020 13:43:04 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, Jun 2, 2020 at 7:26 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> When there's multiple clusters, by default gdb will show you all the CPUs in the first
+> cluster. Would the behaviour be better if the other cluster in
+> this machine was the first (default) one?
 
-> The default behaviour for virtio devices is not to use the platforms normal
-> DMA paths, but instead to use the fact that it's running in a hypervisor
-> to directly access guest memory.  That doesn't work if the guest's memory
-> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> 
-> So, if a guest memory protection mechanism is enabled, then apply the
-> iommu_platform=on option so it will go through normal DMA mechanisms.
-> Those will presumably have some way of marking memory as shared with the
-> hypervisor or hardware so that DMA will work.
+For our use case yes it would be better. I will look to see if this is
+doable with a small patch on our fork.
 
-cc: Halil, who had been looking at the interaction of virtio-ccw
-devices and s390 protected virt.
+> Hmm. That's the behavior for 'target remote' but 'target extended-remote'
+> ought to support multiple inferiors. What gdb version is this?
 
-(IIRC, we wanted to try with a on/off/auto property for virtio-ccw?)
+Force of habit, I made a fool of myself and used only 'target remote'.
+Sorry for the noise here.
 
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/core/machine.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 88d699bceb..cb6580954e 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,8 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  #include "exec/guest-memory-protection.h"
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/virtio-pci.h"
->  
->  GlobalProperty hw_compat_5_0[] = {};
->  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
-> @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machine)
->           * areas.
->           */
->          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> +
-> +        /*
-> +         * Virtio devices can't count on directly accessing guest
-> +         * memory, so they need iommu_platform=on to use normal DMA
-> +         * mechanisms.  That requires disabling legacy virtio support
-> +         * for virtio pci devices
-> +         */
-> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
->      }
->  
->      machine_class->init(machine);
-
+Thanks for your help,
 
