@@ -2,125 +2,81 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F01C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C78A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38A32075B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:30:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KcihkD23"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38A32075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9D5022070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D5022070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhBU8-00062b-44
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60794)
+	id 1jhBVs-0007Re-Re
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:31:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jhBTO-0005bT-LS; Fri, 05 Jun 2020 08:29:22 -0400
-Received: from mail-vi1eur05on2095.outbound.protection.outlook.com
- ([40.107.21.95]:59072 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jhBTN-0000M9-46; Fri, 05 Jun 2020 08:29:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FzYnN15iBy+DuPJl2ClkA4jtbOKdOzxTEUC412h2CXGCln2GBYQ7vOsVlHMopj2zuu7XXw4xFv8/A3etpuH0rfsm+N7YAspqnF5EmwwdhvWk9guc8tC4YX9Ibgax3C4qY9eBnczNndqb8lgAYqGFN+FW8sOsgmCmv+vVgn6uw1n37DUeYqf2t3XzW/LrIwzvfY7Sx3ihmVLVBN10pnzdcgANFK17cYsF1VXyghyCG+mGzwB8c6vd7SZJDvJu61kqJGeqQEBhFGAQNaxgRTxALwlJ/3JhOiYHktWEuAKuvHRabd2hMYrQuUwrbN8ZKzKecz6FIGA5FFrUI9ODqqw/aA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Xp8hG9JtdqzdlihkLFy13RCqSLNcUOFpdC7BWE4vGs=;
- b=k+AEbhgOWjqcCYFOcYXVrlRsgc81UYeWhSMFS81eMdkytwo3zA4IGUIattwX20B+vXV7IalLfeEnkR4epm7V9iv0fb2JuGX4vmRapxzgxBCOfXMPJEQ4FTrV/Q2CblG3B88OQK/Y8c0ljNoS+Re1ZjqeUfsmaj8zAZctKopu5bIt0g1tXlwo4Q9aiJ1H1eyt/LqpyOpKccdyIL2IkKqlX5u6WFSiWoefZdoRs8DqlaYrBIx5oqmckAWxi20rFjoe7vjQlkGIFToTq4WNaGomL0/27RKgyaVYktY/+bIbdQNmhAdQCmZ+kyaHBJ9GGy1RT9tdclqfZyxocf8dtIDGNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Xp8hG9JtdqzdlihkLFy13RCqSLNcUOFpdC7BWE4vGs=;
- b=KcihkD236lCONehnwYX+Fwm03W/RThsaYm0QC6dXTaj+V2M4fOPuaCJtinJjESBWjiAXa7K2xQJjt7JYDEs8Z2cxi6zTXZTesjh61+RIOqzDuyrPsHIA1XibPBPFNIcqmpaqKPQKmNw19Ga4yWeMfRenKx2JxvYMG9A1i3fYBTs=
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4152.eurprd08.prod.outlook.com (2603:10a6:20b:a7::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.22; Fri, 5 Jun
- 2020 12:29:17 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::2122:8358:546a:adae]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::2122:8358:546a:adae%3]) with mapi id 15.20.3066.022; Fri, 5 Jun 2020
- 12:29:17 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH v4 07/12] qcow2_format.py: separate generic functionality
- of structure classes
-Thread-Topic: [PATCH v4 07/12] qcow2_format.py: separate generic functionality
- of structure classes
-Thread-Index: AQHWOpdw2OBDPv1/70OPnvaU2KRbR6jJ8lBa
-Date: Fri, 5 Jun 2020 12:29:17 +0000
-Message-ID: <AM6PR08MB4070FDB41EB8996982EEAF1CF4860@AM6PR08MB4070.eurprd08.prod.outlook.com>
-References: <20200604174135.11042-1-vsementsov@virtuozzo.com>,
- <20200604174135.11042-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20200604174135.11042-8-vsementsov@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-x-originating-ip: [109.252.114.191]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ff0d346f-f603-4d7b-111e-08d8094c109b
-x-ms-traffictypediagnostic: AM6PR08MB4152:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB4152607A61E2CA4E80A0CED0F4860@AM6PR08MB4152.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2512;
-x-forefront-prvs: 0425A67DEF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qP36Be9hZIuXjLedlW+klqtNeThRdSRaOMbnVWnM6ImMLxbosoSCIo70a9ejCWOWC4yyWCQmUFgmFnjIQkQmQQbnXzBQHrqozzs24f8gnJ30rehCHZt5KpUKDZZ8tHBfYiNicWmtdMfyNc5Dh/3aOHfi8rJo/sR0fRx76+xH3y+sNp8ehTAAiat4c8xJRexJJDStGLhhtL2DMX4ymGsJ9/KGP63h44nW/Rd9QFvJYuo975PFOk4kDXUxFd21ttrVfo4D+E0Cly7xd6R4qFzFeziOaazvYg0uTvD/WBWZ7mUOYGZqDipkUs3Sqc/TEKLw7sjKPgYM0kB82XFCu73tZFk3x60I1ZB4bqYjYCY62wQpBut1vSCAie7DCr0Hm+rs
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(136003)(376002)(396003)(346002)(366004)(26005)(44832011)(5660300002)(478600001)(8676002)(6506007)(76116006)(53546011)(186003)(91956017)(2906002)(8936002)(66556008)(64756008)(66946007)(33656002)(54906003)(66446008)(7696005)(71200400001)(86362001)(66476007)(83380400001)(52536014)(4326008)(9686003)(316002)(55016002)(110136005)(107886003)(41533002);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: Zmke/aAUMtDY2u2OVH3xQng8yx+jAcGETxWHCpLqA4ZJ8QSSw3+aQOV8NxU1AOpaF73qXFim2YtlROQb4oM7f2P01WvuY4H4bb9eZdfWQ6wnrSce0DMU/Uj6NwIHA7O3XHmULjnM2F+awowaGzJL+xI36tcvr9fWYA3TtyYvtB2lJkEbaBDY5nN6wemLWwfWFLkj7bSXyGQuw3q+LloLSQAjTMOA8wIXRjflT3JFeWqT4ljRjAd97yS2f1o21/Pz9bRlz1Eg6Kb+gACN1nP87Y4f3flZ7Pbfw0Tph1QcCRk3+RW8tpmOej/vFLOBMyR1zf/KqPeKyPUjEwTgzDACxhA/32Uxi5ijWRN0RqfacRZnoRBoSe5IggSAFmWBV7dnNYh8URQQkKCp4zNk83Q84foSXre3px5L17uNQ4QChm68YTXfr/BePLy49xDC1j3Ynp9tnV4rtxxVF0aSp0MBiVguwyywCUAgeHML3IAoYP+k3jsbTsyf+PTuYTn08Ot/
-Content-Type: multipart/alternative;
- boundary="_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_"
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jhBUs-0006l1-G5
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:30:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49714)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jhBUp-0000eH-Qj
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jhBUn-0004RR-Ux
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 12:30:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E8E772E80BA
+ for <qemu-devel@nongnu.org>; Fri,  5 Jun 2020 12:30:49 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff0d346f-f603-4d7b-111e-08d8094c109b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2020 12:29:17.2598 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yHG+jLciY5F0DJfeHKtSC04yw4tQbweNSYB7GjpUc6BpSIlmmos37ACexry2IMfoJftY5+iRnf4Mr51y+QlCoh9mmvy2zFtZLg1zjQOq8QE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4152
-Received-SPF: pass client-ip=40.107.21.95;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 08:29:18
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 Jun 2020 12:17:27 -0000
+From: Hajin Jang <1882123@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm armhf debian regression
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: joveler pmaydell
+X-Launchpad-Bug-Reporter: Hajin Jang (joveler)
+X-Launchpad-Bug-Modifier: Hajin Jang (joveler)
+References: <159129432300.4081.5698403082350753204.malonedeb@soybean.canonical.com>
+Message-Id: <159135944766.31675.4523233204978552419.malone@gac.canonical.com>
+Subject: [Bug 1882123] Re: ARM cpu emulation regression on QEMU 4.2.0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2cf87dc320abf0faf909db8afb31df3c040d3de0
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 04:10:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -129,143 +85,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Reply-To: Bug 1882123 <1882123@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I pinpointed the exact commits which affected the regression.
 
-Two more int types in the comment?
+[QEMU 4.2.0-rc0 : illegal hardware instruction]
+- Introduced in commit af28822
+https://github.com/qemu/qemu/commit/af2882289951e58363d714afd16f80050685fa29
+The commit affected LDREX/STREX translation, and broke dotnet command from =
+.NET Core SDK.
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+[QEMU 4.2.0-rc2 : .NET SEHException]
+- Introduced in commit 655b026
+https://github.com/qemu/qemu/commit/655b02646dc175dc10666459b0a1e4346fc8d46a
+The commit fixes STREX a bit. As a result, dotnet command is now executable=
+ except JIT compiling. =
 
-________________________________
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Sent: Thursday, June 4, 2020 8:41 PM
-To: qemu-block@nongnu.org <qemu-block@nongnu.org>
-Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; mreitz@redhat.com <mreit=
-z@redhat.com>; kwolf@redhat.com <kwolf@redhat.com>; eblake@redhat.com <ebla=
-ke@redhat.com>; Denis Lunev <den@virtuozzo.com>; Vladimir Sementsov-Ogievsk=
-iy <vsementsov@virtuozzo.com>; Andrey Shinkevich <andrey.shinkevich@virtuoz=
-zo.com>
-Subject: [PATCH v4 07/12] qcow2_format.py: separate generic functionality o=
-f structure classes
 
-We are going to introduce more Qcow2 structure types, defined like
-QcowHeader. Move generic functionality into base class to be reused for
-further structure classes.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/qcow2_format.py | 93 +++++++++++++++++++-----------
- 1 file changed, 58 insertions(+), 35 deletions(-)
+I also tested lastest HEAD from the master, and it still has the SEHExcepti=
+on regression.
+(Tested commit is 66234fee9c2d37bfbc523aa8d0ae5300a14cc10e)
 
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_=
-format.py
-index 1fd9473b7f..d71f578377 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -2,6 +2,62 @@ import struct
+-- =
 
-+
-+class Qcow2Struct(metaclass=3DQcow2StructMeta):
-+
-+    """Qcow2Struct: base class for qcow2 data structures
-+
-+    Successors should define fields class variable, which is: list of tupl=
-es,
-+    each of three elements:
-+        - c-type (one of 'u32', 'u64')
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882123
 
-u8, u16 ?
+Title:
+  ARM cpu emulation regression on QEMU 4.2.0
 
---_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Status in QEMU:
+  New
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-</head>
-<body>
-<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
-tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
-ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
-riant-caps: normal; font-weight: 400;">Two more int types
- in the comment?</span></div>
-<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
-tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
-ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
-riant-caps: normal; font-weight: 400;"><br>
-</span></div>
-<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
-tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
-ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
-riant-caps: normal; font-weight: 400;">Reviewed-by: Andrey
- Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;</span><br>
-</div>
-<div><br>
-</div>
-<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
-yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Vladimir Sementsov-Og=
-ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
-<b>Sent:</b> Thursday, June 4, 2020 8:41 PM<br>
-<b>To:</b> qemu-block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
-<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; mreitz@redh=
-at.com &lt;mreitz@redhat.com&gt;; kwolf@redhat.com &lt;kwolf@redhat.com&gt;=
-; eblake@redhat.com &lt;eblake@redhat.com&gt;; Denis Lunev &lt;den@virtuozz=
-o.com&gt;; Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt;;
- Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;<br>
-<b>Subject:</b> [PATCH v4 07/12] qcow2_format.py: separate generic function=
-ality of structure classes</font>
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
-">
-<div class=3D"PlainText">We are going to introduce more Qcow2 structure typ=
-es, defined like<br>
-QcowHeader. Move generic functionality into base class to be reused for<br>
-further structure classes.<br>
-<br>
-Signed-off-by: Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt=
-;<br>
----<br>
-&nbsp;tests/qemu-iotests/qcow2_format.py | 93 &#43;&#43;&#43;&#43;&#43;&#43=
-;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;---------=
---<br>
-&nbsp;1 file changed, 58 insertions(&#43;), 35 deletions(-)<br>
-<br>
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_=
-format.py<br>
-index 1fd9473b7f..d71f578377 100644<br>
---- a/tests/qemu-iotests/qcow2_format.py<br>
-&#43;&#43;&#43; b/tests/qemu-iotests/qcow2_format.py<br>
-@@ -2,6 &#43;2,62 @@ import struct<br>
-<br>
-&#43;<br>
-&#43;class Qcow2Struct(metaclass=3DQcow2StructMeta):<br>
-&#43;<br>
-&#43;&nbsp;&nbsp;&nbsp; &quot;&quot;&quot;Qcow2Struct: base class for qcow2=
- data structures<br>
-&#43;<br>
-&#43;&nbsp;&nbsp;&nbsp; Successors should define fields class variable, whi=
-ch is: list of tuples,<br>
-&#43;&nbsp;&nbsp;&nbsp; each of three elements:<br>
-&#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - c-type (one of 'u32', 'u6=
-4')</div>
-<div class=3D"PlainText"><br>
-</div>
-<div class=3D"PlainText">u8, u16 ?</div>
-</span></font></div>
-</body>
-</html>
+Bug description:
+  [*] Summary
 
---_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_--
+  Latest QEMU has an ARM CPU emulation regression.
+  Regression is reproducible by building any C# project with .NET Core SDK =
+3.1.300 on Debian 10 armhf guest OS.
+
+  Releases affected: QEMU 4.2.0, 5.0.0
+  Releases not affected: QEMU 4.1.0, QEMU 4.1.1
+
+  [*] Detail
+
+  .NET Core SDK 3.1 fails to run on Debian 10 emulated by qemu-system-
+  arm.
+
+  I occasionally test my C# projects on the virtual armhf/arm64 system
+  emulated by QEMU. MSBuild, a build engine of the .NET Core SDK,
+  crashes on QEMU 4.2.0 or later. The crash only happens when MSBuild
+  tries to do any JIT compiling (dotnet build / dotnet test).
+
+  I attached the MSBuild crash logs. MSBuild always crashes with
+  SEHException, which means it tried to call C binary from .NET binary.
+
+  I think the ARM CPU emulation regression happened between QEMU 4.1.1 ~
+  4.2.0. The issue affects QEMU 4.2.0 and 5.0.0. QEMU 4.1.0, 4.1.1, and
+  real Raspberry Pi 2 are not affected by this issue, and .NET Core SDK
+  works completely fine.
+
+  [*] Environment
+
+  [Host OS]
+  Distribution: Linux Mint 19.3 amd64
+  CPU: AMD Ryzen 5 3600
+  Kernel: Ubuntu 5.3.0-51-generic
+
+  [QEMU Guest OS]
+  Distribution: Debian 10 Buster armhf
+  Kernel: Debian 4.19.0-9-armmp-lpae
+  .NET Core SDK: 3.1.300
+
+  [Raspberry Pi 2]
+  Distribution: Raspberry Pi OS Buster armhf
+  Kernel: 4.19.118-v7+
+
+  [Tested C# Projects]
+  This is a list of C# projects I have tested on QEMU and RPI2.
+  - https://github.com/ied206/Joveler.DynLoader
+  - https://github.com/ied206/Joveler.Compression
+  - https://github.com/ied206/ManagedWimLib
+
+  [QEMU Launch Arguments]
+  qemu-system-arm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 3 -M virt -m 4096 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-kernel vmlinuz-4.19.0-9-armmp-lpae \
+  =C2=A0=C2=A0=C2=A0=C2=A0-initrd initrd.img-4.19.0-9-armmp-lpae \
+  =C2=A0=C2=A0=C2=A0=C2=A0-append "root=3D/dev/vda2" \
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive if=3Dnone,file=3Ddebian_arm.qcow2,format=
+=3Dqcow2,id=3Dhd \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-blk-device,drive=3Dhd \
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev user,id=3Dmynet,hostfwd=3Dtcp::<PORT>-:22=
+ \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-device,netdev=3Dmynet \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-rng-device
+
+  [QEMU Configure Arguments]
+  ./configure --enable-spice --enable-gtk --enable-vnc-jpeg --enable-vnc-pn=
+g --enable-avx2 --enable-libusb --enable-opengl --enable-virglrenderer --en=
+able-kvm --enable-system --enable-modules --audio-drv-list=3Dpa
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882123/+subscriptions
 
