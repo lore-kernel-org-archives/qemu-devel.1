@@ -2,74 +2,93 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F281DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C98C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5FCF2074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5FCF2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id DA40D2074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="l+B8P5LT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA40D2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1IH-0005aD-1R
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:37:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55994)
+	id 1jh1II-0005ch-26
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:37:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1jh1Gs-0003AQ-6U
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 21:35:47 -0400
-Received: from lucky1.263xmail.com ([211.157.147.135]:42522)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
+ id 1jh1BR-0002DB-5o; Thu, 04 Jun 2020 21:30:09 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:2775)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1jh1Go-0001dd-1s
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 21:35:45 -0400
-Received: from localhost (unknown [192.168.167.235])
- by lucky1.263xmail.com (Postfix) with ESMTP id 08255982F4;
- Fri,  5 Jun 2020 09:32:29 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [223.72.76.36])
- by smtp.263.net (postfix) whith ESMTP id
- P31252T139913132439296S1591320743394459_; 
- Fri, 05 Jun 2020 09:32:29 +0800 (CST)
-X-UNIQUE-TAG: <e6f4e6b67e5501a060b678245bee726c>
-X-RL-SENDER: chengang@emindsoft.com.cn
-X-SENDER: chengang@emindsoft.com.cn
-X-LOGIN-NAME: chengang@emindsoft.com.cn
-X-FST-TO: laurent@vivier.eu
-X-SENDER-IP: 223.72.76.36
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: chengang@emindsoft.com.cn
-To: laurent@vivier.eu,
-	riku.voipio@iki.fi
-Subject: [PATCH v7] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Date: Fri,  5 Jun 2020 09:32:21 +0800
-Message-Id: <20200605013221.22828-1-chengang@emindsoft.com.cn>
-X-Mailer: git-send-email 2.24.0.308.g228f53135a
+ (Exim 4.90_1)
+ (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
+ id 1jh1BP-00009b-V2; Thu, 04 Jun 2020 21:30:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1591320608; x=1622856608;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=aYDJIv52R35pGo+x383MSKsJbltgkUkvhSmP0kHofFc=;
+ b=l+B8P5LTqixeNLbXMeXX2p/07inxo2pUqYRTxvsaySN+xHB8csC1Jed3
+ 1TDRWY7sYsx7JoEFrU9+MFws4I9VAIXoR/yMzFmY7XfRdw+I+f/OZX35E
+ ObNp2PX4mQ1n714YDk9+q4aMfszz5cibnDg8ZLCWsnOIKEJZyhhGT15RO
+ bYKpKBibATBvvssVv6kwCb8kp4YNQHRHdWoonaiLYU0TLZGoY1vUKBt15
+ W1lC3AvzZ8qs7hhHUypN5Ddky75rQyOWGCCgbuI5TY+FyFv+CZ7RCIPsp
+ MlXZ0px0p9Rv1gtMAhky4uHq+R+XntV6B/NYf0K94M0yPEN/CCYYlsMCs w==;
+IronPort-SDR: yPX10IfgeYGMXbFvchT9MHVCXyOpdvFgj1V3yOQ0SLo0hk34W6zdLivDYTHVdQCmqX9oGtMkah
+ IpLUe0jNS6ZsuhGxwBPslnRivxgGMUtmV2Viw1gFEcidmWIiWA//xauvbRxZHuDO153WsvnGI3
+ NnSkyxULoDz3eAq6WEso3rEQBJBUFLTN3J5EylrGWwFyfV7yaHKRlTEYimyoqhYog7NrSz4DGr
+ Be5yy2dcq6+GAh+Zf7uaHnOaWDEf7pVED+DsfQnN/QrEMX8lWzH8IOeg8wTplSYt6ZVeMQG0Y3
+ 6YM=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="143573571"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:55 +0800
+IronPort-SDR: ngo/fv0omU5qYEBAa9V/uP6oXfChWE8dVYUekGCLdlEtGB5TcuFBoP7WbgvL1wAP1Sm6W4vbq1
+ +XJfGRhtFUUaAT1U9zm35vckNG7L7rTYA=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Jun 2020 18:18:57 -0700
+IronPort-SDR: bMRr1iGQjM8DTr2o/ujSmT1pV/Vka5u59ewaKUNG6ykIf9H4n6qyHsRvPet0MajoDBxFhCsBd7
+ 0eO0n3l9u+bA==
+WDCIronportException: Internal
+Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.233])
+ by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:55 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v2 09/17] target/riscv: Convert MSTATUS MTL to GVA
+Date: Thu,  4 Jun 2020 18:21:07 -0700
+Message-Id: <c4bd44f93615c74cfacfd94815ed7a47700640b4.1591319882.git.alistair@alistair23.me>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
+References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=211.157.147.135;
- envelope-from=chengang@emindsoft.com.cn; helo=lucky1.263xmail.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:35:32
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=4185f83b6=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:29:41
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,242 +101,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chengang@emindsoft.com.cn, qemu-devel@nongnu.org
+Cc: alistair.francis@wdc.com, anup.pate@wdc.com, palmer@dabbelt.com,
+ alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
-
-Another DRM_IOCTL_* commands will be done later.
-
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- configure                  | 10 ++++
- linux-user/ioctls.h        |  5 ++
- linux-user/syscall.c       | 98 ++++++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  | 15 ++++++
- linux-user/syscall_types.h | 11 +++++
- 5 files changed, 139 insertions(+)
+ target/riscv/cpu_bits.h   |  5 +++--
+ target/riscv/cpu_helper.c | 20 ++++++++++++++++----
+ target/riscv/csr.c        |  6 +++---
+ 3 files changed, 22 insertions(+), 9 deletions(-)
 
-diff --git a/configure b/configure
-index f087d2bcd1..389dbb1d09 100755
---- a/configure
-+++ b/configure
-@@ -3136,6 +3136,13 @@ if ! check_include "ifaddrs.h" ; then
-   have_ifaddrs_h=no
- fi
- 
-+#########################################
-+# libdrm check
-+have_drm_h=no
-+if check_include "libdrm/drm.h" ; then
-+    have_drm_h=yes
-+fi
-+
- ##########################################
- # VTE probe
- 
-@@ -7127,6 +7134,9 @@ fi
- if test "$have_ifaddrs_h" = "yes" ; then
-     echo "HAVE_IFADDRS_H=y" >> $config_host_mak
- fi
-+if test "$have_drm_h" = "yes" ; then
-+  echo "HAVE_DRM_H=y" >> $config_host_mak
-+fi
- if test "$have_broken_size_max" = "yes" ; then
-     echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
- fi
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0defa1d8c1..f2e2fa9c87 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -574,6 +574,11 @@
-   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
-                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
- 
-+#ifdef HAVE_DRM_H
-+  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-+#endif
-+
- #ifdef TARGET_TIOCSTART
-   IOCTL_IGNORE(TIOCSTART)
-   IOCTL_IGNORE(TIOCSTOP)
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 7f6700c54e..c0515c4378 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -112,6 +112,9 @@
- #include <linux/if_alg.h>
- #include <linux/rtc.h>
- #include <sound/asound.h>
-+#ifdef HAVE_DRM_H
-+#include <libdrm/drm.h>
-+#endif
- #include "linux_loop.h"
- #include "uname.h"
- 
-@@ -5276,6 +5279,101 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
- }
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index bb4ee3fc35..028e268faa 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -364,10 +364,10 @@
+ #define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
+ #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
+ #if defined(TARGET_RISCV64)
+-#define MSTATUS_MTL         0x4000000000ULL
++#define MSTATUS_GVA         0x4000000000ULL
+ #define MSTATUS_MPV         0x8000000000ULL
+ #elif defined(TARGET_RISCV32)
+-#define MSTATUS_MTL         0x00000040
++#define MSTATUS_GVA         0x00000040
+ #define MSTATUS_MPV         0x00000080
  #endif
  
-+#ifdef HAVE_DRM_H
-+
-+static void unlock_drm_version(struct drm_version *host_ver,
-+                               struct target_drm_version *target_ver,
-+                               bool copy)
-+{
-+    unlock_user(host_ver->name, target_ver->name,
-+                                copy ? host_ver->name_len : 0);
-+    unlock_user(host_ver->date, target_ver->date,
-+                                copy ? host_ver->date_len : 0);
-+    unlock_user(host_ver->desc, target_ver->desc,
-+                                copy ? host_ver->desc_len : 0);
-+}
-+
-+static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
-+                                          struct target_drm_version *target_ver)
-+{
-+    memset(host_ver, 0, sizeof(*host_ver));
-+
-+    __get_user(host_ver->name_len, &target_ver->name_len);
-+    if (host_ver->name_len) {
-+        host_ver->name = lock_user(VERIFY_WRITE, target_ver->name,
-+                                   target_ver->name_len, 0);
-+        if (!host_ver->name) {
-+            return -EFAULT;
-+        }
-+    }
-+
-+    __get_user(host_ver->date_len, &target_ver->date_len);
-+    if (host_ver->date_len) {
-+        host_ver->date = lock_user(VERIFY_WRITE, target_ver->date,
-+                                   target_ver->date_len, 0);
-+        if (!host_ver->date) {
-+            goto err;
-+        }
-+    }
-+
-+    __get_user(host_ver->desc_len, &target_ver->desc_len);
-+    if (host_ver->desc_len) {
-+        host_ver->desc = lock_user(VERIFY_WRITE, target_ver->desc,
-+                                   target_ver->desc_len, 0);
-+        if (!host_ver->desc) {
-+            goto err;
-+        }
-+    }
-+
-+    return 0;
-+err:
-+    unlock_drm_version(host_ver, target_ver, false);
-+    return -EFAULT;
-+}
-+
-+static inline void host_to_target_drmversion(
-+                                          struct target_drm_version *target_ver,
-+                                          struct drm_version *host_ver)
-+{
-+    __put_user(host_ver->version_major, &target_ver->version_major);
-+    __put_user(host_ver->version_minor, &target_ver->version_minor);
-+    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
-+    __put_user(host_ver->name_len, &target_ver->name_len);
-+    __put_user(host_ver->date_len, &target_ver->date_len);
-+    __put_user(host_ver->desc_len, &target_ver->desc_len);
-+    unlock_drm_version(host_ver, target_ver, true);
-+}
-+
-+static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                             int fd, int cmd, abi_long arg)
-+{
-+    struct drm_version *ver;
-+    struct target_drm_version *target_ver;
-+    abi_long ret;
-+
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_VERSION:
-+        if (!lock_user_struct(VERIFY_WRITE, target_ver, arg, 0)) {
-+            return -TARGET_EFAULT;
-+        }
-+        ver = (struct drm_version *)buf_temp;
-+        ret = target_to_host_drmversion(ver, target_ver);
-+        if (!is_error(ret)) {
-+            ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-+            if (is_error(ret)) {
-+                unlock_drm_version(ver, target_ver, false);
-+            } else {
-+                host_to_target_drmversion(target_ver, ver);
+@@ -429,6 +429,7 @@
+ #define HSTATUS_VTVM         0x00100000
+ #define HSTATUS_VTSR         0x00400000
+ #define HSTATUS_HU           0x00000200
++#define HSTATUS_GVA          0x00000040
+ 
+ #define HSTATUS32_WPRI       0xFF8FF87E
+ #define HSTATUS64_WPRI       0xFFFFFFFFFF8FF87EULL
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 1521c14b72..3b1a2f75ca 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -892,6 +892,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+         if (riscv_has_ext(env, RVH)) {
+             target_ulong hdeleg = async ? env->hideleg : env->hedeleg;
+ 
++            if (riscv_cpu_virt_enabled(env) && tval) {
++                /*
++                 * If we are writing a guest virtual address to stval, set
++                 * this to 1. If we are trapping to VS we will set this to 0
++                 * later.
++                 */
++                env->hstatus = set_field(env->hstatus, HSTATUS_GVA, 1);
 +            }
-+        }
-+        unlock_user_struct(target_ver, arg, 0);
-+        return ret;
-+    }
-+    return -TARGET_ENOSYS;
-+}
 +
-+#endif
-+
- static IOCTLEntry ioctl_entries[] = {
- #define IOCTL(cmd, access, ...) \
-     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 152ec637cb..3c261cff0e 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
- #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
- #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
+             if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
+                 !force_hs_execp) {
+                 /*
+@@ -902,6 +911,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+                     cause == IRQ_VS_EXT)
+                     cause = cause - 1;
+                 /* Trap to VS mode */
++                env->hstatus = set_field(env->hstatus, HSTATUS_GVA, 0);
+             } else if (riscv_cpu_virt_enabled(env)) {
+                 /* Trap into HS mode, from virt */
+                 riscv_cpu_swap_hypervisor_regs(env);
+@@ -950,13 +960,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+ #ifdef TARGET_RISCV32
+             env->mstatush = set_field(env->mstatush, MSTATUS_MPV,
+                                        riscv_cpu_virt_enabled(env));
+-            env->mstatush = set_field(env->mstatush, MSTATUS_MTL,
+-                                       riscv_cpu_force_hs_excep_enabled(env));
++            if (riscv_cpu_virt_enabled(env) && tval) {
++                env->mstatush = set_field(env->mstatush, MSTATUS_GVA, 1);
++            }
+ #else
+             env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
+                                       riscv_cpu_virt_enabled(env));
+-            env->mstatus = set_field(env->mstatus, MSTATUS_MTL,
+-                                      riscv_cpu_force_hs_excep_enabled(env));
++            if (riscv_cpu_virt_enabled(env) && tval) {
++                env->mstatus = set_field(env->mstatus, MSTATUS_GVA, 1);
++            }
+ #endif
  
-+/* drm ioctls */
-+#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-+
- /* from asm/termbits.h */
+             mtval2 = env->guest_phys_fault_addr;
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 53665b0985..69a3c8379c 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -335,10 +335,10 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+         MSTATUS_TW;
+ #if defined(TARGET_RISCV64)
+     /*
+-     * RV32: MPV and MTL are not in mstatus. The current plan is to
++     * RV32: MPV and GVA are not in mstatus. The current plan is to
+      * add them to mstatush. For now, we just don't support it.
+      */
+-    mask |= MSTATUS_MTL | MSTATUS_MPV;
++    mask |= MSTATUS_MPV | MSTATUS_GVA;
+ #endif
  
- #define TARGET_NCC 8
-@@ -2598,6 +2601,18 @@ struct target_mq_attr {
-     abi_long mq_curmsgs;
- };
+     mstatus = (mstatus & ~mask) | (val & mask);
+@@ -364,7 +364,7 @@ static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
+         tlb_flush(env_cpu(env));
+     }
  
-+struct target_drm_version {
-+    int version_major;
-+    int version_minor;
-+    int version_patchlevel;
-+    abi_ulong name_len;
-+    abi_ulong name;
-+    abi_ulong date_len;
-+    abi_ulong date;
-+    abi_ulong desc_len;
-+    abi_ulong desc;
-+};
-+
- #include "socket.h"
+-    val &= MSTATUS_MPV | MSTATUS_MTL;
++    val &= MSTATUS_MPV | MSTATUS_GVA;
  
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e12c1661e..e2b0484f50 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
- STRUCT(dm_target_msg,
-        TYPE_ULONGLONG) /* sector */
+     env->mstatush = val;
  
-+STRUCT(drm_version,
-+       TYPE_INT, /* version_major */
-+       TYPE_INT, /* version_minor */
-+       TYPE_INT, /* version_patchlevel */
-+       TYPE_ULONG, /* name_len */
-+       TYPE_PTRVOID, /* name */
-+       TYPE_ULONG, /* date_len */
-+       TYPE_PTRVOID, /* date */
-+       TYPE_ULONG, /* desc_len */
-+       TYPE_PTRVOID) /* desc */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
 -- 
-2.24.0.308.g228f53135a
-
-
+2.26.2
 
 
