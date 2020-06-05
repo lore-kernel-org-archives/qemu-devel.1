@@ -2,81 +2,120 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63105C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F01C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD2C206A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D38A32075B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:30:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cm7/4nWf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD2C206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KcihkD23"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38A32075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhBFB-0001e5-D5
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58040)
+	id 1jhBU8-00062b-44
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhBEV-0000p1-JP
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:13:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22664
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhBEU-0004rD-Ic
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:13:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591359237;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=SvGA44pfFz2/boo8SntBpQIHo+GR9B9PLMFVHmmUnW4=;
- b=Cm7/4nWf6H0uKXd8bHQm3XSM6bST9bz/aHH/vCCeSk2mg2Tmm9qNHXvruPeCFubvF7XjD4
- e8B4fzyYW3Q2FPHa9xHqk9RPQyqu0PvkHWYkzAZzSeoxt1ap7L04/wl69FeWf6jEBdtLCo
- D88pd9hi4Nadpg72e/4X6G6slvF9okc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-3pS72EwQNSOyNOA7HFawaA-1; Fri, 05 Jun 2020 08:13:54 -0400
-X-MC-Unique: 3pS72EwQNSOyNOA7HFawaA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5E9C83DE70;
- Fri,  5 Jun 2020 12:13:52 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4AD385C5FA;
- Fri,  5 Jun 2020 12:13:44 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] numa: forbid '-numa node,
- mem' for 5.1 and newer machine types
-Date: Fri,  5 Jun 2020 08:13:42 -0400
-Message-Id: <20200605121342.534811-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jhBTO-0005bT-LS; Fri, 05 Jun 2020 08:29:22 -0400
+Received: from mail-vi1eur05on2095.outbound.protection.outlook.com
+ ([40.107.21.95]:59072 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jhBTN-0000M9-46; Fri, 05 Jun 2020 08:29:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FzYnN15iBy+DuPJl2ClkA4jtbOKdOzxTEUC412h2CXGCln2GBYQ7vOsVlHMopj2zuu7XXw4xFv8/A3etpuH0rfsm+N7YAspqnF5EmwwdhvWk9guc8tC4YX9Ibgax3C4qY9eBnczNndqb8lgAYqGFN+FW8sOsgmCmv+vVgn6uw1n37DUeYqf2t3XzW/LrIwzvfY7Sx3ihmVLVBN10pnzdcgANFK17cYsF1VXyghyCG+mGzwB8c6vd7SZJDvJu61kqJGeqQEBhFGAQNaxgRTxALwlJ/3JhOiYHktWEuAKuvHRabd2hMYrQuUwrbN8ZKzKecz6FIGA5FFrUI9ODqqw/aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Xp8hG9JtdqzdlihkLFy13RCqSLNcUOFpdC7BWE4vGs=;
+ b=k+AEbhgOWjqcCYFOcYXVrlRsgc81UYeWhSMFS81eMdkytwo3zA4IGUIattwX20B+vXV7IalLfeEnkR4epm7V9iv0fb2JuGX4vmRapxzgxBCOfXMPJEQ4FTrV/Q2CblG3B88OQK/Y8c0ljNoS+Re1ZjqeUfsmaj8zAZctKopu5bIt0g1tXlwo4Q9aiJ1H1eyt/LqpyOpKccdyIL2IkKqlX5u6WFSiWoefZdoRs8DqlaYrBIx5oqmckAWxi20rFjoe7vjQlkGIFToTq4WNaGomL0/27RKgyaVYktY/+bIbdQNmhAdQCmZ+kyaHBJ9GGy1RT9tdclqfZyxocf8dtIDGNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Xp8hG9JtdqzdlihkLFy13RCqSLNcUOFpdC7BWE4vGs=;
+ b=KcihkD236lCONehnwYX+Fwm03W/RThsaYm0QC6dXTaj+V2M4fOPuaCJtinJjESBWjiAXa7K2xQJjt7JYDEs8Z2cxi6zTXZTesjh61+RIOqzDuyrPsHIA1XibPBPFNIcqmpaqKPQKmNw19Ga4yWeMfRenKx2JxvYMG9A1i3fYBTs=
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB4152.eurprd08.prod.outlook.com (2603:10a6:20b:a7::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.22; Fri, 5 Jun
+ 2020 12:29:17 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::2122:8358:546a:adae%3]) with mapi id 15.20.3066.022; Fri, 5 Jun 2020
+ 12:29:17 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v4 07/12] qcow2_format.py: separate generic functionality
+ of structure classes
+Thread-Topic: [PATCH v4 07/12] qcow2_format.py: separate generic functionality
+ of structure classes
+Thread-Index: AQHWOpdw2OBDPv1/70OPnvaU2KRbR6jJ8lBa
+Date: Fri, 5 Jun 2020 12:29:17 +0000
+Message-ID: <AM6PR08MB4070FDB41EB8996982EEAF1CF4860@AM6PR08MB4070.eurprd08.prod.outlook.com>
+References: <20200604174135.11042-1-vsementsov@virtuozzo.com>,
+ <20200604174135.11042-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20200604174135.11042-8-vsementsov@virtuozzo.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+x-originating-ip: [109.252.114.191]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ff0d346f-f603-4d7b-111e-08d8094c109b
+x-ms-traffictypediagnostic: AM6PR08MB4152:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB4152607A61E2CA4E80A0CED0F4860@AM6PR08MB4152.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2512;
+x-forefront-prvs: 0425A67DEF
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qP36Be9hZIuXjLedlW+klqtNeThRdSRaOMbnVWnM6ImMLxbosoSCIo70a9ejCWOWC4yyWCQmUFgmFnjIQkQmQQbnXzBQHrqozzs24f8gnJ30rehCHZt5KpUKDZZ8tHBfYiNicWmtdMfyNc5Dh/3aOHfi8rJo/sR0fRx76+xH3y+sNp8ehTAAiat4c8xJRexJJDStGLhhtL2DMX4ymGsJ9/KGP63h44nW/Rd9QFvJYuo975PFOk4kDXUxFd21ttrVfo4D+E0Cly7xd6R4qFzFeziOaazvYg0uTvD/WBWZ7mUOYGZqDipkUs3Sqc/TEKLw7sjKPgYM0kB82XFCu73tZFk3x60I1ZB4bqYjYCY62wQpBut1vSCAie7DCr0Hm+rs
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(136003)(376002)(396003)(346002)(366004)(26005)(44832011)(5660300002)(478600001)(8676002)(6506007)(76116006)(53546011)(186003)(91956017)(2906002)(8936002)(66556008)(64756008)(66946007)(33656002)(54906003)(66446008)(7696005)(71200400001)(86362001)(66476007)(83380400001)(52536014)(4326008)(9686003)(316002)(55016002)(110136005)(107886003)(41533002);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: Zmke/aAUMtDY2u2OVH3xQng8yx+jAcGETxWHCpLqA4ZJ8QSSw3+aQOV8NxU1AOpaF73qXFim2YtlROQb4oM7f2P01WvuY4H4bb9eZdfWQ6wnrSce0DMU/Uj6NwIHA7O3XHmULjnM2F+awowaGzJL+xI36tcvr9fWYA3TtyYvtB2lJkEbaBDY5nN6wemLWwfWFLkj7bSXyGQuw3q+LloLSQAjTMOA8wIXRjflT3JFeWqT4ljRjAd97yS2f1o21/Pz9bRlz1Eg6Kb+gACN1nP87Y4f3flZ7Pbfw0Tph1QcCRk3+RW8tpmOej/vFLOBMyR1zf/KqPeKyPUjEwTgzDACxhA/32Uxi5ijWRN0RqfacRZnoRBoSe5IggSAFmWBV7dnNYh8URQQkKCp4zNk83Q84foSXre3px5L17uNQ4QChm68YTXfr/BePLy49xDC1j3Ynp9tnV4rtxxVF0aSp0MBiVguwyywCUAgeHML3IAoYP+k3jsbTsyf+PTuYTn08Ot/
+Content-Type: multipart/alternative;
+ boundary="_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_"
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff0d346f-f603-4d7b-111e-08d8094c109b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2020 12:29:17.2598 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yHG+jLciY5F0DJfeHKtSC04yw4tQbweNSYB7GjpUc6BpSIlmmos37ACexry2IMfoJftY5+iRnf4Mr51y+QlCoh9mmvy2zFtZLg1zjQOq8QE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4152
+Received-SPF: pass client-ip=40.107.21.95;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 08:29:18
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -90,218 +129,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
- libvir-list@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- pbonzini@redhat.com, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deprecation period is run out and it's a time to flip the switch
-introduced by cd5ff8333a.  Disable legacy option for new machine
-types (since 5.1) and amend documentation.
+--_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-'-numa node,memdev' shall be used instead of disabled option
-with new machine types.
+Two more int types in the comment?
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
+________________________________
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Sent: Thursday, June 4, 2020 8:41 PM
+To: qemu-block@nongnu.org <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; mreitz@redhat.com <mreit=
+z@redhat.com>; kwolf@redhat.com <kwolf@redhat.com>; eblake@redhat.com <ebla=
+ke@redhat.com>; Denis Lunev <den@virtuozzo.com>; Vladimir Sementsov-Ogievsk=
+iy <vsementsov@virtuozzo.com>; Andrey Shinkevich <andrey.shinkevich@virtuoz=
+zo.com>
+Subject: [PATCH v4 07/12] qcow2_format.py: separate generic functionality o=
+f structure classes
+
+We are going to introduce more Qcow2 structure types, defined like
+QcowHeader. Move generic functionality into base class to be reused for
+further structure classes.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
-v1:
- - rebased on top of current master
- - move compat mode from 4.2 to 5.0
-v2:
- - move deprection text to recently removed section
- - pick up reviewed-bys
+ tests/qemu-iotests/qcow2_format.py | 93 +++++++++++++++++++-----------
+ 1 file changed, 58 insertions(+), 35 deletions(-)
 
-CC: peter.maydell@linaro.org
-CC: ehabkost@redhat.com
-CC: marcel.apfelbaum@gmail.com
-CC: mst@redhat.com
-CC: pbonzini@redhat.com
-CC: rth@twiddle.net
-CC: david@gibson.dropbear.id.au
-CC: libvir-list@redhat.com
-CC: qemu-arm@nongnu.org
-CC: qemu-ppc@nongnu.org
-CC: eblake@redhat.com
----
- docs/system/deprecated.rst | 37 ++++++++++++++++++++-----------------
- hw/arm/virt.c              |  2 +-
- hw/core/numa.c             |  6 ++++++
- hw/i386/pc.c               |  1 -
- hw/i386/pc_piix.c          |  1 +
- hw/i386/pc_q35.c           |  1 +
- hw/ppc/spapr.c             |  2 +-
- qemu-options.hx            |  9 +++++----
- 8 files changed, 35 insertions(+), 24 deletions(-)
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_=
+format.py
+index 1fd9473b7f..d71f578377 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -2,6 +2,62 @@ import struct
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index f0061f94aa..6f717e4a1d 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -101,23 +101,6 @@ error in the future.
- The ``-realtime mlock=on|off`` argument has been replaced by the
- ``-overcommit mem-lock=on|off`` argument.
- 
--``-numa node,mem=``\ *size* (since 4.1)
--'''''''''''''''''''''''''''''''''''''''
--
--The parameter ``mem`` of ``-numa node`` is used to assign a part of
--guest RAM to a NUMA node. But when using it, it's impossible to manage specified
--RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
--so guest end-ups with the fake NUMA configuration with suboptiomal performance.
--However since 2014 there is an alternative way to assign RAM to a NUMA node
--using parameter ``memdev``, which does the same as ``mem`` and adds
--means to actualy manage node RAM on the host side. Use parameter ``memdev``
--with *memory-backend-ram* backend as an replacement for parameter ``mem``
--to achieve the same fake NUMA effect or a properly configured
--*memory-backend-file* backend to actually benefit from NUMA configuration.
--In future new machine versions will not accept the option but it will still
--work with old machine types. User can check QAPI schema to see if the legacy
--option is supported by looking at MachineInfo::numa-mem-supported property.
--
- ``-numa`` node (without memory specified) (since 4.1)
- '''''''''''''''''''''''''''''''''''''''''''''''''''''
- 
-@@ -512,3 +495,23 @@ long starting at 1MiB, the old command::
- can be rewritten as::
- 
-   qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2
 +
-+Command line options
-+--------------------
++class Qcow2Struct(metaclass=3DQcow2StructMeta):
 +
-+``-numa node,mem=``\ *size* (removed in 5.1)
-+'''''''''''''''''''''''''''''''''''''''
++    """Qcow2Struct: base class for qcow2 data structures
 +
-+The parameter ``mem`` of ``-numa node`` is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter ``memdev``, which does the same as ``mem`` and adds
-+means to actualy manage node RAM on the host side. Use parameter ``memdev``
-+with *memory-backend-ram* backend as an replacement for parameter ``mem``
-+to achieve the same fake NUMA effect or a properly configured
-+*memory-backend-file* backend to actually benefit from NUMA configuration.
-+In future new machine versions will not accept the option but it will still
-+work with old machine types. User can check QAPI schema to see if the legacy
-+option is supported by looking at MachineInfo::numa-mem-supported property.
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 37462a6f78..063d4703f7 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2262,7 +2262,6 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     hc->pre_plug = virt_machine_device_pre_plug_cb;
-     hc->plug = virt_machine_device_plug_cb;
-     hc->unplug_request = virt_machine_device_unplug_request_cb;
--    mc->numa_mem_supported = true;
-     mc->nvdimm_supported = true;
-     mc->auto_enable_numa_with_memhp = true;
-     mc->default_ram_id = "mach-virt.ram";
-@@ -2375,6 +2374,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
- static void virt_machine_5_0_options(MachineClass *mc)
- {
-     virt_machine_5_1_options(mc);
-+    mc->numa_mem_supported = true;
- }
- DEFINE_VIRT_MACHINE(5, 0)
- 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 316bc50d75..05be412e59 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -117,6 +117,12 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     }
- 
-     if (node->has_mem) {
-+        if (!mc->numa_mem_supported) {
-+            error_setg(errp, "Parameter -numa node,mem is not supported by this"
-+                      " machine type. Use -numa node,memdev instead");
-+            return;
-+        }
-+
-         numa_info[nodenr].node_mem = node->mem;
-         if (!qtest_enabled()) {
-             warn_report("Parameter -numa node,mem is deprecated,"
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..a86136069c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1960,7 +1960,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug = pc_machine_device_unplug_cb;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported = true;
--    mc->numa_mem_supported = true;
-     mc->default_ram_id = "pc.ram";
- 
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index f66e1d73ce..8955436efa 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -438,6 +438,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
-     pc_i440fx_5_1_machine_options(m);
-     m->alias = NULL;
-     m->is_default = false;
-+    m->numa_mem_supported = true;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 4ba8ac8774..af6b32adb7 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -366,6 +366,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
- {
-     pc_q35_5_1_machine_options(m);
-     m->alias = NULL;
-+    m->numa_mem_supported = true;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
- }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3b1a5ed865..210d61d1b3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4511,7 +4511,6 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      * in which LMBs are represented and hot-added
-      */
-     mc->numa_mem_align_shift = 28;
--    mc->numa_mem_supported = true;
-     mc->auto_enable_numa = true;
- 
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-@@ -4599,6 +4598,7 @@ static void spapr_machine_5_0_class_options(MachineClass *mc)
- {
-     spapr_machine_5_1_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-+    mc->numa_mem_supported = true;
- }
- 
- DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 93bde2bbc8..196f468786 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -239,10 +239,11 @@ SRST
-         -numa node,nodeid=0 -numa node,nodeid=1 \
-         -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
- 
--    '\ ``mem``\ ' assigns a given RAM amount to a node. '\ ``memdev``\ '
--    assigns RAM from a given memory backend device to a node. If
--    '\ ``mem``\ ' and '\ ``memdev``\ ' are omitted in all nodes, RAM is
--    split equally between them.
-+    Legacy '\ ``mem``\ ' assigns a given RAM amount to a node (not supported
-+    for 5.1 and newer machine types). '\ ``memdev``\ ' assigns RAM from
-+    a given memory backend device to a node. If '\ ``mem``\ ' and
-+    '\ ``memdev``\ ' are omitted in all nodes, RAM is split equally between them.
-+
- 
-     '\ ``mem``\ ' and '\ ``memdev``\ ' are mutually exclusive.
-     Furthermore, if one node uses '\ ``memdev``\ ', all of them have to
--- 
-2.18.4
++    Successors should define fields class variable, which is: list of tupl=
+es,
++    each of three elements:
++        - c-type (one of 'u32', 'u64')
 
+u8, u16 ?
+
+--_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
+tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
+ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
+riant-caps: normal; font-weight: 400;">Two more int types
+ in the comment?</span></div>
+<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
+tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
+ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
+riant-caps: normal; font-weight: 400;"><br>
+</span></div>
+<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
+tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
+ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
+riant-caps: normal; font-weight: 400;">Reviewed-by: Andrey
+ Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;</span><br>
+</div>
+<div><br>
+</div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Vladimir Sementsov-Og=
+ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
+<b>Sent:</b> Thursday, June 4, 2020 8:41 PM<br>
+<b>To:</b> qemu-block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
+<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; mreitz@redh=
+at.com &lt;mreitz@redhat.com&gt;; kwolf@redhat.com &lt;kwolf@redhat.com&gt;=
+; eblake@redhat.com &lt;eblake@redhat.com&gt;; Denis Lunev &lt;den@virtuozz=
+o.com&gt;; Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt;;
+ Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;<br>
+<b>Subject:</b> [PATCH v4 07/12] qcow2_format.py: separate generic function=
+ality of structure classes</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
+">
+<div class=3D"PlainText">We are going to introduce more Qcow2 structure typ=
+es, defined like<br>
+QcowHeader. Move generic functionality into base class to be reused for<br>
+further structure classes.<br>
+<br>
+Signed-off-by: Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt=
+;<br>
+---<br>
+&nbsp;tests/qemu-iotests/qcow2_format.py | 93 &#43;&#43;&#43;&#43;&#43;&#43=
+;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;---------=
+--<br>
+&nbsp;1 file changed, 58 insertions(&#43;), 35 deletions(-)<br>
+<br>
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_=
+format.py<br>
+index 1fd9473b7f..d71f578377 100644<br>
+--- a/tests/qemu-iotests/qcow2_format.py<br>
+&#43;&#43;&#43; b/tests/qemu-iotests/qcow2_format.py<br>
+@@ -2,6 &#43;2,62 @@ import struct<br>
+<br>
+&#43;<br>
+&#43;class Qcow2Struct(metaclass=3DQcow2StructMeta):<br>
+&#43;<br>
+&#43;&nbsp;&nbsp;&nbsp; &quot;&quot;&quot;Qcow2Struct: base class for qcow2=
+ data structures<br>
+&#43;<br>
+&#43;&nbsp;&nbsp;&nbsp; Successors should define fields class variable, whi=
+ch is: list of tuples,<br>
+&#43;&nbsp;&nbsp;&nbsp; each of three elements:<br>
+&#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - c-type (one of 'u32', 'u6=
+4')</div>
+<div class=3D"PlainText"><br>
+</div>
+<div class=3D"PlainText">u8, u16 ?</div>
+</span></font></div>
+</body>
+</html>
+
+--_000_AM6PR08MB4070FDB41EB8996982EEAF1CF4860AM6PR08MB4070eurp_--
 
