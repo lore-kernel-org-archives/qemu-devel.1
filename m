@@ -2,98 +2,105 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF5AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3EDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:10:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB5BE2053B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:10:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G7wGumtz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5BE2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 21C56206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:10:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C56206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhEvP-0003Ot-7B
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33488)
+	id 1jhEvg-00046k-2W
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jhEu5-000236-Sw
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:09:09 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52214)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jhEu5-0007ow-0H
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:09:09 -0400
-Received: by mail-wm1-x343.google.com with SMTP id u13so8958681wml.1
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 09:09:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HFowDgHn4CBYjLaoEFTClYZH1tSts7iWWVJ2bzP7d/4=;
- b=G7wGumtzTnSbypPQtW2KHJtsrZW16TxcX+jKYPog8A+Y49HiFsc8Eg3Nimp4mYrF8L
- hpE1Rd6Knsrc43CICm31c4Vimzr/nlaYIMGr9Spxo3p93j6VRoZvJ/fDWeKuzsKwxfoz
- U1bemqHLCIccpPVZDiEUxuoKmpnwm8wpjBPzjH3jlgj73XawHfp6TOQ41oTZKG5XkQIk
- hZmgdAFg0evvOPYR7+XvNU/FL2uT1l32aLGOLJWXwGhpXn1zve67XQhPc0DZ0ADUS7ku
- eu5gfJCLtoT8UVF/4HB4rBhoyygxvQd1++eVXnIonAypLQwlMeA+34eaVbtzwYeq1k+R
- FvUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HFowDgHn4CBYjLaoEFTClYZH1tSts7iWWVJ2bzP7d/4=;
- b=q7JHgYkJATglWJOjjQgvjR+CG3Dhn8hV7lCxYXRD5gzmV8wv8su8w1EKOGviEmGQ2V
- IjqCSRNd8lrb/hZTuduXLsKQd/PaFpIxjJf8uWsyi2q7+TcXEaTci2RkkobLaveUEOGO
- +0x+u0dEL15TuBy56NDnwsRItabnzYKPTxuFL2f3yqDBjqVdJcpiVDcGjOa55OjdirZZ
- LL/wYwvT8CNDVnFmnKAzb9zJSmGRayilc7dmpBoAx3pP4PcLLlOIClJslJhDPIfhB2xY
- TQKVuvCrNhrVwu7LKG4PETrQFnfhag3moI6pSO96L6+gk6M8fuLYHaI5hWlRX9Usk4Pw
- OuEw==
-X-Gm-Message-State: AOAM530dh8Kd89mhyx7k7x8JqamZ7e7srpnO7M0xnZWK8HnMzbvIaJ0Q
- 6aFro0yQJkkqKFlAU0bHV8R/ViuF
-X-Google-Smtp-Source: ABdhPJzKRZDaqHOjQwunW/PtDPHO2s2YUm9hzSttfdlVgTULDZfzLcCHQp/x3yO4VwAY+jxkoIZhig==
-X-Received: by 2002:a05:600c:2317:: with SMTP id
- 23mr3449919wmo.139.1591373343588; 
- Fri, 05 Jun 2020 09:09:03 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id t189sm11870010wma.4.2020.06.05.09.09.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 05 Jun 2020 09:09:02 -0700 (PDT)
-Subject: Re: [PATCH 05/10] hw/rx: RX MCU and target
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20200531162427.57410-1-ysato@users.sourceforge.jp>
- <20200531162427.57410-6-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <efa08ca1-648f-2d1a-c512-9938b4918f36@amsat.org>
-Date: Fri, 5 Jun 2020 18:09:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jhEqK-0004Kn-Gk; Fri, 05 Jun 2020 12:05:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6436)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jhEqI-00072Q-Cp; Fri, 05 Jun 2020 12:05:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 055G2K42069333; Fri, 5 Jun 2020 12:05:06 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31fr7rj9w9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 05 Jun 2020 12:05:06 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055G30F3072434;
+ Fri, 5 Jun 2020 12:05:05 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31fr7rj9v0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 05 Jun 2020 12:05:05 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055G0uoi001764;
+ Fri, 5 Jun 2020 16:05:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma02fra.de.ibm.com with ESMTP id 31end6hgyd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 05 Jun 2020 16:05:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 055G50kh655828
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 5 Jun 2020 16:05:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D6DD7A4040;
+ Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 28265A404D;
+ Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.61.106])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Date: Fri, 5 Jun 2020 18:04:58 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200605180458.7646070b.pasic@linux.ibm.com>
+In-Reply-To: <20200605124535.12e8c96e.cohuck@redhat.com>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-19-david@gibson.dropbear.id.au>
+ <20200605124535.12e8c96e.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200531162427.57410-6-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-05_04:2020-06-04,
+ 2020-06-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=876
+ clxscore=1011 phishscore=0 bulkscore=0 cotscore=-2147483648 suspectscore=0
+ spamscore=0 mlxscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006050116
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 11:26:55
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,95 +114,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, "Michael
+ S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/20 6:24 PM, Yoshinori Sato wrote:
-> rx62n - RX62N MCU.
-> rx-virt - RX QEMU virtual target.
->  This has the same specifications as the gdb simulator.
+On Fri, 5 Jun 2020 12:45:35 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Thu, 21 May 2020 13:43:04 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 > 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  include/hw/rx/rx.h    |   7 ++
->  include/hw/rx/rx62n.h |  91 ++++++++++++++++
->  hw/rx/rx-virt.c       | 143 +++++++++++++++++++++++++
->  hw/rx/rx62n.c         | 240 ++++++++++++++++++++++++++++++++++++++++++
->  hw/rx/Kconfig         |  13 +++
->  hw/rx/Makefile.objs   |   2 +
->  6 files changed, 496 insertions(+)
->  create mode 100644 include/hw/rx/rx.h
->  create mode 100644 include/hw/rx/rx62n.h
->  create mode 100644 hw/rx/rx-virt.c
->  create mode 100644 hw/rx/rx62n.c
->  create mode 100644 hw/rx/Kconfig
->  create mode 100644 hw/rx/Makefile.objs
+> > The default behaviour for virtio devices is not to use the platforms normal
+> > DMA paths, but instead to use the fact that it's running in a hypervisor
+> > to directly access guest memory.  That doesn't work if the guest's memory
+> > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+> > 
+> > So, if a guest memory protection mechanism is enabled, then apply the
+> > iommu_platform=on option so it will go through normal DMA mechanisms.
+> > Those will presumably have some way of marking memory as shared with the
+> > hypervisor or hardware so that DMA will work.
 > 
-[...]
-> +static void register_tmr(RX62NState *s, int unit)
-> +{
-> +    SysBusDevice *tmr;
-> +    int i, irqbase;
-> +
-> +    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
-> +                            sizeof(RTMRState), TYPE_RENESAS_8TMR,
-> +                            &error_abort, NULL);
-> +
-> +    tmr = SYS_BUS_DEVICE(&s->tmr[unit]);
-> +    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
-> +
-> +    qdev_init_nofail(DEVICE(tmr));
-> +    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
-> +    irqbase = RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
-> +    for (i = 0; i < TMR_NR_IRQ; i++) {
-> +        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
-> +    }
-> +}
-> +
-> +static void register_cmt(RX62NState *s, int unit)
-> +{
-> +    SysBusDevice *cmt;
-> +    int i, irqbase;
-> +
-> +    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
-> +                            sizeof(RTIMERState), TYPE_RENESAS_TIMER,
-> +                            &error_abort, NULL);
-> +
-> +    cmt = SYS_BUS_DEVICE(&s->cmt[unit]);
-> +    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
-> +    qdev_prop_set_int32(DEVICE(cmt), "feature", RTIMER_FEAT_CMT);
+> cc: Halil, who had been looking at the interaction of virtio-ccw
+> devices and s390 protected virt.
+> 
+> (IIRC, we wanted to try with a on/off/auto property for virtio-ccw?)
 
-OK, single logical change, no problem.
+Thanks Connie! I will definitely look into this. And regarding
+on/off/auto I will try to send out something today.
 
-> +    qdev_init_nofail(DEVICE(cmt));
-> +    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
-> +    irqbase = RX62N_CMT_IRQBASE + TIMER_CH_CMT * unit;
-> +    for (i = 0; i < TIMER_CH_CMT; i++) {
-> +        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
-> +    }
-> +}
-> +
-> +static void register_sci(RX62NState *s, int unit)
-> +{
-> +    SysBusDevice *sci;
-> +    int i, irqbase;
-> +
-> +    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
-> +                            sizeof(RSCIState), TYPE_RENESAS_SCI,
-> +                            &error_abort, NULL);
-> +    sci = SYS_BUS_DEVICE(&s->sci[unit]);
-> +
-> +    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
-> +    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
-> +    qdev_prop_set_int32(DEVICE(sci), "feature", SCI_FEAT_SCIA);
-> +    qdev_prop_set_int32(DEVICE(sci), "register-size", 8);
-> +    qdev_init_nofail(DEVICE(sci));
-> +    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
-> +    irqbase = RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
-> +    for (i = 0; i < SCI_NR_IRQ; i++) {
-> +        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
-> +    }
-> +}[...]
-
+Regards,
+Halil
 
